@@ -1,0 +1,161 @@
+{\rtf1\ansi\ansicpg1252\cocoartf1404\cocoasubrtf340
+{\fonttbl\f0\fswiss\fcharset0 Helvetica;\f1\fmodern\fcharset0 CourierNewPSMT;}
+{\colortbl;\red255\green255\blue255;}
+\margl1440\margr1440\vieww9000\viewh8400\viewkind0
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0\fs24 \cf0 \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\qc\partightenfactor0
+
+\b \cf0 Command and Control Port Interface Control Document
+\b0 \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+\cf0 \
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\b \cf0 Purpose:
+\b0 \
+\
+This document describes the JSON protocol used to communicate over the Command and Control port of a Swiftfire server. It defines how the parameters, telemetry and commands should be send and how the reply will be structured.\
+\
+\
+
+\b Target audience:
+\b0 \
+\
+Developers building consoles or making changes to a Swiftfire server.\
+\
+
+\b \
+1. Definitions and acronyms:
+\b0 \
+\
+Message: A JSON formatted string sent to a Swiftfire server.\
+Reply: A JSON formatted string sent by a Swiftfire server in response to a message.\
+LogLine: A JSON formatted string sent by a Swiftfire server in response to an internal event.\
+\
+M&C: Monitoring and Control\
+\
+\
+
+\b 2. General description:
+\b0 \
+\
+A Swiftfire server is a free running application without any GUI elements. As such a user cannot control its operation except by starting and stopping the server and changing the default parameters in the configuration file. However all Swiftfire servers are listening on a Unix port for Monitoring and Control messages. It is through these messages and the replies thereon that a Swiftfire server can be monitored and controlled. In addition to the normal M&C messages a Swiftfire server can generate LogLine messages in response to events in the server. A user can start a Console application and attach that Console application to a Swiftfire server that is already running. The Console application will generally have a GUI through which the user can monitor and control the Swiftfire server operations. The messages, replies and loglines are formatted using the JSON standard.\
+\
+\
+
+\b 3. Protocol description:
+\b0 \
+\
+All messages and replies will be formatted according to the JSON standard, using a subset of ASCII-only characters.\
+All messages and replies will only use ASCII characters with character codes 0x20 through 0x7E.\
+TAB, BLANK, LINEFEED and CARRIAGE RETURN characters may be used to create a better humanly readable file, however they will be ignored when interpreting the JSON code.\
+Unicode characters are not supported.\
+There is no defined behaviour if not-supported characters are used.\
+\
+All name strings (of a JSON name/value pair) are case insensitive.\
+\
+
+\b 4. Messages:
+\b0 \
+\
+A message consists of a command string and a payload:\
+\
+
+\f1 Message = \{<Command>:<Payload>\}\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\f0 \cf0 \
+The following commands are available:\
+\
+\pard\tx566\tx1133\tx1700\tx2267\tx2834\tx3401\tx3968\tx4535\tx5102\tx5669\tx6236\tx6803\pardirnatural\partightenfactor0
+
+\b \cf0 4.1 Start
+\b0 \
+\
+Starts servicing HTTP requests.\
+\
+This command has no additional parameters, The payload is therefore a JSON NULL.\
+\
+Example:  
+\f1 \{"Start":null\}
+\f0 \
+\
+
+\b 4.2 Stop
+\b0 \
+\
+Stops servicing HTTP requests.\
+\
+This command has no additional parameters, The payload is therefore a JSON NULL.\
+\
+Example:  
+\f1 \{"Stop":null\}
+\f0 \
+\
+
+\b 4.3 Quit
+\b0 \
+\
+Quits the Swiftfire server. No further communication is possible with the Swiftfire Server after this command is given, until the Swiftfire Server is started again manually.\
+\
+This command has no additional parameters, The payload is therefore a JSON NULL.\
+\
+Example:  
+\f1 \{"Quit":null\}
+\f0 \
+\
+
+\b 4.4 Read
+\b0 \
+\
+Requests the return of the value of a parameter or telemetry component identified by the Id following the command.\
+\
+Example:  
+\f1 \{"Read":"ServicePortNumber"\}
+\f0 \
+\
+For a list of parameters that can be read, refer to the file MacDef.swift\
+\
+A read command is the only command which will evoke a reply.\
+\
+The reply is structured as a Parameter Id followed by it's value.\
+\
+Example 1: 
+\f1 \{"ServicePortNumber":"80"\}
+\f0 \
+Example 2: 
+\f1 \{"NetworkTarget":\{"Address":"localhost","port":"1234"\}\}
+\f0 \
+\
+If a Read command contains an error, no reply will be generated.\
+\
+
+\b 4.5 Write
+\b0 : \
+\
+Requests the update of a parameter. The parameter to be updated and its value are contained in a JSON object contained by the command JSON object.\
+\
+Example:  
+\f1 \{"Write":\{"ServicePortNumber":"8800"\}\}
+\f0 \
+\
+Note: Only one parameter/value object may be present.\
+\
+For a list of parameters that can be updated, refer to the MacDef.swift\
+\
+
+\b \
+5. Reply:
+\b0 \
+\
+Except for the READ commands, there is no reply for a message. See the read command for a description of those replies.\
+\
+\
+\
+=== End of document ===\
+\
+\
+\
+}

@@ -1,0 +1,36 @@
+{
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyRepositoryLocationsKey" : {
+
+  },
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
+    "39D294A3A0619F7440CBCF677E29AAE955CC1617" : 0,
+    "5B20DC5A3688C85EB1A5785522EE90A45D6C6FB2" : 0,
+    "4112BE80E1590C6E997D243FD2B2107DD98EDD52" : 0
+  },
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "C445D5E9-C2B7-459B-BD6E-A74D58AED0BB",
+  "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
+    "39D294A3A0619F7440CBCF677E29AAE955CC1617" : "..\/SwifterJSON\/SwifterJSON",
+    "5B20DC5A3688C85EB1A5785522EE90A45D6C6FB2" : "..\/SwifterSockets\/SwifterSockets",
+    "4112BE80E1590C6E997D243FD2B2107DD98EDD52" : "..\/SwifterLog\/SwifterLog"
+  },
+  "DVTSourceControlWorkspaceBlueprintNameKey" : "Swiftfire",
+  "DVTSourceControlWorkspaceBlueprintVersion" : 204,
+  "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "Swiftfire.xcodeproj",
+  "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/starbase56.local\/git\/SwifterJSON.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "39D294A3A0619F7440CBCF677E29AAE955CC1617"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/starbase56.local\/git\/SwifterLog.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "4112BE80E1590C6E997D243FD2B2107DD98EDD52"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/starbase56.local\/git\/SwifterSockets.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "5B20DC5A3688C85EB1A5785522EE90A45D6C6FB2"
+    }
+  ]
+}

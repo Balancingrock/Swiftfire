@@ -1,0 +1,554 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 46;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		864C6EFC1CC23DE400C60220 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6EFB1CC23DE400C60220 /* main.swift */; };
+		864C6F2A1CC23F5200C60220 /* Telemetry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F1F1CC23F5200C60220 /* Telemetry.swift */; };
+		864C6F2B1CC23F5200C60220 /* HttpResponseCodes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F201CC23F5200C60220 /* HttpResponseCodes.swift */; };
+		864C6F2C1CC23F5200C60220 /* HttpHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F211CC23F5200C60220 /* HttpHeader.swift */; };
+		864C6F2D1CC23F5200C60220 /* Domain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F221CC23F5200C60220 /* Domain.swift */; };
+		864C6F2E1CC23F5200C60220 /* Domain.HttpSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F231CC23F5200C60220 /* Domain.HttpSupport.swift */; };
+		864C6F2F1CC23F5200C60220 /* Domains.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F241CC23F5200C60220 /* Domains.swift */; };
+		864C6F301CC23F5200C60220 /* FileURLs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F251CC23F5200C60220 /* FileURLs.swift */; };
+		864C6F311CC23F5200C60220 /* Parameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F261CC23F5200C60220 /* Parameters.swift */; };
+		864C6F321CC23F5200C60220 /* HttpConnectionPool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F271CC23F5200C60220 /* HttpConnectionPool.swift */; };
+		864C6F331CC23F5200C60220 /* Startup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F281CC23F5200C60220 /* Startup.swift */; };
+		864C6F341CC23F5200C60220 /* Host.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F291CC23F5200C60220 /* Host.swift */; };
+		864C6F371CC23F5F00C60220 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F351CC23F5F00C60220 /* Extensions.swift */; };
+		864C6F381CC23F5F00C60220 /* UInt8Buffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F361CC23F5F00C60220 /* UInt8Buffer.swift */; };
+		864C6F3F1CC23F7E00C60220 /* AcceptAndDispatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F3A1CC23F7E00C60220 /* AcceptAndDispatch.swift */; };
+		864C6F401CC23F7E00C60220 /* HttpConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F3B1CC23F7E00C60220 /* HttpConnection.swift */; };
+		864C6F411CC23F7E00C60220 /* HttpConnection.DataEndDetector.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F3C1CC23F7E00C60220 /* HttpConnection.DataEndDetector.swift */; };
+		864C6F421CC23F7E00C60220 /* HttpConnection.HttpWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F3D1CC23F7E00C60220 /* HttpConnection.HttpWorker.swift */; };
+		864C6F431CC23F7E00C60220 /* HttpConnection.Forwarding.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F3E1CC23F7E00C60220 /* HttpConnection.Forwarding.swift */; };
+		864C6F471CC23F9F00C60220 /* MonitoringAndControlLoop.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F451CC23F9F00C60220 /* MonitoringAndControlLoop.swift */; };
+		864C6F481CC23F9F00C60220 /* MacDef.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F461CC23F9F00C60220 /* MacDef.swift */; };
+		864C6F5D1CC2406600C60220 /* DomainTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F5B1CC2406600C60220 /* DomainTest.swift */; };
+		864C6F5E1CC2406600C60220 /* UInt8BufferTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F5C1CC2406600C60220 /* UInt8BufferTest.swift */; };
+		864C6F621CC243AF00C60220 /* asl-bridge.m in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F601CC243AF00C60220 /* asl-bridge.m */; };
+		864C6F631CC243AF00C60220 /* SwifterLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F611CC243AF00C60220 /* SwifterLog.swift */; };
+		864C6F661CC2470300C60220 /* ASCII.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F641CC2470300C60220 /* ASCII.swift */; };
+		864C6F671CC2470300C60220 /* VJson.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F651CC2470300C60220 /* VJson.swift */; };
+		864C6F6E1CC2472100C60220 /* SwifterSockets.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F681CC2472100C60220 /* SwifterSockets.swift */; };
+		864C6F6F1CC2472100C60220 /* SwifterSockets.InitServer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F691CC2472100C60220 /* SwifterSockets.InitServer.swift */; };
+		864C6F701CC2472100C60220 /* SwifterSockets.InitClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F6A1CC2472100C60220 /* SwifterSockets.InitClient.swift */; };
+		864C6F711CC2472100C60220 /* SwifterSockets.Transmit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F6B1CC2472100C60220 /* SwifterSockets.Transmit.swift */; };
+		864C6F721CC2472100C60220 /* SwifterSockets.Receive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F6C1CC2472100C60220 /* SwifterSockets.Receive.swift */; };
+		864C6F731CC2472100C60220 /* SwifterSockets.Accept.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F6D1CC2472100C60220 /* SwifterSockets.Accept.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXCopyFilesBuildPhase section */
+		864C6EF61CC23DE400C60220 /* CopyFiles */ = {
+			isa = PBXCopyFilesBuildPhase;
+			buildActionMask = 2147483647;
+			dstPath = /usr/share/man/man1/;
+			dstSubfolderSpec = 0;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 1;
+		};
+/* End PBXCopyFilesBuildPhase section */
+
+/* Begin PBXFileReference section */
+		864C6EF81CC23DE400C60220 /* Swiftfire */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Swiftfire; sourceTree = BUILT_PRODUCTS_DIR; };
+		864C6EFB1CC23DE400C60220 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
+		864C6F021CC23EAE00C60220 /* Swiftfire-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Swiftfire-Bridging-Header.h"; sourceTree = "<group>"; };
+		864C6F1F1CC23F5200C60220 /* Telemetry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Telemetry.swift; sourceTree = "<group>"; };
+		864C6F201CC23F5200C60220 /* HttpResponseCodes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HttpResponseCodes.swift; sourceTree = "<group>"; };
+		864C6F211CC23F5200C60220 /* HttpHeader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HttpHeader.swift; sourceTree = "<group>"; };
+		864C6F221CC23F5200C60220 /* Domain.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Domain.swift; sourceTree = "<group>"; };
+		864C6F231CC23F5200C60220 /* Domain.HttpSupport.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Domain.HttpSupport.swift; sourceTree = "<group>"; };
+		864C6F241CC23F5200C60220 /* Domains.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Domains.swift; sourceTree = "<group>"; };
+		864C6F251CC23F5200C60220 /* FileURLs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileURLs.swift; sourceTree = "<group>"; };
+		864C6F261CC23F5200C60220 /* Parameters.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Parameters.swift; sourceTree = "<group>"; };
+		864C6F271CC23F5200C60220 /* HttpConnectionPool.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HttpConnectionPool.swift; sourceTree = "<group>"; };
+		864C6F281CC23F5200C60220 /* Startup.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Startup.swift; sourceTree = "<group>"; };
+		864C6F291CC23F5200C60220 /* Host.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Host.swift; sourceTree = "<group>"; };
+		864C6F351CC23F5F00C60220 /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
+		864C6F361CC23F5F00C60220 /* UInt8Buffer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UInt8Buffer.swift; sourceTree = "<group>"; };
+		864C6F3A1CC23F7E00C60220 /* AcceptAndDispatch.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AcceptAndDispatch.swift; sourceTree = "<group>"; };
+		864C6F3B1CC23F7E00C60220 /* HttpConnection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HttpConnection.swift; sourceTree = "<group>"; };
+		864C6F3C1CC23F7E00C60220 /* HttpConnection.DataEndDetector.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HttpConnection.DataEndDetector.swift; sourceTree = "<group>"; };
+		864C6F3D1CC23F7E00C60220 /* HttpConnection.HttpWorker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HttpConnection.HttpWorker.swift; sourceTree = "<group>"; };
+		864C6F3E1CC23F7E00C60220 /* HttpConnection.Forwarding.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HttpConnection.Forwarding.swift; sourceTree = "<group>"; };
+		864C6F441CC23F9F00C60220 /* MAC-InterfaceControlDocument.rtf */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.rtf; path = "MAC-InterfaceControlDocument.rtf"; sourceTree = "<group>"; };
+		864C6F451CC23F9F00C60220 /* MonitoringAndControlLoop.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MonitoringAndControlLoop.swift; sourceTree = "<group>"; };
+		864C6F461CC23F9F00C60220 /* MacDef.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MacDef.swift; sourceTree = "<group>"; };
+		864C6F4B1CC23FE400C60220 /* ToDo */ = {isa = PBXFileReference; lastKnownFileType = text; path = ToDo; sourceTree = "<group>"; };
+		864C6F4C1CC23FE400C60220 /* Improvements */ = {isa = PBXFileReference; lastKnownFileType = text; path = Improvements; sourceTree = "<group>"; };
+		864C6F4D1CC23FE400C60220 /* Feature Requests */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Feature Requests"; sourceTree = "<group>"; };
+		864C6F531CC2405100C60220 /* UnitTesting.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = UnitTesting.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
+		864C6F571CC2405100C60220 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		864C6F5B1CC2406600C60220 /* DomainTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DomainTest.swift; sourceTree = "<group>"; };
+		864C6F5C1CC2406600C60220 /* UInt8BufferTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UInt8BufferTest.swift; sourceTree = "<group>"; };
+		864C6F5F1CC243AF00C60220 /* asl-bridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "asl-bridge.h"; path = "../../../SwifterLog/SwifterLog/SwifterLog/asl-bridge.h"; sourceTree = "<group>"; };
+		864C6F601CC243AF00C60220 /* asl-bridge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "asl-bridge.m"; path = "../../../SwifterLog/SwifterLog/SwifterLog/asl-bridge.m"; sourceTree = "<group>"; };
+		864C6F611CC243AF00C60220 /* SwifterLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwifterLog.swift; path = ../../../SwifterLog/SwifterLog/SwifterLog/SwifterLog.swift; sourceTree = "<group>"; };
+		864C6F641CC2470300C60220 /* ASCII.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ASCII.swift; path = ../../../SwifterJSON/SwifterJSON/SwifterJSON/ASCII.swift; sourceTree = "<group>"; };
+		864C6F651CC2470300C60220 /* VJson.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = VJson.swift; path = ../../../SwifterJSON/SwifterJSON/SwifterJSON/VJson.swift; sourceTree = "<group>"; };
+		864C6F681CC2472100C60220 /* SwifterSockets.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwifterSockets.swift; path = ../../../SwifterSockets/SwifterSockets/SwifterSockets/SwifterSockets.swift; sourceTree = "<group>"; };
+		864C6F691CC2472100C60220 /* SwifterSockets.InitServer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwifterSockets.InitServer.swift; path = ../../../SwifterSockets/SwifterSockets/SwifterSockets/SwifterSockets.InitServer.swift; sourceTree = "<group>"; };
+		864C6F6A1CC2472100C60220 /* SwifterSockets.InitClient.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwifterSockets.InitClient.swift; path = ../../../SwifterSockets/SwifterSockets/SwifterSockets/SwifterSockets.InitClient.swift; sourceTree = "<group>"; };
+		864C6F6B1CC2472100C60220 /* SwifterSockets.Transmit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwifterSockets.Transmit.swift; path = ../../../SwifterSockets/SwifterSockets/SwifterSockets/SwifterSockets.Transmit.swift; sourceTree = "<group>"; };
+		864C6F6C1CC2472100C60220 /* SwifterSockets.Receive.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwifterSockets.Receive.swift; path = ../../../SwifterSockets/SwifterSockets/SwifterSockets/SwifterSockets.Receive.swift; sourceTree = "<group>"; };
+		864C6F6D1CC2472100C60220 /* SwifterSockets.Accept.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwifterSockets.Accept.swift; path = ../../../SwifterSockets/SwifterSockets/SwifterSockets/SwifterSockets.Accept.swift; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		864C6EF51CC23DE400C60220 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		864C6F501CC2405100C60220 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		864C6EEF1CC23DE400C60220 = {
+			isa = PBXGroup;
+			children = (
+				864C6F061CC23EC100C60220 /* Bridge */,
+				864C6F0C1CC23EF200C60220 /* SwifterLog */,
+				864C6F111CC23F1700C60220 /* SwifterJSON */,
+				864C6F1E1CC23F3400C60220 /* SwifterSockets */,
+				864C6F391CC23F6500C60220 /* Utils */,
+				864C6EFA1CC23DE400C60220 /* Swiftfire */,
+				864C6F4E1CC23FEC00C60220 /* Documentation */,
+				864C6F541CC2405100C60220 /* UnitTesting */,
+				864C6EF91CC23DE400C60220 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		864C6EF91CC23DE400C60220 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				864C6EF81CC23DE400C60220 /* Swiftfire */,
+				864C6F531CC2405100C60220 /* UnitTesting.xctest */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+		864C6EFA1CC23DE400C60220 /* Swiftfire */ = {
+			isa = PBXGroup;
+			children = (
+				864C6F1F1CC23F5200C60220 /* Telemetry.swift */,
+				864C6F201CC23F5200C60220 /* HttpResponseCodes.swift */,
+				864C6F211CC23F5200C60220 /* HttpHeader.swift */,
+				864C6F221CC23F5200C60220 /* Domain.swift */,
+				864C6F231CC23F5200C60220 /* Domain.HttpSupport.swift */,
+				864C6F241CC23F5200C60220 /* Domains.swift */,
+				864C6F251CC23F5200C60220 /* FileURLs.swift */,
+				864C6F261CC23F5200C60220 /* Parameters.swift */,
+				864C6F281CC23F5200C60220 /* Startup.swift */,
+				864C6F291CC23F5200C60220 /* Host.swift */,
+				864C6EFB1CC23DE400C60220 /* main.swift */,
+				864C6F3A1CC23F7E00C60220 /* AcceptAndDispatch.swift */,
+				864C6F4A1CC23FBE00C60220 /* HttpConnection */,
+				864C6F491CC23FA900C60220 /* Monitoring and Control */,
+			);
+			path = Swiftfire;
+			sourceTree = "<group>";
+		};
+		864C6F061CC23EC100C60220 /* Bridge */ = {
+			isa = PBXGroup;
+			children = (
+				864C6F021CC23EAE00C60220 /* Swiftfire-Bridging-Header.h */,
+			);
+			name = Bridge;
+			path = Swiftfire;
+			sourceTree = "<group>";
+		};
+		864C6F0C1CC23EF200C60220 /* SwifterLog */ = {
+			isa = PBXGroup;
+			children = (
+				864C6F5F1CC243AF00C60220 /* asl-bridge.h */,
+				864C6F601CC243AF00C60220 /* asl-bridge.m */,
+				864C6F611CC243AF00C60220 /* SwifterLog.swift */,
+			);
+			name = SwifterLog;
+			path = Swiftfire;
+			sourceTree = "<group>";
+		};
+		864C6F111CC23F1700C60220 /* SwifterJSON */ = {
+			isa = PBXGroup;
+			children = (
+				864C6F641CC2470300C60220 /* ASCII.swift */,
+				864C6F651CC2470300C60220 /* VJson.swift */,
+			);
+			name = SwifterJSON;
+			path = Swiftfire;
+			sourceTree = "<group>";
+		};
+		864C6F1E1CC23F3400C60220 /* SwifterSockets */ = {
+			isa = PBXGroup;
+			children = (
+				864C6F681CC2472100C60220 /* SwifterSockets.swift */,
+				864C6F691CC2472100C60220 /* SwifterSockets.InitServer.swift */,
+				864C6F6A1CC2472100C60220 /* SwifterSockets.InitClient.swift */,
+				864C6F6B1CC2472100C60220 /* SwifterSockets.Transmit.swift */,
+				864C6F6C1CC2472100C60220 /* SwifterSockets.Receive.swift */,
+				864C6F6D1CC2472100C60220 /* SwifterSockets.Accept.swift */,
+			);
+			name = SwifterSockets;
+			path = Swiftfire;
+			sourceTree = "<group>";
+		};
+		864C6F391CC23F6500C60220 /* Utils */ = {
+			isa = PBXGroup;
+			children = (
+				864C6F351CC23F5F00C60220 /* Extensions.swift */,
+				864C6F361CC23F5F00C60220 /* UInt8Buffer.swift */,
+			);
+			name = Utils;
+			path = Swiftfire;
+			sourceTree = "<group>";
+		};
+		864C6F491CC23FA900C60220 /* Monitoring and Control */ = {
+			isa = PBXGroup;
+			children = (
+				864C6F441CC23F9F00C60220 /* MAC-InterfaceControlDocument.rtf */,
+				864C6F451CC23F9F00C60220 /* MonitoringAndControlLoop.swift */,
+				864C6F461CC23F9F00C60220 /* MacDef.swift */,
+			);
+			name = "Monitoring and Control";
+			sourceTree = "<group>";
+		};
+		864C6F4A1CC23FBE00C60220 /* HttpConnection */ = {
+			isa = PBXGroup;
+			children = (
+				864C6F271CC23F5200C60220 /* HttpConnectionPool.swift */,
+				864C6F3B1CC23F7E00C60220 /* HttpConnection.swift */,
+				864C6F3C1CC23F7E00C60220 /* HttpConnection.DataEndDetector.swift */,
+				864C6F3D1CC23F7E00C60220 /* HttpConnection.HttpWorker.swift */,
+				864C6F3E1CC23F7E00C60220 /* HttpConnection.Forwarding.swift */,
+			);
+			name = HttpConnection;
+			sourceTree = "<group>";
+		};
+		864C6F4E1CC23FEC00C60220 /* Documentation */ = {
+			isa = PBXGroup;
+			children = (
+				864C6F4B1CC23FE400C60220 /* ToDo */,
+				864C6F4C1CC23FE400C60220 /* Improvements */,
+				864C6F4D1CC23FE400C60220 /* Feature Requests */,
+			);
+			name = Documentation;
+			path = Swiftfire;
+			sourceTree = "<group>";
+		};
+		864C6F541CC2405100C60220 /* UnitTesting */ = {
+			isa = PBXGroup;
+			children = (
+				864C6F5B1CC2406600C60220 /* DomainTest.swift */,
+				864C6F5C1CC2406600C60220 /* UInt8BufferTest.swift */,
+				864C6F571CC2405100C60220 /* Info.plist */,
+			);
+			path = UnitTesting;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		864C6EF71CC23DE400C60220 /* Swiftfire */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 864C6EFF1CC23DE400C60220 /* Build configuration list for PBXNativeTarget "Swiftfire" */;
+			buildPhases = (
+				864C6EF41CC23DE400C60220 /* Sources */,
+				864C6EF51CC23DE400C60220 /* Frameworks */,
+				864C6EF61CC23DE400C60220 /* CopyFiles */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = Swiftfire;
+			productName = Swiftfire;
+			productReference = 864C6EF81CC23DE400C60220 /* Swiftfire */;
+			productType = "com.apple.product-type.tool";
+		};
+		864C6F521CC2405100C60220 /* UnitTesting */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = 864C6F581CC2405100C60220 /* Build configuration list for PBXNativeTarget "UnitTesting" */;
+			buildPhases = (
+				864C6F4F1CC2405100C60220 /* Sources */,
+				864C6F501CC2405100C60220 /* Frameworks */,
+				864C6F511CC2405100C60220 /* Resources */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = UnitTesting;
+			productName = UnitTesting;
+			productReference = 864C6F531CC2405100C60220 /* UnitTesting.xctest */;
+			productType = "com.apple.product-type.bundle.unit-test";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		864C6EF01CC23DE400C60220 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				LastSwiftUpdateCheck = 0730;
+				LastUpgradeCheck = 0730;
+				ORGANIZATIONNAME = "Marinus van der Lugt";
+				TargetAttributes = {
+					864C6EF71CC23DE400C60220 = {
+						CreatedOnToolsVersion = 7.3;
+					};
+					864C6F521CC2405100C60220 = {
+						CreatedOnToolsVersion = 7.3;
+					};
+				};
+			};
+			buildConfigurationList = 864C6EF31CC23DE400C60220 /* Build configuration list for PBXProject "Swiftfire" */;
+			compatibilityVersion = "Xcode 3.2";
+			developmentRegion = English;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+			);
+			mainGroup = 864C6EEF1CC23DE400C60220;
+			productRefGroup = 864C6EF91CC23DE400C60220 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				864C6EF71CC23DE400C60220 /* Swiftfire */,
+				864C6F521CC2405100C60220 /* UnitTesting */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXResourcesBuildPhase section */
+		864C6F511CC2405100C60220 /* Resources */ = {
+			isa = PBXResourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXResourcesBuildPhase section */
+
+/* Begin PBXSourcesBuildPhase section */
+		864C6EF41CC23DE400C60220 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				864C6F371CC23F5F00C60220 /* Extensions.swift in Sources */,
+				864C6F311CC23F5200C60220 /* Parameters.swift in Sources */,
+				864C6F2A1CC23F5200C60220 /* Telemetry.swift in Sources */,
+				864C6EFC1CC23DE400C60220 /* main.swift in Sources */,
+				864C6F721CC2472100C60220 /* SwifterSockets.Receive.swift in Sources */,
+				864C6F731CC2472100C60220 /* SwifterSockets.Accept.swift in Sources */,
+				864C6F661CC2470300C60220 /* ASCII.swift in Sources */,
+				864C6F421CC23F7E00C60220 /* HttpConnection.HttpWorker.swift in Sources */,
+				864C6F471CC23F9F00C60220 /* MonitoringAndControlLoop.swift in Sources */,
+				864C6F6F1CC2472100C60220 /* SwifterSockets.InitServer.swift in Sources */,
+				864C6F6E1CC2472100C60220 /* SwifterSockets.swift in Sources */,
+				864C6F2B1CC23F5200C60220 /* HttpResponseCodes.swift in Sources */,
+				864C6F671CC2470300C60220 /* VJson.swift in Sources */,
+				864C6F2E1CC23F5200C60220 /* Domain.HttpSupport.swift in Sources */,
+				864C6F301CC23F5200C60220 /* FileURLs.swift in Sources */,
+				864C6F711CC2472100C60220 /* SwifterSockets.Transmit.swift in Sources */,
+				864C6F631CC243AF00C60220 /* SwifterLog.swift in Sources */,
+				864C6F481CC23F9F00C60220 /* MacDef.swift in Sources */,
+				864C6F411CC23F7E00C60220 /* HttpConnection.DataEndDetector.swift in Sources */,
+				864C6F321CC23F5200C60220 /* HttpConnectionPool.swift in Sources */,
+				864C6F2C1CC23F5200C60220 /* HttpHeader.swift in Sources */,
+				864C6F621CC243AF00C60220 /* asl-bridge.m in Sources */,
+				864C6F701CC2472100C60220 /* SwifterSockets.InitClient.swift in Sources */,
+				864C6F431CC23F7E00C60220 /* HttpConnection.Forwarding.swift in Sources */,
+				864C6F2F1CC23F5200C60220 /* Domains.swift in Sources */,
+				864C6F381CC23F5F00C60220 /* UInt8Buffer.swift in Sources */,
+				864C6F401CC23F7E00C60220 /* HttpConnection.swift in Sources */,
+				864C6F3F1CC23F7E00C60220 /* AcceptAndDispatch.swift in Sources */,
+				864C6F341CC23F5200C60220 /* Host.swift in Sources */,
+				864C6F331CC23F5200C60220 /* Startup.swift in Sources */,
+				864C6F2D1CC23F5200C60220 /* Domain.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+		864C6F4F1CC2405100C60220 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				864C6F5E1CC2406600C60220 /* UInt8BufferTest.swift in Sources */,
+				864C6F5D1CC2406600C60220 /* DomainTest.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		864C6EFD1CC23DE400C60220 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = dwarf;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MTL_ENABLE_DEBUG_INFO = YES;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = macosx;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		864C6EFE1CC23DE400C60220 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_CXX_LANGUAGE_STANDARD = "gnu++0x";
+				CLANG_CXX_LIBRARY = "libc++";
+				CLANG_ENABLE_MODULES = YES;
+				CLANG_ENABLE_OBJC_ARC = YES;
+				CLANG_WARN_BOOL_CONVERSION = YES;
+				CLANG_WARN_CONSTANT_CONVERSION = YES;
+				CLANG_WARN_DIRECT_OBJC_ISA_USAGE = YES_ERROR;
+				CLANG_WARN_EMPTY_BODY = YES;
+				CLANG_WARN_ENUM_CONVERSION = YES;
+				CLANG_WARN_INT_CONVERSION = YES;
+				CLANG_WARN_OBJC_ROOT_CLASS = YES_ERROR;
+				CLANG_WARN_UNREACHABLE_CODE = YES;
+				CLANG_WARN__DUPLICATE_METHOD_MATCH = YES;
+				CODE_SIGN_IDENTITY = "-";
+				COPY_PHASE_STRIP = NO;
+				DEBUG_INFORMATION_FORMAT = "dwarf-with-dsym";
+				ENABLE_NS_ASSERTIONS = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				GCC_C_LANGUAGE_STANDARD = gnu99;
+				GCC_NO_COMMON_BLOCKS = YES;
+				GCC_WARN_64_TO_32_BIT_CONVERSION = YES;
+				GCC_WARN_ABOUT_RETURN_TYPE = YES_ERROR;
+				GCC_WARN_UNDECLARED_SELECTOR = YES;
+				GCC_WARN_UNINITIALIZED_AUTOS = YES_AGGRESSIVE;
+				GCC_WARN_UNUSED_FUNCTION = YES;
+				GCC_WARN_UNUSED_VARIABLE = YES;
+				MACOSX_DEPLOYMENT_TARGET = 10.11;
+				MTL_ENABLE_DEBUG_INFO = NO;
+				SDKROOT = macosx;
+			};
+			name = Release;
+		};
+		864C6F001CC23DE400C60220 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "Swiftfire/Swiftfire-Bridging-Header.h";
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+			};
+			name = Debug;
+		};
+		864C6F011CC23DE400C60220 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				CLANG_ENABLE_MODULES = YES;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_OBJC_BRIDGING_HEADER = "Swiftfire/Swiftfire-Bridging-Header.h";
+			};
+			name = Release;
+		};
+		864C6F591CC2405100C60220 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = UnitTesting/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = nl.balancingrock.UnitTesting;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Debug;
+		};
+		864C6F5A1CC2405100C60220 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				COMBINE_HIDPI_IMAGES = YES;
+				INFOPLIST_FILE = UnitTesting/Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = "$(inherited) @executable_path/../Frameworks @loader_path/../Frameworks";
+				PRODUCT_BUNDLE_IDENTIFIER = nl.balancingrock.UnitTesting;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		864C6EF31CC23DE400C60220 /* Build configuration list for PBXProject "Swiftfire" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				864C6EFD1CC23DE400C60220 /* Debug */,
+				864C6EFE1CC23DE400C60220 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		864C6EFF1CC23DE400C60220 /* Build configuration list for PBXNativeTarget "Swiftfire" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				864C6F001CC23DE400C60220 /* Debug */,
+				864C6F011CC23DE400C60220 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		864C6F581CC2405100C60220 /* Build configuration list for PBXNativeTarget "UnitTesting" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				864C6F591CC2405100C60220 /* Debug */,
+				864C6F5A1CC2405100C60220 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+	};
+	rootObject = 864C6EF01CC23DE400C60220 /* Project object */;
+}
