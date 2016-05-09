@@ -26,13 +26,26 @@ This is an early public release and I do not consider this code ready for prime 
 
 However: It does work! :-)
 
+#Usage
+
+Swiftfire needs the files from SwifterLog, SwifterSockets and SwifterJSON as source files.
+To this end I created a workspace with 5 projects (6 actually), all of the above mentioned packages.
+The I drag & drop the group with the source files from (for example) SwifterLog and drop them in Swiftfire. In the dialogue I make sure that the files are not copied, only referenced. That is basically it, compile & run...
+
 #Features
+
 - Webserver for static websites
 - Handles multiple domains
 - Client forwarding (to other hosts or a different port on the same host)
 
 #Version history
 
-####V0.9.0
+####v0.9.1
+
+- Minor changes to accomodate changes in SwifterSockets/SwifterLog/SwifterJSON
+- Added 'descriptionWithSeparator' to Extensions.swift
+- Added release tags
+
+####v0.9.0
 
 - Initial public release

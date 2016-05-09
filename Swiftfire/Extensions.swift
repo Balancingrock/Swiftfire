@@ -3,27 +3,27 @@
 //  File:       Extensions.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.0
+//  Version:    0.9.1
 //
 //  Author:     Marinus van der Lugt
 //  Website:    http://www.balancingrock.nl/swiftfire.html
+//  Blog:       http://swiftrien.blogspot.com
+//  Git:        https://github.com/Swiftrien/Swiftfire
 //
 //  Copyright:  (c) 2014-2016 Marinus van der Lugt, All rights reserved.
 //
-//  License:    Use this code any way you like with the following three provision:
+//  License:    Use or redistribute this code any way you like with the following two provision:
 //
-//  1) You are NOT ALLOWED to redistribute this source code.
-//
-//  2) You ACCEPT this source code AS IS without any guarantees that it will work as intended. Any liability from its
+//  1) You ACCEPT this source code AS IS without any guarantees that it will work as intended. Any liability from its
 //  use is YOURS.
 //
-//  3) You WILL NOT seek compensation for possible damages from the author or balancingrock.nl.
+//  2) You WILL NOT seek damages from the author or balancingrock.nl.
 //
 //  I also ask you to please leave this header with the source code.
 //
-//  I strongly believe that NAP is the way for societies to function optimally. I thus reject the implicit use of force
-//  to extract payment. Since I cannot negotiate with you about the price of this code, I have choosen to leave it up to
-//  you to determine its price. You pay me whatever you think this code is worth to you.
+//  I strongly believe that the Non Agression Principle is the way for societies to function optimally. I thus reject
+//  the implicit use of force to extract payment. Since I cannot negotiate with you about the price of this code, I
+//  have choosen to leave it up to you to determine its price. You pay me whatever you think this code is worth to you.
 //
 //   - You can send payment via paypal to: sales@balancingrock.nl
 //   - Or wire bitcoins to: 1GacSREBxPy1yskLMc9de2nofNv2SNdwqH
@@ -33,7 +33,7 @@
 //
 //  If you like to pay in another way, please contact me at rien@balancingrock.nl
 //
-//  (It is always a good idea to visit the website/google to ensure that you actually pay me and not some imposter)
+//  (It is always a good idea to visit the website/blog/google to ensure that you actually pay me and not some imposter)
 //
 //  For private and non-profit use the suggested price is the price of 1 good cup of coffee, say $4.
 //  For commercial use the suggested price is the price of 1 good meal, say $20.
@@ -47,6 +47,7 @@
 // =====================================================================================================================
 //
 // History
+// w0.9.1 - Added 'descriptionWithSeparator'
 // v0.9.0 - Initial release
 // =====================================================================================================================
 
@@ -85,5 +86,13 @@ extension Dictionary {
             elements.append(e)
         }
         return elements
+    }
+}
+
+extension CollectionType {
+    
+    func descriptionWithSeparator(separator: String) -> String {
+        if let item = first { return reduce("\(item)") { $0 + separator + "\($1)" } }
+        return ""
     }
 }
