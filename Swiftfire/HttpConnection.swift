@@ -3,7 +3,7 @@
 //  File:       HttpConnection.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.0
+//  Version:    0.9.2
 //
 //  Author:     Marinus van der Lugt
 //  Website:    http://www.balancingrock.nl/swiftfire.html
@@ -47,6 +47,8 @@
 // =====================================================================================================================
 //
 // History
+//
+// v0.9.2 - Replaced sendXXXX functions with httpErrorResponseWithCode and httpResponseWithCode
 // v0.9.0 - Initial release
 // =====================================================================================================================
 
@@ -292,65 +294,57 @@ extension HttpConnection {
 }
 
 
-// Helpers for transmission of short error messages to the client
+// Helpers for the creation of messages to the client
 
 extension HttpConnection {
 
     /**
-     Creates a header for the given code and encloses the given body in a HTML header/body statement before transmitting the resulting message.
-     This is a conveniance operation for error-replies that need a little additional detail in the body.
+     Builds a buffer with a HTTP error response in it. The response will contain an error code, and can contain a specified error message as well.
      
-     - Parameter code: The http responsecode to be used.
-     - Parameter title: This string will be included as the header title of the Http Response, if nil, then the raw value of the error code will be used.
-     - Parameter body: This string will be included in a <body>text</body> in the body part if present, if nil, then the raw value of the error code will be used.
+     - Parameter code: The HTTP Response Code to be included in the header.
+     - Parameter message: The HTML code to be included as visible message to the client. Note that any text should be enclosed in (at a minimum) a paragraph (<p>...</p>).
+     
+     - Returns: The buffer with the response.
+     
+     - Note: If the message contains characters that cannot be converted to an UTF8 string, then the response will not contain any visible data.
      */
     
-    func sendMessageWithCode(code: HttpResponseCode, title: String?, body: String?) {
+    func httpErrorResponseWithCode(code: HttpResponseCode, andMessage message: String? = nil) -> UInt8Buffer {
         
+        let message = message ?? "HTTP Request rejected with: \(code.rawValue)"
         
-        // Create the payload
-        
-        let titleString = title ?? code.rawValue
-        let bodyString = body ?? code.rawValue
-        
-        let httpPayload =
+        let body =
             "<!DOCTYPE HTML PUBLIC \"-//W3C//DTD HTML 4.01 Transitional//EN\" \"http://www.w3.org/TR/html4/loose.dtd\">" + CRLF +
-            "<html><head><title>\(titleString)</title></head>" + CRLF +
-            "<body>\(bodyString)</body></html>" + CRLF
+                "<html><head><title>\(code.rawValue)</title></head>" + CRLF +
+                "<body>\(message)</body></html>" + CRLF
         
-        sendMessageWithCode(code, body: httpPayload)
+        let bodyData = body.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: true) ?? NSData()
+        
+        let response = httpResponseWithCode(code, andBody: bodyData)
+        
+        return response
     }
     
     
     /**
-     Creates a header for the given code and transmits the resulting message.
+     Builds a buffer with a HTTP response.
      
-     - Note: This function is for convenience, not speed. Use "transferToClient" to avoid uneccesary copying of data.
+     - Parameter code: The code to be used in the header.
+     - Parameter andBody: The body to be included.
      
-     - Parameter code: The http responsecode to be used.
-     - Parameter body: This will be included as the body part of the message. It should consist of a valid HTML document.
+     - Return: A buffer with the response.
      */
     
-    func sendMessageWithCode(code: HttpResponseCode, body: String) {
+    func httpResponseWithCode(code: HttpResponseCode, andBody body: NSData) -> UInt8Buffer {
         
-        
-        // Create the response header
-        
-        let httpHeader = "HTTP/1.1 " + code.rawValue + CRLF +
+        let header = "HTTP/1.1 " + code.rawValue + CRLF +
             "Date: \(NSDate())" + CRLF +
             "Server: Swiftfire/\(Parameters.version)" + CRLF +
             "Content-Type: text/html; charset=UTF-8" + CRLF +
-            "Content-Length: \(body.lengthOfBytesUsingEncoding(NSUTF8StringEncoding))" + CRLFCRLF
+            "Content-Length: \(body.length)" + CRLFCRLF
         
-        let dataBuffer = (httpHeader + body).dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: true)!
+        let headerData = header.dataUsingEncoding(NSUTF8StringEncoding)
         
-        let buffer = UInt8Buffer(sizeInBytes: dataBuffer.length)
-        
-        buffer.add(UnsafePointer<UInt8>(dataBuffer.bytes), length: dataBuffer.length)
-
-        
-        // Transfer the message to the client (if possible)
-        
-        transferToClient(buffer)
+        return UInt8Buffer(buffers: headerData, body)
     }
 }

@@ -3,7 +3,7 @@
 //  File:       Domain.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.0
+//  Version:    0.9.2
 //
 //  Author:     Marinus van der Lugt
 //  Website:    http://www.balancingrock.nl/swiftfire.html
@@ -47,6 +47,9 @@
 // =====================================================================================================================
 //
 // History
+//
+// v0.9.2 - Removed 'final' from the class definition
+//        - Added enableHttpPreprocessor, enableHttpPostprocessor, httpWorkerPreprocessor and httpWorkerPostprocessor
 // v0.9.0 - Initial release
 // =====================================================================================================================
 
@@ -68,7 +71,7 @@ protocol DomainNameChangeListener {
 }
 
 
-final class Domain: Equatable, CustomStringConvertible {
+class Domain: Equatable, CustomStringConvertible {
     
     // These are used for the item identifiers and the titles of the items in the outline view, therefore they cannot be static. (Each item displayed must have a unique id = "AnyObject"))
     
@@ -183,6 +186,16 @@ final class Domain: Equatable, CustomStringConvertible {
     var nameChangeListener: DomainNameChangeListener?
     
     
+    /// Enables a http pre-processor
+    
+    var enableHttpPreprocessor = false
+    
+    
+    /// Enables the http post-processor
+    
+    var enableHttpPostprocessor = false
+    
+    
     /// The JSON representation for this object
     
     var json: VJson {
@@ -268,6 +281,37 @@ final class Domain: Equatable, CustomStringConvertible {
         }
         
         return changed
+    }
+    
+    
+    /**
+     If the property "enableHttpPreprocessor" is set to true, then this function will be called. The return value must be a valid HTTP Response or nil. If a non-nil is returned the content of the returned buffer will be provided as the response for the request. If a non-nil is returned the default httpWorker will NOT be called. Also the postprocessor will NOT be called if a non-nil is returned. Hence the preprocessor must implement updating of telemetry and the maintenance of logs.
+    
+     - Parameter header: The HTTP header as reqeived from the client.
+     - Parameter body: The HTTP body as received from the client, may have length zero.
+     - Parameter connection: The active connection for this request.
+    
+     - Returns: Either nil, or a valid HTTP response.
+     */
+    
+    func httpWorkerPreprocessor(header header: HttpHeader, body: UInt8Buffer, connection: HttpConnection) -> UInt8Buffer? {
+        return nil
+    }
+    
+    
+    /**
+     If the property "enableHttpPostprocessor" is set to true and the httpWorkerPreprocessor (if called) returned a nil, then this operation will be called after the default implementation prepared the response. The return value must be a valid HTTP Response or nil. If a non-nil is returned the content of the returned buffer will be provided as the response for the request instead of the result from the default httpWorker.
+
+     - Parameter header: The HTTP header as reqeived from the client.
+     - Parameter body: The HTTP body as received from the client, may have length zero.
+     - Parameter response: The response as prepared by the (default) httpWorker, note that this might be an error reply.
+     - Parameter connection: The active connection for this request.
+
+     - Returns: Either nil, or a valid HTTP response.
+     */
+    
+    func httpWorkerPostprocessor(header header: HttpHeader, body: UInt8Buffer, response: UInt8Buffer, connection: HttpConnection) -> UInt8Buffer? {
+        return nil
     }
 }
 

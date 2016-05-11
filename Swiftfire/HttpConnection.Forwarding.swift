@@ -3,7 +3,7 @@
 //  File:       HttpConnection.Forwarding.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.0
+//  Version:    0.9.2
 //
 //  Author:     Marinus van der Lugt
 //  Website:    http://www.balancingrock.nl/swiftfire.html
@@ -47,6 +47,8 @@
 // =====================================================================================================================
 //
 // History
+// v0.9.2 - Minor adjustment to forwardingOpenConnection
+//        - Replaced sendMessageWithCode with httpErrorResponseWithCode
 // v0.9.0 - Initial release
 // =====================================================================================================================
 
@@ -73,23 +75,22 @@ extension HttpConnection {
     
     func forwardingOpenConnection(host: Host) {
         
-        if forwardingSocket == nil {
+        do {
             
-            do {
-                
-                forwardingSocket = try SwifterSockets.initClientOrThrow(address: host.address, port: (host.port ?? Parameters.asString(ParameterId.SERVICE_PORT_NUMBER)))
-                
-                
-                // Start the receiver
-                
-                dispatch_async(forwardingReceiverQueue, {[unowned self] in self.forwardingReceiverLoop() })
-
-            } catch {
-                
-                log.atLevelError(id: logId, source: #file.source(#function, #line), message: "Could not open connection to \(host).")
-                sendMessageWithCode(HttpResponseCode.CODE_502_Bad_Gateway, body: "<p>Forwarding failed, server not reachable.</p>")
-                forwardingCloseConnection()
-            }
+            forwardingSocket = try SwifterSockets.initClientOrThrow(address: host.address, port: (host.port ?? Parameters.asString(ParameterId.SERVICE_PORT_NUMBER)))
+            
+            
+            // Start the receiver
+            
+            dispatch_async(forwardingReceiverQueue, {[unowned self] in self.forwardingReceiverLoop() })
+            
+        } catch {
+            
+            log.atLevelError(id: logId, source: #file.source(#function, #line), message: "Could not open connection to \(host).")
+            let response = httpErrorResponseWithCode(.CODE_502_Bad_Gateway, andMessage: "<p>Forwarding failed, server not reachable.</p>")
+            transferToClient(response)
+            
+            forwardingCloseConnection()
         }
     }
     
@@ -109,9 +110,10 @@ extension HttpConnection {
         
         if forwardingSocket == nil {
             
-            sendMessageWithCode(HttpResponseCode.CODE_502_Bad_Gateway, body: "<p>Forwarding failed, server not reachable.</p>")
+            let response = httpErrorResponseWithCode(.CODE_502_Bad_Gateway, andMessage: "<p>Forwarding failed, server not reachable.</p>")
+            transferToClient(response)
             return
-        
+            
         } else {
 
             do {
@@ -120,7 +122,9 @@ extension HttpConnection {
                 
             } catch {
                 
-                sendMessageWithCode(HttpResponseCode.CODE_502_Bad_Gateway, body: "<p>Forwarding failed, server not reachable, not responding or generating connection errors.</p>")
+                let response = httpErrorResponseWithCode(.CODE_502_Bad_Gateway, andMessage: "<p>Forwarding failed, server not reachable, not responding or generating connection errors.</p>")
+                transferToClient(response)
+                
                 forwardingCloseConnection()
             }
         }

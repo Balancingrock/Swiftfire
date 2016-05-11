@@ -12,7 +12,7 @@
 		864C6F2B1CC23F5200C60220 /* HttpResponseCodes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F201CC23F5200C60220 /* HttpResponseCodes.swift */; };
 		864C6F2C1CC23F5200C60220 /* HttpHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F211CC23F5200C60220 /* HttpHeader.swift */; };
 		864C6F2D1CC23F5200C60220 /* Domain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F221CC23F5200C60220 /* Domain.swift */; };
-		864C6F2E1CC23F5200C60220 /* Domain.HttpSupport.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F231CC23F5200C60220 /* Domain.HttpSupport.swift */; };
+		864C6F2E1CC23F5200C60220 /* Domain.HttpWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F231CC23F5200C60220 /* Domain.HttpWorker.swift */; };
 		864C6F2F1CC23F5200C60220 /* Domains.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F241CC23F5200C60220 /* Domains.swift */; };
 		864C6F301CC23F5200C60220 /* FileURLs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F251CC23F5200C60220 /* FileURLs.swift */; };
 		864C6F311CC23F5200C60220 /* Parameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F261CC23F5200C60220 /* Parameters.swift */; };
@@ -63,7 +63,7 @@
 		864C6F201CC23F5200C60220 /* HttpResponseCodes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HttpResponseCodes.swift; sourceTree = "<group>"; };
 		864C6F211CC23F5200C60220 /* HttpHeader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HttpHeader.swift; sourceTree = "<group>"; };
 		864C6F221CC23F5200C60220 /* Domain.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Domain.swift; sourceTree = "<group>"; };
-		864C6F231CC23F5200C60220 /* Domain.HttpSupport.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Domain.HttpSupport.swift; sourceTree = "<group>"; };
+		864C6F231CC23F5200C60220 /* Domain.HttpWorker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Domain.HttpWorker.swift; sourceTree = "<group>"; };
 		864C6F241CC23F5200C60220 /* Domains.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Domains.swift; sourceTree = "<group>"; };
 		864C6F251CC23F5200C60220 /* FileURLs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileURLs.swift; sourceTree = "<group>"; };
 		864C6F261CC23F5200C60220 /* Parameters.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Parameters.swift; sourceTree = "<group>"; };
@@ -149,15 +149,13 @@
 				864C6F1F1CC23F5200C60220 /* Telemetry.swift */,
 				864C6F201CC23F5200C60220 /* HttpResponseCodes.swift */,
 				864C6F211CC23F5200C60220 /* HttpHeader.swift */,
-				864C6F221CC23F5200C60220 /* Domain.swift */,
-				864C6F231CC23F5200C60220 /* Domain.HttpSupport.swift */,
-				864C6F241CC23F5200C60220 /* Domains.swift */,
 				864C6F251CC23F5200C60220 /* FileURLs.swift */,
 				864C6F261CC23F5200C60220 /* Parameters.swift */,
 				864C6F281CC23F5200C60220 /* Startup.swift */,
 				864C6F291CC23F5200C60220 /* Host.swift */,
 				864C6EFB1CC23DE400C60220 /* main.swift */,
 				864C6F3A1CC23F7E00C60220 /* AcceptAndDispatch.swift */,
+				86F49FBD1CE1CF0000AFEE55 /* Domains */,
 				864C6F4A1CC23FBE00C60220 /* HttpConnection */,
 				864C6F491CC23FA900C60220 /* Monitoring and Control */,
 			);
@@ -262,6 +260,16 @@
 			path = UnitTesting;
 			sourceTree = "<group>";
 		};
+		86F49FBD1CE1CF0000AFEE55 /* Domains */ = {
+			isa = PBXGroup;
+			children = (
+				864C6F221CC23F5200C60220 /* Domain.swift */,
+				864C6F231CC23F5200C60220 /* Domain.HttpWorker.swift */,
+				864C6F241CC23F5200C60220 /* Domains.swift */,
+			);
+			name = Domains;
+			sourceTree = "<group>";
+		};
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
@@ -364,7 +372,7 @@
 				864C6F6E1CC2472100C60220 /* SwifterSockets.swift in Sources */,
 				864C6F2B1CC23F5200C60220 /* HttpResponseCodes.swift in Sources */,
 				864C6F671CC2470300C60220 /* VJson.swift in Sources */,
-				864C6F2E1CC23F5200C60220 /* Domain.HttpSupport.swift in Sources */,
+				864C6F2E1CC23F5200C60220 /* Domain.HttpWorker.swift in Sources */,
 				864C6F301CC23F5200C60220 /* FileURLs.swift in Sources */,
 				864C6F711CC2472100C60220 /* SwifterSockets.Transmit.swift in Sources */,
 				864C6F631CC243AF00C60220 /* SwifterLog.swift in Sources */,

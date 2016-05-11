@@ -3,7 +3,7 @@
 //  File:       HttpConnection.HttpWorker.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.0
+//  Version:    0.9.2
 //
 //  Author:     Marinus van der Lugt
 //  Website:    http://www.balancingrock.nl/swiftfire.html
@@ -47,6 +47,9 @@
 // =====================================================================================================================
 //
 // History
+//
+// v0.9.2 - Made forwarding case cleaner
+//        - Moved the code that provides a response to the Domain class
 // v0.9.0 - Initial release
 // =====================================================================================================================
 
@@ -67,267 +70,50 @@ extension HttpConnection {
     func httpWorker(header header: HttpHeader, body: UInt8Buffer) {
         
         
-        // =================================================================================================================
+        // =============================================================================================================
         // Find the domain this request is for
-        // =================================================================================================================
+        // =============================================================================================================
         
         guard let host = header.host else {
-            log.atLevelDebug(id: logId, source: SOURCE + ".\(#function).\(#line)", message: "Could not extract host from HttpHeader")
-            handleHttpCode400()
+            log.atLevelDebug(id: logId, source: SOURCE + ".\(#function).\(#line)", message: "Could not extract host from Http Request Header")
+            let response = httpErrorResponseWithCode(.CODE_400_Bad_Request, andMessage: "<p>Could not extract host from Http Request Header<p>")
+            transferToClient(response)
             return
         }
         
         guard let domain = domains.enabledDomainForName(host.address) else {
             log.atLevelDebug(id: logId, source: SOURCE + ".\(#function).\(#line)", message: "Domain not found for host: \(host.address), port: \(host.port)")
-            handleHttpCode400()
+            let response = httpErrorResponseWithCode(.CODE_400_Bad_Request, andMessage: "<p>Domain not found for host: \(host.address), port: \(host.port)</p>")
+            transferToClient(response)
             return
         }
         
         
-        // =================================================================================================================
+        // =============================================================================================================
         // Evaluate forwarding
-        // =================================================================================================================
+        // =============================================================================================================
         //
         // In case of forwarding do not check other header fields, simply transfer everything to the new destination.
         
         if domain.forwardHost != nil {
-            forwardingOpenConnection(domain.forwardHost!)
-            forwardingTransmit(UInt8Buffer(buffers: header.asUInt8Buffer(), body))
+            if forwardingSocket == nil { forwardingOpenConnection(domain.forwardHost!) }
+            if forwardingSocket != nil { forwardingTransmit(UInt8Buffer(buffers: header.asUInt8Buffer(), body)) }
             // The forwarding connection will be closed when the forwarding target closes its connection. Until then all data received from the forwarding target will be routed to the client.
             return
         }
         
         
-        // =================================================================================================================
-        // The header must be HTML version 1.1
-        // =================================================================================================================
-        
-        guard let httpVersion = header.httpVersion where httpVersion == HttpVersion.HTTP_1_1 else {
-            log.atLevelDebug(id: logId, source: SOURCE + "\(#function).\(#line)", message: "HTTP Version not present or not 1.1")
-            handleHttpCode505()
-            return
-        }
-        
-        
-        // =================================================================================================================
-        // It must be either a GET or POST operation
-        // =================================================================================================================
-        
-        guard let operation = header.operation else {
-            log.atLevelDebug(id: logId, source: SOURCE + "\(#function).\(#line)", message: "Could not extract operation")
-            handleHttpCode400()
-            return
-        }
-        
-        guard (operation == HttpOperation.GET || operation == HttpOperation.POST) else {
-            log.atLevelDebug(id: logId, source: SOURCE + "\(#function).\(#line)", message: "Operation not a GET or POST")
-            handleHttpCode501()
-            return
-        }
-        
-        
-        // =================================================================================================================
-        // Determine the resource path
-        // =================================================================================================================
-        
-        guard let partialPath = header.url else {
-            log.atLevelDebug(id: logId, source: SOURCE + "\(#function).\(#line)", message: "No URL found")
-            handleHttpCode400()
-            return
-        }
-        let path = (domain.root as NSString).stringByAppendingPathComponent(partialPath)
-        
-        
-        // =================================================================================================================
-        // Check if the resource exists in the file system
-        // =================================================================================================================
-        
-        if !filemanager.fileExistsAtPath(path) { handleHttpCode404() }
-        
-        
-        // =================================================================================================================
-        // Directory access is not allowed, but the index.html or index.htm will be returned if a directory is accessed and
-        // it contains such a file
-        // =================================================================================================================
-        
-        guard let resourcePath = filterForDirectoryAccess(path) else {
-            handleDirAccessNotAllowed()
-            return
-        }
+        // =============================================================================================================
+        // The domain takes over from here
+        // =============================================================================================================
 
-        
-        // =================================================================================================================
-        // Fetch the requested resource and return it
-        // =================================================================================================================
-        
-        let responsePayload = createResponsePayloadForResourceAtPath(resourcePath)
-        
-        if responsePayload == nil { handleHttpCode500WithText("A Server side error occured, the error has been logged.") }
-        
-        
-        // =================================================================================================================
-        // Create the http header for the response
-        // =================================================================================================================
-        
-        let responseHeaderString = "HTTP/1.1 " + HttpResponseCode.CODE_200_OK.rawValue + CRLF +
-            "Date: \(NSDate())" + CRLF +
-            "Server: Swiftfire/\(Parameters.version)" + CRLF +
-            "Content-Type: text/html; charset=UTF-8" + CRLF +
-            "Content-Length: \(responsePayload!.length)" + CRLFCRLF
-        
-        let responseHeader = responseHeaderString.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: true)!
-        
-        
-        // =================================================================================================================
-        // Add header and payload together
-        // =================================================================================================================
-        
-        let response = UInt8Buffer(sizeInBytes: responseHeader.length + responsePayload!.length)
-        
-        response.add(responseHeader)
-        response.add(responsePayload!)
-        
-        
-        // =================================================================================================================
-        // Increase the total number of replies
-        // =================================================================================================================
-        
-        telemetry.nofSuccessfulHttpReplies.increment()
-        
+        let response = domain.httpWorker(header, body: body, connection: self)
+
         
         // =================================================================================================================
         // Transfer the reply
         // =================================================================================================================
         
         transferToClient(response)
-    }
-    
-    
-    private func handleHttpCode400() {
-        telemetry.nofHttp400Replies.increment()
-        handleHttpErrorCode(.CODE_400_Bad_Request)
-    }
-    
-    
-    private func handleHttpCode404() {
-        telemetry.nofHttp404Replies.increment()
-        handleHttpErrorCode(.CODE_404_Not_Found)
-    }
-    
-    
-    private func handleHttpCode500WithText(text: String) {
-        
-        telemetry.nofHttp500Replies.increment()
-        
-        log.atLevelError(id: logId, source: #file.source(#function, #line), message: "Failure while creating HTTP Response")
-        
-        sendMessageWithCode(
-            HttpResponseCode.CODE_500_Internal_Server_Error,
-            title: nil,
-            body: "<p>\(text)</p>")
-    }
-    
-    
-    private func handleHttpCode501() {
-        telemetry.nofHttp501Replies.increment()
-        handleHttpErrorCode(.CODE_501_Not_Implemented)
-    }
-    
-    
-    private func handleHttpCode505() {
-        telemetry.nofHttp505Replies.increment()
-        handleHttpErrorCode(.CODE_505_HTTP_Version_Not_Supported)
-    }
-    
-    
-    private func handleHttpErrorCode(code: HttpResponseCode) {
-        
-        let message = "HTTP Request rejected with: \(code.rawValue)"
-        log.atLevelNotice(id: logId, source: #file.source(#function, #line), message: message)
-        
-        sendMessageWithCode(code, title: nil, body: nil)
-    }
-    
-    
-    private func handleDirAccessNotAllowed() {
-        let message = "<p>Directory access not allowed</p>"
-        sendMessageWithCode(HttpResponseCode.CODE_403_Forbidden, body: message)
-    }
-    
-    
-    /// - Returns: The resource path ammended by index.html or index.htm
-    
-    private func filterForDirectoryAccess(path: String) -> String? {
-        
-        
-        // GP
-        
-        var isDirectory: ObjCBool = false
-        
-        
-        // Test the unmodified path
-        
-        if filemanager.fileExistsAtPath(path, isDirectory: &isDirectory) {
-            if !isDirectory {
-                return path
-            }
-        } else {
-            return nil
-        }
-        
-        
-        // The path exists, but it is a directory.
-        
-        
-        // Check for an 'index.html' file
-        
-        let tpath = (path as NSString).stringByAppendingPathComponent("index.html")
-        
-        if filemanager.fileExistsAtPath(tpath, isDirectory: &isDirectory) {
-            if !isDirectory {
-                return tpath
-            }
-        } else {
-            return nil
-        }
-        
-        
-        // Check for an 'index.htm' file
-        
-        let t2path = (path as NSString).stringByAppendingPathComponent("index.html")
-        
-        if filemanager.fileExistsAtPath(t2path, isDirectory: &isDirectory) {
-            if !isDirectory {
-                return t2path
-            }
-        } else {
-            return nil
-        }
-        
-        
-        // Failed, the directory exists, but no default file is present.
-        // Access is denied
-        
-        return nil
-    }
-    
-    
-    // A simple implementation that can serve plain file html pages.
-    // - Returns: The contents of the file at the path given by the ap_WebsiteDirectory and the requested URL
-    
-    private func createResponsePayloadForResourceAtPath(path: String) -> NSData? {
-        
-        if filemanager.isReadableFileAtPath(path) {
-            if let data = filemanager.contentsAtPath(path) {
-                log.atLevelDebug(id: logId, source: SOURCE + ".createHttpResponse", message: "Returning file: " + path)
-                return data
-            } else {
-                log.atLevelError(id: logId, source: #file.source(#function, #line), message: "Failed to read file: \(path)")
-                return nil
-            }
-        } else {
-            log.atLevelError(id: logId, source: #file.source(#function, #line), message: "No read access rights for file at: \(path)")
-            return nil
-        }
     }
 }
