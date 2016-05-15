@@ -3,7 +3,7 @@
 //  File:       AcceptAndDispatch.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.0
+//  Version:    0.9.3
 //
 //  Author:     Marinus van der Lugt
 //  Website:    http://www.balancingrock.nl/swiftfire.html
@@ -47,6 +47,8 @@
 // =====================================================================================================================
 //
 // History
+//
+// v0.9.3 - Renamed telemetry to serverTelemetry
 // v0.9.0 - Initial release
 // =====================================================================================================================
 
@@ -141,7 +143,7 @@ func acceptAndDispatch(socket: Int32) {
             
                 // Update telemetry
                 
-                telemetry.nofAcceptWaitsForConnectionObject.increment()
+                serverTelemetry.nofAcceptWaitsForConnectionObject.increment()
                 
                 sleep (1) // Wait for 1 second, maybe something will be free by then
                 
@@ -225,7 +227,7 @@ func acceptAndDispatch(socket: Int32) {
             
             // Telemetry update
                 
-            telemetry.nofAcceptedHttpRequests.increment()
+            serverTelemetry.nofAcceptedHttpRequests.increment()
                 
                 
             // ====================================================================

@@ -3,7 +3,7 @@
 //  File:       Domains.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.0
+//  Version:    0.9.3
 //
 //  Author:     Marinus van der Lugt
 //  Website:    http://www.balancingrock.nl/swiftfire.html
@@ -47,6 +47,8 @@
 // =====================================================================================================================
 //
 // History
+//
+// v0.9.3 - Changed input parameters of domainForName to optional
 // v0.9.0 - Initial release
 // =====================================================================================================================
 
@@ -80,7 +82,9 @@ final class Domains: DomainNameChangeListener, SequenceType {
      - Note: The "wwwIncluded" property is also evaluated.
      */
     
-    func domainForName(name: String) -> Domain? {
+    func domainForName(name: String?) -> Domain? {
+        
+        guard let name = name else { return nil }
         
         let lname = name.lowercaseString
         

@@ -8,7 +8,7 @@
 
 /* Begin PBXBuildFile section */
 		864C6EFC1CC23DE400C60220 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6EFB1CC23DE400C60220 /* main.swift */; };
-		864C6F2A1CC23F5200C60220 /* Telemetry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F1F1CC23F5200C60220 /* Telemetry.swift */; };
+		864C6F2A1CC23F5200C60220 /* ServerTelemetry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F1F1CC23F5200C60220 /* ServerTelemetry.swift */; };
 		864C6F2B1CC23F5200C60220 /* HttpResponseCodes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F201CC23F5200C60220 /* HttpResponseCodes.swift */; };
 		864C6F2C1CC23F5200C60220 /* HttpHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F211CC23F5200C60220 /* HttpHeader.swift */; };
 		864C6F2D1CC23F5200C60220 /* Domain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F221CC23F5200C60220 /* Domain.swift */; };
@@ -40,6 +40,9 @@
 		864C6F711CC2472100C60220 /* SwifterSockets.Transmit.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F6B1CC2472100C60220 /* SwifterSockets.Transmit.swift */; };
 		864C6F721CC2472100C60220 /* SwifterSockets.Receive.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F6C1CC2472100C60220 /* SwifterSockets.Receive.swift */; };
 		864C6F731CC2472100C60220 /* SwifterSockets.Accept.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F6D1CC2472100C60220 /* SwifterSockets.Accept.swift */; };
+		865713D51CE447C300B9CD36 /* DomainTelemetry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 865713D41CE447C300B9CD36 /* DomainTelemetry.swift */; };
+		865713D71CE44BD200B9CD36 /* UIntTelemetry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 865713D61CE44BD200B9CD36 /* UIntTelemetry.swift */; };
+		865713D91CE44BF400B9CD36 /* TelemetryProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 865713D81CE44BF400B9CD36 /* TelemetryProtocol.swift */; };
 		868577091CDF21CE000BE5D6 /* SwifterLogNetwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = 868577081CDF21CE000BE5D6 /* SwifterLogNetwork.swift */; };
 /* End PBXBuildFile section */
 
@@ -59,7 +62,7 @@
 		864C6EF81CC23DE400C60220 /* Swiftfire */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Swiftfire; sourceTree = BUILT_PRODUCTS_DIR; };
 		864C6EFB1CC23DE400C60220 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		864C6F021CC23EAE00C60220 /* Swiftfire-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Swiftfire-Bridging-Header.h"; sourceTree = "<group>"; };
-		864C6F1F1CC23F5200C60220 /* Telemetry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Telemetry.swift; sourceTree = "<group>"; };
+		864C6F1F1CC23F5200C60220 /* ServerTelemetry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ServerTelemetry.swift; sourceTree = "<group>"; };
 		864C6F201CC23F5200C60220 /* HttpResponseCodes.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HttpResponseCodes.swift; sourceTree = "<group>"; };
 		864C6F211CC23F5200C60220 /* HttpHeader.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HttpHeader.swift; sourceTree = "<group>"; };
 		864C6F221CC23F5200C60220 /* Domain.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Domain.swift; sourceTree = "<group>"; };
@@ -98,6 +101,9 @@
 		864C6F6B1CC2472100C60220 /* SwifterSockets.Transmit.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwifterSockets.Transmit.swift; path = ../../../SwifterSockets/SwifterSockets/SwifterSockets/SwifterSockets.Transmit.swift; sourceTree = "<group>"; };
 		864C6F6C1CC2472100C60220 /* SwifterSockets.Receive.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwifterSockets.Receive.swift; path = ../../../SwifterSockets/SwifterSockets/SwifterSockets/SwifterSockets.Receive.swift; sourceTree = "<group>"; };
 		864C6F6D1CC2472100C60220 /* SwifterSockets.Accept.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwifterSockets.Accept.swift; path = ../../../SwifterSockets/SwifterSockets/SwifterSockets/SwifterSockets.Accept.swift; sourceTree = "<group>"; };
+		865713D41CE447C300B9CD36 /* DomainTelemetry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DomainTelemetry.swift; sourceTree = "<group>"; };
+		865713D61CE44BD200B9CD36 /* UIntTelemetry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UIntTelemetry.swift; sourceTree = "<group>"; };
+		865713D81CE44BF400B9CD36 /* TelemetryProtocol.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TelemetryProtocol.swift; sourceTree = "<group>"; };
 		868577081CDF21CE000BE5D6 /* SwifterLogNetwork.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwifterLogNetwork.swift; path = ../../../SwifterLog/SwifterLog/SwifterLog/SwifterLogNetwork.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -146,7 +152,7 @@
 		864C6EFA1CC23DE400C60220 /* Swiftfire */ = {
 			isa = PBXGroup;
 			children = (
-				864C6F1F1CC23F5200C60220 /* Telemetry.swift */,
+				864C6F1F1CC23F5200C60220 /* ServerTelemetry.swift */,
 				864C6F201CC23F5200C60220 /* HttpResponseCodes.swift */,
 				864C6F211CC23F5200C60220 /* HttpHeader.swift */,
 				864C6F251CC23F5200C60220 /* FileURLs.swift */,
@@ -212,6 +218,8 @@
 			children = (
 				864C6F351CC23F5F00C60220 /* Extensions.swift */,
 				864C6F361CC23F5F00C60220 /* UInt8Buffer.swift */,
+				865713D61CE44BD200B9CD36 /* UIntTelemetry.swift */,
+				865713D81CE44BF400B9CD36 /* TelemetryProtocol.swift */,
 			);
 			name = Utils;
 			path = Swiftfire;
@@ -263,9 +271,10 @@
 		86F49FBD1CE1CF0000AFEE55 /* Domains */ = {
 			isa = PBXGroup;
 			children = (
+				864C6F241CC23F5200C60220 /* Domains.swift */,
 				864C6F221CC23F5200C60220 /* Domain.swift */,
 				864C6F231CC23F5200C60220 /* Domain.HttpWorker.swift */,
-				864C6F241CC23F5200C60220 /* Domains.swift */,
+				865713D41CE447C300B9CD36 /* DomainTelemetry.swift */,
 			);
 			name = Domains;
 			sourceTree = "<group>";
@@ -361,10 +370,11 @@
 				864C6F371CC23F5F00C60220 /* Extensions.swift in Sources */,
 				864C6F311CC23F5200C60220 /* Parameters.swift in Sources */,
 				868577091CDF21CE000BE5D6 /* SwifterLogNetwork.swift in Sources */,
-				864C6F2A1CC23F5200C60220 /* Telemetry.swift in Sources */,
+				864C6F2A1CC23F5200C60220 /* ServerTelemetry.swift in Sources */,
 				864C6EFC1CC23DE400C60220 /* main.swift in Sources */,
 				864C6F721CC2472100C60220 /* SwifterSockets.Receive.swift in Sources */,
 				864C6F731CC2472100C60220 /* SwifterSockets.Accept.swift in Sources */,
+				865713D71CE44BD200B9CD36 /* UIntTelemetry.swift in Sources */,
 				864C6F661CC2470300C60220 /* ASCII.swift in Sources */,
 				864C6F421CC23F7E00C60220 /* HttpConnection.HttpWorker.swift in Sources */,
 				864C6F471CC23F9F00C60220 /* MonitoringAndControlLoop.swift in Sources */,
@@ -375,11 +385,13 @@
 				864C6F2E1CC23F5200C60220 /* Domain.HttpWorker.swift in Sources */,
 				864C6F301CC23F5200C60220 /* FileURLs.swift in Sources */,
 				864C6F711CC2472100C60220 /* SwifterSockets.Transmit.swift in Sources */,
+				865713D51CE447C300B9CD36 /* DomainTelemetry.swift in Sources */,
 				864C6F631CC243AF00C60220 /* SwifterLog.swift in Sources */,
 				864C6F481CC23F9F00C60220 /* MacDef.swift in Sources */,
 				864C6F411CC23F7E00C60220 /* HttpConnection.DataEndDetector.swift in Sources */,
 				864C6F321CC23F5200C60220 /* HttpConnectionPool.swift in Sources */,
 				864C6F2C1CC23F5200C60220 /* HttpHeader.swift in Sources */,
+				865713D91CE44BF400B9CD36 /* TelemetryProtocol.swift in Sources */,
 				864C6F621CC243AF00C60220 /* asl-bridge.m in Sources */,
 				864C6F701CC2472100C60220 /* SwifterSockets.InitClient.swift in Sources */,
 				864C6F431CC23F7E00C60220 /* HttpConnection.Forwarding.swift in Sources */,

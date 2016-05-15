@@ -3,7 +3,7 @@
 //  File:       MonitoringAndControl.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.0
+//  Version:    0.9.3
 //
 //  Author:     Marinus van der Lugt
 //  Website:    http://www.balancingrock.nl/swiftfire.html
@@ -47,6 +47,8 @@
 // =====================================================================================================================
 //
 // History
+//
+// v0.9.3 - Removed no longer existing server telemetry
 // v0.9.0 - Initial release
 // =====================================================================================================================
 
@@ -353,32 +355,50 @@ final class MonitoringAndControl {
             return
         }
 
-        guard let command = MacDef.Command(rawValue: commandName) else {
-            log.atLevelError(id: socket, source: #file.source(#function, #line), message: "Unknown command name \(commandName)")
+        switch commandName {
+        case ReadDomainTelemetryCommand.JSON_ID: doCommandReadDomainTelemetry(message)
+        default:
+            
+            guard let command = MacDef.Command(rawValue: commandName) else {
+                log.atLevelError(id: socket, source: #file.source(#function, #line), message: "Unknown command name \(commandName)")
+                return
+            }
+            
+            switch command {
+            case .CREATE: doCommandCreate(message)
+            case .QUIT: doCommandQuit(message)
+            case .READ:
+                
+                guard let readResult = doCommandRead(message) else { return }
+                let json = VJson.createJsonHierarchy()
+                json.addChild(readResult)
+                transferMessage(json)
+                
+            case .REMOVE: doCommandRemove(message)
+            case .START: doCommandStart(message)
+            case .STOP: doCommandStop(message)
+            case .UPDATE: doCommandUpdate(message)
+            case .WRITE: doCommandWrite(message)
+            case .DELTA: doCommandDelta(message)
+            case .RESTORE_DOMAINS: doCommandRestoreDomains(message)
+            case .RESTORE_PARAMETERS: doCommandRestoreParameters(message)
+            case .SAVE_DOMAINS: doCommandSaveDomains(message)
+            case .SAVE_PARAMETERS: doCommandSaveParameters(message)
+            }
+        }
+    }
+    
+    private func doCommandReadDomainTelemetry(json: VJson) {
+        guard let command = ReadDomainTelemetryCommand(json: json) else {
+            log.atLevelError(id: socket, source: #file.source(#function, #line), message: "Could not create DomainTelemetryRead command from json code: \(json.description)")
             return
         }
-        
-        switch command {
-        case .CREATE: doCommandCreate(message)
-        case .QUIT: doCommandQuit(message)
-        case .READ:
-            
-            guard let readResult = doCommandRead(message) else { return }
-            let json = VJson.createJsonHierarchy()
-            json.addChild(readResult)
-            transferMessage(json)
-            
-        case .REMOVE: doCommandRemove(message)
-        case .START: doCommandStart(message)
-        case .STOP: doCommandStop(message)
-        case .UPDATE: doCommandUpdate(message)
-        case .WRITE: doCommandWrite(message)
-        case .DELTA: doCommandDelta(message)
-        case .RESTORE_DOMAINS: doCommandRestoreDomains(message)
-        case .RESTORE_PARAMETERS: doCommandRestoreParameters(message)
-        case .SAVE_DOMAINS: doCommandSaveDomains(message)
-        case .SAVE_PARAMETERS: doCommandSaveParameters(message)
+        guard let domain = domains.domainForName(command.domainName) else {
+            log.atLevelError(id: socket, source: #file.source(#function, #line), message: "No domain available with name = \(command.domainName)")
+            return
         }
+        let reply = ReadDomainTelemetryReply(domainName: domain.name, domainTelemetry: domain.telemetry)
+        transferMessage(reply.json)
     }
     
     private func doCommandCreate(message: VJson) {
@@ -637,57 +657,21 @@ final class MonitoringAndControl {
             
         case .NOF_ACCEPTED_CLIENTS:
             
-            log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, telemetry.nofAcceptedHttpRequests = \(telemetry.nofAcceptedHttpRequests)")
-            return parameter.jsonWithValue(telemetry.nofAcceptedHttpRequests.intValue)
-            
-            
-        case .NOF_RECEIVE_TIMEOUTS:
-            
-            log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, telemetry.nofReceiveTimeouts = \(telemetry.nofReceiveTimeouts)")
-            return parameter.jsonWithValue(telemetry.nofReceiveTimeouts.intValue)
-            
-            
-        case .NOF_RECEIVE_ERRORS:
-            
-            log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, telemetry.nofReceiveErrors = \(telemetry.nofReceiveErrors)")
-            return parameter.jsonWithValue(telemetry.nofReceiveErrors.intValue)
-            
+            log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, telemetry.nofAcceptedHttpRequests = \(serverTelemetry.nofAcceptedHttpRequests)")
+            return parameter.jsonWithValue(serverTelemetry.nofAcceptedHttpRequests.intValue)
+
             
         case .NOF_HTTP_400_REPLIES:
             
-            log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, telemetry.nofHttp400Replies = \(telemetry.nofHttp400Replies)")
-            return parameter.jsonWithValue(telemetry.nofHttp400Replies.intValue)
+            log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, telemetry.nofHttp400Replies = \(serverTelemetry.nofHttp400Replies)")
+            return parameter.jsonWithValue(serverTelemetry.nofHttp400Replies.intValue)
             
+                        
+        case .NOF_HTTP_502_REPLIES:
             
-        case .NOF_HTTP_404_REPLIES:
-            
-            log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, telemetry.nofHttp404Replies = \(telemetry.nofHttp404Replies)")
-            return parameter.jsonWithValue(telemetry.nofHttp404Replies.intValue)
-            
-            
-        case .NOF_HTTP_500_REPLIES:
-            
-            log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, telemetry.nofHttp500Replies = \(telemetry.nofHttp500Replies)")
-            return parameter.jsonWithValue(telemetry.nofHttp500Replies.intValue)
-            
-            
-        case .NOF_HTTP_501_REPLIES:
-            
-            log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, telemetry.nofHttp501Replies = \(telemetry.nofHttp501Replies)")
-            return parameter.jsonWithValue(telemetry.nofHttp501Replies.intValue)
-            
-            
-        case .NOF_HTTP_505_REPLIES:
-            
-            log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, telemetry.nofHttp505Replies = \(telemetry.nofHttp505Replies)")
-            return parameter.jsonWithValue(telemetry.nofHttp505Replies.intValue)
-            
-            
-        case .NOF_SUCCESSFUL_HTTP_REPLIES:
-            
-            log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, telemetry.nofSuccessfulHttpReplies = \(telemetry.nofSuccessfulHttpReplies)")
-            return parameter.jsonWithValue(telemetry.nofSuccessfulHttpReplies.intValue)
-            
+            log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, telemetry.nofHttp505Replies = \(serverTelemetry.nofHttp502Replies)")
+            return parameter.jsonWithValue(serverTelemetry.nofHttp502Replies.intValue)
+
             
         case .SERVER_STATUS:
             

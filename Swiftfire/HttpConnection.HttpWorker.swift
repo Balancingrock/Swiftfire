@@ -3,7 +3,7 @@
 //  File:       HttpConnection.HttpWorker.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.2
+//  Version:    0.9.3
 //
 //  Author:     Marinus van der Lugt
 //  Website:    http://www.balancingrock.nl/swiftfire.html
@@ -48,6 +48,9 @@
 //
 // History
 //
+// v0.9.3 - Added incrementing of serverTelemetry.nofHttp400Replies if the host cannot be mapped to a domain
+//        - Split "domain not found" error into "domain not found" and "domain not enabled"
+//        - Removed port information from "domain not found/enabled" error
 // v0.9.2 - Made forwarding case cleaner
 //        - Moved the code that provides a response to the Domain class
 // v0.9.0 - Initial release
@@ -75,6 +78,7 @@ extension HttpConnection {
         // =============================================================================================================
         
         guard let host = header.host else {
+            serverTelemetry.nofHttp400Replies.increment()
             log.atLevelDebug(id: logId, source: SOURCE + ".\(#function).\(#line)", message: "Could not extract host from Http Request Header")
             let response = httpErrorResponseWithCode(.CODE_400_Bad_Request, andMessage: "<p>Could not extract host from Http Request Header<p>")
             transferToClient(response)
@@ -82,8 +86,15 @@ extension HttpConnection {
         }
         
         guard let domain = domains.enabledDomainForName(host.address) else {
-            log.atLevelDebug(id: logId, source: SOURCE + ".\(#function).\(#line)", message: "Domain not found for host: \(host.address), port: \(host.port)")
-            let response = httpErrorResponseWithCode(.CODE_400_Bad_Request, andMessage: "<p>Domain not found for host: \(host.address), port: \(host.port)</p>")
+            serverTelemetry.nofHttp400Replies.increment()
+            let message: String
+            if domains.domainForName(host.address) == nil {
+                message = "Domain not found for host: \(host.address)"
+            } else {
+                message = "Domain not enabled for host: \(host.address)"
+            }
+            log.atLevelNotice(id: logId, source: SOURCE + ".\(#function).\(#line)", message: message)
+            let response = httpErrorResponseWithCode(.CODE_400_Bad_Request, andMessage: "<p>\(message)</p>")
             transferToClient(response)
             return
         }

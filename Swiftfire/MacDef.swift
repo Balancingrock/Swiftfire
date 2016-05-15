@@ -3,7 +3,7 @@
 //  File:       MacDef.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.0
+//  Version:    0.9.3
 //
 //  Author:     Marinus van der Lugt
 //  Website:    http://www.balancingrock.nl/swiftfire.html
@@ -47,10 +47,68 @@
 // =====================================================================================================================
 //
 // History
+//
+// v0.9.3 - Removed telemetry that has been relocated from the server to the domains
+//        - Added command "ReadDomainTelemetry"
 // v0.9.0 - Initial release
 // =====================================================================================================================
 
 import Foundation
+
+class ReadDomainTelemetryCommand {
+    
+    static let JSON_ID = "ReadDomainTelemetryCommand"
+    
+    let domainName: String
+    
+    var json: VJson {
+        let j = VJson.createJsonHierarchy()
+        j[ReadDomainTelemetryCommand.JSON_ID].stringValue = domainName
+        return j
+    }
+    
+    init?(domainName: String?) {
+        guard let domainName = domainName else { return nil }
+        self.domainName = domainName
+    }
+    
+    init?(json: VJson?) {
+        guard let json = json else { return nil }
+        guard let jdomainName = json.objectOfType(VJson.JType.STRING, atPath: ReadDomainTelemetryCommand.JSON_ID)?.stringValue else { return nil }
+        domainName = jdomainName
+    }
+}
+
+class ReadDomainTelemetryReply {
+    
+    static let JSON_ID = "ReadDomainTelemetryReply"
+    
+    var domainName: String
+    var domainTelemetry: DomainTelemetry
+    
+    var json: VJson {
+        let jsonTelemetry = domainTelemetry.json("Telemetry")
+        let j = VJson.createJsonHierarchy()
+        j[ReadDomainTelemetryReply.JSON_ID]["Domain"].stringValue = domainName
+        j[ReadDomainTelemetryReply.JSON_ID].addChild(jsonTelemetry)
+        return j
+    }
+    
+    init(domainName: String, domainTelemetry: DomainTelemetry) {
+        self.domainName = domainName
+        self.domainTelemetry = domainTelemetry.duplicate
+    }
+    
+    init?(json: VJson?) {
+        guard let json = json else { return nil }
+        guard let jname = json.objectOfType(VJson.JType.STRING, atPath: ReadDomainTelemetryReply.JSON_ID, "Domain")?.stringValue else { return nil }
+        guard let jtelemetryJson = json.objectOfType(VJson.JType.OBJECT, atPath: ReadDomainTelemetryReply.JSON_ID, "Telemetry") else { return nil }
+        guard let jtelemetry = DomainTelemetry(json: jtelemetryJson) else { return nil }
+        
+        domainName = jname
+        domainTelemetry = jtelemetry
+    }
+}
 
 class MacDef {
 
@@ -76,22 +134,22 @@ class MacDef {
             
             switch self {
             
-            case READ where value is Parameter:
+            case .READ where value is Parameter:
                 let json = VJson.createJsonHierarchy()
                 json[self.rawValue].stringValue = (value as! Parameter).rawValue
                 return json
-            
-            case WRITE, CREATE, REMOVE, UPDATE where value is VJson:
+                
+            case .WRITE, .CREATE, .REMOVE, .UPDATE where value is VJson:
                 let json = VJson.createJsonHierarchy()
                 json[self.rawValue].addChild((value as! VJson))
                 return json
             
-            case START, STOP, QUIT, SAVE_PARAMETERS, SAVE_DOMAINS, RESTORE_PARAMETERS, RESTORE_DOMAINS where value == nil:
+            case .START, .STOP, .QUIT, .SAVE_PARAMETERS, .SAVE_DOMAINS, .RESTORE_PARAMETERS, .RESTORE_DOMAINS where value == nil:
                 let json = VJson.createJsonHierarchy()
                 json[self.rawValue].nullValue = true
                 return json
             
-            case DELTA where value is Int:
+            case .DELTA where value is Int:
                 let json = VJson.createJsonHierarchy()
                 json[self.rawValue].integerValue = (value as! Int)
                 return json
@@ -123,17 +181,11 @@ class MacDef {
         case VERSION_NUMBER = "VersionNumber"
         case SERVER_STATUS = "ServerStatus"
         case NOF_ACCEPTED_CLIENTS = "NofAcceptedClients"
-        case NOF_RECEIVE_TIMEOUTS = "NofReceiveTimeouts"
-        case NOF_RECEIVE_ERRORS = "NofReceiveErrors"
-        case NOF_SUCCESSFUL_HTTP_REPLIES = "NofSuccessfulHttpReplies"
         case NOF_HTTP_400_REPLIES = "NofHttp400Replies"
-        case NOF_HTTP_404_REPLIES = "NofHttp404Replies"
-        case NOF_HTTP_500_REPLIES = "NofHttp500Replies"
-        case NOF_HTTP_501_REPLIES = "NofHttp501Replies"
-        case NOF_HTTP_505_REPLIES = "NofHttp505Replies"
+        case NOF_HTTP_502_REPLIES = "NofHttp502Replies"
         case DOMAINS = "Domains"
         
-        static let all = [SERVICE_PORT_NUMBER, MAX_NOF_ACCEPTED_CONNECTIONS, MAX_NOF_PENDING_CONNECTIONS, MAX_WAIT_FOR_PENDING_CONNECTIONS, MAX_NOF_PENDING_CLIENT_MESSAGES, MAX_CLIENT_MESSAGE_SIZE, DEBUG_MODE, ASL_LOGLEVEL, STDOUT_LOGLEVEL, FILE_LOGLEVEL, CALLBACK_LOGLEVEL, NETWORK_LOGLEVEL, NETWORK_LOG_TARGET_ADDRESS, NETWORK_LOG_TARGET_PORT, VERSION_NUMBER, SERVER_STATUS, NOF_ACCEPTED_CLIENTS, NOF_RECEIVE_TIMEOUTS, NOF_RECEIVE_ERRORS, NOF_SUCCESSFUL_HTTP_REPLIES, NOF_HTTP_400_REPLIES, NOF_HTTP_404_REPLIES, NOF_HTTP_500_REPLIES, NOF_HTTP_501_REPLIES, NOF_HTTP_505_REPLIES, DOMAINS]
+        static let all = [SERVICE_PORT_NUMBER, MAX_NOF_ACCEPTED_CONNECTIONS, MAX_NOF_PENDING_CONNECTIONS, MAX_WAIT_FOR_PENDING_CONNECTIONS, MAX_NOF_PENDING_CLIENT_MESSAGES, MAX_CLIENT_MESSAGE_SIZE, DEBUG_MODE, ASL_LOGLEVEL, STDOUT_LOGLEVEL, FILE_LOGLEVEL, CALLBACK_LOGLEVEL, NETWORK_LOGLEVEL, NETWORK_LOG_TARGET_ADDRESS, NETWORK_LOG_TARGET_PORT, VERSION_NUMBER, SERVER_STATUS, NOF_ACCEPTED_CLIENTS, NOF_HTTP_400_REPLIES, NOF_HTTP_502_REPLIES, DOMAINS]
         
         var label: String {
             switch self {
@@ -154,14 +206,8 @@ class MacDef {
             case VERSION_NUMBER: return "The Version Number of Swiftfire"
             case SERVER_STATUS: return "The Status of Swiftfire"
             case NOF_ACCEPTED_CLIENTS: return "The Total Number of Client Connections"
-            case NOF_RECEIVE_TIMEOUTS: return "The Total Number of Timeouts during the Receive_Loop"
-            case NOF_RECEIVE_ERRORS: return "The Total Number of Errors during the Recv call"
-            case NOF_SUCCESSFUL_HTTP_REPLIES: return "The Total Number of Successful HTTP Replies Delivered"
             case NOF_HTTP_400_REPLIES: return "The Total Number of HTTP 400 Errors Generated"
-            case NOF_HTTP_404_REPLIES: return "The Total Number of HTTP 404 Errors Generated"
-            case NOF_HTTP_500_REPLIES: return "The Total Number of HTTP 500 Errors Generated"
-            case NOF_HTTP_501_REPLIES: return "The Total Number of HTTP 501 Errors Generated"
-            case NOF_HTTP_505_REPLIES: return "The Total Number of HTTP 505 Errors Generated"
+            case NOF_HTTP_502_REPLIES: return "The Total Number of HTTP 502 Errors Generated"
             case DOMAINS: return "Domains"
             }
         }
@@ -185,14 +231,8 @@ class MacDef {
             case VERSION_NUMBER: return "The Version Number of Swiftfire"
             case SERVER_STATUS: return "The Status of Swiftfire"
             case NOF_ACCEPTED_CLIENTS: return "The Total Number of Client Connections"
-            case NOF_RECEIVE_TIMEOUTS: return "The Total Number of Timeouts during the Receive_Loop"
-            case NOF_RECEIVE_ERRORS: return "The Total Number of Errors during the Recv call"
-            case NOF_SUCCESSFUL_HTTP_REPLIES: return "The Total Number of Successful HTTP Replies Delivered"
             case NOF_HTTP_400_REPLIES: return "The Total Number of HTTP 400 Errors Generated"
-            case NOF_HTTP_404_REPLIES: return "The Total Number of HTTP 404 Errors Generated"
-            case NOF_HTTP_500_REPLIES: return "The Total Number of HTTP 500 Errors Generated"
-            case NOF_HTTP_501_REPLIES: return "The Total Number of HTTP 501 Errors Generated"
-            case NOF_HTTP_505_REPLIES: return "The Total Number of HTTP 505 Errors Generated"
+            case NOF_HTTP_502_REPLIES: return "The Total Number of HTTP 502 Errors Generated"
             case DOMAINS: return "Domains"
             }
         }
@@ -215,7 +255,7 @@ class MacDef {
                 return VJson.createString(value: (value as! String), name: self.rawValue)
                 
                 
-            case MAX_NOF_ACCEPTED_CONNECTIONS, MAX_NOF_PENDING_CONNECTIONS, MAX_WAIT_FOR_PENDING_CONNECTIONS, MAX_NOF_PENDING_CLIENT_MESSAGES, MAX_CLIENT_MESSAGE_SIZE, ASL_LOGLEVEL, STDOUT_LOGLEVEL, FILE_LOGLEVEL, CALLBACK_LOGLEVEL, NETWORK_LOGLEVEL, NOF_ACCEPTED_CLIENTS, NOF_RECEIVE_TIMEOUTS, NOF_RECEIVE_ERRORS, NOF_SUCCESSFUL_HTTP_REPLIES, NOF_HTTP_400_REPLIES, NOF_HTTP_404_REPLIES, NOF_HTTP_500_REPLIES, NOF_HTTP_501_REPLIES, NOF_HTTP_505_REPLIES where value is Int:
+            case MAX_NOF_ACCEPTED_CONNECTIONS, MAX_NOF_PENDING_CONNECTIONS, MAX_WAIT_FOR_PENDING_CONNECTIONS, MAX_NOF_PENDING_CLIENT_MESSAGES, MAX_CLIENT_MESSAGE_SIZE, ASL_LOGLEVEL, STDOUT_LOGLEVEL, FILE_LOGLEVEL, CALLBACK_LOGLEVEL, NETWORK_LOGLEVEL, NOF_ACCEPTED_CLIENTS, NOF_HTTP_400_REPLIES, NOF_HTTP_502_REPLIES where value is Int:
                 
                 return VJson.createNumber(value: (value as! Int), name: self.rawValue)
                 
@@ -260,7 +300,7 @@ class MacDef {
                 return json!.stringValue
             
                 
-            case MAX_NOF_ACCEPTED_CONNECTIONS, MAX_NOF_PENDING_CONNECTIONS, MAX_WAIT_FOR_PENDING_CONNECTIONS, MAX_NOF_PENDING_CLIENT_MESSAGES, MAX_CLIENT_MESSAGE_SIZE, ASL_LOGLEVEL, STDOUT_LOGLEVEL, FILE_LOGLEVEL, CALLBACK_LOGLEVEL, NETWORK_LOGLEVEL, NOF_ACCEPTED_CLIENTS, NOF_RECEIVE_TIMEOUTS, NOF_RECEIVE_ERRORS, NOF_SUCCESSFUL_HTTP_REPLIES, NOF_HTTP_400_REPLIES, NOF_HTTP_404_REPLIES, NOF_HTTP_500_REPLIES, NOF_HTTP_501_REPLIES, NOF_HTTP_505_REPLIES where ((json?.isNumber) != nil):
+            case MAX_NOF_ACCEPTED_CONNECTIONS, MAX_NOF_PENDING_CONNECTIONS, MAX_WAIT_FOR_PENDING_CONNECTIONS, MAX_NOF_PENDING_CLIENT_MESSAGES, MAX_CLIENT_MESSAGE_SIZE, ASL_LOGLEVEL, STDOUT_LOGLEVEL, FILE_LOGLEVEL, CALLBACK_LOGLEVEL, NETWORK_LOGLEVEL, NOF_ACCEPTED_CLIENTS, NOF_HTTP_400_REPLIES, NOF_HTTP_502_REPLIES where ((json?.isNumber) != nil):
                 
                 return json!.integerValue
             
@@ -297,7 +337,7 @@ class MacDef {
                 return jsonWithValue(value)
 
                 
-            case MAX_NOF_ACCEPTED_CONNECTIONS, MAX_NOF_PENDING_CONNECTIONS, MAX_WAIT_FOR_PENDING_CONNECTIONS, MAX_NOF_PENDING_CLIENT_MESSAGES, MAX_CLIENT_MESSAGE_SIZE, ASL_LOGLEVEL, STDOUT_LOGLEVEL, FILE_LOGLEVEL, CALLBACK_LOGLEVEL, NETWORK_LOGLEVEL, NOF_ACCEPTED_CLIENTS, NOF_RECEIVE_TIMEOUTS, NOF_RECEIVE_ERRORS, NOF_SUCCESSFUL_HTTP_REPLIES, NOF_HTTP_400_REPLIES, NOF_HTTP_404_REPLIES, NOF_HTTP_500_REPLIES, NOF_HTTP_501_REPLIES, NOF_HTTP_505_REPLIES:
+            case MAX_NOF_ACCEPTED_CONNECTIONS, MAX_NOF_PENDING_CONNECTIONS, MAX_WAIT_FOR_PENDING_CONNECTIONS, MAX_NOF_PENDING_CLIENT_MESSAGES, MAX_CLIENT_MESSAGE_SIZE, ASL_LOGLEVEL, STDOUT_LOGLEVEL, FILE_LOGLEVEL, CALLBACK_LOGLEVEL, NETWORK_LOGLEVEL, NOF_ACCEPTED_CLIENTS, NOF_HTTP_400_REPLIES, NOF_HTTP_502_REPLIES:
                 
                 if let ival = Int(value) {
                     return jsonWithValue(ival)
@@ -334,7 +374,7 @@ class MacDef {
             
             switch self {
             
-            case SERVICE_PORT_NUMBER, MAX_NOF_ACCEPTED_CONNECTIONS, MAX_NOF_PENDING_CONNECTIONS, MAX_WAIT_FOR_PENDING_CONNECTIONS, MAX_NOF_PENDING_CLIENT_MESSAGES, MAX_CLIENT_MESSAGE_SIZE, DEBUG_MODE, ASL_LOGLEVEL, STDOUT_LOGLEVEL, FILE_LOGLEVEL, CALLBACK_LOGLEVEL, NETWORK_LOGLEVEL, VERSION_NUMBER, SERVER_STATUS, NOF_ACCEPTED_CLIENTS, NOF_RECEIVE_TIMEOUTS, NOF_RECEIVE_ERRORS, NOF_SUCCESSFUL_HTTP_REPLIES, NOF_HTTP_400_REPLIES, NOF_HTTP_404_REPLIES, NOF_HTTP_500_REPLIES, NOF_HTTP_501_REPLIES, NOF_HTTP_505_REPLIES, NETWORK_LOG_TARGET_PORT, NETWORK_LOG_TARGET_ADDRESS:
+            case SERVICE_PORT_NUMBER, MAX_NOF_ACCEPTED_CONNECTIONS, MAX_NOF_PENDING_CONNECTIONS, MAX_WAIT_FOR_PENDING_CONNECTIONS, MAX_NOF_PENDING_CLIENT_MESSAGES, MAX_CLIENT_MESSAGE_SIZE, DEBUG_MODE, ASL_LOGLEVEL, STDOUT_LOGLEVEL, FILE_LOGLEVEL, CALLBACK_LOGLEVEL, NETWORK_LOGLEVEL, VERSION_NUMBER, SERVER_STATUS, NOF_ACCEPTED_CLIENTS, NOF_HTTP_400_REPLIES, NOF_HTTP_502_REPLIES, NETWORK_LOG_TARGET_PORT, NETWORK_LOG_TARGET_ADDRESS:
                 
                 return json.asString
                 
@@ -359,7 +399,7 @@ class MacDef {
                 return nil
                 
                 
-            case MAX_NOF_ACCEPTED_CONNECTIONS, MAX_NOF_PENDING_CONNECTIONS, MAX_WAIT_FOR_PENDING_CONNECTIONS, MAX_NOF_PENDING_CLIENT_MESSAGES, MAX_CLIENT_MESSAGE_SIZE, NOF_ACCEPTED_CLIENTS, NOF_RECEIVE_TIMEOUTS, NOF_RECEIVE_ERRORS, NOF_SUCCESSFUL_HTTP_REPLIES, NOF_HTTP_400_REPLIES, NOF_HTTP_404_REPLIES, NOF_HTTP_500_REPLIES, NOF_HTTP_501_REPLIES, NOF_HTTP_505_REPLIES:
+            case MAX_NOF_ACCEPTED_CONNECTIONS, MAX_NOF_PENDING_CONNECTIONS, MAX_WAIT_FOR_PENDING_CONNECTIONS, MAX_NOF_PENDING_CLIENT_MESSAGES, MAX_CLIENT_MESSAGE_SIZE, NOF_ACCEPTED_CLIENTS, NOF_HTTP_400_REPLIES, NOF_HTTP_502_REPLIES:
                 
                 if let iv = Int(v) {
                     if v == iv.description { return nil }

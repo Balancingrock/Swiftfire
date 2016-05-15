@@ -3,7 +3,7 @@
 //  File:       Domain.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.2
+//  Version:    0.9.3
 //
 //  Author:     Marinus van der Lugt
 //  Website:    http://www.balancingrock.nl/swiftfire.html
@@ -48,6 +48,8 @@
 //
 // History
 //
+// v0.9.3 - Added domain telemetry
+//        - Corrected description of forwardUrlItemTitle
 // v0.9.2 - Removed 'final' from the class definition
 //        - Added enableHttpPreprocessor, enableHttpPostprocessor, httpWorkerPreprocessor and httpWorkerPostprocessor
 // v0.9.0 - Initial release
@@ -78,7 +80,7 @@ class Domain: Equatable, CustomStringConvertible {
     let nameItemTitle: NSString = "Domain"
     let wwwIncludedItemTitle: NSString = "Also map 'www' prefix:"
     let rootItemTitle: NSString = "Root folder:"
-    let forwardUrlItemTitle: NSString = "Foreward to (Domain:Port/Path):"
+    let forwardUrlItemTitle: NSString = "Foreward to (Domain:Port):"
     let enabledItemTitle: NSString = "Enable Domain:"
 
     static let nofContainedItems: Int = 4 // Minus 1 for the domain name
@@ -196,6 +198,11 @@ class Domain: Equatable, CustomStringConvertible {
     var enableHttpPostprocessor = false
     
     
+    /// The domain telemetry
+    
+    var telemetry = DomainTelemetry()
+    
+    
     /// The JSON representation for this object
     
     var json: VJson {
@@ -205,6 +212,7 @@ class Domain: Equatable, CustomStringConvertible {
         domain["Root"].stringValue = root as String
         domain["ForewardUrl"].stringValue = forwardUrl as String
         domain["Enabled"].boolValue = enabled.boolValue
+        domain.addChild(telemetry.json("Telemetry"))
         return domain
     }
     
@@ -225,16 +233,18 @@ class Domain: Equatable, CustomStringConvertible {
         guard let jfurl = json.objectOfType(VJson.JType.STRING, atPath: "ForewardUrl")?.stringValue else { return nil }
         guard let jwww  = json.objectOfType(VJson.JType.BOOL, atPath: "IncludeWww")?.boolValue else { return nil }
         guard let jenab = json.objectOfType(VJson.JType.BOOL, atPath: "Enabled")?.boolValue else { return nil }
+        guard let jtelemetry = DomainTelemetry(json: json.objectOfType(VJson.JType.OBJECT, atPath: "Telemetry")) else { return nil }
         
         self.name = jname
         self.root = jroot
         self.forwardUrl = jfurl
         self.wwwIncluded = jwww
         self.enabled = jenab
+        self.telemetry = jtelemetry
     }
     
     
-    /// Creates an exact copy of the object and returns that.
+    /// Creates a copy of the object and returns that.
     
     var copy: Domain {
         let new = Domain()
@@ -243,6 +253,7 @@ class Domain: Equatable, CustomStringConvertible {
         new.root = self.root
         new.forwardUrl = self.forwardUrl
         new.enabled = self.enabled
+        new.telemetry = self.telemetry.duplicate
         return new
     }
     
@@ -277,6 +288,11 @@ class Domain: Equatable, CustomStringConvertible {
         
         if forwardUrl != new.forwardUrl  {
             forwardUrl = new.forwardUrl
+            changed = true
+        }
+        
+        if telemetry != new.telemetry {
+            telemetry = new.telemetry.duplicate
             changed = true
         }
         

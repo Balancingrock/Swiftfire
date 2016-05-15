@@ -3,7 +3,7 @@
 //  File:       Domain.HttpWorker.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.2
+//  Version:    0.9.3
 //
 //  Author:     Marinus van der Lugt
 //  Website:    http://www.balancingrock.nl/swiftfire.html
@@ -48,6 +48,7 @@
 //
 // History
 //
+// v0.9.3 - Moved renamed telemetry items
 // v0.9.2 - Added httpWorker and associated functions
 //        - Removed resourcePathFor
 //        - Renamed from Domain.HttpSupport to Domain.HttpWorker
@@ -73,6 +74,9 @@ extension Domain {
     func httpWorker(header: HttpHeader, body: UInt8Buffer, connection: HttpConnection) -> UInt8Buffer {
         
         
+        telemetry.nofRequests.increment()
+        
+        
         // =============================================================================================================
         // Call the preprocessor if necessary
         // =============================================================================================================
@@ -95,7 +99,7 @@ extension Domain {
         
         guard let httpVersion = header.httpVersion where httpVersion == HttpVersion.HTTP_1_1 else {
             log.atLevelDebug(id: connection.logId, source: #file.source(#function, #line), message: "HTTP Version not present or not 1.1")
-            telemetry.nofHttp505Replies.increment()
+            telemetry.nof505.increment()
             return connection.httpErrorResponseWithCode(.CODE_505_HTTP_Version_Not_Supported)
         }
         
@@ -106,13 +110,13 @@ extension Domain {
         
         guard let operation = header.operation else {
             log.atLevelDebug(id: connection.logId, source: #file.source(#function, #line), message: "Could not extract operation")
-            telemetry.nofHttp400Replies.increment()
+            telemetry.nof400.increment()
             return connection.httpErrorResponseWithCode(.CODE_400_Bad_Request)
         }
         
         guard (operation == HttpOperation.GET || operation == HttpOperation.POST) else {
             log.atLevelDebug(id: connection.logId, source: #file.source(#function, #line), message: "Operation not a GET or POST")
-            telemetry.nofHttp501Replies.increment()
+            telemetry.nof501.increment()
             return connection.httpErrorResponseWithCode(.CODE_501_Not_Implemented)
         }
         
@@ -123,7 +127,7 @@ extension Domain {
         
         guard let partialPath = header.url else {
             log.atLevelDebug(id: connection.logId, source: #file.source(#function, #line), message: "No URL found")
-            telemetry.nofHttp400Replies.increment()
+            telemetry.nof400.increment()
             return connection.httpErrorResponseWithCode(.CODE_400_Bad_Request)
         }
         let path = (root as NSString).stringByAppendingPathComponent(partialPath)
@@ -134,7 +138,7 @@ extension Domain {
         // =============================================================================================================
         
         if !connection.filemanager.fileExistsAtPath(path) {
-            telemetry.nofHttp404Replies.increment()
+            telemetry.nof404.increment()
             return connection.httpErrorResponseWithCode(.CODE_404_Not_Found)
         }
         
@@ -145,6 +149,7 @@ extension Domain {
         // =============================================================================================================
         
         guard let resourcePath = filterForDirectoryAccess(path, connection: connection) else {
+            telemetry.nof403.increment()
             return connection.httpErrorResponseWithCode(HttpResponseCode.CODE_403_Forbidden, andMessage: "<p>Directory access not allowed</p>")
         }
         
@@ -166,6 +171,7 @@ extension Domain {
         // =============================================================================================================
         
         let response = connection.httpResponseWithCode(.CODE_200_OK, andBody: responsePayload!)
+        telemetry.nof200.increment()
         
         
         // =============================================================================================================

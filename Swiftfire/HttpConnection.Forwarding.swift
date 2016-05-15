@@ -3,7 +3,7 @@
 //  File:       HttpConnection.Forwarding.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.2
+//  Version:    0.9.3
 //
 //  Author:     Marinus van der Lugt
 //  Website:    http://www.balancingrock.nl/swiftfire.html
@@ -47,6 +47,8 @@
 // =====================================================================================================================
 //
 // History
+//
+// v0.9.3 - Added a telemetry counter to the "bad gateway" errors
 // v0.9.2 - Minor adjustment to forwardingOpenConnection
 //        - Replaced sendMessageWithCode with httpErrorResponseWithCode
 // v0.9.0 - Initial release
@@ -86,6 +88,7 @@ extension HttpConnection {
             
         } catch {
             
+            serverTelemetry.nofHttp502Replies.increment()
             log.atLevelError(id: logId, source: #file.source(#function, #line), message: "Could not open connection to \(host).")
             let response = httpErrorResponseWithCode(.CODE_502_Bad_Gateway, andMessage: "<p>Forwarding failed, server not reachable.</p>")
             transferToClient(response)
@@ -110,6 +113,7 @@ extension HttpConnection {
         
         if forwardingSocket == nil {
             
+            serverTelemetry.nofHttp502Replies.increment()
             let response = httpErrorResponseWithCode(.CODE_502_Bad_Gateway, andMessage: "<p>Forwarding failed, server not reachable.</p>")
             transferToClient(response)
             return
@@ -122,6 +126,7 @@ extension HttpConnection {
                 
             } catch {
                 
+                serverTelemetry.nofHttp502Replies.increment()
                 let response = httpErrorResponseWithCode(.CODE_502_Bad_Gateway, andMessage: "<p>Forwarding failed, server not reachable, not responding or generating connection errors.</p>")
                 transferToClient(response)
                 

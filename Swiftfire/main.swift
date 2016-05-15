@@ -3,7 +3,7 @@
 //  File:       main.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.1
+//  Version:    0.9.3
 //
 //  Author:     Marinus van der Lugt
 //  Website:    http://www.balancingrock.nl/swiftfire.html
@@ -47,6 +47,8 @@
 // =====================================================================================================================
 //
 // History
+//
+// v0.9.3 - Added serverTelemetry
 // v0.9.1 - Minor changes to accommodate changes in SwifterSockets and SwifterLog
 // v0.9.0 - Initial release
 // =====================================================================================================================
@@ -62,6 +64,11 @@ let acceptQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0)
 // When this variable is set to 'true' the monitoring and control loop will terminate and thereby terminate Swiftfire
 
 var abortMacLoop: Bool = false
+
+
+// The server telemetry
+
+let serverTelemetry = ServerTelemetry()
 
 
 // The available domains

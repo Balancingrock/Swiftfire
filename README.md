@@ -40,6 +40,14 @@ The I drag & drop the group with the source files from (for example) SwifterLog 
 
 #Version history
 
+####v0.9.3
+
+- Added domain telemetry
+
+####v0.9.2
+
+- Minor changes to accomodate changes in other packages
+
 ####v0.9.1
 
 - Minor changes to accomodate changes in SwifterSockets/SwifterLog/SwifterJSON
