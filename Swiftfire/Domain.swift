@@ -3,7 +3,7 @@
 //  File:       Domain.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.3
+//  Version:    0.9.4
 //
 //  Author:     Marinus van der Lugt
 //  Website:    http://www.balancingrock.nl/swiftfire.html
@@ -48,6 +48,8 @@
 //
 // History
 //
+// v0.9.4 - Accomodated new VJson testing
+//        - Made _name private
 // v0.9.3 - Added domain telemetry
 //        - Corrected description of forwardUrlItemTitle
 // v0.9.2 - Removed 'final' from the class definition
@@ -106,7 +108,7 @@ class Domain: Equatable, CustomStringConvertible {
             return self._name
         }
     }
-    var _name: String = "domain.toplevel"
+    private var _name: String = "domain.toplevel"
     
     
     /// If the domain should map both the name with 'www' and without it to the same root, set this value to 'true'
@@ -224,16 +226,18 @@ class Domain: Equatable, CustomStringConvertible {
     
     // Provide the JSON reconstruction init
     
-    init?(json: VJson) {
+    init?(json: VJson?) {
+        
+        guard let json = json else { return nil }
         
         guard json.nameValue == "Domain" else { return nil }
         
-        guard let jname = json.objectOfType(VJson.JType.STRING, atPath: "Name")?.stringValue else { return nil }
-        guard let jroot = json.objectOfType(VJson.JType.STRING, atPath: "Root")?.stringValue else { return nil }
-        guard let jfurl = json.objectOfType(VJson.JType.STRING, atPath: "ForewardUrl")?.stringValue else { return nil }
-        guard let jwww  = json.objectOfType(VJson.JType.BOOL, atPath: "IncludeWww")?.boolValue else { return nil }
-        guard let jenab = json.objectOfType(VJson.JType.BOOL, atPath: "Enabled")?.boolValue else { return nil }
-        guard let jtelemetry = DomainTelemetry(json: json.objectOfType(VJson.JType.OBJECT, atPath: "Telemetry")) else { return nil }
+        guard let jname = (json|"Name")?.stringValue else { return nil }
+        guard let jroot = (json|"Root")?.stringValue else { return nil }
+        guard let jfurl = (json|"ForewardUrl")?.stringValue else { return nil }
+        guard let jwww  = (json|"IncludeWww")?.boolValue else { return nil }
+        guard let jenab = (json|"Enabled")?.boolValue else { return nil }
+        guard let jtelemetry = DomainTelemetry(json: (json|"Telemetry")) else { return nil }
         
         self.name = jname
         self.root = jroot

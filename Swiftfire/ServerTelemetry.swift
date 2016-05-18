@@ -60,7 +60,6 @@ import Foundation
 
 
 class ServerTelemetry: CustomStringConvertible, CustomDebugStringConvertible {
-
     
     /// The reset of the telemetry values
     

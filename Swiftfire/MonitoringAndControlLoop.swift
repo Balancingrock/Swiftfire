@@ -3,7 +3,7 @@
 //  File:       MonitoringAndControl.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.3
+//  Version:    0.9.4
 //
 //  Author:     Marinus van der Lugt
 //  Website:    http://www.balancingrock.nl/swiftfire.html
@@ -48,6 +48,7 @@
 //
 // History
 //
+// v0.9.4 - Changed according to new command & reply definitions
 // v0.9.3 - Removed no longer existing server telemetry
 // v0.9.0 - Initial release
 // =====================================================================================================================
@@ -108,12 +109,7 @@ final class MonitoringAndControl {
         
         // Check for autostart
         
-        if startup.autostart {
-            // Simulate start message
-            if let startCommand = MacDef.Command.START.jsonHierarchyWithValue(nil) {
-                doCommandStart(startCommand)
-            }
-        }
+        if startup.autostart { doServerStartCommand() }
         
         
         // For the data received via the M&C server.
@@ -340,152 +336,88 @@ final class MonitoringAndControl {
     
     private func executeCommandInMessage(message: VJson) {
         
-        guard message.isObject else {
-            log.atLevelError(id: socket, source: #file.source(#function, #line), message: "Expected an JSON OBJECT")
-            return
-        }
-        
-        guard message.nofChildren == 1 else {
-            log.atLevelError(id: socket, source: #file.source(#function, #line), message: "Expected 1 child, found \(message.nofChildren)")
-            return
-        }
-        
-        guard let commandName = message.arrayValue?[0].nameValue else {
-            log.atLevelError(id: socket, source: #file.source(#function, #line), message: "Command name not available")
-            return
-        }
-
-        switch commandName {
-        case ReadDomainTelemetryCommand.JSON_ID: doCommandReadDomainTelemetry(message)
-        default:
-            
-            guard let command = MacDef.Command(rawValue: commandName) else {
-                log.atLevelError(id: socket, source: #file.source(#function, #line), message: "Unknown command name \(commandName)")
-                return
-            }
-            
-            switch command {
-            case .CREATE: doCommandCreate(message)
-            case .QUIT: doCommandQuit(message)
-            case .READ:
-                
-                guard let readResult = doCommandRead(message) else { return }
-                let json = VJson.createJsonHierarchy()
-                json.addChild(readResult)
-                transferMessage(json)
-                
-            case .REMOVE: doCommandRemove(message)
-            case .START: doCommandStart(message)
-            case .STOP: doCommandStop(message)
-            case .UPDATE: doCommandUpdate(message)
-            case .WRITE: doCommandWrite(message)
-            case .DELTA: doCommandDelta(message)
-            case .RESTORE_DOMAINS: doCommandRestoreDomains(message)
-            case .RESTORE_PARAMETERS: doCommandRestoreParameters(message)
-            case .SAVE_DOMAINS: doCommandSaveDomains(message)
-            case .SAVE_PARAMETERS: doCommandSaveParameters(message)
-            }
+        if let command = ReadDomainTelemetryCommand(json: message) { doReadDomainTelemetryCommand(command) }
+        else if let command = ReadServerParameterCommand(json: message) { doReadServerParameterCommand(command) }
+        else if let command = ReadServerTelemetryCommand(json: message) { doReadServerTelemetryCommand(command) }
+        else if let command = WriteServerParameterCommand(json: message) { doWriteServerParameterCommand(command) }
+        else if let command = CreateDomainCommand(json: message) { doCreateDomainCommand(command) }
+        else if let command = RemoveDomainCommand(json: message) { doRemoveDomainCommand(command) }
+        else if let command = UpdateDomainCommand(json: message) { doUpdateDomainCommand(command) }
+        else if let command = ReadDomainsCommand(json: message) { doReadDomainsCommand(command) }
+        else if ServerQuitCommand(json: message) != nil { doServerQuitCommand() }
+        else if ServerStartCommand(json: message) != nil { doServerStartCommand() }
+        else if ServerStopCommand(json: message) != nil { doServerStopCommand() }
+        else if let command = DeltaCommand(json: message) { doDeltaCommand(command) }
+        else if RestoreDomainsCommand(json: message) != nil { doRestoreDomainsCommand() }
+        else if SaveDomainsCommand(json: message) != nil { doSaveDomainsCommand() }
+        else if RestoreServerParametersCommand(json: message) != nil { doRestoreServerParametersCommand() }
+        else if SaveServerParametersCommand(json: message) != nil { doSaveServerParametersCommand() }
+        else {
+            log.atLevelError(id: socket, source: #file.source(#function, #line), message: "Could not create command from JSON code: \(message)")
         }
     }
     
-    private func doCommandReadDomainTelemetry(json: VJson) {
-        guard let command = ReadDomainTelemetryCommand(json: json) else {
-            log.atLevelError(id: socket, source: #file.source(#function, #line), message: "Could not create DomainTelemetryRead command from json code: \(json.description)")
-            return
-        }
+    private func doReadDomainTelemetryCommand(command: ReadDomainTelemetryCommand) {
+        
         guard let domain = domains.domainForName(command.domainName) else {
             log.atLevelError(id: socket, source: #file.source(#function, #line), message: "No domain available with name = \(command.domainName)")
             return
         }
+        
         let reply = ReadDomainTelemetryReply(domainName: domain.name, domainTelemetry: domain.telemetry)
+        
         transferMessage(reply.json)
     }
     
-    private func doCommandCreate(message: VJson) {
-        
-        guard let domain = Domain(json: message[MacDef.Command.CREATE.rawValue][MacDef.CommandCreate.DOMAIN.rawValue]) else {
-            log.atLevelError(id: socket, source: #file.source(#function, #line), message: "CREATE contains an invalid DOMAIN spec '\(message[MacDef.CommandCreate.DOMAIN.rawValue])'")
-            return
-        }
+    private func doCreateDomainCommand(command: CreateDomainCommand) {
         
         // Check if this domain already exists
-        guard !domains.contains(domain.name as String) else {
-            log.atLevelError(id: socket, source: #file.source(#function, #line), message: "CREATE-DOMAIN NAME already exists (\(domain.name as String))")
+        guard domains.domainForName(command.domainName) != nil else {
+            log.atLevelError(id: socket, source: #file.source(#function, #line), message: "Domain name already exists (\(command.domainName as String))")
             return
         }
         
-        // Check if the prefix 'www' must be used, and if so, then check if that domain is already exists
-        if domain.wwwIncluded.boolValue {
-            if domains.contains("www." + (domain.name as String) as String) {
-                log.atLevelError(id: socket, source: #file.source(#function, #line), message: "CREATE-DOMAIN www.NAME already exists (\("www." + (domain.name as String)))")
-                return
-            }
-        }
+        let domain = Domain()
+        domain.name = command.domainName
         
         domains.add(domain)
         
         log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Added new domain with \(domain))")
-        
         log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Number of domains: \(domains.count)")
-
     }
     
-    private func doCommandRemove(message: VJson) {
+    private func doRemoveDomainCommand(command: RemoveDomainCommand) {
         
-        guard let name = message[MacDef.Command.REMOVE.rawValue][MacDef.CommandCreate.DOMAIN.rawValue]["Name"].stringValue?.lowercaseString else {
-            log.atLevelError(id: socket, source: #file.source(#function, #line), message: "REMOVE should contain a DOMAIN with a NAME of the STRING type '\(message)'")
-            return
-        }
-        
-        if domains.remove(name) {
-            log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "REMOVE-DOMAIN Removed domain '\(name)')")
+        if domains.remove(command.domainName) {
+            log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "REMOVE-DOMAIN Removed domain '\(command.domainName)')")
         } else {
-            log.atLevelError(id: socket, source: #file.source(#function, #line), message: "REMOVE-DOMAIN NAME does not exist (\(name))")
+            log.atLevelError(id: socket, source: #file.source(#function, #line), message: "REMOVE-DOMAIN NAME does not exist (\(command.domainName))")
         }
     }
     
-    private func doCommandUpdate(message: VJson) {
+    private func doUpdateDomainCommand(command: UpdateDomainCommand) {
         
-        guard let oldDomain = Domain(json: message[MacDef.Command.UPDATE.rawValue][MacDef.CommandUpdate.OLD.rawValue][MacDef.CommandUpdate.DOMAIN.rawValue]) else {
-            log.atLevelError(id: socket, source: #file.source(#function, #line), message: "UPDATE-DOMAIN could not create old domain from path UPDATE.OLD.DOMAIN")
+        guard domains.contains(command.oldDomainName) else {
+            log.atLevelError(id: socket, source: #file.source(#function, #line), message: "UPDATE-DOMAIN no domain present with name \(command.oldDomainName)")
             return
         }
         
-        guard let newDomain = Domain(json: message[MacDef.Command.UPDATE.rawValue][MacDef.CommandUpdate.NEW.rawValue][MacDef.CommandUpdate.DOMAIN.rawValue]) else {
-            log.atLevelError(id: socket, source: #file.source(#function, #line), message: "UPDATE-DOMAIN could not create new domain from path UPDATE.NEW.DOMAIN")
-            return
-        }
-        
-        guard domains.contains(oldDomain.name) else {
-            log.atLevelError(id: socket, source: #file.source(#function, #line), message: "UPDATE-DOMAIN no domain present with name \(oldDomain.name)")
-            return
-        }
-        
-        if domains.update(oldDomain.name, withDomain: newDomain) {
-            log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "UPDATE-DOMAIN updated domain \(oldDomain.name) to \(newDomain))")
+        if domains.update(command.oldDomainName, withDomain: command.newDomain) {
+            log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "UPDATE-DOMAIN updated domain \(command.oldDomainName) to \(command.newDomain))")
             return
         } else {
             log.atLevelError(id: socket, source: #file.source(#function, #line), message: "UPDATE-DOMAIN failed")
         }
     }
     
-    private func doCommandQuit(message: VJson) {
+    private func doReadDomainsCommand(command: ReadDomainsCommand) {
+    
+        let reply = ReadDomainsReply(domains: domains)
         
-        guard message.isObject else {
-            log.atLevelError(id: socket, source: #file.source(#function, #line), message: "QUIT should be an OBJECT")
-            return
-        }
-        
-        guard message.nofChildren == 1 else {
-            log.atLevelError(id: socket, source: #file.source(#function, #line), message: "QUIT should contain 1 child, found \(message.nofChildren)")
-            return
-        }
-        
-        guard message[MacDef.Command.QUIT.rawValue].isNull else {
-            log.atLevelError(id: socket, source: #file.source(#function, #line), message: "QUIT should contain a NULL value (with the name Quit)")
-            return
-        }
-        
+        transferMessage(reply.json)
+    }
+    
+    private func doServerQuitCommand() {
         
         // Stop the http server if it is running
         
@@ -510,23 +442,8 @@ final class MonitoringAndControl {
         abortMacLoop = true
     }
     
-    private func doCommandStart(message: VJson) {
-        
-        guard message.isObject else {
-            log.atLevelError(id: socket, source: #file.source(#function, #line), message: "START should be an OBJECT")
-            return
-        }
-        
-        guard message.nofChildren == 1 else {
-            log.atLevelError(id: socket, source: #file.source(#function, #line), message: "START should contain 1 child, found \(message.nofChildren)")
-            return
-        }
-        
-        guard message[MacDef.Command.START.rawValue].isNull else {
-            log.atLevelError(id: socket, source: #file.source(#function, #line), message: "START should contain a NULL value (with the name Start)")
-            return
-        }
-        
+    private func doServerStartCommand() {
+
         
         // If the server is running, don't do anything
         
@@ -569,23 +486,7 @@ final class MonitoringAndControl {
         log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "START completed")
     }
     
-    private func doCommandStop(message: VJson) {
-      
-        guard message.isObject else {
-            log.atLevelError(id: socket, source: #file.source(#function, #line), message: "STOP should be an OBJECT")
-            return
-        }
-        
-        guard message.nofChildren == 1 else {
-            log.atLevelError(id: socket, source: #file.source(#function, #line), message: "STOP should contain 1 child, found \(message.nofChildren)")
-            return
-        }
-        
-        guard message[MacDef.Command.STOP.rawValue].isNull else {
-            log.atLevelError(id: socket, source: #file.source(#function, #line), message: "STOP should contain a NULL value (with the name Stop)")
-            return
-        }
-        
+    private func doServerStopCommand() {
         
         // Only if the server is not already stopped
         
@@ -599,382 +500,410 @@ final class MonitoringAndControl {
         log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "STOP completed")
     }
     
-    private func doCommandRead(message: VJson) -> VJson? {
+    private func doReadServerParameterCommand(command: ReadServerParameterCommand) {
         
-        guard let parameterName = message[MacDef.Command.READ.rawValue].stringValue else {
-            log.atLevelError(id: socket, source: #file.source(#function, #line), message: "READ should contain a STRING as parameter id")
-            return nil
-        }
-
-        guard let parameter = MacDef.Parameter(rawValue: parameterName) else {
-            log.atLevelError(id: socket, source: #file.source(#function, #line), message: "READ contains unknown parameter id: '\(message[MacDef.Command.READ.rawValue].stringValue)'")
-            return nil
-        }
-        
-        switch parameter {
+        switch command.parameter {
             
         case .DEBUG_MODE:
             
             log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, debugMode = \(Parameters.asBool(.DEBUG_MODE))")
-            return parameter.jsonWithValue(Parameters.asBool(.DEBUG_MODE))
-
+            
+            let reply = ReadServerParameterReply(parameter: command.parameter, value: Parameters.asBool(.DEBUG_MODE))
+            
+            transferMessage(reply.json)
+            
             
         case .SERVICE_PORT_NUMBER:
             
             log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, servicePortNumber = \(Parameters.asString(.SERVICE_PORT_NUMBER))")
-            return parameter.jsonWithValue(Parameters.asString(.SERVICE_PORT_NUMBER))
+            
+            let reply = ReadServerParameterReply(parameter: command.parameter, value: Parameters.asString(.SERVICE_PORT_NUMBER))
+            
+            transferMessage(reply.json)
             
             
         case .MAX_NOF_PENDING_CLIENT_MESSAGES:
             
             log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, maxNofPendingClientMessages = \(Parameters.asInt(.MAX_NOF_PENDING_CLIENT_MESSAGES))")
-            return parameter.jsonWithValue(Parameters.asInt(.MAX_NOF_PENDING_CLIENT_MESSAGES))
+            
+            let reply = ReadServerParameterReply(parameter: command.parameter, value: Parameters.asInt(.MAX_NOF_PENDING_CLIENT_MESSAGES))
+            
+            transferMessage(reply.json)
             
             
         case .MAX_CLIENT_MESSAGE_SIZE:
             
             log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, maxClientMessageSize = \(Parameters.asInt(.MAX_CLIENT_MESSAGE_SIZE))")
-            return parameter.jsonWithValue(Parameters.asInt(.MAX_CLIENT_MESSAGE_SIZE))
+            
+            let reply = ReadServerParameterReply(parameter: command.parameter, value: Parameters.asInt(.MAX_CLIENT_MESSAGE_SIZE))
+            
+            transferMessage(reply.json)
             
             
         case .MAX_NOF_ACCEPTED_CONNECTIONS:
             
             log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, ap_MaxNumberOfAcceptedConnections = \(Parameters.asInt(.MAX_NOF_ACCEPTED_CONNECTIONS))")
-            return parameter.jsonWithValue(Parameters.asInt(.MAX_NOF_ACCEPTED_CONNECTIONS))
+            
+            let reply = ReadServerParameterReply(parameter: command.parameter, value: Parameters.asInt(.MAX_NOF_ACCEPTED_CONNECTIONS))
+            
+            transferMessage(reply.json)
             
             
         case .MAX_NOF_PENDING_CONNECTIONS:
             
-            log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, ap_MaxNumberOfWaitingConnections = \(Parameters.asInt(.MAX_NOF_PENDING_CONNECTIONS))")
-            return parameter.jsonWithValue(Int(Parameters.asInt(.MAX_NOF_PENDING_CONNECTIONS)))
+            log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, ap_MaxNumberOfPendingConnections = \(Parameters.asInt(.MAX_NOF_PENDING_CONNECTIONS))")
+            
+            let reply = ReadServerParameterReply(parameter: command.parameter, value: Parameters.asInt(.MAX_NOF_PENDING_CONNECTIONS))
+            
+            transferMessage(reply.json)
             
             
         case .MAX_WAIT_FOR_PENDING_CONNECTIONS:
             
-            log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, ap_MaxWaitForWaitingConnections = \(Parameters.asInt(.MAX_WAIT_FOR_PENDING_CONNECTIONS))")
-            return parameter.jsonWithValue(Parameters.asInt(.MAX_WAIT_FOR_PENDING_CONNECTIONS))
+            log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, ap_MaxWaitForPendingConnections = \(Parameters.asInt(.MAX_WAIT_FOR_PENDING_CONNECTIONS))")
             
+            let reply = ReadServerParameterReply(parameter: command.parameter, value: Parameters.asInt(.MAX_WAIT_FOR_PENDING_CONNECTIONS))
             
-        case .NOF_ACCEPTED_CLIENTS:
-            
-            log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, telemetry.nofAcceptedHttpRequests = \(serverTelemetry.nofAcceptedHttpRequests)")
-            return parameter.jsonWithValue(serverTelemetry.nofAcceptedHttpRequests.intValue)
-
-            
-        case .NOF_HTTP_400_REPLIES:
-            
-            log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, telemetry.nofHttp400Replies = \(serverTelemetry.nofHttp400Replies)")
-            return parameter.jsonWithValue(serverTelemetry.nofHttp400Replies.intValue)
-            
-                        
-        case .NOF_HTTP_502_REPLIES:
-            
-            log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, telemetry.nofHttp505Replies = \(serverTelemetry.nofHttp502Replies)")
-            return parameter.jsonWithValue(serverTelemetry.nofHttp502Replies.intValue)
-
-            
-        case .SERVER_STATUS:
-            
-            let rs = httpServerIsRunning()
-            log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, at_RunningStatus = \(rs)")
-            return parameter.jsonWithValue(rs ? "Running" : "Not Running")
-            
-            
-        case .VERSION_NUMBER:
-            
-            log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, ap_Version = \(Parameters.version)")
-            return parameter.jsonWithValue(Parameters.version)
+            transferMessage(reply.json)
             
             
         case .ASL_LOGLEVEL:
             
             log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, log.aslFacilityRecordAtAndAboveLevel = \(log.aslFacilityRecordAtAndAboveLevel.rawValue)")
-            return parameter.jsonWithValue(log.aslFacilityRecordAtAndAboveLevel.rawValue)
+            
+            let reply = ReadServerParameterReply(parameter: command.parameter, value: log.aslFacilityRecordAtAndAboveLevel.rawValue)
+            
+            transferMessage(reply.json)
             
             
         case .FILE_LOGLEVEL:
             
             log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, log.logfileRecordAtAndAboveLevel = \(log.fileRecordAtAndAboveLevel.rawValue)")
-            return parameter.jsonWithValue(log.fileRecordAtAndAboveLevel.rawValue)
             
+            let reply = ReadServerParameterReply(parameter: command.parameter, value: log.fileRecordAtAndAboveLevel.rawValue)
+            
+            transferMessage(reply.json)
+
             
         case .STDOUT_LOGLEVEL:
             
             log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, log.stdoutPrintAtAndAboveLevel = \(log.stdoutPrintAtAndAboveLevel.rawValue)")
-            return parameter.jsonWithValue(log.stdoutPrintAtAndAboveLevel.rawValue)
+
+            let reply = ReadServerParameterReply(parameter: command.parameter, value: log.stdoutPrintAtAndAboveLevel.rawValue)
+            
+            transferMessage(reply.json)
             
             
         case .CALLBACK_LOGLEVEL:
             
             log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, log.callbackTransmitAtAndAboveLevel = \(log.callbackAtAndAboveLevel.rawValue)")
-            return parameter.jsonWithValue(log.callbackAtAndAboveLevel.rawValue)
+
+            let reply = ReadServerParameterReply(parameter: command.parameter, value: log.callbackAtAndAboveLevel.rawValue)
+            
+            transferMessage(reply.json)
             
             
         case .NETWORK_LOGLEVEL:
             
             log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, log.networkTransmitAtAndAboveLevel = \(log.networkTransmitAtAndAboveLevel.rawValue)")
-            return parameter.jsonWithValue(log.networkTransmitAtAndAboveLevel.rawValue)
+
+            let reply = ReadServerParameterReply(parameter: command.parameter, value: log.networkTransmitAtAndAboveLevel.rawValue)
+            
+            transferMessage(reply.json)
             
             
         case .NETWORK_LOG_TARGET_ADDRESS:
             
             let dest = log.networkTarget?.address ?? "Not set"
             log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, log.networkTarget.address = \(dest)")
-            return parameter.jsonWithValue(dest)
+
+            let reply = ReadServerParameterReply(parameter: command.parameter, value: dest)
+            
+            transferMessage(reply.json)
 
             
         case .NETWORK_LOG_TARGET_PORT:
             
             let port = log.networkTarget?.port ?? "0"
             log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, log.networkTarget.port = \(port)")
-            return parameter.jsonWithValue(port)
+
+            let reply = ReadServerParameterReply(parameter: command.parameter, value: port)
             
-            
-        case .DOMAINS:
-            
-            return parameter.jsonWithValue(domains)
+            transferMessage(reply.json)
         }
     }
     
-    
-    private func doCommandWrite(message: VJson) {
+    private func doReadServerTelemetryCommand(command: ReadServerTelemetryCommand) {
         
-        guard let subject = message[MacDef.Command.WRITE.rawValue].arrayValue?[0] else {
-            log.atLevelWarning(id: socket, source: #file.source(#function, #line), message: "WRITE could not extract parameter name")
-            return
+        switch command.telemetryItem {
+            
+            
+        case .NOF_ACCEPTED_HTTP_REQUESTS:
+            
+            log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, telemetry.nofAcceptedHttpRequests = \(serverTelemetry.nofAcceptedHttpRequests.intValue)")
+            
+            let reply = ReadServerTelemetryReply(item: command.telemetryItem, value: serverTelemetry.nofAcceptedHttpRequests.intValue)
+            
+            transferMessage(reply.json)
+            
+
+        case .NOF_ACCEPT_WAITS_FOR_CONNECTION_OBJECT:
+             
+            log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, telemetry.nofAcceptWaitsForConnectionObject = \(serverTelemetry.nofAcceptWaitsForConnectionObject.intValue)")
+             
+            let reply = ReadServerTelemetryReply(item: command.telemetryItem, value: serverTelemetry.nofAcceptWaitsForConnectionObject.intValue)
+             
+            transferMessage(reply.json)
+            
+             
+        case .NOF_HTTP_400_REPLIES:
+             
+            log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, telemetry.nofHttp400Replies = \(serverTelemetry.nofHttp400Replies.intValue)")
+            
+            let reply = ReadServerTelemetryReply(item: command.telemetryItem, value: serverTelemetry.nofHttp400Replies.intValue)
+
+            transferMessage(reply.json)
+             
+        case .NOF_HTTP_502_REPLIES:
+             
+            log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, telemetry.nofHttp502Replies = \(serverTelemetry.nofHttp502Replies.intValue)")
+            
+            let reply = ReadServerTelemetryReply(item: command.telemetryItem, value: serverTelemetry.nofHttp502Replies.intValue)
+            
+            transferMessage(reply.json)
+            
+             
+        case .SERVER_STATUS:
+             
+            let rs = httpServerIsRunning()
+            
+            log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, at_RunningStatus = \(rs)")
+            
+            let reply = ReadServerTelemetryReply(item: command.telemetryItem, value: (rs ? "Running" : "Not Running"))
+            
+            transferMessage(reply.json)
+            
+             
+        case .SERVER_VERSION:
+             
+             log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, ap_Version = \(Parameters.version)")
+             
+             let reply = ReadServerTelemetryReply(item: command.telemetryItem, value: Parameters.version)
+
+             transferMessage(reply.json)
         }
+    }
+
+    private func doWriteServerParameterCommand(command: WriteServerParameterCommand) {
         
-        guard let parameter = MacDef.Parameter.create(subject.nameValue) else {
-            log.atLevelWarning(id: socket, source: #file.source(#function, #line), message: "WRITE contains unknown parameter id: '\(message.stringValue)'")
-            return
-        }
-        
-        switch parameter {
+        switch command.parameter {
             
         case .ASL_LOGLEVEL:
             
-            guard let intLevel = subject.integerValue else {
-                log.atLevelWarning(id: socket, source: #file.source(#function, #line), message: "WRITE-ASL_LOGLEVEL should contain a NUMBER value")
-                return
-            }
-            
-            guard let newLevel = SwifterLog.Level(rawValue: intLevel) else {
-                log.atLevelWarning(id: socket, source: #file.source(#function, #line), message: "WRITE-ASL_LOGLEVEL new value should be in range 0..8, found \(intLevel)")
+            guard let level = command.intValue, let newLevel = SwifterLog.Level(rawValue: level) else {
+                log.atLevelWarning(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) new value should be in range 0..8, found \(command.intValue)")
                 return
             }
             
             if newLevel != log.aslFacilityRecordAtAndAboveLevel {
-                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "WRITE-ASL_LOGLEVEL updating from \(log.aslFacilityRecordAtAndAboveLevel) to \(newLevel)")
+                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) updating from \(log.aslFacilityRecordAtAndAboveLevel) to \(newLevel)")
                 log.aslFacilityRecordAtAndAboveLevel = newLevel
             } else {
-                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "WRITE-ASL_LOGLEVEL new level same as present level: \(newLevel)")
+                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) new level same as present level: \(newLevel)")
             }
             
             
         case .DEBUG_MODE:
             
-            guard let debugMode = subject.boolValue else {
-                log.atLevelWarning(id: socket, source: #file.source(#function, #line), message: "WRITE-DEBUG_MODE should contain a BOOL value")
+            guard let debugMode = command.boolValue else {
+                log.atLevelWarning(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) should contain a BOOL value")
                 return
             }
             
             if debugMode != Parameters.asBool(.DEBUG_MODE) {
-                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "WRITE-DEBUG_MODE updating from \(Parameters.asBool(.DEBUG_MODE)) to \(debugMode)")
+                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) updating from \(Parameters.asBool(.DEBUG_MODE)) to \(debugMode)")
                 Parameters.pdict[.DEBUG_MODE] = debugMode
             } else {
-                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "WRITE-DEBUG_MODE new level same as present level: \(Parameters.asBool(.DEBUG_MODE))")
+                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) new level same as present level: \(Parameters.asBool(.DEBUG_MODE))")
             }
             
             
         case .FILE_LOGLEVEL:
             
-            guard let intLevel = subject.integerValue else {
-                log.atLevelWarning(id: socket, source: #file.source(#function, #line), message: "WRITE-FILE_LOGLEVEL should contain a NUMBER value")
+            guard let intLevel = command.intValue else {
+                log.atLevelWarning(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) should contain a NUMBER value")
                 return
             }
             
             guard let newLevel = SwifterLog.Level(rawValue: intLevel) else {
-                log.atLevelWarning(id: socket, source: #file.source(#function, #line), message: "WRITE-FILE_LOGLEVEL new value should be in range 0..8, found \(intLevel)")
+                log.atLevelWarning(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) new value should be in range 0..8, found \(intLevel)")
                 return
             }
             
             if newLevel != log.fileRecordAtAndAboveLevel {
-                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "WRITE-FILE_LOGLEVEL updating from \(log.fileRecordAtAndAboveLevel) to \(newLevel)")
+                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) updating from \(log.fileRecordAtAndAboveLevel) to \(newLevel)")
                 log.fileRecordAtAndAboveLevel = newLevel
             } else {
-                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "WRITE-FILE_LOGLEVEL new level same as present level: \(newLevel)")
+                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) new level same as present level: \(newLevel)")
             }
             
             
         case .CALLBACK_LOGLEVEL:
             
-            guard let intLevel = subject.integerValue else {
-                log.atLevelWarning(id: socket, source: #file.source(#function, #line), message: "WRITE-CALLBACK_LOGLEVEL should contain a NUMBER value")
+            guard let intLevel = command.intValue else {
+                log.atLevelWarning(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) should contain a NUMBER value")
                 return
             }
             
             guard let newLevel = SwifterLog.Level(rawValue: intLevel) else {
-                log.atLevelWarning(id: socket, source: #file.source(#function, #line), message: "WRITE-CALLBACK_LOGLEVEL new value should be in range 0..8, found \(intLevel)")
+                log.atLevelWarning(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) new value should be in range 0..8, found \(intLevel)")
                 return
             }
             
             if newLevel != log.callbackAtAndAboveLevel {
-                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "WRITE-CALLBACK_LOGLEVEL updating from \(log.callbackAtAndAboveLevel) to \(newLevel)")
+                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) updating from \(log.callbackAtAndAboveLevel) to \(newLevel)")
                 log.callbackAtAndAboveLevel = newLevel
             } else {
-                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "WRITE-CALLBACK_LOGLEVEL new level same as present level: \(newLevel)")
+                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) new level same as present level: \(newLevel)")
             }
             
             
         case .MAX_NOF_PENDING_CLIENT_MESSAGES:
             
-            guard let dbSize = subject.integerValue else {
-                log.atLevelWarning(id: socket, source: #file.source(#function, #line), message: "WRITE-MAX_NOF_PENDING_CLIENT_MESSAGES should contain a NUMBER value")
+            guard let dbSize = command.intValue else {
+                log.atLevelWarning(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) should contain a NUMBER value")
                 return
             }
             
             if dbSize != Parameters.asInt(.MAX_NOF_PENDING_CLIENT_MESSAGES) {
-                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "WRITE-MAX_NOF_PENDING_CLIENT_MESSAGES updating from \(Parameters.asInt(.MAX_NOF_PENDING_CLIENT_MESSAGES)) to \(dbSize)")
+                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) updating from \(Parameters.asInt(.MAX_NOF_PENDING_CLIENT_MESSAGES)) to \(dbSize)")
                 Parameters.pdict[.MAX_NOF_PENDING_CLIENT_MESSAGES] = dbSize
             } else {
-                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "WRITE-MAX_NOF_PENDING_CLIENT_MESSAGES new value same as present value: \(dbSize)")
+                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) new value same as present value: \(dbSize)")
             }
             
             
         case .MAX_CLIENT_MESSAGE_SIZE:
             
-            guard let dbSize = subject.integerValue else {
-                log.atLevelWarning(id: socket, source: #file.source(#function, #line), message: "WRITE-MAX_CLIENT_MESSAGE_SIZE should contain a NUMBER value")
+            guard let dbSize = command.intValue else {
+                log.atLevelWarning(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) should contain a NUMBER value")
                 return
             }
             
             if dbSize != Parameters.asInt(.MAX_CLIENT_MESSAGE_SIZE) {
-                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "WRITE-MAX_CLIENT_MESSAGE_SIZE updating from \(Parameters.asInt(.MAX_CLIENT_MESSAGE_SIZE)) to \(dbSize)")
+                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) updating from \(Parameters.asInt(.MAX_CLIENT_MESSAGE_SIZE)) to \(dbSize)")
                 Parameters.pdict[.MAX_CLIENT_MESSAGE_SIZE] = dbSize
             } else {
-                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "WRITE-MAX_CLIENT_MESSAGE_SIZE new value same as present value: \(dbSize)")
+                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) new value same as present value: \(dbSize)")
             }
             
             
         case .MAX_NOF_ACCEPTED_CONNECTIONS:
             
-            guard let maxConn = subject.integerValue else {
-                log.atLevelWarning(id: socket, source: #file.source(#function, #line), message: "WRITE-MAX_NOF_ACCEPTED_CONNECTIONS should contain a NUMBER value")
+            guard let maxConn = command.intValue else {
+                log.atLevelWarning(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) should contain a NUMBER value")
                 return
             }
             
             if maxConn != Parameters.asInt(.MAX_NOF_ACCEPTED_CONNECTIONS) {
-                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "WRITE-MAX_NOF_ACCEPTED_CONNECTIONS updating from \(Parameters.asInt(.MAX_NOF_ACCEPTED_CONNECTIONS)) to \(maxConn)")
+                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) updating from \(Parameters.asInt(.MAX_NOF_ACCEPTED_CONNECTIONS)) to \(maxConn)")
                 Parameters.pdict[.MAX_NOF_ACCEPTED_CONNECTIONS] = maxConn
             } else {
-                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "WRITE-MAX_NOF_ACCEPTED_CONNECTIONS new value same as present value: \(maxConn)")
+                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) new value same as present value: \(maxConn)")
             }
             
             
         case .MAX_NOF_PENDING_CONNECTIONS:
             
-            guard let maxPend = subject.integerValue else {
-                log.atLevelWarning(id: socket, source: #file.source(#function, #line), message: "WRITE-MAX_NOF_PENDING_CONNECTIONS should contain a NUMBER value")
+            guard let maxPend = command.intValue else {
+                log.atLevelWarning(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) should contain a NUMBER value")
                 return
             }
             
             if maxPend != Parameters.asInt(.MAX_NOF_PENDING_CONNECTIONS) {
-                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "WRITE-MAX_NOF_PENDING_CONNECTIONS updating from \(Parameters.asInt(.MAX_NOF_PENDING_CONNECTIONS)) to \(maxPend)")
+                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) updating from \(Parameters.asInt(.MAX_NOF_PENDING_CONNECTIONS)) to \(maxPend)")
                 Parameters.pdict[.MAX_NOF_PENDING_CONNECTIONS] = Int32(maxPend)
             } else {
-                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "WRITE-MAX_NOF_PENDING_CONNECTIONS new value same as present value: \(maxPend)")
+                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) new value same as present value: \(maxPend)")
             }
             
             
         case .MAX_WAIT_FOR_PENDING_CONNECTIONS:
             
-            guard let maxWait = subject.integerValue else {
-                log.atLevelWarning(id: socket, source: #file.source(#function, #line), message: "WRITE-MAX_WAIT_FOR_PENDING_CONNECTIONS should contain a NUMBER value")
+            guard let maxWait = command.intValue else {
+                log.atLevelWarning(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) should contain a NUMBER value")
                 return
             }
             
             if maxWait != Parameters.asInt(.MAX_WAIT_FOR_PENDING_CONNECTIONS) {
-                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "WRITE-MAX_WAIT_FOR_PENDING_CONNECTIONS updating from \(Parameters.asInt(.MAX_WAIT_FOR_PENDING_CONNECTIONS)) to \(maxWait)")
+                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) updating from \(Parameters.asInt(.MAX_WAIT_FOR_PENDING_CONNECTIONS)) to \(maxWait)")
                 Parameters.pdict[.MAX_WAIT_FOR_PENDING_CONNECTIONS] = maxWait
             } else {
-                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "WRITE-MAX_WAIT_FOR_PENDING_CONNECTIONS new value same as present value: \(maxWait)")
+                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) new value same as present value: \(maxWait)")
             }
             
             
         case .NETWORK_LOG_TARGET_ADDRESS:
             
-            guard let address = subject.stringValue else {
-                log.atLevelWarning(id: socket, source: #file.source(#function, #line), message: "WRITE-NETWORK_LOG_TARGET_ADDRESS should contain a STRING value")
-                return
-            }
-            
-            networkLogTarget.address = address
+            networkLogTarget.address = command.value
             
             let localCopy: SwifterLog.NetworkTarget = networkLogTarget
             
             if conditionallySetNetworkLogTarget() {
-                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "WRITE-NETWORK_LOG_TARGET_ADDRESS setting the network target to: \(localCopy.address):\(localCopy.port)")
+                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) setting the network target to: \(localCopy.address):\(localCopy.port)")
             } else {
-                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "WRITE-NETWORK_LOG_TARGET_ADDRESS updated target address, waiting for port.")
+                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) updated target address, waiting for port.")
             }
             
             
         case .NETWORK_LOG_TARGET_PORT:
             
-            guard let port = subject.stringValue else {
-                log.atLevelWarning(id: socket, source: #file.source(#function, #line), message: "WRITE-NETWORK_LOG_TARGET_ADDRESS should contain a STRING value")
-                return
-            }
-            
-            networkLogTarget.port = port
+            networkLogTarget.port = command.value
             
             let localCopy: SwifterLog.NetworkTarget = networkLogTarget
             
             if conditionallySetNetworkLogTarget() {
-                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "WRITE-NETWORK_LOG_TARGET_ADDRESS setting the network target to: \(localCopy.address):\(localCopy.port)")
+                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) setting the network target to: \(localCopy.address):\(localCopy.port)")
             } else {
-                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "WRITE-NETWORK_LOG_TARGET_ADDRESS updated target port, waiting for address.")
+                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) updated target port, waiting for address.")
             }
             
             
         case .NETWORK_LOGLEVEL:
             
-            guard let intLevel = subject.integerValue else {
-                log.atLevelWarning(id: socket, source: #file.source(#function, #line), message: "WRITE-NETWORK_LOGLEVEL should contain a NUMBER value")
+            guard let intLevel = command.intValue else {
+                log.atLevelWarning(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) should contain a NUMBER value")
                 return
             }
             
             guard let newLevel = SwifterLog.Level(rawValue: intLevel) else {
-                log.atLevelWarning(id: socket, source: #file.source(#function, #line), message: "WRITE-NETWORK_LOGLEVEL new value should be in range 0..8, found \(intLevel)")
+                log.atLevelWarning(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) new value should be in range 0..8, found \(intLevel)")
                 return
             }
             
             if newLevel != log.networkTransmitAtAndAboveLevel {
-                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "WRITE-NETWORK_LOGLEVEL updating from \(log.networkTransmitAtAndAboveLevel) to \(newLevel)")
+                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) updating from \(log.networkTransmitAtAndAboveLevel) to \(newLevel)")
                 log.networkTransmitAtAndAboveLevel = newLevel
             } else {
-                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "WRITE-NETWORK_LOGLEVEL new level same as present level: \(newLevel)")
+                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) new level same as present level: \(newLevel)")
             }
             
             
         case .SERVICE_PORT_NUMBER:
             
-            guard let portStr = subject.stringValue else {
-                log.atLevelWarning(id: socket, source: #file.source(#function, #line), message: "WRITE-SERVICE_PORT_NUMBER should contain a STRING value")
-                return
-            }
+            let portStr = command.value
             
             if portStr != Parameters.asString(.SERVICE_PORT_NUMBER) {
-                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "WRITE-SERVICE_PORT_NUMBER updating from \(Parameters.asString(.SERVICE_PORT_NUMBER)) to \(portStr)")
+                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) updating from \(Parameters.asString(.SERVICE_PORT_NUMBER)) to \(portStr)")
                 Parameters.pdict[.SERVICE_PORT_NUMBER] = portStr
             } else {
-                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "WRITE-SERVICE_PORT_NUMBER new value same as present value: \(portStr)")
+                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) new value same as present value: \(portStr)")
             }
             
             
         case .STDOUT_LOGLEVEL:
             
-            guard let intLevel = subject.integerValue else {
+            guard let intLevel = command.intValue else {
                 log.atLevelWarning(id: socket, source: #file.source(#function, #line), message: "WRITE-STDOUT_LOGLEVEL should contain a NUMBER value")
                 return
             }
@@ -990,120 +919,41 @@ final class MonitoringAndControl {
             } else {
                 log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "WRITE-STDOUT_LOGLEVEL new level same as present level: \(newLevel)")
             }
-            
-        default:
-            
-            log.atLevelError(id: socket, source: #file.source(#function, #line), message: "Missing case for parameter \(parameter.rawValue)")
         }
     }
     
-    private func doCommandDelta(message: VJson) {
-
-        guard message.isObject else {
-            log.atLevelError(id: socket, source: #file.source(#function, #line), message: "DELTA should be an OBJECT")
-            return
-        }
-        
-        guard message.nofChildren == 1 else {
-            log.atLevelError(id: socket, source: #file.source(#function, #line), message: "DELTA should contain 1 child, found \(message.nofChildren)")
-            return
-        }
-        
-        guard let delta = message[MacDef.Command.DELTA.rawValue].integerValue else {
-            log.atLevelWarning(id: socket, source: #file.source(#function, #line), message: "DELTA should contain a NUMBER value with the name Delta")
-            return
-        }
+    private func doDeltaCommand(command: DeltaCommand) {
         
         log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "DELTA start")
 
-        if delta == 0 { return }
-        sleep(UInt32(min(delta, 10))) // Never more than 10 seconds
+        if command.delay == 0 { return }
+        sleep(UInt32(min(command.delay, 10))) // Never more than 10 seconds
         
         log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "DELTA completed")
     }
     
-    private func doCommandRestoreDomains(message: VJson) {
-        
-        guard message.isObject else {
-            log.atLevelError(id: socket, source: #file.source(#function, #line), message: "RESTORE_DOMAINS should be an OBJECT")
-            return
-        }
-        
-        guard message.nofChildren == 1 else {
-            log.atLevelError(id: socket, source: #file.source(#function, #line), message: "RESTORE_DOMAINS should contain 1 child, found \(message.nofChildren)")
-            return
-        }
-        
-        guard message[MacDef.Command.RESTORE_DOMAINS.rawValue].isNull else {
-            log.atLevelError(id: socket, source: #file.source(#function, #line), message: "RESTORE_DOMAINS should contain a NULL value (with the name RestoreDomains)")
-            return
-        }
+    private func doRestoreDomainsCommand() {
         
         domains.restore()
         
         log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "RESTORE_DOMAINS completed")
     }
     
-    private func doCommandRestoreParameters(message: VJson) {
-        
-        guard message.isObject else {
-            log.atLevelError(id: socket, source: #file.source(#function, #line), message: "RESTORE_PARAMETERS should be an OBJECT")
-            return
-        }
-        
-        guard message.nofChildren == 1 else {
-            log.atLevelError(id: socket, source: #file.source(#function, #line), message: "RESTORE_PARAMETERS should contain 1 child, found \(message.nofChildren)")
-            return
-        }
-        
-        guard message[MacDef.Command.RESTORE_PARAMETERS.rawValue].isNull else {
-            log.atLevelError(id: socket, source: #file.source(#function, #line), message: "RESTORE_PARAMETERS should contain a NULL value (with the name RestoreParameters)")
-            return
-        }
+    private func doRestoreServerParametersCommand() {
         
         Parameters.restore()
         
         log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "RESTORE_PARAMETERS completed")
     }
 
-    private func doCommandSaveDomains(message: VJson) {
-        
-        guard message.isObject else {
-            log.atLevelError(id: socket, source: #file.source(#function, #line), message: "SAVE_DOMAINS should be an OBJECT")
-            return
-        }
-        
-        guard message.nofChildren == 1 else {
-            log.atLevelError(id: socket, source: #file.source(#function, #line), message: "SAVE_DOMAINS should contain 1 child, found \(message.nofChildren)")
-            return
-        }
-        
-        guard message[MacDef.Command.SAVE_DOMAINS.rawValue].isNull else {
-            log.atLevelError(id: socket, source: #file.source(#function, #line), message: "SAVE_DOMAINS should contain a NULL value (with the name SaveDomains)")
-            return
-        }
+    private func doSaveDomainsCommand() {
         
         domains.save()
         
         log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "SAVE_DOMAINS completed")
     }
 
-    private func doCommandSaveParameters(message: VJson) {
-        
-        guard message.isObject else {
-            log.atLevelError(id: socket, source: #file.source(#function, #line), message: "SAVE_PARAMETERS should be an OBJECT")
-            return
-        }
-        
-        guard message.nofChildren == 1 else {
-            log.atLevelError(id: socket, source: #file.source(#function, #line), message: "SAVE_PARAMETERS should contain 1 child, found \(message.nofChildren)")
-            return
-        }
-        
-        guard message[MacDef.Command.SAVE_PARAMETERS.rawValue].isNull else {
-            log.atLevelError(id: socket, source: #file.source(#function, #line), message: "SAVE_PARAMETERS should contain a NULL value (with the name SaveParameters)")
-            return
-        }
+    private func doSaveServerParametersCommand() {
         
         Parameters.save()
         

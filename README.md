@@ -40,6 +40,11 @@ The I drag & drop the group with the source files from (for example) SwifterLog 
 
 #Version history
 
+####v0.9.4
+
+- Switched to VJSON pipe operators
+- Simplified the SwifterConsole M&C interface
+
 ####v0.9.3
 
 - Added domain telemetry

@@ -3,7 +3,7 @@
 //  File:       MacDef.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.3
+//  Version:    0.9.4
 //
 //  Author:     Marinus van der Lugt
 //  Website:    http://www.balancingrock.nl/swiftfire.html
@@ -48,6 +48,7 @@
 //
 // History
 //
+// v0.9.4 - Changed interface definitions from enum's to old-school classes
 // v0.9.3 - Removed telemetry that has been relocated from the server to the domains
 //        - Added command "ReadDomainTelemetry"
 // v0.9.0 - Initial release
@@ -55,60 +56,6 @@
 
 import Foundation
 
-class ReadDomainTelemetryCommand {
-    
-    static let JSON_ID = "ReadDomainTelemetryCommand"
-    
-    let domainName: String
-    
-    var json: VJson {
-        let j = VJson.createJsonHierarchy()
-        j[ReadDomainTelemetryCommand.JSON_ID].stringValue = domainName
-        return j
-    }
-    
-    init?(domainName: String?) {
-        guard let domainName = domainName else { return nil }
-        self.domainName = domainName
-    }
-    
-    init?(json: VJson?) {
-        guard let json = json else { return nil }
-        guard let jdomainName = json.objectOfType(VJson.JType.STRING, atPath: ReadDomainTelemetryCommand.JSON_ID)?.stringValue else { return nil }
-        domainName = jdomainName
-    }
-}
-
-class ReadDomainTelemetryReply {
-    
-    static let JSON_ID = "ReadDomainTelemetryReply"
-    
-    var domainName: String
-    var domainTelemetry: DomainTelemetry
-    
-    var json: VJson {
-        let jsonTelemetry = domainTelemetry.json("Telemetry")
-        let j = VJson.createJsonHierarchy()
-        j[ReadDomainTelemetryReply.JSON_ID]["Domain"].stringValue = domainName
-        j[ReadDomainTelemetryReply.JSON_ID].addChild(jsonTelemetry)
-        return j
-    }
-    
-    init(domainName: String, domainTelemetry: DomainTelemetry) {
-        self.domainName = domainName
-        self.domainTelemetry = domainTelemetry.duplicate
-    }
-    
-    init?(json: VJson?) {
-        guard let json = json else { return nil }
-        guard let jname = json.objectOfType(VJson.JType.STRING, atPath: ReadDomainTelemetryReply.JSON_ID, "Domain")?.stringValue else { return nil }
-        guard let jtelemetryJson = json.objectOfType(VJson.JType.OBJECT, atPath: ReadDomainTelemetryReply.JSON_ID, "Telemetry") else { return nil }
-        guard let jtelemetry = DomainTelemetry(json: jtelemetryJson) else { return nil }
-        
-        domainName = jname
-        domainTelemetry = jtelemetry
-    }
-}
 
 class MacDef {
 

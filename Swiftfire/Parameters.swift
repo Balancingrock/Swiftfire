@@ -3,7 +3,7 @@
 //  File:       Parameters.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.3
+//  Version:    0.9.4
 //
 //  Author:     Marinus van der Lugt
 //  Website:    http://www.balancingrock.nl/swiftfire.html
@@ -48,6 +48,7 @@
 //
 // History
 //
+// v0.9.4 - Updated version number
 // v0.9.3 - Updated version number
 // v0.9.2 - Updated version number
 // v0.9.0 - Initial release
