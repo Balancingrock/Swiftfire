@@ -65,6 +65,7 @@
 		865713E71CE9B90200B9CD36 /* CreateDomainCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 865713E61CE9B90200B9CD36 /* CreateDomainCommand.swift */; };
 		865713E91CE9BC7E00B9CD36 /* ServerParameter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 865713E81CE9BC7E00B9CD36 /* ServerParameter.swift */; };
 		868577091CDF21CE000BE5D6 /* SwifterLogNetwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = 868577081CDF21CE000BE5D6 /* SwifterLogNetwork.swift */; };
+		8694C9AC1CEEF84E00F45D8B /* MimeType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8694C9AB1CEEF84E00F45D8B /* MimeType.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -147,6 +148,7 @@
 		865713E61CE9B90200B9CD36 /* CreateDomainCommand.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CreateDomainCommand.swift; sourceTree = "<group>"; };
 		865713E81CE9BC7E00B9CD36 /* ServerParameter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ServerParameter.swift; sourceTree = "<group>"; };
 		868577081CDF21CE000BE5D6 /* SwifterLogNetwork.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwifterLogNetwork.swift; path = ../../../SwifterLog/SwifterLog/SwifterLog/SwifterLogNetwork.swift; sourceTree = "<group>"; };
+		8694C9AB1CEEF84E00F45D8B /* MimeType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MimeType.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -203,6 +205,7 @@
 				864C6F291CC23F5200C60220 /* Host.swift */,
 				864C6EFB1CC23DE400C60220 /* main.swift */,
 				864C6F3A1CC23F7E00C60220 /* AcceptAndDispatch.swift */,
+				8694C9AB1CEEF84E00F45D8B /* MimeType.swift */,
 				86F49FBD1CE1CF0000AFEE55 /* Domains */,
 				864C6F4A1CC23FBE00C60220 /* HttpConnection */,
 				864C6F491CC23FA900C60220 /* Monitoring and Control */,
@@ -441,6 +444,7 @@
 				864C6F721CC2472100C60220 /* SwifterSockets.Receive.swift in Sources */,
 				8650538F1CEB747400D31DBF /* ReadDomainsCommand.swift in Sources */,
 				865053601CEB3C1200D31DBF /* ReadServerTelemetryCommand.swift in Sources */,
+				8694C9AC1CEEF84E00F45D8B /* MimeType.swift in Sources */,
 				864C6F731CC2472100C60220 /* SwifterSockets.Accept.swift in Sources */,
 				865713D71CE44BD200B9CD36 /* UIntTelemetry.swift in Sources */,
 				864C6F661CC2470300C60220 /* ASCII.swift in Sources */,

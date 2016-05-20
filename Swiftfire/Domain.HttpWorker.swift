@@ -3,7 +3,7 @@
 //  File:       Domain.HttpWorker.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.3
+//  Version:    0.9.5
 //
 //  Author:     Marinus van der Lugt
 //  Website:    http://www.balancingrock.nl/swiftfire.html
@@ -48,6 +48,7 @@
 //
 // History
 //
+// v0.9.5 - Added MIME support
 // v0.9.3 - Moved renamed telemetry items
 // v0.9.2 - Added httpWorker and associated functions
 //        - Removed resourcePathFor
@@ -170,7 +171,8 @@ extension Domain {
         // Create the http response
         // =============================================================================================================
         
-        let response = connection.httpResponseWithCode(.CODE_200_OK, andBody: responsePayload!)
+        let mimeType = mimeTypeForPath(resourcePath) ?? MIME_TYPE_DEFAULT
+        let response = connection.httpResponseWithCode(.CODE_200_OK, mimeType: mimeType, andBody: responsePayload!)
         telemetry.nof200.increment()
         
         

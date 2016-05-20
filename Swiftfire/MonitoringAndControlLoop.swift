@@ -3,7 +3,7 @@
 //  File:       MonitoringAndControl.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.4
+//  Version:    0.9.5
 //
 //  Author:     Marinus van der Lugt
 //  Website:    http://www.balancingrock.nl/swiftfire.html
@@ -48,6 +48,7 @@
 //
 // History
 //
+// v0.9.5 - Fixed bug that revented domain creation
 // v0.9.4 - Changed according to new command & reply definitions
 // v0.9.3 - Removed no longer existing server telemetry
 // v0.9.0 - Initial release
@@ -372,7 +373,7 @@ final class MonitoringAndControl {
     private func doCreateDomainCommand(command: CreateDomainCommand) {
         
         // Check if this domain already exists
-        guard domains.domainForName(command.domainName) != nil else {
+        guard domains.domainForName(command.domainName) == nil else {
             log.atLevelError(id: socket, source: #file.source(#function, #line), message: "Domain name already exists (\(command.domainName as String))")
             return
         }

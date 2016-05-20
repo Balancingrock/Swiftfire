@@ -3,7 +3,7 @@
 //  File:       Parameters.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.4
+private let VERSION = "0.9.5"
 //
 //  Author:     Marinus van der Lugt
 //  Website:    http://www.balancingrock.nl/swiftfire.html
@@ -48,6 +48,7 @@
 //
 // History
 //
+// v0.9.5 - Updated version number
 // v0.9.4 - Updated version number
 // v0.9.3 - Updated version number
 // v0.9.2 - Updated version number
@@ -185,7 +186,7 @@ final class Parameters {
     
     /// The version number of Swiftfire
     
-    static let version = "0.9.3" // Always hard coded, never read from the parameter defaults file
+    static let version = VERSION // Always hard coded, never read from the parameter defaults file
     
     
     // The current version number of the parameter-defaults file

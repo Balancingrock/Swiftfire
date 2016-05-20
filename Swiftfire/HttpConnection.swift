@@ -3,7 +3,7 @@
 //  File:       HttpConnection.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.2
+//  Version:    0.9.5
 //
 //  Author:     Marinus van der Lugt
 //  Website:    http://www.balancingrock.nl/swiftfire.html
@@ -48,6 +48,7 @@
 //
 // History
 //
+// v0.9.5 - Added support for different MIME types of response
 // v0.9.2 - Replaced sendXXXX functions with httpErrorResponseWithCode and httpResponseWithCode
 // v0.9.0 - Initial release
 // =====================================================================================================================
@@ -320,7 +321,7 @@ extension HttpConnection {
         
         let bodyData = body.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: true) ?? NSData()
         
-        let response = httpResponseWithCode(code, andBody: bodyData)
+        let response = httpResponseWithCode(code, mimeType: MIME_TYPE_HTML, andBody: bodyData)
         
         return response
     }
@@ -335,12 +336,12 @@ extension HttpConnection {
      - Return: A buffer with the response.
      */
     
-    func httpResponseWithCode(code: HttpResponseCode, andBody body: NSData) -> UInt8Buffer {
+    func httpResponseWithCode(code: HttpResponseCode, mimeType: String, andBody body: NSData) -> UInt8Buffer {
         
         let header = "HTTP/1.1 " + code.rawValue + CRLF +
             "Date: \(NSDate())" + CRLF +
             "Server: Swiftfire/\(Parameters.version)" + CRLF +
-            "Content-Type: text/html; charset=UTF-8" + CRLF +
+            "Content-Type: \(mimeType); charset=UTF-8" + CRLF +
             "Content-Length: \(body.length)" + CRLFCRLF
         
         let headerData = header.dataUsingEncoding(NSUTF8StringEncoding)
