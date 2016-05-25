@@ -64,8 +64,9 @@
 		865713E51CE8CC1E00B9CD36 /* WriteServerParameterCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 865713E41CE8CC1E00B9CD36 /* WriteServerParameterCommand.swift */; };
 		865713E71CE9B90200B9CD36 /* CreateDomainCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 865713E61CE9B90200B9CD36 /* CreateDomainCommand.swift */; };
 		865713E91CE9BC7E00B9CD36 /* ServerParameter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 865713E81CE9BC7E00B9CD36 /* ServerParameter.swift */; };
-		868577091CDF21CE000BE5D6 /* SwifterLogNetwork.swift in Sources */ = {isa = PBXBuildFile; fileRef = 868577081CDF21CE000BE5D6 /* SwifterLogNetwork.swift */; };
 		8694C9AC1CEEF84E00F45D8B /* MimeType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8694C9AB1CEEF84E00F45D8B /* MimeType.swift */; };
+		86EB627F1CF5C2310083F472 /* SwifterLog.Network.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86EB627E1CF5C2310083F472 /* SwifterLog.Network.swift */; };
+		86EB62841CF5C3550083F472 /* ClosingMacConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86EB62831CF5C3550083F472 /* ClosingMacConnection.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -103,7 +104,6 @@
 		864C6F3D1CC23F7E00C60220 /* HttpConnection.HttpWorker.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HttpConnection.HttpWorker.swift; sourceTree = "<group>"; };
 		864C6F3E1CC23F7E00C60220 /* HttpConnection.Forwarding.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HttpConnection.Forwarding.swift; sourceTree = "<group>"; };
 		864C6F451CC23F9F00C60220 /* MonitoringAndControlLoop.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MonitoringAndControlLoop.swift; sourceTree = "<group>"; };
-		864C6F461CC23F9F00C60220 /* MacDef.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MacDef.swift; sourceTree = "<group>"; };
 		864C6F4B1CC23FE400C60220 /* ToDo */ = {isa = PBXFileReference; lastKnownFileType = text; path = ToDo; sourceTree = "<group>"; };
 		864C6F4C1CC23FE400C60220 /* Improvements */ = {isa = PBXFileReference; lastKnownFileType = text; path = Improvements; sourceTree = "<group>"; };
 		864C6F4D1CC23FE400C60220 /* Feature Requests */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Feature Requests"; sourceTree = "<group>"; };
@@ -147,8 +147,9 @@
 		865713E41CE8CC1E00B9CD36 /* WriteServerParameterCommand.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WriteServerParameterCommand.swift; sourceTree = "<group>"; };
 		865713E61CE9B90200B9CD36 /* CreateDomainCommand.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CreateDomainCommand.swift; sourceTree = "<group>"; };
 		865713E81CE9BC7E00B9CD36 /* ServerParameter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ServerParameter.swift; sourceTree = "<group>"; };
-		868577081CDF21CE000BE5D6 /* SwifterLogNetwork.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwifterLogNetwork.swift; path = ../../../SwifterLog/SwifterLog/SwifterLog/SwifterLogNetwork.swift; sourceTree = "<group>"; };
 		8694C9AB1CEEF84E00F45D8B /* MimeType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MimeType.swift; sourceTree = "<group>"; };
+		86EB627E1CF5C2310083F472 /* SwifterLog.Network.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwifterLog.Network.swift; path = ../../../SwifterLog/SwifterLog/SwifterLog/SwifterLog.Network.swift; sourceTree = "<group>"; };
+		86EB62831CF5C3550083F472 /* ClosingMacConnection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClosingMacConnection.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -228,7 +229,7 @@
 				864C6F5F1CC243AF00C60220 /* asl-bridge.h */,
 				864C6F601CC243AF00C60220 /* asl-bridge.m */,
 				864C6F611CC243AF00C60220 /* SwifterLog.swift */,
-				868577081CDF21CE000BE5D6 /* SwifterLogNetwork.swift */,
+				86EB627E1CF5C2310083F472 /* SwifterLog.Network.swift */,
 			);
 			name = SwifterLog;
 			path = Swiftfire;
@@ -274,7 +275,6 @@
 			isa = PBXGroup;
 			children = (
 				864C6F451CC23F9F00C60220 /* MonitoringAndControlLoop.swift */,
-				864C6F461CC23F9F00C60220 /* MacDef.swift */,
 				865713E81CE9BC7E00B9CD36 /* ServerParameter.swift */,
 				865053631CEB3DF000D31DBF /* ServerTelemetryItem.swift */,
 				865713E21CE8C44600B9CD36 /* ReadDomainTelemetryCommand.swift */,
@@ -297,6 +297,7 @@
 				865053491CEB0CD700D31DBF /* ServerStartCommand.swift */,
 				8650534B1CEB124200D31DBF /* ServerStopCommand.swift */,
 				865053551CEB35FA00D31DBF /* DeltaCommand.swift */,
+				86EB62831CF5C3550083F472 /* ClosingMacConnection.swift */,
 			);
 			name = "Monitoring and Control";
 			sourceTree = "<group>";
@@ -436,7 +437,6 @@
 				864C6F371CC23F5F00C60220 /* Extensions.swift in Sources */,
 				864C6F311CC23F5200C60220 /* Parameters.swift in Sources */,
 				865713E71CE9B90200B9CD36 /* CreateDomainCommand.swift in Sources */,
-				868577091CDF21CE000BE5D6 /* SwifterLogNetwork.swift in Sources */,
 				8650535E1CEB37AC00D31DBF /* RestoreDomainsCommand.swift in Sources */,
 				864C6F2A1CC23F5200C60220 /* ServerTelemetry.swift in Sources */,
 				864C6EFC1CC23DE400C60220 /* main.swift in Sources */,
@@ -452,6 +452,7 @@
 				865713E91CE9BC7E00B9CD36 /* ServerParameter.swift in Sources */,
 				864C6F471CC23F9F00C60220 /* MonitoringAndControlLoop.swift in Sources */,
 				864C6F6F1CC2472100C60220 /* SwifterSockets.InitServer.swift in Sources */,
+				86EB627F1CF5C2310083F472 /* SwifterLog.Network.swift in Sources */,
 				865053521CEB257500D31DBF /* ReadDomainTelemetryReply.swift in Sources */,
 				864C6F6E1CC2472100C60220 /* SwifterSockets.swift in Sources */,
 				865053911CEB748F00D31DBF /* ReadDomainsReply.swift in Sources */,
@@ -472,6 +473,7 @@
 				864C6F411CC23F7E00C60220 /* HttpConnection.DataEndDetector.swift in Sources */,
 				865713E31CE8C44600B9CD36 /* ReadDomainTelemetryCommand.swift in Sources */,
 				864C6F321CC23F5200C60220 /* HttpConnectionPool.swift in Sources */,
+				86EB62841CF5C3550083F472 /* ClosingMacConnection.swift in Sources */,
 				864C6F2C1CC23F5200C60220 /* HttpHeader.swift in Sources */,
 				865713D91CE44BF400B9CD36 /* TelemetryProtocol.swift in Sources */,
 				864C6F621CC243AF00C60220 /* asl-bridge.m in Sources */,

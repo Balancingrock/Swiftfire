@@ -3,10 +3,11 @@
 //  File:       Parameters.swift
 //  Project:    Swiftfire
 //
-private let VERSION = "0.9.5"
+private let VERSION = "0.9.6"
 //
 //  Author:     Marinus van der Lugt
-//  Website:    http://www.balancingrock.nl/swiftfire.html
+//  Company:    http://balancingrock.nl
+//  Website:    http://swiftfire.nl/
 //  Blog:       http://swiftrien.blogspot.com
 //  Git:        https://github.com/Swiftrien/Swiftfire
 //
@@ -48,6 +49,7 @@ private let VERSION = "0.9.5"
 //
 // History
 //
+// v0.9.6 - Header update & version number update
 // v0.9.5 - Updated version number
 // v0.9.4 - Updated version number
 // v0.9.3 - Updated version number
@@ -320,7 +322,7 @@ final class Parameters {
         
         
         // This is the number of TCP connection negotiations that are allowed (before they are accepted)
-        // Note: when the MAX_NUMBER_OF_WAITING_CONNECTIONS has been reached, new connections have to wait before they are accepted.
+        // Note: when the MAX_NUMBER_OF_PENDING_CONNECTIONS has been reached, new connections will be rejected.
         
         pdict[.MAX_NOF_PENDING_CONNECTIONS] = 20
         

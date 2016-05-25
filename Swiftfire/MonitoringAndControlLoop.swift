@@ -3,10 +3,11 @@
 //  File:       MonitoringAndControl.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.5
+//  Version:    0.9.6
 //
 //  Author:     Marinus van der Lugt
-//  Website:    http://www.balancingrock.nl/swiftfire.html
+//  Company:    http://balancingrock.nl
+//  Website:    http://swiftfire.nl/
 //  Blog:       http://swiftrien.blogspot.com
 //  Git:        https://github.com/Swiftrien/Swiftfire
 //
@@ -48,6 +49,8 @@
 //
 // History
 //
+// v0.9.6 - Header update
+//        - Added transmission of "ClosingMacConnection" upon timeout for the M&C connection
 // v0.9.5 - Fixed bug that revented domain creation
 // v0.9.4 - Changed according to new command & reply definitions
 // v0.9.3 - Removed no longer existing server telemetry
@@ -249,6 +252,8 @@ final class MonitoringAndControl {
                     // A timeout occured, log a message
                     
                     log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Closing Monitoring and Control Connection due to inactivity")
+                    
+                    transferMessage(ClosingMacConnection().json)
                     
                     break RECEIVE_LOOP
                     

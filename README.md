@@ -1,7 +1,7 @@
 # Swiftfire
 A webserver in pure Swift
 
-Swifterfire is the end product of 5 packages that make up the Swiftfire webserver:
+Swifterfire is the end product of 5 packages that make up the [Swiftfire](http://swiftfire.nl) webserver:
 
 #####[SwiftfireConsole](https://github.com/Swiftrien/SwiftfireConsole)
 

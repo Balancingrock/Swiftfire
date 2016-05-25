@@ -3,10 +3,11 @@
 //  File:       HttpConnection.HttpWorker.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.3
+//  Version:    0.9.6
 //
 //  Author:     Marinus van der Lugt
-//  Website:    http://www.balancingrock.nl/swiftfire.html
+//  Company:    http://balancingrock.nl
+//  Website:    http://swiftfire.nl/
 //  Blog:       http://swiftrien.blogspot.com
 //  Git:        https://github.com/Swiftrien/Swiftfire
 //
@@ -48,6 +49,7 @@
 //
 // History
 //
+// v0.9.6 - Header update
 // v0.9.3 - Added incrementing of serverTelemetry.nofHttp400Replies if the host cannot be mapped to a domain
 //        - Split "domain not found" error into "domain not found" and "domain not enabled"
 //        - Removed port information from "domain not found/enabled" error

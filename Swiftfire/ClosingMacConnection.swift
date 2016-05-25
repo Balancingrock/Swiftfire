@@ -1,6 +1,6 @@
 // =====================================================================================================================
 //
-//  File:       ReadServerTelemetryReply.swift
+//  File:       ClosingMacConnection.swift
 //  Project:    Swiftfire
 //
 //  Version:    0.9.6
@@ -49,69 +49,27 @@
 //
 // History
 //
-// v0.9.6 - Header update
-// v0.9.4 - Initial release (replaces part of MacDef.swift)
+// v0.9.6 - Initial release
 // =====================================================================================================================
 
 import Foundation
 
 
-private let REPLY_NAME = "ReadServerTelemetryReply"
-private let ITEM = "Item"
-private let VALUE = "Value"
+private let NAME = "ClosingMacConnection"
 
 
-final class ReadServerTelemetryReply {
-    
-    var item: ServerTelemetryItem
-    var value: String
-    
-    var intValue: Int? {
-        return Int(value)
-    }
-    
-    var boolValue: Bool? {
-        return Bool(value)
-    }
-    
-    var doubleValue: Double? {
-        return Double(value)
-    }
+final class ClosingMacConnection {
     
     var json: VJson {
         let j = VJson.createJsonHierarchy()
-        j[REPLY_NAME][ITEM].stringValue = item.rawValue
-        j[REPLY_NAME][VALUE].stringValue = value
+        j[NAME].nullValue = true
         return j
     }
     
-    init(item: ServerTelemetryItem, value: String) {
-        self.item = item
-        self.value = value
-    }
-    
-    init(item: ServerTelemetryItem, value: Bool) {
-        self.item = item
-        self.value = value ? "true" : "false"
-    }
-    
-    init(item: ServerTelemetryItem, value: Int) {
-        self.item = item
-        self.value = value.description
-    }
-    
-    init(item: ServerTelemetryItem, value: Double) {
-        self.item = item
-        self.value = value.description
-    }
+    init() {}
     
     init?(json: VJson?) {
         guard let json = json else { return nil }
-        guard let jname = (json|REPLY_NAME|ITEM)?.stringValue else { return nil }
-        guard let jitem = ServerTelemetryItem(rawValue: jname) else { return nil }
-        guard let jvalue = (json|REPLY_NAME|VALUE)?.stringValue else { return nil }
-        
-        self.item = jitem
-        self.value = jvalue
+        guard let _ = (json|NAME)?.nullValue else { return nil }
     }
 }

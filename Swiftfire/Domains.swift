@@ -3,10 +3,11 @@
 //  File:       Domains.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.3
+//  Version:    0.9.6
 //
 //  Author:     Marinus van der Lugt
-//  Website:    http://www.balancingrock.nl/swiftfire.html
+//  Company:    http://balancingrock.nl
+//  Website:    http://swiftfire.nl/
 //  Blog:       http://swiftrien.blogspot.com
 //  Git:        https://github.com/Swiftrien/Swiftfire
 //
@@ -48,6 +49,8 @@
 //
 // History
 //
+// v0.9.6 - Header update
+//        - Changed 'save' to exclude telemetry
 // v0.9.3 - Changed input parameters of domainForName to optional
 // v0.9.0 - Initial release
 // =====================================================================================================================
@@ -389,7 +392,9 @@ final class Domains: DomainNameChangeListener, SequenceType {
             
             for (i, d) in self.enumerate() {
                 
-                json["Domains"][i] = d.json
+                let jd = d.json
+                jd.removeChildWithName("Telemetry")
+                json["Domains"][i] = jd
             }
             
             if let errorMsg = json.save(file) {
