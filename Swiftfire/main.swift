@@ -106,11 +106,13 @@ log.registerCallback(logforewarder)
 
 if !Parameters.restore() {
     log.atLevelEmergency(id: -1, source: #file.source(#function, #line), message: "Swiftfire terminated because the default parameters could not be determined")
+    sleep(5)
     exit(EXIT_FAILURE)
 }
 
 if !domains.restore()  {
     log.atLevelEmergency(id: -1, source: #file.source(#function, #line), message: "Swiftfire terminated because the default domains could not be read")
+    sleep(5)
     exit(EXIT_FAILURE)
 }
 

@@ -50,6 +50,7 @@
 // History
 //
 // v0.9.6 - Header update
+//        - Merged MAX_NOF_PENDING_CLIENT_MESSAGES with MAX_CLIENT_MESSAGE_SIZE into CLIENT_MESSAGE_BUFFER_SIZE
 // v0.9.5 - Added support for different MIME types of response
 // v0.9.2 - Replaced sendXXXX functions with httpErrorResponseWithCode and httpResponseWithCode
 // v0.9.0 - Initial release
@@ -158,7 +159,7 @@ class HttpConnection {
 
     /// The data received from a client.
 
-    var messageBuffer = HttpMessageBuffer(sizeInBytes: Parameters.asInt(ParameterId.MAX_CLIENT_MESSAGE_SIZE) * Parameters.asInt(ParameterId.MAX_NOF_PENDING_CLIENT_MESSAGES))
+    var messageBuffer = HttpMessageBuffer(sizeInBytes: Parameters.asInt(ParameterId.CLIENT_MESSAGE_BUFFER_SIZE))
 
     
     // MARK: - For the forwarding function
@@ -283,7 +284,7 @@ extension HttpConnection {
             
             // Clean out old stuff so a new client can use this object
             
-            self.messageBuffer = HttpMessageBuffer(sizeInBytes: Parameters.asInt(ParameterId.MAX_CLIENT_MESSAGE_SIZE) * Parameters.asInt(ParameterId.MAX_NOF_PENDING_CLIENT_MESSAGES))
+            self.messageBuffer = HttpMessageBuffer(sizeInBytes: Parameters.asInt(ParameterId.CLIENT_MESSAGE_BUFFER_SIZE))
             self.httpHeader = nil
             self.maxSendBufferSize = nil
             self.abortProcessing = false

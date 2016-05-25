@@ -50,6 +50,7 @@
 // History
 //
 // v0.9.6 - Header update
+//        - Merged MAX_NOF_PENDING_CLIENT_MESSAGES and MAX_CLIENT_MESSAGE_SIZE into CLIENT_MESSAGE_BUFFER_SIZE
 // v0.9.4 - Initial release (replaces part of MacDef.swift)
 // =====================================================================================================================
 
@@ -61,8 +62,7 @@ enum ServerParameter: String {
     case MAX_NOF_ACCEPTED_CONNECTIONS = "MaxNofAcceptedConnections"
     case MAX_NOF_PENDING_CONNECTIONS = "MaxNofPendingConnections"
     case MAX_WAIT_FOR_PENDING_CONNECTIONS = "MaxWaitForPendingConnections"
-    case MAX_NOF_PENDING_CLIENT_MESSAGES = "MaxNofPendingClientMessages"
-    case MAX_CLIENT_MESSAGE_SIZE = "MaxClientMessageSize"
+    case CLIENT_MESSAGE_BUFFER_SIZE = "ClientMessageBufferSize"
     case DEBUG_MODE = "DebugMode"
     case ASL_LOGLEVEL = "AslLogLevel"
     case STDOUT_LOGLEVEL = "StdoutLogLevel"
@@ -78,8 +78,7 @@ enum ServerParameter: String {
         case .MAX_NOF_ACCEPTED_CONNECTIONS: return "Maximum Number of Client Connections in Parallel"
         case .MAX_NOF_PENDING_CONNECTIONS: return "Maximum Number of Pending Client Connections"
         case .MAX_WAIT_FOR_PENDING_CONNECTIONS: return "Maximum Wait for Pending Client Connections"
-        case .MAX_NOF_PENDING_CLIENT_MESSAGES: return "Maximum Number of Pending Client Messages"
-        case .MAX_CLIENT_MESSAGE_SIZE: return "Maximum Size of a Client Message in Bytes"
+        case .CLIENT_MESSAGE_BUFFER_SIZE: return "Size of the Client Message Buffer in Bytes"
         case .DEBUG_MODE: return "Enable more Debug Information to be Logged"
         case .ASL_LOGLEVEL: return "Send Logging at this -and above- level to the ASL Facility"
         case .STDOUT_LOGLEVEL: return "Send Logging at this -and above- level to stdout (console)"
@@ -97,8 +96,7 @@ enum ServerParameter: String {
         case .MAX_NOF_ACCEPTED_CONNECTIONS: return "Maximum Number of Client Connections in Parallel"
         case .MAX_NOF_PENDING_CONNECTIONS: return "Maximum Number of Pending Client Connections"
         case .MAX_WAIT_FOR_PENDING_CONNECTIONS: return "Maximum Wait for Pending Client Connections"
-        case .MAX_NOF_PENDING_CLIENT_MESSAGES: return "Maximum Number of Pending Client Messages"
-        case .MAX_CLIENT_MESSAGE_SIZE: return "Maximum Size of a Client Message in Bytes"
+        case .CLIENT_MESSAGE_BUFFER_SIZE: return "Size of the Client Message Buffer in Bytes"
         case .DEBUG_MODE: return "Enable more Debug Information to be Logged"
         case .ASL_LOGLEVEL: return "Send Logging at this -and above- level to the ASL Facility"
         case .STDOUT_LOGLEVEL: return "Send Logging at this -and above- level to stdout (console)"
@@ -121,7 +119,7 @@ enum ServerParameter: String {
             return nil
             
             
-        case MAX_NOF_ACCEPTED_CONNECTIONS, MAX_NOF_PENDING_CONNECTIONS, MAX_WAIT_FOR_PENDING_CONNECTIONS, MAX_NOF_PENDING_CLIENT_MESSAGES, MAX_CLIENT_MESSAGE_SIZE:
+        case MAX_NOF_ACCEPTED_CONNECTIONS, MAX_NOF_PENDING_CONNECTIONS, MAX_WAIT_FOR_PENDING_CONNECTIONS, CLIENT_MESSAGE_BUFFER_SIZE:
             
             if let iv = Int(v) {
                 if v == iv.description { return nil }
@@ -152,5 +150,5 @@ enum ServerParameter: String {
         }
     }
 
-    static let all: Array<ServerParameter> = [.SERVICE_PORT_NUMBER, .MAX_NOF_ACCEPTED_CONNECTIONS, .MAX_NOF_PENDING_CONNECTIONS, .MAX_WAIT_FOR_PENDING_CONNECTIONS, .MAX_NOF_PENDING_CLIENT_MESSAGES, .MAX_CLIENT_MESSAGE_SIZE, .DEBUG_MODE, .ASL_LOGLEVEL, .STDOUT_LOGLEVEL, .FILE_LOGLEVEL, .CALLBACK_LOGLEVEL, .NETWORK_LOGLEVEL, .NETWORK_LOG_TARGET_ADDRESS, .NETWORK_LOG_TARGET_PORT]
+    static let all: Array<ServerParameter> = [.SERVICE_PORT_NUMBER, .MAX_NOF_ACCEPTED_CONNECTIONS, .MAX_NOF_PENDING_CONNECTIONS, .MAX_WAIT_FOR_PENDING_CONNECTIONS, .CLIENT_MESSAGE_BUFFER_SIZE, .DEBUG_MODE, .ASL_LOGLEVEL, .STDOUT_LOGLEVEL, .FILE_LOGLEVEL, .CALLBACK_LOGLEVEL, .NETWORK_LOGLEVEL, .NETWORK_LOG_TARGET_ADDRESS, .NETWORK_LOG_TARGET_PORT]
 }

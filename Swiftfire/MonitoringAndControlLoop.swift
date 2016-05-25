@@ -528,20 +528,11 @@ final class MonitoringAndControl {
             transferMessage(reply.json)
             
             
-        case .MAX_NOF_PENDING_CLIENT_MESSAGES:
+        case .CLIENT_MESSAGE_BUFFER_SIZE:
             
-            log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, maxNofPendingClientMessages = \(Parameters.asInt(.MAX_NOF_PENDING_CLIENT_MESSAGES))")
+            log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, clientMessageBufferSize = \(Parameters.asInt(.CLIENT_MESSAGE_BUFFER_SIZE))")
             
-            let reply = ReadServerParameterReply(parameter: command.parameter, value: Parameters.asInt(.MAX_NOF_PENDING_CLIENT_MESSAGES))
-            
-            transferMessage(reply.json)
-            
-            
-        case .MAX_CLIENT_MESSAGE_SIZE:
-            
-            log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, maxClientMessageSize = \(Parameters.asInt(.MAX_CLIENT_MESSAGE_SIZE))")
-            
-            let reply = ReadServerParameterReply(parameter: command.parameter, value: Parameters.asInt(.MAX_CLIENT_MESSAGE_SIZE))
+            let reply = ReadServerParameterReply(parameter: command.parameter, value: Parameters.asInt(.CLIENT_MESSAGE_BUFFER_SIZE))
             
             transferMessage(reply.json)
             
@@ -774,31 +765,16 @@ final class MonitoringAndControl {
             }
             
             
-        case .MAX_NOF_PENDING_CLIENT_MESSAGES:
+        case .CLIENT_MESSAGE_BUFFER_SIZE:
             
             guard let dbSize = command.intValue else {
                 log.atLevelWarning(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) should contain a NUMBER value")
                 return
             }
             
-            if dbSize != Parameters.asInt(.MAX_NOF_PENDING_CLIENT_MESSAGES) {
-                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) updating from \(Parameters.asInt(.MAX_NOF_PENDING_CLIENT_MESSAGES)) to \(dbSize)")
-                Parameters.pdict[.MAX_NOF_PENDING_CLIENT_MESSAGES] = dbSize
-            } else {
-                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) new value same as present value: \(dbSize)")
-            }
-            
-            
-        case .MAX_CLIENT_MESSAGE_SIZE:
-            
-            guard let dbSize = command.intValue else {
-                log.atLevelWarning(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) should contain a NUMBER value")
-                return
-            }
-            
-            if dbSize != Parameters.asInt(.MAX_CLIENT_MESSAGE_SIZE) {
-                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) updating from \(Parameters.asInt(.MAX_CLIENT_MESSAGE_SIZE)) to \(dbSize)")
-                Parameters.pdict[.MAX_CLIENT_MESSAGE_SIZE] = dbSize
+            if dbSize != Parameters.asInt(.CLIENT_MESSAGE_BUFFER_SIZE) {
+                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) updating from \(Parameters.asInt(.CLIENT_MESSAGE_BUFFER_SIZE)) to \(dbSize)")
+                Parameters.pdict[.CLIENT_MESSAGE_BUFFER_SIZE] = dbSize
             } else {
                 log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) new value same as present value: \(dbSize)")
             }

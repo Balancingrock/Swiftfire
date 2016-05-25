@@ -67,6 +67,7 @@
 		8694C9AC1CEEF84E00F45D8B /* MimeType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8694C9AB1CEEF84E00F45D8B /* MimeType.swift */; };
 		86EB627F1CF5C2310083F472 /* SwifterLog.Network.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86EB627E1CF5C2310083F472 /* SwifterLog.Network.swift */; };
 		86EB62841CF5C3550083F472 /* ClosingMacConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86EB62831CF5C3550083F472 /* ClosingMacConnection.swift */; };
+		86F529461CF5F2860092E24D /* ResetDomainTelemetry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86F529451CF5F2860092E24D /* ResetDomainTelemetry.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXCopyFilesBuildPhase section */
@@ -150,6 +151,7 @@
 		8694C9AB1CEEF84E00F45D8B /* MimeType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MimeType.swift; sourceTree = "<group>"; };
 		86EB627E1CF5C2310083F472 /* SwifterLog.Network.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwifterLog.Network.swift; path = ../../../SwifterLog/SwifterLog/SwifterLog/SwifterLog.Network.swift; sourceTree = "<group>"; };
 		86EB62831CF5C3550083F472 /* ClosingMacConnection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClosingMacConnection.swift; sourceTree = "<group>"; };
+		86F529451CF5F2860092E24D /* ResetDomainTelemetry.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ResetDomainTelemetry.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -298,6 +300,7 @@
 				8650534B1CEB124200D31DBF /* ServerStopCommand.swift */,
 				865053551CEB35FA00D31DBF /* DeltaCommand.swift */,
 				86EB62831CF5C3550083F472 /* ClosingMacConnection.swift */,
+				86F529451CF5F2860092E24D /* ResetDomainTelemetry.swift */,
 			);
 			name = "Monitoring and Control";
 			sourceTree = "<group>";
@@ -477,6 +480,7 @@
 				864C6F2C1CC23F5200C60220 /* HttpHeader.swift in Sources */,
 				865713D91CE44BF400B9CD36 /* TelemetryProtocol.swift in Sources */,
 				864C6F621CC243AF00C60220 /* asl-bridge.m in Sources */,
+				86F529461CF5F2860092E24D /* ResetDomainTelemetry.swift in Sources */,
 				8650534A1CEB0CD700D31DBF /* ServerStartCommand.swift in Sources */,
 				864C6F701CC2472100C60220 /* SwifterSockets.InitClient.swift in Sources */,
 				864C6F431CC23F7E00C60220 /* HttpConnection.Forwarding.swift in Sources */,

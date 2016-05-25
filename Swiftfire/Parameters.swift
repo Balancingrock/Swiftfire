@@ -50,6 +50,7 @@ private let VERSION = "0.9.6"
 // History
 //
 // v0.9.6 - Header update & version number update
+//        - Merged MAX_NOF_PENDING_CLIENT_MESSAGES with MAX_CLIENT_MESSAGE_SIZE into CLIENT_MESSAGE_BUFFER_SIZE
 // v0.9.5 - Updated version number
 // v0.9.4 - Updated version number
 // v0.9.3 - Updated version number
@@ -80,8 +81,7 @@ enum ParameterId: String {
     case MAX_NOF_ACCEPTED_CONNECTIONS = "MaxNumberOfAcceptedConnections"
     case MAX_NOF_PENDING_CONNECTIONS = "MaxNumberOfPendingConnections"
     case MAX_WAIT_FOR_PENDING_CONNECTIONS = "MaxWaitForPendingConnections"
-    case MAX_NOF_PENDING_CLIENT_MESSAGES = "MaxNumberOfPendingClientMessages"
-    case MAX_CLIENT_MESSAGE_SIZE = "MaxClienMessageSize"
+    case CLIENT_MESSAGE_BUFFER_SIZE = "ClienMessageBufferSize"
     case HTTP_KEEP_ALIVE_INACTIVITY_TIMEOUT = "HttpKeepAliveInactivityTimeout"
     case HTTP_RESPONSE_CLIENT_TIMEOUT = "HttpResponseClientTimeout"
     case MAC_INACTIVITY_TIMEOUT = "MacInactivityTimeout"
@@ -96,7 +96,7 @@ enum ParameterId: String {
             return { (json: VJson) -> Any? in json.boolValue }
             
             
-        case PARAMETER_DEFAULTS_FILE_VERSION, MAX_NOF_PENDING_CONNECTIONS, MAX_NOF_ACCEPTED_CONNECTIONS, MAX_WAIT_FOR_PENDING_CONNECTIONS, MAX_NOF_PENDING_CLIENT_MESSAGES, MAX_CLIENT_MESSAGE_SIZE, HTTP_KEEP_ALIVE_INACTIVITY_TIMEOUT, HTTP_RESPONSE_CLIENT_TIMEOUT:
+        case PARAMETER_DEFAULTS_FILE_VERSION, MAX_NOF_PENDING_CONNECTIONS, MAX_NOF_ACCEPTED_CONNECTIONS, MAX_WAIT_FOR_PENDING_CONNECTIONS, CLIENT_MESSAGE_BUFFER_SIZE, HTTP_KEEP_ALIVE_INACTIVITY_TIMEOUT, HTTP_RESPONSE_CLIENT_TIMEOUT:
             // These are the Int parameters
             
             return { (json: VJson) -> Any? in json.integerValue }
@@ -125,7 +125,7 @@ enum ParameterId: String {
             return VJson.createBool(value: val as! Bool, name: self.rawValue)
             
             
-        case PARAMETER_DEFAULTS_FILE_VERSION, MAX_NOF_PENDING_CONNECTIONS, MAX_NOF_ACCEPTED_CONNECTIONS, MAX_WAIT_FOR_PENDING_CONNECTIONS, MAX_NOF_PENDING_CLIENT_MESSAGES, MAX_CLIENT_MESSAGE_SIZE, HTTP_KEEP_ALIVE_INACTIVITY_TIMEOUT, HTTP_RESPONSE_CLIENT_TIMEOUT:
+        case PARAMETER_DEFAULTS_FILE_VERSION, MAX_NOF_PENDING_CONNECTIONS, MAX_NOF_ACCEPTED_CONNECTIONS, MAX_WAIT_FOR_PENDING_CONNECTIONS, CLIENT_MESSAGE_BUFFER_SIZE, HTTP_KEEP_ALIVE_INACTIVITY_TIMEOUT, HTTP_RESPONSE_CLIENT_TIMEOUT:
             // These are the Int parameters
             
             return VJson.createNumber(value: val as! Int, name: self.rawValue)
@@ -144,7 +144,7 @@ enum ParameterId: String {
         }
     }
     
-    static var all: Array<ParameterId> = [DEBUG_MODE, PARAMETER_DEFAULTS_FILE_VERSION, MAX_NOF_PENDING_CONNECTIONS, MAX_NOF_ACCEPTED_CONNECTIONS, MAX_WAIT_FOR_PENDING_CONNECTIONS, MAX_NOF_PENDING_CLIENT_MESSAGES, MAX_CLIENT_MESSAGE_SIZE, HTTP_KEEP_ALIVE_INACTIVITY_TIMEOUT, HTTP_RESPONSE_CLIENT_TIMEOUT, SERVICE_PORT_NUMBER, MAC_INACTIVITY_TIMEOUT]
+    static var all: Array<ParameterId> = [DEBUG_MODE, PARAMETER_DEFAULTS_FILE_VERSION, MAX_NOF_PENDING_CONNECTIONS, MAX_NOF_ACCEPTED_CONNECTIONS, MAX_WAIT_FOR_PENDING_CONNECTIONS, CLIENT_MESSAGE_BUFFER_SIZE, HTTP_KEEP_ALIVE_INACTIVITY_TIMEOUT, HTTP_RESPONSE_CLIENT_TIMEOUT, SERVICE_PORT_NUMBER, MAC_INACTIVITY_TIMEOUT]
 }
 
 
@@ -342,15 +342,10 @@ final class Parameters {
         
         pdict[.MAX_WAIT_FOR_PENDING_CONNECTIONS] = 30
         
-        
-        /// Implicitly sets the size of a connection's buffer after multiplication with the MAX_CLIENT_MESSAGE_SIZE
-        
-        pdict[.MAX_NOF_PENDING_CLIENT_MESSAGES] = 10
-        
-        
+                
         /// The maximum size of a http message that can be received from client. (Sets the size of the receiver buffer)
         
-        pdict[.MAX_CLIENT_MESSAGE_SIZE] = 10000
+        pdict[.CLIENT_MESSAGE_BUFFER_SIZE] = 100000
         
         
         /// When a HTTP request has the "keep alive" option set, the connection will remain open for this time after the last data block was processed from that client.

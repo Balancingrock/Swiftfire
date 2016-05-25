@@ -257,8 +257,8 @@ func acceptAndDispatch(socket: Int32) {
 
                 dispatch_async(connection!.receiverQueue, {
                     
-                    let buffer = UnsafeMutablePointer<UInt8>.alloc(Parameters.asInt(ParameterId.MAX_CLIENT_MESSAGE_SIZE))
-                    let bufferPtr = UnsafeMutableBufferPointer(start: buffer, count: Parameters.asInt(ParameterId.MAX_CLIENT_MESSAGE_SIZE))
+                    let buffer = UnsafeMutablePointer<UInt8>.alloc(Parameters.asInt(ParameterId.CLIENT_MESSAGE_BUFFER_SIZE))
+                    let bufferPtr = UnsafeMutableBufferPointer(start: buffer, count: Parameters.asInt(ParameterId.CLIENT_MESSAGE_BUFFER_SIZE))
 
                     log.atLevelDebug(id: socket, source: SOURCE, message: "Starting Receiver Loop")
 
