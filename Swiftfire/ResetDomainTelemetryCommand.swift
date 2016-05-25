@@ -1,6 +1,6 @@
 // =====================================================================================================================
 //
-//  File:       ResetDomainTelemetry.swift
+//  File:       ResetDomainTelemetryCommand.swift
 //  Project:    Swiftfire
 //
 //  Version:    0.9.6
@@ -55,10 +55,10 @@
 import Foundation
 
 
-private let COMMAND_NAME = "ResetDomainTelemetry"
+private let COMMAND_NAME = "ResetDomainTelemetryCommand"
 
 
-final class ResetDomainTelemetry {
+final class ResetDomainTelemetryCommand {
     
     let domainName: String
     

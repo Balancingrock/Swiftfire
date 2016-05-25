@@ -51,6 +51,7 @@
 //
 // v0.9.6 - Header update
 //        - Added transmission of "ClosingMacConnection" upon timeout for the M&C connection
+//        - Added ResetDomainTelemetry
 // v0.9.5 - Fixed bug that revented domain creation
 // v0.9.4 - Changed according to new command & reply definitions
 // v0.9.3 - Removed no longer existing server telemetry
@@ -350,6 +351,7 @@ final class MonitoringAndControl {
         else if let command = RemoveDomainCommand(json: message) { doRemoveDomainCommand(command) }
         else if let command = UpdateDomainCommand(json: message) { doUpdateDomainCommand(command) }
         else if let command = ReadDomainsCommand(json: message) { doReadDomainsCommand(command) }
+        else if let command = ResetDomainTelemetryCommand(json: message) { doResetDomainTelemetryCommand(command) }
         else if ServerQuitCommand(json: message) != nil { doServerQuitCommand() }
         else if ServerStartCommand(json: message) != nil { doServerStartCommand() }
         else if ServerStopCommand(json: message) != nil { doServerStopCommand() }
@@ -362,7 +364,21 @@ final class MonitoringAndControl {
             log.atLevelError(id: socket, source: #file.source(#function, #line), message: "Could not create command from JSON code: \(message)")
         }
     }
-    
+
+    private func doResetDomainTelemetryCommand(command: ResetDomainTelemetryCommand) {
+        
+        guard let domain = domains.domainForName(command.domainName) else {
+            log.atLevelError(id: socket, source: #file.source(#function, #line), message: "No domain available with name = \(command.domainName)")
+            return
+        }
+        
+        domain.telemetry.reset()
+        
+        let reply = ReadDomainTelemetryReply(domainName: domain.name, domainTelemetry: domain.telemetry)
+        
+        transferMessage(reply.json)
+    }
+
     private func doReadDomainTelemetryCommand(command: ReadDomainTelemetryCommand) {
         
         guard let domain = domains.domainForName(command.domainName) else {
