@@ -40,6 +40,15 @@ The I drag & drop the group with the source files from (for example) SwifterLog 
 
 #Version history
 
+####v0.9.6
+
+- Header update to include new website: [swiftfire.nl](http://swiftfire.nl)
+- Removed Startup, folded into Parameters
+- Merged MAX_NOF_PENDING_CLIENT_MESSAGES with MAX_CLIENT_MESSAGE_SIZE into CLIENT_MESSAGE_BUFFER_SIZE
+- Save & Restore no longer preserve telemetry values
+- Added transmission of "ClosingMacConnection" info upon timeout for the M&C connection
+- Added ResetDomainTelemetry command
+
 ####v0.9.5
 
 - Fixed bug that prevented domain creation
