@@ -51,6 +51,7 @@ private let VERSION = "0.9.6"
 //
 // v0.9.6 - Header update & version number update
 //        - Merged MAX_NOF_PENDING_CLIENT_MESSAGES with MAX_CLIENT_MESSAGE_SIZE into CLIENT_MESSAGE_BUFFER_SIZE
+//        - Merged AutoStartup into this file
 // v0.9.5 - Updated version number
 // v0.9.4 - Updated version number
 // v0.9.3 - Updated version number
@@ -85,30 +86,64 @@ enum ParameterId: String {
     case HTTP_KEEP_ALIVE_INACTIVITY_TIMEOUT = "HttpKeepAliveInactivityTimeout"
     case HTTP_RESPONSE_CLIENT_TIMEOUT = "HttpResponseClientTimeout"
     case MAC_INACTIVITY_TIMEOUT = "MacInactivityTimeout"
+    case AUTO_STARTUP = "AutoStartup"
+    case MAC_PORT_NUMBER = "MonitoringAndControlPortNumber"
+    case ASL_FACILITY_RECORD_AT_AND_ABOVE_LEVEL = "AslFacilityRecordAtAndAboveLevel"
+    case STDOUT_PRINT_AT_AND_ABOVE_LEVEL = "StdoutPrintAtAndAboveLevel"
+    case CALLBACK_AT_AND_ABOVE_LEVEL = "CallbackAtAndAboveLevel"
+    case FILE_RECORD_AT_AND_ABOVE_LEVEL = "FileRecordAtAndAboveLevel"
+    case LOGFILE_MAX_SIZE = "LogfileMaxSize"
+    case LOGFILE_MAX_NOF_FILES = "LogfileMaxNofFiles"
+    case LOGFILES_FOLDER = "LogfilesFolder"
+    case NETWORK_TRANSMIT_AT_AND_ABOVE_LEVEL = "NetworkTransmitAtAndAboveLevel"
+    case NETWORK_LOGTARGET_IP_ADDRESS = "NetworkLogtargetIpAddress"
+    case NETWORK_LOGTARGET_PORT_NUMBER = "NetworkLogtargetPortNumber"
     
     private var jsonRead: JsonReadAccess {
         
         switch self {
             
-        case DEBUG_MODE:
+        case .DEBUG_MODE,
+             .AUTO_STARTUP:
+            
             // These are the Bool parameters
             
             return { (json: VJson) -> Any? in json.boolValue }
             
             
-        case PARAMETER_DEFAULTS_FILE_VERSION, MAX_NOF_PENDING_CONNECTIONS, MAX_NOF_ACCEPTED_CONNECTIONS, MAX_WAIT_FOR_PENDING_CONNECTIONS, CLIENT_MESSAGE_BUFFER_SIZE, HTTP_KEEP_ALIVE_INACTIVITY_TIMEOUT, HTTP_RESPONSE_CLIENT_TIMEOUT:
+        case .PARAMETER_DEFAULTS_FILE_VERSION,
+             .MAX_NOF_PENDING_CONNECTIONS,
+             .MAX_NOF_ACCEPTED_CONNECTIONS,
+             .MAX_WAIT_FOR_PENDING_CONNECTIONS,
+             .CLIENT_MESSAGE_BUFFER_SIZE,
+             .HTTP_KEEP_ALIVE_INACTIVITY_TIMEOUT,
+             .HTTP_RESPONSE_CLIENT_TIMEOUT,
+             .ASL_FACILITY_RECORD_AT_AND_ABOVE_LEVEL,
+             .STDOUT_PRINT_AT_AND_ABOVE_LEVEL,
+             .CALLBACK_AT_AND_ABOVE_LEVEL,
+             .FILE_RECORD_AT_AND_ABOVE_LEVEL,
+             .LOGFILE_MAX_SIZE,
+             .LOGFILE_MAX_NOF_FILES,
+             .NETWORK_TRANSMIT_AT_AND_ABOVE_LEVEL:
+            
             // These are the Int parameters
             
             return { (json: VJson) -> Any? in json.integerValue }
             
             
-        case SERVICE_PORT_NUMBER:
+        case .SERVICE_PORT_NUMBER,
+             .MAC_PORT_NUMBER,
+             .LOGFILES_FOLDER,
+             .NETWORK_LOGTARGET_IP_ADDRESS,
+             .NETWORK_LOGTARGET_PORT_NUMBER:
+            
             // These are the String parameters
             
             return { (json: VJson) -> Any? in json.stringValue }
             
             
-        case MAC_INACTIVITY_TIMEOUT:
+        case .MAC_INACTIVITY_TIMEOUT:
+            
             // These are the Double parameters
             
             return { (json: VJson) -> Any? in json.doubleValue }
@@ -119,32 +154,54 @@ enum ParameterId: String {
         
         switch self {
             
-        case DEBUG_MODE:
+        case .DEBUG_MODE,
+             .AUTO_STARTUP:
+            
             // These are the Bool parameters
             
             return VJson.createBool(value: val as! Bool, name: self.rawValue)
             
             
-        case PARAMETER_DEFAULTS_FILE_VERSION, MAX_NOF_PENDING_CONNECTIONS, MAX_NOF_ACCEPTED_CONNECTIONS, MAX_WAIT_FOR_PENDING_CONNECTIONS, CLIENT_MESSAGE_BUFFER_SIZE, HTTP_KEEP_ALIVE_INACTIVITY_TIMEOUT, HTTP_RESPONSE_CLIENT_TIMEOUT:
+        case PARAMETER_DEFAULTS_FILE_VERSION,
+             .MAX_NOF_PENDING_CONNECTIONS,
+             .MAX_NOF_ACCEPTED_CONNECTIONS,
+             .MAX_WAIT_FOR_PENDING_CONNECTIONS,
+             .CLIENT_MESSAGE_BUFFER_SIZE,
+             .HTTP_KEEP_ALIVE_INACTIVITY_TIMEOUT,
+             .HTTP_RESPONSE_CLIENT_TIMEOUT,
+             .ASL_FACILITY_RECORD_AT_AND_ABOVE_LEVEL,
+             .STDOUT_PRINT_AT_AND_ABOVE_LEVEL,
+             .CALLBACK_AT_AND_ABOVE_LEVEL,
+             .FILE_RECORD_AT_AND_ABOVE_LEVEL,
+             .LOGFILE_MAX_NOF_FILES,
+             .LOGFILE_MAX_SIZE,
+             .NETWORK_TRANSMIT_AT_AND_ABOVE_LEVEL:
+            
             // These are the Int parameters
             
             return VJson.createNumber(value: val as! Int, name: self.rawValue)
             
             
-        case SERVICE_PORT_NUMBER:
+        case .SERVICE_PORT_NUMBER,
+             .MAC_PORT_NUMBER,
+             .LOGFILES_FOLDER,
+             .NETWORK_LOGTARGET_IP_ADDRESS,
+             .NETWORK_LOGTARGET_PORT_NUMBER:
+            
             // These are the String parameters
             
             return VJson.createString(value: val as! String, name: self.rawValue)
             
             
-        case MAC_INACTIVITY_TIMEOUT:
+        case .MAC_INACTIVITY_TIMEOUT:
+            
             // These are the Double parameters
             
             return VJson.createNumber(value: val as! Double, name: self.rawValue)
         }
     }
     
-    static var all: Array<ParameterId> = [DEBUG_MODE, PARAMETER_DEFAULTS_FILE_VERSION, MAX_NOF_PENDING_CONNECTIONS, MAX_NOF_ACCEPTED_CONNECTIONS, MAX_WAIT_FOR_PENDING_CONNECTIONS, CLIENT_MESSAGE_BUFFER_SIZE, HTTP_KEEP_ALIVE_INACTIVITY_TIMEOUT, HTTP_RESPONSE_CLIENT_TIMEOUT, SERVICE_PORT_NUMBER, MAC_INACTIVITY_TIMEOUT]
+    static var all: Array<ParameterId> = [.AUTO_STARTUP, .MAC_PORT_NUMBER, .DEBUG_MODE, .PARAMETER_DEFAULTS_FILE_VERSION, .MAX_NOF_PENDING_CONNECTIONS, .MAX_NOF_ACCEPTED_CONNECTIONS, .MAX_WAIT_FOR_PENDING_CONNECTIONS, .CLIENT_MESSAGE_BUFFER_SIZE, .HTTP_KEEP_ALIVE_INACTIVITY_TIMEOUT, .HTTP_RESPONSE_CLIENT_TIMEOUT, .SERVICE_PORT_NUMBER, .MAC_INACTIVITY_TIMEOUT, .ASL_FACILITY_RECORD_AT_AND_ABOVE_LEVEL, .STDOUT_PRINT_AT_AND_ABOVE_LEVEL, .CALLBACK_AT_AND_ABOVE_LEVEL, .FILE_RECORD_AT_AND_ABOVE_LEVEL, .LOGFILE_MAX_SIZE, .LOGFILE_MAX_NOF_FILES, .LOGFILES_FOLDER, .NETWORK_TRANSMIT_AT_AND_ABOVE_LEVEL, .NETWORK_LOGTARGET_IP_ADDRESS, .NETWORK_LOGTARGET_PORT_NUMBER]
 }
 
 
@@ -361,6 +418,66 @@ final class Parameters {
         /// When the M&C connection has been established, it will remain locked to the given connection until no activity has been detected for this amount of time. Note that when a console periodically retrieves telemetry, that interval should be shorter than this inactvity timeout or else another console could take over. Time is in seconds.
         
         pdict[.MAC_INACTIVITY_TIMEOUT] = 600.0
+        
+        
+        /// When set to true, Swiftfire will enter "Running" automatically.
+        
+        pdict[.AUTO_STARTUP] = false
+        
+        
+        /// The port number on which Swiftfire will listen for M&C connections.
+        
+        pdict[.MAC_PORT_NUMBER] = "2043"
+        
+        
+        /// For SwifterLog ASL threshold
+        
+        pdict[.ASL_FACILITY_RECORD_AT_AND_ABOVE_LEVEL] = SwifterLog.Level.NONE.rawValue
+        
+        
+        /// For the SwifterLog stdout threshold
+        
+        pdict[.STDOUT_PRINT_AT_AND_ABOVE_LEVEL] = SwifterLog.Level.NONE.rawValue
+        
+        
+        /// For the SwifterLog callback threshold
+        
+        pdict[.CALLBACK_AT_AND_ABOVE_LEVEL] = SwifterLog.Level.NONE.rawValue
+        
+        
+        /// For the SwifterLog file threshold
+        
+        pdict[.FILE_RECORD_AT_AND_ABOVE_LEVEL] = SwifterLog.Level.NOTICE.rawValue
+        
+        
+        /// For the SwifterLog maximum number of logfiles
+        
+        pdict[.LOGFILE_MAX_NOF_FILES] = 20
+        
+        
+        /// For the SwifterLog maximum logfile size (in kbytes)
+        
+        pdict[.LOGFILE_MAX_SIZE] = 1000 // 1MB
+        
+        
+        /// For the SwifterLog logfile destination folder
+        
+        pdict[.LOGFILES_FOLDER] = "" // I.e. default
+        
+        
+        /// For the SwifterLog network target threshold
+        
+        pdict[.NETWORK_TRANSMIT_AT_AND_ABOVE_LEVEL] = SwifterLog.Level.NONE.rawValue
+
+        
+        /// The IP address for the logging network target
+        
+        pdict[.NETWORK_LOGTARGET_IP_ADDRESS] = "" // i.e. none
+        
+        
+        /// The Port number for the logging network target
+        
+        pdict[.NETWORK_LOGTARGET_PORT_NUMBER] = "" // I.e. none
     }
     
     

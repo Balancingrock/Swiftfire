@@ -50,6 +50,7 @@
 // History
 //
 // v0.9.6 - Header update
+//        - Merged Startup into Parameters
 // v0.9.3 - Added serverTelemetry
 // v0.9.1 - Minor changes to accommodate changes in SwifterSockets and SwifterLog
 // v0.9.0 - Initial release
@@ -78,28 +79,6 @@ let serverTelemetry = ServerTelemetry()
 var domains: Domains = Domains()
 
 
-// ==============================================
-// Start of application: Configure logging levels
-// ==============================================
-
-log.aslFacilityRecordAtAndAboveLevel = startup.aslFacilityRecordAtAndAboveLevel
-log.fileRecordAtAndAboveLevel        = startup.fileRecordAtAndAboveLevel
-log.stdoutPrintAtAndAboveLevel       = startup.stdoutPrintAtAndAboveLevel
-log.callbackAtAndAboveLevel          = startup.callbackAtAndAboveLevel
-log.networkTransmitAtAndAboveLevel   = startup.networkTransmitAtAndAboveLevel
-
-class LogForewarder: SwifterlogCallbackProtocol {
-    func logInfo(time: NSDate, level: SwifterLog.Level, source: String, message: String) {
-        let logline = LogLine(time: time, level: level, source: source, message: message)
-        mac.transferMessage(logline.json)
-    }
-}
-
-let logforewarder = LogForewarder()
-
-log.registerCallback(logforewarder)
-
-
 // ====================================================
 // Load parameters and domains from file (if available)
 // ====================================================
@@ -117,6 +96,59 @@ if !domains.restore()  {
 }
 
 
+// =======================================
+// Start of application: Configure logging
+// =======================================
+
+if let threshold = SwifterLog.Level(rawValue: Parameters.asInt(.ASL_FACILITY_RECORD_AT_AND_ABOVE_LEVEL)) {
+    log.aslFacilityRecordAtAndAboveLevel = threshold
+}
+
+if let threshold = SwifterLog.Level(rawValue: Parameters.asInt(.FILE_RECORD_AT_AND_ABOVE_LEVEL)) {
+    log.fileRecordAtAndAboveLevel = threshold
+}
+
+if Parameters.asString(.LOGFILES_FOLDER) != "" {
+    log.logfileDirectoryPath = Parameters.asString(.LOGFILES_FOLDER)
+}
+
+log.logfileMaxNumberOfFiles = Parameters.asInt(.LOGFILE_MAX_NOF_FILES)
+
+log.logfileMaxSizeInBytes = UInt64(Parameters.asInt(.LOGFILE_MAX_SIZE))
+
+if let threshold = SwifterLog.Level(rawValue: Parameters.asInt(.STDOUT_PRINT_AT_AND_ABOVE_LEVEL)) {
+    log.stdoutPrintAtAndAboveLevel = threshold
+}
+
+if let threshold = SwifterLog.Level(rawValue: Parameters.asInt(.CALLBACK_AT_AND_ABOVE_LEVEL)) {
+    log.callbackAtAndAboveLevel = threshold
+}
+
+if let threshold = SwifterLog.Level(rawValue: Parameters.asInt(.NETWORK_TRANSMIT_AT_AND_ABOVE_LEVEL)) {
+    log.networkTransmitAtAndAboveLevel = threshold
+}
+
+if (Parameters.asString(.NETWORK_LOGTARGET_IP_ADDRESS) != "") && (Parameters.asString(.NETWORK_LOGTARGET_PORT_NUMBER) != "") {
+    log.connectToNetworkTarget(address: Parameters.asString(.NETWORK_LOGTARGET_IP_ADDRESS), port: Parameters.asString(.NETWORK_LOGTARGET_PORT_NUMBER))
+}
+
+
+// ======================================
+// Configure callback for log information
+// ======================================
+
+class LogForewarder: SwifterlogCallbackProtocol {
+    func logInfo(time: NSDate, level: SwifterLog.Level, source: String, message: String) {
+        let logline = LogLine(time: time, level: level, source: source, message: message)
+        mac.transferMessage(logline.json)
+    }
+}
+
+let logforewarder = LogForewarder()
+
+log.registerCallback(logforewarder)
+
+
 // =========================================================
 // Initialize the port for the Command and Control interface
 // =========================================================
@@ -124,7 +156,7 @@ if !domains.restore()  {
 log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Initializing M&C loop")
 
 let result: SwifterSockets.InitServerReturn = SwifterSockets.initServer(
-    port: startup.macPort,
+    port: Parameters.asString(.MAC_PORT_NUMBER),
     maxPendingConnectionRequest: 1)
 
 switch result {

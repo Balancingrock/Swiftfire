@@ -52,6 +52,7 @@
 // v0.9.6 - Header update
 //        - Added transmission of "ClosingMacConnection" upon timeout for the M&C connection
 //        - Added ResetDomainTelemetry
+//        - Merged Startup into Parameters
 // v0.9.5 - Fixed bug that revented domain creation
 // v0.9.4 - Changed according to new command & reply definitions
 // v0.9.3 - Removed no longer existing server telemetry
@@ -114,7 +115,7 @@ final class MonitoringAndControl {
         
         // Check for autostart
         
-        if startup.autostart { doServerStartCommand() }
+        if Parameters.asBool(.AUTO_STARTUP) { doServerStartCommand() }
         
         
         // For the data received via the M&C server.
@@ -643,6 +644,58 @@ final class MonitoringAndControl {
             let reply = ReadServerParameterReply(parameter: command.parameter, value: port)
             
             transferMessage(reply.json)
+            
+            
+        case .AUTO_STARTUP:
+            
+            let value = Parameters.asBool(.AUTO_STARTUP)
+            log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, AUTO_STARTUP = \(value)")
+            
+            let reply = ReadServerParameterReply(parameter: command.parameter, value: value)
+            
+            transferMessage(reply.json)
+
+        
+        case .MAC_PORT_NUMBER:
+            
+            let port = Parameters.asString(.MAC_PORT_NUMBER)
+            log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, MAC_PORT_NUMBER = \(port)")
+            
+            let reply = ReadServerParameterReply(parameter: command.parameter, value: port)
+            
+            transferMessage(reply.json)
+            
+            
+        case .LOGFILE_MAX_NOF_FILES:
+            
+            let nof = log.logfileMaxNumberOfFiles
+            
+            log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, log.logfileMaxNumberOfFiles = \(nof)")
+            
+            let reply = ReadServerParameterReply(parameter: command.parameter, value: nof)
+            
+            transferMessage(reply.json)
+
+            
+        case .LOGFILE_MAX_SIZE:
+            
+            let nof = Int(log.logfileMaxSizeInBytes)
+            
+            log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, log.logfileMaxSizeInBytes = \(nof)")
+            
+            let reply = ReadServerParameterReply(parameter: command.parameter, value: nof)
+            
+            transferMessage(reply.json)
+            
+            
+        case .LOGFILES_FOLDER:
+            
+            let folder = log.logfileDirectoryPath ?? ""
+            log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, log.logfileDirectoryPath = \(folder)")
+            
+            let reply = ReadServerParameterReply(parameter: command.parameter, value: folder as String)
+            
+            transferMessage(reply.json)
         }
     }
     
@@ -721,6 +774,7 @@ final class MonitoringAndControl {
             if newLevel != log.aslFacilityRecordAtAndAboveLevel {
                 log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) updating from \(log.aslFacilityRecordAtAndAboveLevel) to \(newLevel)")
                 log.aslFacilityRecordAtAndAboveLevel = newLevel
+                Parameters.pdict[.ASL_FACILITY_RECORD_AT_AND_ABOVE_LEVEL] = level
             } else {
                 log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) new level same as present level: \(newLevel)")
             }
@@ -756,6 +810,7 @@ final class MonitoringAndControl {
             if newLevel != log.fileRecordAtAndAboveLevel {
                 log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) updating from \(log.fileRecordAtAndAboveLevel) to \(newLevel)")
                 log.fileRecordAtAndAboveLevel = newLevel
+                Parameters.pdict[.FILE_RECORD_AT_AND_ABOVE_LEVEL] = intLevel
             } else {
                 log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) new level same as present level: \(newLevel)")
             }
@@ -776,6 +831,7 @@ final class MonitoringAndControl {
             if newLevel != log.callbackAtAndAboveLevel {
                 log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) updating from \(log.callbackAtAndAboveLevel) to \(newLevel)")
                 log.callbackAtAndAboveLevel = newLevel
+                Parameters.pdict[.CALLBACK_AT_AND_ABOVE_LEVEL] = intLevel
             } else {
                 log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) new level same as present level: \(newLevel)")
             }
@@ -846,6 +902,7 @@ final class MonitoringAndControl {
             networkLogTarget.address = command.value
             
             let localCopy: SwifterLog.NetworkTarget = networkLogTarget
+            Parameters.pdict[.NETWORK_LOGTARGET_IP_ADDRESS] = command.value
             
             if conditionallySetNetworkLogTarget() {
                 log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) setting the network target to: \(localCopy.address):\(localCopy.port)")
@@ -859,6 +916,7 @@ final class MonitoringAndControl {
             networkLogTarget.port = command.value
             
             let localCopy: SwifterLog.NetworkTarget = networkLogTarget
+            Parameters.pdict[.NETWORK_LOGTARGET_PORT_NUMBER] = command.value
             
             if conditionallySetNetworkLogTarget() {
                 log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) setting the network target to: \(localCopy.address):\(localCopy.port)")
@@ -882,6 +940,7 @@ final class MonitoringAndControl {
             if newLevel != log.networkTransmitAtAndAboveLevel {
                 log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) updating from \(log.networkTransmitAtAndAboveLevel) to \(newLevel)")
                 log.networkTransmitAtAndAboveLevel = newLevel
+                Parameters.pdict[ParameterId.NETWORK_TRANSMIT_AT_AND_ABOVE_LEVEL] = intLevel
             } else {
                 log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) new level same as present level: \(newLevel)")
             }
@@ -914,8 +973,82 @@ final class MonitoringAndControl {
             if newLevel != log.stdoutPrintAtAndAboveLevel {
                 log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "WRITE-STDOUT_LOGLEVEL updating from \(log.stdoutPrintAtAndAboveLevel) to \(newLevel)")
                 log.stdoutPrintAtAndAboveLevel = newLevel
+                Parameters.pdict[ParameterId.STDOUT_PRINT_AT_AND_ABOVE_LEVEL] = intLevel
             } else {
                 log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "WRITE-STDOUT_LOGLEVEL new level same as present level: \(newLevel)")
+            }
+            
+            
+        case .AUTO_STARTUP:
+            
+            guard let newValue = command.boolValue else {
+                log.atLevelWarning(id: socket, source: #file.source(#function, #line), message: "WRITE-AUTO_STARTUP should contain a BOOL value")
+                return
+            }
+            
+            let oldValue = Parameters.asBool(ParameterId.AUTO_STARTUP)
+            
+            if oldValue != newValue {
+                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "WRITE-AUTO_STARTUP updating from \(oldValue) to \(newValue)")
+                Parameters.pdict[ParameterId.AUTO_STARTUP] = newValue
+            } else {
+                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "WRITE-AUTO_STARTUP new value same as present value: \(newValue)")
+            }
+            
+            
+        case .MAC_PORT_NUMBER:
+            
+            let newValue = command.value
+            
+            let oldValue = Parameters.asString(ParameterId.MAC_PORT_NUMBER)
+            
+            if oldValue != newValue {
+                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "WRITE-MAC_PORT_NUMBER updating from \(oldValue) to \(newValue)")
+                Parameters.pdict[ParameterId.MAC_PORT_NUMBER] = newValue
+            } else {
+                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "WRITE-MAC_PORT_NUMBER new value same as present value: \(newValue)")
+            }
+
+            
+        case .LOGFILES_FOLDER:
+            
+            let newValue = command.value
+            
+            let oldValue = log.logfileDirectoryPath ?? ""
+            
+            if oldValue != newValue {
+                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "WRITE-LOGFILES_FOLDER updating from \(oldValue) to \(newValue)")
+                Parameters.pdict[ParameterId.LOGFILES_FOLDER] = newValue
+            } else {
+                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "WRITE-LOGFILES_FOLDER new value same as present value: \(newValue)")
+            }
+            
+            
+        case .LOGFILE_MAX_SIZE:
+            
+            let newValue = command.intValue
+            
+            let oldValue = Int(log.logfileMaxSizeInBytes)
+            
+            if oldValue != newValue {
+                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "WRITE-LOGFILES_MAX_SIZE updating from \(oldValue) to \(newValue)")
+                Parameters.pdict[ParameterId.LOGFILE_MAX_SIZE] = newValue
+            } else {
+                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "WRITE-LOGFILES_MAX_SIZE new value same as present value: \(newValue)")
+            }
+
+            
+        case .LOGFILE_MAX_NOF_FILES:
+            
+            let newValue = command.intValue
+            
+            let oldValue = log.logfileMaxNumberOfFiles
+            
+            if oldValue != newValue {
+                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "WRITE-LOGFILE_MAX_NOF_FILES updating from \(oldValue) to \(newValue)")
+                Parameters.pdict[ParameterId.LOGFILE_MAX_NOF_FILES] = newValue
+            } else {
+                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "WRITE-LOGFILE_MAX_NOF_FILES new value same as present value: \(newValue)")
             }
         }
     }

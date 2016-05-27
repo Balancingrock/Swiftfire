@@ -17,7 +17,6 @@
 		864C6F301CC23F5200C60220 /* FileURLs.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F251CC23F5200C60220 /* FileURLs.swift */; };
 		864C6F311CC23F5200C60220 /* Parameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F261CC23F5200C60220 /* Parameters.swift */; };
 		864C6F321CC23F5200C60220 /* HttpConnectionPool.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F271CC23F5200C60220 /* HttpConnectionPool.swift */; };
-		864C6F331CC23F5200C60220 /* Startup.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F281CC23F5200C60220 /* Startup.swift */; };
 		864C6F341CC23F5200C60220 /* Host.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F291CC23F5200C60220 /* Host.swift */; };
 		864C6F371CC23F5F00C60220 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F351CC23F5F00C60220 /* Extensions.swift */; };
 		864C6F381CC23F5F00C60220 /* UInt8Buffer.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F361CC23F5F00C60220 /* UInt8Buffer.swift */; };
@@ -95,7 +94,6 @@
 		864C6F251CC23F5200C60220 /* FileURLs.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileURLs.swift; sourceTree = "<group>"; };
 		864C6F261CC23F5200C60220 /* Parameters.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Parameters.swift; sourceTree = "<group>"; };
 		864C6F271CC23F5200C60220 /* HttpConnectionPool.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HttpConnectionPool.swift; sourceTree = "<group>"; };
-		864C6F281CC23F5200C60220 /* Startup.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Startup.swift; sourceTree = "<group>"; };
 		864C6F291CC23F5200C60220 /* Host.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Host.swift; sourceTree = "<group>"; };
 		864C6F351CC23F5F00C60220 /* Extensions.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Extensions.swift; sourceTree = "<group>"; };
 		864C6F361CC23F5F00C60220 /* UInt8Buffer.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UInt8Buffer.swift; sourceTree = "<group>"; };
@@ -204,7 +202,6 @@
 				864C6F211CC23F5200C60220 /* HttpHeader.swift */,
 				864C6F251CC23F5200C60220 /* FileURLs.swift */,
 				864C6F261CC23F5200C60220 /* Parameters.swift */,
-				864C6F281CC23F5200C60220 /* Startup.swift */,
 				864C6F291CC23F5200C60220 /* Host.swift */,
 				864C6EFB1CC23DE400C60220 /* main.swift */,
 				864C6F3A1CC23F7E00C60220 /* AcceptAndDispatch.swift */,
@@ -494,7 +491,6 @@
 				864C6F3F1CC23F7E00C60220 /* AcceptAndDispatch.swift in Sources */,
 				864C6F341CC23F5200C60220 /* Host.swift in Sources */,
 				8650534E1CEB131C00D31DBF /* RemoveDomainCommand.swift in Sources */,
-				864C6F331CC23F5200C60220 /* Startup.swift in Sources */,
 				864C6F2D1CC23F5200C60220 /* Domain.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;

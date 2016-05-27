@@ -51,6 +51,7 @@
 //
 // v0.9.6 - Header update
 //        - Merged MAX_NOF_PENDING_CLIENT_MESSAGES and MAX_CLIENT_MESSAGE_SIZE into CLIENT_MESSAGE_BUFFER_SIZE
+//        - Merged Auto-Startup into Parameters, added configuration of more logging options
 // v0.9.4 - Initial release (replaces part of MacDef.swift)
 // =====================================================================================================================
 
@@ -71,6 +72,11 @@ enum ServerParameter: String {
     case NETWORK_LOGLEVEL = "NetworkLogLevel"
     case NETWORK_LOG_TARGET_ADDRESS = "NetworkLogTargetAddress"
     case NETWORK_LOG_TARGET_PORT = "NetworkLogTargetPort"
+    case AUTO_STARTUP = "AutoStartup"
+    case MAC_PORT_NUMBER = "MonitoringAndControlPortNumber"
+    case LOGFILES_FOLDER = "LogfilesFolder"
+    case LOGFILE_MAX_NOF_FILES = "LogfileMaxNofFiles"
+    case LOGFILE_MAX_SIZE = "LogfileMaxSize"
 
     var guiLabel: String {
         switch self {
@@ -87,10 +93,15 @@ enum ServerParameter: String {
         case .CALLBACK_LOGLEVEL: return "Send Logging at this -and above- level to the Callback Targets"
         case .NETWORK_LOG_TARGET_ADDRESS: return "The Network Target IP Address for Logging"
         case .NETWORK_LOG_TARGET_PORT: return "The Network Target Port for logging"
+        case .AUTO_STARTUP: return "Goto 'Running' on application start"
+        case .MAC_PORT_NUMBER: return "Number of M&C port (on next start, if saved)"
+        case .LOGFILES_FOLDER: return "Folder for logfiles"
+        case .LOGFILE_MAX_NOF_FILES: return "Maximum number of logfiles"
+        case .LOGFILE_MAX_SIZE: return "Maximum size of a logfile"
         }
     }
 
-    var toolTip: String {
+/*    var toolTip: String {
         switch self {
         case .SERVICE_PORT_NUMBER: return "HTTP Service Port Number (usually: 80)"
         case .MAX_NOF_ACCEPTED_CONNECTIONS: return "Maximum Number of Client Connections in Parallel"
@@ -105,8 +116,13 @@ enum ServerParameter: String {
         case .CALLBACK_LOGLEVEL: return "Send Logging at this -and above- level to the Callback Targets"
         case .NETWORK_LOG_TARGET_ADDRESS: return "The Network Target IP Address for Logging"
         case .NETWORK_LOG_TARGET_PORT: return "The Network Target Port number for logging"
+        case .AUTO_STARTUP: return "Goto 'Running' on application start"
+        case .MAC_PORT_NUMBER: return "Number of M&C port (on next start, if saved)"
+        case .LOGFILES_FOLDER: return "Folder for logfiles"
+        case .LOGFILE_MAX_NOF_FILES: return "Maximum number of logfiles"
+        case .LOGFILES_MAX_SIZE: return "Maximum size of a logfile"
         }
-    }
+    }*/
 
     func validateStringValue(value: String?) -> String? {
         
@@ -114,12 +130,21 @@ enum ServerParameter: String {
         
         switch self {
             
-        case SERVICE_PORT_NUMBER, NETWORK_LOG_TARGET_ADDRESS, NETWORK_LOG_TARGET_PORT:
+        case .SERVICE_PORT_NUMBER,
+             .NETWORK_LOG_TARGET_ADDRESS,
+             .NETWORK_LOG_TARGET_PORT,
+             .MAC_PORT_NUMBER,
+             .LOGFILES_FOLDER:
             
             return nil
             
             
-        case MAX_NOF_ACCEPTED_CONNECTIONS, MAX_NOF_PENDING_CONNECTIONS, MAX_WAIT_FOR_PENDING_CONNECTIONS, CLIENT_MESSAGE_BUFFER_SIZE:
+        case .MAX_NOF_ACCEPTED_CONNECTIONS,
+             .MAX_NOF_PENDING_CONNECTIONS,
+             .MAX_WAIT_FOR_PENDING_CONNECTIONS,
+             .CLIENT_MESSAGE_BUFFER_SIZE,
+             .LOGFILE_MAX_NOF_FILES,
+             .LOGFILE_MAX_SIZE:
             
             if let iv = Int(v) {
                 if v == iv.description { return nil }
@@ -129,7 +154,11 @@ enum ServerParameter: String {
             }
             
             
-        case ASL_LOGLEVEL, STDOUT_LOGLEVEL, FILE_LOGLEVEL, CALLBACK_LOGLEVEL, NETWORK_LOGLEVEL:
+        case .ASL_LOGLEVEL,
+             .STDOUT_LOGLEVEL,
+             .FILE_LOGLEVEL,
+             .CALLBACK_LOGLEVEL,
+             .NETWORK_LOGLEVEL:
             
             if let iv = Int(v) {
                 if v != iv.description { return "Invalid characters in integer" }
@@ -140,7 +169,8 @@ enum ServerParameter: String {
             }
             
             
-        case DEBUG_MODE:
+        case .DEBUG_MODE,
+             .AUTO_STARTUP:
             
             if let _ = Bool(v) {
                 return nil
@@ -150,5 +180,5 @@ enum ServerParameter: String {
         }
     }
 
-    static let all: Array<ServerParameter> = [.SERVICE_PORT_NUMBER, .MAX_NOF_ACCEPTED_CONNECTIONS, .MAX_NOF_PENDING_CONNECTIONS, .MAX_WAIT_FOR_PENDING_CONNECTIONS, .CLIENT_MESSAGE_BUFFER_SIZE, .DEBUG_MODE, .ASL_LOGLEVEL, .STDOUT_LOGLEVEL, .FILE_LOGLEVEL, .CALLBACK_LOGLEVEL, .NETWORK_LOGLEVEL, .NETWORK_LOG_TARGET_ADDRESS, .NETWORK_LOG_TARGET_PORT]
+    static let all: Array<ServerParameter> = [.SERVICE_PORT_NUMBER, .MAX_NOF_ACCEPTED_CONNECTIONS, .MAX_NOF_PENDING_CONNECTIONS, .MAX_WAIT_FOR_PENDING_CONNECTIONS, .CLIENT_MESSAGE_BUFFER_SIZE, .DEBUG_MODE, .ASL_LOGLEVEL, .STDOUT_LOGLEVEL, .FILE_LOGLEVEL, .CALLBACK_LOGLEVEL, .NETWORK_LOGLEVEL, .NETWORK_LOG_TARGET_ADDRESS, .NETWORK_LOG_TARGET_PORT, .AUTO_STARTUP, .MAC_PORT_NUMBER, .LOGFILES_FOLDER, .LOGFILE_MAX_SIZE, .LOGFILE_MAX_NOF_FILES]
 }
