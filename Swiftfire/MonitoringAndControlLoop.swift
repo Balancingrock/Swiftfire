@@ -3,7 +3,7 @@
 //  File:       MonitoringAndControl.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.6
+//  Version:    0.9.7
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,6 +49,8 @@
 //
 // History
 //
+// v0.9.7 - Added HEADER_LOGGING_ENABLED, ACCESS_LOGGING_ENABLED, MAX_FILE_SIZE_FOR_HEADER_LOGGING,
+//          MAX_FILE_SIZE_FOR_ACCESS_LOGGING, FLUSH_HEADER_LOGFILE_AFTER_EACH_WRITE
 // v0.9.6 - Header update
 //        - Added transmission of "ClosingMacConnection" upon timeout for the M&C connection
 //        - Added ResetDomainTelemetry
@@ -696,6 +698,46 @@ final class MonitoringAndControl {
             let reply = ReadServerParameterReply(parameter: command.parameter, value: folder as String)
             
             transferMessage(reply.json)
+            
+            
+        case .MAX_FILE_SIZE_FOR_HEADER_LOGGING:
+            
+            let value = Parameters.asInt(.MAX_FILE_SIZE_FOR_HEADER_LOGGING)
+            log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, MAX_FILE_SIZE_FOR_HEADER_LOGGING = \(value)")
+            
+            let reply = ReadServerParameterReply(parameter: command.parameter, value: value)
+            
+            transferMessage(reply.json)
+            
+            
+        case .MAX_FILE_SIZE_FOR_ACCESS_LOGGING:
+            
+            let value = Parameters.asInt(.MAX_FILE_SIZE_FOR_ACCESS_LOGGING)
+            log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, MAX_FILE_SIZE_FOR_ACCESS_LOGGING = \(value)")
+            
+            let reply = ReadServerParameterReply(parameter: command.parameter, value: value)
+            
+            transferMessage(reply.json)
+            
+            
+        case .HEADER_LOGGING_ENABLED:
+            
+            let value = Parameters.asBool(.HEADER_LOGGING_ENABLED)
+            log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, HEADER_LOGGING_ENABLED = \(value)")
+            
+            let reply = ReadServerParameterReply(parameter: command.parameter, value: value)
+            
+            transferMessage(reply.json)
+            
+            
+        case .FLUSH_HEADER_LOGFILE_AFTER_EACH_WRITE:
+            
+            let value = Parameters.asBool(.FLUSH_HEADER_LOGFILE_AFTER_EACH_WRITE)
+            log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, FLUSH_HEADER_LOGFILE_AFTER_EACH_WRITE = \(value)")
+            
+            let reply = ReadServerParameterReply(parameter: command.parameter, value: value)
+            
+            transferMessage(reply.json)
         }
     }
     
@@ -1049,6 +1091,60 @@ final class MonitoringAndControl {
                 Parameters.pdict[ParameterId.LOGFILE_MAX_NOF_FILES] = newValue
             } else {
                 log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "WRITE-LOGFILE_MAX_NOF_FILES new value same as present value: \(newValue)")
+            }
+
+            
+        case .MAX_FILE_SIZE_FOR_HEADER_LOGGING:
+            
+            let newValue = command.intValue
+            let oldValue = Parameters.asInt(.MAX_FILE_SIZE_FOR_HEADER_LOGGING)
+            if oldValue != newValue {
+                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "WRITE-MAX_FILE_SIZE_FOR_HEADER_LOGGING updating from \(oldValue) to \(newValue)")
+                Parameters.pdict[ParameterId.MAX_FILE_SIZE_FOR_HEADER_LOGGING] = newValue
+            } else {
+                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "WRITE-MAX_FILE_SIZE_FOR_HEADER_LOGGING new value same as present value: \(newValue)")
+            }
+            
+            
+        case .MAX_FILE_SIZE_FOR_ACCESS_LOGGING:
+            
+            let newValue = command.intValue
+            let oldValue = Parameters.asInt(.MAX_FILE_SIZE_FOR_ACCESS_LOGGING)
+            if oldValue != newValue {
+                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "WRITE-MAX_FILE_SIZE_FOR_ACCESS_LOGGING updating from \(oldValue) to \(newValue)")
+                Parameters.pdict[ParameterId.MAX_FILE_SIZE_FOR_ACCESS_LOGGING] = newValue
+            } else {
+                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "WRITE-MAX_FILE_SIZE_FOR_ACCESS_LOGGING new value same as present value: \(newValue)")
+            }
+            
+            
+        case .HEADER_LOGGING_ENABLED:
+            
+            guard let newValue = command.boolValue else {
+                log.atLevelWarning(id: socket, source: #file.source(#function, #line), message: "WRITE-HEADER_LOGGING_ENABLED should contain a BOOL value")
+                return
+            }
+            let oldValue = Parameters.asBool(.HEADER_LOGGING_ENABLED)
+            if oldValue != newValue {
+                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "WRITE-HEADER_LOGGING_ENABLED updating from \(oldValue) to \(newValue)")
+                Parameters.pdict[ParameterId.HEADER_LOGGING_ENABLED] = newValue
+            } else {
+                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "WRITE-HEADER_LOGGING_ENABLED new value same as present value: \(newValue)")
+            }
+            
+            
+        case .FLUSH_HEADER_LOGFILE_AFTER_EACH_WRITE:
+            
+            guard let newValue = command.boolValue else {
+                log.atLevelWarning(id: socket, source: #file.source(#function, #line), message: "WRITE-FLUSH_HEADER_LOGFILE_AFTER_EACH_WRITE should contain a BOOL value")
+                return
+            }
+            let oldValue = Parameters.asBool(.FLUSH_HEADER_LOGFILE_AFTER_EACH_WRITE)
+            if oldValue != newValue {
+                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "WRITE-FLUSH_HEADER_LOGFILE_AFTER_EACH_WRITE updating from \(oldValue) to \(newValue)")
+                Parameters.pdict[ParameterId.FLUSH_HEADER_LOGFILE_AFTER_EACH_WRITE] = newValue
+            } else {
+                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "WRITE-FLUSH_HEADER_LOGFILE_AFTER_EACH_WRITE new value same as present value: \(newValue)")
             }
         }
     }

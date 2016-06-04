@@ -3,7 +3,7 @@
 //  File:       FileURLs.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.6
+//  Version:    0.9.7
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,6 +49,9 @@
 //
 // History
 //
+// v0.9.7 - Added header logging directory
+//        - Removed startup file
+//        - Made class final
 // v0.9.6 - Header update
 // v0.9.0 - Initial release
 // =====================================================================================================================
@@ -56,12 +59,12 @@
 import Foundation
 
 
-class FileURLs {
+final class FileURLs {
     
     
     /// The Application Support Directory
     
-    static private var appSupportDir: NSURL? = {
+    static var appSupportDir: NSURL? = {
         
         let filemanager = NSFileManager.defaultManager()
         
@@ -108,6 +111,69 @@ class FileURLs {
     }()
     
     
+    /// The directory containing the logging files
+    
+    static private var loggingDir: NSURL? = {
+        
+        guard let dirpath = appSupportDir?.URLByAppendingPathComponent("logging") else { return nil }
+        
+        let filemanager = NSFileManager.defaultManager()
+        
+        do {
+            
+            try filemanager.createDirectoryAtPath(dirpath.path!, withIntermediateDirectories: true, attributes: nil)
+            
+            return dirpath
+            
+        } catch {
+            
+            return nil
+        }
+    }()
+
+    
+    /// The directory containing the header logging files
+    
+    static var headerLoggingDir: NSURL? = {
+        
+        guard let dirpath = loggingDir?.URLByAppendingPathComponent("headers") else { return nil }
+        
+        let filemanager = NSFileManager.defaultManager()
+        
+        do {
+            
+            try filemanager.createDirectoryAtPath(dirpath.path!, withIntermediateDirectories: true, attributes: nil)
+            
+            return dirpath
+            
+        } catch {
+            
+            return nil
+        }
+    }()
+
+    
+    /// The directory containing the header logging files
+    
+    static var accessLoggingDir: NSURL? = {
+        
+        guard let dirpath = loggingDir?.URLByAppendingPathComponent("access") else { return nil }
+        
+        let filemanager = NSFileManager.defaultManager()
+        
+        do {
+            
+            try filemanager.createDirectoryAtPath(dirpath.path!, withIntermediateDirectories: true, attributes: nil)
+            
+            return dirpath
+            
+        } catch {
+            
+            return nil
+        }
+    }()
+
+    
     /// The file with parameter defaults
     
     static var parameterDefaults: NSURL? = {
@@ -127,16 +193,6 @@ class FileURLs {
         return dirpath.URLByAppendingPathComponent("domain-defaults.json")
     }()
 
-    
-    /// The startup file
-    
-    static var startUpFile: NSURL? = {
-        
-        guard let dirpath = appSupportDir else { return nil }
-        
-        return dirpath.URLByAppendingPathComponent("auto-startup.json")
-    }()
-    
     
     /// Determines if a file exists and is not a directory
     

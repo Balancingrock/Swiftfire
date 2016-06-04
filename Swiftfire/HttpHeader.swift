@@ -3,7 +3,7 @@
 //  File:       HttpHeader.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.6
+//  Version:    0.9.7
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,6 +49,7 @@
 //
 // History
 //
+// v0.9.7 - Added header logging
 // v0.9.6 - Header update
 // v0.9.0 - Initial release
 // =====================================================================================================================
@@ -203,18 +204,6 @@ final class HttpHeader {
         // Don't copy the lazy variables, they will be recreated when necessary.
         return cp
     }
-    
-    
-    /// - Returns: The header as a NSData object containing the lines as an UTF8 encoded string separated by CRLF en closed by a CRLFCRLF sequence. Nil if the lines could not be encoded as an UTF8 coding.
-    /*
-    func asNSData() -> NSData? {
-        var str = ""
-        for line in lines {
-            str += line + CRLF
-        }
-        str += CRLF
-        return str.dataUsingEncoding(NSUTF8StringEncoding)
-    }*/
     
     
     /// - Returns: The header as a UInt8Buffer object containing the lines as an UTF8 encoded string separated by CRLF en closed by a CRLFCRLF sequence. Nil if the lines could not be encoded as an UTF8 coding.
@@ -399,4 +388,104 @@ final class HttpHeader {
         return nil
     }()
     
+    
+    // MARK: Storage for header logging
+    
+    private static let headerLoggingQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_LOW, 0)
+    
+    private static var _headerLoggingFileHandle: NSFileHandle?
+    
+    private static let dailyTask = TimedClosure(queue: HttpHeader.headerLoggingQueue, wallclockTime: WallclockTime(hour:0, minute:0, second:0), closure: {
+        dispatch_async(HttpHeader.headerLoggingQueue, { HttpHeader.closeHeaderLoggingFile() }) // Close file, a new one will be created on demand
+    })
+}
+
+
+// MARK: - Header Logging
+
+extension HttpHeader {
+    
+    private static var headerLoggingDateFormatter: NSDateFormatter = {
+        let ltf = NSDateFormatter()
+        ltf.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+        return ltf
+    }()
+    
+    
+    // This will create a new filename based on the current time.
+    
+    private static var filename: String {
+        return "HeaderLog_" + HttpHeader.headerLoggingDateFormatter.stringFromDate(NSDate()) + ".txt"
+    }
+    
+    
+    // This wil create a new file URL based on the current time
+    
+    private static var fileUrl: NSURL? {
+        guard let dirUrl = FileURLs.headerLoggingDir else { return nil }
+        return dirUrl.URLByAppendingPathComponent(HttpHeader.filename)
+    }
+    
+    
+    // Returns the current file handle if there is one, creates a new one if necessary.
+    
+    private static var handle: NSFileHandle? {
+        
+        if _headerLoggingFileHandle == nil {
+            
+            // Create the file
+            if let fileUrl = HttpHeader.fileUrl {
+                
+                if NSFileManager.defaultManager().createFileAtPath(fileUrl.path!, contents: nil, attributes: [NSFilePosixPermissions : NSNumber(int: 0o640)]) {
+                    _headerLoggingFileHandle = NSFileHandle(forUpdatingAtPath: fileUrl.path!)
+                } else {
+                    log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Could not generate header logfile at: \(fileUrl.path!)")
+                    _headerLoggingFileHandle = nil
+                }
+                
+            } else {
+                log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Could not retrieve header logfile fileUrl")
+                _headerLoggingFileHandle = nil
+            }
+        }
+        return _headerLoggingFileHandle
+    }
+    
+    
+    static func closeHeaderLoggingFile() {
+        if let file = self._headerLoggingFileHandle {
+            file.closeFile()
+            self._headerLoggingFileHandle = nil
+        }
+    }
+
+    
+    func record(connection: HttpConnection) {
+        
+        // Do everything on the queue to prevent threading errors
+        
+        dispatch_async(HttpHeader.headerLoggingQueue, {
+            
+            if let file = HttpHeader.handle {
+                if file.seekToEndOfFile() > UInt64(Parameters.asInt(.MAX_FILE_SIZE_FOR_HEADER_LOGGING) * 1024) {
+                    HttpHeader.closeHeaderLoggingFile()
+                }
+            }
+            
+            if let file = HttpHeader.handle {
+                
+                var message = "--------------------------------------------------------------------------------\n"
+                message += "Time      : \(HttpHeader.headerLoggingDateFormatter.stringFromDate(connection.timeOfAccept))\n"
+                message += "IP Address: \(connection.clientIp)\n"
+                message += "Log Id    : \(connection.logId)\n\n"
+                message = self.lines.reduce(message, combine: { $0 + $1 + "\n"})
+                message += "\n"
+                
+                if let data = message.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: true) {
+                    file.writeData(data)
+                    if Parameters.asBool(.FLUSH_HEADER_LOGFILE_AFTER_EACH_WRITE) { file.synchronizeFile() }
+                }
+            }
+            })
+    }
 }

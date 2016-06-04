@@ -3,7 +3,7 @@
 //  File:       ServerParameter.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.6
+//  Version:    0.9.7
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,6 +49,8 @@
 //
 // History
 //
+// v0.9.7 - Added HEADER_LOGGING_ENABLED, MAX_FILE_SIZE_FOR_HEADER_LOGGING,
+//          MAX_FILE_SIZE_FOR_ACCESS_LOGGING, FLUSH_HEADER_LOGFILE_AFTER_EACH_WRITE
 // v0.9.6 - Header update
 //        - Merged MAX_NOF_PENDING_CLIENT_MESSAGES and MAX_CLIENT_MESSAGE_SIZE into CLIENT_MESSAGE_BUFFER_SIZE
 //        - Merged Auto-Startup into Parameters, added configuration of more logging options
@@ -78,6 +80,11 @@ enum ServerParameter: String {
     case LOGFILE_MAX_NOF_FILES = "LogfileMaxNofFiles"
     case LOGFILE_MAX_SIZE = "LogfileMaxSize"
 
+    case HEADER_LOGGING_ENABLED = "HeaderLoggingEnabled"
+    case MAX_FILE_SIZE_FOR_HEADER_LOGGING = "MaxFileSizeForHeaderLogging"
+    case MAX_FILE_SIZE_FOR_ACCESS_LOGGING = "MaxFileSizeForAccessLogging"
+    case FLUSH_HEADER_LOGFILE_AFTER_EACH_WRITE = "FlushHeaderLogfileAfterEachWrite"
+
     var guiLabel: String {
         switch self {
         case .SERVICE_PORT_NUMBER: return "HTTP Service Port Number (usually: 80)"
@@ -98,31 +105,13 @@ enum ServerParameter: String {
         case .LOGFILES_FOLDER: return "Folder for logfiles"
         case .LOGFILE_MAX_NOF_FILES: return "Maximum number of logfiles"
         case .LOGFILE_MAX_SIZE: return "Maximum size of a logfile"
+            
+        case HEADER_LOGGING_ENABLED: return "Enables logging of the full HTTP header"
+        case MAX_FILE_SIZE_FOR_HEADER_LOGGING: return "Maximum File Size of a Header Logfile"
+        case MAX_FILE_SIZE_FOR_ACCESS_LOGGING: return "Maximum File Size of an Access Logfile"
+        case FLUSH_HEADER_LOGFILE_AFTER_EACH_WRITE: return "Forces a file-write after each received HTTP header"
         }
     }
-
-/*    var toolTip: String {
-        switch self {
-        case .SERVICE_PORT_NUMBER: return "HTTP Service Port Number (usually: 80)"
-        case .MAX_NOF_ACCEPTED_CONNECTIONS: return "Maximum Number of Client Connections in Parallel"
-        case .MAX_NOF_PENDING_CONNECTIONS: return "Maximum Number of Pending Client Connections"
-        case .MAX_WAIT_FOR_PENDING_CONNECTIONS: return "Maximum Wait for Pending Client Connections"
-        case .CLIENT_MESSAGE_BUFFER_SIZE: return "Size of the Client Message Buffer in Bytes"
-        case .DEBUG_MODE: return "Enable more Debug Information to be Logged"
-        case .ASL_LOGLEVEL: return "Send Logging at this -and above- level to the ASL Facility"
-        case .STDOUT_LOGLEVEL: return "Send Logging at this -and above- level to stdout (console)"
-        case .FILE_LOGLEVEL: return "Send Logging at this -and above- level to the Logfiles"
-        case .NETWORK_LOGLEVEL: return "Send Logging at this -and above- level to a Network Target"
-        case .CALLBACK_LOGLEVEL: return "Send Logging at this -and above- level to the Callback Targets"
-        case .NETWORK_LOG_TARGET_ADDRESS: return "The Network Target IP Address for Logging"
-        case .NETWORK_LOG_TARGET_PORT: return "The Network Target Port number for logging"
-        case .AUTO_STARTUP: return "Goto 'Running' on application start"
-        case .MAC_PORT_NUMBER: return "Number of M&C port (on next start, if saved)"
-        case .LOGFILES_FOLDER: return "Folder for logfiles"
-        case .LOGFILE_MAX_NOF_FILES: return "Maximum number of logfiles"
-        case .LOGFILES_MAX_SIZE: return "Maximum size of a logfile"
-        }
-    }*/
 
     func validateStringValue(value: String?) -> String? {
         
@@ -144,7 +133,9 @@ enum ServerParameter: String {
              .MAX_WAIT_FOR_PENDING_CONNECTIONS,
              .CLIENT_MESSAGE_BUFFER_SIZE,
              .LOGFILE_MAX_NOF_FILES,
-             .LOGFILE_MAX_SIZE:
+             .LOGFILE_MAX_SIZE,
+             .MAX_FILE_SIZE_FOR_HEADER_LOGGING,
+             .MAX_FILE_SIZE_FOR_ACCESS_LOGGING:
             
             if let iv = Int(v) {
                 if v == iv.description { return nil }
@@ -170,7 +161,9 @@ enum ServerParameter: String {
             
             
         case .DEBUG_MODE,
-             .AUTO_STARTUP:
+             .AUTO_STARTUP,
+             .HEADER_LOGGING_ENABLED,
+             .FLUSH_HEADER_LOGFILE_AFTER_EACH_WRITE:
             
             if let _ = Bool(v) {
                 return nil
@@ -180,5 +173,5 @@ enum ServerParameter: String {
         }
     }
 
-    static let all: Array<ServerParameter> = [.SERVICE_PORT_NUMBER, .MAX_NOF_ACCEPTED_CONNECTIONS, .MAX_NOF_PENDING_CONNECTIONS, .MAX_WAIT_FOR_PENDING_CONNECTIONS, .CLIENT_MESSAGE_BUFFER_SIZE, .DEBUG_MODE, .ASL_LOGLEVEL, .STDOUT_LOGLEVEL, .FILE_LOGLEVEL, .CALLBACK_LOGLEVEL, .NETWORK_LOGLEVEL, .NETWORK_LOG_TARGET_ADDRESS, .NETWORK_LOG_TARGET_PORT, .AUTO_STARTUP, .MAC_PORT_NUMBER, .LOGFILES_FOLDER, .LOGFILE_MAX_SIZE, .LOGFILE_MAX_NOF_FILES]
+    static let all: Array<ServerParameter> = [.SERVICE_PORT_NUMBER, .MAX_NOF_ACCEPTED_CONNECTIONS, .MAX_NOF_PENDING_CONNECTIONS, .MAX_WAIT_FOR_PENDING_CONNECTIONS, .CLIENT_MESSAGE_BUFFER_SIZE, .DEBUG_MODE, .ASL_LOGLEVEL, .STDOUT_LOGLEVEL, .FILE_LOGLEVEL, .CALLBACK_LOGLEVEL, .NETWORK_LOGLEVEL, .NETWORK_LOG_TARGET_ADDRESS, .NETWORK_LOG_TARGET_PORT, .AUTO_STARTUP, .MAC_PORT_NUMBER, .LOGFILES_FOLDER, .LOGFILE_MAX_SIZE, .LOGFILE_MAX_NOF_FILES, .MAX_FILE_SIZE_FOR_HEADER_LOGGING, .MAX_FILE_SIZE_FOR_ACCESS_LOGGING, .HEADER_LOGGING_ENABLED, .FLUSH_HEADER_LOGFILE_AFTER_EACH_WRITE]
 }

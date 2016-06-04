@@ -7,10 +7,10 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		864A74881D019CAD0003173F /* Four04Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864A74871D019CAD0003173F /* Four04Log.swift */; };
 		864C6EFC1CC23DE400C60220 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6EFB1CC23DE400C60220 /* main.swift */; };
 		864C6F2A1CC23F5200C60220 /* ServerTelemetry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F1F1CC23F5200C60220 /* ServerTelemetry.swift */; };
 		864C6F2B1CC23F5200C60220 /* HttpResponseCodes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F201CC23F5200C60220 /* HttpResponseCodes.swift */; };
-		864C6F2C1CC23F5200C60220 /* HttpHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F211CC23F5200C60220 /* HttpHeader.swift */; };
 		864C6F2D1CC23F5200C60220 /* Domain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F221CC23F5200C60220 /* Domain.swift */; };
 		864C6F2E1CC23F5200C60220 /* Domain.HttpWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F231CC23F5200C60220 /* Domain.HttpWorker.swift */; };
 		864C6F2F1CC23F5200C60220 /* Domains.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F241CC23F5200C60220 /* Domains.swift */; };
@@ -55,6 +55,7 @@
 		865053641CEB3DF000D31DBF /* ServerTelemetryItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = 865053631CEB3DF000D31DBF /* ServerTelemetryItem.swift */; };
 		8650538F1CEB747400D31DBF /* ReadDomainsCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8650538E1CEB747400D31DBF /* ReadDomainsCommand.swift */; };
 		865053911CEB748F00D31DBF /* ReadDomainsReply.swift in Sources */ = {isa = PBXBuildFile; fileRef = 865053901CEB748F00D31DBF /* ReadDomainsReply.swift */; };
+		8654472C1CFCBA4700BFCAD4 /* HttpHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F211CC23F5200C60220 /* HttpHeader.swift */; };
 		865713D51CE447C300B9CD36 /* DomainTelemetry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 865713D41CE447C300B9CD36 /* DomainTelemetry.swift */; };
 		865713D71CE44BD200B9CD36 /* UIntTelemetry.swift in Sources */ = {isa = PBXBuildFile; fileRef = 865713D61CE44BD200B9CD36 /* UIntTelemetry.swift */; };
 		865713D91CE44BF400B9CD36 /* TelemetryProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = 865713D81CE44BF400B9CD36 /* TelemetryProtocol.swift */; };
@@ -63,6 +64,10 @@
 		865713E51CE8CC1E00B9CD36 /* WriteServerParameterCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 865713E41CE8CC1E00B9CD36 /* WriteServerParameterCommand.swift */; };
 		865713E71CE9B90200B9CD36 /* CreateDomainCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 865713E61CE9B90200B9CD36 /* CreateDomainCommand.swift */; };
 		865713E91CE9BC7E00B9CD36 /* ServerParameter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 865713E81CE9BC7E00B9CD36 /* ServerParameter.swift */; };
+		86775ABD1CFF258500C8B34C /* AccessLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86775ABC1CFF258500C8B34C /* AccessLog.swift */; };
+		8678225D1D002ECB00A93401 /* WallclockTime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8678225C1D002ECB00A93401 /* WallclockTime.swift */; };
+		867CD0531CFDB103009B9868 /* FileLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 867CD0521CFDB103009B9868 /* FileLog.swift */; };
+		867CD0551CFDCFF9009B9868 /* TimedClosure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 867CD0541CFDCFF9009B9868 /* TimedClosure.swift */; };
 		8694C9AC1CEEF84E00F45D8B /* MimeType.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8694C9AB1CEEF84E00F45D8B /* MimeType.swift */; };
 		86EB627F1CF5C2310083F472 /* SwifterLog.Network.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86EB627E1CF5C2310083F472 /* SwifterLog.Network.swift */; };
 		86EB62841CF5C3550083F472 /* ClosingMacConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86EB62831CF5C3550083F472 /* ClosingMacConnection.swift */; };
@@ -82,6 +87,7 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		864A74871D019CAD0003173F /* Four04Log.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Four04Log.swift; sourceTree = "<group>"; };
 		864C6EF81CC23DE400C60220 /* Swiftfire */ = {isa = PBXFileReference; explicitFileType = "compiled.mach-o.executable"; includeInIndex = 0; path = Swiftfire; sourceTree = BUILT_PRODUCTS_DIR; };
 		864C6EFB1CC23DE400C60220 /* main.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = main.swift; sourceTree = "<group>"; };
 		864C6F021CC23EAE00C60220 /* Swiftfire-Bridging-Header.h */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.c.h; path = "Swiftfire-Bridging-Header.h"; sourceTree = "<group>"; };
@@ -146,6 +152,10 @@
 		865713E41CE8CC1E00B9CD36 /* WriteServerParameterCommand.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WriteServerParameterCommand.swift; sourceTree = "<group>"; };
 		865713E61CE9B90200B9CD36 /* CreateDomainCommand.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = CreateDomainCommand.swift; sourceTree = "<group>"; };
 		865713E81CE9BC7E00B9CD36 /* ServerParameter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ServerParameter.swift; sourceTree = "<group>"; };
+		86775ABC1CFF258500C8B34C /* AccessLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AccessLog.swift; sourceTree = "<group>"; };
+		8678225C1D002ECB00A93401 /* WallclockTime.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WallclockTime.swift; sourceTree = "<group>"; };
+		867CD0521CFDB103009B9868 /* FileLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FileLog.swift; sourceTree = "<group>"; };
+		867CD0541CFDCFF9009B9868 /* TimedClosure.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimedClosure.swift; sourceTree = "<group>"; };
 		8694C9AB1CEEF84E00F45D8B /* MimeType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MimeType.swift; sourceTree = "<group>"; };
 		86EB627E1CF5C2310083F472 /* SwifterLog.Network.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwifterLog.Network.swift; path = ../../../SwifterLog/SwifterLog/SwifterLog/SwifterLog.Network.swift; sourceTree = "<group>"; };
 		86EB62831CF5C3550083F472 /* ClosingMacConnection.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ClosingMacConnection.swift; sourceTree = "<group>"; };
@@ -206,6 +216,8 @@
 				864C6EFB1CC23DE400C60220 /* main.swift */,
 				864C6F3A1CC23F7E00C60220 /* AcceptAndDispatch.swift */,
 				8694C9AB1CEEF84E00F45D8B /* MimeType.swift */,
+				86775ABC1CFF258500C8B34C /* AccessLog.swift */,
+				864A74871D019CAD0003173F /* Four04Log.swift */,
 				86F49FBD1CE1CF0000AFEE55 /* Domains */,
 				864C6F4A1CC23FBE00C60220 /* HttpConnection */,
 				864C6F491CC23FA900C60220 /* Monitoring and Control */,
@@ -265,6 +277,9 @@
 				864C6F361CC23F5F00C60220 /* UInt8Buffer.swift */,
 				865713D61CE44BD200B9CD36 /* UIntTelemetry.swift */,
 				865713D81CE44BF400B9CD36 /* TelemetryProtocol.swift */,
+				8678225C1D002ECB00A93401 /* WallclockTime.swift */,
+				867CD0541CFDCFF9009B9868 /* TimedClosure.swift */,
+				867CD0521CFDB103009B9868 /* FileLog.swift */,
 			);
 			name = Utils;
 			path = Swiftfire;
@@ -441,6 +456,7 @@
 				864C6F2A1CC23F5200C60220 /* ServerTelemetry.swift in Sources */,
 				864C6EFC1CC23DE400C60220 /* main.swift in Sources */,
 				865053641CEB3DF000D31DBF /* ServerTelemetryItem.swift in Sources */,
+				867CD0531CFDB103009B9868 /* FileLog.swift in Sources */,
 				864C6F721CC2472100C60220 /* SwifterSockets.Receive.swift in Sources */,
 				8650538F1CEB747400D31DBF /* ReadDomainsCommand.swift in Sources */,
 				865053601CEB3C1200D31DBF /* ReadServerTelemetryCommand.swift in Sources */,
@@ -454,6 +470,8 @@
 				864C6F6F1CC2472100C60220 /* SwifterSockets.InitServer.swift in Sources */,
 				86EB627F1CF5C2310083F472 /* SwifterLog.Network.swift in Sources */,
 				865053521CEB257500D31DBF /* ReadDomainTelemetryReply.swift in Sources */,
+				8678225D1D002ECB00A93401 /* WallclockTime.swift in Sources */,
+				867CD0551CFDCFF9009B9868 /* TimedClosure.swift in Sources */,
 				864C6F6E1CC2472100C60220 /* SwifterSockets.swift in Sources */,
 				865053911CEB748F00D31DBF /* ReadDomainsReply.swift in Sources */,
 				865053541CEB2E5600D31DBF /* UpdateDomainCommand.swift in Sources */,
@@ -473,8 +491,8 @@
 				864C6F411CC23F7E00C60220 /* HttpConnection.DataEndDetector.swift in Sources */,
 				865713E31CE8C44600B9CD36 /* ReadDomainTelemetryCommand.swift in Sources */,
 				864C6F321CC23F5200C60220 /* HttpConnectionPool.swift in Sources */,
+				86775ABD1CFF258500C8B34C /* AccessLog.swift in Sources */,
 				86EB62841CF5C3550083F472 /* ClosingMacConnection.swift in Sources */,
-				864C6F2C1CC23F5200C60220 /* HttpHeader.swift in Sources */,
 				865713D91CE44BF400B9CD36 /* TelemetryProtocol.swift in Sources */,
 				864C6F621CC243AF00C60220 /* asl-bridge.m in Sources */,
 				86F529461CF5F2860092E24D /* ResetDomainTelemetryCommand.swift in Sources */,
@@ -486,9 +504,11 @@
 				864C6F401CC23F7E00C60220 /* HttpConnection.swift in Sources */,
 				865053621CEB3C2F00D31DBF /* ReadServerTelemetryReply.swift in Sources */,
 				8650534C1CEB124200D31DBF /* ServerStopCommand.swift in Sources */,
+				864A74881D019CAD0003173F /* Four04Log.swift in Sources */,
 				865713E11CE8C40D00B9CD36 /* ReadServerParameterCommand.swift in Sources */,
 				865053581CEB376900D31DBF /* SaveServerParametersCommand.swift in Sources */,
 				864C6F3F1CC23F7E00C60220 /* AcceptAndDispatch.swift in Sources */,
+				8654472C1CFCBA4700BFCAD4 /* HttpHeader.swift in Sources */,
 				864C6F341CC23F5200C60220 /* Host.swift in Sources */,
 				8650534E1CEB131C00D31DBF /* RemoveDomainCommand.swift in Sources */,
 				864C6F2D1CC23F5200C60220 /* Domain.swift in Sources */,

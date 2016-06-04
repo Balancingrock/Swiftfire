@@ -3,7 +3,7 @@
 //  File:       Parameters.swift
 //  Project:    Swiftfire
 //
-private let VERSION = "0.9.6"
+private let VERSION = "0.9.7"
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,6 +49,11 @@ private let VERSION = "0.9.6"
 //
 // History
 //
+// v0.9.7 - Changed initial value of HTTP_KEEP_ALIVE_INACTIVITY_TIMEOUT to 1 second
+//        - Added HEADER_LOGGING_ENABLED, ACCESS_LOGGING_ENABLED, MAX_FILE_SIZE_FOR_HEADER_LOGGING,
+//          MAX_FILE_SIZE_FOR_ACCESS_LOGGING, FLUSH_HEADER_LOGFILE_AFTER_EACH_WRITE
+//        - Slightly optimized code to upgrade to new parameter file version
+//        - Added function to upgrade to parameter version 2
 // v0.9.6 - Header update & version number update
 //        - Merged MAX_NOF_PENDING_CLIENT_MESSAGES with MAX_CLIENT_MESSAGE_SIZE into CLIENT_MESSAGE_BUFFER_SIZE
 //        - Merged AutoStartup into this file
@@ -58,10 +63,6 @@ private let VERSION = "0.9.6"
 // v0.9.2 - Updated version number
 // v0.9.0 - Initial release
 // =====================================================================================================================
-//
-// =============================================================================================
-// These are the configuration parameters for Swiftfire
-// =============================================================================================
 
 import Foundation
 
@@ -76,6 +77,7 @@ enum ParameterId: String {
     // 3) Add the parameter to the static property 'all'
     // 4) Add the default value to upgradeParameterDictionaryToVersionXXX
     
+    // Version 1
     case PARAMETER_DEFAULTS_FILE_VERSION = "ParameterDefaultsFileVersion"
     case DEBUG_MODE = "DebugMode"
     case SERVICE_PORT_NUMBER = "ServicePortNumber"
@@ -99,12 +101,20 @@ enum ParameterId: String {
     case NETWORK_LOGTARGET_IP_ADDRESS = "NetworkLogtargetIpAddress"
     case NETWORK_LOGTARGET_PORT_NUMBER = "NetworkLogtargetPortNumber"
     
+    // Version 2
+    case HEADER_LOGGING_ENABLED = "HeaderLoggingEnabled"
+    case MAX_FILE_SIZE_FOR_HEADER_LOGGING = "MaxFileSizeForHeaderLogging"
+    case MAX_FILE_SIZE_FOR_ACCESS_LOGGING = "MaxFileSizeForAccessLogging"
+    case FLUSH_HEADER_LOGFILE_AFTER_EACH_WRITE = "FlushHeaderLogfileAfterEachWrite"
+    
     private var jsonRead: JsonReadAccess {
         
         switch self {
             
         case .DEBUG_MODE,
-             .AUTO_STARTUP:
+             .AUTO_STARTUP,
+             .HEADER_LOGGING_ENABLED,
+             .FLUSH_HEADER_LOGFILE_AFTER_EACH_WRITE:
             
             // These are the Bool parameters
             
@@ -124,7 +134,9 @@ enum ParameterId: String {
              .FILE_RECORD_AT_AND_ABOVE_LEVEL,
              .LOGFILE_MAX_SIZE,
              .LOGFILE_MAX_NOF_FILES,
-             .NETWORK_TRANSMIT_AT_AND_ABOVE_LEVEL:
+             .NETWORK_TRANSMIT_AT_AND_ABOVE_LEVEL,
+             .MAX_FILE_SIZE_FOR_ACCESS_LOGGING,
+             .MAX_FILE_SIZE_FOR_HEADER_LOGGING:
             
             // These are the Int parameters
             
@@ -155,7 +167,9 @@ enum ParameterId: String {
         switch self {
             
         case .DEBUG_MODE,
-             .AUTO_STARTUP:
+             .AUTO_STARTUP,
+             .HEADER_LOGGING_ENABLED,
+             .FLUSH_HEADER_LOGFILE_AFTER_EACH_WRITE:
             
             // These are the Bool parameters
             
@@ -175,7 +189,9 @@ enum ParameterId: String {
              .FILE_RECORD_AT_AND_ABOVE_LEVEL,
              .LOGFILE_MAX_NOF_FILES,
              .LOGFILE_MAX_SIZE,
-             .NETWORK_TRANSMIT_AT_AND_ABOVE_LEVEL:
+             .NETWORK_TRANSMIT_AT_AND_ABOVE_LEVEL,
+             .MAX_FILE_SIZE_FOR_ACCESS_LOGGING,
+             .MAX_FILE_SIZE_FOR_HEADER_LOGGING:
             
             // These are the Int parameters
             
@@ -201,7 +217,7 @@ enum ParameterId: String {
         }
     }
     
-    static var all: Array<ParameterId> = [.AUTO_STARTUP, .MAC_PORT_NUMBER, .DEBUG_MODE, .PARAMETER_DEFAULTS_FILE_VERSION, .MAX_NOF_PENDING_CONNECTIONS, .MAX_NOF_ACCEPTED_CONNECTIONS, .MAX_WAIT_FOR_PENDING_CONNECTIONS, .CLIENT_MESSAGE_BUFFER_SIZE, .HTTP_KEEP_ALIVE_INACTIVITY_TIMEOUT, .HTTP_RESPONSE_CLIENT_TIMEOUT, .SERVICE_PORT_NUMBER, .MAC_INACTIVITY_TIMEOUT, .ASL_FACILITY_RECORD_AT_AND_ABOVE_LEVEL, .STDOUT_PRINT_AT_AND_ABOVE_LEVEL, .CALLBACK_AT_AND_ABOVE_LEVEL, .FILE_RECORD_AT_AND_ABOVE_LEVEL, .LOGFILE_MAX_SIZE, .LOGFILE_MAX_NOF_FILES, .LOGFILES_FOLDER, .NETWORK_TRANSMIT_AT_AND_ABOVE_LEVEL, .NETWORK_LOGTARGET_IP_ADDRESS, .NETWORK_LOGTARGET_PORT_NUMBER]
+    static var all: Array<ParameterId> = [.AUTO_STARTUP, .MAC_PORT_NUMBER, .DEBUG_MODE, .PARAMETER_DEFAULTS_FILE_VERSION, .MAX_NOF_PENDING_CONNECTIONS, .MAX_NOF_ACCEPTED_CONNECTIONS, .MAX_WAIT_FOR_PENDING_CONNECTIONS, .CLIENT_MESSAGE_BUFFER_SIZE, .HTTP_KEEP_ALIVE_INACTIVITY_TIMEOUT, .HTTP_RESPONSE_CLIENT_TIMEOUT, .SERVICE_PORT_NUMBER, .MAC_INACTIVITY_TIMEOUT, .ASL_FACILITY_RECORD_AT_AND_ABOVE_LEVEL, .STDOUT_PRINT_AT_AND_ABOVE_LEVEL, .CALLBACK_AT_AND_ABOVE_LEVEL, .FILE_RECORD_AT_AND_ABOVE_LEVEL, .LOGFILE_MAX_SIZE, .LOGFILE_MAX_NOF_FILES, .LOGFILES_FOLDER, .NETWORK_TRANSMIT_AT_AND_ABOVE_LEVEL, .NETWORK_LOGTARGET_IP_ADDRESS, .NETWORK_LOGTARGET_PORT_NUMBER, .HEADER_LOGGING_ENABLED, .MAX_FILE_SIZE_FOR_ACCESS_LOGGING, .MAX_FILE_SIZE_FOR_HEADER_LOGGING, .FLUSH_HEADER_LOGFILE_AFTER_EACH_WRITE]
 }
 
 
@@ -250,7 +266,7 @@ final class Parameters {
     
     // The current version number of the parameter-defaults file
     
-    private static var parameterDefaultsFileVersion = 1
+    private static var parameterDefaultsFileVersion = 2
     
     
     /**
@@ -273,7 +289,7 @@ final class Parameters {
         
         guard FileURLs.exists(FileURLs.parameterDefaults) else {
             log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "No 'parameter-defaults.json' file present, starting with hard coded defaults.")
-            updateParameterDictionary(parameterDefaultsFileVersion)
+            updateParameterDictionary()
             logParameterSettings()
             return true
         }
@@ -305,7 +321,7 @@ final class Parameters {
         
         if let fileVersion = pdict[.PARAMETER_DEFAULTS_FILE_VERSION] as? Int {
             if fileVersion < parameterDefaultsFileVersion {
-                updateParameterDictionary(parameterDefaultsFileVersion)
+                updateParameterDictionary()
             } else if fileVersion > parameterDefaultsFileVersion {
                 log.atLevelWarning(id: -1, source: #file.source(#function, #line), message: "Error in parameter-defaults file, version number is too high. ( > \(parameterDefaultsFileVersion))")
                 return false
@@ -323,11 +339,6 @@ final class Parameters {
             }
         }
         if !complete { return false }
-        
-        
-        // Log the settings for this session.
-        
-        logParameterSettings()
         
         
         // Success
@@ -356,12 +367,22 @@ final class Parameters {
     }
     
     
-    private static func updateParameterDictionary(toVersion: Int) {
+    private static func updateParameterDictionary() {
+        
         if pdict[.PARAMETER_DEFAULTS_FILE_VERSION] == nil {
             log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Initializing the parameter dictionary to version 1")
             initParameterDictionary()
         }
-        log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Updating the settings file to version \(toVersion)")
+        
+        var version = asInt(.PARAMETER_DEFAULTS_FILE_VERSION)
+        while version < parameterDefaultsFileVersion {
+            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Updating the settings file to version \(version)")
+            switch (version) {
+            case 1: upgradeToVersion2()
+            default: log.atLevelCritical(source: #file.source(#function, #line), message: "Missing code to upgrade parameters to version \(version)")
+            }
+            version = asInt(.PARAMETER_DEFAULTS_FILE_VERSION)
+        }
     }
     
     
@@ -407,7 +428,7 @@ final class Parameters {
         
         /// When a HTTP request has the "keep alive" option set, the connection will remain open for this time after the last data block was processed from that client.
         
-        pdict[.HTTP_KEEP_ALIVE_INACTIVITY_TIMEOUT] = 10 * 60 // 10 minutes
+        pdict[.HTTP_KEEP_ALIVE_INACTIVITY_TIMEOUT] = 1 // 1 second
         
         
         /// When data has to be transferred to a client, this is the timeout for the transmit operation.
@@ -480,6 +501,33 @@ final class Parameters {
         pdict[.NETWORK_LOGTARGET_PORT_NUMBER] = "" // I.e. none
     }
     
+    private static func upgradeToVersion2() {
+        
+        /// Enables/Disables logging of all request headers
+        
+        pdict[.HEADER_LOGGING_ENABLED] = false
+        
+
+        /// The maximum file size for header logging (in kbytes)
+        
+        pdict[.MAX_FILE_SIZE_FOR_HEADER_LOGGING] = 1000 // 1 MB
+        
+        
+        /// Synchronize the header logging file after each write
+        
+        pdict[.FLUSH_HEADER_LOGFILE_AFTER_EACH_WRITE] = false
+        
+        
+        /// The maximum file size for access logging (in kbytes)
+        
+        pdict[.MAX_FILE_SIZE_FOR_ACCESS_LOGGING] = 1000 // 1 MB
+        
+        
+        /// Update the version to 2
+        
+        pdict[.PARAMETER_DEFAULTS_FILE_VERSION] = 2
+    }
+    
     
     /**
      Save the parameter dictionary contents to the 'domains-default.json' file.
@@ -504,7 +552,7 @@ final class Parameters {
     }
     
     
-    private static func logParameterSettings() {
+    static func logParameterSettings() {
         
         log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Swiftfire Version Number: \(Parameters.version)")
 

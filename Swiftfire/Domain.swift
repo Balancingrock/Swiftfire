@@ -3,7 +3,7 @@
 //  File:       Domain.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.6
+//  Version:    0.9.7
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,6 +49,7 @@
 //
 // History
 //
+// v0.9.7 - Added logging options for Access and 404
 // v0.9.6 - Header update
 //        - Changed init(json) to accept initializations without telemetry
 // v0.9.4 - Accomodated new VJson testing
@@ -78,7 +79,7 @@ protocol DomainNameChangeListener {
 }
 
 
-class Domain: Equatable, CustomStringConvertible {
+class Domain: Equatable, ReflectedStringConvertible {
     
     // These are used for the item identifiers and the titles of the items in the outline view, therefore they cannot be static. (Each item displayed must have a unique id = "AnyObject"))
     
@@ -87,24 +88,46 @@ class Domain: Equatable, CustomStringConvertible {
     let rootItemTitle: NSString = "Root folder:"
     let forwardUrlItemTitle: NSString = "Foreward to (Domain:Port):"
     let enabledItemTitle: NSString = "Enable Domain:"
+    let enableAccessLoggingItemTitle: NSString = "Enable Access Logging:"
+    let enable404LoggingItemTitle: NSString = "Enable 404 Logging:"
 
-    static let nofContainedItems: Int = 4 // Minus 1 for the domain name
+    static let nofContainedItems: Int = 6 // Minus 1 for the domain name
 
-    
-    // CustomStringConvertible
-    
-    var description: String { return "Domain = name: \(_name), enabled: \(enabled), root: \(root), wwwIncluded: \(wwwIncluded), forwardUrl: \(forwardUrl)" }
-    
 
     /// The domain name plus extension. Only use the 'www' prefix if you want to differentiate between two domains, one with and one without the 'www'.
     /// - Note: The name will always be all-lowercase, even when set using uppercase letters.
     
     var name: String {
         set {
-            let oldValue = _name
-            self._name = newValue.lowercaseString
-            if let changeListener = nameChangeListener {
-                changeListener.domainNameChanged(oldValue, to: newValue)
+            if _name != newValue.lowercaseString {
+    
+                // Update the _name
+                let oldValue = _name
+                self._name = newValue.lowercaseString
+                
+                // Set the new support dir url for this domain
+                if let appSupportDir = FileURLs.appSupportDir {
+                   self.domainSupportDir = appSupportDir.URLByAppendingPathComponent(name, isDirectory: true)
+                } else {
+                    self.domainSupportDir = nil
+                }
+
+                // If the access log is in use, close it and create a new one if necessary
+                if accessLogEnabled {
+                    accessLogEnabled = false
+                    accessLogEnabled = true // false -> true change creates a new logfile
+                }
+                
+                // If the 404 log is in use, close it and create a new one
+                if four04LogEnabled {
+                    four04LogEnabled = false
+                    four04LogEnabled = true // false -> true change creates a new logfile
+                }
+                
+                //
+                if let changeListener = nameChangeListener {
+                    changeListener.domainNameChanged(oldValue, to: newValue)
+                }
             }
         }
         get {
@@ -188,6 +211,53 @@ class Domain: Equatable, CustomStringConvertible {
     var enabled: Bool = false
     
     
+    /// Enables the access log when set to true
+    
+    var accessLogEnabled: Bool = false {
+        didSet {
+            // Exit if nothing changed
+            guard accessLogEnabled == oldValue else { return }
+            
+            if accessLogEnabled {
+                if accessLog == nil {
+                    guard let appSupportDir = FileURLs.appSupportDir else { return }
+                    let domainDir = appSupportDir.URLByAppendingPathComponent(name, isDirectory: true)
+                    let logDir = domainDir.URLByAppendingPathComponent("logging", isDirectory: true)
+                    accessLog = AccessLog(logDir: logDir)
+                } else {
+                    log.atLevelDebug(id: -1, source: #file.source(#function, #line), message: "\(name) accessLog unexpected nil")
+                }
+            } else {
+                if accessLog != nil { accessLog!.close(); accessLog = nil }
+            }
+        }
+    }
+    
+    
+    /// Enables the 404 log when set to true
+    
+    var four04LogEnabled: Bool = false {
+        didSet {
+            // Exit if nothing changed
+            guard four04LogEnabled == oldValue else { return }
+            
+            if four04LogEnabled {
+                if four04Log == nil {
+                    guard let appSupportDir = FileURLs.appSupportDir else { return }
+                    let domainDir = appSupportDir.URLByAppendingPathComponent(name, isDirectory: true)
+                    let logDir = domainDir.URLByAppendingPathComponent("logging", isDirectory: true)
+                    four04Log = Four04Log(logDir: logDir)
+                } else {
+                    log.atLevelDebug(id: -1, source: #file.source(#function, #line), message: "\(name) four04Log unexpected nil")
+                }
+            } else {
+                if four04Log != nil { four04Log!.close(); four04Log = nil }
+            }
+        }
+    }
+    
+    
+
     /// Callback in case of name changed
     
     var nameChangeListener: DomainNameChangeListener?
@@ -208,15 +278,50 @@ class Domain: Equatable, CustomStringConvertible {
     var telemetry = DomainTelemetry()
     
     
+    // The access log & 404 log
+    
+    var accessLog: AccessLog?
+    var four04Log: Four04Log?
+    
+    
+    // The application support directory for this domain
+    
+    lazy var domainSupportDir: NSURL? = {
+        guard let appSupportDir = FileURLs.appSupportDir else { return nil }
+        let url = appSupportDir.URLByAppendingPathComponent(self.name, isDirectory: true)
+        do {
+            try NSFileManager.defaultManager().createDirectoryAtURL(url, withIntermediateDirectories: true, attributes: nil)
+            return url
+        } catch {
+            log.atLevelDebug(id: -1, source: #file.source(#function, #line), message: "Could not create domain directory at \(url.path!)")
+            return nil
+        }
+    }()
+    
+    lazy var loggingDir: NSURL? = {
+        guard let domainSupportDir = self.domainSupportDir else { return nil }
+        let url = domainSupportDir.URLByAppendingPathComponent("logging", isDirectory: true)
+        do {
+            try NSFileManager.defaultManager().createDirectoryAtURL(url, withIntermediateDirectories: true, attributes: nil)
+            return url
+        } catch {
+            log.atLevelDebug(id: -1, source: #file.source(#function, #line), message: "Could not create domain logging directory at \(url.path!)")
+            return nil
+        }
+    }()
+    
+    
     /// The JSON representation for this object
     
     var json: VJson {
         let domain = VJson.createObject(name: "Domain")
-        domain["Name"].stringValue = name as String
-        domain["IncludeWww"].boolValue = wwwIncluded.boolValue
-        domain["Root"].stringValue = root as String
-        domain["ForewardUrl"].stringValue = forwardUrl as String
-        domain["Enabled"].boolValue = enabled.boolValue
+        domain["Name"].stringValue = name
+        domain["IncludeWww"].boolValue = wwwIncluded
+        domain["Root"].stringValue = root
+        domain["ForewardUrl"].stringValue = forwardUrl
+        domain["Enabled"].boolValue = enabled
+        domain["AccessLogEnabled"].boolValue = accessLogEnabled
+        domain["404LogEnabled"].boolValue = four04LogEnabled
         domain.addChild(telemetry.json("Telemetry"))
         return domain
     }
@@ -231,6 +336,8 @@ class Domain: Equatable, CustomStringConvertible {
     
     init?(json: VJson?) {
         
+        // Initialize the properties that must be present
+        
         guard let json = json else { return nil }
         
         guard json.nameValue == "Domain" else { return nil }
@@ -240,14 +347,29 @@ class Domain: Equatable, CustomStringConvertible {
         guard let jfurl = (json|"ForewardUrl")?.stringValue else { return nil }
         guard let jwww  = (json|"IncludeWww")?.boolValue else { return nil }
         guard let jenab = (json|"Enabled")?.boolValue else { return nil }
+        guard let jacc  = (json|"AccessLogEnabled")?.boolValue else { return nil }
+        guard let jfour = (json|"404LogEnabled")?.boolValue else { return nil }
         
         self.name = jname
         self.root = jroot
         self.forwardUrl = jfurl
         self.wwwIncluded = jwww
         self.enabled = jenab
+        self.accessLogEnabled = jacc
+        self.four04LogEnabled = jfour
+
+        
+        // Initialize the properties that may be present
 
         if let jtelemetry = DomainTelemetry(json: (json|"Telemetry")) { self.telemetry = jtelemetry }
+        
+        
+        // Setup the loggers if they are enabled
+        
+        if let loggingDir = loggingDir {
+            if accessLogEnabled { accessLog = AccessLog(logDir: loggingDir) }
+            if four04LogEnabled { four04Log = Four04Log(logDir: loggingDir) }
+        }
     }
     
     
@@ -261,6 +383,8 @@ class Domain: Equatable, CustomStringConvertible {
         new.forwardUrl = self.forwardUrl
         new.enabled = self.enabled
         new.telemetry = self.telemetry.duplicate
+        new.accessLogEnabled = self.accessLogEnabled
+        new.four04LogEnabled = self.four04LogEnabled
         return new
     }
     
@@ -303,12 +427,24 @@ class Domain: Equatable, CustomStringConvertible {
             changed = true
         }
         
+        if accessLogEnabled != new.accessLogEnabled {
+            accessLogEnabled = new.accessLogEnabled
+            changed = true
+        }
+        
+        if four04LogEnabled != new.four04LogEnabled {
+            four04LogEnabled = new.four04LogEnabled
+            changed = true
+        }
+        
         return changed
     }
     
     
     /**
      If the property "enableHttpPreprocessor" is set to true, then this function will be called. The return value must be a valid HTTP Response or nil. If a non-nil is returned the content of the returned buffer will be provided as the response for the request. If a non-nil is returned the default httpWorker will NOT be called. Also the postprocessor will NOT be called if a non-nil is returned. Hence the preprocessor must implement updating of telemetry and the maintenance of logs.
+     
+     - Note: The preprocessor is responsible for error detection and creation, including updating of log's if appropriate.
     
      - Parameter header: The HTTP header as reqeived from the client.
      - Parameter body: The HTTP body as received from the client, may have length zero.
@@ -349,6 +485,8 @@ extension Domain {
         case 1: return enabledItemTitle
         case 2: return rootItemTitle
         case 3: return forwardUrlItemTitle
+        case 4: return enableAccessLoggingItemTitle
+        case 5: return enable404LoggingItemTitle
         default: return nil
         }
     }
@@ -359,6 +497,8 @@ extension Domain {
         if item === enabledItemTitle { return enabledItemTitle }
         if item === rootItemTitle { return rootItemTitle }
         if item === forwardUrlItemTitle { return forwardUrlItemTitle }
+        if item === enableAccessLoggingItemTitle { return enableAccessLoggingItemTitle }
+        if item === enable404LoggingItemTitle { return enable404LoggingItemTitle }
         return nil
     }
     
@@ -367,10 +507,9 @@ extension Domain {
         if item === wwwIncludedItemTitle { return wwwIncluded.description as NSString }
         if item === enabledItemTitle { return enabled.description as NSString }
         if item === rootItemTitle { return root as NSString }
-        if item === forwardUrlItemTitle {
-            if forwardUrl.isEmpty { return "-" }
-            return forwardUrl as NSString
-        }
+        if item === forwardUrlItemTitle { return (forwardUrl.isEmpty ? "-" : forwardUrl) as NSString }
+        if item === enableAccessLoggingItemTitle { return accessLogEnabled.description as NSString }
+        if item === enable404LoggingItemTitle { return four04LogEnabled.description as NSString }
         return nil
     }
     
@@ -381,6 +520,8 @@ extension Domain {
             if item === enabledItemTitle { return false }
             if item === rootItemTitle { return false }
             if item === forwardUrlItemTitle { return false }
+            if item === enableAccessLoggingItemTitle { return false }
+            if item === enable404LoggingItemTitle { return false }
         } else {
             // Must be value column
             if item === self { return false }
@@ -388,6 +529,8 @@ extension Domain {
             if item === enabledItemTitle { return true }
             if item === rootItemTitle { return true }
             if item === forwardUrlItemTitle { return true }
+            if item === enableAccessLoggingItemTitle { return true }
+            if item === enable404LoggingItemTitle { return true }
         }
         return nil
     }
@@ -429,6 +572,24 @@ extension Domain {
         if item === forwardUrlItemTitle {
             forwardUrl = strValue
             return (true, nil)
+        }
+        
+        if item === enableAccessLoggingItemTitle {
+            if let bValue = Bool(strValue) {
+                accessLogEnabled = bValue
+                return (true, nil)
+            } else {
+                return (true, "Could not convert \(strValue) to a valid Bool")
+            }
+        }
+        
+        if item === enable404LoggingItemTitle {
+            if let bValue = Bool(strValue) {
+                four04LogEnabled = bValue
+                return (true, nil)
+            } else {
+                return (true, "Could not convert \(strValue) to a valid Bool")
+            }
         }
         
         return (false, nil)

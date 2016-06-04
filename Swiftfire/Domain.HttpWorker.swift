@@ -3,7 +3,7 @@
 //  File:       Domain.HttpWorker.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.6
+//  Version:    0.9.7
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,6 +49,7 @@
 //
 // History
 //
+// v0.9.7 - Added Access logging
 // v0.9.6 - Header update
 // v0.9.5 - Added MIME support
 // v0.9.3 - Moved renamed telemetry items
@@ -76,6 +77,23 @@ extension Domain {
     
     func httpWorker(header: HttpHeader, body: UInt8Buffer, connection: HttpConnection) -> UInt8Buffer {
         
+        
+        // =============================================================================================================
+        // Access logging
+        // =============================================================================================================
+        
+        if accessLogEnabled {
+            let url = header.url ?? "unknown"
+            let version = header.httpVersion?.rawValue ?? "unknown"
+            let operation = header.operation?.rawValue ?? "unknown"
+            accessLog?.record(NSDate(), ipAddress: connection.clientIp, url: url, operation: operation, version: version)
+        }
+        
+        
+        // =============================================================================================================
+        // Telemetry update
+        // =============================================================================================================
+
         
         telemetry.nofRequests.increment()
         
@@ -142,6 +160,7 @@ extension Domain {
         
         if !connection.filemanager.fileExistsAtPath(path) {
             telemetry.nof404.increment()
+            if four04LogEnabled { four04Log?.record(path) }
             return connection.httpErrorResponseWithCode(.CODE_404_Not_Found)
         }
         

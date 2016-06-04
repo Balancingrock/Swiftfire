@@ -3,7 +3,7 @@
 //  File:       Domains.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.6
+//  Version:    0.9.7
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -11,7 +11,7 @@
 //  Blog:       http://swiftrien.blogspot.com
 //  Git:        https://github.com/Swiftrien/Swiftfire
 //
-//  Copyright:  (c) 2014-2016 Marinus van der Lugt, All rights reserved.
+//  Copyright:  (c) 2015-2016 Marinus van der Lugt, All rights reserved.
 //
 //  License:    Use or redistribute this code any way you like with the following two provision:
 //
@@ -49,6 +49,7 @@
 //
 // History
 //
+// v0.9.7 - Fixed bug where domains were added without using the 'add' function.
 // v0.9.6 - Header update
 //        - Changed 'save' to exclude telemetry
 // v0.9.3 - Changed input parameters of domainForName to optional
@@ -197,7 +198,7 @@ final class Domains: DomainNameChangeListener, SequenceType {
         
         var oldDomains = self.domains.valuesAsArray()
         var newDomains = updateDomains.domains.valuesAsArray()
-        
+
         
         // First match (domain)names and update the older with the newer if a match is found
         
@@ -258,8 +259,7 @@ final class Domains: DomainNameChangeListener, SequenceType {
         // If there are new domains left, then add them to the existing domains
         
         while newDomains.count > 0 {
-            let nd = newDomains.removeFirst()
-            self.domains[nd.name.lowercaseString] = nd
+            add(newDomains.removeFirst())
         }
     }
     
@@ -358,13 +358,6 @@ final class Domains: DomainNameChangeListener, SequenceType {
                     }
                 }
                 
-                
-                // Log all domains that were read
-                
-                for d in self {
-                    log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: d.description)
-                }
-
                 return true
 
             } catch let error as VJson.Exception {
@@ -383,6 +376,7 @@ final class Domains: DomainNameChangeListener, SequenceType {
             return false
         }
     }
+    
     
     func save() {
         
@@ -404,6 +398,19 @@ final class Domains: DomainNameChangeListener, SequenceType {
         } else {
             
             log.atLevelError(id: -1, source: #file.source(#function, #line), message: "No domains-defaults file URL available")
+        }
+    }
+    
+    
+    // Write all domains to the log at level NOTICE
+    
+    func logDomains() {
+        if self.count == 0 {
+            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "No domains defined")
+        } else {
+            for d in self {
+                log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: d.description)
+            }
         }
     }
 }

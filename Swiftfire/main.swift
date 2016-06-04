@@ -3,7 +3,7 @@
 //  File:       main.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.6
+//  Version:    0.9.7
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,6 +49,8 @@
 //
 // History
 //
+// v0.9.7 - Added closing of header logging file on normal termination
+//        - Added initial setup of logger before the setup parameters are read from the parameter defaults
 // v0.9.6 - Header update
 //        - Merged Startup into Parameters
 // v0.9.3 - Added serverTelemetry
@@ -149,6 +151,14 @@ let logforewarder = LogForewarder()
 log.registerCallback(logforewarder)
 
 
+// =========================================================================
+// Show the paremeter settings and available domains in the log destinations
+// =========================================================================
+
+Parameters.logParameterSettings()
+domains.logDomains()
+
+
 // =========================================================
 // Initialize the port for the Command and Control interface
 // =========================================================
@@ -171,6 +181,8 @@ case let SwifterSockets.InitServerReturn.SOCKET(socket):
     mac.acceptAndReceiveLoop(socket)
     
     SwifterSockets.closeSocket(socket)
+    
+    HttpHeader.closeHeaderLoggingFile()
     
     
     // Give other tasks time to complete
