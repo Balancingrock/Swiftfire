@@ -710,16 +710,6 @@ final class MonitoringAndControl {
             transferMessage(reply.json)
             
             
-        case .MAX_FILE_SIZE_FOR_ACCESS_LOGGING:
-            
-            let value = Parameters.asInt(.MAX_FILE_SIZE_FOR_ACCESS_LOGGING)
-            log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, MAX_FILE_SIZE_FOR_ACCESS_LOGGING = \(value)")
-            
-            let reply = ReadServerParameterReply(parameter: command.parameter, value: value)
-            
-            transferMessage(reply.json)
-            
-            
         case .HEADER_LOGGING_ENABLED:
             
             let value = Parameters.asBool(.HEADER_LOGGING_ENABLED)
@@ -1103,18 +1093,6 @@ final class MonitoringAndControl {
                 Parameters.pdict[ParameterId.MAX_FILE_SIZE_FOR_HEADER_LOGGING] = newValue
             } else {
                 log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "WRITE-MAX_FILE_SIZE_FOR_HEADER_LOGGING new value same as present value: \(newValue)")
-            }
-            
-            
-        case .MAX_FILE_SIZE_FOR_ACCESS_LOGGING:
-            
-            let newValue = command.intValue
-            let oldValue = Parameters.asInt(.MAX_FILE_SIZE_FOR_ACCESS_LOGGING)
-            if oldValue != newValue {
-                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "WRITE-MAX_FILE_SIZE_FOR_ACCESS_LOGGING updating from \(oldValue) to \(newValue)")
-                Parameters.pdict[ParameterId.MAX_FILE_SIZE_FOR_ACCESS_LOGGING] = newValue
-            } else {
-                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "WRITE-MAX_FILE_SIZE_FOR_ACCESS_LOGGING new value same as present value: \(newValue)")
             }
             
             

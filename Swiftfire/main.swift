@@ -50,7 +50,7 @@
 // History
 //
 // v0.9.7 - Added closing of header logging file on normal termination
-//        - Added initial setup of logger before the setup parameters are read from the parameter defaults
+//        - Changed logging of parameters and domains to occur after the setup of the logger
 // v0.9.6 - Header update
 //        - Merged Startup into Parameters
 // v0.9.3 - Added serverTelemetry
@@ -102,6 +102,8 @@ if !domains.restore()  {
 // Start of application: Configure logging
 // =======================================
 
+log.logfileDirectoryPath = FileURLs.applicationLogDir!.path!
+
 if let threshold = SwifterLog.Level(rawValue: Parameters.asInt(.ASL_FACILITY_RECORD_AT_AND_ABOVE_LEVEL)) {
     log.aslFacilityRecordAtAndAboveLevel = threshold
 }
@@ -116,7 +118,7 @@ if Parameters.asString(.LOGFILES_FOLDER) != "" {
 
 log.logfileMaxNumberOfFiles = Parameters.asInt(.LOGFILE_MAX_NOF_FILES)
 
-log.logfileMaxSizeInBytes = UInt64(Parameters.asInt(.LOGFILE_MAX_SIZE))
+log.logfileMaxSizeInBytes = UInt64(Parameters.asInt(.LOGFILE_MAX_SIZE) * 1024)
 
 if let threshold = SwifterLog.Level(rawValue: Parameters.asInt(.STDOUT_PRINT_AT_AND_ABOVE_LEVEL)) {
     log.stdoutPrintAtAndAboveLevel = threshold

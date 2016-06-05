@@ -49,7 +49,7 @@
 //
 // History
 //
-// v0.9.7 - Added header logging directory
+// v0.9.7 - Added header logging and application log directory
 //        - Removed startup file
 //        - Made class final
 // v0.9.6 - Header update
@@ -153,11 +153,11 @@ final class FileURLs {
     }()
 
     
-    /// The directory containing the header logging files
+    /// The directory containing the application log files
     
-    static var accessLoggingDir: NSURL? = {
+    static var applicationLogDir: NSURL? = {
         
-        guard let dirpath = loggingDir?.URLByAppendingPathComponent("access") else { return nil }
+        guard let dirpath = loggingDir?.URLByAppendingPathComponent("application") else { return nil }
         
         let filemanager = NSFileManager.defaultManager()
         
