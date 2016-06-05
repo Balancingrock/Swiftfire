@@ -40,6 +40,14 @@ The I drag & drop the group with the source files from (for example) SwifterLog 
 
 #Version history
 
+####v0.9.7
+
+- Cleaned up parameter definition setting and usage
+- Added option to log all HTTP request headers
+- Added option to log all access to a domain
+- Added option to log all URLs that result in a 404 reply
+- Few minor bug fixes (minor = will probably never occur and does not impact functionaly)
+
 ####v0.9.6
 
 - Header update to include new website: [swiftfire.nl](http://swiftfire.nl)
