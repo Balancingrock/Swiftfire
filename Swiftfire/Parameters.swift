@@ -54,6 +54,7 @@ private let VERSION = "0.9.7"
 //          FLUSH_HEADER_LOGFILE_AFTER_EACH_WRITE
 //        - Slightly optimized code to upgrade to new parameter file version
 //        - Added function to upgrade to parameter version 2
+//        - Moved M&C support for the server parameters to this file
 // v0.9.6 - Header update & version number update
 //        - Merged MAX_NOF_PENDING_CLIENT_MESSAGES with MAX_CLIENT_MESSAGE_SIZE into CLIENT_MESSAGE_BUFFER_SIZE
 //        - Merged AutoStartup into this file
@@ -96,7 +97,6 @@ enum ParameterId: String {
     case FILE_RECORD_AT_AND_ABOVE_LEVEL = "FileRecordAtAndAboveLevel"
     case LOGFILE_MAX_SIZE = "LogfileMaxSize"
     case LOGFILE_MAX_NOF_FILES = "LogfileMaxNofFiles"
-    case LOGFILES_FOLDER = "LogfilesFolder"
     case NETWORK_TRANSMIT_AT_AND_ABOVE_LEVEL = "NetworkTransmitAtAndAboveLevel"
     case NETWORK_LOGTARGET_IP_ADDRESS = "NetworkLogtargetIpAddress"
     case NETWORK_LOGTARGET_PORT_NUMBER = "NetworkLogtargetPortNumber"
@@ -105,6 +105,37 @@ enum ParameterId: String {
     case HEADER_LOGGING_ENABLED = "HeaderLoggingEnabled"
     case MAX_FILE_SIZE_FOR_HEADER_LOGGING = "MaxFileSizeForHeaderLogging"
     case FLUSH_HEADER_LOGFILE_AFTER_EACH_WRITE = "FlushHeaderLogfileAfterEachWrite"
+    
+    static func from(serverParameter: ServerParameter) -> ParameterId {
+        switch serverParameter {
+        //   .PARAMETER_DEFAULTS_FILE_VERSION is not writeable
+        case .DEBUG_MODE: return .DEBUG_MODE
+        case .SERVICE_PORT_NUMBER: return .SERVICE_PORT_NUMBER
+        case .MAX_NOF_ACCEPTED_CONNECTIONS: return .MAX_NOF_ACCEPTED_CONNECTIONS
+        case .MAX_NOF_PENDING_CONNECTIONS: return .MAX_NOF_PENDING_CONNECTIONS
+        case .MAX_WAIT_FOR_PENDING_CONNECTIONS: return .MAX_WAIT_FOR_PENDING_CONNECTIONS
+        case .CLIENT_MESSAGE_BUFFER_SIZE: return .CLIENT_MESSAGE_BUFFER_SIZE
+        case .HTTP_KEEP_ALIVE_INACTIVITY_TIMEOUT: return .HTTP_KEEP_ALIVE_INACTIVITY_TIMEOUT
+        case .HTTP_RESPONSE_CLIENT_TIMEOUT: return .HTTP_RESPONSE_CLIENT_TIMEOUT
+        case .MAC_INACTIVITY_TIMEOUT: return .MAC_INACTIVITY_TIMEOUT
+        case .AUTO_STARTUP: return .AUTO_STARTUP
+        case .MAC_PORT_NUMBER: return .MAC_PORT_NUMBER
+        case .ASL_FACILITY_RECORD_AT_AND_ABOVE_LEVEL: return .ASL_FACILITY_RECORD_AT_AND_ABOVE_LEVEL
+        case .STDOUT_PRINT_AT_AND_ABOVE_LEVEL: return .STDOUT_PRINT_AT_AND_ABOVE_LEVEL
+        case .CALLBACK_AT_AND_ABOVE_LEVEL: return .CALLBACK_AT_AND_ABOVE_LEVEL
+        case .FILE_RECORD_AT_AND_ABOVE_LEVEL: return .FILE_RECORD_AT_AND_ABOVE_LEVEL
+        case .LOGFILE_MAX_SIZE: return .LOGFILE_MAX_SIZE
+        case .LOGFILE_MAX_NOF_FILES: return .LOGFILE_MAX_NOF_FILES
+        case .NETWORK_TRANSMIT_AT_AND_ABOVE_LEVEL: return .NETWORK_TRANSMIT_AT_AND_ABOVE_LEVEL
+        case .NETWORK_LOGTARGET_IP_ADDRESS: return .NETWORK_LOGTARGET_IP_ADDRESS
+        case .NETWORK_LOGTARGET_PORT_NUMBER: return .NETWORK_LOGTARGET_PORT_NUMBER
+            
+        // Version 2
+        case .HEADER_LOGGING_ENABLED: return .HEADER_LOGGING_ENABLED
+        case .MAX_FILE_SIZE_FOR_HEADER_LOGGING: return .MAX_FILE_SIZE_FOR_HEADER_LOGGING
+        case .FLUSH_HEADER_LOGFILE_AFTER_EACH_WRITE: return .FLUSH_HEADER_LOGFILE_AFTER_EACH_WRITE
+        }
+    }
     
     private var jsonRead: JsonReadAccess {
         
@@ -143,7 +174,6 @@ enum ParameterId: String {
             
         case .SERVICE_PORT_NUMBER,
              .MAC_PORT_NUMBER,
-             .LOGFILES_FOLDER,
              .NETWORK_LOGTARGET_IP_ADDRESS,
              .NETWORK_LOGTARGET_PORT_NUMBER:
             
@@ -197,7 +227,6 @@ enum ParameterId: String {
             
         case .SERVICE_PORT_NUMBER,
              .MAC_PORT_NUMBER,
-             .LOGFILES_FOLDER,
              .NETWORK_LOGTARGET_IP_ADDRESS,
              .NETWORK_LOGTARGET_PORT_NUMBER:
             
@@ -214,7 +243,7 @@ enum ParameterId: String {
         }
     }
     
-    static var all: Array<ParameterId> = [.AUTO_STARTUP, .MAC_PORT_NUMBER, .DEBUG_MODE, .PARAMETER_DEFAULTS_FILE_VERSION, .MAX_NOF_PENDING_CONNECTIONS, .MAX_NOF_ACCEPTED_CONNECTIONS, .MAX_WAIT_FOR_PENDING_CONNECTIONS, .CLIENT_MESSAGE_BUFFER_SIZE, .HTTP_KEEP_ALIVE_INACTIVITY_TIMEOUT, .HTTP_RESPONSE_CLIENT_TIMEOUT, .SERVICE_PORT_NUMBER, .MAC_INACTIVITY_TIMEOUT, .ASL_FACILITY_RECORD_AT_AND_ABOVE_LEVEL, .STDOUT_PRINT_AT_AND_ABOVE_LEVEL, .CALLBACK_AT_AND_ABOVE_LEVEL, .FILE_RECORD_AT_AND_ABOVE_LEVEL, .LOGFILE_MAX_SIZE, .LOGFILE_MAX_NOF_FILES, .LOGFILES_FOLDER, .NETWORK_TRANSMIT_AT_AND_ABOVE_LEVEL, .NETWORK_LOGTARGET_IP_ADDRESS, .NETWORK_LOGTARGET_PORT_NUMBER, .HEADER_LOGGING_ENABLED, .MAX_FILE_SIZE_FOR_HEADER_LOGGING, .FLUSH_HEADER_LOGFILE_AFTER_EACH_WRITE]
+    static var all: Array<ParameterId> = [.AUTO_STARTUP, .MAC_PORT_NUMBER, .DEBUG_MODE, .PARAMETER_DEFAULTS_FILE_VERSION, .MAX_NOF_PENDING_CONNECTIONS, .MAX_NOF_ACCEPTED_CONNECTIONS, .MAX_WAIT_FOR_PENDING_CONNECTIONS, .CLIENT_MESSAGE_BUFFER_SIZE, .HTTP_KEEP_ALIVE_INACTIVITY_TIMEOUT, .HTTP_RESPONSE_CLIENT_TIMEOUT, .SERVICE_PORT_NUMBER, .MAC_INACTIVITY_TIMEOUT, .ASL_FACILITY_RECORD_AT_AND_ABOVE_LEVEL, .STDOUT_PRINT_AT_AND_ABOVE_LEVEL, .CALLBACK_AT_AND_ABOVE_LEVEL, .FILE_RECORD_AT_AND_ABOVE_LEVEL, .LOGFILE_MAX_SIZE, .LOGFILE_MAX_NOF_FILES, .NETWORK_TRANSMIT_AT_AND_ABOVE_LEVEL, .NETWORK_LOGTARGET_IP_ADDRESS, .NETWORK_LOGTARGET_PORT_NUMBER, .HEADER_LOGGING_ENABLED, .MAX_FILE_SIZE_FOR_HEADER_LOGGING, .FLUSH_HEADER_LOGFILE_AFTER_EACH_WRITE]
 }
 
 
@@ -478,11 +507,6 @@ final class Parameters {
         pdict[.LOGFILE_MAX_SIZE] = 1000 // 1MB
         
         
-        /// For the SwifterLog logfile destination folder
-        
-        pdict[.LOGFILES_FOLDER] = "" // I.e. default
-        
-        
         /// For the SwifterLog network target threshold
         
         pdict[.NETWORK_TRANSMIT_AT_AND_ABOVE_LEVEL] = SwifterLog.Level.NONE.rawValue
@@ -552,6 +576,290 @@ final class Parameters {
             log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "\(p.rawValue): \(pdict[p]!)")
         }
     }
+    
+    
+    // MARK: - Support for Monitoring & Control
+    
+    static func doReadServerParameterCommand(socket: Int32, command: ReadServerParameterCommand) -> VJson {
+        
+        func createBoolReply(parameter: ServerParameter) -> VJson {
+            let parameterId = ParameterId.from(parameter)
+            log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, \(parameterId.rawValue) = \(Parameters.asBool(parameterId))")
+            return ReadServerParameterReply(parameter: parameter, value: Parameters.asBool(parameterId)).json
+        }
+        
+        func createStringReply(parameter: ServerParameter) -> VJson {
+            let parameterId = ParameterId.from(parameter)
+            log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, \(parameterId.rawValue) = \(Parameters.asString(parameterId))")
+            return ReadServerParameterReply(parameter: parameter, value: Parameters.asString(parameterId)).json
+        }
+
+        func createIntReply(parameter: ServerParameter) -> VJson {
+            let parameterId = ParameterId.from(parameter)
+            log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, \(parameterId.rawValue) = \(Parameters.asInt(parameterId))")
+            return ReadServerParameterReply(parameter: parameter, value: Parameters.asInt(parameterId)).json
+        }
+
+
+        switch command.parameter {
+            
+        case .DEBUG_MODE,
+             .AUTO_STARTUP,
+             .HEADER_LOGGING_ENABLED,
+             .FLUSH_HEADER_LOGFILE_AFTER_EACH_WRITE:
+            
+            return createBoolReply(command.parameter)
+            
+            
+        case .SERVICE_PORT_NUMBER,
+             .MAC_PORT_NUMBER:
+            
+            return createStringReply(command.parameter)
+            
+            
+        case .CLIENT_MESSAGE_BUFFER_SIZE,
+             .HTTP_KEEP_ALIVE_INACTIVITY_TIMEOUT,
+             .MAX_NOF_ACCEPTED_CONNECTIONS,
+             .MAX_NOF_PENDING_CONNECTIONS,
+             .MAX_WAIT_FOR_PENDING_CONNECTIONS,
+             .LOGFILE_MAX_NOF_FILES,
+             .LOGFILE_MAX_SIZE,
+             .MAX_FILE_SIZE_FOR_HEADER_LOGGING,
+             .HTTP_RESPONSE_CLIENT_TIMEOUT,
+             .MAC_INACTIVITY_TIMEOUT:
+            
+            return createIntReply(command.parameter)
+            
+            
+        case .ASL_FACILITY_RECORD_AT_AND_ABOVE_LEVEL:
+            
+            
+            log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, log.aslFacilityRecordAtAndAboveLevel = \(log.aslFacilityRecordAtAndAboveLevel.rawValue)")
+            
+            return ReadServerParameterReply(parameter: command.parameter, value: log.aslFacilityRecordAtAndAboveLevel.rawValue).json
+            
+            
+        case .FILE_RECORD_AT_AND_ABOVE_LEVEL:
+            
+            log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, log.logfileRecordAtAndAboveLevel = \(log.fileRecordAtAndAboveLevel.rawValue)")
+            
+            return ReadServerParameterReply(parameter: command.parameter, value: log.fileRecordAtAndAboveLevel.rawValue).json
+            
+            
+        case .STDOUT_PRINT_AT_AND_ABOVE_LEVEL:
+            
+            log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, log.stdoutPrintAtAndAboveLevel = \(log.stdoutPrintAtAndAboveLevel.rawValue)")
+            
+            return ReadServerParameterReply(parameter: command.parameter, value: log.stdoutPrintAtAndAboveLevel.rawValue).json
+            
+            
+        case .CALLBACK_AT_AND_ABOVE_LEVEL:
+            
+            log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, log.callbackTransmitAtAndAboveLevel = \(log.callbackAtAndAboveLevel.rawValue)")
+            
+            return ReadServerParameterReply(parameter: command.parameter, value: log.callbackAtAndAboveLevel.rawValue).json
+            
+            
+        case .NETWORK_TRANSMIT_AT_AND_ABOVE_LEVEL:
+            
+            log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, log.networkTransmitAtAndAboveLevel = \(log.networkTransmitAtAndAboveLevel.rawValue)")
+            
+            return ReadServerParameterReply(parameter: command.parameter, value: log.networkTransmitAtAndAboveLevel.rawValue).json
+            
+            
+        case .NETWORK_LOGTARGET_IP_ADDRESS:
+            
+            let dest = log.networkTarget?.address ?? "Not set"
+            log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, log.networkTarget.address = \(dest)")
+            
+            return ReadServerParameterReply(parameter: command.parameter, value: dest).json
+            
+            
+        case .NETWORK_LOGTARGET_PORT_NUMBER:
+            
+            let port = log.networkTarget?.port ?? "0"
+            log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, log.networkTarget.port = \(port)")
+            
+            return ReadServerParameterReply(parameter: command.parameter, value: port).json
+        }
+    }
+
+    
+    // The network target for the logger
+    
+    private static var networkLogTarget = SwifterLog.NetworkTarget("","")
+    
+    
+    /// Checks if the networkLogTarget contains two non-empty fields, and if so, tries to connect the logger to the target. After a connection attempt it will empty the fields.
+    /// - Returns: True if the connection attempt was made, false otherwise.
+    /// - Note: It does not report the sucess/failure of the connection attempt.
+    
+    private static func conditionallySetNetworkLogTarget() -> Bool {
+        if networkLogTarget.address.isEmpty { return false }
+        if networkLogTarget.port.isEmpty { return false }
+        log.connectToNetworkTarget(networkLogTarget)
+        log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Setting the network logtarget to: \(networkLogTarget.address):\(networkLogTarget.port)")
+        networkLogTarget.address = ""
+        networkLogTarget.port = ""
+        return true
+    }
+    
+    static func doWriteServerParameterCommand(socket: Int32, command: WriteServerParameterCommand) {
+        
+        func updateBool(parameter: ParameterId, newValue: Bool) {
+            if newValue != Parameters.asBool(parameter) {
+                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Write: \(parameter.rawValue) updating from \(Parameters.asBool(parameter)) to \(newValue)")
+                Parameters.pdict[parameter] = newValue
+            } else {
+                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Write: \(parameter.rawValue) new value same as old value: \(newValue)")
+            }
+        }
+        
+        func updateInt(parameter: ParameterId, newValue: Int) {
+            if newValue != Parameters.asInt(parameter) {
+                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) updating from \(Parameters.asInt(parameter)) to \(newValue)")
+                Parameters.pdict[parameter] = newValue
+            } else {
+                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) new value same as old value: \(newValue)")
+            }
+        }
+        
+        func updateDouble(parameter: ParameterId, newValue: Double) {
+            if newValue != Parameters.asDouble(parameter) {
+                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) updating from \(Parameters.asDouble(parameter)) to \(newValue)")
+                Parameters.pdict[parameter] = newValue
+            } else {
+                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) new value same as old value: \(newValue)")
+            }
+        }
+
+        func updateString(parameter: ParameterId, newValue: String) {
+            if newValue != Parameters.asString(parameter) {
+                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) updating from \(Parameters.asString(parameter)) to \(newValue)")
+                Parameters.pdict[parameter] = newValue
+            } else {
+                log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) new value same as old value: \(newValue)")
+            }
+        }
+
+        
+        // Update parameter
+
+        switch command.parameter {
+            
+
+        case .DEBUG_MODE,
+             .AUTO_STARTUP,
+             .HEADER_LOGGING_ENABLED,
+             .FLUSH_HEADER_LOGFILE_AFTER_EACH_WRITE:
+            
+            // For the booleans
+            
+            guard let newValue = command.boolValue else {
+                log.atLevelWarning(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) should contain a BOOL value")
+                return
+            }
+            
+            updateBool(ParameterId.from(command.parameter), newValue: newValue)
+            
+            
+        case .CLIENT_MESSAGE_BUFFER_SIZE,
+             .HTTP_KEEP_ALIVE_INACTIVITY_TIMEOUT,
+             .MAX_NOF_ACCEPTED_CONNECTIONS,
+             .MAX_NOF_PENDING_CONNECTIONS,
+             .MAX_WAIT_FOR_PENDING_CONNECTIONS,
+             .LOGFILE_MAX_SIZE,
+             .LOGFILE_MAX_NOF_FILES,
+             .MAX_FILE_SIZE_FOR_HEADER_LOGGING,
+             .HTTP_RESPONSE_CLIENT_TIMEOUT:
+            
+            // For the integers
+            
+            guard let newValue = command.intValue else {
+                log.atLevelWarning(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) should contain a Int value")
+                return
+            }
+            
+            updateInt(ParameterId.from(command.parameter), newValue: newValue)
+            
+            
+        case .ASL_FACILITY_RECORD_AT_AND_ABOVE_LEVEL,
+             .FILE_RECORD_AT_AND_ABOVE_LEVEL,
+             .CALLBACK_AT_AND_ABOVE_LEVEL,
+             .NETWORK_TRANSMIT_AT_AND_ABOVE_LEVEL,
+             .STDOUT_PRINT_AT_AND_ABOVE_LEVEL:
+            
+            // For the SwifterLog.Level
+            
+            guard let level = command.intValue, let newLevel = SwifterLog.Level(rawValue: level) else {
+                log.atLevelWarning(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) new value should be in range 0..8, found \(command.intValue)")
+                return
+            }
+            
+            updateInt(ParameterId.from(command.parameter), newValue: newLevel.rawValue)
+            
+            
+        case .SERVICE_PORT_NUMBER,
+             .MAC_PORT_NUMBER,
+             .NETWORK_LOGTARGET_IP_ADDRESS,
+             .NETWORK_LOGTARGET_PORT_NUMBER:
+            
+            // For the Strings
+            
+            updateString(ParameterId.from(command.parameter), newValue: command.value)
+            
+            
+        case .MAC_INACTIVITY_TIMEOUT:
+            
+            guard let newValue = command.doubleValue else {
+                log.atLevelWarning(id: socket, source: #file.source(#function, #line), message: "\(command.parameter.rawValue) should contain a NUMBER value")
+                return
+            }
+
+            // For the Doubles
+            
+            updateDouble(ParameterId.from(command.parameter), newValue: newValue)
+        }
+        
+        
+        // Perform actions where necessary
+        
+        switch command.parameter {
+            
+        case .ASL_FACILITY_RECORD_AT_AND_ABOVE_LEVEL:
+            
+            log.aslFacilityRecordAtAndAboveLevel = SwifterLog.Level(rawValue: Parameters.asInt(.ASL_FACILITY_RECORD_AT_AND_ABOVE_LEVEL))!
+
+        case .FILE_RECORD_AT_AND_ABOVE_LEVEL:
+            
+            log.fileRecordAtAndAboveLevel = SwifterLog.Level(rawValue: Parameters.asInt(.FILE_RECORD_AT_AND_ABOVE_LEVEL))!
+            
+        case .CALLBACK_AT_AND_ABOVE_LEVEL:
+            
+            log.callbackAtAndAboveLevel = SwifterLog.Level(rawValue: Parameters.asInt(.CALLBACK_AT_AND_ABOVE_LEVEL))!
+            
+        case .NETWORK_TRANSMIT_AT_AND_ABOVE_LEVEL:
+            
+            log.networkTransmitAtAndAboveLevel = SwifterLog.Level(rawValue: Parameters.asInt(.NETWORK_TRANSMIT_AT_AND_ABOVE_LEVEL))!
+
+        case .STDOUT_PRINT_AT_AND_ABOVE_LEVEL:
+            
+            log.stdoutPrintAtAndAboveLevel = SwifterLog.Level(rawValue: Parameters.asInt(.STDOUT_PRINT_AT_AND_ABOVE_LEVEL))!
+
+        case .NETWORK_LOGTARGET_IP_ADDRESS:
+            
+            networkLogTarget.address = Parameters.asString(.NETWORK_LOGTARGET_IP_ADDRESS)
+            conditionallySetNetworkLogTarget()
+
+        case .NETWORK_LOGTARGET_PORT_NUMBER:
+
+            networkLogTarget.port = Parameters.asString(.NETWORK_LOGTARGET_PORT_NUMBER)
+            conditionallySetNetworkLogTarget()
+
+        default: break
+        }
+    }
+
 }
 
 // == End of file ==

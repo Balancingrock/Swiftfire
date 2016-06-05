@@ -112,10 +112,6 @@ if let threshold = SwifterLog.Level(rawValue: Parameters.asInt(.FILE_RECORD_AT_A
     log.fileRecordAtAndAboveLevel = threshold
 }
 
-if Parameters.asString(.LOGFILES_FOLDER) != "" {
-    log.logfileDirectoryPath = Parameters.asString(.LOGFILES_FOLDER)
-}
-
 log.logfileMaxNumberOfFiles = Parameters.asInt(.LOGFILE_MAX_NOF_FILES)
 
 log.logfileMaxSizeInBytes = UInt64(Parameters.asInt(.LOGFILE_MAX_SIZE) * 1024)
