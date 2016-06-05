@@ -53,6 +53,7 @@
 //          FLUSH_HEADER_LOGFILE_AFTER_EACH_WRITE
 //          Added missing HTTP_KEEP_ALIVE_INACTIVITY_TIMEOUT
 //        - Moved doWriteServerParameterCommand and doReadServerParameterCommand processing to Parameters
+//        - Added 1 second delay after transmitting closing-connection.
 // v0.9.6 - Header update
 //        - Added transmission of "ClosingMacConnection" upon timeout for the M&C connection
 //        - Added ResetDomainTelemetry
@@ -260,6 +261,8 @@ final class MonitoringAndControl {
                     log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Closing Monitoring and Control Connection due to inactivity")
                     
                     transferMessage(ClosingMacConnection().json)
+                    
+                    sleep(1)
                     
                     break RECEIVE_LOOP
                     
