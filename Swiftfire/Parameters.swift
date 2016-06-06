@@ -3,7 +3,7 @@
 //  File:       Parameters.swift
 //  Project:    Swiftfire
 //
-private let VERSION = "0.9.7"
+private let VERSION = "0.9.8"
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,6 +49,7 @@ private let VERSION = "0.9.7"
 //
 // History
 //
+// v0.9.8 - Updated version number
 // v0.9.7 - Changed initial value of HTTP_KEEP_ALIVE_INACTIVITY_TIMEOUT to 1 second
 //        - Added HEADER_LOGGING_ENABLED, MAX_FILE_SIZE_FOR_HEADER_LOGGING,
 //          FLUSH_HEADER_LOGFILE_AFTER_EACH_WRITE

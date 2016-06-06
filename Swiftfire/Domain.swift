@@ -3,7 +3,7 @@
 //  File:       Domain.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.7
+//  Version:    0.9.8
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,6 +49,7 @@
 //
 // History
 //
+// v0.9.8 - Fixed bug that would prevent the creation of accessLog and four04Log
 // v0.9.7 - Added logging options for Access and 404
 // v0.9.6 - Header update
 //        - Changed init(json) to accept initializations without telemetry
@@ -216,7 +217,7 @@ class Domain: Equatable, ReflectedStringConvertible {
     var accessLogEnabled: Bool = false {
         didSet {
             // Exit if nothing changed
-            guard accessLogEnabled == oldValue else { return }
+            guard accessLogEnabled != oldValue else { return }
             
             if accessLogEnabled {
                 if accessLog == nil {
@@ -239,7 +240,7 @@ class Domain: Equatable, ReflectedStringConvertible {
     var four04LogEnabled: Bool = false {
         didSet {
             // Exit if nothing changed
-            guard four04LogEnabled == oldValue else { return }
+            guard four04LogEnabled != oldValue else { return }
             
             if four04LogEnabled {
                 if four04Log == nil {

@@ -40,6 +40,10 @@ The I drag & drop the group with the source files from (for example) SwifterLog 
 
 #Version history
 
+####v0.9.8
+
+- Quick fix for bug that would prevent creation of AccessLog and Four04Log.
+
 ####v0.9.7
 
 - Cleaned up parameter definition setting and usage
