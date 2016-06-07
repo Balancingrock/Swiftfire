@@ -3,7 +3,7 @@
 //  File:       AccessLog.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.7
+//  Version:    0.9.9
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,20 +49,22 @@
 //
 // History
 //
+// v0.9.9 - Changed maxsize to 1MB
+//        - Renamed FileLog to Logfile.
 // v0.9.7 - Initial release
 // =====================================================================================================================
 
 import Foundation
 
 
-final class AccessLog: FileLog {
+final class AccessLog: Logfile {
     
     init?(logDir: NSURL) {
-        super.init(filename: "AccessLog", fileExtension: "csv", directory: logDir, options: .MaxFileSize(1024 * 1024), .NewFileDailyAt(WallclockTime(hour: 0, minute: 0, second: 0)))
+        super.init(filename: "AccessLog", fileExtension: "csv", directory: logDir, options: .MaxFileSize(1024), .NewFileDailyAt(WallclockTime(hour: 0, minute: 0, second: 0)))
     }
     
     func record(time: NSDate, ipAddress: String, url: String, operation: String, version: String) {
-        let message = FileLog.dateFormatter.stringFromDate(time) + ", \(ipAddress), \(url), \(operation), \(version)\n"
+        let message = Logfile.dateFormatter.stringFromDate(time) + ", \(ipAddress), \(url), \(operation), \(version)\n"
         super.record(message)
     }
     

@@ -3,7 +3,7 @@
 //  File:       WallclockTime.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.7
+//  Version:    0.9.9
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,6 +49,7 @@
 //
 // History
 //
+// v0.9.9 - Replaced NSCalendarOptions.MatchFirst with NSCalendarOptions.MatchNextTime because the former caused an exception in playground
 // v0.9.7 - Initial release
 // =====================================================================================================================
 
@@ -107,16 +108,16 @@ public func + (lhs: WallclockTime, rhs: WallclockTime) -> (time: WallclockTime, 
 }
 
 public func + (lhs: NSDate, rhs: WallclockTime) -> NSDate {
-    return NSCalendar.currentCalendar().dateByAddingComponents(rhs.dateComponents(), toDate: lhs, options: NSCalendarOptions.MatchFirst)!
+    return NSCalendar.currentCalendar().dateByAddingComponents(rhs.dateComponents, toDate: lhs, options: NSCalendarOptions.MatchNextTime)!
 }
 
 /// A 24-hour wallclock implementation
 public struct WallclockTime {
-    let hour: Int
-    let minute: Int
-    let second: Int
+    public let hour: Int
+    public let minute: Int
+    public let second: Int
     
-    func dateComponents() -> NSDateComponents {
+    public var dateComponents: NSDateComponents {
         let comp = NSDateComponents()
         comp.hour = self.hour
         comp.minute = self.minute
@@ -136,6 +137,6 @@ public extension NSDate {
     
     /// A new NSDate set to the first future wallclock time in the current calendar
     public static func firstFutureDate(with wallclockTime: WallclockTime) -> NSDate {
-        return NSCalendar.currentCalendar().nextDateAfterDate(NSDate(), matchingHour: wallclockTime.hour, minute: wallclockTime.minute, second: wallclockTime.second, options: NSCalendarOptions.MatchFirst)!
+        return NSCalendar.currentCalendar().nextDateAfterDate(NSDate(), matchingHour: wallclockTime.hour, minute: wallclockTime.minute, second: wallclockTime.second, options: NSCalendarOptions.MatchNextTime)!
     }
 }

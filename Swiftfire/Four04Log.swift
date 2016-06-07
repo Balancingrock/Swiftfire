@@ -3,7 +3,7 @@
 //  File:       Four04Log.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.7
+//  Version:    0.9.9
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,18 +49,21 @@
 //
 // History
 //
+// v0.9.9 - Renamed FileLog to Logfile.
+//        - Lowered maxsize of file to 1MB
+//        - Fixed bug where a 404 URL would occur more than once and missing line breaks in the logfile
 // v0.9.7 - Initial release
 // =====================================================================================================================
 
 import Foundation
 
 
-final class Four04Log: FileLog {
+final class Four04Log: Logfile {
     
     var reported: Array<String> = Array()
     
     init?(logDir: NSURL) {
-        super.init(filename: "404Log", directory: logDir, options: .MaxFileSize(1024 * 1024))
+        super.init(filename: "404Log", directory: logDir, options: .MaxFileSize(1024))
     }
     
     
@@ -70,7 +73,8 @@ final class Four04Log: FileLog {
         for str in reported {
             if str == message { return }
         }
-        reported.append(message + "\n")
-        super.record(message)
+        reported.append(message)
+        super.record(message + "\n")
+        super.flush()
     }
 }
