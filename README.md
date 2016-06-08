@@ -40,6 +40,13 @@ The I drag & drop the group with the source files from (for example) SwifterLog 
 
 #Version history
 
+####v0.9.9
+
+- Fixed a bug in SwifterSockets that would not log correct IPv6 addresses.
+- Fixed a number of bugs that messed up logging of access and 404
+- Renamed FileLog to Logfile
+- Replaced header logging code with usage of Logfile
+
 ####v0.9.8
 
 - Quick fix for bug that would prevent creation of AccessLog and Four04Log.
