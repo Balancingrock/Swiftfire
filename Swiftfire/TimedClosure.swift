@@ -3,7 +3,7 @@
 //  File:       TimedClosure.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.7
+//  Version:    0.9.10
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,7 +49,10 @@
 //
 // History
 //
-// v0.9.7 - Initial release
+// v0.9.10 - Added debuggin output
+//         - Moved request for execution to observer of nextExecution
+//         - Removed private from 'once'.
+// v0.9.7  - Initial release
 // =====================================================================================================================
 
 import Foundation
@@ -60,13 +63,24 @@ final class TimedClosure {
     
     private var closure: NoParametersNoReturn
     private var queue: dispatch_queue_t
-    private var once: Bool
+    var once: Bool
     private var previousExecution: NSDate
-    private var nextExecution: NSDate
     private var delay: NSTimeInterval?
     private var wallclockDelay: WallclockTime?
-    private var stopExecuting = false
+    var doNotExecute = false
     
+    
+    // Writing to this variable will trigger an execution request to be issued.
+    
+    private var nextExecution: NSDate {
+        didSet {
+            var delta = nextExecution.timeIntervalSinceNow
+            if delta < 0 { delta = 0 }
+            log.atLevelDebug(id: -1, source: #file.source(#function, #line), message: "Delay = \(delta)")
+            dispatch_after(UInt64(delta * Double(NSEC_PER_SEC)), queue, { [weak self] in self?.execute() })
+        }
+    }
+
     private var calendar = NSCalendar.currentCalendar()
     
     
@@ -91,9 +105,6 @@ final class TimedClosure {
         self.delay = delay
         
         self.nextExecution = previousExecution.dateByAddingTimeInterval(delay)
-        
-        let delta = nextExecution.timeIntervalSinceDate(previousExecution)
-        dispatch_after(UInt64(delta * Double(NSEC_PER_SEC)), queue, { [weak self] in self?.execute() })
     }
     
     
@@ -118,9 +129,6 @@ final class TimedClosure {
         self.wallclockDelay = delay
         
         self.nextExecution = previousExecution + delay
-        
-        let delta = nextExecution.timeIntervalSinceDate(previousExecution)
-        dispatch_after(UInt64(delta * Double(NSEC_PER_SEC)), queue, { [weak self] in self?.execute() })
     }
 
     
@@ -144,9 +152,6 @@ final class TimedClosure {
         self.once = once
 
         self.nextExecution = NSDate.firstFutureDate(with: wallclockTime)
-        
-        let delta = nextExecution.timeIntervalSinceDate(previousExecution)
-        dispatch_after(UInt64(delta * Double(NSEC_PER_SEC)), queue, { [weak self] in self?.execute() })
     }
     
     
@@ -156,7 +161,8 @@ final class TimedClosure {
      */
     
     func cancel() {
-        stopExecuting = true
+        once = true
+        doNotExecute = true
     }
     
     
@@ -164,13 +170,24 @@ final class TimedClosure {
     
     private func execute() {
         
-        // Check if the user cancelled
-        if stopExecuting { return }
+        log.atLevelDebug(id: -1, source: #file.source(#function, #line), message: "Started execution")
         
-        // Execute the closure
-        closure()
+        
+        // Check if the user cancelled
+        
+        if !doNotExecute {
+            
+        
+            // Execute the closure
+
+            log.atLevelDebug(id: -1, source: #file.source(#function, #line), message: "Executing closure")
+            
+            closure()
+        }
+
         
         // Repeat as necessary
+        
         if !once {
             
             // Note: by using the calculated execution times rather than the actual execution time a creep in execution time is prevented.
@@ -183,9 +200,6 @@ final class TimedClosure {
             } else {
                 nextExecution = calendar.dateByAddingUnit(NSCalendarUnit.Day, value: 1, toDate: previousExecution, options: NSCalendarOptions.MatchFirst)!
             }
-            
-            let delta = nextExecution.timeIntervalSinceDate(previousExecution)
-            dispatch_after(UInt64(delta * Double(NSEC_PER_SEC)), queue, { [unowned self] in self.execute() })
         }
     }
 }

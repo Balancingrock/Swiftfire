@@ -3,7 +3,7 @@
 //  File:       Domain.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.8
+//  Version:    0.9.10
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,17 +49,18 @@
 //
 // History
 //
-// v0.9.8 - Fixed bug that would prevent the creation of accessLog and four04Log
-// v0.9.7 - Added logging options for Access and 404
-// v0.9.6 - Header update
-//        - Changed init(json) to accept initializations without telemetry
-// v0.9.4 - Accomodated new VJson testing
-//        - Made _name private
-// v0.9.3 - Added domain telemetry
-//        - Corrected description of forwardUrlItemTitle
-// v0.9.2 - Removed 'final' from the class definition
-//        - Added enableHttpPreprocessor, enableHttpPostprocessor, httpWorkerPreprocessor and httpWorkerPostprocessor
-// v0.9.0 - Initial release
+// v0.9.10 - Added domain statistics
+// v0.9.8  - Fixed bug that would prevent the creation of accessLog and four04Log
+// v0.9.7  - Added logging options for Access and 404
+// v0.9.6  - Header update
+//         - Changed init(json) to accept initializations without telemetry
+// v0.9.4  - Accomodated new VJson testing
+//         - Made _name private
+// v0.9.3  - Added domain telemetry
+//         - Corrected description of forwardUrlItemTitle
+// v0.9.2  - Removed 'final' from the class definition
+//         - Added enableHttpPreprocessor, enableHttpPostprocessor, httpWorkerPreprocessor and httpWorkerPostprocessor
+// v0.9.0  - Initial release
 // =====================================================================================================================
 
 import Foundation
@@ -309,6 +310,25 @@ class Domain: Equatable, ReflectedStringConvertible {
             log.atLevelDebug(id: -1, source: #file.source(#function, #line), message: "Could not create domain logging directory at \(url.path!)")
             return nil
         }
+    }()
+    
+    
+    /// The domain statistics
+    
+    lazy var statistics: DomainStatistics? = {
+        guard let domainSupportDir = self.domainSupportDir else { return nil }
+        let url = domainSupportDir.URLByAppendingPathComponent("statistics", isDirectory: true)
+        do {
+            try NSFileManager.defaultManager().createDirectoryAtURL(url, withIntermediateDirectories: true, attributes: nil)
+        } catch {
+            log.atLevelDebug(id: -1, source: #file.source(#function, #line), message: "Could not create domain statistics directory at \(url.path!)")
+            return nil
+        }
+        
+        guard let resourceStatFile = Logfile(filename: "Resource", fileExtension: "json", directory: url, options: Logfile.InitOption.NewFileDailyAt(WallclockTime(hour: 0, minute: 0, second: 0))) else { return nil }
+        guard let ipStatFile = Logfile(filename: "IP-Address", fileExtension: "json", directory: url, options: Logfile.InitOption.NewFileDailyAt(WallclockTime(hour: 0, minute: 0, second: 0))) else { return nil }
+        
+        return DomainStatistics(resourceFile: resourceStatFile, ipFile: ipStatFile)
     }()
     
     

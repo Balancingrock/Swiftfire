@@ -3,7 +3,7 @@
 //  File:       WallclockTime.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.9
+//  Version:    0.9.10
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,8 +49,9 @@
 //
 // History
 //
-// v0.9.9 - Replaced NSCalendarOptions.MatchFirst with NSCalendarOptions.MatchNextTime because the former caused an exception in playground
-// v0.9.7 - Initial release
+// v0.9.10 - Improved init of WallclockTime, added init from string, added compliance to Equatable and CustomStringConvertible
+// v0.9.9  - Replaced NSCalendarOptions.MatchFirst with NSCalendarOptions.MatchNextTime because the former caused an exception in playground
+// v0.9.7  - Initial release
 // =====================================================================================================================
 
 import Foundation
@@ -112,10 +113,102 @@ public func + (lhs: NSDate, rhs: WallclockTime) -> NSDate {
 }
 
 /// A 24-hour wallclock implementation
-public struct WallclockTime {
+
+public struct WallclockTime: CustomStringConvertible, Equatable {
+    
     public let hour: Int
     public let minute: Int
     public let second: Int
+    
+    public var description: String { return "\(hour):\(minute):\(second)" }
+    
+    /**
+     Creates a new Wallclock time from the given units. It is safe to specify over-unit values. If done, these over-unit values will be carried over into the next higher unit for as much as possible. If an over-unit results in the hour component to be bigger than 24, only the over-unit part will be used. Example: Wallclock(hour: 123, minute: 456, second: 7890) will result in a Wallclock time of 12:47:30.
+     */
+    
+    public init(hour: Int, minute: Int, second: Int) {
+        self.second = second % 60
+        let minutesFromSeconds = (second - second % 60) / 60
+        let minutes = minute + minutesFromSeconds
+        self.minute = minutes % 60
+        let hoursFromMinutes = (minutes - minutes % 60) / 60
+        let hours = hour + hoursFromMinutes
+        self.hour = hours % 24
+    }
+    
+    
+    /**
+     Creates a new Wallclock time from the given string. The string should follow the "hour:minute:second" syntax. If a single number is present, it will be interpreted as a number of seconds. Two numbers as minute's and second's.
+     */
+    
+    public init?(string: String) {
+        let parts = string.componentsSeparatedByString(":")
+        switch parts.count {
+        case 0:
+            return nil
+            
+        case 1:
+            var seconds: Int = 0
+            if !parts[0].isEmpty {
+                if let val = Int(parts[0]) {
+                    seconds = val
+                } else {
+                    return nil
+                }
+            } else {
+                return nil
+            }
+            self.init(hour: 0, minute: 0, second: seconds)
+
+        case 2:
+            var minutes: Int = 0
+            var seconds: Int = 0
+            if !parts[0].isEmpty {
+                if let val = Int(parts[0]) {
+                    minutes = val
+                } else {
+                    return nil
+                }
+            }
+            if !parts[1].isEmpty {
+                if let val = Int(parts[1]) {
+                    seconds = val
+                } else {
+                    return nil
+                }
+            }
+            self.init(hour: 0, minute: minutes, second: seconds)
+
+        case 3:
+            var hours: Int = 0
+            var minutes: Int = 0
+            var seconds: Int = 0
+            if !parts[0].isEmpty {
+                if let val = Int(parts[0]) {
+                    hours = val
+                } else {
+                    return nil
+                }
+            }
+            if !parts[1].isEmpty {
+                if let val = Int(parts[1]) {
+                    minutes = val
+                } else {
+                    return nil
+                }
+            }
+            if !parts[2].isEmpty {
+                if let val = Int(parts[2]) {
+                    seconds = val
+                } else {
+                    return nil
+                }
+            }
+            self.init(hour: hours, minute: minutes, second: seconds)
+
+        default: return nil
+        }
+    }
     
     public var dateComponents: NSDateComponents {
         let comp = NSDateComponents()

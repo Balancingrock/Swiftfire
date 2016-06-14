@@ -3,7 +3,7 @@
 //  File:       Parameters.swift
 //  Project:    Swiftfire
 //
-private let VERSION = "0.9.9"
+private let VERSION = "0.9.10"
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,22 +49,22 @@ private let VERSION = "0.9.9"
 //
 // History
 //
-// v0.9.9 - Updated version number
-// v0.9.8 - Updated version number
-// v0.9.7 - Changed initial value of HTTP_KEEP_ALIVE_INACTIVITY_TIMEOUT to 1 second
-//        - Added HEADER_LOGGING_ENABLED, MAX_FILE_SIZE_FOR_HEADER_LOGGING,
-//          FLUSH_HEADER_LOGFILE_AFTER_EACH_WRITE
-//        - Slightly optimized code to upgrade to new parameter file version
-//        - Added function to upgrade to parameter version 2
-//        - Moved M&C support for the server parameters to this file
-// v0.9.6 - Header update & version number update
-//        - Merged MAX_NOF_PENDING_CLIENT_MESSAGES with MAX_CLIENT_MESSAGE_SIZE into CLIENT_MESSAGE_BUFFER_SIZE
-//        - Merged AutoStartup into this file
-// v0.9.5 - Updated version number
-// v0.9.4 - Updated version number
-// v0.9.3 - Updated version number
-// v0.9.2 - Updated version number
-// v0.9.0 - Initial release
+// v0.9.10 - Updated version number
+// v0.9.9  - Updated version number
+// v0.9.8  - Updated version number
+// v0.9.7  - Changed initial value of HTTP_KEEP_ALIVE_INACTIVITY_TIMEOUT to 1 second
+//         - Added HEADER_LOGGING_ENABLED, MAX_FILE_SIZE_FOR_HEADER_LOGGING, FLUSH_HEADER_LOGFILE_AFTER_EACH_WRITE
+//         - Slightly optimized code to upgrade to new parameter file version
+//         - Added function to upgrade to parameter version 2
+//         - Moved M&C support for the server parameters to this file
+// v0.9.6  - Header update & version number update
+//         - Merged MAX_NOF_PENDING_CLIENT_MESSAGES with MAX_CLIENT_MESSAGE_SIZE into CLIENT_MESSAGE_BUFFER_SIZE
+//         - Merged AutoStartup into this file
+// v0.9.5  - Updated version number
+// v0.9.4  - Updated version number
+// v0.9.3  - Updated version number
+// v0.9.2  - Updated version number
+// v0.9.0  - Initial release
 // =====================================================================================================================
 
 import Foundation

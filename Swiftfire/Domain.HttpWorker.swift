@@ -3,7 +3,7 @@
 //  File:       Domain.HttpWorker.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.7
+//  Version:    0.9.10
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,14 +49,15 @@
 //
 // History
 //
-// v0.9.7 - Added Access logging
-// v0.9.6 - Header update
-// v0.9.5 - Added MIME support
-// v0.9.3 - Moved renamed telemetry items
-// v0.9.2 - Added httpWorker and associated functions
-//        - Removed resourcePathFor
-//        - Renamed from Domain.HttpSupport to Domain.HttpWorker
-// v0.9.0 - Initial release
+// v0.9.10 - Added domain statistics
+// v0.9.7  - Added Access logging
+// v0.9.6  - Header update
+// v0.9.5  - Added MIME support
+// v0.9.3  - Moved renamed telemetry items
+// v0.9.2  - Added httpWorker and associated functions
+//         - Removed resourcePathFor
+//         - Renamed from Domain.HttpSupport to Domain.HttpWorker
+// v0.9.0  - Initial release
 // =====================================================================================================================
 
 import Foundation
@@ -91,6 +92,13 @@ extension Domain {
         
         
         // =============================================================================================================
+        // Update the domain statistics
+        // =============================================================================================================
+        
+        self.statistics?.record(header, connection: connection)
+        
+        
+        // =============================================================================================================
         // Telemetry update
         // =============================================================================================================
 
@@ -103,12 +111,8 @@ extension Domain {
         // =============================================================================================================
         
         if enableHttpPreprocessor {
-        
-            
             // If the preprocessor creates a response, then return it as the response for this domain
-            
             if let response = httpWorkerPreprocessor(header: header, body: body, connection: connection) {
-                
                 return response
             }
         }
@@ -202,11 +206,8 @@ extension Domain {
         // =============================================================================================================
 
         if enableHttpPostprocessor {
-            
             // If the postprocessor returns a response, use that instead of the already prepared response
-            
             if let postProResponse = httpWorkerPostprocessor(header: header, body: body, response: response, connection: connection) {
-                
                 return postProResponse
             }
         }

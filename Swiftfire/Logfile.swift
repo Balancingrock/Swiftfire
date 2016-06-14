@@ -3,7 +3,7 @@
 //  File:       Logfile.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.9
+//  Version:    0.9.10
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,11 +49,12 @@
 //
 // History
 //
-// v0.9.9 - Renamed FileLog to Logfile and general overhaul for publication on Swiftrien.
-//        - Fixed several bugs that messed up file creation (sorry!).
-//        - Changed the way in which the oldest file is determined, files are now filtered for containing the 'filename' string.
-//        - Added flush operations
-// v0.9.7 - Initial release
+// v0.9.10 - Fixed newFileDailyAt and newFileAfterDelay to accept setting to nil after creation.
+// v0.9.9  - Renamed FileLog to Logfile and general overhaul for publication on Swiftrien.
+//         - Fixed several bugs that messed up file creation (sorry!).
+//         - Changed the way in which the oldest file is determined, files are now filtered for containing the 'filename' string.
+//         - Added flush operations
+// v0.9.7  - Initial release
 // =====================================================================================================================
 
 import Foundation
@@ -194,7 +195,7 @@ class Logfile {
     
     var newFileDailyAt: WallclockTime? {
         didSet {
-            self.nextDailyFileAt = NSDate.firstFutureDate(with: newFileDailyAt!)
+            self.nextDailyFileAt = (newFileDailyAt == nil) ? nil : NSDate.firstFutureDate(with: newFileDailyAt!)
         }
     }
     
@@ -208,7 +209,7 @@ class Logfile {
     
     var newFileAfterDelay: WallclockTime? {
         didSet {
-            self.nextDelayedFileAt = NSDate() + newFileAfterDelay!
+            self.nextDelayedFileAt = (newFileAfterDelay == nil) ? nil : NSDate() + newFileAfterDelay!
         }
     }
     

@@ -25,7 +25,7 @@ class DomainTest: XCTestCase {
 
         // Create a default domain and check if the json description is as expected
         
-        let expectedResult = "{\"Domain\":{\"Name\":\"domain-name.extension\",\"IncludeWww\":true,\"Root\":\"root-folder\",\"ForewardUrl\":\"\",\"Enabled\":false}}"
+        let expectedResult = "\"Domain\":{\"Name\":\"domain.toplevel\",\"IncludeWww\":true,\"Root\":\"/Library/WebServer/Documents\",\"ForewardUrl\":\"\",\"Enabled\":false,\"AccessLogEnabled\":false,\"404LogEnabled\":false,\"Telemetry\":{\"NofRequests\":{\"Value\":0,\"GuiLabel\":\"Total Number of Requests\"},\"Nof200\":{\"Value\":0,\"GuiLabel\":\"Number of Succesfull Replies (200)\"},\"Nof400\":{\"Value\":0,\"GuiLabel\":\"Number of Bad Requests (400)\"},\"Nof403\":{\"Value\":0,\"GuiLabel\":\"Number of Forbidden (403)\"},\"Nof404\":{\"Value\":0,\"GuiLabel\":\"Number of Not Found (404)\"},\"Nof500\":{\"Value\":0,\"GuiLabel\":\"Number of Server Errors (500)\"},\"Nof501\":{\"Value\":0,\"GuiLabel\":\"Number of Not Implemented (501)\"},\"Nof505\":{\"Value\":0,\"GuiLabel\":\"Number of HTTP Version Not Supported (505)\"}}}"
         
         let domain = Domain()
         let str = domain.json.description
