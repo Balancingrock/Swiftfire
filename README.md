@@ -40,6 +40,10 @@ The I drag & drop the group with the source files from (for example) SwifterLog 
 
 #Version history
 
+####v0.9.10
+
+- Added domain statistics
+
 ####v0.9.9
 
 - Fixed a bug in SwifterSockets that would not log correct IPv6 addresses.
