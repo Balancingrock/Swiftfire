@@ -332,12 +332,7 @@ extension Domain {
         let fullPath = (root as NSString).stringByAppendingPathComponent(path)
 
         
-        // Test the full path
-        
-        if connection.filemanager.isReadableFileAtPath(fullPath) { return (path, nil) }
-
-        
-        // Either the file is not readable (.AccessNotAllowed) or the path is a directory. Check which case it is
+        // Check for existence
         
         var isDirectory: ObjCBool = false
 
@@ -370,7 +365,9 @@ extension Domain {
                 
             } else {
                 
-                // It is not a directory, but the file exists, thus the file is not accessable
+                // It is a file
+                
+                if connection.filemanager.isReadableFileAtPath(fullPath) { return (path, nil) }
                 
                 return (nil, .AccessNotAllowed)
             }
@@ -396,6 +393,7 @@ extension Domain {
     
     private func createResponse(path: String, connection: HttpConnection, mutation: Mutation) -> NSData? {
         
+        
         // Build the full path
         
         let fullPath = (root as NSString).stringByAppendingPathComponent(path)
@@ -404,7 +402,11 @@ extension Domain {
         // Test the full path
         
         if connection.filemanager.isReadableFileAtPath(fullPath) {
-            return connection.filemanager.contentsAtPath(fullPath)
+            if let result = connection.filemanager.contentsAtPath(fullPath) { return result }
+            let message = "Reading contents of file failed (but file is reported readable) resource: \(fullPath)"
+            mutation.responseDetails = message
+            log.atLevelError(id: connection.logId, source: #file.source(#function, #line), message: message)
+            return nil
         }
         
         

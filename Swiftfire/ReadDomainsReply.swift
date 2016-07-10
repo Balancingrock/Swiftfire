@@ -67,10 +67,11 @@ final class ReadDomainsReply {
     
     var json: VJson {
         let j = VJson()
-        let arr = j[DOMAINS] // Create the Domains item
+        let arr = VJson.array(DOMAINS)
         for (i, d) in domains.enumerate() {
             arr[i] = d.json
         }
+        j[REPLY_NAME].add(arr)
         return j
     }
     
@@ -80,10 +81,10 @@ final class ReadDomainsReply {
     
     init?(json: VJson?) {
         guard let json = json else { return nil }
-        guard (json|DOMAINS) != nil else { return nil }
-        domains = Domains()
-        for j in (json|DOMAINS)! {
-            if let d = Domain(json: j|"Domain") { domains.add(d) } else { return nil }
+        guard (json|REPLY_NAME|DOMAINS) != nil else { return nil }
+        self.domains = Domains()
+        for j in (json|REPLY_NAME|DOMAINS)! {
+            if let d = Domain(json: j) { domains.add(d) } else { return nil }
         }
     }
 }

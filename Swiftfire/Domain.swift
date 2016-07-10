@@ -352,9 +352,7 @@ class Domain: Equatable, ReflectedStringConvertible {
         // Initialize the properties that must be present
         
         guard let json = json else { return nil }
-        
-        guard json.nameValue == "Domain" else { return nil }
-        
+                
         guard let jname = (json|"Name")?.stringValue else { return nil }
         guard let jroot = (json|"Root")?.stringValue else { return nil }
         guard let jfurl = (json|"ForewardUrl")?.stringValue else { return nil }
