@@ -3,10 +3,11 @@
 //  File:       ConsoleWindowViewController.swift
 //  Project:    SwiftfireConsole
 //
-//  Version:    0.9.1
+//  Version:    0.9.11
 //
 //  Author:     Marinus van der Lugt
-//  Website:    http://www.balancingrock.nl/swiftfire.html
+//  Company:    http://balancingrock.nl
+//  Website:    http://swiftfire.nl/
 //  Blog:       http://swiftrien.blogspot.com
 //  Git:        https://github.com/Swiftrien/SwiftfireConsole
 //
@@ -28,7 +29,7 @@
 //   - You can send payment via paypal to: sales@balancingrock.nl
 //   - Or wire bitcoins to: 1GacSREBxPy1yskLMc9de2nofNv2SNdwqH
 //
-//  I prefer the above two, but if these options don't suit you, you might also send me a gift from my amazon.co.uk
+//  I prefer the above two, but if these options don't suit you, you can also send me a gift from my amazon.co.uk
 //  whishlist: http://www.amazon.co.uk/gp/registry/wishlist/34GNMPZKAQ0OO/ref=cm_sw_em_r_wsl_cE3Tub013CKN6_wb
 //
 //  If you like to pay in another way, please contact me at rien@balancingrock.nl
@@ -47,8 +48,16 @@
 // =====================================================================================================================
 //
 // History
-// v0.9.1 - Minor adjustment to acomodate changes in SwifterLog
-// v0.9.0 - Initial release
+//
+// v0.9.11 - Merged into Swiftfire project
+// v0.9.5  - Minor updates to accomodate parameter updates on Swiftfire
+// v0.9.4  - Header update
+//         - Added detection of closing of the M&C connection
+//         - Added 'reset telemetry' button to domain tab
+// v0.9.3  - Changed due to new M&C interface
+// v0.9.2  - Added DomainTelemetry
+// v0.9.1  - Minor adjustment to acomodate changes in SwifterLog
+// v0.9.0  - Initial release
 // =====================================================================================================================
 
 import Foundation
@@ -97,33 +106,13 @@ class ConsoleWindowViewController: NSViewController {
         
         swiftfireMacInterface = SwiftfireMacInterface(delegate: self)
         
-        parameterTable = [
-            ParameterTabTableRow(parameter: .DEBUG_MODE, swiftfireMacInterface: swiftfireMacInterface),
-            ParameterTabTableRow(parameter: .SERVICE_PORT_NUMBER, swiftfireMacInterface: swiftfireMacInterface),
-            ParameterTabTableRow(parameter: .MAX_NOF_PENDING_CLIENT_MESSAGES, swiftfireMacInterface: swiftfireMacInterface),
-            ParameterTabTableRow(parameter: .MAX_CLIENT_MESSAGE_SIZE, swiftfireMacInterface: swiftfireMacInterface),
-            ParameterTabTableRow(parameter: .MAX_NOF_ACCEPTED_CONNECTIONS, swiftfireMacInterface: swiftfireMacInterface),
-            ParameterTabTableRow(parameter: .MAX_NOF_PENDING_CONNECTIONS, swiftfireMacInterface: swiftfireMacInterface),
-            ParameterTabTableRow(parameter: .MAX_WAIT_FOR_PENDING_CONNECTIONS, swiftfireMacInterface: swiftfireMacInterface),
-            ParameterTabTableRow(parameter: .ASL_LOGLEVEL, swiftfireMacInterface: swiftfireMacInterface),
-            ParameterTabTableRow(parameter: .STDOUT_LOGLEVEL, swiftfireMacInterface: swiftfireMacInterface),
-            ParameterTabTableRow(parameter: .FILE_LOGLEVEL, swiftfireMacInterface: swiftfireMacInterface),
-            ParameterTabTableRow(parameter: .NETWORK_LOGLEVEL, swiftfireMacInterface: swiftfireMacInterface),
-            ParameterTabTableRow(parameter: .NETWORK_LOG_TARGET_ADDRESS, swiftfireMacInterface: swiftfireMacInterface),
-            ParameterTabTableRow(parameter: .NETWORK_LOG_TARGET_PORT, swiftfireMacInterface: swiftfireMacInterface)
-        ]
+        for p in ServerParameter.all {
+            parameterTable.append(ParameterTabTableRow(parameter: p, swiftfireMacInterface: swiftfireMacInterface))
+        }
         
-        telemetryTable = [
-            TelemetryTabTableRow(parameter: .NOF_ACCEPTED_CLIENTS, swiftfireMacInterface: swiftfireMacInterface),
-            TelemetryTabTableRow(parameter: .NOF_HTTP_400_REPLIES, swiftfireMacInterface: swiftfireMacInterface),
-            TelemetryTabTableRow(parameter: .NOF_HTTP_404_REPLIES, swiftfireMacInterface: swiftfireMacInterface),
-            TelemetryTabTableRow(parameter: .NOF_HTTP_500_REPLIES, swiftfireMacInterface: swiftfireMacInterface),
-            TelemetryTabTableRow(parameter: .NOF_HTTP_501_REPLIES, swiftfireMacInterface: swiftfireMacInterface),
-            TelemetryTabTableRow(parameter: .NOF_HTTP_505_REPLIES, swiftfireMacInterface: swiftfireMacInterface),
-            TelemetryTabTableRow(parameter: .NOF_SUCCESSFUL_HTTP_REPLIES, swiftfireMacInterface: swiftfireMacInterface),
-            TelemetryTabTableRow(parameter: .NOF_RECEIVE_ERRORS, swiftfireMacInterface: swiftfireMacInterface),
-            TelemetryTabTableRow(parameter: .NOF_RECEIVE_TIMEOUTS, swiftfireMacInterface: swiftfireMacInterface)
-        ]
+        for t in ServerTelemetryItem.all {
+            telemetryTable.append(TelemetryTabTableRow(telemetryItem: t, swiftfireMacInterface: swiftfireMacInterface))
+        }
 
         
         let runLoopObserver = CFRunLoopObserverCreateWithHandler(
@@ -131,7 +120,10 @@ class ConsoleWindowViewController: NSViewController {
             CFRunLoopActivity.BeforeWaiting.rawValue,
             true,
             0,
-            { [unowned self] (_, _) -> Void in self.displayErrorMessage(); self.updateParameterValuesInGui(); self.addQueuedToAcceptedLogLines() })
+            { [unowned self] (_, _) -> Void in
+                self.processQueuedReplies()
+                self.displayErrorMessage()
+            })
         
         CFRunLoopAddObserver(CFRunLoopGetCurrent(), runLoopObserver, kCFRunLoopCommonModes)
     }
@@ -142,16 +134,30 @@ class ConsoleWindowViewController: NSViewController {
     // ***************************************************************
     
     let aboveTabs: AboveTabs = AboveTabs()
+    @IBOutlet weak var connectButton: NSButton!
     
     
     // *********************************
     // MARK: Storage for the Domains tab
     // *********************************
     
+    var domains = Domains()
     @IBOutlet weak var domainNameColumn: NSTableColumn!
     @IBOutlet weak var domainValueColumn: NSTableColumn!
     @IBOutlet weak var domainOutlineView: NSOutlineView!
     
+    
+    // *******************************************
+    // MARK: Storage for the Domains Telemetry tab
+    // *******************************************
+    
+    dynamic var domainTelemetry: Array<TelemetryItem>? = Array<TelemetryItem>()
+    @IBOutlet weak var dtAutofetchCheckbox: NSButton!
+    @IBOutlet weak var dtDelayBetweenAutofetches: NSTextField!
+    @IBOutlet weak var dtSelectDomainPopupBox: NSPopUpButton!
+    
+    var domainTelemetryFetchTimer: NSTimer?
+
     
     // *********************************************************
     // MARK: Storage for the Parameter Tab (Uses Cocoa Bindings)
@@ -160,9 +166,9 @@ class ConsoleWindowViewController: NSViewController {
     dynamic var parameterTable = Array<ParameterTabTableRow>()
 
     
-    // *********************************************************
-    // MARK: Storage for the Telemetry Tab (Uses Cocoa Bindings)
-    // *********************************************************
+    // ****************************************************************
+    // MARK: Storage for the Server Telemetry Tab (Uses Cocoa Bindings)
+    // ****************************************************************
 
     @IBOutlet weak var autofetchCheckbox: NSButton!
     @IBOutlet weak var delayBetweenAutoFetches: NSTextField!
@@ -193,12 +199,15 @@ class ConsoleWindowViewController: NSViewController {
     // ************************************************************
     
     private let parameterUpdateLockObject = NSString()
-    private var parameterUpdates: Dictionary<MacDef.Parameter, VJson> = [:]
+    private var parameterUpdates: Dictionary<ServerParameter, VJson> = [:]
     
     private let errorMessageLockObject = NSString()
     private var errorMessageIsActive = false
     private var errorMessages: Array<String> = []
     private var previousErrorMessage: String?
+    
+    private let queuedRepliesLockObject = NSString()
+    private var queuedReplies: Array<VJson> = [] // Holds all replies from a Swiftfire server
 }
 
 
@@ -207,25 +216,54 @@ class ConsoleWindowViewController: NSViewController {
 extension ConsoleWindowViewController {
     
     @IBAction func connectButtonAction(sender: AnyObject?) {
-        if !swiftfireMacInterface.communicationIsEstablished {
-            if let (address, port) = aboveTabs.serverAddressAndPort() {
-                swiftfireMacInterface.openConnectionToAddress(address, onPortNumber: port)
-            } else {
-                queueErrorMessage(MISSING_SERVER_ADDRESS_OR_PORT)
-                return
-            }
+        
+        if connectButton.title == "Connect" {
+        
             if !swiftfireMacInterface.communicationIsEstablished {
-                queueErrorMessage("Connection failed, please check Swiftfire IP Address and Port Number")
-                return
+            
+                if let (address, port) = aboveTabs.serverAddressAndPort() {
+                    swiftfireMacInterface.openConnectionToAddress(address, onPortNumber: port)
+                } else {
+                    queueErrorMessage(MISSING_SERVER_ADDRESS_OR_PORT)
+                    return
+                }
+                
+                if !swiftfireMacInterface.communicationIsEstablished {
+                    queueErrorMessage("Connection failed, please check Swiftfire IP Address and Port Number")
+                    return
+                }
             }
+            
+            aboveTabs.setValue(" ", forKeyPath: "serverVersionNumber")
+            aboveTabs.setValue(" ", forKeyPath: "serverStatus")
+            
+            var readAllParameters = Array<VJson?>()
+            
+            for parameter in ServerParameter.all {
+                if let command = ReadServerParameterCommand(parameter: parameter) {
+                    readAllParameters.append(command.json)
+                }
+            }
+            
+            for telemetryItem in ServerTelemetryItem.all {
+                if let command = ReadServerTelemetryCommand(telemetryItem: telemetryItem) {
+                    readAllParameters.append(command.json)
+                }
+            }
+            
+            readAllParameters.append(ReadDomainsCommand().json)
+            
+            swiftfireMacInterface.sendMessages(readAllParameters)
+        
+        } else {
+            
+            swiftfireMacInterface.closeConnection()
+
+            aboveTabs.setValue(" ", forKeyPath: "serverVersionNumber")
+            aboveTabs.setValue(" ", forKeyPath: "serverStatus")
+
+            connectButton.title = "Connect"
         }
-        aboveTabs.setValue(" ", forKeyPath: "serverVersionNumber")
-        aboveTabs.setValue(" ", forKeyPath: "serverStatus")
-        var readAllParameters = Array<VJson?>()
-        for parameter in MacDef.Parameter.all {
-            readAllParameters.append(MacDef.Command.READ.jsonHierarchyWithValue(parameter)!)
-        }
-        swiftfireMacInterface.sendMessages(readAllParameters)
     }
     
     @IBAction func startButtonAction(sender: AnyObject?) {
@@ -236,9 +274,9 @@ extension ConsoleWindowViewController {
         aboveTabs.setValue(" ", forKeyPath: "serverStatus")
         // Send three commands: start, wait 5 sec, read status.
         swiftfireMacInterface.sendMessages([
-            MacDef.Command.START.jsonHierarchyWithValue(nil),
-            MacDef.Command.DELTA.jsonHierarchyWithValue(1),
-            MacDef.Command.READ.jsonHierarchyWithValue(MacDef.Parameter.SERVER_STATUS)
+            ServerStartCommand().json,
+            DeltaCommand(delay: 1)!.json,
+            ReadServerTelemetryCommand(telemetryItem: .SERVER_STATUS)!.json
             ])
     }
     
@@ -250,9 +288,9 @@ extension ConsoleWindowViewController {
         aboveTabs.setValue(" ", forKeyPath: "serverStatus")
         // Send three commands: start, wait 10 sec, read status.
         swiftfireMacInterface.sendMessages([
-            MacDef.Command.STOP.jsonHierarchyWithValue(nil),
-            MacDef.Command.DELTA.jsonHierarchyWithValue(1),
-            MacDef.Command.READ.jsonHierarchyWithValue(MacDef.Parameter.SERVER_STATUS)
+            ServerStopCommand().json,
+            DeltaCommand(delay: 1)!.json,
+            ReadServerTelemetryCommand(telemetryItem: .SERVER_STATUS)!.json
             ])
     }
     
@@ -261,7 +299,7 @@ extension ConsoleWindowViewController {
             queueErrorMessage(MISSING_SERVER_ADDRESS_OR_PORT)
             return
         }
-        swiftfireMacInterface.sendMessages([MacDef.Command.QUIT.jsonHierarchyWithValue(nil)])
+        swiftfireMacInterface.sendMessages([ServerStopCommand().json])
     }
 }
 
@@ -333,46 +371,69 @@ extension ConsoleWindowViewController: NSOutlineViewDataSource, NSOutlineViewDel
     }
     
     func outlineView(outlineView: NSOutlineView, setObjectValue object: AnyObject?, forTableColumn tableColumn: NSTableColumn?, byItem item: AnyObject?) {
+        
         var old, new: Domain?
-        var errorMessage: String?
+        
+        var errorMessage: String? // Will be set when an update fails due to wrong arguments
+        
+        
+        // Test each domain if contains the item to be updated
+        
         for d in domains {
             old = d.copy
             var ready: Bool
-            (ready, errorMessage) = d.updateItem(item, withValue:object)
+            (ready, errorMessage) = d.updateItem(item, withValue: object)
+            
+            
+            // Stop when a domain accepted the item
+            
             if ready {
                 new = d
                 break
             }
         }
+        
         if errorMessage != nil {
+            
             queueErrorMessage(errorMessage!)
-            return
-        }
-        if new != nil {
-            let json = VJson.createJsonHierarchy()
-            json[MacDef.Command.UPDATE.rawValue][MacDef.CommandUpdate.NEW.rawValue].addChild(new!.json)
-            json[MacDef.Command.UPDATE.rawValue][MacDef.CommandUpdate.OLD.rawValue].addChild(old!.json)
-            swiftfireMacInterface.sendMessages([json])
+            
+        } else if new != nil {
+            
+            if let command = UpdateDomainCommand(oldDomainName: old?.name, newDomain: new) {
+                swiftfireMacInterface.sendMessages([command.json])
+            }
 
             // Re-acquire the domains
-            self.swiftfireMacInterface.sendMessages([MacDef.Command.READ.jsonHierarchyWithValue(MacDef.Parameter.DOMAINS)])
+            let command = ReadDomainsCommand()
+            
+            swiftfireMacInterface.sendMessages([command.json])
+        
+        } else {
+            
+            queueErrorMessage("Program error: Could not identify item to be updated")
         }
     }
     
     @IBAction func addDomain(sender: AnyObject?) {
         
-        let domain = Domain()
+        var domainName = "Domain.com"
         
-        while domains.contains(domain.name) {
-            domain.name = domain.name + ".new"
+        while domains.contains(domainName) {
+            domainName = domainName + ".new"
         }
         
-        let command = MacDef.Command.CREATE.jsonHierarchyWithValue(domain.json)
+        if let command = CreateDomainCommand(domainName: domainName) {
         
-        self.swiftfireMacInterface.sendMessages([command])
+            self.swiftfireMacInterface.sendMessages([command.json])
         
-        // Re-acquire the domains
-        self.swiftfireMacInterface.sendMessages([MacDef.Command.READ.jsonHierarchyWithValue(MacDef.Parameter.DOMAINS)])
+            // Re-acquire the domains
+            
+            self.swiftfireMacInterface.sendMessages([ReadDomainsCommand().json])
+            
+        } else {
+            
+            log.atLevelError(source: #file.source(#function, #line), message: "Failed to create CreateDomainCommand")
+        }
     }
     
     @IBAction func removeDomain(sender: AnyObject?) {
@@ -408,14 +469,130 @@ extension ConsoleWindowViewController: NSOutlineViewDataSource, NSOutlineViewDel
             if response == NSAlertFirstButtonReturn {
                 // Send one REMOVE command for each domain that is selected
                 for domain in selectedDomains {
-                    let command = MacDef.Command.REMOVE.jsonHierarchyWithValue(domain.json)
-                    self.swiftfireMacInterface.sendMessages([command])
+                    if let command = RemoveDomainCommand(domainName: domain.name) {
+                        self.swiftfireMacInterface.sendMessages([command.json])
+                    }
                 }
                 // Re-acquire the domains
-                self.swiftfireMacInterface.sendMessages([MacDef.Command.READ.jsonHierarchyWithValue(MacDef.Parameter.DOMAINS)])
+                self.swiftfireMacInterface.sendMessages([ReadDomainsCommand().json])
             }
         }
         
+    }
+}
+
+
+// MARK: - For the Domains Telemetry tab
+
+extension ConsoleWindowViewController {
+    
+    
+    /// Changes the domain for which the telemetry is displayed
+    
+    @IBAction func handleSelectedDomainPopupButton(sender: AnyObject?) {
+        
+        // Note: Error handling is implicit through the use of optionals
+    
+        
+        // Get the name of the domain for which to display the telemetry
+        
+        let selectedItemTitle = dtSelectDomainPopupBox.titleOfSelectedItem
+        
+        
+        // Get the of which the telemetry must be displayed
+        
+        let domain = domains.domainForName(selectedItemTitle)
+
+        
+        // Update the telemetry items (bindings are used, hence the setValue)
+        
+        setValue(domain?.telemetry.all, forKey: "domainTelemetry")
+        
+        
+        // Also, read the current telemetry from the domain
+        
+        handleRefreshDomainTelemetryButton(nil)
+    }
+    
+    
+    /// Sends a command to read the telemetry of the selected domain.
+    
+    @IBAction func handleRefreshDomainTelemetryButton(sender: AnyObject?) {
+
+        // Note: Error handling is implicit through the use of optionals
+
+        
+        // Get name of domain for which the telemetry must be requested
+        
+        let selectedItemTitle = dtSelectDomainPopupBox.titleOfSelectedItem
+        
+        
+        // Create the command to read the telemetry
+        
+        let command = ReadDomainTelemetryCommand(domainName: selectedItemTitle)
+
+        
+        // Send the command
+        
+        swiftfireMacInterface.sendMessages([command?.json])
+    }
+    
+    
+    /// Enables or disables a timer-initiated command to fetch domain telemetry from Swiftfire.
+    
+    @IBAction func dtAutofetchCheckboxAction(sender: AnyObject?) {
+        
+        
+        // Retrieve the interval for the timer
+        
+        guard let interval = Int(dtDelayBetweenAutofetches.stringValue) where interval > 0 else { return }
+        
+        
+        // Whatever happens, we need to invalidate and remove an existing timer
+        
+        if domainTelemetryFetchTimer != nil {
+            domainTelemetryFetchTimer!.invalidate()
+            domainTelemetryFetchTimer = nil
+        }
+        
+        
+        // Create a new timer if the checkbox is switched to "on"
+        
+        if dtAutofetchCheckbox.state == NSOnState {
+            
+            domainTelemetryFetchTimer = NSTimer.scheduledTimerWithTimeInterval(Double(interval), target: self, selector: #selector(ConsoleWindowViewController.handleRefreshDomainTelemetryButton(_:)), userInfo: nil, repeats: true)
+        }
+    }
+    
+    @IBAction func dtDelayBetweenAutoFetchesUpdates(sender: AnyObject?) {
+        
+        if let interval = Int(dtDelayBetweenAutofetches.stringValue) {
+            if interval == 0 {
+                queueErrorMessage("Please provide an Autorefresh > 0")
+                return
+            }
+        } else {
+            queueErrorMessage("Please provide an Integer value > 0")
+        }
+        
+        dtAutofetchCheckboxAction(nil)
+    }
+    
+    @IBAction func resetTelemetryButtonAction(sender: AnyObject?) {
+        
+        // Get name of domain for which the telemetry must be reset
+        
+        let selectedItemTitle = dtSelectDomainPopupBox.titleOfSelectedItem
+        
+        
+        // Create the command to reset the telemetry
+        
+        let command = ResetDomainTelemetryCommand(domainName: selectedItemTitle)
+        
+        
+        // Send the command
+        
+        swiftfireMacInterface.sendMessages([command?.json])
     }
 }
 
@@ -469,7 +646,6 @@ extension ConsoleWindowViewController {
         
         autofetchCheckboxAction(nil)
     }
-
 }
 
 
@@ -483,11 +659,9 @@ extension ConsoleWindowViewController {
             return
         }
         let logLevel = swiftfireSendLogLevelPopupButton.indexOfSelectedItem
-        let parameter = MacDef.Parameter.CALLBACK_LOGLEVEL
-        swiftfireMacInterface.sendMessages([
-            MacDef.Command.WRITE.jsonHierarchyWithValue(parameter.jsonWithValue(logLevel)),
-            MacDef.Command.READ.jsonHierarchyWithValue(parameter)
-            ])
+        let writeCommand = WriteServerParameterCommand(parameter: .CALLBACK_AT_AND_ABOVE_LEVEL, value: logLevel)!.json
+        let readCommand = ReadServerParameterCommand(parameter: .CALLBACK_AT_AND_ABOVE_LEVEL)!.json
+        swiftfireMacInterface.sendMessages([writeCommand, readCommand])
     }
     
 
@@ -534,77 +708,6 @@ extension ConsoleWindowViewController {
 
 extension ConsoleWindowViewController: SwiftfireMacInterfaceDelegate {
     
-    // -------------------------
-    // For the parameter updates
-    
-    func swiftfireMacInterface(swiftfireMacInterface: SwiftfireMacInterface, parameter: MacDef.Parameter, value: VJson) {
-        synchronized(parameterUpdateLockObject, { [unowned self] in self.parameterUpdates[parameter] = value })
-    }
-    
-    func updateParameterValuesInGui() {
-        
-        func parameterUpdateAboveTabs(parameter: MacDef.Parameter, _ value: VJson) {
-            if let str = parameter.valueFromJson(value) as? String {
-                switch parameter {
-                case .VERSION_NUMBER: aboveTabs.setValue(str, forKeyPath: "serverVersionNumber")
-                case .SERVER_STATUS: aboveTabs.setValue(str, forKeyPath: "serverStatus")
-                default: break
-                }
-            }
-        }
-        
-        func parameterUpdateOnParameterTab(parameter: MacDef.Parameter, _ value: VJson) {
-            for row in parameterTable {
-                row.updateIfParametersMatch(parameter, value: value)
-            }
-        }
-        
-        func parameterUpdateOnTelemetryTab(parameter: MacDef.Parameter, _ value: VJson) {
-            for row in telemetryTable {
-                row.updateIfParametersMatch(parameter, value: value)
-            }
-        }
-        
-        func parameterUpdateOnLogTab(parameter: MacDef.Parameter, _ value: VJson) {
-            if let i = parameter.valueFromJson(value) as? Int {
-                switch parameter {
-                case .CALLBACK_LOGLEVEL: swiftfireSendLogLevelPopupButton.selectItemAtIndex(i)
-                default: break
-                }
-            }
-        }
-        
-        func parameterUpdateOnDomainTab(parameter: MacDef.Parameter, _ value: VJson) {
-            if parameter == MacDef.Parameter.DOMAINS {
-                let locDom = Domains()
-                for jd in value {
-                    if jd.isObject && jd.nameValue == nil && jd.nofChildren == 1 {
-                        let domain = Domain(json: jd.arrayValue![0])
-                        if domain != nil {
-                            locDom.add(domain!)
-                        }
-                    }
-                }
-                domains.updateWithDomains(locDom)
-                domainOutlineView.reloadData()
-            }
-        }
-
-        synchronized(parameterUpdateLockObject, {
-            [unowned self] in
-            for (parameter, value) in self.parameterUpdates {
-                parameterUpdateAboveTabs(parameter, value)
-                parameterUpdateOnParameterTab(parameter, value)
-                parameterUpdateOnTelemetryTab(parameter, value)
-                parameterUpdateOnLogTab(parameter, value)
-                parameterUpdateOnDomainTab(parameter, value)
-            }
-            
-            self.parameterUpdates = [:]
-        })
-    }
-    
-    
     // ---------------------
     // For the error display
     
@@ -615,7 +718,6 @@ extension ConsoleWindowViewController: SwiftfireMacInterfaceDelegate {
     
     func queueErrorMessage(message: String) {
         synchronized(errorMessageLockObject, { [unowned self] in self.errorMessages.insert(message, atIndex: 0) })
-        
     }
 
     func displayErrorMessage() {
@@ -656,11 +758,116 @@ extension ConsoleWindowViewController: SwiftfireMacInterfaceDelegate {
     }
     
     
-    // -------------------
-    // For the log display
+    // ---------------------------
+    // For messages from Swiftfire
     
-    func swiftfireMacInterface(swiftfireMacInterface: SwiftfireMacInterface, logline: LogLine) {
-        synchronized(queuedLogLinesLockObject, { [unowned self] in self.queuedLogLines.insert(logline, atIndex: 0) })
+    func swiftfireMacInterface(swiftfireMacInterface: SwiftfireMacInterface, reply: VJson) {
+        synchronized(queuedRepliesLockObject, { [unowned self] in self.queuedReplies.insert(reply, atIndex: 0) })
+    }
+    
+    func processQueuedReplies() {
+        
+        while let reply = queuedReplies.popLast() {
+            
+            // Check if the reply is a log line
+            
+            if let logLine = LogLine(json: reply) {
+                
+                acceptedLogLines.append(logLine)
+                addLogLineConditionallyToView(logLine)
+                
+                
+            } else if let message = ReadDomainTelemetryReply(json: reply) {
+                
+                processReadDomainTelemetryReply(message)
+                
+                
+            } else if let message = ReadServerTelemetryReply(json: reply) {
+                
+                switch message.item {
+                
+                case .SERVER_VERSION:
+                    aboveTabs.setValue(message.value, forKeyPath: "serverVersionNumber")
+                    connectButton.title = "Disconnect"
+                    
+                case .SERVER_STATUS:
+                    aboveTabs.setValue(message.value, forKeyPath: "serverStatus")
+                
+                default: break
+                }
+
+                for row in telemetryTable {
+                    row.updateIfParametersMatch(message.item, value: message.value)
+                }
+
+                
+            } else if let message = ReadServerParameterReply(json: reply) {
+                
+                for row in parameterTable {
+                    row.updateIfParametersMatch(message.parameter, value: message.value)
+                }
+
+                
+            } else if let message = ReadDomainsReply(json: reply) {
+                
+                domains.updateWithDomains(message.domains)
+                
+                // When updated, make sure to update the domain telemetry as well
+                
+                let selectedTitle = dtSelectDomainPopupBox.titleOfSelectedItem
+                dtSelectDomainPopupBox.removeAllItems()
+                for d in domains {
+                    dtSelectDomainPopupBox.addItemWithTitle(d.name)
+                }
+                if selectedTitle != nil {
+                    dtSelectDomainPopupBox.selectItemWithTitle(selectedTitle!)
+                }
+                if dtSelectDomainPopupBox.indexOfSelectedItem < 0 {
+                    if domains.count > 0 {
+                        dtSelectDomainPopupBox.selectItemAtIndex(0)
+                    }
+                }
+                
+                if let titleOfSelectedDomain = dtSelectDomainPopupBox.titleOfSelectedItem {
+                    if let domain = domains.domainForName(titleOfSelectedDomain) {
+                        setValue(domain.telemetry.all, forKey: "domainTelemetry")
+                    }
+                }
+                
+                domainOutlineView.reloadData()
+                
+            } else if let message = ReadStatisticsReply(json: reply) {
+                
+                log.atLevelDebug(id: -1, source: #file.source(#function, #line), message: "Received statistics: \(reply)")
+                statistics.load(message.statistics)
+                
+
+            } else if ClosingMacConnection(json: reply) != nil {
+                
+                aboveTabs.setValue(" ", forKeyPath: "serverVersionNumber")
+                aboveTabs.setValue(" ", forKeyPath: "serverStatus")
+                connectButton.title = "Connect"
+
+            } else {
+                
+                log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Cannot decode received message: \(reply)")
+            }
+        }
+    }
+    
+    private func processReadDomainTelemetryReply(reply: ReadDomainTelemetryReply) {
+        
+        guard let domain = domains.domainForName(reply.domainName) else {
+            return
+        }
+        
+        domain.telemetry = reply.domainTelemetry
+        
+        // Update the domain telemetry tab also (if the selected domain is the one in the reply)
+        
+        if dtSelectDomainPopupBox.titleOfSelectedItem == reply.domainName {
+            setValue(reply.domainTelemetry.all, forKey: "domainTelemetry")
+        }
     }
 }
 
@@ -674,7 +881,7 @@ extension ConsoleWindowViewController {
             queueErrorMessage(NO_CONNECTION_AVAILABLE)
             return
         }
-        swiftfireMacInterface.sendMessages([MacDef.Command.SAVE_PARAMETERS.jsonHierarchyWithValue(nil)])
+        swiftfireMacInterface.sendMessages([SaveServerParametersCommand().json])
     }
     
     @IBAction func handleMenuItemSaveDomains(sender: AnyObject?) {
@@ -682,7 +889,7 @@ extension ConsoleWindowViewController {
             queueErrorMessage(NO_CONNECTION_AVAILABLE)
             return
         }
-        swiftfireMacInterface.sendMessages([MacDef.Command.SAVE_DOMAINS.jsonHierarchyWithValue(nil)])
+        swiftfireMacInterface.sendMessages([SaveDomainsCommand().json])
     }
 
     @IBAction func handleMenuItemRestoreParameters(sender: AnyObject?) {
@@ -690,7 +897,7 @@ extension ConsoleWindowViewController {
             queueErrorMessage(NO_CONNECTION_AVAILABLE)
             return
         }
-        swiftfireMacInterface.sendMessages([MacDef.Command.RESTORE_PARAMETERS.jsonHierarchyWithValue(nil)])
+        swiftfireMacInterface.sendMessages([RestoreServerParametersCommand().json])
     }
 
     @IBAction func handleMenuItemRestoreDomains(sender: AnyObject?) {
@@ -698,6 +905,6 @@ extension ConsoleWindowViewController {
             queueErrorMessage(NO_CONNECTION_AVAILABLE)
             return
         }
-        swiftfireMacInterface.sendMessages([MacDef.Command.RESTORE_DOMAINS.jsonHierarchyWithValue(nil)])
+        swiftfireMacInterface.sendMessages([RestoreDomainsCommand().json, ReadDomainsCommand().json])
     }
 }

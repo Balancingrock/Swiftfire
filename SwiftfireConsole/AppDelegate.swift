@@ -3,10 +3,11 @@
 //  File:       AppDelegate.swift
 //  Project:    SwiftfireConsole
 //
-//  Version:    0.9.0
+//  Version:    0.9.11
 //
 //  Author:     Marinus van der Lugt
-//  Website:    http://www.balancingrock.nl/swiftfire.html
+//  Company:    http://balancingrock.nl
+//  Website:    http://swiftfire.nl/
 //  Blog:       http://swiftrien.blogspot.com
 //  Git:        https://github.com/Swiftrien/SwiftfireConsole
 //
@@ -28,7 +29,7 @@
 //   - You can send payment via paypal to: sales@balancingrock.nl
 //   - Or wire bitcoins to: 1GacSREBxPy1yskLMc9de2nofNv2SNdwqH
 //
-//  I prefer the above two, but if these options don't suit you, you might also send me a gift from my amazon.co.uk
+//  I prefer the above two, but if these options don't suit you, you can also send me a gift from my amazon.co.uk
 //  whishlist: http://www.amazon.co.uk/gp/registry/wishlist/34GNMPZKAQ0OO/ref=cm_sw_em_r_wsl_cE3Tub013CKN6_wb
 //
 //  If you like to pay in another way, please contact me at rien@balancingrock.nl
@@ -47,24 +48,26 @@
 // =====================================================================================================================
 //
 // History
-// v0.9.1 - Minor changes to accomodate changes in SwifterSockets/SwifterLog/SwifterJSON
-// v0.9.0 - Initial release
+//
+// v0.9.11 - Added statistics
+//         - Merged into Swiftfire project
+// v0.9.4  - Header update
+// v0.9.1  - Minor changes to accomodate changes in SwifterSockets/SwifterLog/SwifterJSON
+// v0.9.0  - Initial release
 // =====================================================================================================================
 
 import Cocoa
 
-
-// The available domains
-
-var domains: Domains = Domains()
-
-
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate {
-    
+
     @IBOutlet weak var window: NSWindow!
-    
+
     @IBOutlet weak var windowController: ConsoleWindowViewController!
+
+
+    var statisticsWindowController: StatisticsWindowController!
+    
     
     func applicationDidFinishLaunching(aNotification: NSNotification) {
         // Insert code here to initialize your application
@@ -73,10 +76,66 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         log.stdoutPrintAtAndAboveLevel = SwifterLog.Level.DEBUG
         log.networkTransmitAtAndAboveLevel = SwifterLog.Level.NONE
         log.callbackAtAndAboveLevel = SwifterLog.Level.NONE
+        
+        //generateTestContent()
     }
-    
+
     func applicationWillTerminate(aNotification: NSNotification) {
         // Insert code here to tear down your application
+    }
+    
+    @IBAction func showStatisticsWindow(sender: AnyObject?) {
+        statisticsWindowController = StatisticsWindowController(windowNibName: "StatisticsWindow")
+        statisticsWindowController.showWindow(nil)
+    }
+    
+    @IBAction func refreshStatistics(sender: AnyObject?) {
+        let macif = windowController.swiftfireMacInterface
+        let readCmd = ReadStatisticsCommand()
+        log.atLevelDebug(id: -1, source: #file.source(#function, #line), message: "Sending message \(readCmd.json)")
+        macif.sendMessages([readCmd.json])
+    }
+    
+    func generateTestContent() {
+        
+        Parameters.restore()
+        
+        httpConnectionPool.create()
+        
+        if let con = httpConnectionPool.allocate() {
+            
+            let mu = Mutation.createAddClientRecord()
+            mu.client = "localhost"
+            mu.domain = "swiftfire.nl"
+            mu.requestReceived = NSDate().timeIntervalSince1970
+            mu.requestCompleted = mu.requestReceived! + 0.4
+            mu.connectionObjectId = 3
+            mu.connectionAllocationCount = 12
+            mu.socket = -1
+            mu.httpResponseCode = "200 OK"
+            mu.responseDetails = ""
+            
+            mu.url = "/index.html"
+            statistics.submit(mu)
+            
+            mu.url = "/pages/contact.html"
+            statistics.submit(mu)
+            
+            mu.url = "/pages/any.html"
+            statistics.submit(mu)
+            
+            mu.client = "otherhost"
+            mu.url = "/pages/contact.html"
+            statistics.submit(mu)
+            
+            mu.url = "/post/help.html"
+            statistics.submit(mu)
+            
+            httpConnectionPool.free(con)
+            
+        } else {
+            fatalError("Could not allocate connection")
+        }
     }
 }
 

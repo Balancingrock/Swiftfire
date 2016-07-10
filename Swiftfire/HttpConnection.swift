@@ -3,7 +3,7 @@
 //  File:       HttpConnection.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.6
+//  Version:    0.9.11
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -29,7 +29,7 @@
 //   - You can send payment via paypal to: sales@balancingrock.nl
 //   - Or wire bitcoins to: 1GacSREBxPy1yskLMc9de2nofNv2SNdwqH
 //
-//  I prefer the above two, but if these options don't suit you, you might also send me a gift from my amazon.co.uk
+//  I prefer the above two, but if these options don't suit you, you can also send me a gift from my amazon.co.uk
 //  whishlist: http://www.amazon.co.uk/gp/registry/wishlist/34GNMPZKAQ0OO/ref=cm_sw_em_r_wsl_cE3Tub013CKN6_wb
 //
 //  If you like to pay in another way, please contact me at rien@balancingrock.nl
@@ -49,11 +49,12 @@
 //
 // History
 //
-// v0.9.6 - Header update
-//        - Merged MAX_NOF_PENDING_CLIENT_MESSAGES with MAX_CLIENT_MESSAGE_SIZE into CLIENT_MESSAGE_BUFFER_SIZE
-// v0.9.5 - Added support for different MIME types of response
-// v0.9.2 - Replaced sendXXXX functions with httpErrorResponseWithCode and httpResponseWithCode
-// v0.9.0 - Initial release
+// v0.9.11 - Added "allocationCount", "objectId" and "objectIdCount"
+// v0.9.6  - Header update
+//         - Merged MAX_NOF_PENDING_CLIENT_MESSAGES with MAX_CLIENT_MESSAGE_SIZE into CLIENT_MESSAGE_BUFFER_SIZE
+// v0.9.5  - Added support for different MIME types of response
+// v0.9.2  - Replaced sendXXXX functions with httpErrorResponseWithCode and httpResponseWithCode
+// v0.9.0  - Initial release
 // =====================================================================================================================
 
 import Foundation
@@ -71,7 +72,15 @@ private var bufferCapture: Int = 0
 
 /// Holds all data that is associated with an HTTP Connection.
 
-class HttpConnection {
+final class HttpConnection {
+    
+    // Keep track of the object ID for correlation mapping between statistics and logfile (debug level)
+    static var objectIdCount: Int16 = 0
+    var objectId: Int16 = 0
+    init() {
+        self.objectId = HttpConnection.objectIdCount
+        HttpConnection.objectIdCount += 1
+    }
     
     
     /**
@@ -102,6 +111,12 @@ class HttpConnection {
     
     var logId: Int32 { return socket ?? -1 }
     
+    
+    /// The number of times this connection object was allocated
+    
+    var allocationCount: Int32 { return _allocationCount }
+    private var _allocationCount: Int32 = 0
+    func incrementAllocationCounter() { _allocationCount += 1 }
     
     /// The IP address of the client
     

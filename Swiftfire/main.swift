@@ -3,7 +3,7 @@
 //  File:       main.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.7
+//  Version:    0.9.11
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -29,7 +29,7 @@
 //   - You can send payment via paypal to: sales@balancingrock.nl
 //   - Or wire bitcoins to: 1GacSREBxPy1yskLMc9de2nofNv2SNdwqH
 //
-//  I prefer the above two, but if these options don't suit you, you might also send me a gift from my amazon.co.uk
+//  I prefer the above two, but if these options don't suit you, you can also send me a gift from my amazon.co.uk
 //  whishlist: http://www.amazon.co.uk/gp/registry/wishlist/34GNMPZKAQ0OO/ref=cm_sw_em_r_wsl_cE3Tub013CKN6_wb
 //
 //  If you like to pay in another way, please contact me at rien@balancingrock.nl
@@ -49,36 +49,19 @@
 //
 // History
 //
-// v0.9.7 - Added closing of header logging file on normal termination
-//        - Changed logging of parameters and domains to occur after the setup of the logger
-// v0.9.6 - Header update
-//        - Merged Startup into Parameters
-// v0.9.3 - Added serverTelemetry
-// v0.9.1 - Minor changes to accommodate changes in SwifterSockets and SwifterLog
-// v0.9.0 - Initial release
+// v0.9.11 - Moved some global definitions to other files
+// v0.9.7  - Added closing of header logging file on normal termination
+//         - Changed logging of parameters and domains to occur after the setup of the logger
+// v0.9.6  - Header update
+//         - Merged Startup into Parameters
+// v0.9.3  - Added serverTelemetry
+// v0.9.1  - Minor changes to accommodate changes in SwifterSockets and SwifterLog
+// v0.9.0  - Initial release
 // =====================================================================================================================
 
+
 import Foundation
-
-
-// The queue on which Swiftfire will accept client connection requests
-
-let acceptQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0)
-
-
-// When this variable is set to 'true' the monitoring and control loop will terminate and thereby terminate Swiftfire
-
-var abortMacLoop: Bool = false
-
-
-// The server telemetry
-
-let serverTelemetry = ServerTelemetry()
-
-
-// The available domains
-
-var domains: Domains = Domains()
+import CoreData
 
 
 // ====================================================
@@ -147,7 +130,7 @@ class LogForewarder: SwifterlogCallbackProtocol {
 let logforewarder = LogForewarder()
 
 log.registerCallback(logforewarder)
-
+    
 
 // =========================================================================
 // Show the paremeter settings and available domains in the log destinations

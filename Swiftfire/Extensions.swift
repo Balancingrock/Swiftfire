@@ -3,7 +3,7 @@
 //  File:       Extensions.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.6
+//  Version:    0.9.11
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,9 +49,12 @@
 //
 // History
 //
-// v0.9.6 - Header update
-// w0.9.1 - Added 'descriptionWithSeparator'
-// v0.9.0 - Initial release
+// v0.9.11 - Added NSDate and NSDateComponents extensions
+//         - Removed faulty 'descriptionWithSeparator'
+//         - Updated for VJson 0.9.8
+// v0.9.6  - Header update
+// w0.9.1  - Added 'descriptionWithSeparator'
+// v0.9.0  - Initial release
 // =====================================================================================================================
 
 import Foundation
@@ -92,10 +95,44 @@ extension Dictionary {
     }
 }
 
-extension CollectionType {
+extension NSDate {
     
-    func descriptionWithSeparator(separator: String) -> String {
-        if let item = first { return reduce("\(item)") { $0 + separator + "\($1)" } }
-        return ""
+    func yearMonthDay(calendar: NSCalendar? = nil) -> NSDateComponents {
+        let calendar = calendar ?? NSCalendar.currentCalendar()
+        let components = calendar.components(NSCalendarUnit(arrayLiteral: .Year, .Month, .Day), fromDate: self)
+        return components
+    }
+    
+    func hourMinuteSecond(calendar: NSCalendar? = nil) -> NSDateComponents {
+        let calendar = calendar ?? NSCalendar.currentCalendar()
+        let components = calendar.components(NSCalendarUnit(arrayLiteral: .Hour, .Minute, .Second), fromDate: self)
+        return components
+    }
+}
+
+extension NSDateComponents {
+    
+    var json: VJson {
+        let j = VJson.object()
+        if self.year != NSDateComponentUndefined { j["Year"] &= self.year }
+        if self.month != NSDateComponentUndefined { j["Month"] &= self.month }
+        if self.day != NSDateComponentUndefined { j["Day"] &= self.day }
+        if self.hour != NSDateComponentUndefined { j["Hour"] &= self.hour }
+        if self.minute != NSDateComponentUndefined { j["Minute"] &= self.minute }
+        if self.second != NSDateComponentUndefined { j["Second"] &= self.second }
+        return j
+    }
+    
+    /// - Note: Values that are not present will be undefined. I.e. have value: NSDateComponentUndefined
+    
+    convenience init?(json: VJson?) {
+        guard let json = json else { return nil }
+        self.init()
+        if let jval = (json|"Year")?.integerValue { self.year = jval }
+        if let jval = (json|"Month")?.integerValue { self.month = jval }
+        if let jval = (json|"Day")?.integerValue { self.day = jval }
+        if let jval = (json|"Hour")?.integerValue { self.hour = jval }
+        if let jval = (json|"Minute")?.integerValue { self.minute = jval }
+        if let jval = (json|"Second")?.integerValue { self.second = jval }
     }
 }

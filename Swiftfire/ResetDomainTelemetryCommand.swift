@@ -3,7 +3,7 @@
 //  File:       ResetDomainTelemetryCommand.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.6
+//  Version:    0.9.11
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -29,7 +29,7 @@
 //   - You can send payment via paypal to: sales@balancingrock.nl
 //   - Or wire bitcoins to: 1GacSREBxPy1yskLMc9de2nofNv2SNdwqH
 //
-//  I prefer the above two, but if these options don't suit you, you might also send me a gift from my amazon.co.uk
+//  I prefer the above two, but if these options don't suit you, you can also send me a gift from my amazon.co.uk
 //  whishlist: http://www.amazon.co.uk/gp/registry/wishlist/34GNMPZKAQ0OO/ref=cm_sw_em_r_wsl_cE3Tub013CKN6_wb
 //
 //  If you like to pay in another way, please contact me at rien@balancingrock.nl
@@ -49,7 +49,8 @@
 //
 // History
 //
-// v0.9.6 - Initial release (replaces part of MacDef.swift)
+// v0.9.11 - Updated for VJson 0.9.8
+// v0.9.6  - Initial release (replaces part of MacDef.swift)
 // =====================================================================================================================
 
 import Foundation
@@ -63,7 +64,7 @@ final class ResetDomainTelemetryCommand {
     let domainName: String
     
     var json: VJson {
-        let j = VJson.createJsonHierarchy()
+        let j = VJson()
         j[COMMAND_NAME].stringValue = domainName
         return j
     }

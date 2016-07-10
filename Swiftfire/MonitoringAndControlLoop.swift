@@ -3,7 +3,7 @@
 //  File:       MonitoringAndControl.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.7
+//  Version:    0.9.11
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -29,7 +29,7 @@
 //   - You can send payment via paypal to: sales@balancingrock.nl
 //   - Or wire bitcoins to: 1GacSREBxPy1yskLMc9de2nofNv2SNdwqH
 //
-//  I prefer the above two, but if these options don't suit you, you might also send me a gift from my amazon.co.uk
+//  I prefer the above two, but if these options don't suit you, you can also send me a gift from my amazon.co.uk
 //  whishlist: http://www.amazon.co.uk/gp/registry/wishlist/34GNMPZKAQ0OO/ref=cm_sw_em_r_wsl_cE3Tub013CKN6_wb
 //
 //  If you like to pay in another way, please contact me at rien@balancingrock.nl
@@ -49,19 +49,21 @@
 //
 // History
 //
-// v0.9.7 - Added HEADER_LOGGING_ENABLED, MAX_FILE_SIZE_FOR_HEADER_LOGGING,
-//          FLUSH_HEADER_LOGFILE_AFTER_EACH_WRITE
-//          Added missing HTTP_KEEP_ALIVE_INACTIVITY_TIMEOUT
-//        - Moved doWriteServerParameterCommand and doReadServerParameterCommand processing to Parameters
-//        - Added 1 second delay after transmitting closing-connection.
-// v0.9.6 - Header update
-//        - Added transmission of "ClosingMacConnection" upon timeout for the M&C connection
-//        - Added ResetDomainTelemetry
-//        - Merged Startup into Parameters
-// v0.9.5 - Fixed bug that revented domain creation
-// v0.9.4 - Changed according to new command & reply definitions
-// v0.9.3 - Removed no longer existing server telemetry
-// v0.9.0 - Initial release
+// v0.9.11 - Moved declaration of abortMacLoop and acceptQueue to here (from main.swift)
+//         - Added ReadStatisticsCommand
+//         - Updated for VJson 0.9.8
+// v0.9.7  - Added HEADER_LOGGING_ENABLED, MAX_FILE_SIZE_FOR_HEADER_LOGGING, FLUSH_HEADER_LOGFILE_AFTER_EACH_WRITE
+//         - Added missing HTTP_KEEP_ALIVE_INACTIVITY_TIMEOUT
+//         - Moved doWriteServerParameterCommand and doReadServerParameterCommand processing to Parameters
+//         - Added 1 second delay after transmitting closing-connection.
+// v0.9.6  - Header update
+//         - Added transmission of "ClosingMacConnection" upon timeout for the M&C connection
+//         - Added ResetDomainTelemetry
+//         - Merged Startup into Parameters
+// v0.9.5  - Fixed bug that revented domain creation
+// v0.9.4  - Changed according to new command & reply definitions
+// v0.9.3  - Removed no longer existing server telemetry
+// v0.9.0  - Initial release
 // =====================================================================================================================
 
 
@@ -69,6 +71,16 @@ import Foundation
 
 
 let mac = MonitoringAndControl()
+
+
+// The queue on which Swiftfire will accept client connection requests
+
+let acceptQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0)
+
+
+// When this variable is set to 'true' the monitoring and control loop will terminate and thereby terminate Swiftfire
+
+var abortMacLoop: Bool = false
 
 
 final class MonitoringAndControl {
@@ -309,7 +321,7 @@ final class MonitoringAndControl {
                 
                 // Note: If a JSON hierarchy is read, it is also removed from the buffer
                 
-                json = try VJson.createJsonHierarchy(buffer)
+                json = try VJson.parse(buffer)
                 
                 
                 // Execute the command
@@ -360,6 +372,7 @@ final class MonitoringAndControl {
         else if let command = UpdateDomainCommand(json: message) { doUpdateDomainCommand(command) }
         else if let command = ReadDomainsCommand(json: message) { doReadDomainsCommand(command) }
         else if let command = ResetDomainTelemetryCommand(json: message) { doResetDomainTelemetryCommand(command) }
+        else if let command = ReadStatisticsCommand(json: message) { transferMessage(command.execute()) }
         else if ServerQuitCommand(json: message) != nil { doServerQuitCommand() }
         else if ServerStartCommand(json: message) != nil { doServerStartCommand() }
         else if ServerStopCommand(json: message) != nil { doServerStopCommand() }

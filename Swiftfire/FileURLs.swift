@@ -3,7 +3,7 @@
 //  File:       FileURLs.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.7
+//  Version:    0.9.11
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -11,7 +11,7 @@
 //  Blog:       http://swiftrien.blogspot.com
 //  Git:        https://github.com/Swiftrien/Swiftfire
 //
-//  Copyright:  (c) 2014-2016 Marinus van der Lugt, All rights reserved.
+//  Copyright:  (c) 2016 Marinus van der Lugt, All rights reserved.
 //
 //  License:    Use or redistribute this code any way you like with the following two provision:
 //
@@ -29,7 +29,7 @@
 //   - You can send payment via paypal to: sales@balancingrock.nl
 //   - Or wire bitcoins to: 1GacSREBxPy1yskLMc9de2nofNv2SNdwqH
 //
-//  I prefer the above two, but if these options don't suit you, you might also send me a gift from my amazon.co.uk
+//  I prefer the above two, but if these options don't suit you, you can also send me a gift from my amazon.co.uk
 //  whishlist: http://www.amazon.co.uk/gp/registry/wishlist/34GNMPZKAQ0OO/ref=cm_sw_em_r_wsl_cE3Tub013CKN6_wb
 //
 //  If you like to pay in another way, please contact me at rien@balancingrock.nl
@@ -49,11 +49,12 @@
 //
 // History
 //
-// v0.9.7 - Added header logging and application log directory
-//        - Removed startup file
-//        - Made class final
-// v0.9.6 - Header update
-// v0.9.0 - Initial release
+// v0.9.11 - Added statistics support
+// v0.9.7  - Added header logging and application log directory
+//         - Removed startup file
+//         - Made class final
+// v0.9.6  - Header update
+// v0.9.0  - Initial release
 // =====================================================================================================================
 
 import Foundation
@@ -142,7 +143,7 @@ final class FileURLs {
         
         do {
             
-            try filemanager.createDirectoryAtPath(dirpath.path!, withIntermediateDirectories: true, attributes: nil)
+            try filemanager.createDirectoryAtURL(dirpath, withIntermediateDirectories: true, attributes: nil)
             
             return dirpath
             
@@ -163,12 +164,33 @@ final class FileURLs {
         
         do {
             
-            try filemanager.createDirectoryAtPath(dirpath.path!, withIntermediateDirectories: true, attributes: nil)
+            try filemanager.createDirectoryAtURL(dirpath, withIntermediateDirectories: true, attributes: nil)
             
             return dirpath
             
         } catch {
             
+            return nil
+        }
+    }()
+
+    
+    /// The directory for the statistics file
+    
+    static var statisticsDir: NSURL? = {
+        
+        guard let dirpath = appSupportDir?.URLByAppendingPathComponent("statistics") else { return nil }
+
+        let filemanager = NSFileManager.defaultManager()
+
+        do {
+            
+            try filemanager.createDirectoryAtURL(dirpath, withIntermediateDirectories: true, attributes: nil)
+            
+            return dirpath
+        
+        } catch {
+
             return nil
         }
     }()

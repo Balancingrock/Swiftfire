@@ -3,7 +3,7 @@
 //  File:       HttpConnection.HttpWorker.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.6
+//  Version:    0.9.11
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -29,7 +29,7 @@
 //   - You can send payment via paypal to: sales@balancingrock.nl
 //   - Or wire bitcoins to: 1GacSREBxPy1yskLMc9de2nofNv2SNdwqH
 //
-//  I prefer the above two, but if these options don't suit you, you might also send me a gift from my amazon.co.uk
+//  I prefer the above two, but if these options don't suit you, you can also send me a gift from my amazon.co.uk
 //  whishlist: http://www.amazon.co.uk/gp/registry/wishlist/34GNMPZKAQ0OO/ref=cm_sw_em_r_wsl_cE3Tub013CKN6_wb
 //
 //  If you like to pay in another way, please contact me at rien@balancingrock.nl
@@ -49,13 +49,14 @@
 //
 // History
 //
-// v0.9.6 - Header update
-// v0.9.3 - Added incrementing of serverTelemetry.nofHttp400Replies if the host cannot be mapped to a domain
-//        - Split "domain not found" error into "domain not found" and "domain not enabled"
-//        - Removed port information from "domain not found/enabled" error
-// v0.9.2 - Made forwarding case cleaner
-//        - Moved the code that provides a response to the Domain class
-// v0.9.0 - Initial release
+// v0.9.11 - Added support for usage statistics
+// v0.9.6  - Header update
+// v0.9.3  - Added incrementing of serverTelemetry.nofHttp400Replies if the host cannot be mapped to a domain
+//         - Split "domain not found" error into "domain not found" and "domain not enabled"
+//         - Removed port information from "domain not found/enabled" error
+// v0.9.2  - Made forwarding case cleaner
+//         - Moved the code that provides a response to the Domain class
+// v0.9.0  - Initial release
 // =====================================================================================================================
 
 import Foundation
@@ -76,19 +77,49 @@ extension HttpConnection {
         
         
         // =============================================================================================================
+        // Create a new statistics record for this message
+        // =============================================================================================================
+
+        let mutation = Mutation.createAddClientRecord()
+        mutation.client = clientIp
+        mutation.connectionAllocationCount = allocationCount
+        mutation.connectionObjectId = objectId
+        mutation.socket = logId
+        mutation.requestReceived = NSDate().timeIntervalSince1970
+        
+        
+        // =============================================================================================================
         // Find the domain this request is for
         // =============================================================================================================
         
         guard let host = header.host else {
+            
+            // Telemetry update
             serverTelemetry.nofHttp400Replies.increment()
-            log.atLevelDebug(id: logId, source: SOURCE + ".\(#function).\(#line)", message: "Could not extract host from Http Request Header")
-            let response = httpErrorResponseWithCode(.CODE_400_Bad_Request, andMessage: "<p>Could not extract host from Http Request Header<p>")
+            
+            // Logging update
+            let message = "Could not extract host from Http Request Header"
+            log.atLevelDebug(id: logId, source: SOURCE + ".\(#function).\(#line)", message: message)
+            
+            // Reply to client
+            let response = httpErrorResponseWithCode(.CODE_400_Bad_Request, andMessage: "<p>\(message)<p>")
             transferToClient(response)
+            
+            // Mutation update
+            mutation.httpResponseCode = HttpResponseCode.CODE_400_Bad_Request.rawValue
+            mutation.responseDetails = message
+            mutation.requestCompleted = NSDate().timeIntervalSince1970
+            statistics.submit(mutation)
+            
             return
         }
         
         guard let domain = domains.enabledDomainForName(host.address) else {
+            
+            // Telemetry update
             serverTelemetry.nofHttp400Replies.increment()
+            
+            // Logging update
             let message: String
             if domains.domainForName(host.address) == nil {
                 message = "Domain not found for host: \(host.address)"
@@ -96,10 +127,24 @@ extension HttpConnection {
                 message = "Domain not enabled for host: \(host.address)"
             }
             log.atLevelNotice(id: logId, source: SOURCE + ".\(#function).\(#line)", message: message)
+            
+            // Reply to client
             let response = httpErrorResponseWithCode(.CODE_400_Bad_Request, andMessage: "<p>\(message)</p>")
             transferToClient(response)
+            
+            // Mutation update
+            mutation.httpResponseCode = HttpResponseCode.CODE_400_Bad_Request.rawValue
+            mutation.responseDetails = message
+            mutation.requestCompleted = NSDate().timeIntervalSince1970
+            statistics.submit(mutation)
+
             return
         }
+        
+        
+        // Update mutation
+        
+        mutation.domain = domain.name
         
         
         // =============================================================================================================
@@ -112,6 +157,13 @@ extension HttpConnection {
             if forwardingSocket == nil { forwardingOpenConnection(domain.forwardHost!) }
             if forwardingSocket != nil { forwardingTransmit(UInt8Buffer(buffers: header.asUInt8Buffer(), body)) }
             // The forwarding connection will be closed when the forwarding target closes its connection. Until then all data received from the forwarding target will be routed to the client.
+
+            // Mutation update
+            mutation.httpResponseCode = "Unavailable"
+            mutation.responseDetails = "Forwarding of domain '\(host.address)'"
+            mutation.requestCompleted = NSDate().timeIntervalSince1970
+            statistics.submit(mutation)
+
             return
         }
         
@@ -120,7 +172,7 @@ extension HttpConnection {
         // The domain takes over from here
         // =============================================================================================================
 
-        let response = domain.httpWorker(header, body: body, connection: self)
+        let response = domain.httpWorker(header, body: body, connection: self, mutation: mutation)
 
         
         // =================================================================================================================
@@ -128,5 +180,11 @@ extension HttpConnection {
         // =================================================================================================================
         
         transferToClient(response)
+        
+        // Mutation update
+        mutation.httpResponseCode ??= HttpResponseCode.CODE_200_OK.rawValue
+        mutation.responseDetails ??= ""
+        mutation.requestCompleted = NSDate().timeIntervalSince1970
+        statistics.submit(mutation)
     }
 }

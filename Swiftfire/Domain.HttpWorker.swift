@@ -3,7 +3,7 @@
 //  File:       Domain.HttpWorker.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.10
+//  Version:    0.9.11
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -29,7 +29,7 @@
 //   - You can send payment via paypal to: sales@balancingrock.nl
 //   - Or wire bitcoins to: 1GacSREBxPy1yskLMc9de2nofNv2SNdwqH
 //
-//  I prefer the above two, but if these options don't suit you, you might also send me a gift from my amazon.co.uk
+//  I prefer the above two, but if these options don't suit you, you can also send me a gift from my amazon.co.uk
 //  whishlist: http://www.amazon.co.uk/gp/registry/wishlist/34GNMPZKAQ0OO/ref=cm_sw_em_r_wsl_cE3Tub013CKN6_wb
 //
 //  If you like to pay in another way, please contact me at rien@balancingrock.nl
@@ -49,7 +49,7 @@
 //
 // History
 //
-// v0.9.10 - Added domain statistics
+// v0.9.11 - Added statistics, partial rewrite of some code parts.
 // v0.9.7  - Added Access logging
 // v0.9.6  - Header update
 // v0.9.5  - Added MIME support
@@ -76,7 +76,7 @@ extension Domain {
      - Returns: The buffer with the response, ready for transmission back to the client.
      */
     
-    func httpWorker(header: HttpHeader, body: UInt8Buffer, connection: HttpConnection) -> UInt8Buffer {
+    func httpWorker(header: HttpHeader, body: UInt8Buffer, connection: HttpConnection, mutation: Mutation) -> UInt8Buffer {
         
         
         // =============================================================================================================
@@ -92,17 +92,9 @@ extension Domain {
         
         
         // =============================================================================================================
-        // Update the domain statistics
-        // =============================================================================================================
-        
-        self.statistics?.record(header, connection: connection)
-        
-        
-        // =============================================================================================================
         // Telemetry update
         // =============================================================================================================
 
-        
         telemetry.nofRequests.increment()
         
         
@@ -112,7 +104,7 @@ extension Domain {
         
         if enableHttpPreprocessor {
             // If the preprocessor creates a response, then return it as the response for this domain
-            if let response = httpWorkerPreprocessor(header: header, body: body, connection: connection) {
+            if let response = httpWorkerPreprocessor(header: header, body: body, connection: connection, mutation: mutation) {
                 return response
             }
         }
@@ -122,9 +114,37 @@ extension Domain {
         // The header must be HTTP version 1.1
         // =============================================================================================================
         
-        guard let httpVersion = header.httpVersion where httpVersion == HttpVersion.HTTP_1_1 else {
-            log.atLevelDebug(id: connection.logId, source: #file.source(#function, #line), message: "HTTP Version not present or not 1.1")
+        guard let httpVersion = header.httpVersion else {
+            
+            // Telemetry update
             telemetry.nof505.increment()
+            
+            // Log update
+            let message = "HTTP Version not present"
+            log.atLevelDebug(id: connection.logId, source: #file.source(#function, #line), message: message)
+            
+            // Mutation update
+            mutation.httpResponseCode = HttpResponseCode.CODE_505_HTTP_Version_Not_Supported.rawValue
+            mutation.responseDetails = message
+            
+            // Response
+            return connection.httpErrorResponseWithCode(.CODE_505_HTTP_Version_Not_Supported)
+        }
+            
+        guard httpVersion == HttpVersion.HTTP_1_1 else {
+            
+            // Telemetry update
+            telemetry.nof505.increment()
+
+            // Log update
+            let message = "HTTP Version '\(httpVersion)' not supported"
+            log.atLevelDebug(id: connection.logId, source: #file.source(#function, #line), message: message)
+            
+            // Mutation update
+            mutation.httpResponseCode = HttpResponseCode.CODE_505_HTTP_Version_Not_Supported.rawValue
+            mutation.responseDetails = message
+
+            // Response
             return connection.httpErrorResponseWithCode(.CODE_505_HTTP_Version_Not_Supported)
         }
         
@@ -134,14 +154,36 @@ extension Domain {
         // =============================================================================================================
         
         guard let operation = header.operation else {
-            log.atLevelDebug(id: connection.logId, source: #file.source(#function, #line), message: "Could not extract operation")
+            
+            // Telemetry update
             telemetry.nof400.increment()
+
+            // Log update
+            let message = "Could not extract operation"
+            log.atLevelDebug(id: connection.logId, source: #file.source(#function, #line), message: message)
+            
+            // Mutation update
+            mutation.httpResponseCode = HttpResponseCode.CODE_400_Bad_Request.rawValue
+            mutation.responseDetails = message
+            
+            // Response
             return connection.httpErrorResponseWithCode(.CODE_400_Bad_Request)
         }
         
         guard (operation == HttpOperation.GET || operation == HttpOperation.POST) else {
-            log.atLevelDebug(id: connection.logId, source: #file.source(#function, #line), message: "Operation not a GET or POST")
+
+            // Telemetry update
             telemetry.nof501.increment()
+            
+            // Log update
+            let message = "Operation '\(operation.rawValue)' not supported)"
+            log.atLevelDebug(id: connection.logId, source: #file.source(#function, #line), message: message)
+
+            // Mutation update
+            mutation.httpResponseCode = HttpResponseCode.CODE_501_Not_Implemented.rawValue
+            mutation.responseDetails = message
+            
+            // Response
             return connection.httpErrorResponseWithCode(.CODE_501_Not_Implemented)
         }
         
@@ -151,32 +193,67 @@ extension Domain {
         // =============================================================================================================
         
         guard let partialPath = header.url else {
-            log.atLevelDebug(id: connection.logId, source: #file.source(#function, #line), message: "No URL found")
+
+            // Telemetry update
             telemetry.nof400.increment()
+
+            // Log update
+            let message = "No URL found in header"
+            log.atLevelDebug(id: connection.logId, source: #file.source(#function, #line), message: message)
+            
+            // Mutation update
+            mutation.httpResponseCode = HttpResponseCode.CODE_400_Bad_Request.rawValue
+            mutation.responseDetails = message
+            
+            // Response
             return connection.httpErrorResponseWithCode(.CODE_400_Bad_Request)
         }
-        let path = (root as NSString).stringByAppendingPathComponent(partialPath)
+        
+        // Mutation update
+        mutation.url = partialPath
         
         
         // =============================================================================================================
-        // Check if the resource exists in the file system
+        // Check if the resource is available
         // =============================================================================================================
         
-        if !connection.filemanager.fileExistsAtPath(path) {
-            telemetry.nof404.increment()
-            if four04LogEnabled { four04Log?.record(path) }
-            return connection.httpErrorResponseWithCode(.CODE_404_Not_Found)
-        }
+        let (newPartialPath, errorReason) = resourceIsAvailable(partialPath, connection: connection)
         
+        if newPartialPath == nil {
         
-        // =============================================================================================================
-        // Directory access is not allowed, but the index.html or index.htm will be returned if a directory is accessed
-        // and it contains such a file
-        // =============================================================================================================
-        
-        guard let resourcePath = filterForDirectoryAccess(path, connection: connection) else {
-            telemetry.nof403.increment()
-            return connection.httpErrorResponseWithCode(HttpResponseCode.CODE_403_Forbidden, andMessage: "<p>Directory access not allowed</p>")
+            assert(errorReason != nil, "")
+            
+            if errorReason == .NotAvailable {
+                
+                // Telemetry update
+                telemetry.nof404.increment()
+                
+                // Conditional recording of all 404 path errors
+                if four04LogEnabled { four04Log?.record(partialPath) }
+                
+                // Mutation update
+                mutation.httpResponseCode = HttpResponseCode.CODE_404_Not_Found.rawValue
+                mutation.responseDetails = "Resource for url '\(partialPath)' not found"
+                
+                // Response
+                return connection.httpErrorResponseWithCode(.CODE_404_Not_Found)
+                
+            } else if errorReason == .AccessNotAllowed {
+                
+                // Telemetry update
+                telemetry.nof403.increment()
+                
+                // Mutation update
+                let message = "Access not allowed"
+                mutation.httpResponseCode = HttpResponseCode.CODE_403_Forbidden.rawValue
+                mutation.responseDetails = message
+                
+                // Response
+                return connection.httpErrorResponseWithCode(HttpResponseCode.CODE_403_Forbidden, andMessage: "<p>\(message)</p>")
+            
+            } else {
+                assert(false, "error reason should not be .Available")
+            }
         }
         
         
@@ -184,10 +261,22 @@ extension Domain {
         // Fetch the requested resource and return it
         // =============================================================================================================
         
-        let responsePayload = createResponsePayloadForResourceAtPath(resourcePath, connection: connection)
+        let responsePayload = createResponse(newPartialPath!, connection: connection, mutation: mutation)
         
         if responsePayload == nil {
-            log.atLevelError(id: connection.logId, source: #file.source(#function, #line), message: "Failure while creating HTTP Response")
+            
+            // Telemetry update
+            telemetry.nof500.increment()
+            
+            // Log update
+            let message = "Failure while creating HTTP Response"
+            log.atLevelError(id: connection.logId, source: #file.source(#function, #line), message: message)
+            
+            // Mutation update
+            mutation.httpResponseCode ??= HttpResponseCode.CODE_500_Internal_Server_Error.rawValue
+            mutation.responseDetails ??= message
+            
+            // Response
             return connection.httpErrorResponseWithCode(.CODE_500_Internal_Server_Error, andMessage: "<p>A Server side error occured, the error has been logged.</p>")
         }
         
@@ -196,18 +285,26 @@ extension Domain {
         // Create the http response
         // =============================================================================================================
         
-        let mimeType = mimeTypeForPath(resourcePath) ?? MIME_TYPE_DEFAULT
+        let mimeType = mimeTypeForPath(newPartialPath!) ?? MIME_TYPE_DEFAULT
         let response = connection.httpResponseWithCode(.CODE_200_OK, mimeType: mimeType, andBody: responsePayload!)
+        
         telemetry.nof200.increment()
         
+        // Mutation update
+        mutation.httpResponseCode = HttpResponseCode.CODE_200_OK.rawValue
+
         
         // =============================================================================================================
         // Check if the postprocessor must be run
         // =============================================================================================================
 
         if enableHttpPostprocessor {
+            
             // If the postprocessor returns a response, use that instead of the already prepared response
-            if let postProResponse = httpWorkerPostprocessor(header: header, body: body, response: response, connection: connection) {
+            if let postProResponse = httpWorkerPostprocessor(header: header, body: body, response: response, connection: connection, mutation: mutation) {
+                
+                mutation.responseDetails ??= "Response provided by postprocessor"
+                
                 return postProResponse
             }
         }
@@ -217,80 +314,137 @@ extension Domain {
     }
     
     
-    /// - Returns: The resource path ammended by index.html or index.htm
+    /**
+     This method is destined to be overriden by a child implementation of Domain.
+     
+     Returns the status of the resource at the given path. This should be one of the following: Available, NotAvailable or AccessNotAllowed. The standard implementation will test if a readable file is available at the given path (after appending the path to the root). If the path indicates a directory, it will check for a readable index.html or index.htm file in that directory.
+     
+     - Note: The return value of this operation determines if the client receives a 404 (Not Available), 403 (Not Allowed) or 200 (OK).
+     
+     - Returns: The path at which the resource was found, note that this may be changed because of the automatic mapping of index.html and index.htm. If the path is nil then rge error reason will detail which errorcode must be returned to the client.
+     */
+
+    func resourceIsAvailable(path: String, connection: HttpConnection) -> (atPath: String?, errorReason: ResourceAvailability?) {
+        
+
+        // Build the full path
+        
+        let fullPath = (root as NSString).stringByAppendingPathComponent(path)
+
+        
+        // Test the full path
+        
+        if connection.filemanager.isReadableFileAtPath(fullPath) { return (path, nil) }
+
+        
+        // Either the file is not readable (.AccessNotAllowed) or the path is a directory. Check which case it is
+        
+        var isDirectory: ObjCBool = false
+
+        if connection.filemanager.fileExistsAtPath(fullPath, isDirectory: &isDirectory) {
+            
+
+            // There is something, if it is a directory, check for index.html or index.htm
+            
+            if isDirectory {
+                
+                
+                // Check for an 'index.html' file
+                
+                let tpath = (fullPath as NSString).stringByAppendingPathComponent("index.html")
+                
+                if connection.filemanager.isReadableFileAtPath(tpath) { return ((path as NSString).stringByAppendingString("index.html"), nil) }
+                
+                
+                // Check for an 'index.htm' file
+                
+                let t2path = (fullPath as NSString).stringByAppendingPathComponent("index.htm")
+                
+                if connection.filemanager.isReadableFileAtPath(t2path) { return ((path as NSString).stringByAppendingString("index.htm"), nil) }
+                
+                
+                // Neither file exists, and directory access is not allowed
+                
+                return (nil, .AccessNotAllowed)
+                
+                
+            } else {
+                
+                // It is not a directory, but the file exists, thus the file is not accessable
+                
+                return (nil, .AccessNotAllowed)
+            }
+        
+        } else {
+        
+            // There is nothing at the resource path
+            
+            return (nil, .NotAvailable)
+        }
+    }
     
-    private func filterForDirectoryAccess(path: String, connection: HttpConnection) -> String? {
+    
+    /**
+     This method is destined to be overriden by a child implementation of Domain.
+
+     This standard implementation returns the file pointed at by the resource.
+     
+     - Note: It is advised to update the statistics record if the data cannot be provided. If that is not done, a default message will be put in.
+     
+     - Returns: The contents of the file given by the root directory appended by the given path.
+     */
+    
+    private func createResponse(path: String, connection: HttpConnection, mutation: Mutation) -> NSData? {
+        
+        // Build the full path
+        
+        let fullPath = (root as NSString).stringByAppendingPathComponent(path)
         
         
-        // GP
+        // Test the full path
+        
+        if connection.filemanager.isReadableFileAtPath(fullPath) {
+            return connection.filemanager.contentsAtPath(fullPath)
+        }
+        
+        
+        // Either the file is not readable or it is a directory
         
         var isDirectory: ObjCBool = false
         
-        
-        // Test the unmodified path
-        
-        if connection.filemanager.fileExistsAtPath(path, isDirectory: &isDirectory) {
-            if !isDirectory {
-                return path
-            }
-        } else {
-            return nil
-        }
-        
-        
-        // The path exists, but it is a directory.
-        
-        
-        // Check for an 'index.html' file
-        
-        let tpath = (path as NSString).stringByAppendingPathComponent("index.html")
-        
-        if connection.filemanager.fileExistsAtPath(tpath, isDirectory: &isDirectory) {
-            if !isDirectory {
-                return tpath
-            }
-        } else {
-            return nil
-        }
-        
-        
-        // Check for an 'index.htm' file
-        
-        let t2path = (path as NSString).stringByAppendingPathComponent("index.html")
-        
-        if connection.filemanager.fileExistsAtPath(t2path, isDirectory: &isDirectory) {
-            if !isDirectory {
-                return t2path
-            }
-        } else {
-            return nil
-        }
-        
-        
-        // Failed, the directory exists, but no default file is present.
-        // Access is denied
-        
-        return nil
-    }
-    
-    
-    // A simple implementation that can serve plain file html pages.
-    // - Returns: The contents of the file at the path given by the ap_WebsiteDirectory and the requested URL
-    
-    private func createResponsePayloadForResourceAtPath(path: String, connection: HttpConnection) -> NSData? {
-        
-        if connection.filemanager.isReadableFileAtPath(path) {
-            if let data = connection.filemanager.contentsAtPath(path) {
-                log.atLevelDebug(id: connection.logId, source: #file.source(#function, #line), message: "Returning file: " + path)
-                return data
+        if connection.filemanager.fileExistsAtPath(fullPath, isDirectory: &isDirectory) {
+            
+            
+            // There is something, if it is a directory, check for index.html or index.htm
+            
+            if isDirectory {
+                
+                
+                // Neither file exists, and directory access is not allowed
+                
+                let message = "A dictionary is not a resource: \(fullPath)"
+                mutation.responseDetails = message
+                log.atLevelError(id: connection.logId, source: #file.source(#function, #line), message: message)
+                return nil
+                
             } else {
-                log.atLevelError(id: connection.logId, source: #file.source(#function, #line), message: "Failed to read file: \(path)")
+                
+                // It is not a directory, but the file exists, thus the file is not accessable
+                
+                let message = "The file: \(fullPath) is not readable"
+                mutation.responseDetails = message
+                log.atLevelError(id: connection.logId, source: #file.source(#function, #line), message: message)
                 return nil
             }
+            
         } else {
-            log.atLevelError(id: connection.logId, source: #file.source(#function, #line), message: "No read access rights for file at: \(path)")
+            
+            // There is nothing at the resource path
+            
+            let message = "No file exists at \(fullPath)"
+            mutation.responseDetails = message
+            log.atLevelError(id: connection.logId, source: #file.source(#function, #line), message: message)
             return nil
         }
     }
-
 }

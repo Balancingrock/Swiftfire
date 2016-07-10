@@ -3,7 +3,7 @@
 //  File:       Parameters.swift
 //  Project:    Swiftfire
 //
-private let VERSION = "0.9.10"
+private let VERSION = "0.9.11"
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -29,7 +29,7 @@ private let VERSION = "0.9.10"
 //   - You can send payment via paypal to: sales@balancingrock.nl
 //   - Or wire bitcoins to: 1GacSREBxPy1yskLMc9de2nofNv2SNdwqH
 //
-//  I prefer the above two, but if these options don't suit you, you might also send me a gift from my amazon.co.uk
+//  I prefer the above two, but if these options don't suit you, you can also send me a gift from my amazon.co.uk
 //  whishlist: http://www.amazon.co.uk/gp/registry/wishlist/34GNMPZKAQ0OO/ref=cm_sw_em_r_wsl_cE3Tub013CKN6_wb
 //
 //  If you like to pay in another way, please contact me at rien@balancingrock.nl
@@ -49,6 +49,7 @@ private let VERSION = "0.9.10"
 //
 // History
 //
+// v0.9.11 - Updated version number
 // v0.9.10 - Updated version number
 // v0.9.9  - Updated version number
 // v0.9.8  - Updated version number
@@ -203,7 +204,7 @@ enum ParameterId: String {
             
             // These are the Bool parameters
             
-            return VJson.createBool(value: val as! Bool, name: self.rawValue)
+            return VJson(val as? Bool, name: self.rawValue)
             
             
         case PARAMETER_DEFAULTS_FILE_VERSION,
@@ -224,7 +225,7 @@ enum ParameterId: String {
             
             // These are the Int parameters
             
-            return VJson.createNumber(value: val as! Int, name: self.rawValue)
+            return VJson(val as? Int, name: self.rawValue)
             
             
         case .SERVICE_PORT_NUMBER,
@@ -234,14 +235,14 @@ enum ParameterId: String {
             
             // These are the String parameters
             
-            return VJson.createString(value: val as! String, name: self.rawValue)
+            return VJson(val as? String, name: self.rawValue)
             
             
         case .MAC_INACTIVITY_TIMEOUT:
             
             // These are the Double parameters
             
-            return VJson.createNumber(value: val as! Double, name: self.rawValue)
+            return VJson(val as? Double, name: self.rawValue)
         }
     }
     
@@ -327,7 +328,7 @@ final class Parameters {
         
         var json: VJson
         do {
-            json = try VJson.createJsonHierarchy(FileURLs.parameterDefaults!)
+            json = try VJson.parse(FileURLs.parameterDefaults!)
         } catch let error as VJson.Exception {
             log.atLevelWarning(id: -1, source: #file.source(#function, #line), message: "Could not retrieve JSON code from parameter-defaults file. Error = \(error).")
             return false
@@ -555,10 +556,10 @@ final class Parameters {
         
         if let file = FileURLs.parameterDefaults {
             
-            let json = VJson.createJsonHierarchy()
+            let json = VJson()
         
             for p in ParameterId.all {
-                json.addChild(p.jsonWrite(pdict[p]), forName: p.rawValue)
+                json.add(p.jsonWrite(pdict[p]), forName: p.rawValue)
             }
             
             json.save(file)

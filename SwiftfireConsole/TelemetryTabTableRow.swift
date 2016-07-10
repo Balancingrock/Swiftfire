@@ -3,10 +3,11 @@
 //  File:       TelemetryTabTableRow.swift
 //  Project:    SwiftfireConsole
 //
-//  Version:    0.9.0
+//  Version:    0.9.11
 //
 //  Author:     Marinus van der Lugt
-//  Website:    http://www.balancingrock.nl/swiftfire.html
+//  Company:    http://balancingrock.nl
+//  Website:    http://swiftfire.nl/
 //  Blog:       http://swiftrien.blogspot.com
 //  Git:        https://github.com/Swiftrien/SwiftfireConsole
 //
@@ -28,7 +29,7 @@
 //   - You can send payment via paypal to: sales@balancingrock.nl
 //   - Or wire bitcoins to: 1GacSREBxPy1yskLMc9de2nofNv2SNdwqH
 //
-//  I prefer the above two, but if these options don't suit you, you might also send me a gift from my amazon.co.uk
+//  I prefer the above two, but if these options don't suit you, you can also send me a gift from my amazon.co.uk
 //  whishlist: http://www.amazon.co.uk/gp/registry/wishlist/34GNMPZKAQ0OO/ref=cm_sw_em_r_wsl_cE3Tub013CKN6_wb
 //
 //  If you like to pay in another way, please contact me at rien@balancingrock.nl
@@ -47,7 +48,11 @@
 // =====================================================================================================================
 //
 // History
-// v0.9.0 - Initial release
+//
+// v0.9.11 - Merged into Swiftfire project
+// v0.9.4  - Header update
+// v0.9.3  - Changed due to new M&C interface
+// v0.9.0  - Initial release
 // =====================================================================================================================
 
 
@@ -65,13 +70,13 @@ final class TelemetryTabTableRow: NSObject {
     
     // The parameter that is shown in this table row
     
-    var parameter: MacDef.Parameter
+    var telemetryItem: ServerTelemetryItem
     
     
     // Since 'parameter' is an enum it is not KVO compliant, hence we need an indirection.
     
     var label: String {
-        return parameter.label + ":"
+        return telemetryItem.guiLabel + ":"
     }
     
     
@@ -90,16 +95,19 @@ final class TelemetryTabTableRow: NSObject {
     
     func readValueFromSwiftfireServer() {
         
-        let json = MacDef.Command.READ.jsonHierarchyWithValue(parameter)
+        guard let command = ReadServerTelemetryCommand(telemetryItem: telemetryItem) else {
+            log.atLevelError(source: #file.source(#function, #line), message: "Failure in creating ReadServerTelemetryCommand for item \(telemetryItem)")
+            return
+        }
         
-        swiftfireMacInterface.sendMessages([json])
+        swiftfireMacInterface.sendMessages([command.json])
     }
     
     
     // Init
     
-    init(parameter: MacDef.Parameter, swiftfireMacInterface: SwiftfireMacInterface) {
-        self.parameter = parameter
+    init(telemetryItem: ServerTelemetryItem, swiftfireMacInterface: SwiftfireMacInterface) {
+        self.telemetryItem = telemetryItem
         self.swiftfireMacInterface = swiftfireMacInterface
         super.init()
     }
@@ -107,10 +115,9 @@ final class TelemetryTabTableRow: NSObject {
     
     // Updates the displayed value
     
-    func updateIfParametersMatch(parameter: MacDef.Parameter, value: VJson) {
-        if parameter == self.parameter {
-            let str = parameter.stringValue(value)
-            self.setValue(str, forKey: "lastValueRead")
+    func updateIfParametersMatch(telemetryItem: ServerTelemetryItem, value: String) {
+        if telemetryItem == self.telemetryItem {
+            self.setValue(value, forKey: "lastValueRead")
         }
     }
 }

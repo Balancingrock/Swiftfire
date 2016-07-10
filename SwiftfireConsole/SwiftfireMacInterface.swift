@@ -3,10 +3,11 @@
 //  File:       SwiftfireMacInterface.swift
 //  Project:    SwiftfireConsole
 //
-//  Version:    0.9.0
+//  Version:    0.9.11
 //
 //  Author:     Marinus van der Lugt
-//  Website:    http://www.balancingrock.nl/swiftfire.html
+//  Company:    http://balancingrock.nl
+//  Website:    http://swiftfire.nl/
 //  Blog:       http://swiftrien.blogspot.com
 //  Git:        https://github.com/Swiftrien/SwiftfireConsole
 //
@@ -28,7 +29,7 @@
 //   - You can send payment via paypal to: sales@balancingrock.nl
 //   - Or wire bitcoins to: 1GacSREBxPy1yskLMc9de2nofNv2SNdwqH
 //
-//  I prefer the above two, but if these options don't suit you, you might also send me a gift from my amazon.co.uk
+//  I prefer the above two, but if these options don't suit you, you can also send me a gift from my amazon.co.uk
 //  whishlist: http://www.amazon.co.uk/gp/registry/wishlist/34GNMPZKAQ0OO/ref=cm_sw_em_r_wsl_cE3Tub013CKN6_wb
 //
 //  If you like to pay in another way, please contact me at rien@balancingrock.nl
@@ -47,9 +48,15 @@
 // =====================================================================================================================
 //
 // History
-// v0.9.1 - Minor change to accomodate a change in SwifterLog
-// v0.9.0 - Initial release
+//
+// v0.9.11 - Merged into Swiftfire project
+// v0.9.4  - Header update
+//         - Added closeConnection()
+// v0.9.2  - Simplified SwiftfireMacInterfaceDelegate to a dual func signature.
+// v0.9.1  - Minor change to accomodate a change in SwifterLog
+// v0.9.0  - Initial release
 // =====================================================================================================================
+
 
 import Foundation
 
@@ -69,29 +76,15 @@ protocol SwiftfireMacInterfaceDelegate {
     
     
     /**
-     Allows the delegate to update its GUI (or logfile) with the parameter as specified.
+     Allows the delegate to process the received data from a Swiftfire server.
      
      - Parameter swiftfireMacInterface: The originating interface.
-     - Parameter parameter: The parameter to be updated.
-     - Parameter value: The VJson object (as received from the server) with the value for the parameter to be updated.
-
-     - Note: This operation is initiated from a thread that runs (asynchrously) in the background. It is presumed that this will occur while the runloop is paused, but this cannot be guaranteed. It would be prudent to implement a mechanism that only updates the GUI from an end-of-runloop observer.
-     */
-    
-    func swiftfireMacInterface(swiftfireMacInterface: SwiftfireMacInterface, parameter: MacDef.Parameter, value: VJson)
-    
-    
-    /**
-     Allows the delegate to update its GUI (or logfile) with the logline as specified.
+     - Parameter reply: The VJson object as received from the server.
      
-     - Parameter swiftfireMacInterface: The originating interface.
-     - Parameter parameter: The parameter to be updated.
-     - Parameter value: The VJson object (as received from the server) with the value for the parameter to be updated.
-
-     - Note: This operation is initiated from a thread that runs (asynchrously) in the background. It is presumed that this will occur while the runloop is paused, but this cannot be guaranteed. It would be prudent to implement a mechanism that only updates the GUI from an end-of-runloop observer.
+     - Note: This operation is initiated from a thread that runs (asynchrously) in the background. It is presumed that this will occur while the runloop is paused, but this cannot be guaranteed. It would be prudent to implement a mechanism that only updates a GUI from an end-of-runloop observer.
      */
-
-    func swiftfireMacInterface(swiftfireMacInterface: SwiftfireMacInterface, logline: LogLine)
+    
+    func swiftfireMacInterface(swiftfireMacInterface: SwiftfireMacInterface, reply: VJson)
 }
 
 
@@ -137,6 +130,16 @@ class SwiftfireMacInterface: NSObject {
     }
 
 
+    /**
+     Closes the connection to the Swiftfire Server.
+     */
+    
+    func closeConnection() {
+        SwifterSockets.closeSocket(swiftfireSocket)
+        swiftfireSocket = nil
+    }
+    
+    
     /**
      This function attempts to send JSON formatted messages to the Swiftfire server.
   
@@ -224,17 +227,14 @@ class SwiftfireMacInterface: NSObject {
                 let message = "Error occured on transmission to Swiftfire M&C connection: \(str)"
                 log.atLevelError(id: swiftfireSocket!, source: #file.source(#function, #line), message: message)
                 if let d = delegate { d.swiftfireMacInterface(self, message: message) }
-                SwifterSockets.closeSocket(swiftfireSocket!)
-                swiftfireSocket = nil
-                
+                closeConnection()
                 
             case .TIMEOUT:
                 
                 let message = "Timeout occured on Swiftfire M&C connection"
                 log.atLevelError(id: swiftfireSocket!, source: #file.source(#function, #line), message: message)
                 if let d = delegate { d.swiftfireMacInterface(self, message: message) }
-                SwifterSockets.closeSocket(swiftfireSocket!)
-                swiftfireSocket = nil
+                closeConnection()
                 
                 
             case .READY:
@@ -247,8 +247,7 @@ class SwiftfireMacInterface: NSObject {
                 let message = "Swiftfire M&C connection unexpectedly closed"
                 log.atLevelError(id: swiftfireSocket!, source: #file.source(#function, #line), message: message)
                 if let d = delegate { d.swiftfireMacInterface(self, message: message) }
-                SwifterSockets.closeSocket(swiftfireSocket)
-                swiftfireSocket = nil
+                closeConnection()
 
                 
             case .CLIENT_CLOSED:
@@ -256,8 +255,7 @@ class SwiftfireMacInterface: NSObject {
                 let message = "Swiftfire M&C connection closed by Swiftfire"
                 log.atLevelError(id: swiftfireSocket!, source: #file.source(#function, #line), message: message)
                 if let d = delegate { d.swiftfireMacInterface(self, message: message) }
-                SwifterSockets.closeSocket(swiftfireSocket)
-                swiftfireSocket = nil
+                closeConnection()
             }
             
         } else {
@@ -297,15 +295,13 @@ class SwiftfireMacInterface: NSObject {
                 case let .CLIENT_CLOSED(data: data) where data is NSData:
                     receivedData.appendData(data as! NSData)
                     if receivedData.length > 0 { self.processReceivedData(receivedData) }
-                    SwifterSockets.closeSocket(self.swiftfireSocket)
-                    self.swiftfireSocket = nil
+                    self.closeConnection()
                     break RECEIVER_LOOP
 
                 case let .SERVER_CLOSED(data: data) where data is NSData:
                     receivedData.appendData(data as! NSData)
                     if receivedData.length > 0 { self.processReceivedData(receivedData) }
-                    SwifterSockets.closeSocket(self.swiftfireSocket)
-                    self.swiftfireSocket = nil
+                    self.closeConnection()
                     break RECEIVER_LOOP
 
                 case let .ERROR(message: message):
@@ -348,7 +344,7 @@ class SwiftfireMacInterface: NSObject {
                 
                 // Create the JSON hierarchy
                 
-                json = try VJson.createJsonHierarchy(data)
+                json = try VJson.parse(data)
                 
             } catch let error as VJson.Exception {
                 
@@ -378,33 +374,7 @@ class SwiftfireMacInterface: NSObject {
             log.atLevelDebug(id: -1, source: SOURCE, message: "Received JSON code \(json!)")
             
             
-            // Update the GUI with the results
-            
-            if !json!.isObject {
-                log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Expected JSON code should be an OBJECT")
-                return
-            }
-            
-            
-            // If this is a logline then process it as such
-            
-            if let logLine = LogLine(json: json!) {
-                
-                if let d = delegate { d.swiftfireMacInterface(self, logline: logLine) }
-                
-                
-            } else { // It must be a parameter update...
-                
-                if json!.nofChildren == 1 {
-                    if let parameter = MacDef.Parameter.create(json!.arrayValue![0].nameValue) {
-                        if let d = delegate { d.swiftfireMacInterface(self, parameter: parameter, value: json!.arrayValue![0]) }
-                    } else {
-                        log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Unknown parameter received in message: \(json!)")
-                    }
-                } else {
-                    log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Expected 1 child, found: \(json!.nofChildren)")
-                }
-            }
+            if let d = self.delegate { d.swiftfireMacInterface(self, reply: json!) }
         }
     }
 }

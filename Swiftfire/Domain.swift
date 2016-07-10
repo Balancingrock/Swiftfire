@@ -3,7 +3,7 @@
 //  File:       Domain.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.10
+//  Version:    0.9.11
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -29,7 +29,7 @@
 //   - You can send payment via paypal to: sales@balancingrock.nl
 //   - Or wire bitcoins to: 1GacSREBxPy1yskLMc9de2nofNv2SNdwqH
 //
-//  I prefer the above two, but if these options don't suit you, you might also send me a gift from my amazon.co.uk
+//  I prefer the above two, but if these options don't suit you, you can also send me a gift from my amazon.co.uk
 //  whishlist: http://www.amazon.co.uk/gp/registry/wishlist/34GNMPZKAQ0OO/ref=cm_sw_em_r_wsl_cE3Tub013CKN6_wb
 //
 //  If you like to pay in another way, please contact me at rien@balancingrock.nl
@@ -49,7 +49,9 @@
 //
 // History
 //
-// v0.9.10 - Added domain statistics
+// v0.9.11 - Removed domain statistis.
+//         - Updated for VJson 0.9.8
+// v0.9.10 - Added domain statistics.
 // v0.9.8  - Fixed bug that would prevent the creation of accessLog and four04Log
 // v0.9.7  - Added logging options for Access and 404
 // v0.9.6  - Header update
@@ -146,7 +148,7 @@ class Domain: Equatable, ReflectedStringConvertible {
     
     /// The root folder for this domain.
     
-    var root: String = "/Library/WebServer/Documents"
+    var root: String = "/Library/Server/Web/Data/Sites/MyGreatSite"
     
     
     /// If this is non-empty, the domain will be rerouted to this host. The HTTP header host field will remain unchanged. Even when re-routed to another port. The host must be identified as an <address>:<port> combination where either address or port is optional.
@@ -313,40 +315,30 @@ class Domain: Equatable, ReflectedStringConvertible {
     }()
     
     
-    /// The domain statistics
-    
-    lazy var statistics: DomainStatistics? = {
-        guard let domainSupportDir = self.domainSupportDir else { return nil }
-        let url = domainSupportDir.URLByAppendingPathComponent("statistics", isDirectory: true)
-        do {
-            try NSFileManager.defaultManager().createDirectoryAtURL(url, withIntermediateDirectories: true, attributes: nil)
-        } catch {
-            log.atLevelDebug(id: -1, source: #file.source(#function, #line), message: "Could not create domain statistics directory at \(url.path!)")
-            return nil
-        }
-        
-        guard let resourceStatFile = Logfile(filename: "Resource", fileExtension: "json", directory: url, options: Logfile.InitOption.NewFileDailyAt(WallclockTime(hour: 0, minute: 0, second: 0))) else { return nil }
-        guard let ipStatFile = Logfile(filename: "IP-Address", fileExtension: "json", directory: url, options: Logfile.InitOption.NewFileDailyAt(WallclockTime(hour: 0, minute: 0, second: 0))) else { return nil }
-        
-        return DomainStatistics(resourceFile: resourceStatFile, ipFile: ipStatFile)
-    }()
-    
-    
     /// The JSON representation for this object
     
     var json: VJson {
-        let domain = VJson.createObject(name: "Domain")
-        domain["Name"].stringValue = name
-        domain["IncludeWww"].boolValue = wwwIncluded
-        domain["Root"].stringValue = root
-        domain["ForewardUrl"].stringValue = forwardUrl
-        domain["Enabled"].boolValue = enabled
-        domain["AccessLogEnabled"].boolValue = accessLogEnabled
-        domain["404LogEnabled"].boolValue = four04LogEnabled
-        domain.addChild(telemetry.json("Telemetry"))
+        let domain = VJson.object("Domain")
+        domain["Name"] &= name
+        domain["IncludeWww"] &= wwwIncluded
+        domain["Root"] &= root
+        domain["ForewardUrl"] &= forwardUrl
+        domain["Enabled"] &= enabled
+        domain["AccessLogEnabled"] &= accessLogEnabled
+        domain["404LogEnabled"] &= four04LogEnabled
+        domain.add(telemetry.json("Telemetry"))
         return domain
     }
     
+    
+    // Used in the resource availability test
+    
+    enum ResourceAvailability {
+        case Available
+        case NotAvailable
+        case AccessNotAllowed
+    }
+
     
     // Allow the no-parameter init
     
@@ -470,11 +462,12 @@ class Domain: Equatable, ReflectedStringConvertible {
      - Parameter header: The HTTP header as reqeived from the client.
      - Parameter body: The HTTP body as received from the client, may have length zero.
      - Parameter connection: The active connection for this request.
+     - Parameter mutation: The mutation that will be recorded in the statistics database. The operation should only update the httpResponseCode and responseDetails.
     
      - Returns: Either nil, or a valid HTTP response.
      */
     
-    func httpWorkerPreprocessor(header header: HttpHeader, body: UInt8Buffer, connection: HttpConnection) -> UInt8Buffer? {
+    func httpWorkerPreprocessor(header header: HttpHeader, body: UInt8Buffer, connection: HttpConnection, mutation: Mutation) -> UInt8Buffer? {
         return nil
     }
     
@@ -486,11 +479,12 @@ class Domain: Equatable, ReflectedStringConvertible {
      - Parameter body: The HTTP body as received from the client, may have length zero.
      - Parameter response: The response as prepared by the (default) httpWorker, note that this might be an error reply.
      - Parameter connection: The active connection for this request.
+     - Parameter mutation: The mutation that will be recorded in the statistics database. The operation should only update the httpResponseCode and responseDetails.
 
      - Returns: Either nil, or a valid HTTP response.
      */
     
-    func httpWorkerPostprocessor(header header: HttpHeader, body: UInt8Buffer, response: UInt8Buffer, connection: HttpConnection) -> UInt8Buffer? {
+    func httpWorkerPostprocessor(header header: HttpHeader, body: UInt8Buffer, response: UInt8Buffer, connection: HttpConnection, mutation: Mutation) -> UInt8Buffer? {
         return nil
     }
 }

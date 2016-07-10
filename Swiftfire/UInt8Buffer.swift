@@ -3,7 +3,7 @@
 //  File:       UInt8Buffer.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.6
+//  Version:    0.9.11
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,8 +49,9 @@
 //
 // History
 //
-// v0.9.6 - Header update
-// v0.9.0 - Initial release
+// v0.9.11 - Comment update
+// v0.9.6  - Header update
+// v0.9.0  - Initial release
 // =====================================================================================================================
 
 import Foundation
@@ -83,8 +84,7 @@ class UInt8Buffer {
     }
     
     
-    /// - Returns: The value of the received data interpreted as an UTF-8 encoded String. Nil if the data could not be converted.
-    /// - Note: The returned value is a struct and thus a copy of the data in the buffer.
+    /// - Returns: The copy of the data interpreted as an UTF-8 encoded String. Nil if the data could not be converted.
     
     var stringValue: String {
         return String(bytes: ptr, encoding: NSUTF8StringEncoding) ?? ""

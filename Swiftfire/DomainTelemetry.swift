@@ -3,7 +3,7 @@
 //  File:       DomainTelemetry.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.6
+//  Version:    0.9.11
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -29,7 +29,7 @@
 //   - You can send payment via paypal to: sales@balancingrock.nl
 //   - Or wire bitcoins to: 1GacSREBxPy1yskLMc9de2nofNv2SNdwqH
 //
-//  I prefer the above two, but if these options don't suit you, you might also send me a gift from my amazon.co.uk
+//  I prefer the above two, but if these options don't suit you, you can also send me a gift from my amazon.co.uk
 //  whishlist: http://www.amazon.co.uk/gp/registry/wishlist/34GNMPZKAQ0OO/ref=cm_sw_em_r_wsl_cE3Tub013CKN6_wb
 //
 //  If you like to pay in another way, please contact me at rien@balancingrock.nl
@@ -49,8 +49,9 @@
 //
 // History
 //
-// v0.9.6 - Header update
-// v0.9.3 - Initial release
+// v0.9.11 - Updated for VJson 0.9.8
+// v0.9.6  - Header update
+// v0.9.3  - Initial release
 // =====================================================================================================================
 
 
@@ -74,9 +75,9 @@ class TelemetryItem: NSObject {
     }
     
     func json(id: String) -> VJson {
-        let j = VJson.createObject(name: id)
-        j["Value"].integerValue = value
-        j["GuiLabel"].stringValue = guiLabel
+        let j = VJson.object(id)
+        j["Value"] &= value
+        j["GuiLabel"] &= guiLabel
         return j
     }
     
@@ -97,8 +98,8 @@ class TelemetryItem: NSObject {
     
     convenience init?(json: VJson?) {
         guard let json = json else { return nil }
-        guard let jguiLabel = json.objectOfType(VJson.JType.STRING, atPath: "GuiLabel")?.stringValue else { return nil }
-        guard let jvalue = json.objectOfType(VJson.JType.NUMBER, atPath: "Value")?.integerValue else { return nil }
+        guard let jguiLabel = (json|"GuiLabel")?.stringValue else { return nil }
+        guard let jvalue = (json|"Value")?.integerValue else { return nil }
         self.init(guiLabel: jguiLabel, value: jvalue)
     }
 }
@@ -183,15 +184,15 @@ class DomainTelemetry: NSObject {
     /// The JSON representation for this object
     
     func json(id: String) -> VJson {
-        let j = VJson.createObject(name: id)
-        j.addChild(nofRequests.json("NofRequests"))
-        j.addChild(nof200.json("Nof200"))
-        j.addChild(nof400.json("Nof400"))
-        j.addChild(nof403.json("Nof403"))
-        j.addChild(nof404.json("Nof404"))
-        j.addChild(nof500.json("Nof500"))
-        j.addChild(nof501.json("Nof501"))
-        j.addChild(nof505.json("Nof505"))
+        let j = VJson.object(id)
+        j.add(nofRequests.json("NofRequests"))
+        j.add(nof200.json("Nof200"))
+        j.add(nof400.json("Nof400"))
+        j.add(nof403.json("Nof403"))
+        j.add(nof404.json("Nof404"))
+        j.add(nof500.json("Nof500"))
+        j.add(nof501.json("Nof501"))
+        j.add(nof505.json("Nof505"))
         return j
     }
     
@@ -210,14 +211,14 @@ class DomainTelemetry: NSObject {
         
         guard let json = json else { return nil }
         
-        guard let jnofRequests = TelemetryItem(json: json.objectOfType(VJson.JType.OBJECT, atPath: "NofRequests")) else { return nil }
-        guard let jNof200 = TelemetryItem(json: json.objectOfType(VJson.JType.OBJECT, atPath: "Nof200")) else { return nil }
-        guard let jNof400 = TelemetryItem(json: json.objectOfType(VJson.JType.OBJECT, atPath: "Nof400")) else { return nil }
-        guard let jNof403 = TelemetryItem(json: json.objectOfType(VJson.JType.OBJECT, atPath: "Nof403")) else { return nil }
-        guard let jNof404 = TelemetryItem(json: json.objectOfType(VJson.JType.OBJECT, atPath: "Nof404")) else { return nil }
-        guard let jNof500 = TelemetryItem(json: json.objectOfType(VJson.JType.OBJECT, atPath: "Nof500")) else { return nil }
-        guard let jNof501 = TelemetryItem(json: json.objectOfType(VJson.JType.OBJECT, atPath: "Nof501")) else { return nil }
-        guard let jNof505 = TelemetryItem(json: json.objectOfType(VJson.JType.OBJECT, atPath: "Nof505")) else { return nil }
+        guard let jnofRequests = TelemetryItem(json: json|"NofRequests") else { return nil }
+        guard let jNof200 = TelemetryItem(json: json|"Nof200") else { return nil }
+        guard let jNof400 = TelemetryItem(json: json|"Nof400") else { return nil }
+        guard let jNof403 = TelemetryItem(json: json|"Nof403") else { return nil }
+        guard let jNof404 = TelemetryItem(json: json|"Nof404") else { return nil }
+        guard let jNof500 = TelemetryItem(json: json|"Nof500") else { return nil }
+        guard let jNof501 = TelemetryItem(json: json|"Nof501") else { return nil }
+        guard let jNof505 = TelemetryItem(json: json|"Nof505") else { return nil }
 
         self.init()
 
