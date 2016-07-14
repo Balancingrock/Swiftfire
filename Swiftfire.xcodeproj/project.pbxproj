@@ -82,6 +82,10 @@
 		865713E91CE9BC7E00B9CD36 /* ServerParameter.swift in Sources */ = {isa = PBXBuildFile; fileRef = 865713E81CE9BC7E00B9CD36 /* ServerParameter.swift */; };
 		8662F1CE1D09AEF200E4B5DD /* TimedClosure.swift in Sources */ = {isa = PBXBuildFile; fileRef = 867CD0541CFDCFF9009B9868 /* TimedClosure.swift */; };
 		8663FDD01D151E7800ADC731 /* Statistics.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 8663FDCE1D151E7800ADC731 /* Statistics.xcdatamodeld */; };
+		866C52561D36228800CB37FA /* Comms.swift in Sources */ = {isa = PBXBuildFile; fileRef = 866C52551D36228800CB37FA /* Comms.swift */; };
+		866C52571D36247E00CB37FA /* Comms.swift in Sources */ = {isa = PBXBuildFile; fileRef = 866C52551D36228800CB37FA /* Comms.swift */; };
+		866C52591D365C2000CB37FA /* UpdateClientCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 866C52581D365C2000CB37FA /* UpdateClientCommand.swift */; };
+		866C525A1D365C2000CB37FA /* UpdateClientCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 866C52581D365C2000CB37FA /* UpdateClientCommand.swift */; };
 		866E652D1D2157A300FE011D /* ReadStatisticsCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 866E652C1D2157A300FE011D /* ReadStatisticsCommand.swift */; };
 		866E65301D21598100FE011D /* ReadStatisticsReply.swift in Sources */ = {isa = PBXBuildFile; fileRef = 866E652F1D21598100FE011D /* ReadStatisticsReply.swift */; };
 		866F8D331D1D15AD009EA66D /* CDMutation+CoreDataProperties.swift in Sources */ = {isa = PBXBuildFile; fileRef = 866F8D311D1D15AD009EA66D /* CDMutation+CoreDataProperties.swift */; };
@@ -96,6 +100,8 @@
 		867564261D0C601900AE2451 /* Domain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F221CC23F5200C60220 /* Domain.swift */; };
 		86775ABD1CFF258500C8B34C /* AccessLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86775ABC1CFF258500C8B34C /* AccessLog.swift */; };
 		867CD0531CFDB103009B9868 /* Logfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 867CD0521CFDB103009B9868 /* Logfile.swift */; };
+		868979F31D34104500FD4674 /* UpdatePathPartCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 868979F21D34104500FD4674 /* UpdatePathPartCommand.swift */; };
+		868979F41D34104500FD4674 /* UpdatePathPartCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = 868979F21D34104500FD4674 /* UpdatePathPartCommand.swift */; };
 		868C1F991D0D442500B36719 /* VJson.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F651CC2470300C60220 /* VJson.swift */; };
 		868C1F9A1D0D442900B36719 /* ASCII.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F641CC2470300C60220 /* ASCII.swift */; };
 		868C1F9B1D0D443400B36719 /* SwifterLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F611CC243AF00C60220 /* SwifterLog.swift */; };
@@ -346,6 +352,8 @@
 		865713E81CE9BC7E00B9CD36 /* ServerParameter.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ServerParameter.swift; sourceTree = "<group>"; };
 		8663FDCF1D151E7800ADC731 /* Statistics.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Statistics.xcdatamodel; sourceTree = "<group>"; };
 		8663FDD11D15256300ADC731 /* Statistics-Console.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = "Statistics-Console.swift"; path = "Swiftfire/Statistics-Console.swift"; sourceTree = "<group>"; };
+		866C52551D36228800CB37FA /* Comms.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Comms.swift; sourceTree = "<group>"; };
+		866C52581D365C2000CB37FA /* UpdateClientCommand.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UpdateClientCommand.swift; sourceTree = "<group>"; };
 		866E652C1D2157A300FE011D /* ReadStatisticsCommand.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReadStatisticsCommand.swift; sourceTree = "<group>"; };
 		866E652F1D21598100FE011D /* ReadStatisticsReply.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ReadStatisticsReply.swift; sourceTree = "<group>"; };
 		866F8D311D1D15AD009EA66D /* CDMutation+CoreDataProperties.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "CDMutation+CoreDataProperties.swift"; sourceTree = "<group>"; };
@@ -359,6 +367,7 @@
 		8678225C1D002ECB00A93401 /* WallclockTime.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WallclockTime.swift; sourceTree = "<group>"; };
 		867CD0521CFDB103009B9868 /* Logfile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Logfile.swift; sourceTree = "<group>"; };
 		867CD0541CFDCFF9009B9868 /* TimedClosure.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = TimedClosure.swift; sourceTree = "<group>"; };
+		868979F21D34104500FD4674 /* UpdatePathPartCommand.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = UpdatePathPartCommand.swift; sourceTree = "<group>"; };
 		86935EA81D0EB753009367B2 /* WallclockTimeTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = WallclockTimeTest.swift; path = ../UnitTesting/WallclockTimeTest.swift; sourceTree = "<group>"; };
 		8694C9AB1CEEF84E00F45D8B /* MimeType.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = MimeType.swift; sourceTree = "<group>"; };
 		8696165A1D22603C00CE264A /* SwiftfireConsole.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = SwiftfireConsole.app; sourceTree = BUILT_PRODUCTS_DIR; };
@@ -513,6 +522,7 @@
 		864C6F491CC23FA900C60220 /* Monitoring and Control */ = {
 			isa = PBXGroup;
 			children = (
+				866C52551D36228800CB37FA /* Comms.swift */,
 				864C6F451CC23F9F00C60220 /* MonitoringAndControlLoop.swift */,
 				865713E81CE9BC7E00B9CD36 /* ServerParameter.swift */,
 				865053631CEB3DF000D31DBF /* ServerTelemetryItem.swift */,
@@ -540,6 +550,8 @@
 				86F529451CF5F2860092E24D /* ResetDomainTelemetryCommand.swift */,
 				866E652C1D2157A300FE011D /* ReadStatisticsCommand.swift */,
 				866E652F1D21598100FE011D /* ReadStatisticsReply.swift */,
+				868979F21D34104500FD4674 /* UpdatePathPartCommand.swift */,
+				866C52581D365C2000CB37FA /* UpdateClientCommand.swift */,
 			);
 			name = "Monitoring and Control";
 			sourceTree = "<group>";
@@ -816,6 +828,7 @@
 				8652A2221D191D0800099549 /* CDPathPart+CoreDataProperties.swift in Sources */,
 				8663FDD01D151E7800ADC731 /* Statistics.xcdatamodeld in Sources */,
 				865713D91CE44BF400B9CD36 /* TelemetryProtocol.swift in Sources */,
+				866C52591D365C2000CB37FA /* UpdateClientCommand.swift in Sources */,
 				864C6F621CC243AF00C60220 /* asl-bridge.m in Sources */,
 				86F529461CF5F2860092E24D /* ResetDomainTelemetryCommand.swift in Sources */,
 				8650534A1CEB0CD700D31DBF /* ServerStartCommand.swift in Sources */,
@@ -824,8 +837,10 @@
 				864C6F2F1CC23F5200C60220 /* Domains.swift in Sources */,
 				866E652D1D2157A300FE011D /* ReadStatisticsCommand.swift in Sources */,
 				864C6F381CC23F5F00C60220 /* UInt8Buffer.swift in Sources */,
+				868979F31D34104500FD4674 /* UpdatePathPartCommand.swift in Sources */,
 				864C6F401CC23F7E00C60220 /* HttpConnection.swift in Sources */,
 				8652A2281D191D0800099549 /* CDCounter.swift in Sources */,
+				866C52561D36228800CB37FA /* Comms.swift in Sources */,
 				865053621CEB3C2F00D31DBF /* ReadServerTelemetryReply.swift in Sources */,
 				8650534C1CEB124200D31DBF /* ServerStopCommand.swift in Sources */,
 				864A74881D019CAD0003173F /* Four04Log.swift in Sources */,
@@ -921,8 +936,10 @@
 			buildActionMask = 2147483647;
 			files = (
 				86B2BA7E1D2262AC0023D7E2 /* CDMutation.swift in Sources */,
+				866C52571D36247E00CB37FA /* Comms.swift in Sources */,
 				86B2BAA11D2262D30023D7E2 /* SaveServerParametersCommand.swift in Sources */,
 				86B2BAAF1D2262D30023D7E2 /* ReadStatisticsReply.swift in Sources */,
+				868979F41D34104500FD4674 /* UpdatePathPartCommand.swift in Sources */,
 				86B2BAA21D2262D30023D7E2 /* RestoreServerParametersCommand.swift in Sources */,
 				86B2BA721D22626A0023D7E2 /* UIntTelemetry.swift in Sources */,
 				86B2BA6B1D2262600023D7E2 /* SwifterSockets.InitServer.swift in Sources */,
@@ -975,6 +992,7 @@
 				86B2BA911D2262C60023D7E2 /* HttpHeader.swift in Sources */,
 				86B2BA711D22626A0023D7E2 /* UInt8Buffer.swift in Sources */,
 				86B2BA8D1D2262C00023D7E2 /* AccessLog.swift in Sources */,
+				866C525A1D365C2000CB37FA /* UpdateClientCommand.swift in Sources */,
 				86B2BAA51D2262D30023D7E2 /* UpdateDomainCommand.swift in Sources */,
 				86B2BA901D2262C60023D7E2 /* HttpResponseCodes.swift in Sources */,
 				86B2BA691D2261A10023D7E2 /* VJson.swift in Sources */,

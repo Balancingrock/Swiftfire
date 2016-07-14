@@ -3,7 +3,7 @@
 //  File:       AppDelegate.swift
 //  Project:    SwiftfireConsole
 //
-//  Version:    0.9.11
+//  Version:    0.9.12
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,6 +49,7 @@
 //
 // History
 //
+// v0.9.12 - Added initialization of the statisticsWindowController in the statistics object.
 // v0.9.11 - Added statistics
 //         - Merged into Swiftfire project
 // v0.9.4  - Header update
@@ -87,6 +88,7 @@ class AppDelegate: NSObject, NSApplicationDelegate {
     @IBAction func showStatisticsWindow(sender: AnyObject?) {
         statisticsWindowController = StatisticsWindowController(windowNibName: "StatisticsWindow")
         statisticsWindowController.showWindow(nil)
+        statistics.statisticsWindowController = statisticsWindowController
     }
     
     @IBAction func refreshStatistics(sender: AnyObject?) {

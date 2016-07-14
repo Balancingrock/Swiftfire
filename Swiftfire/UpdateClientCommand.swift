@@ -1,7 +1,7 @@
 // =====================================================================================================================
 //
-//  File:       StatisticsWindowController.swift
-//  Project:    SwiftfireConsole
+//  File:       UpdateClientCommand.swift
+//  Project:    Swiftfire
 //
 //  Version:    0.9.12
 //
@@ -9,9 +9,9 @@
 //  Company:    http://balancingrock.nl
 //  Website:    http://swiftfire.nl/
 //  Blog:       http://swiftrien.blogspot.com
-//  Git:        https://github.com/Swiftrien/SwiftfireConsole
+//  Git:        https://github.com/Swiftrien/Swiftfire
 //
-//  Copyright:  (c) 2014-2016 Marinus van der Lugt, All rights reserved.
+//  Copyright:  (c) 2016 Marinus van der Lugt, All rights reserved.
 //
 //  License:    Use or redistribute this code any way you like with the following two provision:
 //
@@ -49,55 +49,46 @@
 //
 // History
 //
-// v0.9.12 - Added time-boxing for domains tab
-// v0.9.11 - Initial release
+// v0.9.12 - Initial release
 // =====================================================================================================================
 
 import Foundation
-import Cocoa
 
-class StatisticsWindowController: NSWindowController {
-    
-    
-    // Uses Bindings
+private let CLIENT = "Client"
+private let NEW_VALUE = "NewValue"
+private let COMMAND_NAME = "UpdateClientCommand"
 
-    var data: Statistics = statistics
+
+final class UpdateClientCommand {
     
+    var client: String
+    var newValue: Bool
     
-    // Window components
-    
-    @IBOutlet var startDatePicker: NSDatePicker!
-    @IBOutlet var endDatePicker: NSDatePicker!
-    
-    
-    // Actions from the GUI
-    
-    @IBAction func startDatePickerAction(sender: AnyObject) {
-        recalculateCountValue()
+    var json: VJson {
+        let j = VJson()
+        j[COMMAND_NAME][CLIENT] &= client
+        j[COMMAND_NAME][NEW_VALUE] &= newValue
+        return j
     }
     
-    @IBAction func endDatePickerAction(sender: AnyObject) {
-        recalculateCountValue()
+    init(client: String, newValue: Bool) {
+        self.client = client
+        self.newValue = newValue
     }
     
-    
-    // Recalculates the count value for the time period between the dates.
-    
-    func recalculateCountValue() {
-        let startDate = startDatePicker.dateValue.timeIntervalSince1970
-        let endDate = endDatePicker.dateValue.timeIntervalSince1970
-        for pp in statistics.cdDomains.domains?.allObjects as! [CDPathPart] {
-            pp.recalculateCountForPeriod(startDate, endDate: endDate)
-        }
+    init?(json: VJson?) {
+        guard let json = json else { return nil }
+        guard let jclient = (json|COMMAND_NAME|CLIENT)?.stringValue else { return nil }
+        guard let jnewvalue = (json|COMMAND_NAME|NEW_VALUE)?.boolValue else { return nil }
+        client = jclient
+        newValue = jnewvalue
     }
     
-    
-    // Initialize the GUI
-    
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        let today = NSCalendar.currentCalendar().startOfDayForDate(NSDate())
-        startDatePicker.dateValue = today
-        endDatePicker.dateValue = today
-    }    
+    func execute() {
+        log.atLevelDebug(id: -1, source: #file.source(#function, #line))
+        let mutation = Mutation.createUpdateClient()
+        mutation.client = client
+        mutation.doNotTrace = newValue
+        statistics.submit(mutation)
+    }
 }

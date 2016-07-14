@@ -3,7 +3,7 @@
 //  File:       Mutation.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.11
+//  Version:    0.9.12
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,6 +49,7 @@
 //
 // History
 //
+// v0.9.12 - Added support for UpdatePathPart and UpdateClient
 // v0.9.11 - Initial release
 // =====================================================================================================================
 
@@ -79,13 +80,13 @@ enum MutationKind: Int16 {
     /// - Note: The following fields must be filled in before submitting: requestCompleted, requestReceived, httpResponseCode, responseDetails, connectionAllocationCount, connectionObjectId, socket. Other fields are optional.
     
     case AddClientRecord = 0
+    case UpdatePathPart
+    case UpdateClient
     
 /*    case RemoveClientRecords
     case RemoveAllClientRecords
-    case UpdateClient
     case RemoveClient
     case RemoveAllClients
-    case UpdatePathPart
     case RemovePathPart
     case RemoveAllPathParts
     case EmptyDatabase
@@ -95,13 +96,13 @@ enum MutationKind: Int16 {
 class Mutation {
     
     static func createAddClientRecord() -> Mutation { return Mutation(kind: .AddClientRecord) }
+    static func createUpdatePathPart() -> Mutation { return Mutation(kind: .UpdatePathPart) }
+    static func createUpdateClient() -> Mutation { return Mutation(kind: .UpdateClient) }
 /*
     static func createRemoveClientRecords() -> Mutation { return Mutation(kind: .RemoveClientRecords) }
     static func createRemoveAllClientRecords() -> Mutation { return Mutation(kind: .RemoveAllClientRecords) }
-    static func createUpdateClient() -> Mutation { return Mutation(kind: .UpdateClient) }
     static func createRemoveClient() -> Mutation { return Mutation(kind: .RemoveClient) }
     static func createRemoveAllClients() -> Mutation { return Mutation(kind: .RemoveAllClients) }
-    static func createUpdatePathPart() -> Mutation { return Mutation(kind: .UpdatePathPart) }
     static func createRemovePathPart() -> Mutation { return Mutation(kind: .RemovePathPart) }
     static func createRemoveAllPathParts() -> Mutation { return Mutation(kind: .RemoveAllPathParts) }
     static func createEmptyDatabase() -> Mutation { return Mutation(kind: .EmptyDatabase) }

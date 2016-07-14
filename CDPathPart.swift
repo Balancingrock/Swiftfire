@@ -3,7 +3,7 @@
 //  File:       CDPathPart.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.11
+//  Version:    0.9.12
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,6 +49,7 @@
 //
 // History
 //
+// v0.9.12 - Added manipulation of doNotTrace
 // v0.9.11 - Initial release
 // =====================================================================================================================
 
@@ -62,11 +63,6 @@ private let COUNTER = "C"
 private let NEXT = "N"
 
 class CDPathPart: NSManagedObject {
-
-    var count: Int64 {
-        guard let counterList = self.counterList else { return 0 }
-        return counterList.count
-    }
     
     var json: VJson {
         let json = VJson()
@@ -128,5 +124,54 @@ class CDPathPart: NSManagedObject {
         }
         
         return new
+    }
+    
+    var count: NSNumber?
+
+    func recalculateCountForPeriod(startDate: Double, endDate: Double) {
+        
+        var privateCount: Int64 = 0
+        
+        if let counter = counterList {
+        
+            if counter.endDate <= endDate && counter.startDate >= startDate {
+                privateCount = counter.count
+            }
+            
+            while let counter = counter.next {
+                if counter.endDate <= endDate && counter.startDate >= startDate {
+                    privateCount += counter.count
+                }
+            }
+        }
+        
+        self.setValue(NSNumber(longLong: privateCount), forKey: "count")
+        
+        
+        // Propagate to sub-parts
+        for pp in self.next?.allObjects as! [CDPathPart] {
+            pp.recalculateCountForPeriod(startDate, endDate: endDate)
+        }
+    }
+    
+    var _doNotTrace: NSNumber {
+        get {
+            return NSNumber(bool: doNotTrace)
+        }
+        set {
+            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "New value for doNotTrace \(newValue), transmitting to Swiftfire")
+
+            var url: NSString = pathPart!
+            while let pp = previous {
+                url = (pp.pathPart! as NSString).stringByAppendingPathComponent(url as String)
+            }
+            let command = UpdatePathPartCommand(url: url as String, newValue: newValue.boolValue)
+            
+            if toSwiftfire != nil {
+                toSwiftfire?.transferToSwiftfire(command.json.description)
+            } else {
+                log.atLevelWarning(id: -1, source: #file.source(#function, #line), message: "Attempt to set new value for doNotTrace \(newValue), but no transmitter available")
+            }
+        }
     }
 }

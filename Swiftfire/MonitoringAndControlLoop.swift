@@ -3,7 +3,7 @@
 //  File:       MonitoringAndControl.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.11
+//  Version:    0.9.12
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,6 +49,7 @@
 //
 // History
 //
+// v0.9.12 - Added TransferToConsole protocol compliance
 // v0.9.11 - Moved declaration of abortMacLoop and acceptQueue to here (from main.swift)
 //         - Added ReadStatisticsCommand
 //         - Updated for VJson 0.9.8
@@ -83,7 +84,7 @@ let acceptQueue = dispatch_get_global_queue(DISPATCH_QUEUE_PRIORITY_HIGH, 0)
 var abortMacLoop: Bool = false
 
 
-final class MonitoringAndControl {
+final class MonitoringAndControl: TransferToConsole {
     
     // Prevent more instantiations
     
@@ -197,6 +198,13 @@ final class MonitoringAndControl {
             log.atLevelNotice(id: acceptOnSocket, source: #file.source(#function, #line), message: "Accepted M&C connection")
             
             
+            // =================================
+            // Connection to console is now open
+            // =================================
+            
+            toConsole = self
+            
+            
             // ========================
             // Receive data from client
             // ========================
@@ -272,9 +280,9 @@ final class MonitoringAndControl {
                     
                     log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Closing Monitoring and Control Connection due to inactivity")
                     
-                    transferMessage(ClosingMacConnection().json)
+                    transferToConsole(ClosingMacConnection().json.description)
                     
-                    sleep(1)
+                    sleep(1) // Give the transfer some time
                     
                     break RECEIVE_LOOP
                     
@@ -294,6 +302,13 @@ final class MonitoringAndControl {
                     log.atLevelError(id: socket, source: #file.source(#function, #line), message: "Unknown error while receiving JSON message on the M&C interface")
                 }
             }
+            
+            // ===========================================
+            // Connection to console is no longer possible
+            // ===========================================
+            
+            toConsole = nil
+
             
             // Close the socket on which the data was received.
             
@@ -364,7 +379,7 @@ final class MonitoringAndControl {
     private func executeCommandInMessage(message: VJson) {
         
         if let command = ReadDomainTelemetryCommand(json: message) { doReadDomainTelemetryCommand(command) }
-        else if let command = ReadServerParameterCommand(json: message) { transferMessage(Parameters.doReadServerParameterCommand(socket, command:command)) }
+        else if let command = ReadServerParameterCommand(json: message) { Parameters.doReadServerParameterCommand(socket, command:command) }
         else if let command = ReadServerTelemetryCommand(json: message) { doReadServerTelemetryCommand(command) }
         else if let command = WriteServerParameterCommand(json: message) { Parameters.doWriteServerParameterCommand(socket, command: command) }
         else if let command = CreateDomainCommand(json: message) { doCreateDomainCommand(command) }
@@ -372,7 +387,9 @@ final class MonitoringAndControl {
         else if let command = UpdateDomainCommand(json: message) { doUpdateDomainCommand(command) }
         else if let command = ReadDomainsCommand(json: message) { doReadDomainsCommand(command) }
         else if let command = ResetDomainTelemetryCommand(json: message) { doResetDomainTelemetryCommand(command) }
-        else if let command = ReadStatisticsCommand(json: message) { transferMessage(command.execute()) }
+        else if let command = ReadStatisticsCommand(json: message) { command.execute() }
+        else if let command = UpdatePathPartCommand(json: message) { command.execute() }
+        else if let command = UpdateClientCommand(json: message) { command.execute() }
         else if ServerQuitCommand(json: message) != nil { doServerQuitCommand() }
         else if ServerStartCommand(json: message) != nil { doServerStartCommand() }
         else if ServerStopCommand(json: message) != nil { doServerStopCommand() }
@@ -397,7 +414,7 @@ final class MonitoringAndControl {
         
         let reply = ReadDomainTelemetryReply(domainName: domain.name, domainTelemetry: domain.telemetry)
         
-        transferMessage(reply.json)
+        transferToConsole(reply.json.description)
     }
 
     private func doReadDomainTelemetryCommand(command: ReadDomainTelemetryCommand) {
@@ -409,7 +426,7 @@ final class MonitoringAndControl {
         
         let reply = ReadDomainTelemetryReply(domainName: domain.name, domainTelemetry: domain.telemetry)
         
-        transferMessage(reply.json)
+        transferToConsole(reply.json.description)
     }
     
     private func doCreateDomainCommand(command: CreateDomainCommand) {
@@ -457,7 +474,7 @@ final class MonitoringAndControl {
     
         let reply = ReadDomainsReply(domains: domains)
         
-        transferMessage(reply.json)
+        transferToConsole(reply.json.description)
     }
     
     private func doServerQuitCommand() {
@@ -555,7 +572,7 @@ final class MonitoringAndControl {
             
             let reply = ReadServerTelemetryReply(item: command.telemetryItem, value: serverTelemetry.nofAcceptedHttpRequests.intValue)
             
-            transferMessage(reply.json)
+            transferToConsole(reply.json.description)
             
 
         case .NOF_ACCEPT_WAITS_FOR_CONNECTION_OBJECT:
@@ -564,7 +581,7 @@ final class MonitoringAndControl {
              
             let reply = ReadServerTelemetryReply(item: command.telemetryItem, value: serverTelemetry.nofAcceptWaitsForConnectionObject.intValue)
              
-            transferMessage(reply.json)
+            transferToConsole(reply.json.description)
             
              
         case .NOF_HTTP_400_REPLIES:
@@ -573,7 +590,7 @@ final class MonitoringAndControl {
             
             let reply = ReadServerTelemetryReply(item: command.telemetryItem, value: serverTelemetry.nofHttp400Replies.intValue)
 
-            transferMessage(reply.json)
+            transferToConsole(reply.json.description)
              
         case .NOF_HTTP_502_REPLIES:
              
@@ -581,7 +598,7 @@ final class MonitoringAndControl {
             
             let reply = ReadServerTelemetryReply(item: command.telemetryItem, value: serverTelemetry.nofHttp502Replies.intValue)
             
-            transferMessage(reply.json)
+            transferToConsole(reply.json.description)
             
              
         case .SERVER_STATUS:
@@ -592,7 +609,7 @@ final class MonitoringAndControl {
             
             let reply = ReadServerTelemetryReply(item: command.telemetryItem, value: (rs ? "Running" : "Not Running"))
             
-            transferMessage(reply.json)
+            transferToConsole(reply.json.description)
             
              
         case .SERVER_VERSION:
@@ -601,7 +618,7 @@ final class MonitoringAndControl {
              
              let reply = ReadServerTelemetryReply(item: command.telemetryItem, value: Parameters.version)
 
-             transferMessage(reply.json)
+             transferToConsole(reply.json.description)
         }
     }
 
@@ -644,14 +661,20 @@ final class MonitoringAndControl {
         log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "SAVE_PARAMETERS completed")
     }
     
-    func transferMessage(json: VJson?) {
+/*    func transferMessage(json: VJson?) {
         if json == nil { return }
         if socket == -1 { return }
-        dispatch_async(transferQueue, { self._transferMessage(json!)})
+        dispatch_async(transferQueue, { self._transferMessage(json!.description)})
+    }*/
+    
+    private func _transferMessage(message: String) {
+        if socket == -1 { return }
+        SwifterSockets.transmit(socket, string: message, timeout: 1.0, telemetry: nil)
     }
     
-    private func _transferMessage(json: VJson) {
-        if socket == -1 { return }
-        SwifterSockets.transmit(socket, string: json.description, timeout: 1.0, telemetry: nil)
+    func transferToConsole(message: String) -> Bool {
+        if socket == -1 { return false }
+        dispatch_async(transferQueue, { self._transferMessage(message)})
+        return true
     }
 }

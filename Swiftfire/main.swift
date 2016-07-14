@@ -3,7 +3,7 @@
 //  File:       main.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.11
+//  Version:    0.9.12
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,6 +49,7 @@
 //
 // History
 //
+// v0.9.12 - Switched to 'toConsole' protocol (in Comms.swift) for communication with the console.
 // v0.9.11 - Moved some global definitions to other files
 // v0.9.7  - Added closing of header logging file on normal termination
 //         - Changed logging of parameters and domains to occur after the setup of the logger
@@ -123,7 +124,7 @@ if (Parameters.asString(.NETWORK_LOGTARGET_IP_ADDRESS) != "") && (Parameters.asS
 class LogForewarder: SwifterlogCallbackProtocol {
     func logInfo(time: NSDate, level: SwifterLog.Level, source: String, message: String) {
         let logline = LogLine(time: time, level: level, source: source, message: message)
-        mac.transferMessage(logline.json)
+        toConsole?.transferToConsole(logline.json.description)
     }
 }
 

@@ -3,7 +3,7 @@
 //  File:       Statistics-Swiftfire.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.11
+//  Version:    0.9.12
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,6 +49,8 @@
 //
 // History
 //
+// v0.9.12 - Changed cd counters to daily counters
+//         - Added support for 'doNotTrace' options
 // v0.9.11 - Initial release
 // =====================================================================================================================
 
@@ -133,9 +135,9 @@ final class Statistics: NSObject {
     }
     
     
-    /// The timed closure that is used to create a new generation of CDCounters (one for each CDPathPart)
+    /// The timed closure that is used to create a new generation of CDCounters
     
-    /// var createNewCdCounters: TimedClosure?
+    var createsNewCdCounters: TimedClosure?
     
     
     /// Creates a new instance of the statistics object.
@@ -165,6 +167,11 @@ final class Statistics: NSObject {
         
         super.init()
         
+        createsNewCdCounters = TimedClosure(
+            queue: dispatch_get_main_queue(),
+            delay: WallclockTime(hour: 0, minute: 0, second: 0),
+            closure: createNewCdCounterGeneration,
+            once: false)
         
         guard let statisticsDir = FileURLs.statisticsDir else {
             log.atLevelCritical(id: -1, source: #file.source(#function, #line), message: "Unable to retrieve statistics directory")
@@ -176,6 +183,27 @@ final class Statistics: NSObject {
         managedObjectContext.performBlock({
             do {
                 try self.persistentStoreCoordinator.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: storeURL, options: nil)
+                
+                // Check if the counters have a start time in today, if not, then create new counters
+                let fetchRequest = NSFetchRequest(entityName: "CDPathPart")
+                let pathParts = try self.managedObjectContext.executeFetchRequest(fetchRequest) as! [CDPathPart]
+                let switchOverTime = NSDate().timeIntervalSince1970
+                
+                for pp in pathParts {
+                    
+                    let oldCounter = pp.counterList!
+                    
+                    if !NSCalendar.currentCalendar().isDateInToday(NSDate(timeIntervalSince1970: oldCounter.startDate)) {
+                        
+                        let newCounter = NSEntityDescription.insertNewObjectForEntityForName("CDCounter", inManagedObjectContext: self.managedObjectContext) as! CDCounter
+                        
+                        oldCounter.pathPart = nil
+                        pp.counterList = newCounter // Also sets newCounter.pathPart
+                        newCounter.next = oldCounter // Also sets oldCounter.previous
+                        newCounter.startDate = switchOverTime
+                        oldCounter.endDate = switchOverTime
+                    }
+                }
             } catch {
                 log.atLevelEmergency(id: -1, source: #file.source(#function, #line), message: "Error migrating store: \(error)")
                 return
@@ -245,6 +273,46 @@ final class Statistics: NSObject {
         })
         
         return result
+    }
+    
+    
+    // Creates a new generation of counters.
+    
+    private func createNewCdCounterGeneration() {
+        
+        managedObjectContext.performBlock({
+            
+            let switchOverTime = NSDate().timeIntervalSince1970
+            
+            for pp in self.cdDomains.domains?.allObjects as! [CDPathPart] {
+                
+                
+                // Skip no-trace pp's
+                
+                if pp.doNotTrace { continue }
+                
+                
+                // Get the old counter
+                
+                if let oldCounter = pp.counterList {
+                
+                
+                    // Create new counter
+                
+                    let newCounter = NSEntityDescription.insertNewObjectForEntityForName("CDCounter", inManagedObjectContext: self.managedObjectContext) as! CDCounter
+                    
+                    oldCounter.pathPart = nil
+                    pp.counterList = newCounter // Also sets newCounter.pathPart
+                    newCounter.next = oldCounter // Also sets oldCounter.previous
+                    newCounter.startDate = switchOverTime
+                    oldCounter.endDate = switchOverTime
+                    
+                    
+                } else {
+                    log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Missing counter for PathPart \(pp.pathPart)")
+                }
+            }
+        })
     }
     
     
@@ -366,6 +434,8 @@ final class Statistics: NSObject {
             
             switch mutation.kind {
             case .AddClientRecord: do { try self.addClientRecord(mutation) } catch {}
+            case .UpdatePathPart: self.updatePathPart(mutation)
+            case .UpdateClient: self.updateClient(mutation)
 /*            case .EmptyDatabase: self.emptyDatabase(mutation)
             case .RemoveAllClientRecords: self.removeAllClientRecords(mutation)
             case .RemoveAllClients: self.removeAllClients(mutation)
@@ -373,8 +443,6 @@ final class Statistics: NSObject {
             case .RemoveClient: self.removeClient(mutation)
             case .RemoveClientRecords: self.removeClientRecords(mutation)
             case .RemovePathPart: self.removePathParts(mutation)
-            case .UpdateClient: self.updateClient(mutation)
-            case .UpdatePathPart: self.updatePathPart(mutation)
                  */
             }
             do {
@@ -539,6 +607,92 @@ final class Statistics: NSObject {
         
     }
 
+    private func updatePathPart(mutation: Mutation) {
+        
+        guard let urlstr = mutation.url else {
+            log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Missing URL in UpdatePathPartCommand")
+            return
+        }
+        
+        guard let newState = mutation.doNotTrace else {
+            log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Missing New State in UpdatePathPartCommand")
+            return
+        }
+        
+        // Create an array of path components
+        let url = NSURL(string: urlstr) ?? NSURL(string: "")!
+        var pathParts = url.pathComponents ?? [""]
+        
+        // If the first part is a "/", then remove it
+        if pathParts.count > 0 && pathParts[0] == "/" { pathParts.removeAtIndex(0) }
+        
+        // Get the root of the path parts
+        let matchedDomains = (cdDomains.domains?.allObjects as! [CDPathPart]).filter(){ $0.pathPart! == pathParts[0]}
+        if matchedDomains.count != 1 {
+            log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Unknown or ambiguous domain in URL of UpdatePathPartCommand")
+            return
+        }
+        var current = matchedDomains[0]
+        
+        while pathParts.count > 0 {
+            
+            // Matched this part, remove it
+            pathParts.removeAtIndex(0)
+            
+            if pathParts.count == 0 { break }
+            
+            // Check for more
+            if current.next != nil || current.next?.count == 0 {
+                log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Unknown path part \(pathParts[0]) in URL of UpdatePathPartCommand")
+                return
+            }
+            let matchedParts = (current.next!.allObjects as! [CDPathPart]).filter(){ $0.pathPart! == pathParts[0]}
+            if matchedParts.count != 1 {
+                log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Unknown or ambigious path part \(pathParts[0]) in URL of UpdatePathPartCommand")
+                return
+            }
+            
+            // Advance down the tree
+            current = matchedDomains[0]
+        }
+        
+        // current now contains the sought after path part, update the doNotTrace status
+        current.doNotTrace = newState
+        
+        // Try to signal the console (if any) that the path part is updated
+        let message = ReadStatisticsReply(statistics: self.json).json.description
+        toConsole?.transferToConsole(message)
+    }
+    
+    
+    private func updateClient(mutation: Mutation) {
+        
+        guard let address = mutation.client else {
+            log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Missing client address in UpdateClientCommand")
+            return
+        }
+        
+        guard let newState = mutation.doNotTrace else {
+            log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Missing New State in UpdateClientCommand")
+            return
+        }
+        
+        // Get the root of the path parts
+        let matchedClients = (cdClients.clients?.allObjects as! [CDClient]).filter(){ $0.address! == address }
+        if matchedClients.count != 1 {
+            log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Unknown or ambiguous client in address of UpdateClientCommand")
+            return
+        }
+        let client = matchedClients[0]
+        
+        // current now contains the sought after path part, update the doNotTrace status
+        client.doNotTrace = newState
+        
+        // Try to signal the console (if any) that the path part is updated
+        let message = ReadStatisticsReply(statistics: self.json).json.description
+        toConsole?.transferToConsole(message)
+    }
+    
 /*
     private func emptyDatabase(mutation: Mutation) {
         
@@ -565,14 +719,6 @@ final class Statistics: NSObject {
     }
     
     private func removePathParts(mutation: Mutation) {
-        
-    }
-    
-    private func updateClient(mutation: Mutation) {
-        
-    }
-    
-    private func updatePathPart(mutation: Mutation) {
         
     }
 */

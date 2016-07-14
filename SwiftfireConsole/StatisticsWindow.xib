@@ -5,7 +5,12 @@
         <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
     </dependencies>
     <objects>
-        <customObject id="-2" userLabel="File's Owner" customClass="StatisticsWindowController" customModule="SwiftfireConsole" customModuleProvider="target"/>
+        <customObject id="-2" userLabel="File's Owner" customClass="StatisticsWindowController" customModule="SwiftfireConsole" customModuleProvider="target">
+            <connections>
+                <outlet property="endDatePicker" destination="wS6-tg-ES0" id="rq2-Gk-O4j"/>
+                <outlet property="startDatePicker" destination="jjO-Un-erQ" id="Zo1-Kg-i39"/>
+            </connections>
+        </customObject>
         <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
         <customObject id="-3" userLabel="Application" customClass="NSObject"/>
         <window title="Statistics" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" animationBehavior="default" id="rLs-ti-HGg">
@@ -27,13 +32,13 @@
                                     <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                     <subviews>
                                         <scrollView autohidesScrollers="YES" horizontalLineScroll="19" horizontalPageScroll="10" verticalLineScroll="19" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="zRD-u4-19d">
-                                            <rect key="frame" x="-3" y="-3" width="814" height="499"/>
+                                            <rect key="frame" x="-3" y="-3" width="814" height="468"/>
                                             <clipView key="contentView" id="Gfm-9m-9ag">
-                                                <rect key="frame" x="1" y="0.0" width="812" height="498"/>
+                                                <rect key="frame" x="1" y="0.0" width="812" height="467"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <outlineView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" multipleSelection="NO" autosaveColumns="NO" rowSizeStyle="automatic" headerView="yDJ-51-7HP" viewBased="YES" indentationPerLevel="30" outlineTableColumn="GkG-K3-KRg" id="5vE-HS-Aw5">
-                                                        <rect key="frame" x="0.0" y="0.0" width="812" height="475"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="812" height="444"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <size key="intercellSpacing" width="3" height="2"/>
                                                         <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -128,12 +133,12 @@
                                                                         <subviews>
                                                                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" fixedFrame="YES" translatesAutoresizingMaskIntoConstraints="NO" id="g3a-wm-Xif">
                                                                                 <rect key="frame" x="0.0" y="0.0" width="100" height="17"/>
-                                                                                <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="kp1-OY-Hj1">
+                                                                                <textFieldCell key="cell" lineBreakMode="truncatingTail" selectable="YES" editable="YES" sendsActionOnEndEditing="YES" title="Table View Cell" id="kp1-OY-Hj1">
                                                                                     <font key="font" metaFont="system"/>
                                                                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                                     <connections>
-                                                                                        <binding destination="PG2-dh-1RY" name="value" keyPath="objectValue.doNotTrace" id="9ao-t3-ykP"/>
+                                                                                        <binding destination="PG2-dh-1RY" name="value" keyPath="objectValue._doNotTrace" id="S1F-cn-uIx"/>
                                                                                     </connections>
                                                                                 </textFieldCell>
                                                                             </textField>
@@ -161,15 +166,97 @@
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </scroller>
                                             <tableHeaderView key="headerView" id="yDJ-51-7HP">
-                                                <rect key="frame" x="0.0" y="0.0" width="813" height="23"/>
+                                                <rect key="frame" x="0.0" y="0.0" width="812" height="23"/>
                                                 <autoresizingMask key="autoresizingMask"/>
                                             </tableHeaderView>
                                         </scrollView>
+                                        <datePicker verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="jjO-Un-erQ">
+                                            <rect key="frame" x="90" y="473" width="97" height="27"/>
+                                            <constraints>
+                                                <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="23" id="1NZ-hA-wqq"/>
+                                                <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="94" id="LTb-eG-eIQ"/>
+                                                <constraint firstAttribute="height" constant="23" id="csG-Ov-2G3"/>
+                                                <constraint firstAttribute="width" constant="94" id="qsr-kK-eVV"/>
+                                            </constraints>
+                                            <datePickerCell key="cell" borderStyle="bezel" alignment="left" id="ox6-L9-BYu">
+                                                <font key="font" metaFont="system"/>
+                                                <date key="date" timeIntervalSinceReferenceDate="473299200">
+                                                    <!--2016-01-01 00:00:00 +0000-->
+                                                </date>
+                                                <date key="minDate" timeIntervalSinceReferenceDate="473299200">
+                                                    <!--2016-01-01 00:00:00 +0000-->
+                                                </date>
+                                                <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                            </datePickerCell>
+                                            <connections>
+                                                <action selector="startDatePickerAction:" target="-2" id="yud-Jx-jH7"/>
+                                            </connections>
+                                        </datePicker>
+                                        <datePicker verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="wS6-tg-ES0">
+                                            <rect key="frame" x="276" y="473" width="97" height="27"/>
+                                            <constraints>
+                                                <constraint firstAttribute="width" constant="94" id="2fF-lM-gfY"/>
+                                                <constraint firstAttribute="height" constant="23" id="bDW-R7-wtM"/>
+                                                <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="94" id="od8-kb-RE0"/>
+                                                <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="23" id="u9X-7X-HSg"/>
+                                            </constraints>
+                                            <datePickerCell key="cell" borderStyle="bezel" alignment="left" id="QnK-Wu-tFk">
+                                                <font key="font" metaFont="system"/>
+                                                <date key="date" timeIntervalSinceReferenceDate="473299200">
+                                                    <!--2016-01-01 00:00:00 +0000-->
+                                                </date>
+                                                <date key="minDate" timeIntervalSinceReferenceDate="473299200">
+                                                    <!--2016-01-01 00:00:00 +0000-->
+                                                </date>
+                                                <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                            </datePickerCell>
+                                            <connections>
+                                                <action selector="endDatePickerAction:" target="-2" id="mVS-pz-Bsy"/>
+                                            </connections>
+                                        </datePicker>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="p7z-xo-jjc">
+                                            <rect key="frame" x="15" y="476" width="69" height="17"/>
+                                            <constraints>
+                                                <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="65" id="C6O-jF-mLT"/>
+                                                <constraint firstAttribute="width" constant="65" id="N4i-jP-8Hl"/>
+                                                <constraint firstAttribute="height" constant="17" id="NgK-DW-lJH"/>
+                                                <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="17" id="pF2-fC-KCO"/>
+                                            </constraints>
+                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Start date:" id="P9O-wb-LPN">
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
+                                        <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="uvX-RH-FWX">
+                                            <rect key="frame" x="208" y="476" width="62" height="17"/>
+                                            <constraints>
+                                                <constraint firstAttribute="width" constant="58" id="I0B-on-wlx"/>
+                                                <constraint firstAttribute="width" relation="greaterThanOrEqual" constant="58" id="PSu-aV-EzL"/>
+                                                <constraint firstAttribute="height" constant="17" id="dSy-1s-lbq"/>
+                                                <constraint firstAttribute="height" relation="greaterThanOrEqual" constant="17" id="upf-Tx-90h"/>
+                                            </constraints>
+                                            <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="End date:" id="2Ks-9n-Qnf">
+                                                <font key="font" metaFont="system"/>
+                                                <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                                                <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                                            </textFieldCell>
+                                        </textField>
                                     </subviews>
                                     <constraints>
+                                        <constraint firstItem="uvX-RH-FWX" firstAttribute="top" secondItem="by6-99-3dt" secondAttribute="top" constant="6" id="15E-K0-SWD"/>
                                         <constraint firstAttribute="trailing" secondItem="zRD-u4-19d" secondAttribute="trailing" constant="-3" id="D4x-uc-88q"/>
+                                        <constraint firstItem="jjO-Un-erQ" firstAttribute="leading" secondItem="p7z-xo-jjc" secondAttribute="trailing" constant="8" id="Dj1-ou-7t2"/>
+                                        <constraint firstItem="jjO-Un-erQ" firstAttribute="top" secondItem="by6-99-3dt" secondAttribute="top" constant="3" id="EWV-pD-aHN"/>
+                                        <constraint firstItem="p7z-xo-jjc" firstAttribute="leading" secondItem="by6-99-3dt" secondAttribute="leading" constant="17" id="EXu-qL-mfW"/>
+                                        <constraint firstItem="wS6-tg-ES0" firstAttribute="leading" secondItem="uvX-RH-FWX" secondAttribute="trailing" constant="8" id="I01-66-Xoz"/>
+                                        <constraint firstItem="p7z-xo-jjc" firstAttribute="top" secondItem="by6-99-3dt" secondAttribute="top" constant="6" id="S5x-ya-Ceo"/>
+                                        <constraint firstItem="uvX-RH-FWX" firstAttribute="leading" secondItem="jjO-Un-erQ" secondAttribute="trailing" constant="26" id="Sqz-XE-TtC"/>
                                         <constraint firstItem="zRD-u4-19d" firstAttribute="leading" secondItem="by6-99-3dt" secondAttribute="leading" constant="-3" id="UQC-Kf-GcV"/>
-                                        <constraint firstItem="zRD-u4-19d" firstAttribute="top" secondItem="by6-99-3dt" secondAttribute="top" constant="3" id="rR3-Yp-aXz"/>
+                                        <constraint firstItem="wS6-tg-ES0" firstAttribute="top" secondItem="by6-99-3dt" secondAttribute="top" constant="3" id="q8f-g1-nmX"/>
+                                        <constraint firstItem="zRD-u4-19d" firstAttribute="top" secondItem="by6-99-3dt" secondAttribute="top" constant="34" id="rR3-Yp-aXz"/>
                                         <constraint firstAttribute="bottom" secondItem="zRD-u4-19d" secondAttribute="bottom" constant="-3" id="zX1-VP-AYl"/>
                                     </constraints>
                                 </view>
@@ -357,7 +444,7 @@
                                                                                     <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
                                                                                 </textFieldCell>
                                                                                 <connections>
-                                                                                    <binding destination="6c1-24-5nr" name="value" keyPath="objectValue.doNotTrace" id="MaC-bL-jus"/>
+                                                                                    <binding destination="6c1-24-5nr" name="value" keyPath="objectValue._doNotTrace" id="8ZF-ci-y4r"/>
                                                                                 </connections>
                                                                             </textField>
                                                                         </subviews>

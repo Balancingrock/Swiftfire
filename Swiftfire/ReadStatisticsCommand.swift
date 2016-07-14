@@ -3,7 +3,7 @@
 //  File:       ReadStatisticsCommand.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.11
+//  Version:    0.9.12
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,6 +49,7 @@
 //
 // History
 //
+// v0.9.12 - Fixed missing command name
 // v0.9.11 - Initial release
 // =====================================================================================================================
 
@@ -73,10 +74,10 @@ final class ReadStatisticsCommand {
         guard (json|COMMAND_NAME)?.nullValue == true else { return nil }
     }
     
-    func execute() -> VJson? {
+    func execute() {
         log.atLevelDebug(id: -1, source: #file.source(#function, #line))
         let stat = statistics
         let reply = ReadStatisticsReply(statistics: stat.json)
-        return reply.json
+        toConsole?.transferToConsole(reply.json.description)
     }
 }

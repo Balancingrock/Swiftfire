@@ -3,7 +3,7 @@
 //  File:       SwiftfireMacInterface.swift
 //  Project:    SwiftfireConsole
 //
-//  Version:    0.9.11
+//  Version:    0.9.12
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,6 +49,7 @@
 //
 // History
 //
+// v0.9.12 - Added TransferToSwiftfire protocol
 // v0.9.11 - Merged into Swiftfire project
 // v0.9.4  - Header update
 //         - Added closeConnection()
@@ -88,7 +89,7 @@ protocol SwiftfireMacInterfaceDelegate {
 }
 
 
-class SwiftfireMacInterface: NSObject {
+class SwiftfireMacInterface: NSObject, TransferToSwiftfire {
 
     
     /// Indicates if this M&C interface is operational
@@ -143,6 +144,25 @@ class SwiftfireMacInterface: NSObject {
     /**
      This function attempts to send JSON formatted messages to the Swiftfire server.
   
+     - Parameter messages: A list of VJson messages to be sent.
+     
+     - Returns: True if the status flag "communicationIsEstablished" is set, false otherwise.
+     */
+
+    func sendMessages(messages: [VJson?]) -> Bool {
+        
+        let textMessages = messages.flatMap(){ $0?.description }
+        
+        return sendMessages(textMessages)
+    }
+    
+    func transferToSwiftfire(message: String) -> Bool {
+        return sendMessages([message])
+    }
+    
+    /**
+     This function attempts to send string formatted messages to the Swiftfire server.
+     
      - Parameter address: The IP address of the Swiftfire server.
      - Parameter port: The port number of the Swiftfire server that it is listening for M&C messages.
      - Parameter messages: A list of VJson messages to be sent.
@@ -150,11 +170,11 @@ class SwiftfireMacInterface: NSObject {
      
      - Returns: True if the transfer attempt will be made (asynchronously). False if not. Note that in fact the status flag "communicationIsEstablished" is returned.
      */
-
-    func sendMessages(messages: [VJson?]) -> Bool {
+    
+    func sendMessages(messages: [String]) -> Bool {
         
         return synchronized(self, { [unowned self] () -> Bool in
-
+            
             
             // Check if a connection has been established
             
@@ -163,17 +183,17 @@ class SwiftfireMacInterface: NSObject {
                 
                 // Transmit the messages
                 
-                for message in messages.filter({$0 != nil}) {
+                for message in messages {
                     dispatch_async(self.toServerQueue, {
-                        self.transmitMessage(message!.description)
+                        self.transmitMessage(message)
                     })
                 }
             }
             
             return (self.swiftfireSocket != nil)
-        })
+            })
     }
-    
+
 
     /**
      Initializes a new object with the given delegate. Without a delegate it is only possible to send messages. Without a delegate no errors, telemetry or remote logging will be available.
@@ -278,6 +298,14 @@ class SwiftfireMacInterface: NSObject {
         
         dispatch_async(fromServerQueue, { [unowned self] in
             
+            
+            // Make the transfer operation globally available
+            
+            toSwiftfire = self
+            
+            
+            // Start receiving
+            
             RECEIVER_LOOP: while self.swiftfireSocket != nil {
             
                 let jsonEndDetector = SwifterSockets.JsonEndDetector()
@@ -324,6 +352,11 @@ class SwiftfireMacInterface: NSObject {
                     log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Unexpected 'default' executed")
                 }
             }
+            
+            
+            // Transmitter is no longer available either
+            
+            toSwiftfire = nil
         })
     }
     

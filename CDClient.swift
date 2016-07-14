@@ -3,7 +3,7 @@
 //  File:       CDClient.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.11
+//  Version:    0.9.12
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,6 +49,7 @@
 //
 // History
 //
+// v0.9.12 - Added manipulation of doNotTrace
 // v0.9.11 - Initial release
 // =====================================================================================================================
 
@@ -137,5 +138,22 @@ class CDClient: NSManagedObject {
             }
         }
         return new
+    }
+    
+    var _doNotTrace: NSNumber {
+        get {
+            return NSNumber(bool: doNotTrace)
+        }
+        set {
+            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "New value for doNotTrace \(newValue), transmitting to Swiftfire")
+            
+            let command = UpdateClientCommand(client: address!, newValue: newValue.boolValue)
+            
+            if toSwiftfire != nil {
+                toSwiftfire?.transferToSwiftfire(command.json.description)
+            } else {
+                log.atLevelWarning(id: -1, source: #file.source(#function, #line), message: "Attempt to set new value for doNotTrace \(newValue), but no transmitter available")
+            }
+        }
     }
 }

@@ -3,7 +3,7 @@
 //  File:       Parameters.swift
 //  Project:    Swiftfire
 //
-private let VERSION = "0.9.11"
+private let VERSION = "0.9.12b1"
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,6 +49,7 @@ private let VERSION = "0.9.11"
 //
 // History
 //
+// v0.9.12 - Updated version number
 // v0.9.11 - Updated version number
 // v0.9.10 - Updated version number
 // v0.9.9  - Updated version number
@@ -583,7 +584,7 @@ final class Parameters {
     
     // MARK: - Support for Monitoring & Control
     
-    static func doReadServerParameterCommand(socket: Int32, command: ReadServerParameterCommand) -> VJson {
+    static func doReadServerParameterCommand(socket: Int32, command: ReadServerParameterCommand) {
         
         func createBoolReply(parameter: ServerParameter) -> VJson {
             let parameterId = ParameterId.from(parameter)
@@ -611,13 +612,13 @@ final class Parameters {
              .HEADER_LOGGING_ENABLED,
              .FLUSH_HEADER_LOGFILE_AFTER_EACH_WRITE:
             
-            return createBoolReply(command.parameter)
+            toConsole?.transferToConsole(createBoolReply(command.parameter).description)
             
             
         case .SERVICE_PORT_NUMBER,
              .MAC_PORT_NUMBER:
             
-            return createStringReply(command.parameter)
+            toConsole?.transferToConsole(createStringReply(command.parameter).description)
             
             
         case .CLIENT_MESSAGE_BUFFER_SIZE,
@@ -631,7 +632,7 @@ final class Parameters {
              .HTTP_RESPONSE_CLIENT_TIMEOUT,
              .MAC_INACTIVITY_TIMEOUT:
             
-            return createIntReply(command.parameter)
+            toConsole?.transferToConsole(createIntReply(command.parameter).description)
             
             
         case .ASL_FACILITY_RECORD_AT_AND_ABOVE_LEVEL:
@@ -639,35 +640,51 @@ final class Parameters {
             
             log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, log.aslFacilityRecordAtAndAboveLevel = \(log.aslFacilityRecordAtAndAboveLevel.rawValue)")
             
-            return ReadServerParameterReply(parameter: command.parameter, value: log.aslFacilityRecordAtAndAboveLevel.rawValue).json
-            
+            toConsole?.transferToConsole(
+                ReadServerParameterReply(
+                    parameter: command.parameter,
+                    value: log.aslFacilityRecordAtAndAboveLevel.rawValue
+                ).json.description
+            )
+        
             
         case .FILE_RECORD_AT_AND_ABOVE_LEVEL:
             
             log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, log.logfileRecordAtAndAboveLevel = \(log.fileRecordAtAndAboveLevel.rawValue)")
             
-            return ReadServerParameterReply(parameter: command.parameter, value: log.fileRecordAtAndAboveLevel.rawValue).json
+            toConsole?.transferToConsole(
+                ReadServerParameterReply(
+                    parameter: command.parameter,
+                    value: log.fileRecordAtAndAboveLevel.rawValue
+                    ).json.description
+            )
             
             
         case .STDOUT_PRINT_AT_AND_ABOVE_LEVEL:
             
             log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, log.stdoutPrintAtAndAboveLevel = \(log.stdoutPrintAtAndAboveLevel.rawValue)")
             
-            return ReadServerParameterReply(parameter: command.parameter, value: log.stdoutPrintAtAndAboveLevel.rawValue).json
+            toConsole?.transferToConsole(
+                ReadServerParameterReply(parameter: command.parameter, value: log.stdoutPrintAtAndAboveLevel.rawValue).json.description
+            )
             
             
         case .CALLBACK_AT_AND_ABOVE_LEVEL:
             
             log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, log.callbackTransmitAtAndAboveLevel = \(log.callbackAtAndAboveLevel.rawValue)")
             
-            return ReadServerParameterReply(parameter: command.parameter, value: log.callbackAtAndAboveLevel.rawValue).json
+            toConsole?.transferToConsole(
+                ReadServerParameterReply(parameter: command.parameter, value: log.callbackAtAndAboveLevel.rawValue).json.description
+            )
             
             
         case .NETWORK_TRANSMIT_AT_AND_ABOVE_LEVEL:
             
             log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, log.networkTransmitAtAndAboveLevel = \(log.networkTransmitAtAndAboveLevel.rawValue)")
             
-            return ReadServerParameterReply(parameter: command.parameter, value: log.networkTransmitAtAndAboveLevel.rawValue).json
+            toConsole?.transferToConsole(
+                ReadServerParameterReply(parameter: command.parameter, value: log.networkTransmitAtAndAboveLevel.rawValue).json.description
+            )
             
             
         case .NETWORK_LOGTARGET_IP_ADDRESS:
@@ -675,7 +692,9 @@ final class Parameters {
             let dest = log.networkTarget?.address ?? "Not set"
             log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, log.networkTarget.address = \(dest)")
             
-            return ReadServerParameterReply(parameter: command.parameter, value: dest).json
+            toConsole?.transferToConsole(
+                ReadServerParameterReply(parameter: command.parameter, value: dest).json.description
+            )
             
             
         case .NETWORK_LOGTARGET_PORT_NUMBER:
@@ -683,7 +702,9 @@ final class Parameters {
             let port = log.networkTarget?.port ?? "0"
             log.atLevelNotice(id: socket, source: #file.source(#function, #line), message: "Reading, log.networkTarget.port = \(port)")
             
-            return ReadServerParameterReply(parameter: command.parameter, value: port).json
+            toConsole?.transferToConsole(
+                ReadServerParameterReply(parameter: command.parameter, value: port).json.description
+            )
         }
     }
 

@@ -3,7 +3,7 @@
 //  File:       Statistics-Console.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.11
+//  Version:    0.9.12
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,6 +49,8 @@
 //
 // History
 //
+// v0.9.12 - Added statisticsWindowController to recalculate the count values after loading
+//         - Added 'updatePathPart' and 'updateClient' to mutation switch statements
 // v0.9.11 - Initial release
 // =====================================================================================================================
 
@@ -61,6 +63,9 @@ let statistics = Statistics()
 
 
 final class Statistics: NSObject {
+    
+    
+    var statisticsWindowController: StatisticsWindowController?
     
     
     // The queue on which all mutations will take place
@@ -212,6 +217,8 @@ final class Statistics: NSObject {
         if let cdc = CDClients.createFrom(jclients, inContext: managedObjectContext) {
             cdClients = cdc
         }
+        
+        statisticsWindowController?.recalculateCountValue()
     }
     
     
@@ -346,6 +353,8 @@ final class Statistics: NSObject {
         
         switch mutation.kind {
         case .AddClientRecord: do { try addClientRecord(mutation) } catch {}
+        case .UpdatePathPart: updatePathPart(mutation)
+        case .UpdateClient: updateClient(mutation)
 /*
         case .EmptyDatabase: emptyDatabase(mutation)
         case .RemoveAllClientRecords: removeAllClientRecords(mutation)
@@ -354,8 +363,6 @@ final class Statistics: NSObject {
         case .RemoveClient: removeClient(mutation)
         case .RemoveClientRecords: removeClientRecords(mutation)
         case .RemovePathPart: removePathParts(mutation)
-        case .UpdateClient: updateClient(mutation)
-        case .UpdatePathPart: updatePathPart(mutation)
 */
         }
         
@@ -519,6 +526,15 @@ final class Statistics: NSObject {
         } while current != nil
 
     }
+    
+    private func updatePathPart(mutation: Mutation) {
+        log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Unexpectedly called")
+    }
+    
+    private func updateClient(mutation: Mutation) {
+        log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Unexpectedly called")        
+    }
+
 /*
     private func emptyDatabase(mutation: Mutation) {
         
@@ -548,12 +564,5 @@ final class Statistics: NSObject {
         
     }
 
-    private func updateClient(mutation: Mutation) {
-        
-    }
-    
-    private func updatePathPart(mutation: Mutation) {
-        
-    }
 */
 }

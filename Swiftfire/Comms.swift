@@ -1,7 +1,7 @@
 // =====================================================================================================================
 //
-//  File:       StatisticsWindowController.swift
-//  Project:    SwiftfireConsole
+//  File:       Comms.swift
+//  Project:    Swiftfire
 //
 //  Version:    0.9.12
 //
@@ -9,9 +9,9 @@
 //  Company:    http://balancingrock.nl
 //  Website:    http://swiftfire.nl/
 //  Blog:       http://swiftrien.blogspot.com
-//  Git:        https://github.com/Swiftrien/SwiftfireConsole
+//  Git:        https://github.com/Swiftrien/Swiftfire
 //
-//  Copyright:  (c) 2014-2016 Marinus van der Lugt, All rights reserved.
+//  Copyright:  (c) 2016 Marinus van der Lugt, All rights reserved.
 //
 //  License:    Use or redistribute this code any way you like with the following two provision:
 //
@@ -49,55 +49,23 @@
 //
 // History
 //
-// v0.9.12 - Added time-boxing for domains tab
-// v0.9.11 - Initial release
+// v0.9.12 - Initial release
 // =====================================================================================================================
 
+
 import Foundation
-import Cocoa
 
-class StatisticsWindowController: NSWindowController {
-    
-    
-    // Uses Bindings
 
-    var data: Statistics = statistics
-    
-    
-    // Window components
-    
-    @IBOutlet var startDatePicker: NSDatePicker!
-    @IBOutlet var endDatePicker: NSDatePicker!
-    
-    
-    // Actions from the GUI
-    
-    @IBAction func startDatePickerAction(sender: AnyObject) {
-        recalculateCountValue()
-    }
-    
-    @IBAction func endDatePickerAction(sender: AnyObject) {
-        recalculateCountValue()
-    }
-    
-    
-    // Recalculates the count value for the time period between the dates.
-    
-    func recalculateCountValue() {
-        let startDate = startDatePicker.dateValue.timeIntervalSince1970
-        let endDate = endDatePicker.dateValue.timeIntervalSince1970
-        for pp in statistics.cdDomains.domains?.allObjects as! [CDPathPart] {
-            pp.recalculateCountForPeriod(startDate, endDate: endDate)
-        }
-    }
-    
-    
-    // Initialize the GUI
-    
-    override func awakeFromNib() {
-        super.awakeFromNib()
-        let today = NSCalendar.currentCalendar().startOfDayForDate(NSDate())
-        startDatePicker.dateValue = today
-        endDatePicker.dateValue = today
-    }    
+protocol TransferToConsole {
+    // Returning 'true' only indicates that an attempt will be made to transfer the message, not its successful transmission.
+    func transferToConsole(message: String) -> Bool
 }
+
+protocol TransferToSwiftfire {
+    // Returning 'true' only indicates that an attempt will be made to transfer the message, not its successful transmission.
+    func transferToSwiftfire(message: String) -> Bool
+}
+
+var toConsole: TransferToConsole?
+
+var toSwiftfire: TransferToSwiftfire?

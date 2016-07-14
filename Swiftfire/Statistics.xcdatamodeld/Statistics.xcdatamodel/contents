@@ -29,7 +29,7 @@
         <attribute name="startDate" attributeType="Double" defaultValueString="0.0" syncable="YES"/>
         <relationship name="clientRecords" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CDClientRecord" inverseName="urlCounter" inverseEntity="CDClientRecord" syncable="YES"/>
         <relationship name="next" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="CDCounter" inverseName="previous" inverseEntity="CDCounter" syncable="YES"/>
-        <relationship name="pathPart" maxCount="1" deletionRule="Nullify" destinationEntity="CDPathPart" inverseName="counterList" inverseEntity="CDPathPart" syncable="YES"/>
+        <relationship name="pathPart" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CDPathPart" inverseName="counterList" inverseEntity="CDPathPart" syncable="YES"/>
         <relationship name="previous" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CDCounter" inverseName="next" inverseEntity="CDCounter" syncable="YES"/>
     </entity>
     <entity name="CDDomains" representedClassName=".CDDomains" syncable="YES">
