@@ -1,9 +1,9 @@
 // =====================================================================================================================
 //
-//  File:       AppParameters.swift
+//  File:       HistoricalUsageWindowController.swift
 //  Project:    SwiftfireConsole
 //
-//  Version:    0.9.11
+//  Version:    0.9.12
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,20 +49,49 @@
 //
 // History
 //
-// v0.9.11 - Merged into Swiftfire project
-// v0.9.4  - Header update
-// v0.9.0  - Initial release
+// v0.9.12 - Initial release
 // =====================================================================================================================
 
 import Foundation
+import Cocoa
 
-
-/// The version number of this aplication
-
-let ap_ApplicationVersion = "0.1"
-
-
-/// When this variable is "true" additional code will be executed to generate debug information
-/// (Note: This variable is independant of the logging levels!)
-
-var ap_ApplicationInDebugMode = true
+class HistoricalUsageWindowController: NSWindowController {
+    
+    var pathPart: CDPathPart
+    
+    @IBOutlet weak var startDatePicker: NSDatePicker!
+    @IBOutlet weak var endDatePicker: NSDatePicker!
+    @IBOutlet weak var periodSelectionPopup: NSPopUpButton!
+    @IBOutlet weak var urlLabel: NSTextField!
+    @IBOutlet weak var chartView: HistoricalUsageView!
+    
+    override var windowNibName: String? { return "HistoricalUsageWindow" }
+    
+    init(pathPart: CDPathPart) {
+        self.pathPart = pathPart
+        super.init(window: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) has not been implemented")
+    }
+    
+    @IBAction func handleStartDatePickerAction(sender: AnyObject?) {
+        
+    }
+    
+    @IBAction func handleEndDatePickerAction(sender: AnyObject?) {
+        
+    }
+    
+    @IBAction func handlePeriodSelectionPopupAction(sender: AnyObject?) {
+        
+    }
+    
+    override func windowDidLoad() {
+        log.atLevelDebug(id: -1, source: #file.source(#function, #line), message: "Window did load, frame for view: \(chartView.frame)")
+        chartView.pathPart = pathPart
+        urlLabel.stringValue = pathPart.fullUlr
+    }
+    
+}

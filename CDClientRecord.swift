@@ -3,7 +3,7 @@
 //  File:       CDClientRecord.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.11
+//  Version:    0.9.12
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,6 +49,7 @@
 //
 // History
 //
+// v0.9.12 - Switched requestReceived andrequetsCompleted to javaDate (Int64)
 // v0.9.11 - Initial release
 // =====================================================================================================================
 
@@ -99,12 +100,12 @@ class CDClientRecord: NSManagedObject {
             return nil
         }
 
-        guard let jrequestreceived = (json|REQUEST_RECEIVED)?.doubleValue else {
+        guard let jrequestreceived = (json|REQUEST_RECEIVED)?.integerValue else {
             log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Could not find 'request received' item in json code")
             return nil
         }
 
-        guard let jrequestcompleted = (json|REQUEST_COMPLETED)?.doubleValue else {
+        guard let jrequestcompleted = (json|REQUEST_COMPLETED)?.integerValue else {
             log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Could not find 'request completed' item in json code")
             return nil
         }
@@ -141,8 +142,8 @@ class CDClientRecord: NSManagedObject {
         new.host = (json|HOST)?.stringValue
         new.httpResponseCode = (json|HTTP_RESPONSE_CODE)?.stringValue
         new.responseDetails = (json|RESPONSE_DETAILS)?.stringValue
-        new.requestReceived = jrequestreceived
-        new.requestCompleted = jrequestcompleted
+        new.requestReceived = Int64(jrequestreceived)
+        new.requestCompleted = Int64(jrequestcompleted)
         new.socket = Int32(jsocket)
         new.url = (json|URLSTR)?.stringValue
         

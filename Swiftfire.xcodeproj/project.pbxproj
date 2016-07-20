@@ -7,6 +7,9 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		8630B9321D38BD2000672CBD /* HistoricalUsageWindowController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8630B9311D38BD2000672CBD /* HistoricalUsageWindowController.swift */; };
+		8630B9341D38BD3E00672CBD /* HistoricalUsageWindow.xib in Resources */ = {isa = PBXBuildFile; fileRef = 8630B9331D38BD3E00672CBD /* HistoricalUsageWindow.xib */; };
+		8630B9361D38C43B00672CBD /* HistoricalUsageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8630B9351D38C43B00672CBD /* HistoricalUsageView.swift */; };
 		86490DDD1D2FF39B00ACAFA3 /* Statistics-Swiftfire.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86490DDC1D2FF39B00ACAFA3 /* Statistics-Swiftfire.swift */; };
 		86490DDF1D301E9D00ACAFA3 /* Mutation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86490DDE1D301E9D00ACAFA3 /* Mutation.swift */; };
 		86490DE01D301E9D00ACAFA3 /* Mutation.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86490DDE1D301E9D00ACAFA3 /* Mutation.swift */; };
@@ -167,7 +170,6 @@
 		8696165D1D22603C00CE264A /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8696165C1D22603C00CE264A /* AppDelegate.swift */; };
 		8696165F1D22603C00CE264A /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 8696165E1D22603C00CE264A /* Assets.xcassets */; };
 		869616621D22603C00CE264A /* MainMenu.xib in Resources */ = {isa = PBXBuildFile; fileRef = 869616601D22603C00CE264A /* MainMenu.xib */; };
-		86B2BA5E1D2261360023D7E2 /* AppParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86B2BA571D2261360023D7E2 /* AppParameters.swift */; };
 		86B2BA5F1D2261360023D7E2 /* ConsoleWindowViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86B2BA581D2261360023D7E2 /* ConsoleWindowViewController.swift */; };
 		86B2BA601D2261360023D7E2 /* ParameterTabTableRow.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86B2BA591D2261360023D7E2 /* ParameterTabTableRow.swift */; };
 		86B2BA631D2261360023D7E2 /* SwiftfireMacInterface.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86B2BA5C1D2261360023D7E2 /* SwiftfireMacInterface.swift */; };
@@ -271,6 +273,9 @@
 /* End PBXCopyFilesBuildPhase section */
 
 /* Begin PBXFileReference section */
+		8630B9311D38BD2000672CBD /* HistoricalUsageWindowController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HistoricalUsageWindowController.swift; sourceTree = "<group>"; };
+		8630B9331D38BD3E00672CBD /* HistoricalUsageWindow.xib */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = file.xib; path = HistoricalUsageWindow.xib; sourceTree = "<group>"; };
+		8630B9351D38C43B00672CBD /* HistoricalUsageView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HistoricalUsageView.swift; sourceTree = "<group>"; };
 		86490DDC1D2FF39B00ACAFA3 /* Statistics-Swiftfire.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = "Statistics-Swiftfire.swift"; sourceTree = "<group>"; };
 		86490DDE1D301E9D00ACAFA3 /* Mutation.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Mutation.swift; sourceTree = "<group>"; };
 		864A74871D019CAD0003173F /* Four04Log.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = Four04Log.swift; sourceTree = "<group>"; };
@@ -375,7 +380,6 @@
 		8696165E1D22603C00CE264A /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		869616611D22603C00CE264A /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.xib; name = Base; path = Base.lproj/MainMenu.xib; sourceTree = "<group>"; };
 		869616631D22603C00CE264A /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
-		86B2BA571D2261360023D7E2 /* AppParameters.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AppParameters.swift; sourceTree = "<group>"; };
 		86B2BA581D2261360023D7E2 /* ConsoleWindowViewController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ConsoleWindowViewController.swift; sourceTree = "<group>"; };
 		86B2BA591D2261360023D7E2 /* ParameterTabTableRow.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ParameterTabTableRow.swift; sourceTree = "<group>"; };
 		86B2BA5C1D2261360023D7E2 /* SwiftfireMacInterface.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = SwiftfireMacInterface.swift; sourceTree = "<group>"; };
@@ -622,7 +626,6 @@
 			isa = PBXGroup;
 			children = (
 				8696165C1D22603C00CE264A /* AppDelegate.swift */,
-				86B2BA571D2261360023D7E2 /* AppParameters.swift */,
 				86B2BA581D2261360023D7E2 /* ConsoleWindowViewController.swift */,
 				86B2BA591D2261360023D7E2 /* ParameterTabTableRow.swift */,
 				86B2BA5C1D2261360023D7E2 /* SwiftfireMacInterface.swift */,
@@ -632,6 +635,9 @@
 				869616631D22603C00CE264A /* Info.plist */,
 				865559291D228056008354AB /* StatisticsWindow.xib */,
 				8655592D1D2289E5008354AB /* StatisticsWindowController.swift */,
+				8630B9351D38C43B00672CBD /* HistoricalUsageView.swift */,
+				8630B9331D38BD3E00672CBD /* HistoricalUsageWindow.xib */,
+				8630B9311D38BD2000672CBD /* HistoricalUsageWindowController.swift */,
 			);
 			path = SwiftfireConsole;
 			sourceTree = "<group>";
@@ -755,6 +761,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				8655592A1D228056008354AB /* StatisticsWindow.xib in Resources */,
+				8630B9341D38BD3E00672CBD /* HistoricalUsageWindow.xib in Resources */,
 				8696165F1D22603C00CE264A /* Assets.xcassets in Resources */,
 				869616621D22603C00CE264A /* MainMenu.xib in Resources */,
 			);
@@ -948,6 +955,7 @@
 				86B2BA9B1D2262D30023D7E2 /* ReadDomainsReply.swift in Sources */,
 				86B2BA6A1D2262600023D7E2 /* SwifterSockets.swift in Sources */,
 				86B2BA961D2262D30023D7E2 /* ServerParameter.swift in Sources */,
+				8630B9321D38BD2000672CBD /* HistoricalUsageWindowController.swift in Sources */,
 				86B2BA8A1D2262AC0023D7E2 /* CDCounter.swift in Sources */,
 				86B2BAA31D2262D30023D7E2 /* CreateDomainCommand.swift in Sources */,
 				86B2BA7D1D2262AC0023D7E2 /* CDMutation+CoreDataProperties.swift in Sources */,
@@ -968,6 +976,7 @@
 				8655592E1D2289E5008354AB /* StatisticsWindowController.swift in Sources */,
 				86B2BAB11D2263140023D7E2 /* HttpConnection.swift in Sources */,
 				86B2BA831D2262AC0023D7E2 /* CDClientRecord+CoreDataProperties.swift in Sources */,
+				8630B9361D38C43B00672CBD /* HistoricalUsageView.swift in Sources */,
 				86B2BA8F1D2262C60023D7E2 /* ServerTelemetry.swift in Sources */,
 				86B2BA781D22628D0023D7E2 /* Domains.swift in Sources */,
 				86B2BAA01D2262D30023D7E2 /* WriteServerParameterCommand.swift in Sources */,
@@ -1008,7 +1017,6 @@
 				86B2BAB51D2263250023D7E2 /* HttpConnectionPool.swift in Sources */,
 				86B2BA8C1D2262C00023D7E2 /* MimeType.swift in Sources */,
 				86B2BA761D22626A0023D7E2 /* Logfile.swift in Sources */,
-				86B2BA5E1D2261360023D7E2 /* AppParameters.swift in Sources */,
 				86B2BA921D2262C60023D7E2 /* FileURLs.swift in Sources */,
 				86B2BA971D2262D30023D7E2 /* ServerTelemetryItem.swift in Sources */,
 				86B2BAB01D2262FE0023D7E2 /* AcceptAndDispatch.swift in Sources */,

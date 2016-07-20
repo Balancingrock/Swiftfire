@@ -50,6 +50,7 @@
 // History
 //
 // v0.9.12 - Added manipulation of doNotTrace
+//         - Changed CDCounter startDate to Int64 (javaDate)
 // v0.9.11 - Initial release
 // =====================================================================================================================
 
@@ -128,20 +129,22 @@ class CDPathPart: NSManagedObject {
     
     var count: NSNumber?
 
-    func recalculateCountForPeriod(startDate: Double, endDate: Double) {
+    func recalculateCountForPeriod(startDate: Int64, endDate: Int64) {
         
         var privateCount: Int64 = 0
         
         if let counter = counterList {
         
-            if counter.endDate <= endDate && counter.startDate >= startDate {
+            if counter.startDate >= startDate && counter.startDate <= endDate  {
                 privateCount = counter.count
             }
             
-            while let counter = counter.next {
-                if counter.endDate <= endDate && counter.startDate >= startDate {
-                    privateCount += counter.count
+            var whileCounter = counter.next
+            while whileCounter != nil {
+                if whileCounter!.startDate >= startDate && whileCounter!.startDate <= endDate  {
+                    privateCount += whileCounter!.count
                 }
+                whileCounter = whileCounter!.next
             }
         }
         
@@ -173,5 +176,20 @@ class CDPathPart: NSManagedObject {
                 log.atLevelWarning(id: -1, source: #file.source(#function, #line), message: "Attempt to set new value for doNotTrace \(newValue), but no transmitter available")
             }
         }
+    }
+    
+    func showChart() {
+        log.atLevelDebug(id: -1, source: #file.source(#function, #line))
+        statistics.gui?.displayHistory(self)
+    }
+    
+    var fullUlr: String {
+        var urlstr = self.pathPart!
+        var current = self.previous
+        while current != nil {
+            urlstr = (current!.pathPart! as NSString).stringByAppendingPathComponent(urlstr)
+            current = current!.previous
+        }
+        return urlstr
     }
 }

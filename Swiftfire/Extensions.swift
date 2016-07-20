@@ -3,7 +3,7 @@
 //  File:       Extensions.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.11
+//  Version:    0.9.12
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,6 +49,7 @@
 //
 // History
 //
+// v0.9.12 - Added javaDate & unixDate to NSDate extension
 // v0.9.11 - Added NSDate and NSDateComponents extensions
 //         - Removed faulty 'descriptionWithSeparator'
 //         - Updated for VJson 0.9.8
@@ -107,6 +108,34 @@ extension NSDate {
         let calendar = calendar ?? NSCalendar.currentCalendar()
         let components = calendar.components(NSCalendarUnit(arrayLiteral: .Hour, .Minute, .Second), fromDate: self)
         return components
+    }
+    
+    
+    /// Milli seconds since 1 Jan 1970
+    
+    var javaDate: Int64 {
+        return Int64(self.timeIntervalSince1970 * 1000)
+    }
+    
+    
+    /// Seconds since 1 Jan 1970
+    
+    var unixTime: Int64 {
+        return Int64(self.timeIntervalSince1970)
+    }
+    
+    
+    /// From milli seconds since 1 Jan 1970
+    
+    static func fromJavaDate(value: Int64) -> NSDate {
+        return NSDate(timeIntervalSince1970: Double(value / 1000))
+    }
+    
+    
+    /// From seconds since 1 Jan 1970
+    
+    static func fromUnixTime(value: Int64) -> NSDate {
+        return NSDate(timeIntervalSince1970: Double(value))
     }
 }
 

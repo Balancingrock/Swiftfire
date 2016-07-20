@@ -85,7 +85,7 @@ extension HttpConnection {
         mutation.connectionAllocationCount = allocationCount
         mutation.connectionObjectId = objectId
         mutation.socket = logId
-        mutation.requestReceived = NSDate().timeIntervalSince1970
+        mutation.requestReceived = NSDate().javaDate
         
         
         // =============================================================================================================
@@ -108,7 +108,7 @@ extension HttpConnection {
             // Mutation update
             mutation.httpResponseCode = HttpResponseCode.CODE_400_Bad_Request.rawValue
             mutation.responseDetails = message
-            mutation.requestCompleted = NSDate().timeIntervalSince1970
+            mutation.requestCompleted = NSDate().javaDate
             statistics.submit(mutation)
             
             return
@@ -135,7 +135,7 @@ extension HttpConnection {
             // Mutation update
             mutation.httpResponseCode = HttpResponseCode.CODE_400_Bad_Request.rawValue
             mutation.responseDetails = message
-            mutation.requestCompleted = NSDate().timeIntervalSince1970
+            mutation.requestCompleted = NSDate().javaDate
             statistics.submit(mutation)
 
             return
@@ -161,7 +161,7 @@ extension HttpConnection {
             // Mutation update
             mutation.httpResponseCode = "Unavailable"
             mutation.responseDetails = "Forwarding of domain '\(host.address)'"
-            mutation.requestCompleted = NSDate().timeIntervalSince1970
+            mutation.requestCompleted = NSDate().javaDate
             statistics.submit(mutation)
 
             return
@@ -184,7 +184,7 @@ extension HttpConnection {
         // Mutation update
         mutation.httpResponseCode ??= HttpResponseCode.CODE_200_OK.rawValue
         mutation.responseDetails ??= ""
-        mutation.requestCompleted = NSDate().timeIntervalSince1970
+        mutation.requestCompleted = NSDate().javaDate
         statistics.submit(mutation)
     }
 }

@@ -2,7 +2,7 @@
 //  CDMutation+CoreDataProperties.swift
 //  Swiftfire
 //
-//  Created by Marinus van der Lugt on 27/06/16.
+//  Created by Marinus van der Lugt on 18/07/16.
 //  Copyright © 2016 Marinus van der Lugt. All rights reserved.
 //
 //  Choose "Create NSManagedObject Subclass…" from the Core Data editor menu
@@ -21,8 +21,8 @@ extension CDMutation {
     @NSManaged var doNotTrace: Bool
     @NSManaged var httpResponseCode: String?
     @NSManaged var kind: Int16
-    @NSManaged var requestCompleted: Double
-    @NSManaged var requestReceived: Double
+    @NSManaged var requestCompleted: Int64
+    @NSManaged var requestReceived: Int64
     @NSManaged var responseDetails: String?
     @NSManaged var socket: Int32
     @NSManaged var url: String?

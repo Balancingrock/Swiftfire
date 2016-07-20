@@ -51,6 +51,7 @@
 //
 // v0.9.12 - Added statisticsWindowController to recalculate the count values after loading
 //         - Added 'updatePathPart' and 'updateClient' to mutation switch statements
+//         - Changed timestamps from double to int64
 // v0.9.11 - Initial release
 // =====================================================================================================================
 
@@ -62,7 +63,19 @@ import CoreData
 let statistics = Statistics()
 
 
+// In order to avoid having to link Cocoa with Swiftfire, a protocl is used to request GUI services.
+// These services will only be used from the SwiftfireConsole.
+
+protocol GuiRequest {
+    func displayHistory(pathPart: CDPathPart)
+}
+
 final class Statistics: NSObject {
+    
+    
+    // The Gui Request protocol handler (nil for Swiftfire)
+    
+    var gui: GuiRequest?
     
     
     var statisticsWindowController: StatisticsWindowController?
@@ -300,7 +313,7 @@ final class Statistics: NSObject {
         
         // Add a counter to it
         let c = NSEntityDescription.insertNewObjectForEntityForName("CDCounter", inManagedObjectContext: managedObjectContext) as! CDCounter
-        c.startDate = NSDate().timeIntervalSince1970
+        c.startDate = NSDate().javaDate
         
         pp.counterList = c
         
@@ -333,7 +346,7 @@ final class Statistics: NSObject {
         
         // Add a counter to it
         let c = NSEntityDescription.insertNewObjectForEntityForName("CDCounter", inManagedObjectContext: managedObjectContext) as! CDCounter
-        c.startDate = NSDate().timeIntervalSince1970
+        c.startDate = NSDate().javaDate
         
         pp.counterList = c
 
@@ -388,8 +401,8 @@ final class Statistics: NSObject {
         cdMutation.doNotTrace = mutation.doNotTrace ?? false
         cdMutation.httpResponseCode = mutation.httpResponseCode
         cdMutation.kind = mutation.kind.rawValue
-        cdMutation.requestCompleted = mutation.requestCompleted ?? -1.0
-        cdMutation.requestReceived = mutation.requestReceived ?? -1.0
+        cdMutation.requestCompleted = mutation.requestCompleted ?? 0
+        cdMutation.requestReceived = mutation.requestReceived ?? 0
         cdMutation.responseDetails = mutation.responseDetails
         cdMutation.socket = mutation.socket ?? -1
         cdMutation.url = mutation.url

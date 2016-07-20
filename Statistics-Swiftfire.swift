@@ -51,6 +51,7 @@
 //
 // v0.9.12 - Changed cd counters to daily counters
 //         - Added support for 'doNotTrace' options
+//         - Changed timestamps from double to int64
 // v0.9.11 - Initial release
 // =====================================================================================================================
 
@@ -62,7 +63,19 @@ import CoreData
 let statistics = Statistics()
 
 
+// In order to avoid having to link Cocoa with Swiftfire, a protocl is used to request GUI services.
+// These services will only be used from the SwiftfireConsole.
+
+protocol GuiRequest {
+    func displayHistory(pathPart: CDPathPart)
+}
+
 final class Statistics: NSObject {
+    
+    
+    // The Gui Request protocl handler (nil for Swiftfire)
+    
+    var gui: GuiRequest?
     
     
     // The queue on which all mutations will take place
@@ -135,9 +148,14 @@ final class Statistics: NSObject {
     }
     
     
-    /// The timed closure that is used to create a new generation of CDCounters
+    /// The cutoff javaDate between yesterday and today
     
-    var createsNewCdCounters: TimedClosure?
+    var today: Int64 = NSCalendar.currentCalendar().startOfDayForDate(NSDate()).javaDate
+    
+    
+    /// The timed closure that is used to update 'today'
+    
+    var refreshToday: TimedClosure?
     
     
     /// Creates a new instance of the statistics object.
@@ -167,10 +185,16 @@ final class Statistics: NSObject {
         
         super.init()
         
-        createsNewCdCounters = TimedClosure(
+        refreshToday = TimedClosure(
             queue: dispatch_get_main_queue(),
             delay: WallclockTime(hour: 0, minute: 0, second: 0),
-            closure: createNewCdCounterGeneration,
+            closure: {
+                [unowned self] in
+                self.managedObjectContext.performBlock({
+                    [unowned self] in
+                    self.today = NSCalendar.currentCalendar().startOfDayForDate(NSDate()).javaDate
+                })
+            },
             once: false)
         
         guard let statisticsDir = FileURLs.statisticsDir else {
@@ -187,13 +211,13 @@ final class Statistics: NSObject {
                 // Check if the counters have a start time in today, if not, then create new counters
                 let fetchRequest = NSFetchRequest(entityName: "CDPathPart")
                 let pathParts = try self.managedObjectContext.executeFetchRequest(fetchRequest) as! [CDPathPart]
-                let switchOverTime = NSDate().timeIntervalSince1970
+                let switchOverTime = NSDate().javaDate
                 
                 for pp in pathParts {
                     
                     let oldCounter = pp.counterList!
                     
-                    if !NSCalendar.currentCalendar().isDateInToday(NSDate(timeIntervalSince1970: oldCounter.startDate)) {
+                    if !NSCalendar.currentCalendar().isDateInToday(NSDate.fromJavaDate(oldCounter.startDate)) {
                         
                         let newCounter = NSEntityDescription.insertNewObjectForEntityForName("CDCounter", inManagedObjectContext: self.managedObjectContext) as! CDCounter
                         
@@ -201,7 +225,6 @@ final class Statistics: NSObject {
                         pp.counterList = newCounter // Also sets newCounter.pathPart
                         newCounter.next = oldCounter // Also sets oldCounter.previous
                         newCounter.startDate = switchOverTime
-                        oldCounter.endDate = switchOverTime
                     }
                 }
             } catch {
@@ -276,46 +299,6 @@ final class Statistics: NSObject {
     }
     
     
-    // Creates a new generation of counters.
-    
-    private func createNewCdCounterGeneration() {
-        
-        managedObjectContext.performBlock({
-            
-            let switchOverTime = NSDate().timeIntervalSince1970
-            
-            for pp in self.cdDomains.domains?.allObjects as! [CDPathPart] {
-                
-                
-                // Skip no-trace pp's
-                
-                if pp.doNotTrace { continue }
-                
-                
-                // Get the old counter
-                
-                if let oldCounter = pp.counterList {
-                
-                
-                    // Create new counter
-                
-                    let newCounter = NSEntityDescription.insertNewObjectForEntityForName("CDCounter", inManagedObjectContext: self.managedObjectContext) as! CDCounter
-                    
-                    oldCounter.pathPart = nil
-                    pp.counterList = newCounter // Also sets newCounter.pathPart
-                    newCounter.next = oldCounter // Also sets oldCounter.previous
-                    newCounter.startDate = switchOverTime
-                    oldCounter.endDate = switchOverTime
-                    
-                    
-                } else {
-                    log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Missing counter for PathPart \(pp.pathPart)")
-                }
-            }
-        })
-    }
-    
-    
     /**
      - Returns: The Client Managed Object for the given address. Creates a new one if necessary.
      */
@@ -377,7 +360,7 @@ final class Statistics: NSObject {
         
         // Add a counter to it
         let c = NSEntityDescription.insertNewObjectForEntityForName("CDCounter", inManagedObjectContext: managedObjectContext) as! CDCounter
-        c.startDate = NSDate().timeIntervalSince1970
+        c.startDate = NSDate().javaDate
         
         pp.counterList = c
         
@@ -410,7 +393,7 @@ final class Statistics: NSObject {
         
         // Add a counter to it
         let c = NSEntityDescription.insertNewObjectForEntityForName("CDCounter", inManagedObjectContext: managedObjectContext) as! CDCounter
-        c.startDate = NSDate().timeIntervalSince1970
+        c.startDate = NSDate().javaDate
         
         pp.counterList = c
         
@@ -467,8 +450,8 @@ final class Statistics: NSObject {
             cdMutation.doNotTrace = mutation.doNotTrace ?? false
             cdMutation.httpResponseCode = mutation.httpResponseCode
             cdMutation.kind = mutation.kind.rawValue
-            cdMutation.requestCompleted = mutation.requestCompleted ?? -1.0
-            cdMutation.requestReceived = mutation.requestReceived ?? -1.0
+            cdMutation.requestCompleted = mutation.requestCompleted ?? 0
+            cdMutation.requestReceived = mutation.requestReceived ?? 0
             cdMutation.responseDetails = mutation.responseDetails
             cdMutation.socket = mutation.socket ?? -1
             cdMutation.url = mutation.url
@@ -587,20 +570,20 @@ final class Statistics: NSObject {
         }
         
         
-        // ========================
-        // Update the client record
-        // ========================
-        
-        record.urlCounter = current!.counterList! // Side effect: Also adds the record to the counter.
-        
-        
         // =========================
         // Update all counter values
         // =========================
         
         // The current pathpart is the last, now roll back and increment each of the counters along the way (as well as the forever counter)
         repeat {
+            if current!.counterList!.startDate < today {
+                // Create new counter
+                let newCounter = NSEntityDescription.insertNewObjectForEntityForName("CDCounter", inManagedObjectContext: managedObjectContext) as! CDCounter
+                newCounter.next = current!.counterList!
+                newCounter.pathPart = current
+            }
             current!.counterList!.count += 1
+            current!.counterList!.mutableSetValueForKey("clientRecords").addObject(record)
             current!.foreverCount += 1
             current = current!.previous
         } while current != nil

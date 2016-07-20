@@ -64,34 +64,34 @@ class CDClient: NSManagedObject {
 
     var count: Int { return records?.count ?? 0 }
     
-    lazy var firstAccess: Double = {
+    lazy var firstAccess: Int64 = {
         let arr = self.records?.allObjects as! [CDClientRecord]
         let sortedArr = arr.sort({ $0.requestReceived < $1.requestReceived })
         if let record = sortedArr.first {
             return record.requestReceived
         } else {
-            return 0.0
+            return 0
         }
     }()
     
-    lazy var lastAccess: Double = {
+    lazy var lastAccess: Int64 = {
         let arr = self.records?.allObjects as! [CDClientRecord]
         let sortedArr = arr.sort({ $0.requestReceived < $1.requestReceived })
         if let record = sortedArr.last {
             return record.requestReceived
         } else {
-            return 0.0
+            return 0
         }
     }()
     
     var firstAccessString: String {
-        let fd = NSDate(timeIntervalSince1970: firstAccess)
+        let fd = NSDate.fromJavaDate(firstAccess)
         let dc = NSCalendar.currentCalendar().components(NSCalendarUnit(arrayLiteral: .Year, .Month, .Day, .Hour, .Minute, .Second), fromDate: fd)
         return "\(dc.year)-\(dc.month)-\(dc.day) \(dc.hour):\(dc.minute):\(dc.second)"
     }
     
     var lastAccessString: String {
-        let fd = NSDate(timeIntervalSince1970: lastAccess)
+        let fd = NSDate.fromJavaDate(lastAccess)
         let dc = NSCalendar.currentCalendar().components(NSCalendarUnit(arrayLiteral: .Year, .Month, .Day, .Hour, .Minute, .Second), fromDate: fd)
         return "\(dc.year)-\(dc.month)-\(dc.day) \(dc.hour):\(dc.minute):\(dc.second)"
     }

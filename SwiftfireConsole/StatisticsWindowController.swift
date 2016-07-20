@@ -66,8 +66,8 @@ class StatisticsWindowController: NSWindowController {
     
     // Window components
     
-    @IBOutlet var startDatePicker: NSDatePicker!
-    @IBOutlet var endDatePicker: NSDatePicker!
+    @IBOutlet weak var startDatePicker: NSDatePicker!
+    @IBOutlet weak var endDatePicker: NSDatePicker!
     
     
     // Actions from the GUI
@@ -84,8 +84,8 @@ class StatisticsWindowController: NSWindowController {
     // Recalculates the count value for the time period between the dates.
     
     func recalculateCountValue() {
-        let startDate = startDatePicker.dateValue.timeIntervalSince1970
-        let endDate = endDatePicker.dateValue.timeIntervalSince1970
+        let startDate = startDatePicker.dateValue.javaDate
+        let endDate = endDatePicker.dateValue.javaDate
         for pp in statistics.cdDomains.domains?.allObjects as! [CDPathPart] {
             pp.recalculateCountForPeriod(startDate, endDate: endDate)
         }

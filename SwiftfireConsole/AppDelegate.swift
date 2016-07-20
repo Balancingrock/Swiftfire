@@ -60,7 +60,7 @@
 import Cocoa
 
 @NSApplicationMain
-class AppDelegate: NSObject, NSApplicationDelegate {
+class AppDelegate: NSObject, NSApplicationDelegate, GuiRequest {
 
     @IBOutlet weak var window: NSWindow!
 
@@ -78,7 +78,9 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         log.networkTransmitAtAndAboveLevel = SwifterLog.Level.NONE
         log.callbackAtAndAboveLevel = SwifterLog.Level.NONE
         
-        //generateTestContent()
+        statistics.gui = self
+        
+        generateTestContent()
     }
 
     func applicationWillTerminate(aNotification: NSNotification) {
@@ -98,6 +100,19 @@ class AppDelegate: NSObject, NSApplicationDelegate {
         macif.sendMessages([readCmd.json])
     }
     
+    
+    var historyControllers: Dictionary<String, HistoricalUsageWindowController> = [:]
+    
+    func displayHistory(pathPart: CDPathPart) {
+        if let hwc = historyControllers[pathPart.pathPart!] {
+            hwc.showWindow(nil)
+        } else {
+            let hwc = HistoricalUsageWindowController(pathPart: pathPart)
+            historyControllers[pathPart.pathPart!] = hwc
+            hwc.showWindow(nil)
+        }
+    }
+    
     func generateTestContent() {
         
         Parameters.restore()
@@ -109,8 +124,8 @@ class AppDelegate: NSObject, NSApplicationDelegate {
             let mu = Mutation.createAddClientRecord()
             mu.client = "localhost"
             mu.domain = "swiftfire.nl"
-            mu.requestReceived = NSDate().timeIntervalSince1970
-            mu.requestCompleted = mu.requestReceived! + 0.4
+            mu.requestReceived = NSDate().javaDate
+            mu.requestCompleted = mu.requestReceived! + 4
             mu.connectionObjectId = 3
             mu.connectionAllocationCount = 12
             mu.socket = -1

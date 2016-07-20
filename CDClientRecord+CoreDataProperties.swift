@@ -2,7 +2,7 @@
 //  CDClientRecord+CoreDataProperties.swift
 //  Swiftfire
 //
-//  Created by Marinus van der Lugt on 24/06/16.
+//  Created by Marinus van der Lugt on 18/07/16.
 //  Copyright © 2016 Marinus van der Lugt. All rights reserved.
 //
 //  Choose "Create NSManagedObject Subclass…" from the Core Data editor menu
@@ -18,11 +18,11 @@ extension CDClientRecord {
     @NSManaged var connectionObjectId: Int16
     @NSManaged var host: String?
     @NSManaged var httpResponseCode: String?
-    @NSManaged var requestReceived: Double
+    @NSManaged var requestCompleted: Int64
+    @NSManaged var requestReceived: Int64
     @NSManaged var responseDetails: String?
     @NSManaged var socket: Int32
     @NSManaged var url: String?
-    @NSManaged var requestCompleted: Double
     @NSManaged var client: CDClient?
     @NSManaged var urlCounter: CDCounter?
 

@@ -50,6 +50,7 @@
 // History
 //
 // v0.9.12 - Added support for UpdatePathPart and UpdateClient
+//         - Switched time intervals to javaDate (Int64)
 // v0.9.11 - Initial release
 // =====================================================================================================================
 
@@ -117,8 +118,12 @@ class Mutation {
         guard let jkindInt = (json|KIND)?.integerValue else { return nil }
         guard let jkind = MutationKind(rawValue: Int16(jkindInt)) else { return nil }
         
+        
         let mutation = Mutation(kind: jkind)
-        mutation.requestReceived = (json|REQUEST_RECEIVED)?.doubleValue
+        
+        if let tmp = (json|REQUEST_RECEIVED)?.integerValue {
+            mutation.requestReceived = Int64(tmp)
+        }
         mutation.domain = (json|DOMAIN)?.stringValue
         mutation.url = (json|URLSTR)?.stringValue
         mutation.httpResponseCode = (json|HTTP_RESPONSE_CODE)?.stringValue
@@ -138,7 +143,9 @@ class Mutation {
         
         mutation.doNotTrace = (json|DO_NOT_TRACE)?.boolValue
         mutation.client = (json|CLIENT)?.stringValue
-        mutation.requestCompleted = (json|REQUEST_COMPLETED)?.doubleValue
+        if let tmp = (json|REQUEST_COMPLETED)?.integerValue {
+            mutation.requestCompleted = Int64(tmp)
+        }
         
         return mutation
     }
@@ -146,9 +153,9 @@ class Mutation {
     let kind: MutationKind
     
     
-    /// The time of the receipt of the HTTP request using NSDate().timeIntervalSince1970
+    /// The time of the receipt of the HTTP request using NSDate().javeDate
     
-    var requestReceived: Double?
+    var requestReceived: Int64?
     
     
     /// The domain name of the domain the request is for, may be nil if the request did not contain a domain. (This should then be reported in the HttpResponseCode)
@@ -196,9 +203,9 @@ class Mutation {
     var client: String?
     
     
-    /// The time of the completion of the HTTP request using NSDate().timeIntervalSince1970
+    /// The time of the completion of the HTTP request using NSDate().javaDate
 
-    var requestCompleted: Double?
+    var requestCompleted: Int64?
     
     
     /// The JSON hierarchy representing this object.

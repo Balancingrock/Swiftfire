@@ -3,7 +3,7 @@
 //  File:       CDCounter.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.11
+//  Version:    0.9.12
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,6 +49,7 @@
 //
 // History
 //
+// v0.9.12 - Removed endDate, changed startDate to Int64 (javaDate)
 // v0.9.11 - Initial release
 // =====================================================================================================================
 
@@ -69,11 +70,7 @@ class CDCounter: NSManagedObject {
     
     private static var queue = dispatch_queue_create("nl.balancingrock.swiftfire.cdcounter", DISPATCH_QUEUE_SERIAL)
 
-    private static var instanceCounter: Int64 = {
-        let c = NSCalendar.currentCalendar().components(NSCalendarUnit(arrayLiteral: .Year, .Month, .Day, .Hour, .Minute, .Second), fromDate: NSDate())
-        let now = 1_000_000 + (c.second + 60 * (c.minute + 60 * (c.hour + 24 * (c.day + 31 * (c.month + 12 * c.year)))))
-        return Int64(now)
-    }()
+    private static var instanceCounter: Int64 = { return Int64(NSDate().timeIntervalSince1970) * 1_000_000 }()
     
     override func awakeFromInsert() {
         super.awakeFromInsert()
@@ -91,7 +88,6 @@ class CDCounter: NSManagedObject {
         let json = VJson()
         json[COUNT] &= count
         json[START_DATE] &= startDate
-        json[END_DATE] &= endDate
         json[INSTANCE_ID] &= instanceId
         if let jnext = next?.json {
             json.add(jnext, forName: NEXT)
@@ -110,13 +106,8 @@ class CDCounter: NSManagedObject {
             return nil
         }
         
-        guard let jstartdate = (json|START_DATE)?.doubleValue else {
+        guard let jstartdate = (json|START_DATE)?.integerValue else {
             log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Could not find 'start date' item in json code")
-            return nil
-        }
-
-        guard let jenddate = (json|END_DATE)?.doubleValue else {
-            log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Could not find 'end date' item in json code")
             return nil
         }
 
@@ -130,8 +121,7 @@ class CDCounter: NSManagedObject {
         // The creation in the line above has also given a value to count, this must be overwritten with the value fom the json code
         new.count = Int64(jcount)
         
-        new.startDate = jstartdate
-        new.endDate = jenddate
+        new.startDate = Int64(jstartdate)
         new.instanceId = Int64(jinstanceid)
         
         if let jnext = json|NEXT where !jnext.isNull {
