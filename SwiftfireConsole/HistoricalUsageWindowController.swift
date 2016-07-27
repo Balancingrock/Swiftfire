@@ -58,14 +58,22 @@ import Cocoa
 class HistoricalUsageWindowController: NSWindowController {
     
     var pathPart: CDPathPart
+
+    static var dateLabelFormatter: NSDateFormatter = {
+        let ltf = NSDateFormatter()
+        ltf.dateFormat = "yyyy.MM.dd"
+        return ltf
+    }()
+
     
     @IBOutlet weak var startDatePicker: NSDatePicker!
     @IBOutlet weak var endDatePicker: NSDatePicker!
     @IBOutlet weak var periodSelectionPopup: NSPopUpButton!
     @IBOutlet weak var urlLabel: NSTextField!
-    @IBOutlet weak var chartView: HistoricalUsageView!
+    @IBOutlet weak var historicalUsageView: LineGraphView!
     
     override var windowNibName: String? { return "HistoricalUsageWindow" }
+    
     
     init(pathPart: CDPathPart) {
         self.pathPart = pathPart
@@ -77,21 +85,107 @@ class HistoricalUsageWindowController: NSWindowController {
     }
     
     @IBAction func handleStartDatePickerAction(sender: AnyObject?) {
-        
+        self.update()
     }
     
     @IBAction func handleEndDatePickerAction(sender: AnyObject?) {
-        
+        self.update()
     }
     
     @IBAction func handlePeriodSelectionPopupAction(sender: AnyObject?) {
-        
+        self.update()
     }
     
     override func windowDidLoad() {
-        log.atLevelDebug(id: -1, source: #file.source(#function, #line), message: "Window did load, frame for view: \(chartView.frame)")
-        chartView.pathPart = pathPart
-        urlLabel.stringValue = pathPart.fullUlr
+        let today = NSCalendar.currentCalendar().startOfDayForDate(NSDate())
+        let sometimeago = NSCalendar.currentCalendar().dateByAddingUnit(NSCalendarUnit.Month, value: -1, toDate: today, options: NSCalendarOptions.MatchNextTime)
+        startDatePicker.dateValue = sometimeago!
+        endDatePicker.dateValue = today
+        periodSelectionPopup.selectItemAtIndex(0)
+        urlLabel.stringValue = pathPart.fullUrl
+        update()
     }
     
+    private func update() {
+        
+        func periodStep(start: Int64) -> Int64 {
+            
+            let selectedPeriod = periodSelectionPopup.indexOfSelectedItem
+            
+            if selectedPeriod == 0 { // Daily
+                return NSDate.fromJavaDate(start).javaDateBeginOfTomorrow
+            }
+            
+            if selectedPeriod == 1 { // Weekly
+                return NSDate.fromJavaDate(start).javaDateBeginOfNextWeek
+            }
+            
+            // Monthly
+            return NSDate.fromJavaDate(start).javaDateBeginOfNextMonth
+        }
+
+        // The selected duration of a point in the chart
+        let selectedPeriod = periodSelectionPopup.indexOfSelectedItem
+        
+        // The range of days of which the count must be included in the chart
+        let dayRangeStart = startDatePicker.dateValue.javaDateBeginOfDay
+        let dayRangeEnd = endDatePicker.dateValue.javaDateBeginOfDay
+        
+        // The range of days displayed in the chart
+        let chartRangeStart: Int64
+        let chartRangeEnd: Int64
+        if selectedPeriod == 0 {
+            // Daily, no adjustment necessary
+            chartRangeStart = startDatePicker.dateValue.javaDateBeginOfDay
+            chartRangeEnd = endDatePicker.dateValue.javaDateBeginOfDay
+        } else if selectedPeriod == 1 {
+            // Weekly, adjust to start at monday
+            chartRangeStart = startDatePicker.dateValue.javaDateBeginOfWeek
+            chartRangeEnd = endDatePicker.dateValue.javaDateBeginOfWeek
+        } else {
+            // Monthly, adjust to start of month
+            chartRangeStart = startDatePicker.dateValue.javaDateBeginOfMonth
+            chartRangeEnd = endDatePicker.dateValue.javaDateBeginOfMonth
+        }
+        
+        // Create all datapoints (each datapoint = 1 period)
+        var date = chartRangeStart
+        var dataPoints: Array<LineGraphView.DataPoint> = []
+        while date <= chartRangeEnd {
+            let label = HistoricalUsageWindowController.dateLabelFormatter.stringFromDate(NSDate.fromJavaDate(date))
+            dataPoints.append(LineGraphView.DataPoint(label: label, value: 0))
+            date = periodStep(date)
+        }
+        
+        // The end of the current period
+        var periodEndsBeforeDay = periodStep(dayRangeStart)
+        
+        // The index of the datapoint to be updated
+        var periodIndex = 0
+        
+        // Start at the end of the counters
+        var counterOrNil = pathPart.counterList
+        while counterOrNil!.next != nil { counterOrNil = counterOrNil!.next }
+        
+        // Fill in the counter values
+        while let counter = counterOrNil {
+            
+            // Only if the counter falls in the correct range
+            if counter.forDay >= dayRangeStart && counter.forDay <= dayRangeEnd {
+            
+                // Skip to the proper period when necessary
+                while counter.forDay >= periodEndsBeforeDay {
+                    periodIndex += 1
+                    periodEndsBeforeDay = periodStep(periodEndsBeforeDay)
+                }
+            
+                dataPoints[periodIndex].add(counter.count)
+            }
+            
+            counterOrNil = counter.previous
+        }
+        
+        historicalUsageView!.dataPoints = dataPoints
+        historicalUsageView!.needsDisplay = true
+    }
 }

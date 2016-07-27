@@ -51,6 +51,7 @@
 //
 // v0.9.12 - Added manipulation of doNotTrace
 //         - Changed CDCounter startDate to Int64 (javaDate)
+//         - Added "fullUrl" and "showChart"
 // v0.9.11 - Initial release
 // =====================================================================================================================
 
@@ -135,13 +136,13 @@ class CDPathPart: NSManagedObject {
         
         if let counter = counterList {
         
-            if counter.startDate >= startDate && counter.startDate <= endDate  {
+            if counter.forDay >= startDate && counter.forDay <= endDate  {
                 privateCount = counter.count
             }
             
             var whileCounter = counter.next
             while whileCounter != nil {
-                if whileCounter!.startDate >= startDate && whileCounter!.startDate <= endDate  {
+                if whileCounter!.forDay >= startDate && whileCounter!.forDay <= endDate  {
                     privateCount += whileCounter!.count
                 }
                 whileCounter = whileCounter!.next
@@ -183,7 +184,7 @@ class CDPathPart: NSManagedObject {
         statistics.gui?.displayHistory(self)
     }
     
-    var fullUlr: String {
+    var fullUrl: String {
         var urlstr = self.pathPart!
         var current = self.previous
         while current != nil {

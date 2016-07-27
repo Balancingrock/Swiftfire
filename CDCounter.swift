@@ -50,6 +50,7 @@
 // History
 //
 // v0.9.12 - Removed endDate, changed startDate to Int64 (javaDate)
+//         - Changed startDate to "forDay"
 // v0.9.11 - Initial release
 // =====================================================================================================================
 
@@ -87,7 +88,7 @@ class CDCounter: NSManagedObject {
     var json: VJson {
         let json = VJson()
         json[COUNT] &= count
-        json[START_DATE] &= startDate
+        json[START_DATE] &= forDay
         json[INSTANCE_ID] &= instanceId
         if let jnext = next?.json {
             json.add(jnext, forName: NEXT)
@@ -120,8 +121,7 @@ class CDCounter: NSManagedObject {
         
         // The creation in the line above has also given a value to count, this must be overwritten with the value fom the json code
         new.count = Int64(jcount)
-        
-        new.startDate = Int64(jstartdate)
+        new.forDay = Int64(jstartdate)
         new.instanceId = Int64(jinstanceid)
         
         if let jnext = json|NEXT where !jnext.isNull {

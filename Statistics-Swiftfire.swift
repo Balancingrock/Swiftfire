@@ -52,6 +52,7 @@
 // v0.9.12 - Changed cd counters to daily counters
 //         - Added support for 'doNotTrace' options
 //         - Changed timestamps from double to int64
+//         - Added GuiRequest protocol
 // v0.9.11 - Initial release
 // =====================================================================================================================
 
@@ -95,7 +96,7 @@ final class Statistics: NSObject {
     
     /// The top level object with references to all domains
     
-    lazy var cdDomains: CDDomains = {
+    var cdDomains: CDDomains {
         do {
             let fetchDomainsRequest = NSFetchRequest(entityName: "CDDomains")
             let domainsArray = try self.managedObjectContext.executeFetchRequest(fetchDomainsRequest) as! [CDDomains]
@@ -107,13 +108,13 @@ final class Statistics: NSObject {
         } catch {
             fatalError("Unable to fetch CDDomains with error: \(error)")
         }
-    }()
+    }
     
     
     /// The top level object with references to all clients.
     /// - Note: The domains themselves are CDPathParts just like the other parts of a URL.
     
-    lazy var cdClients: CDClients = {
+    var cdClients: CDClients {
         do {
             let fetchClientsRequest = NSFetchRequest(entityName: "CDClients")
             let clientsArray = try self.managedObjectContext.executeFetchRequest(fetchClientsRequest) as! [CDClients]
@@ -125,7 +126,7 @@ final class Statistics: NSObject {
         } catch {
             fatalError("Unable to fetch CDClients with error: \(error)")
         }
-    }()
+    }
     
     
     /// The top level mutation pointers
@@ -150,7 +151,7 @@ final class Statistics: NSObject {
     
     /// The cutoff javaDate between yesterday and today
     
-    var today: Int64 = NSCalendar.currentCalendar().startOfDayForDate(NSDate()).javaDate
+    var today: Int64 = NSDate().javaDateBeginOfDay
     
     
     /// The timed closure that is used to update 'today'
@@ -206,27 +207,7 @@ final class Statistics: NSObject {
         
         managedObjectContext.performBlock({
             do {
-                try self.persistentStoreCoordinator.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: storeURL, options: nil)
-                
-                // Check if the counters have a start time in today, if not, then create new counters
-                let fetchRequest = NSFetchRequest(entityName: "CDPathPart")
-                let pathParts = try self.managedObjectContext.executeFetchRequest(fetchRequest) as! [CDPathPart]
-                let switchOverTime = NSDate().javaDate
-                
-                for pp in pathParts {
-                    
-                    let oldCounter = pp.counterList!
-                    
-                    if !NSCalendar.currentCalendar().isDateInToday(NSDate.fromJavaDate(oldCounter.startDate)) {
-                        
-                        let newCounter = NSEntityDescription.insertNewObjectForEntityForName("CDCounter", inManagedObjectContext: self.managedObjectContext) as! CDCounter
-                        
-                        oldCounter.pathPart = nil
-                        pp.counterList = newCounter // Also sets newCounter.pathPart
-                        newCounter.next = oldCounter // Also sets oldCounter.previous
-                        newCounter.startDate = switchOverTime
-                    }
-                }
+                try self.persistentStoreCoordinator.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: storeURL, options: nil)                
             } catch {
                 log.atLevelEmergency(id: -1, source: #file.source(#function, #line), message: "Error migrating store: \(error)")
                 return
@@ -262,13 +243,8 @@ final class Statistics: NSObject {
             
             // Create the domains first because this includes the creation of CDCounters. When the Clients are created the CDClientRecord will need the CDCounters to be present.
             
-            if let cdd = CDDomains.createFrom(jdomains, inContext: self.managedObjectContext) {
-                self.cdDomains = cdd
-            }
-            
-            if let cdc = CDClients.createFrom(jclients, inContext: self.managedObjectContext) {
-                self.cdClients = cdc
-            }
+            _ = CDDomains.createFrom(jdomains, inContext: self.managedObjectContext)
+            _ = CDClients.createFrom(jclients, inContext: self.managedObjectContext)
         })
     }
     
@@ -360,7 +336,7 @@ final class Statistics: NSObject {
         
         // Add a counter to it
         let c = NSEntityDescription.insertNewObjectForEntityForName("CDCounter", inManagedObjectContext: managedObjectContext) as! CDCounter
-        c.startDate = NSDate().javaDate
+        c.forDay = NSDate().javaDateBeginOfDay
         
         pp.counterList = c
         
@@ -393,7 +369,7 @@ final class Statistics: NSObject {
         
         // Add a counter to it
         let c = NSEntityDescription.insertNewObjectForEntityForName("CDCounter", inManagedObjectContext: managedObjectContext) as! CDCounter
-        c.startDate = NSDate().javaDate
+        c.forDay = NSDate().javaDateBeginOfDay
         
         pp.counterList = c
         
@@ -427,17 +403,6 @@ final class Statistics: NSObject {
             case .RemoveClientRecords: self.removeClientRecords(mutation)
             case .RemovePathPart: self.removePathParts(mutation)
                  */
-            }
-            do {
-                let fetchClientsRequest = NSFetchRequest(entityName: "CDClients")
-                let clientsArray = try self.managedObjectContext.executeFetchRequest(fetchClientsRequest) as! [CDClients]
-                switch clientsArray.count {
-                case 0: self.cdClients = NSEntityDescription.insertNewObjectForEntityForName("CDClients", inManagedObjectContext: self.managedObjectContext) as! CDClients
-                case 1: self.cdClients = clientsArray[0]
-                default: fatalError("Too many CDClients in core data store (expected 1, found: \(clientsArray.count))")
-                }
-            } catch {
-                fatalError("Unable to fetch CDClients with error: \(error)")
             }
             
             // Store the mutation itself
@@ -576,7 +541,7 @@ final class Statistics: NSObject {
         
         // The current pathpart is the last, now roll back and increment each of the counters along the way (as well as the forever counter)
         repeat {
-            if current!.counterList!.startDate < today {
+            if current!.counterList!.forDay < today {
                 // Create new counter
                 let newCounter = NSEntityDescription.insertNewObjectForEntityForName("CDCounter", inManagedObjectContext: managedObjectContext) as! CDCounter
                 newCounter.next = current!.counterList!

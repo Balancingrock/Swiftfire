@@ -125,6 +125,57 @@ extension NSDate {
     }
     
     
+    /// The javaDate for begin-of-day of self
+    
+    var javaDateBeginOfDay: Int64 {
+        return NSCalendar.currentCalendar().startOfDayForDate(self).javaDate
+    }
+    
+    
+    /// The javaDate for the beginning of tomorrow.
+    
+    var javaDateBeginOfTomorrow: Int64 {
+        return NSCalendar.currentCalendar().dateByAddingUnit(.Day, value: 1, toDate: self, options: .MatchNextTime)!.javaDateBeginOfDay
+    }
+
+    
+    /// The javaDate for the beginning of yesterday.
+    
+    var javaDateBeginOfYesterday: Int64 {
+        return NSCalendar.currentCalendar().dateByAddingUnit(.Day, value: -1, toDate: self, options: .MatchNextTime)!.javaDateBeginOfDay
+    }
+
+    
+    /// The javaDate for the beginning of the week self is in
+    
+    var javaDateBeginOfWeek: Int64 {
+        return NSCalendar.currentCalendar().dateBySettingUnit(.Weekday, value: 1, ofDate: self, options: .MatchNextTime)!.javaDateBeginOfDay
+    }
+    
+    
+    /// The javaDate for the beginning of the next week
+    
+    var javaDateBeginOfNextWeek: Int64 {
+        let aDate = NSCalendar.currentCalendar().dateByAddingUnit(.WeekOfYear, value: 1, toDate: self, options: .MatchNextTime)!
+        return NSCalendar.currentCalendar().dateBySettingUnit(.Weekday, value: 1, ofDate: aDate, options: .MatchNextTime)!.javaDateBeginOfDay
+    }
+    
+
+    /// The javaDate for the beginning of the month self is in
+    
+    var javaDateBeginOfMonth: Int64 {
+        return NSCalendar.currentCalendar().dateBySettingUnit(.Day, value: 1, ofDate: self, options: .MatchNextTime)!.javaDateBeginOfDay
+    }
+    
+    
+    /// The javaData for the beginning of next month
+    
+    var javaDateBeginOfNextMonth: Int64 {
+        let aDate = NSCalendar.currentCalendar().dateByAddingUnit(.Month, value: 1, toDate: self, options: .MatchNextTime)!
+        return NSCalendar.currentCalendar().dateBySettingUnit(.Day, value: 1, ofDate: aDate, options: .MatchNextTime)!.javaDateBeginOfDay
+    }
+    
+    
     /// From milli seconds since 1 Jan 1970
     
     static func fromJavaDate(value: Int64) -> NSDate {

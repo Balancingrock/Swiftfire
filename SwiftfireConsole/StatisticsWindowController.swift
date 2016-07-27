@@ -85,7 +85,7 @@ class StatisticsWindowController: NSWindowController {
     
     func recalculateCountValue() {
         let startDate = startDatePicker.dateValue.javaDate
-        let endDate = endDatePicker.dateValue.javaDate
+        let endDate = endDatePicker.dateValue.javaDate + 24*60*60*1000 // The end date is inclusive, thus the cutoff should be the day after the day in the endDatePicker
         for pp in statistics.cdDomains.domains?.allObjects as! [CDPathPart] {
             pp.recalculateCountForPeriod(startDate, endDate: endDate)
         }
@@ -97,7 +97,9 @@ class StatisticsWindowController: NSWindowController {
     override func awakeFromNib() {
         super.awakeFromNib()
         let today = NSCalendar.currentCalendar().startOfDayForDate(NSDate())
-        startDatePicker.dateValue = today
+        let sometimeago = NSCalendar.currentCalendar().dateByAddingUnit(NSCalendarUnit.Month, value: -1, toDate: today, options: NSCalendarOptions.MatchNextTime)
+        startDatePicker.dateValue = sometimeago!
         endDatePicker.dateValue = today
+        recalculateCountValue()
     }    
 }

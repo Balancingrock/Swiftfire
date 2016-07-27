@@ -50,6 +50,8 @@
 // History
 //
 // v0.9.12 - Added initialization of the statisticsWindowController in the statistics object.
+//         - Added conformance to GuiRequest protocol
+//         - Moved testcontent generation to Statistics
 // v0.9.11 - Added statistics
 //         - Merged into Swiftfire project
 // v0.9.4  - Header update
@@ -80,7 +82,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, GuiRequest {
         
         statistics.gui = self
         
-        generateTestContent()
+        //statistics.generateTestContent()
     }
 
     func applicationWillTerminate(aNotification: NSNotification) {
@@ -110,48 +112,6 @@ class AppDelegate: NSObject, NSApplicationDelegate, GuiRequest {
             let hwc = HistoricalUsageWindowController(pathPart: pathPart)
             historyControllers[pathPart.pathPart!] = hwc
             hwc.showWindow(nil)
-        }
-    }
-    
-    func generateTestContent() {
-        
-        Parameters.restore()
-        
-        httpConnectionPool.create()
-        
-        if let con = httpConnectionPool.allocate() {
-            
-            let mu = Mutation.createAddClientRecord()
-            mu.client = "localhost"
-            mu.domain = "swiftfire.nl"
-            mu.requestReceived = NSDate().javaDate
-            mu.requestCompleted = mu.requestReceived! + 4
-            mu.connectionObjectId = 3
-            mu.connectionAllocationCount = 12
-            mu.socket = -1
-            mu.httpResponseCode = "200 OK"
-            mu.responseDetails = ""
-            
-            mu.url = "/index.html"
-            statistics.submit(mu)
-            
-            mu.url = "/pages/contact.html"
-            statistics.submit(mu)
-            
-            mu.url = "/pages/any.html"
-            statistics.submit(mu)
-            
-            mu.client = "otherhost"
-            mu.url = "/pages/contact.html"
-            statistics.submit(mu)
-            
-            mu.url = "/post/help.html"
-            statistics.submit(mu)
-            
-            httpConnectionPool.free(con)
-            
-        } else {
-            fatalError("Could not allocate connection")
         }
     }
 }
