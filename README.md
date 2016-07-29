@@ -33,7 +33,7 @@ Then I drag & drop the group with the source files from (for example) SwifterLog
 - Webserver for static websites
 - Handles multiple domains
 - Client forwarding (to other hosts or a different port on the same host)
-- Integrated usage statistics
+- Integrated usage statistics (page visits)
 - Includes a console application
 
 #Version history
@@ -52,6 +52,7 @@ Note: Planned releases are for information only and subject to change without no
 - Bugfixes
 - Small feature improvements (if necessary)
 - Code improvements
+- Build with final version of Swift 3
 
 ####v0.9.14 (Planned)
 
@@ -61,13 +62,14 @@ Note: Planned releases are for information only and subject to change without no
 
 ####v0.9.13 (Planned)
 
-- Upgrade to Swift 3
+- Upgrade to Swift 3 (Xcode 8 prerelease)
 
-####v0.9.12 (Planned)
+####v0.9.12 (Current)
 
-- Increase statistics functionaly
+- Added usage charts that track the number of page visits over time
+- Added enabling/disabling of visit counting for specific resources
 
-####v0.9.11 (Current)
+####v0.9.11
 
 - Merged SwiftfireConsole into this project as an extra target
 - Added usage statistics for client & domain usage.
