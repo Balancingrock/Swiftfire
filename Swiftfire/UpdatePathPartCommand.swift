@@ -89,6 +89,6 @@ final class UpdatePathPartCommand {
         let mutation = Mutation.createUpdatePathPart()
         mutation.url = url
         mutation.doNotTrace = newValue
-        statistics.submit(mutation)
+        statistics.submit(mutation: mutation)
     }
 }

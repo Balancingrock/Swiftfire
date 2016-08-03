@@ -1,9 +1,9 @@
 // =====================================================================================================================
 //
-//  File:       CDDomains.swift
+//  File:       CDCounter+CoreDataClass.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.11
+//  Version:    0.9.12
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,6 +49,8 @@
 //
 // History
 //
+// v0.9.12 - Removed endDate, changed startDate to Int64 (javaDate)
+//         - Changed startDate to "forDay"
 // v0.9.11 - Initial release
 // =====================================================================================================================
 
@@ -56,37 +58,80 @@ import Foundation
 import CoreData
 
 
-private let DOMAINS = "Domains"
+private let COUNT = "C"
+private let END_DATE = "E"
+private let INSTANCE_ID = "I"
+private let START_DATE = "S"
+private let NEXT = "N"
 
-class CDDomains: NSManagedObject {
 
+class CDCounter: NSManagedObject {
+    
+    // MARK: - Create unique int identifier
+    
+    private static var queue = DispatchQueue(label: "nl.balancingrock.swiftfire.cdcounter", attributes: [.serial])
+    
+    private static var instanceCounter: Int64 = { return Date().javaDate * 1_000 }()
+    
+    override func awakeFromInsert() {
+        super.awakeFromInsert()
+        
+        CDCounter.queue.sync(execute: { [unowned self] in
+            self.instanceId = CDCounter.instanceCounter
+            CDCounter.instanceCounter += 1
+            })
+    }
+    
+    
+    // MARK: - Convert to/from JSON
+    
     var json: VJson {
         let json = VJson()
-        if let arr = json.add(VJson.array(DOMAINS)) {
-            for domain in domains?.allObjects as! [CDPathPart] {
-                arr.append(domain.json)
-            }
+        json[COUNT] &= count
+        json[START_DATE] &= forDay
+        json[INSTANCE_ID] &= instanceId
+        if let jnext = next?.json {
+            json.add(jnext, forName: NEXT)
         } else {
-            log.atLevelError(id: -1, source:#file.source(#function, #line), message: "Could not create ARRAY for JSON item")
+            json[NEXT].nullValue = true
         }
         return json
     }
     
-    static func createFrom(json: VJson, inContext context: NSManagedObjectContext) -> CDDomains? {
+    static func createFrom(json: VJson, inContext context: NSManagedObjectContext) -> CDCounter? {
         
-        let new = NSEntityDescription.insertNewObjectForEntityForName("CDDomains", inManagedObjectContext: context) as! CDDomains
+        log.atLevelDebug(id: -1, source: #file.source(#function, #line), message: "Json code = \(json)")
         
-        if let jdomains = json|DOMAINS {
-            for pathPart in jdomains {
-                if let pp = CDPathPart.createFrom(pathPart, inContext: context) {
-                    pp.domains = new
-                } else {
-                    context.deleteObject(new)
-                    return nil
-                }
-            }
+        guard let jcount = (json|COUNT)?.int64Value else {
+            log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Could not find 'count' item in json code")
+            return nil
         }
         
+        guard let jstartdate = (json|START_DATE)?.int64Value else {
+            log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Could not find 'start date' item in json code")
+            return nil
+        }
+        
+        guard let jinstanceid = (json|INSTANCE_ID)?.int64Value else {
+            log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Could not find 'instance id' item in json code")
+            return nil
+        }
+        
+        let new = NSEntityDescription.insertNewObject(forEntityName: "CDCounter", into: context) as! CDCounter
+        
+        // The creation in the line above has also given a value to count, this must be overwritten with the value fom the json code
+        new.count = jcount
+        new.forDay = jstartdate
+        new.instanceId = jinstanceid
+        
+        if let jnext = json|NEXT, !jnext.isNull {
+            if let ncounter = CDCounter.createFrom(json: jnext, inContext: context) {
+                ncounter.previous = new
+            } else {
+                context.delete(new)
+                return nil
+            }
+        }
         return new
     }
 }

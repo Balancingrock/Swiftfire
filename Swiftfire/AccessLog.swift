@@ -59,13 +59,13 @@ import Foundation
 
 final class AccessLog: Logfile {
     
-    init?(logDir: NSURL) {
-        super.init(filename: "AccessLog", fileExtension: "csv", directory: logDir, options: .MaxFileSize(1024), .NewFileDailyAt(WallclockTime(hour: 0, minute: 0, second: 0)))
+    init?(logDir: URL) {
+        super.init(filename: "AccessLog", fileExtension: "csv", directory: logDir, options: .maxFileSize(1024), .newFileDailyAt(WallclockTime(hour: 0, minute: 0, second: 0)))
     }
     
-    func record(time: NSDate, ipAddress: String, url: String, operation: String, version: String) {
-        let message = Logfile.dateFormatter.stringFromDate(time) + ", \(ipAddress), \(url), \(operation), \(version)\n"
-        super.record(message)
+    func record(time: Date, ipAddress: String, url: String, operation: String, version: String) {
+        let message = Logfile.dateFormatter.string(from: time) + ", \(ipAddress), \(url), \(operation), \(version)\n"
+        super.record(message: message)
     }
     
     override func record(message: String) {

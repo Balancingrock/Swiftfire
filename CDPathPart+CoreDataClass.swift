@@ -1,6 +1,6 @@
 // =====================================================================================================================
 //
-//  File:       CDPathPart.swift
+//  File:       CDPathPart+CoreDataClass.swift
 //  Project:    Swiftfire
 //
 //  Version:    0.9.12
@@ -88,7 +88,7 @@ class CDPathPart: NSManagedObject {
             log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Could not find 'do not trace' item in json code")
             return nil
         }
-        guard let jforevercount = (json|FOREVER_COUNT)?.integerValue else {
+        guard let jforevercount = (json|FOREVER_COUNT)?.int64Value else {
             log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Could not find 'forever count' item in json code")
             return nil
         }
@@ -100,28 +100,28 @@ class CDPathPart: NSManagedObject {
             log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Could not find 'path part' item in json code")
             return nil
         }
-
-        let new = NSEntityDescription.insertNewObjectForEntityForName("CDPathPart", inManagedObjectContext: context) as! CDPathPart
+        
+        let new = NSEntityDescription.insertNewObject(forEntityName: "CDPathPart", into: context) as! CDPathPart
         
         new.doNotTrace = jdonottrace
-        new.foreverCount = Int64(jforevercount)
+        new.foreverCount = jforevercount
         new.pathPart = (json|PATH_PART)?.stringValue
         
         if let jparts = json|NEXT {
             for jpart in jparts {
-                if let pp = CDPathPart.createFrom(jpart, inContext: context) {
+                if let pp = CDPathPart.createFrom(json: jpart, inContext: context) {
                     pp.previous = new
                 } else {
-                    context.deleteObject(new)
+                    context.delete(new)
                     return nil
                 }
             }
         }
         
-        if let counter = CDCounter.createFrom(jcounter, inContext: context) {
+        if let counter = CDCounter.createFrom(json: jcounter, inContext: context) {
             counter.pathPart = new
         } else {
-            context.deleteObject(new)
+            context.delete(new)
             return nil
         }
         
@@ -129,13 +129,13 @@ class CDPathPart: NSManagedObject {
     }
     
     var count: NSNumber?
-
-    func recalculateCountForPeriod(startDate: Int64, endDate: Int64) {
+    
+    func recalculateCount(from startDate: Int64, to endDate: Int64) {
         
         var privateCount: Int64 = 0
         
         if let counter = counterList {
-        
+            
             if counter.forDay >= startDate && counter.forDay <= endDate  {
                 privateCount = counter.count
             }
@@ -149,30 +149,30 @@ class CDPathPart: NSManagedObject {
             }
         }
         
-        self.setValue(NSNumber(longLong: privateCount), forKey: "count")
+        self.setValue(NSNumber(value: privateCount), forKey: "count")
         
         
         // Propagate to sub-parts
         for pp in self.next?.allObjects as! [CDPathPart] {
-            pp.recalculateCountForPeriod(startDate, endDate: endDate)
+            pp.recalculateCount(from: startDate, to: endDate)
         }
     }
     
     var _doNotTrace: NSNumber {
         get {
-            return NSNumber(bool: doNotTrace)
+            return NSNumber(value: doNotTrace)
         }
         set {
             log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "New value for doNotTrace \(newValue), transmitting to Swiftfire")
-
+            
             var url: NSString = pathPart!
             while let pp = previous {
-                url = (pp.pathPart! as NSString).stringByAppendingPathComponent(url as String)
+                url = (pp.pathPart! as NSString).appendingPathComponent(url as String)
             }
             let command = UpdatePathPartCommand(url: url as String, newValue: newValue.boolValue)
             
             if toSwiftfire != nil {
-                toSwiftfire?.transferToSwiftfire(command.json.description)
+                toSwiftfire?.transferToSwiftfire(message: command.json.description)
             } else {
                 log.atLevelWarning(id: -1, source: #file.source(#function, #line), message: "Attempt to set new value for doNotTrace \(newValue), but no transmitter available")
             }
@@ -181,14 +181,14 @@ class CDPathPart: NSManagedObject {
     
     func showChart() {
         log.atLevelDebug(id: -1, source: #file.source(#function, #line))
-        statistics.gui?.displayHistory(self)
+        statistics.gui?.displayHistory(pathPart: self)
     }
     
     var fullUrl: String {
         var urlstr = self.pathPart!
         var current = self.previous
         while current != nil {
-            urlstr = (current!.pathPart! as NSString).stringByAppendingPathComponent(urlstr)
+            urlstr = (current!.pathPart! as NSString).appendingPathComponent(urlstr)
             current = current!.previous
         }
         return urlstr

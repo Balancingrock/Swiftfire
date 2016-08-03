@@ -80,4 +80,17 @@ final class ReadDomainTelemetryCommand {
         guard let jdomainName = (json|COMMAND_NAME)?.stringValue else { return nil }
         domainName = jdomainName
     }
+    
+    func execute() {
+        
+        guard let domain = domains.domain(forName: domainName) else {
+            log.atLevelError(id: -1, source: #file.source(#function, #line), message: "No domain available with name = \(domainName)")
+            return
+        }
+        
+        let reply = ReadDomainTelemetryReply(domainName: domain.name, domainTelemetry: domain.telemetry)
+        
+        toConsole?.transferToConsole(message: reply.json.description)
+    }
+
 }

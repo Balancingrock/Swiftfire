@@ -1,6 +1,6 @@
 // =====================================================================================================================
 //
-//  File:       CDClientRecord.swift
+//  File:       CDClientRecord+CoreDataClass.swift
 //  Project:    Swiftfire
 //
 //  Version:    0.9.12
@@ -72,7 +72,7 @@ private let URL_COUNTER = "N"
 
 
 class CDClientRecord: NSManagedObject {
-
+    
     var json: VJson {
         let json = VJson()
         json[CONNECTION_ALLOCATION_COUNT] &= connectionAllocationCount
@@ -90,79 +90,78 @@ class CDClientRecord: NSManagedObject {
     
     static func createFrom(json: VJson, inContext context: NSManagedObjectContext) -> CDClientRecord? {
         
-        guard let jconnectionallocationcount = (json|CONNECTION_ALLOCATION_COUNT)?.integerValue else {
+        guard let jconnectionallocationcount = (json|CONNECTION_ALLOCATION_COUNT)?.int32Value else {
             log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Could not find 'connection allocation count' item in json code")
             return nil
         }
         
-        guard let jconnectionid = (json|CONNECTION_OBJECT_ID)?.integerValue else {
+        guard let jconnectionid = (json|CONNECTION_OBJECT_ID)?.int16Value else {
             log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Could not find 'connection id' item in json code")
             return nil
         }
-
-        guard let jrequestreceived = (json|REQUEST_RECEIVED)?.integerValue else {
+        
+        guard let jrequestreceived = (json|REQUEST_RECEIVED)?.int64Value else {
             log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Could not find 'request received' item in json code")
             return nil
         }
-
-        guard let jrequestcompleted = (json|REQUEST_COMPLETED)?.integerValue else {
+        
+        guard let jrequestcompleted = (json|REQUEST_COMPLETED)?.int64Value else {
             log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Could not find 'request completed' item in json code")
             return nil
         }
-
-        guard let jsocket = (json|SOCKET)?.integerValue else {
+        
+        guard let jsocket = (json|SOCKET)?.int32Value else {
             log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Could not find 'socket' item in json code")
             return nil
         }
-
+        
         guard json|HOST != nil else {
             log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Could not find 'host' item in json code")
             return nil
         }
-
+        
         guard json|HTTP_RESPONSE_CODE != nil else {
             log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Could not find 'http response code' item in json code")
             return nil
         }
-
+        
         guard json|RESPONSE_DETAILS != nil else {
             log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Could not find 'response details' item in json code")
             return nil
         }
-
+        
         guard json|URLSTR != nil else {
             log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Could not find 'url' item in json code")
             return nil
         }
-
-        let new = NSEntityDescription.insertNewObjectForEntityForName("CDClientRecord", inManagedObjectContext: context) as! CDClientRecord
         
-        new.connectionAllocationCount = Int32(jconnectionallocationcount)
-        new.connectionObjectId = Int16(jconnectionid)
+        let new = NSEntityDescription.insertNewObject(forEntityName: "CDClientRecord", into: context) as! CDClientRecord
+        
+        new.connectionAllocationCount = jconnectionallocationcount
+        new.connectionObjectId = jconnectionid
         new.host = (json|HOST)?.stringValue
         new.httpResponseCode = (json|HTTP_RESPONSE_CODE)?.stringValue
         new.responseDetails = (json|RESPONSE_DETAILS)?.stringValue
-        new.requestReceived = Int64(jrequestreceived)
-        new.requestCompleted = Int64(jrequestcompleted)
-        new.socket = Int32(jsocket)
+        new.requestReceived = jrequestreceived
+        new.requestCompleted = jrequestcompleted
+        new.socket = jsocket
         new.url = (json|URLSTR)?.stringValue
         
-        if let jurlcounter = (json|URL_COUNTER)?.integerValue {
+        if let jurlcounter = (json|URL_COUNTER)?.int64Value {
             
             if jurlcounter != 0 {
                 
                 do {
-                    let fetchRequest = NSFetchRequest.init(entityName: "CDCounter")
-                    //fetchRequest.predicate = NSPredicate.init(format: "instanceId == %d", jurlcounter)
-                    let counters = (try context.executeFetchRequest(fetchRequest) as! [CDCounter]).filter(){ $0.instanceId == Int64(jurlcounter)}
-                    for cnt in counters {
-                        log.atLevelDebug(id: -1, source: #file.source(#function, #line), message: "Counter id = \(cnt.instanceId)")
+                    let fetchRequest: NSFetchRequest<CDCounter> = CDCounter.fetchRequest()
+                    let counters = try context.fetch(fetchRequest).filter(){ $0.instanceId == jurlcounter }
+                    for c in counters {
+                        log.atLevelDebug(id: -1, source: #file.source(#function, #line), message: "Counter id = \(c.instanceId)")
                     }
                     if counters.count != 1 { throw SFError(message: "Found \(counters.count) counter objects for identifier \(jurlcounter), expected 1)") }
                     new.urlCounter = counters[0]
                 } catch {
                     log.atLevelError(id: -1, source: #file.source(#function, #line), message: "\(error)")
-                    context.deleteObject(new)
+                    context.delete(new)
                     return nil
                 }
             }

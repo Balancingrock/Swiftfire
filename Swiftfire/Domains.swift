@@ -3,7 +3,7 @@
 //  File:       Domains.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.11
+//  Version:    0.9.13
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,6 +49,7 @@
 //
 // History
 //
+// v0.9.13 - Upgraded to Swift 3 beta
 // v0.9.11 - Added local definition of "domains"
 //         - Updated for VJson 0.9.8
 // v0.9.7  - Fixed bug where domains were added without using the 'add' function.
@@ -64,7 +65,7 @@ import Foundation
 let domains = Domains()
 
 
-final class Domains: DomainNameChangeListener, SequenceType {
+final class Domains: DomainNameChangeListener, Sequence {
     
     
     // The managed domains
@@ -82,8 +83,8 @@ final class Domains: DomainNameChangeListener, SequenceType {
      - Note: If a domain is disabled, it will not be examined for a match.
      */
      
-    func contains(domainName: String) -> Bool {
-        return domainForName(domainName) != nil
+    func contains(domainWithName name: String) -> Bool {
+        return domain(forName: name) != nil
     }
 
     
@@ -92,11 +93,11 @@ final class Domains: DomainNameChangeListener, SequenceType {
      - Note: The "wwwIncluded" property is also evaluated.
      */
     
-    func domainForName(name: String?) -> Domain? {
+    func domain(forName name: String?) -> Domain? {
         
         guard let name = name else { return nil }
         
-        let lname = name.lowercaseString
+        let lname = name.lowercased()
         
         for (_, d) in domains {
             if d.name == lname { return d }
@@ -112,16 +113,16 @@ final class Domains: DomainNameChangeListener, SequenceType {
     /**
      - Returns: The enabled domain for the given name. Nil if none can be found.
      - Note: The "wwwIncluded" property is also evaluated.
-     */
+     *
     
-    func enabledDomainForName(name: String) -> Domain? {
+    func domainIsEnabled(forName name: String) -> Domain? {
         
-        let d = domainForName(name)
+        let d = domain(forName: name)
         
-        if let f = d?.enabled where f == true { return d }
+        if let f = d?.enabled, f == true { return d }
         
         return nil
-    }
+    }*/
 
     
     /**
@@ -132,11 +133,12 @@ final class Domains: DomainNameChangeListener, SequenceType {
      - Returns: True if the domain was added, false if there was already a domain with that name.
      */
     
+    @discardableResult
     func add(domain: Domain) -> Bool {
         
-        if contains(domain.name) { return false }
+        if contains(domainWithName: domain.name) { return false }
         
-        domains[domain.name.lowercaseString] = domain
+        domains[domain.name.lowercased()] = domain
         domain.nameChangeListener = self
         
         return true
@@ -151,12 +153,13 @@ final class Domains: DomainNameChangeListener, SequenceType {
      - Return True if the domain was found and removed, false if not.
      */
     
-    func remove(name: String) -> Bool {
+    @discardableResult
+    func remove(domainWithName name: String) -> Bool {
         
-        let lname = name.lowercaseString
+        let lname = name.lowercased()
 
         if domains[lname] != nil {
-            domains.removeValueForKey(lname)
+            domains.removeValue(forKey: lname)
             return true
         } else {
             return false
@@ -172,17 +175,18 @@ final class Domains: DomainNameChangeListener, SequenceType {
      - Returns: True if the update was successful, false if nothing was changed or the domain for the given name did not exist.
      */
     
-    func update(name: String, withDomain new: Domain) -> Bool {
+    @discardableResult
+    func update(domainWithName name: String, withDomain domain: Domain) -> Bool {
         
-        let oldName = name.lowercaseString
+        let oldName = name.lowercased()
         
         for (n, d) in domains {
             if n == oldName {
-                return d.updateWith(new)
+                return d.update(withDomain: domain)
             }
             if d.wwwIncluded {
                 if ("www." + n) == oldName {
-                    return d.updateWith(new)
+                    return d.update(withDomain: domain)
                 }
             }
         }
@@ -198,26 +202,26 @@ final class Domains: DomainNameChangeListener, SequenceType {
      - Note: The most common example is when the number of domains is equal, but the new set has one domain that is not in the old set. This means that the name of the domain has changed, and the not-covered domain in the old set will be renamed to the domain name of the new set. (Any changed properties will also be updated.
      */
      
-    func updateWithDomains(updateDomains: Domains) {
+    func update(withDomains newDomains: Domains) {
         
         // These keep references to domains that have not yet been processed
         
-        var oldDomains = self.domains.valuesAsArray()
-        var newDomains = updateDomains.domains.valuesAsArray()
+        var oldDomains = self.domains.arrayValue()
+        var newDomains = newDomains.domains.arrayValue()
 
         
         // First match (domain)names and update the older with the newer if a match is found
         
-        for nd in updateDomains {
+        for nd in newDomains {
             
             for od in self {
                 
                 if od.name == nd.name {
                     
-                    oldDomains.removeObject(od)
-                    newDomains.removeObject(nd)
+                    oldDomains.removeObject(object: od)
+                    newDomains.removeObject(object: nd)
                     
-                    od.updateWith(nd)
+                    od.update(withDomain: nd)
                 }
             }
         }
@@ -229,7 +233,7 @@ final class Domains: DomainNameChangeListener, SequenceType {
             
             let od = oldDomains.removeFirst()
             
-            if newDomains.count == 0 { self.remove(od.name); continue }
+            if newDomains.count == 0 { self.remove(domainWithName: od.name); continue }
             
             if newDomains.count > 0 {
                 
@@ -237,8 +241,8 @@ final class Domains: DomainNameChangeListener, SequenceType {
                 
                 for nd in newDomains {
                     if nd.root == od.root {
-                        od.updateWith(nd)
-                        newDomains.removeObject(nd)
+                        od.update(withDomain: nd)
+                        newDomains.removeObject(object: nd)
                         continue OLD_LOOP
                     }
                 }
@@ -249,15 +253,15 @@ final class Domains: DomainNameChangeListener, SequenceType {
                 
                 for ood in newDomains {
                     if nnd.root == ood.root {
-                        ood.updateWith(nnd)
-                        oldDomains.removeObject(ood)
+                        ood.update(withDomain: nnd)
+                        oldDomains.removeObject(object: ood)
                         continue OLD_LOOP
                     }
                 }
 
                 // Match any old domain to any new domain
                 
-                od.updateWith(nnd)
+                od.update(withDomain: nnd)
             }
         }
 
@@ -265,14 +269,14 @@ final class Domains: DomainNameChangeListener, SequenceType {
         // If there are new domains left, then add them to the existing domains
         
         while newDomains.count > 0 {
-            add(newDomains.removeFirst())
+            add(domain: newDomains.removeFirst())
         }
     }
     
     
     // MARK: - Support for the generator and sequence protocol
     
-    struct DomainGenerator: GeneratorType {
+    struct DomainGenerator: IteratorProtocol {
         
         typealias Element = Domain
         
@@ -293,7 +297,7 @@ final class Domains: DomainNameChangeListener, SequenceType {
             if source.domains.values.count > 0 {
                 
                 let values = source.domains.values
-                let sortedValues = values.sort({$0.name < $1.name})
+                let sortedValues = values.sorted(isOrderedBefore: {$0.name < $1.name})
                 
                 // Find a value that has not been sent already
                 OUTER: for i in sortedValues {
@@ -317,9 +321,9 @@ final class Domains: DomainNameChangeListener, SequenceType {
         }
     }
     
-    typealias Generator = DomainGenerator
+    // typealias Generator = DomainGenerator
     
-    func generate() -> Generator {
+    func makeIterator() -> DomainGenerator {
         return DomainGenerator(source: self)
     }
     
@@ -327,7 +331,7 @@ final class Domains: DomainNameChangeListener, SequenceType {
     // MARK: - DomainNameChangedListener protocol
     
     func domainNameChanged(from: String, to: String) {
-        if let d = domains.removeValueForKey(from) {
+        if let d = domains.removeValue(forKey: from) {
             domains[to] = d
         }
     }
@@ -335,12 +339,13 @@ final class Domains: DomainNameChangeListener, SequenceType {
     
     // MARK: - Save & Restore
     
+    @discardableResult
     func restore() -> Bool {
         
         
         // Only if the domain-defaults file exists
         
-        guard FileURLs.exists(FileURLs.domainDefaults) else {
+        guard FileURLs.exists(url: FileURLs.domainDefaults) else {
             log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "No domains-defaults file available, starting without domains")
             return true
         }
@@ -354,11 +359,11 @@ final class Domains: DomainNameChangeListener, SequenceType {
             
             do {
                 
-                json = try VJson.parse(file)
+                json = try VJson.parse(file: file)
                 
                 for j in json["Domains"] {
                     if let d = Domain(json: j["Domain"]) {
-                        self.add(d)
+                        self.add(domain: d)
                     } else {
                         log.atLevelWarning(id: -1, source: #file.source(#function, #line), message: "Error reading domain from domains-default file.")
                     }
@@ -390,14 +395,14 @@ final class Domains: DomainNameChangeListener, SequenceType {
             
             let json = VJson()
             
-            for (i, d) in self.enumerate() {
+            for (i, d) in self.enumerated() {
                 
                 let jd = d.json
-                jd.removeChildren("Telemetry")
+                jd.removeChildren(withName: "Telemetry")
                 json["Domains"][i] = jd
             }
             
-            if let errorMsg = json.save(file) {
+            if let errorMsg = json.save(to: file) {
                 log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Could not write domains-defaults to file, error: \(errorMsg)")
             }
             
@@ -410,12 +415,12 @@ final class Domains: DomainNameChangeListener, SequenceType {
     
     // Write all domains to the log at level NOTICE
     
-    func logDomains() {
+    func writeToLog(atLevel: SwifterLog.Level) {
         if self.count == 0 {
-            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "No domains defined")
+            log.atLevel(atLevel, id: -1, source: #file.source(#function, #line), message: "No domains defined")
         } else {
             for d in self {
-                log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: d.description)
+                log.atLevel(atLevel, id: -1, source: #file.source(#function, #line), message: d.description)
             }
         }
     }

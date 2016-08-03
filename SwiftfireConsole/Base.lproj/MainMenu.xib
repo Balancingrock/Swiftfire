@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="15F34" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11173.2" systemVersion="15G31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11173.2"/>
         <capability name="box content view" minToolsVersion="7.0"/>
     </dependencies>
     <objects>
@@ -107,29 +107,29 @@
                     <modifierMask key="keyEquivalentModifierMask"/>
                     <menu key="submenu" title="Swiftfire" id="bib-Uj-vzu">
                         <items>
-                            <menuItem title="Save All Parameters" toolTip="Saves the parameter value's to the parameters-default.json file on the server." id="Was-JA-tGl" userLabel="Connect">
+                            <menuItem title="Save All Parameters" toolTip="Saves the parameter value's to the parameters-default.json file on the server." id="Was-JA-tGl" userLabel="Save All Parameters">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
-                                    <action selector="handleMenuItemSaveParameters:" target="0sR-vM-Qkt" id="cxp-dr-yBg"/>
+                                    <action selector="handleMenuItemSaveParametersWithSender:" target="0sR-vM-Qkt" id="f1p-ts-PmW"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Save All Domains" toolTip="Saves the domain value's to the domains-default.json file on the server." id="IAo-SY-fd9">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
-                                    <action selector="handleMenuItemSaveDomains:" target="0sR-vM-Qkt" id="Rv7-hc-Td4"/>
+                                    <action selector="handleMenuItemSaveDomainsWithSender:" target="0sR-vM-Qkt" id="E3z-au-KMp"/>
                                 </connections>
                             </menuItem>
                             <menuItem isSeparatorItem="YES" id="m54-Is-iLE"/>
                             <menuItem title="Restore Parameters" toolTip="Restores the parameters to the value's stored in the parameters-default.json file on the server." id="tXI-mr-wws">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
-                                    <action selector="handleMenuItemRestoreParameters:" target="0sR-vM-Qkt" id="jsW-pI-Qxn"/>
+                                    <action selector="handleMenuItemRestoreParametersWithSender:" target="0sR-vM-Qkt" id="qlM-W7-5k3"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Restore Domains" toolTip="Restores the domains to the value's stored in the domains-default.json file on the server." id="DVo-aG-piG">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
-                                    <action selector="handleMenuItemRestoreDomains:" target="0sR-vM-Qkt" id="kH6-N4-4fk"/>
+                                    <action selector="handleMenuItemRestoreDomainsWithSender:" target="0sR-vM-Qkt" id="boO-SN-uvx"/>
                                 </connections>
                             </menuItem>
                         </items>
@@ -731,13 +731,13 @@
                             <menuItem title="Show" id="vPI-7W-AiW" userLabel="Show">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
-                                    <action selector="showStatisticsWindow:" target="Voe-Tx-rLC" id="xHW-f8-mSo"/>
+                                    <action selector="showStatisticsWindowWithSender:" target="Voe-Tx-rLC" id="8el-sE-3lR"/>
                                 </connections>
                             </menuItem>
                             <menuItem title="Refresh" id="njh-nX-dk9" userLabel="Refresh">
                                 <modifierMask key="keyEquivalentModifierMask"/>
                                 <connections>
-                                    <action selector="refreshStatistics:" target="Voe-Tx-rLC" id="Sfe-dF-dWf"/>
+                                    <action selector="refreshStatisticsWithSender:" target="Voe-Tx-rLC" id="J1I-Mv-ObL"/>
                                 </connections>
                             </menuItem>
                         </items>
@@ -782,7 +782,7 @@
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" rowHeight="40" rowSizeStyle="automatic" viewBased="YES" id="l97-z1-OBW">
-                                                        <rect key="frame" x="0.0" y="0.0" width="923" height="0.0"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="923" height="543"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <size key="intercellSpacing" width="3" height="2"/>
                                                         <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -921,7 +921,6 @@
                                                         </connections>
                                                     </tableView>
                                                 </subviews>
-                                                <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </clipView>
                                             <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="kpD-j0-NYu">
                                                 <rect key="frame" x="1" y="529" width="923" height="15"/>
@@ -939,7 +938,7 @@
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
-                                                <action selector="getAllParametersButtonAction:" target="0sR-vM-Qkt" id="0el-06-QfK"/>
+                                                <action selector="getAllParametersButtonActionWithSender:" target="0sR-vM-Qkt" id="WGL-1W-03i"/>
                                             </connections>
                                         </button>
                                     </subviews>
@@ -965,7 +964,7 @@
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
                                                     <tableView verticalHuggingPriority="750" allowsExpansionToolTips="YES" columnAutoresizingStyle="lastColumnOnly" columnSelection="YES" multipleSelection="NO" autosaveColumns="NO" rowHeight="40" rowSizeStyle="automatic" viewBased="YES" id="T29-ph-sor">
-                                                        <rect key="frame" x="0.0" y="0.0" width="923" height="0.0"/>
+                                                        <rect key="frame" x="0.0" y="0.0" width="923" height="543"/>
                                                         <autoresizingMask key="autoresizingMask"/>
                                                         <size key="intercellSpacing" width="3" height="2"/>
                                                         <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
@@ -1068,7 +1067,6 @@
                                                         </connections>
                                                     </tableView>
                                                 </subviews>
-                                                <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </clipView>
                                             <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="uTk-Sk-hc1">
                                                 <rect key="frame" x="1" y="529" width="984" height="15"/>
@@ -1089,7 +1087,7 @@
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
-                                                <action selector="getAllTelemetryButtonAction:" target="0sR-vM-Qkt" id="PKf-N8-99P"/>
+                                                <action selector="getAllTelemetryButtonActionWithSender:" target="0sR-vM-Qkt" id="sPz-zM-f9q"/>
                                             </connections>
                                         </button>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="qcc-rf-XNl">
@@ -1114,7 +1112,7 @@
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
-                                                <action selector="autofetchCheckboxAction:" target="0sR-vM-Qkt" id="YhO-5e-cfm"/>
+                                                <action selector="autofetchCheckboxActionWithSender:" target="0sR-vM-Qkt" id="vQa-Jd-SM8"/>
                                             </connections>
                                         </button>
                                         <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="88h-bh-vb2">
@@ -1128,7 +1126,7 @@
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                             <connections>
-                                                <action selector="delayBetweenAutoFetchesUpdates:" target="0sR-vM-Qkt" id="hQd-hW-Q7y"/>
+                                                <action selector="delayBetweenAutoFetchesUpdatesWithSender:" target="0sR-vM-Qkt" id="QcV-lx-oKU"/>
                                             </connections>
                                         </textField>
                                     </subviews>
@@ -1200,7 +1198,6 @@
                                                         </connections>
                                                     </outlineView>
                                                 </subviews>
-                                                <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </clipView>
                                             <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="TOd-lQ-ljl">
                                                 <rect key="frame" x="-7" y="8" width="0.0" height="15"/>
@@ -1226,7 +1223,7 @@
                                                 <font key="font" metaFont="system" size="21"/>
                                             </buttonCell>
                                             <connections>
-                                                <action selector="removeDomain:" target="0sR-vM-Qkt" id="8dv-Vq-baU"/>
+                                                <action selector="removeDomainWithSender:" target="0sR-vM-Qkt" id="5bM-ff-kQA"/>
                                             </connections>
                                         </button>
                                         <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="STo-Bp-PrA">
@@ -1238,10 +1235,10 @@
                                             <buttonCell key="cell" type="smallSquare" bezelStyle="smallSquare" image="NSAddTemplate" imagePosition="overlaps" alignment="center" lineBreakMode="truncatingTail" state="on" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="dvF-WM-N4P">
                                                 <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
                                                 <font key="font" metaFont="system" size="21"/>
-                                                <connections>
-                                                    <action selector="addDomain:" target="0sR-vM-Qkt" id="ZPp-Fu-A32"/>
-                                                </connections>
                                             </buttonCell>
+                                            <connections>
+                                                <action selector="addDomainWithSender:" target="0sR-vM-Qkt" id="UBU-aC-oVJ"/>
+                                            </connections>
                                         </button>
                                     </subviews>
                                     <constraints>
@@ -1278,7 +1275,7 @@
                                                 </menu>
                                             </popUpButtonCell>
                                             <connections>
-                                                <action selector="handleSelectedDomainPopupButton:" target="0sR-vM-Qkt" id="JPh-fh-a59"/>
+                                                <action selector="handleSelectedDomainPopupButtonWithSender:" target="0sR-vM-Qkt" id="mR1-1a-LIa"/>
                                             </connections>
                                         </popUpButton>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="hbG-wD-pGD">
@@ -1374,7 +1371,6 @@
                                                         </connections>
                                                     </tableView>
                                                 </subviews>
-                                                <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </clipView>
                                             <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="io8-ju-24o">
                                                 <rect key="frame" x="1" y="119" width="223" height="15"/>
@@ -1399,7 +1395,7 @@
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
-                                                <action selector="handleRefreshDomainTelemetryButton:" target="0sR-vM-Qkt" id="pJt-jr-JVN"/>
+                                                <action selector="handleRefreshDomainTelemetryButtonWithSender:" target="0sR-vM-Qkt" id="vMv-Li-2Az"/>
                                             </connections>
                                         </button>
                                         <button translatesAutoresizingMaskIntoConstraints="NO" id="jZQ-eh-yoZ">
@@ -1412,7 +1408,7 @@
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
-                                                <action selector="dtAutofetchCheckboxAction:" target="0sR-vM-Qkt" id="vHx-RE-hMO"/>
+                                                <action selector="dtAutofetchCheckboxActionWithSender:" target="0sR-vM-Qkt" id="ztE-F8-bK0"/>
                                             </connections>
                                         </button>
                                         <textField verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="kca-mb-ieR">
@@ -1426,7 +1422,7 @@
                                                 <color key="backgroundColor" name="textBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </textFieldCell>
                                             <connections>
-                                                <action selector="dtDelayBetweenAutoFetchesUpdates:" target="0sR-vM-Qkt" id="hOw-6a-teg"/>
+                                                <action selector="dtDelayBetweenAutoFetchesUpdatesWithSender:" target="0sR-vM-Qkt" id="RxP-Ia-aiD"/>
                                             </connections>
                                         </textField>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="KRw-YT-OHn">
@@ -1451,7 +1447,7 @@
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
-                                                <action selector="resetTelemetryButtonAction:" target="0sR-vM-Qkt" id="PaJ-Vg-JqZ"/>
+                                                <action selector="resetTelemetryButtonActionWithSender:" target="0sR-vM-Qkt" id="n39-NR-SG6"/>
                                             </connections>
                                         </button>
                                     </subviews>
@@ -1510,7 +1506,7 @@
                                                 </menu>
                                             </popUpButtonCell>
                                             <connections>
-                                                <action selector="swiftfireSendLogLevelAction:" target="0sR-vM-Qkt" id="0FC-pe-npr"/>
+                                                <action selector="swiftfireSendLogLevelActionWithSender:" target="0sR-vM-Qkt" id="UlM-a1-CXN"/>
                                             </connections>
                                         </popUpButton>
                                         <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="xSH-VJ-hbh">
@@ -1536,7 +1532,7 @@
                                                 </menu>
                                             </popUpButtonCell>
                                             <connections>
-                                                <action selector="displayLogLevelAction:" target="0sR-vM-Qkt" id="Yb1-fL-OGB"/>
+                                                <action selector="displayLogLevelActionWithSender:" target="0sR-vM-Qkt" id="qWz-6p-QsR"/>
                                             </connections>
                                         </popUpButton>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="waV-EK-Q0P">
@@ -1554,7 +1550,7 @@
                                                 <font key="font" metaFont="system"/>
                                             </buttonCell>
                                             <connections>
-                                                <action selector="clearLogViewAction:" target="0sR-vM-Qkt" id="IGG-oZ-Oiv"/>
+                                                <action selector="clearLogViewActionWithSender:" target="0sR-vM-Qkt" id="Uy1-Uq-l3S"/>
                                             </connections>
                                         </button>
                                         <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="dcz-Nw-kru">
@@ -1563,15 +1559,13 @@
                                                 <rect key="frame" x="1" y="1" width="914" height="511"/>
                                                 <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                 <subviews>
-                                                    <textView editable="NO" importsGraphics="NO" findStyle="panel" allowsUndo="YES" usesRuler="YES" usesFontPanel="YES" verticallyResizable="YES" allowsNonContiguousLayout="YES" quoteSubstitution="YES" dashSubstitution="YES" smartInsertDelete="YES" id="mY6-ES-cPD">
+                                                    <textView editable="NO" importsGraphics="NO" usesFontPanel="YES" findStyle="panel" allowsUndo="YES" usesRuler="YES" allowsNonContiguousLayout="YES" quoteSubstitution="YES" dashSubstitution="YES" smartInsertDelete="YES" id="mY6-ES-cPD">
                                                         <rect key="frame" x="0.0" y="0.0" width="914" height="511"/>
                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                         <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
                                                         <size key="minSize" width="914" height="511"/>
                                                         <size key="maxSize" width="992" height="10000000"/>
                                                         <color key="insertionPointColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
-                                                        <size key="minSize" width="914" height="511"/>
-                                                        <size key="maxSize" width="992" height="10000000"/>
                                                     </textView>
                                                 </subviews>
                                                 <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
@@ -1618,7 +1612,7 @@
                             <outlet property="delegate" destination="0sR-vM-Qkt" id="3Hu-fD-qth"/>
                         </connections>
                     </tabView>
-                    <box title="Swiftfire:" borderType="line" translatesAutoresizingMaskIntoConstraints="NO" id="hGY-Zx-jVf">
+                    <box borderType="line" title="Swiftfire:" translatesAutoresizingMaskIntoConstraints="NO" id="hGY-Zx-jVf">
                         <rect key="frame" x="17" y="619" width="897" height="126"/>
                         <view key="contentView" id="E8g-W0-Fee">
                             <rect key="frame" x="1" y="1" width="895" height="106"/>
@@ -1763,7 +1757,7 @@
                                         <font key="font" metaFont="system"/>
                                     </buttonCell>
                                     <connections>
-                                        <action selector="connectButtonAction:" target="0sR-vM-Qkt" id="saF-Bg-ZOH"/>
+                                        <action selector="connectButtonActionWithSender:" target="0sR-vM-Qkt" id="FRT-kP-xU2"/>
                                     </connections>
                                 </button>
                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="uHK-tP-FCY">
@@ -1778,7 +1772,7 @@
                                         <font key="font" metaFont="system"/>
                                     </buttonCell>
                                     <connections>
-                                        <action selector="startButtonAction:" target="0sR-vM-Qkt" id="A6b-jV-HeS"/>
+                                        <action selector="startButtonActionWithSender:" target="0sR-vM-Qkt" id="a2d-ec-Ybo"/>
                                     </connections>
                                 </button>
                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="H5H-4q-OBk">
@@ -1793,7 +1787,7 @@
                                         <font key="font" metaFont="system"/>
                                     </buttonCell>
                                     <connections>
-                                        <action selector="stopButtonAction:" target="0sR-vM-Qkt" id="qtn-N1-aI8"/>
+                                        <action selector="stopButtonActionWithSender:" target="0sR-vM-Qkt" id="9wk-MC-rxH"/>
                                     </connections>
                                 </button>
                                 <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="vE2-zd-Yfb">
@@ -1804,7 +1798,7 @@
                                         <font key="font" metaFont="system"/>
                                     </buttonCell>
                                     <connections>
-                                        <action selector="quitSwiftfireServerButtonAction:" target="0sR-vM-Qkt" id="Qpd-gQ-bgS"/>
+                                        <action selector="quitSwiftfireServerButtonActionWithSender:" target="0sR-vM-Qkt" id="NTv-xN-t6O"/>
                                     </connections>
                                 </button>
                             </subviews>
@@ -1846,8 +1840,6 @@
                             <constraint firstAttribute="height" constant="122" id="HeX-gJ-m9f"/>
                             <constraint firstAttribute="width" constant="891" id="h91-68-QDS"/>
                         </constraints>
-                        <color key="borderColor" white="0.0" alpha="0.41999999999999998" colorSpace="calibratedWhite"/>
-                        <color key="fillColor" white="0.0" alpha="0.0" colorSpace="calibratedWhite"/>
                         <font key="titleFont" metaFont="system" size="14"/>
                     </box>
                 </subviews>
@@ -1860,7 +1852,7 @@
                     <constraint firstAttribute="trailing" secondItem="nbY-q9-BwB" secondAttribute="trailing" id="vow-Zu-lqq"/>
                 </constraints>
             </view>
-            <point key="canvasLocation" x="365.5" y="619.5"/>
+            <point key="canvasLocation" x="291" y="684"/>
         </window>
         <userDefaultsController representsSharedInstance="YES" id="vWZ-jr-zvL"/>
     </objects>

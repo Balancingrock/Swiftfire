@@ -3,7 +3,7 @@
 //  File:       Comms.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.12
+//  Version:    0.9.13
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,20 +49,25 @@
 //
 // History
 //
+// v0.9.13 - Upgraded to Swift 3 beta
 // v0.9.12 - Initial release
 // =====================================================================================================================
 
+// This module is introduced to allow the two targets (Swiftfire and SwiftfireConsole) to know about each other without conditional compilation.
+// The Swiftfire target will only use the "toConsole" protocol instance and SwiftfireConsole will only use the "toSwiftfire" protocol instance.
 
 import Foundation
 
 
 protocol TransferToConsole {
     // Returning 'true' only indicates that an attempt will be made to transfer the message, not its successful transmission.
+    @discardableResult
     func transferToConsole(message: String) -> Bool
 }
 
 protocol TransferToSwiftfire {
     // Returning 'true' only indicates that an attempt will be made to transfer the message, not its successful transmission.
+    @discardableResult
     func transferToSwiftfire(message: String) -> Bool
 }
 

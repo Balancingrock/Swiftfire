@@ -77,7 +77,15 @@ final class DeltaCommand {
     
     init?(json: VJson?) {
         guard let json = json else { return nil }
-        guard let jdelay = (json|COMMAND_NAME)?.integerValue else { return nil }
+        guard let jdelay = (json|COMMAND_NAME)?.intValue else { return nil }
         delay = jdelay
+    }
+    
+    func execute() {
+        log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Start")
+        if delay > 0 {
+            sleep(UInt32(min(delay, 10))) // Never more than 10 seconds
+        }
+        log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Completed")
     }
 }

@@ -89,6 +89,6 @@ final class UpdateClientCommand {
         let mutation = Mutation.createUpdateClient()
         mutation.client = client
         mutation.doNotTrace = newValue
-        statistics.submit(mutation)
+        statistics.submit(mutation: mutation)
     }
 }

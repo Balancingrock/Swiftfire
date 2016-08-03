@@ -57,7 +57,7 @@
 import Foundation
 
 
-private let SOURCE = ((#file as NSString).lastPathComponent as NSString).stringByDeletingPathExtension
+private let SOURCE = ((#file as NSString).lastPathComponent as NSString).deletingPathExtension
 
 
 // The connection pool for all connections that may be active simultaniously
@@ -70,6 +70,11 @@ internal var httpConnectionPool = HttpConnectionPool()
 final class HttpConnectionPool: NSObject {
     
     
+    // Used to secure atomic access to the pool.
+    
+    private static let syncQueue = DispatchQueue(label: "HttpConnectionPool synchronize queue", attributes: [.serial, .qosUserInteractive])
+    
+    
     // Only one connection pool
     
     private override init() { super.init() }
@@ -77,22 +82,20 @@ final class HttpConnectionPool: NSObject {
     
     // All available connection objects
     
-    var available: Array<HttpConnection> = []
+    private var available: Array<HttpConnection> = []
     
     
     // All connection objects that are in use
     
-    var used: Array<HttpConnection> = []
+    private var used: Array<HttpConnection> = []
     
     
-    /**
-     Allocates an HTTP Connection and returns it. If no HTTP Connection is available it returns nil.
-     - Returns: An HTTP Connection object if available, otherwise nil.
-     */
+    /// Allocates an HTTP Connection and returns it. If no HTTP Connection is available it returns nil.
+    /// - Returns: An HTTP Connection object if available, otherwise nil.
     
     func allocate() -> HttpConnection? {
         
-        return synchronized(self, {
+        return HttpConnectionPool.syncQueue.sync() {
             
             [unowned self] () -> HttpConnection? in
             
@@ -104,35 +107,34 @@ final class HttpConnectionPool: NSObject {
             
             if connection != nil {
                 connection!.incrementAllocationCounter()
-                self.used.insert(connection!, atIndex: 0)
-                log.atLevelDebug(id: -1, source: SOURCE + ".\(#function)", message: "Allocated connection with id = \(connection!.objectId) and allocationCount = \(connection!.allocationCount)" )
+                self.used.insert(connection!, at: 0)
+                log.atLevelDebug(id: -1, source: #file.source(#function, #line), message: "Allocated connection with id = \(connection!.objectId) and allocationCount = \(connection!.allocationCount)" )
             }
             
             return connection
-
-            })
+        }
     }
     
     
-    /**
-     Moves the given connection object from the 'used' to the 'available' pool.
-     */
+    /// Moves the given connection object from the 'used' to the 'available' pool.
     
     func free(connection: HttpConnection) {
         
-        synchronized(self, { [unowned self] in
+        HttpConnectionPool.syncQueue.sync() {
+            
+            [unowned self] in
             
             var found: Int?
-            for (index, c) in self.used.enumerate() {
+            for (index, c) in self.used.enumerated() {
                 if c === connection {
                     found = index
                     break
                 }
             }
             if found != nil {
-                self.used.removeAtIndex(found!)
-                self.available.insert(connection, atIndex: 0)
-                log.atLevelDebug(id: -1, source: SOURCE + ".\(#function)", message: "Freed connection with id = \(connection.objectId) and allocationCount = \(connection.allocationCount)" )
+                self.used.remove(at: found!)
+                self.available.insert(connection, at: 0)
+                log.atLevelDebug(id: -1, source: #file.source(#function, #line), message: "Freed connection with id = \(connection.objectId) and allocationCount = \(connection.allocationCount)" )
             } else {
                 var foundInAvailable = false
                 for c in self.available {
@@ -147,54 +149,58 @@ final class HttpConnectionPool: NSObject {
                     log.atLevelEmergency(id: -1, source: #file.source(#function, #line), message: "Connection not found in 'used' pool, probably tried to close twice?")
                 }
             }
-            })
+        }
     }
     
     
-    /**
-     Request a connection, even if all connections are in use. Since it might take some time before the request is honoured, use the allocate function afterwards to test if a connection was freed. ***I*** (1)
-     
-     - Note: This request is binding. The process that processes HTTP requests *must* free its connection object when the 'abortProcessing' flag is set to true. However, this can take time, especially when the system experiences a heavy load.
-     */
+    /// Request a connection, even if all connections are in use. Since it might take some time before the request is honoured, use the allocate function afterwards to test if a connection was freed. ***I*** (1)
+    /// - Note: This request is binding. The process that processes HTTP requests *must* free its connection object when the 'abortProcessing' flag is set to true. However, this can take time, especially when the system experiences a heavy load.
     
     func request() {
         
-        synchronized(self, { [unowned self] in
+        HttpConnectionPool.syncQueue.sync() {
+            
+            [unowned self] in
             
             // Find the oldest connection still in use and request its release
             
             if self.used.count > 0 {
-                log.atLevelDebug(id: -1, source: SOURCE + ".\(#function).\(#line)", message: "Requesting connection object \(self.used.count - 1) to free itself.")
+                log.atLevelDebug(id: -1, source: #file.source(#function, #line), message: "Requesting connection object \(self.used.count - 1) to free itself.")
                 self.used.last!.abortProcessing = true
             }
-            })
+        }
     }
     
     
-    /**
-     Removes all old connection objects and creates new ones.
-     
-     This function will remove all free connection objects from the pool. Then it will wait until the connections that are in use will become free before removing them. Keep in mind that when there is a reasonable load, this can result in degraded performance for a long time as connections that become free will immediately be picked up again before they can be removed. It would be better to stop the server while this function is called and start again it afterwards.
-     */
+    /// Removes all old connection objects and creates new ones.
+    /// This function will remove all free connection objects from the pool. Then it will wait until the connections that are in use will become free before removing them. Keep in mind that when there is a reasonable load, this can result in degraded performance for a long time as connections that become free will immediately be picked up again before they can be removed. It would be better to stop the server while this function is called and start again it afterwards.
+    
     func create() {
         
         var success = false
         
         while !success {
             
-            synchronized(self, { [unowned self] in
+            HttpConnectionPool.syncQueue.sync() {
+                
+                [unowned self] in
                 
                 log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Current status: Connections available = \(self.available.count), used = \(self.used.count)")
                 self.available = []
                 if self.used.count == 0 {
-                    log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Creatng \(Parameters.asInt(.MAX_NOF_ACCEPTED_CONNECTIONS)) new connection objects")
-                    for _ in 0 ..< Parameters.asInt(.MAX_NOF_ACCEPTED_CONNECTIONS) {
+                    log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Creatng \(Parameters.maxNofAcceptedConnections) new connection objects")
+                    for _ in 0 ..< Parameters.maxNofAcceptedConnections {
                         self.available.append(HttpConnection())
                     }
                     success = true
                 }
-                })
+            }
             
+            
+            // This could take some time, so ensure that this process is aborted when swiftfire must be stopped.
+            
+            if quitSwiftfire { break }
+
             sleep(1)
         }
     }

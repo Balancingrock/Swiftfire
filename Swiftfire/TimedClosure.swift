@@ -62,26 +62,27 @@ typealias NoParametersNoReturn = () -> ()
 final class TimedClosure {
     
     private var closure: NoParametersNoReturn
-    private var queue: dispatch_queue_t
+    private var queue: DispatchQueue
     var once: Bool
-    private var previousExecution: NSDate
-    private var delay: NSTimeInterval?
+    private var previousExecution: Date
+    private var delay: TimeInterval?
     private var wallclockDelay: WallclockTime?
     var doNotExecute = false
     
     
     // Writing to this variable will trigger an execution request to be issued.
     
-    private var nextExecution: NSDate {
+    private var nextExecution: Date {
         didSet {
             var delta = nextExecution.timeIntervalSinceNow
             if delta < 0 { delta = 0 }
             log.atLevelDebug(id: -1, source: #file.source(#function, #line), message: "Delay = \(delta)")
-            dispatch_after(UInt64(delta * Double(NSEC_PER_SEC)), queue, { [weak self] in self?.execute() })
+            let dpt = DispatchTime.now() + delta * Double(NSEC_PER_SEC)
+            queue.after(when: dpt) { [weak self] in self?.execute() }
         }
     }
 
-    private var calendar = NSCalendar.currentCalendar()
+    private var calendar = Calendar.current
     
     
     /**
@@ -95,16 +96,16 @@ final class TimedClosure {
      - Parameter once: If set to 'true', then de closure will be executed only once. If the default value 'false' is used, the closure will be executed periodically.
      */
 
-    init(queue: dispatch_queue_t, delay: NSTimeInterval, closure: NoParametersNoReturn, once: Bool = false) {
+    init(queue: DispatchQueue, delay: TimeInterval, closure: NoParametersNoReturn, once: Bool = false) {
         
-        self.previousExecution = NSDate() // Simulate execution
+        self.previousExecution = Date() // Simulate execution
         
         self.queue = queue
         self.closure = closure
         self.once = once
         self.delay = delay
         
-        self.nextExecution = previousExecution.dateByAddingTimeInterval(delay)
+        self.nextExecution = previousExecution.addingTimeInterval(delay)
     }
     
     
@@ -119,9 +120,9 @@ final class TimedClosure {
      - Parameter once: If set to 'true', then de closure will be executed only once. If the default value 'false' is used, the closure will be executed periodically.
      */
 
-    init(queue: dispatch_queue_t, delay: WallclockTime, closure: NoParametersNoReturn, once: Bool = false) {
+    init(queue: DispatchQueue, delay: WallclockTime, closure: NoParametersNoReturn, once: Bool = false) {
         
-        self.previousExecution = NSDate() // Simulate execution
+        self.previousExecution = Date() // Simulate execution
         
         self.queue = queue
         self.closure = closure
@@ -143,15 +144,15 @@ final class TimedClosure {
      - Parameter once: If set to 'true', then de closure will be executed only once. If the default value 'false' is used, the closure will be executed at the given wallclock time every day.
      */
     
-    init(queue: dispatch_queue_t, wallclockTime: WallclockTime, closure: NoParametersNoReturn, once: Bool = false) {
+    init(queue: DispatchQueue, wallclockTime: WallclockTime, closure: NoParametersNoReturn, once: Bool = false) {
         
-        self.previousExecution = NSDate() // Simulate execution
+        self.previousExecution = Date() // Simulate execution
         
         self.queue = queue
         self.closure = closure
         self.once = once
 
-        self.nextExecution = NSDate.firstFutureDate(with: wallclockTime)
+        self.nextExecution = Date.firstFutureDate(with: wallclockTime)
     }
     
     
@@ -194,11 +195,11 @@ final class TimedClosure {
             previousExecution = nextExecution
 
             if let delay = delay {
-                nextExecution = previousExecution.dateByAddingTimeInterval(delay)
+                nextExecution = previousExecution.addingTimeInterval(delay)
             } else if let wallclockDelay = wallclockDelay {
                 nextExecution = previousExecution + wallclockDelay
             } else {
-                nextExecution = calendar.dateByAddingUnit(NSCalendarUnit.Day, value: 1, toDate: previousExecution, options: NSCalendarOptions.MatchFirst)!
+                nextExecution = calendar.date(byAdding: Calendar.Unit.day, value: 1, to: previousExecution as Date, options: Calendar.Options.matchFirst)!
             }
         }
     }

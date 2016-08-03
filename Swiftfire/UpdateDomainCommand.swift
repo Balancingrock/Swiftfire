@@ -88,4 +88,20 @@ final class UpdateDomainCommand {
         oldDomainName = joldDomainName
         newDomain = jnewDomain
     }
+    
+    func execute() {
+        
+        guard domains.contains(domainWithName: oldDomainName) else {
+            log.atLevelError(id: -1, source: #file.source(#function, #line), message: "UPDATE-DOMAIN no domain present with name \(oldDomainName)")
+            return
+        }
+        
+        if domains.update(domainWithName: oldDomainName, withDomain: newDomain) {
+            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "UPDATE-DOMAIN updated domain \(oldDomainName) to \(newDomain))")
+            return
+        } else {
+            log.atLevelError(id: -1, source: #file.source(#function, #line), message: "UPDATE-DOMAIN failed")
+        }
+    }
+
 }

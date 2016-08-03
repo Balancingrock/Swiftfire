@@ -83,11 +83,6 @@ final class Statistics: NSObject {
     var statisticsWindowController: StatisticsWindowController?
     
     
-    // The queue on which all mutations will take place
-    
-    private static let queue = dispatch_queue_create("CoreDataStatistics", DISPATCH_QUEUE_SERIAL)
-
-    
     /// The store coordinator
     
     private let persistentStoreCoordinator: NSPersistentStoreCoordinator
@@ -102,10 +97,10 @@ final class Statistics: NSObject {
     
     var cdDomains: CDDomains {
         do {
-            let fetchDomainsRequest = NSFetchRequest(entityName: "CDDomains")
-            let domainsArray = try self.managedObjectContext.executeFetchRequest(fetchDomainsRequest) as! [CDDomains]
+            let fetchDomainsRequest = NSFetchRequest<CDDomains>(entityName: "CDDomains")
+            let domainsArray = try self.managedObjectContext.fetch(fetchDomainsRequest)
             switch domainsArray.count {
-            case 0: return NSEntityDescription.insertNewObjectForEntityForName("CDDomains", inManagedObjectContext: self.managedObjectContext) as! CDDomains
+            case 0: return NSEntityDescription.insertNewObject(forEntityName: "CDDomains", into: self.managedObjectContext) as! CDDomains
             case 1: return domainsArray[0]
             default: fatalError("Too many CDDomains in core data store (expected 1, found: \(domainsArray.count))")
             }
@@ -120,10 +115,10 @@ final class Statistics: NSObject {
     
     var cdClients: CDClients {
         do {
-            let fetchClientsRequest = NSFetchRequest(entityName: "CDClients")
-            let clientsArray = try self.managedObjectContext.executeFetchRequest(fetchClientsRequest) as! [CDClients]
+            let fetchClientsRequest = NSFetchRequest<CDClients>(entityName: "CDClients")
+            let clientsArray = try self.managedObjectContext.fetch(fetchClientsRequest)
             switch clientsArray.count {
-            case 0: return NSEntityDescription.insertNewObjectForEntityForName("CDClients", inManagedObjectContext: self.managedObjectContext) as! CDClients
+            case 0: return NSEntityDescription.insertNewObject(forEntityName: "CDClients", into: self.managedObjectContext) as! CDClients
             case 1: return clientsArray[0]
             default: fatalError("Too many CDClients in core data store (expected 1, found: \(clientsArray.count))")
             }
@@ -155,7 +150,7 @@ final class Statistics: NSObject {
     
     /// The cutoff javaDate between yesterday and today
     
-    var today: Int64 = NSDate().javaDateBeginOfDay
+    var today: Int64 = Date().javaDateBeginOfDay
     
     
     /// The timed closure that is used to update 'today'
@@ -170,13 +165,13 @@ final class Statistics: NSObject {
         
         log.atLevelDebug(id: -1, source: #file.source(#function, #line), message: "Creating statistics singleton")
         
-        guard let modelUrl = NSBundle.mainBundle().URLForResource("Statistics", withExtension:"momd") else {
+        guard let modelUrl = Bundle.main.urlForResource("Statistics", withExtension:"momd") else {
             log.atLevelEmergency(id: -1, source: #file.source(#function, #line), message: "Error loading domain statistics model from bundle")
             sleep(1)
             fatalError("Error loading domain statistics model from bundle")
         }
         
-        guard let managedObjectModel = NSManagedObjectModel(contentsOfURL: modelUrl) else {
+        guard let managedObjectModel = NSManagedObjectModel(contentsOf: modelUrl) else {
             log.atLevelEmergency(id: -1, source: #file.source(#function, #line), message: "Error initializing mom from: \(modelUrl)")
             sleep(1)
             fatalError("Error initializing mom from: \(modelUrl)")
@@ -184,7 +179,7 @@ final class Statistics: NSObject {
         
         persistentStoreCoordinator = NSPersistentStoreCoordinator(managedObjectModel: managedObjectModel)
         
-        managedObjectContext = NSManagedObjectContext(concurrencyType: .MainQueueConcurrencyType)
+        managedObjectContext = NSManagedObjectContext(concurrencyType: .mainQueueConcurrencyType)
         
         managedObjectContext.persistentStoreCoordinator = persistentStoreCoordinator
         
@@ -196,10 +191,10 @@ final class Statistics: NSObject {
             return
         }
             
-        let storeURL = statisticsDir.URLByAppendingPathComponent("StatisticsModel.sqlite")
-            
+        
         do {
-            try self.persistentStoreCoordinator.addPersistentStoreWithType(NSSQLiteStoreType, configuration: nil, URL: storeURL, options: nil)
+            let storeURL = try statisticsDir.appendingPathComponent("StatisticsModel.sqlite")
+            try self.persistentStoreCoordinator.addPersistentStore(ofType: NSSQLiteStoreType, configurationName: nil, at: storeURL, options: nil)
         } catch {
             log.atLevelEmergency(id: -1, source: #file.source(#function, #line), message: "Error migrating store: \(error)")
             return
@@ -230,8 +225,8 @@ final class Statistics: NSObject {
         
         // Create the domains first because this includes the creation of CDCounters. When the Clients are created the CDClientRecord will need the CDCounters to be present.
         
-        _ = CDDomains.createFrom(jdomains, inContext: managedObjectContext)
-        _ = CDClients.createFrom(jclients, inContext: managedObjectContext)
+        _ = CDDomains.createFrom(json: jdomains, inContext: managedObjectContext)
+        _ = CDClients.createFrom(json: jclients, inContext: managedObjectContext)
         
         statisticsWindowController?.recalculateCountValue()
     }
@@ -240,6 +235,7 @@ final class Statistics: NSObject {
     /// Saves the content of the core data model to disk if anything was changed.
     /// - Returns: Nil if all went as planned. A NSError if something went wrong.
     
+    @discardableResult
     func save() -> NSError? {
         
         if managedObjectContext.hasChanges {
@@ -262,28 +258,27 @@ final class Statistics: NSObject {
         // Empty the store
         managedObjectContext.reset()
         
-        let cdDomains = NSEntityDescription.insertNewObjectForEntityForName("CDDomains", inManagedObjectContext: managedObjectContext) as! CDDomains
-        _ = NSEntityDescription.insertNewObjectForEntityForName("CDClients", inManagedObjectContext: managedObjectContext) as! CDClients
+        let cdDomains = NSEntityDescription.insertNewObject(forEntityName: "CDDomains", into: managedObjectContext) as! CDDomains
+        _ = NSEntityDescription.insertNewObject(forEntityName: "CDClients", into: managedObjectContext) as! CDClients
         
-        let d1 = NSEntityDescription.insertNewObjectForEntityForName("CDPathPart", inManagedObjectContext: managedObjectContext) as! CDPathPart
+        let d1 = NSEntityDescription.insertNewObject(forEntityName: "CDPathPart", into: managedObjectContext) as! CDPathPart
         d1.pathPart = "overbeterleven.nl"
         d1.domains = cdDomains
         
-        let d1c1 = NSEntityDescription.insertNewObjectForEntityForName("CDCounter", inManagedObjectContext: managedObjectContext) as! CDCounter
+        let d1c1 = NSEntityDescription.insertNewObject(forEntityName: "CDCounter", into: managedObjectContext) as! CDCounter
         d1c1.pathPart = d1
         d1c1.count = 1
-        d1c1.forDay = NSDate().javaDateBeginOfDay
+        d1c1.forDay = Date().javaDateBeginOfDay
         
-        let d1c2 = NSEntityDescription.insertNewObjectForEntityForName("CDCounter", inManagedObjectContext: managedObjectContext) as! CDCounter
+        let d1c2 = NSEntityDescription.insertNewObject(forEntityName: "CDCounter", into: managedObjectContext) as! CDCounter
         d1c2.previous = d1c1
         d1c2.count = 2
-        d1c2.forDay = NSDate().javaDateBeginOfYesterday
+        d1c2.forDay = Date().javaDateBeginOfYesterday
         
-        let d1c3 = NSEntityDescription.insertNewObjectForEntityForName("CDCounter", inManagedObjectContext: managedObjectContext) as! CDCounter
+        let d1c3 = NSEntityDescription.insertNewObject(forEntityName: "CDCounter", into: managedObjectContext) as! CDCounter
         d1c3.previous = d1c2
         d1c3.count = 3
-        d1c3.forDay = NSDate().javaDateBeginOfYesterday - 12 * 60 * 60 * 1000
-
+        d1c3.forDay = Date().javaDateBeginOfYesterday - 12 * 60 * 60 * 1000
     }
     
     
@@ -291,14 +286,14 @@ final class Statistics: NSObject {
      - Returns: The Client Managed Object for the given address. Creates a new one if necessary.
      */
     
-    private func getClientFor(address: String?) throws -> CDClient? {
+    private func getClient(forAddress address: String?) throws -> CDClient? {
         
         guard let address = address else { return nil }
         
-        let fetchRequest = NSFetchRequest(entityName: "CDClient")
-        fetchRequest.predicate = NSPredicate(format: "address == %@", address)
+        let fetchRequest = NSFetchRequest<CDClient>(entityName: "CDClient")
+        fetchRequest.predicate = Predicate(format: "address == %@", address)
 
-        let clients = try managedObjectContext.executeFetchRequest(fetchRequest) as! [CDClient]
+        let clients = try managedObjectContext.fetch(fetchRequest)
         
         switch clients.count {
         
@@ -306,7 +301,7 @@ final class Statistics: NSObject {
         
             log.atLevelDebug(id: -1, source: #file.source(#function, #line), message: "Creating new Client entity for IP Address = \(address)")
             
-            let client = NSEntityDescription.insertNewObjectForEntityForName("CDClient", inManagedObjectContext: managedObjectContext) as! CDClient
+            let client = NSEntityDescription.insertNewObject(forEntityName: "CDClient", into: managedObjectContext) as! CDClient
             client.address = address
             client.clients = cdClients
 
@@ -329,7 +324,7 @@ final class Statistics: NSObject {
      - Returns: The existing CDPathPart for the given part or -if absent- creates a new one.
      */
     
-    private func getPathPart(part: String?) -> CDPathPart? {
+    private func getPathPart(forPart part: String?) -> CDPathPart? {
         
         // Find and return an existing one
         for p in cdDomains.domains! {
@@ -341,13 +336,13 @@ final class Statistics: NSObject {
         }
         
         // Create a new one
-        let pp = NSEntityDescription.insertNewObjectForEntityForName("CDPathPart", inManagedObjectContext: managedObjectContext) as! CDPathPart
+        let pp = NSEntityDescription.insertNewObject(forEntityName: "CDPathPart", into: managedObjectContext) as! CDPathPart
         pp.pathPart = part
         pp.domains = cdDomains
         
         // Add a counter to it
-        let c = NSEntityDescription.insertNewObjectForEntityForName("CDCounter", inManagedObjectContext: managedObjectContext) as! CDCounter
-        c.forDay = NSDate().javaDateBeginOfDay
+        let c = NSEntityDescription.insertNewObject(forEntityName: "CDCounter", into: managedObjectContext) as! CDCounter
+        c.forDay = Date().javaDateBeginOfDay
         
         pp.counterList = c
         
@@ -359,7 +354,7 @@ final class Statistics: NSObject {
      - Returns: Nil if the part already exists and has its "doNotTrace" member set to 'true'. Otherwise it returns the found part or creates a new one (and returns that).
      */
     
-    private func getPathPart(part: String, fromPathPart pathPart: CDPathPart) -> CDPathPart? {
+    private func getPathPart(forPart part: String, fromPathPart pathPart: CDPathPart) -> CDPathPart? {
         
         // Find an existing one
         for p in pathPart.next! {
@@ -374,13 +369,13 @@ final class Statistics: NSObject {
         if pathPart.doNotTrace { return nil }
         
         // Create a new one
-        let pp = NSEntityDescription.insertNewObjectForEntityForName("CDPathPart", inManagedObjectContext: managedObjectContext) as! CDPathPart
+        let pp = NSEntityDescription.insertNewObject(forEntityName: "CDPathPart", into: managedObjectContext) as! CDPathPart
         pp.pathPart = part
         pp.previous = pathPart
         
         // Add a counter to it
-        let c = NSEntityDescription.insertNewObjectForEntityForName("CDCounter", inManagedObjectContext: managedObjectContext) as! CDCounter
-        c.forDay = NSDate().javaDateBeginOfDay
+        let c = NSEntityDescription.insertNewObject(forEntityName: "CDCounter", into: managedObjectContext) as! CDCounter
+        c.forDay = Date().javaDateBeginOfDay
         
         pp.counterList = c
 
@@ -399,9 +394,9 @@ final class Statistics: NSObject {
         // Perform the action associated with the mutation
         
         switch mutation.kind {
-        case .AddClientRecord: do { try addClientRecord(mutation) } catch {}
-        case .UpdatePathPart: updatePathPart(mutation)
-        case .UpdateClient: updateClient(mutation)
+        case .AddClientRecord: do { try addClientRecord(mutation: mutation) } catch {}
+        case .UpdatePathPart: updatePathPart(mutation: mutation)
+        case .UpdateClient: updateClient(mutation: mutation)
 /*
         case .EmptyDatabase: emptyDatabase(mutation)
         case .RemoveAllClientRecords: removeAllClientRecords(mutation)
@@ -416,7 +411,7 @@ final class Statistics: NSObject {
         
         // Store the mutation itself
         
-        let cdMutation = NSEntityDescription.insertNewObjectForEntityForName("CDMutation", inManagedObjectContext: managedObjectContext) as! CDMutation
+        let cdMutation = NSEntityDescription.insertNewObject(forEntityName: "CDMutation", into: managedObjectContext) as! CDMutation
         cdMutation.client = mutation.client
         cdMutation.connectionAllocationCount = mutation.connectionAllocationCount ?? -1
         cdMutation.connectionObjectId = mutation.connectionObjectId ?? -1
@@ -424,8 +419,8 @@ final class Statistics: NSObject {
         cdMutation.doNotTrace = mutation.doNotTrace ?? false
         cdMutation.httpResponseCode = mutation.httpResponseCode
         cdMutation.kind = mutation.kind.rawValue
-        cdMutation.requestCompleted = mutation.requestCompleted ?? 0
-        cdMutation.requestReceived = mutation.requestReceived ?? 0
+        cdMutation.requestCompleted = mutation.requestCompleted ?? -1
+        cdMutation.requestReceived = mutation.requestReceived ?? -1
         cdMutation.responseDetails = mutation.responseDetails
         cdMutation.socket = mutation.socket ?? -1
         cdMutation.url = mutation.url
@@ -446,7 +441,7 @@ final class Statistics: NSObject {
         // =========================================================
         
         // Ensure that the client exists
-        guard let client = try getClientFor(mutation.client) else {
+        guard let client = try getClient(forAddress: mutation.client) else {
             log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Cannot create or get client for address \(mutation.client)")
             return
         }
@@ -496,7 +491,7 @@ final class Statistics: NSObject {
         // Create a new ClientRecord
         // =========================
 
-        let record = NSEntityDescription.insertNewObjectForEntityForName("CDClientRecord", inManagedObjectContext: managedObjectContext) as! CDClientRecord
+        let record = NSEntityDescription.insertNewObject(forEntityName: "CDClientRecord", into: managedObjectContext) as! CDClientRecord
         record.client = client // Side effect: Also adds the record to the client
         record.requestReceived = requestReceived
         record.requestCompleted = requestCompleted
@@ -527,17 +522,17 @@ final class Statistics: NSObject {
         var pathParts = url.pathComponents ?? [""]
         
         // If the first part is a "/", then remove it
-        if pathParts.count > 0 && pathParts[0] == "/" { pathParts.removeAtIndex(0) }
+        if pathParts.count > 0 && pathParts[0] == "/" { pathParts.remove(at: 0) }
         
         // Get the root of the path parts
-        var current = getPathPart(domainStr)
+        var current = getPathPart(forPart: domainStr)
         
         // Exit if tracing is disabled
         if current == nil { return }
         
         // Continue until the last part
         for part in pathParts {
-            current = getPathPart(part, fromPathPart: current!)
+            current = getPathPart(forPart: part, fromPathPart: current!)
             // Exit if tracing is disabled
             if current == nil { return }
         }
@@ -558,12 +553,12 @@ final class Statistics: NSObject {
         repeat {
             if current!.counterList!.forDay < today {
                 // Create new counter
-                let newCounter = NSEntityDescription.insertNewObjectForEntityForName("CDCounter", inManagedObjectContext: managedObjectContext) as! CDCounter
+                let newCounter = NSEntityDescription.insertNewObject(forEntityName: "CDCounter", into: managedObjectContext) as! CDCounter
                 newCounter.next = current!.counterList!
                 newCounter.pathPart = current
             }
             current!.counterList!.count += 1
-            current!.counterList!.mutableSetValueForKey("clientRecords").addObject(record)
+            current!.counterList!.mutableSetValue(forKey: "clientRecords").add(record)
             current!.foreverCount += 1
             current = current!.previous
         } while current != nil

@@ -74,4 +74,9 @@ final class RestoreServerParametersCommand {
         guard let json = json else { return nil }
         guard (json|COMMAND_NAME)?.nullValue == true else { return nil }
     }
+    
+    func execute() {
+        log.atLevelNotice(id: -1, source: #file.source(#function, #line))
+        Parameters.restore()
+    }
 }

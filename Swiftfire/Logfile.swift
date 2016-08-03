@@ -72,35 +72,35 @@ class Logfile {
         
         /// When a logfile has become larger than this number (in KBytes), a new logfile will be started.
         
-        case MaxFileSize(Int)
+        case maxFileSize(Int)
         
         
         /// When a new logfile is created and there are more files in the logfile directory than this number (exclusing hidden files), the oldest file will be deleted.
         /// - Note: This assumes that the filename is a unique string among the other filenames in the logfile directory. The oldest file is determined through sorting of the files containing the 'filename' string.
         
-        case MaxNofFiles(Int)
+        case maxNofFiles(Int)
         
         
         /// A new logfile will be started -when necessary- every time this time elapses. Notice that when no log entries are made, no file will be created. There will be no creep in the starttime. The wallclock time uses the current calendar.
         
-        case NewFileAfterDelay(WallclockTime)
+        case newFileAfterDelay(WallclockTime)
         
         
         /// Starts a new logfile daily at the specified wallclock time.
         
-        case NewFileDailyAt(WallclockTime)
+        case newFileDailyAt(WallclockTime)
     }
 
     
     // The queue on which all file logging activity will take place for thread-safety
     
-    private static let queue = dispatch_queue_create("Logfile", DISPATCH_QUEUE_SERIAL)
+    private static let queue = DispatchQueue(label: "Logfile")
     
     
     // The date formatter used to generate filenames (can also be used for loggin info inside the files)
     
-    static var dateFormatter: NSDateFormatter = {
-        let ltf = NSDateFormatter()
+    static var dateFormatter: DateFormatter = {
+        let ltf = DateFormatter()
         ltf.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
         return ltf
     }()
@@ -109,7 +109,7 @@ class Logfile {
     // Returns the current file handle if there is one, creates a new one if necessary.
     // Note: Accessing this fileHandle in whatever manner will create a fileHandle if there is none and if a file can be created.
     
-    private var fileHandle: NSFileHandle? {
+    private var fileHandle: FileHandle? {
         
         if _fileHandle == nil {
             
@@ -117,9 +117,9 @@ class Logfile {
             
             if let fileUrl = fileUrl {
                 
-                if NSFileManager.defaultManager().createFileAtPath(fileUrl.path!, contents: nil, attributes: [NSFilePosixPermissions : NSNumber(int: 0o640)]) {
-                    _fileHandle = NSFileHandle(forUpdatingAtPath: fileUrl.path!)
-                    if let startData = createFileStart()?.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: true) { _fileHandle?.writeData(startData) }
+                if FileManager.default.createFile(atPath: fileUrl.path!, contents: nil, attributes: [FileAttributeKey.posixPermissions.rawValue : NSNumber(value: 0o640)]) {
+                    _fileHandle = FileHandle(forUpdatingAtPath: fileUrl.path!)
+                    if let startData = createFileStart()?.data(using: String.Encoding.utf8, allowLossyConversion: true) { _fileHandle?.write(startData) }
                     log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Created new logfile at: \(fileUrl.path!)")
                     _filepathForNotice = fileUrl.path!
                 } else {
@@ -135,19 +135,19 @@ class Logfile {
                         
                         // Get all files that are not hidden
                         
-                        let files = try NSFileManager.defaultManager().contentsOfDirectoryAtURL(
-                            directory,
+                        let files = try FileManager.default.contentsOfDirectory(
+                            at: directory as URL,
                             includingPropertiesForKeys: nil,
-                            options: NSDirectoryEnumerationOptions())
+                            options: FileManager.DirectoryEnumerationOptions())
                         
                         
                         // Remove all files that do not contain the choosen filename
                         
-                        let onlyLogfiles = files.flatMap({$0.path!.containsString(filename) ? $0 : nil})
+                        let onlyLogfiles = files.flatMap({$0.path!.contains(filename) ? $0 : nil})
                         
                         if onlyLogfiles.count > maxNofFiles! {
-                            let sortedLogfiles = onlyLogfiles.sort({ $0.lastPathComponent < $1.lastPathComponent })
-                            try NSFileManager.defaultManager().removeItemAtURL(sortedLogfiles.first!)
+                            let sortedLogfiles = onlyLogfiles.sorted(isOrderedBefore: { $0.lastPathComponent < $1.lastPathComponent })
+                            try FileManager.default.removeItem(at: sortedLogfiles.first!)
                             log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Removed oldest logfile at: \(sortedLogfiles.first!.path!)")
                         }
                     } catch {
@@ -163,7 +163,7 @@ class Logfile {
         return _fileHandle
     }
     
-    private var _fileHandle: NSFileHandle?
+    private var _fileHandle: FileHandle?
     
     
     // The first part of the name of the logfiles
@@ -178,7 +178,7 @@ class Logfile {
     
     // The URL of the directory the logfiles are located
     
-    private var directory: NSURL
+    private var directory: URL
     
     
     /// The maximum filesize of a logfile (in bytes)
@@ -195,28 +195,28 @@ class Logfile {
     
     var newFileDailyAt: WallclockTime? {
         didSet {
-            self.nextDailyFileAt = (newFileDailyAt == nil) ? nil : NSDate.firstFutureDate(with: newFileDailyAt!)
+            self.nextDailyFileAt = (newFileDailyAt == nil) ? nil : Date.firstFutureDate(with: newFileDailyAt!)
         }
     }
     
     
     /// The next daily logfile creation
     
-    var nextDailyFileAt: NSDate?
+    var nextDailyFileAt: Date?
     
     
     /// The delay between new logfiles
     
     var newFileAfterDelay: WallclockTime? {
         didSet {
-            self.nextDelayedFileAt = (newFileAfterDelay == nil) ? nil : NSDate() + newFileAfterDelay!
+            self.nextDelayedFileAt = (newFileAfterDelay == nil) ? nil : Date() + newFileAfterDelay!
         }
     }
     
     
     /// The time when the next logfile must be created
     
-    var nextDelayedFileAt: NSDate?
+    var nextDelayedFileAt: Date?
     
     
     /**
@@ -228,7 +228,7 @@ class Logfile {
      - Parameter options: A series of option enums that will be processed in order, hence last-come overrides earlier same-option settings.
      */
     
-    init?(filename: String = "logfile", fileExtension: String = "txt", directory: NSURL? = nil, options: InitOption ...) {
+    init?(filename: String = "logfile", fileExtension: String = "txt", directory: URL? = nil, options: InitOption ...) {
         
         self.filename = filename
         self.fileExtension = fileExtension
@@ -237,16 +237,16 @@ class Logfile {
             
             do {
                 let applicationSupportDirectory =
-                    try NSFileManager.defaultManager().URLForDirectory(
-                        NSSearchPathDirectory.ApplicationSupportDirectory,
-                        inDomain: NSSearchPathDomainMask.UserDomainMask,
-                        appropriateForURL: nil,
+                    try FileManager.default.urlForDirectory(
+                        FileManager.SearchPathDirectory.applicationSupportDirectory,
+                        in: FileManager.SearchPathDomainMask.userDomainMask,
+                        appropriateFor: nil,
                         create: true).path!
                 
-                let appName = NSProcessInfo.processInfo().processName
-                let url = NSURL(fileURLWithPath: applicationSupportDirectory, isDirectory: true).URLByAppendingPathComponent(appName).URLByAppendingPathComponent("logfiles")
+                let appName = ProcessInfo.processInfo.processName
+                let url = try URL(fileURLWithPath: applicationSupportDirectory, isDirectory: true).appendingPathComponent(appName).appendingPathComponent("logfiles")
                 
-                try NSFileManager.defaultManager().createDirectoryAtURL(url, withIntermediateDirectories: true, attributes: nil)
+                try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
                 
                 self.directory = url
                 
@@ -266,19 +266,19 @@ class Logfile {
             
             switch option {
                 
-            case let .MaxFileSize(size):
+            case let .maxFileSize(size):
                 self.maxFileSize = size * 1024
                 
-            case let .MaxNofFiles(num):
+            case let .maxNofFiles(num):
                 self.maxNofFiles = num
                 
-            case let .NewFileAfterDelay(delay):
+            case let .newFileAfterDelay(delay):
                 self.newFileAfterDelay = delay
-                self.nextDelayedFileAt = NSDate() + delay
+                self.nextDelayedFileAt = Date() + delay
                 
-            case let .NewFileDailyAt(time):
+            case let .newFileDailyAt(time):
                 self.newFileDailyAt = time
-                self.nextDailyFileAt = NSDate.firstFutureDate(with: time)
+                self.nextDailyFileAt = Date.firstFutureDate(with: time)
             }
         }
     }
@@ -287,14 +287,18 @@ class Logfile {
     // Create a new filename based on the current time.
     
     private var fullFilename: String {
-        return filename + "_" + Logfile.dateFormatter.stringFromDate(NSDate()) +  "." + fileExtension
+        return filename + "_" + Logfile.dateFormatter.string(from: Date()) +  "." + fileExtension
     }
     
     
     // Create a new file URL
     
-    private var fileUrl: NSURL? {
-        return directory.URLByAppendingPathComponent(fullFilename)
+    private var fileUrl: URL? {
+        do {
+            return try directory.appendingPathComponent(fullFilename)
+        } catch {
+            return nil
+        }
     }
     
     
@@ -308,7 +312,7 @@ class Logfile {
     /// - Note: If a new 'record' call is made after this operation was called then a new logfile will be created.
     
     func close() {
-        dispatch_sync(Logfile.queue, { [weak self] in self?._close() }) // Use weak because the app may have removed the Filelog object
+        _ = Logfile.queue.sync(execute: { [weak self] in self?._close() }) // Use weak because the app may have removed the Filelog object
     }
     
     
@@ -318,7 +322,7 @@ class Logfile {
         if let file = self._fileHandle {
             log.atLevelDebug(id: -1, source: #file.source(#function, #line), message: "Closed current logfile \(_filepathForNotice)")
             file.seekToEndOfFile()
-            if let endData = createFileEnd()?.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: true) { file.writeData(endData) }
+            if let endData = createFileEnd()?.data(using: String.Encoding.utf8, allowLossyConversion: true) { file.write(endData) }
             file.closeFile()
             self._fileHandle = nil
             self._filepathForNotice = nil
@@ -329,7 +333,7 @@ class Logfile {
     /// Force possible buffer content to permanent storage
     
     func flush() {
-        dispatch_sync(Logfile.queue, { [weak self] in self?._flush() }) // Use weak because the app may have removed the Filelog object
+        _ = Logfile.queue.sync(execute: { [weak self] in self?._flush() }) // Use weak because the app may have removed the Filelog object
     }
 
     // Force possible buffer content to permanent storage
@@ -344,7 +348,7 @@ class Logfile {
     /// Records the given string in the current logfile. Will create a new logfile if neccesary.
     
     func record(message: String) {
-        dispatch_async(Logfile.queue, { [weak self] in self?._record(message) }) // Use weak because the app may have removed the Filelog object
+        _ = Logfile.queue.sync(execute: { [weak self] in self?._record(message: message) }) // Use weak because the app may have removed the Filelog object
     }
 
     
@@ -358,24 +362,24 @@ class Logfile {
         
         if let file = self._fileHandle { // Don't want side effect of creating a new fileHandle
             
-            let now = NSDate() // Caching current time
+            let now = Date() // Caching current time
             
             
             // Close the current file if it is bigger than a maxFileSize assuming that maxFileSize is set.
             
             let fileSize = file.seekToEndOfFile()
-            if let maxSize = self.maxFileSize where fileSize > UInt64(maxSize) { self._close() }
+            if let maxSize = self.maxFileSize, fileSize > UInt64(maxSize) { self._close() }
             
             
             // If the daily time has been set, and is in the past, then close the current file.
             
             if let newFileDailyAt = self.newFileDailyAt {
                 
-                if self.nextDailyFileAt!.compare(now) == NSComparisonResult.OrderedAscending {
+                if self.nextDailyFileAt!.compare(now) == ComparisonResult.orderedAscending {
                     
                     self._close()
                     
-                    self.nextDailyFileAt = NSDate.firstFutureDate(with: newFileDailyAt)
+                    self.nextDailyFileAt = Date.firstFutureDate(with: newFileDailyAt)
                 }
             }
             
@@ -384,13 +388,13 @@ class Logfile {
             
             if let newFileAfterDelay = self.newFileAfterDelay {
                 
-                if self.nextDelayedFileAt!.compare(now) == NSComparisonResult.OrderedAscending {
+                if self.nextDelayedFileAt!.compare(now) == ComparisonResult.orderedAscending {
                     
                     self._close()
                     
                     // Increase the time for the next new file, and make sure it is after the current time.
                     
-                    while self.nextDelayedFileAt!.compare(now) == NSComparisonResult.OrderedAscending {
+                    while self.nextDelayedFileAt!.compare(now as Date) == ComparisonResult.orderedAscending {
                         self.nextDelayedFileAt! = self.nextDelayedFileAt! + newFileAfterDelay
                     }
                 }
@@ -399,8 +403,8 @@ class Logfile {
         
         if let file = self.fileHandle { // Want the side effect of creating a new fileHandle (if necessary or possible)
             
-            if let data = message.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: true) {
-                file.writeData(data)
+            if let data = message.data(using: String.Encoding.utf8, allowLossyConversion: true) {
+                file.write(data)
             } else {
                 log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Could not convert log string to UTF8")
             }

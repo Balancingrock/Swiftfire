@@ -57,44 +57,6 @@
 import Foundation
 
 
-// For logging purposes, identifies the module which created the logging entry.
-
-private let SOURCE = ((#file as NSString).lastPathComponent as NSString).stringByDeletingPathExtension
-
-
-// For the buffer that is used to hold the HTTP messages.
-
-class HttpMessageBuffer: UInt8Buffer {
-    
-    
-    // If an HTTP message is present, this is the length of the complete message header + content.
-    
-    var firstMessageSize = 0
-    
-    
-    // Returns true if the complete message was received
-    
-    var firstMessageIsComplete: Bool {
-        if firstMessageSize == 0 { return false }
-        return fill >= firstMessageSize
-    }
-    
-    
-    /**
-     Remove the processed data from the buffer.
-     */
-    
-    func removeFirstMessage() {
-        
-        if firstMessageSize == 0 { return }
-        
-        remove(firstMessageSize)
-        
-        firstMessageSize = 0
-    }
-}
-
-
 extension HttpConnection: DataEndDetector {
     
     /**
@@ -106,12 +68,13 @@ extension HttpConnection: DataEndDetector {
     func endReached(buffer: UnsafeBufferPointer<UInt8>) -> Bool {
         
         
-        log.atLevelDebug(id: logId, source: SOURCE + ".\(#function).\(#line)", message: "Received \(buffer.count) bytes")
+        log.atLevelDebug(id: logId, source: #file.source(#function, #line), message: "Received \(buffer.count) bytes")
         
         
         // Add the new data
         
-        messageBuffer.add(buffer)
+        messageBuffer.append(buffer)
+        
         
         // Signal true if at least one complete message was found
         
@@ -123,128 +86,89 @@ extension HttpConnection: DataEndDetector {
         SCAN_FOR_COMPLETE_MESSAGES: while true {
             
             
-            // Quick check
-            
-            if messageBuffer.fill == 0 {
-                break SCAN_FOR_COMPLETE_MESSAGES
-            }
-            
-            
-            // Init
-            
-            var messageHeaderLength = 0
-            
-            
-            // =========================================================
-            // If the message header is not complete yet, try to read it
-            // =========================================================
+            // If there is no header, try to read a header
             
             if httpHeader == nil {
                 
                 
                 // See if the header is complete in the incoming data
                 
-                if let rangeCrLfCrLf = messageBuffer.stringValue.rangeOfString(CRLFCRLF, options: NSStringCompareOptions(), range: nil, locale: nil) {
+                if let header = HttpHeader(data: messageBuffer) {
                     
                     
-                    // Yes, the header should be complete
+                    // Store the header for future reference
                     
-                    log.atLevelDebug(id: logId, source: SOURCE + ".\(#function).\(#line)", message: "Found end of http request")
-                    
-                    
-                    // Create the http request header from the incoming data
-                    
-                    let headerString = messageBuffer.stringValue.substringToIndex(rangeCrLfCrLf.startIndex)
+                    httpHeader = header
                     
                     
-                    // Set the length of the header
+                    // Yes, the header is complete
                     
-                    messageHeaderLength = headerString.lengthOfBytesUsingEncoding(NSUTF8StringEncoding) + 4 // +4 for the CRLFCRLF
-                    
-                    
-                    // Split the header into its constitue lines
-                    
-                    let headerLines = headerString.componentsSeparatedByString(CRLF)
-                    
-                    
-                    // Create the message header
-                    
-                    httpHeader = HttpHeader(lines: headerLines)
+                    log.atLevelDebug(id: logId, source: #file.source(#function, #line), message: "HTTP Message Header complete")
                     
                     
                     // =======================
                     // The header is complete.
                     // =======================
                     
-                    
                     // Write the header to the log if so required
-                    // Note: This is done here because the host may be missing or wrong, hence there would be no domain for this request.
+                    // Note: This is done now because there might be errors this request.
                     
-                    if Parameters.asBool(ParameterId.HEADER_LOGGING_ENABLED) { httpHeader!.record(self) }
-                    
-                } else {
-                    
-                    // ==============================
-                    // The header is not complete yet
-                    // ==============================
-                    
-                    break SCAN_FOR_COMPLETE_MESSAGES
+                    if Parameters.headerLoggingEnabled { header.record(connection: self) }
                 }
             }
             
             
-            // Check if the body is complete
+            // ====================================
+            // If there is no header break the scan
+            // ====================================
+            
+            if httpHeader == nil { break SCAN_FOR_COMPLETE_MESSAGES }
+            
+            
+            // =========================
+            // Check for a complete body
+            // =========================
             
             let bodyLength = httpHeader!.contentLength
-            messageBuffer.firstMessageSize = bodyLength + messageHeaderLength
+            let messageSize = bodyLength + httpHeader!.headerLength
+
+            if messageSize > messageBuffer.count { break SCAN_FOR_COMPLETE_MESSAGES }
+                
+                
+            // ====================
+            // The body is complete
+            // ====================
+                        
+                        
+            // Create duplicates of the header and body and pass these to the worker. This way the worker has sole access to the data it works on. Note that the header is a class and can thus be copied as is if the local header is set to nil afterwards.
+                
+            let bodyRange = Range(uncheckedBounds: (lower: httpHeader!.headerLength, upper: messageSize))
+            let body = messageBuffer.subdata(in: bodyRange)
+                
+            log.atLevelDebug(id: logId, source: #file.source(#function, #line), message: "HTTP Message Body complete, dispatching worker")
+                            
+                            
+            // =====================
+            // Start the Http Worker
+            // =====================
             
-            if messageBuffer.firstMessageIsComplete {
+            let header = httpHeader!
+            workerQueue.async() { [unowned self] in self.httpWorker(header: header, body: body) }
                 
-                // ============================
-                // Header and body are complete
-                // ============================
+                        
+            // ===========================================================
+            // Remove the message from the buffer and the header from self
+            // ===========================================================
                 
+            let unprocessedRange = Range(uncheckedBounds: (lower: messageSize, upper: messageBuffer.count))
+            messageBuffer = messageBuffer.subdata(in: unprocessedRange)
                 
-                // Create duplicates of the header and buffer and pass these to the worker. This way the worker has sole access to the data it works on.
-                
-                if let header = httpHeader?.copy {
-                    
-                    let body = UInt8Buffer(from: messageBuffer, startByteOffset: messageHeaderLength, endByteOffset: self.messageBuffer.firstMessageSize)
-                    
-                    log.atLevelDebug(id: logId, source: SOURCE + ".\(#function).\(#line)", message: "HTTP Message Complete, dispatching worker")
-                    
-                    
-                    // =====================
-                    // Start the Http Worker
-                    // =====================
-                    
-                    dispatch_async(workerQueue, { [unowned self] in self.httpWorker(header: header, body: body) })
-                    
-                } else {
-                    log.atLevelError(id: logId, source: #file.source(#function, #line), message: "Message is complete, but no httpHeader is available")
-                }
-                
-                
-                // =================================================
-                // Remove the message that was found from the buffer
-                // =================================================
-                
-                messageBuffer.removeFirstMessage()
-                httpHeader = nil
-                
-                
-                // We found at least one complete message
-                
-                result = false
-                
-            } else {
-                
-                // ======================
-                // The body is incomplete
-                // ======================
-                
-                break SCAN_FOR_COMPLETE_MESSAGES
-            }
+            httpHeader = nil
+                        
+                        
+            // We found at least one complete message
+                        
+            result = false
         }
         
         return result

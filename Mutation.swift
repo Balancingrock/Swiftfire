@@ -115,36 +115,36 @@ class Mutation {
     static func mutation(json: VJson?) -> Mutation? {
         
         guard let json = json else { return nil }
-        guard let jkindInt = (json|KIND)?.integerValue else { return nil }
-        guard let jkind = MutationKind(rawValue: Int16(jkindInt)) else { return nil }
+        guard let jkindInt = (json|KIND)?.int16Value else { return nil }
+        guard let jkind = MutationKind(rawValue: jkindInt) else { return nil }
         
         
         let mutation = Mutation(kind: jkind)
         
-        if let tmp = (json|REQUEST_RECEIVED)?.integerValue {
-            mutation.requestReceived = Int64(tmp)
+        if let tmp = (json|REQUEST_RECEIVED)?.int64Value {
+            mutation.requestReceived = tmp
         }
         mutation.domain = (json|DOMAIN)?.stringValue
         mutation.url = (json|URLSTR)?.stringValue
         mutation.httpResponseCode = (json|HTTP_RESPONSE_CODE)?.stringValue
         mutation.responseDetails = (json|RESPONSE_DETAILS)?.stringValue
         
-        if let val = (json|CONNECTION_ALLOCATION_COUNT)?.integerValue {
-            mutation.connectionAllocationCount = Int32(val)
+        if let val = (json|CONNECTION_ALLOCATION_COUNT)?.int32Value {
+            mutation.connectionAllocationCount = val
         }
         
-        if let val = (json|CONNECTION_OBJECT_ID)?.integerValue {
-            mutation.connectionObjectId = Int16(val)
+        if let val = (json|CONNECTION_OBJECT_ID)?.int16Value {
+            mutation.connectionObjectId = val
         }
         
-        if let val = (json|SOCKET)?.integerValue {
-            mutation.socket = Int32(val)
+        if let val = (json|SOCKET)?.int32Value {
+            mutation.socket = val
         }
         
         mutation.doNotTrace = (json|DO_NOT_TRACE)?.boolValue
         mutation.client = (json|CLIENT)?.stringValue
-        if let tmp = (json|REQUEST_COMPLETED)?.integerValue {
-            mutation.requestCompleted = Int64(tmp)
+        if let tmp = (json|REQUEST_COMPLETED)?.int64Value {
+            mutation.requestCompleted = tmp
         }
         
         return mutation

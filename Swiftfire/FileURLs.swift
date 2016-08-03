@@ -65,22 +65,22 @@ final class FileURLs {
     
     /// The Application Support Directory
     
-    static var appSupportDir: NSURL? = {
+    static var appSupportDir: URL? = {
         
-        let filemanager = NSFileManager.defaultManager()
+        let filemanager = FileManager.default
         
         do {
             
-            let appSupportRootpath = try filemanager.URLForDirectory(
-                NSSearchPathDirectory.ApplicationSupportDirectory,
-                inDomain: NSSearchPathDomainMask.UserDomainMask,
-                appropriateForURL: nil,
+            let appSupportRootpath = try filemanager.urlForDirectory(
+                FileManager.SearchPathDirectory.applicationSupportDirectory,
+                in: FileManager.SearchPathDomainMask.userDomainMask,
+                appropriateFor: nil,
                 create: true)
             
-            let appName = NSProcessInfo.processInfo().processName
-            let dirpath = appSupportRootpath.URLByAppendingPathComponent(appName)
+            let appName = ProcessInfo.processInfo.processName
+            let dirpath = try appSupportRootpath.appendingPathComponent(appName)
             
-            try filemanager.createDirectoryAtPath(dirpath.path!, withIntermediateDirectories: true, attributes: nil)
+            try filemanager.createDirectory(atPath: dirpath.path!, withIntermediateDirectories: true, attributes: nil)
             
             return dirpath
             
@@ -93,15 +93,16 @@ final class FileURLs {
     
     /// The directory containing the parameter and domain files with default values
     
-    static private var settingsDir: NSURL? = {
+    static private var settingsDir: URL? = {
         
-        guard let dirpath = appSupportDir?.URLByAppendingPathComponent("settings") else { return nil }
+        guard let appSupportDir = appSupportDir else { return nil }
         
-        let filemanager = NSFileManager.defaultManager()
+        let filemanager = FileManager.default
         
         do {
             
-            try filemanager.createDirectoryAtPath(dirpath.path!, withIntermediateDirectories: true, attributes: nil)
+            let dirpath = try appSupportDir.appendingPathComponent("settings")
+            try filemanager.createDirectory(atPath: dirpath.path!, withIntermediateDirectories: true, attributes: nil)
             
             return dirpath
             
@@ -114,15 +115,16 @@ final class FileURLs {
     
     /// The directory containing the logging files
     
-    static private var loggingDir: NSURL? = {
+    static private var loggingDir: URL? = {
         
-        guard let dirpath = appSupportDir?.URLByAppendingPathComponent("logging") else { return nil }
+        guard let appSupportDir = appSupportDir else { return nil }
         
-        let filemanager = NSFileManager.defaultManager()
+        let filemanager = FileManager.default
         
         do {
             
-            try filemanager.createDirectoryAtPath(dirpath.path!, withIntermediateDirectories: true, attributes: nil)
+            let dirpath = try appSupportDir.appendingPathComponent("logging")
+            try filemanager.createDirectory(atPath: dirpath.path!, withIntermediateDirectories: true, attributes: nil)
             
             return dirpath
             
@@ -135,15 +137,16 @@ final class FileURLs {
     
     /// The directory containing the header logging files
     
-    static var headerLoggingDir: NSURL? = {
+    static var headerLoggingDir: URL? = {
         
-        guard let dirpath = loggingDir?.URLByAppendingPathComponent("headers") else { return nil }
+        guard let loggingDir = loggingDir else { return nil }
         
-        let filemanager = NSFileManager.defaultManager()
+        let filemanager = FileManager.default
         
         do {
             
-            try filemanager.createDirectoryAtURL(dirpath, withIntermediateDirectories: true, attributes: nil)
+            let dirpath = try loggingDir.appendingPathComponent("headers")
+            try filemanager.createDirectory(at: dirpath, withIntermediateDirectories: true, attributes: nil)
             
             return dirpath
             
@@ -156,15 +159,16 @@ final class FileURLs {
     
     /// The directory containing the application log files
     
-    static var applicationLogDir: NSURL? = {
+    static var applicationLogDir: URL? = {
         
-        guard let dirpath = loggingDir?.URLByAppendingPathComponent("application") else { return nil }
+        guard let loggingDir = loggingDir else { return nil }
         
-        let filemanager = NSFileManager.defaultManager()
+        let filemanager = FileManager.default
         
         do {
             
-            try filemanager.createDirectoryAtURL(dirpath, withIntermediateDirectories: true, attributes: nil)
+            let dirpath = try loggingDir.appendingPathComponent("application")
+            try filemanager.createDirectory(at: dirpath, withIntermediateDirectories: true, attributes: nil)
             
             return dirpath
             
@@ -177,15 +181,16 @@ final class FileURLs {
     
     /// The directory for the statistics file
     
-    static var statisticsDir: NSURL? = {
+    static var statisticsDir: URL? = {
         
-        guard let dirpath = appSupportDir?.URLByAppendingPathComponent("statistics") else { return nil }
+        guard let appSupportDir = appSupportDir else { return nil }
 
-        let filemanager = NSFileManager.defaultManager()
+        let filemanager = FileManager.default
 
         do {
             
-            try filemanager.createDirectoryAtURL(dirpath, withIntermediateDirectories: true, attributes: nil)
+            let dirpath = try appSupportDir.appendingPathComponent("statistics")
+            try filemanager.createDirectory(at: dirpath, withIntermediateDirectories: true, attributes: nil)
             
             return dirpath
         
@@ -198,33 +203,47 @@ final class FileURLs {
     
     /// The file with parameter defaults
     
-    static var parameterDefaults: NSURL? = {
+    static var parameterDefaults: URL? = {
         
         guard let dirpath = settingsDir else { return nil }
         
-        return dirpath.URLByAppendingPathComponent("parameter-defaults.json")
+        do {
+            
+            return try dirpath.appendingPathComponent("parameter-defaults.json")
+
+        } catch {
+            
+            return nil
+        }
     }()
     
     
     /// The file with domain defaults
     
-    static var domainDefaults: NSURL? = {
+    static var domainDefaults: URL? = {
         
         guard let dirpath = settingsDir else { return nil }
         
-        return dirpath.URLByAppendingPathComponent("domain-defaults.json")
+        do {
+            
+            return try dirpath.appendingPathComponent("domain-defaults.json")
+            
+        } catch {
+            
+            return nil
+        }
     }()
 
     
     /// Determines if a file exists and is not a directory
     
-    static func exists(url: NSURL?) -> Bool {
+    static func exists(url: URL?) -> Bool {
         
         if url == nil { return false }
         
         var isDir: ObjCBool = false
         
-        let exists = NSFileManager.defaultManager().fileExistsAtPath(url!.path!, isDirectory: &isDir)
+        let exists = FileManager.default.fileExists(atPath: url!.path!, isDirectory: &isDir)
         
         return exists && !isDir
     }

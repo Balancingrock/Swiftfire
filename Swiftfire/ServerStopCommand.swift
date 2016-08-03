@@ -74,4 +74,14 @@ final class ServerStopCommand {
         guard let json = json else { return nil }
         guard (json|COMMAND_NAME)?.nullValue == true else { return nil }
     }
+    
+    func execute() {
+        
+        if httpServerIsRunning() {
+            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Stopping HTTP server")
+            stopAcceptAndDispatch()
+        }
+        
+        log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "HTTP server stopped")
+    }
 }

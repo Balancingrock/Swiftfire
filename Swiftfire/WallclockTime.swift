@@ -108,8 +108,8 @@ public func + (lhs: WallclockTime, rhs: WallclockTime) -> (time: WallclockTime, 
     }
 }
 
-public func + (lhs: NSDate, rhs: WallclockTime) -> NSDate {
-    return NSCalendar.currentCalendar().dateByAddingComponents(rhs.dateComponents, toDate: lhs, options: NSCalendarOptions.MatchNextTime)!
+public func + (lhs: Date, rhs: WallclockTime) -> Date {
+    return Calendar.current.date(byAdding: rhs.dateComponents as DateComponents, to: lhs as Date, options: Calendar.Options.matchNextTime)!
 }
 
 /// A 24-hour wallclock implementation
@@ -142,7 +142,7 @@ public struct WallclockTime: CustomStringConvertible, Equatable {
      */
     
     public init?(string: String) {
-        let parts = string.componentsSeparatedByString(":")
+        let parts = string.components(separatedBy: ":")
         switch parts.count {
         case 0:
             return nil
@@ -210,8 +210,8 @@ public struct WallclockTime: CustomStringConvertible, Equatable {
         }
     }
     
-    public var dateComponents: NSDateComponents {
-        let comp = NSDateComponents()
+    public var dateComponents: DateComponents {
+        var comp = DateComponents()
         comp.hour = self.hour
         comp.minute = self.minute
         comp.second = self.second
@@ -220,16 +220,16 @@ public struct WallclockTime: CustomStringConvertible, Equatable {
 }
 
 
-public extension NSDate {
+public extension Date {
     
     /// The wallclock time from self in the current calendar
     public var wallclockTime: WallclockTime {
-        let comp = NSCalendar.currentCalendar().components([NSCalendarUnit.Hour, NSCalendarUnit.Minute, NSCalendarUnit.Second], fromDate: self)
-        return WallclockTime(hour: comp.hour, minute: comp.minute, second: comp.second)
+        let comp = Calendar.current.components([Calendar.Unit.hour, Calendar.Unit.minute, Calendar.Unit.second], from: self as Date)
+        return WallclockTime(hour: comp.hour!, minute: comp.minute!, second: comp.second!)
     }
     
     /// A new NSDate set to the first future wallclock time in the current calendar
-    public static func firstFutureDate(with wallclockTime: WallclockTime) -> NSDate {
-        return NSCalendar.currentCalendar().nextDateAfterDate(NSDate(), matchingHour: wallclockTime.hour, minute: wallclockTime.minute, second: wallclockTime.second, options: NSCalendarOptions.MatchNextTime)!
+    public static func firstFutureDate(with wallclockTime: WallclockTime) -> Date {
+        return Calendar.current.nextDate(after: Date(), matchingHour: wallclockTime.hour, minute: wallclockTime.minute, second: wallclockTime.second, options: Calendar.Options.matchNextTime)!
     }
 }

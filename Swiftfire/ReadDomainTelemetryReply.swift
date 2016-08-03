@@ -70,7 +70,7 @@ final class ReadDomainTelemetryReply {
     var json: VJson {
         let j = VJson()
         j[REPLY_NAME][DOMAIN_NAME].stringValue = domainName
-        j[REPLY_NAME].add(domainTelemetry.json(TELEMETRY))
+        j[REPLY_NAME].add(domainTelemetry.json(id: TELEMETRY))
         return j
     }
     

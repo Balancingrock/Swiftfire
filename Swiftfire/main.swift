@@ -65,18 +65,28 @@ import Foundation
 import CoreData
 
 
+// Every thread that runs for more than a few milliseconds should poll this variable and terminate itself when it finds that this flag is 'true'.
+
+var quitSwiftfire: Bool = false
+
+
+// Purpose: Set default logging levels to gain some output if anything goes wrong before the log levels are set to the application values
+
+log.aslFacilityRecordAtAndAboveLevel = SwifterLog.Level.notice
+log.fileRecordAtAndAboveLevel = SwifterLog.Level.none
+log.stdoutPrintAtAndAboveLevel = SwifterLog.Level.debug
+log.callbackAtAndAboveLevel = SwifterLog.Level.none
+log.networkTransmitAtAndAboveLevel = SwifterLog.Level.none
+
+
 // ====================================================
 // Load parameters and domains from file (if available)
 // ====================================================
 
-if !Parameters.restore() {
-    log.atLevelEmergency(id: -1, source: #file.source(#function, #line), message: "Swiftfire terminated because the default parameters could not be determined")
-    sleep(5)
-    exit(EXIT_FAILURE)
-}
+Parameters.restore()
 
 if !domains.restore()  {
-    log.atLevelEmergency(id: -1, source: #file.source(#function, #line), message: "Swiftfire terminated because the default domains could not be read")
+    log.atLevelEmergency(id: -1, source: "Main", message: "Swiftfire terminated because the default domains could not be read")
     sleep(5)
     exit(EXIT_FAILURE)
 }
@@ -86,34 +96,19 @@ if !domains.restore()  {
 // Start of application: Configure logging
 // =======================================
 
+log.fileRecordAtAndAboveLevel = Parameters.fileRecordAtAndAboveLevel
 log.logfileDirectoryPath = FileURLs.applicationLogDir!.path!
+log.logfileMaxNumberOfFiles = Parameters.logfileMaxNofFiles
+log.logfileMaxSizeInBytes = UInt64(Parameters.logfileMaxSize) * 1024
 
-if let threshold = SwifterLog.Level(rawValue: Parameters.asInt(.ASL_FACILITY_RECORD_AT_AND_ABOVE_LEVEL)) {
-    log.aslFacilityRecordAtAndAboveLevel = threshold
-}
+log.aslFacilityRecordAtAndAboveLevel = Parameters.aslFacilityRecordAtAndAboveLevel
+log.stdoutPrintAtAndAboveLevel = Parameters.stdoutPrintAtAndAboveLevel
+log.callbackAtAndAboveLevel = Parameters.callbackAtAndAboveLevel
 
-if let threshold = SwifterLog.Level(rawValue: Parameters.asInt(.FILE_RECORD_AT_AND_ABOVE_LEVEL)) {
-    log.fileRecordAtAndAboveLevel = threshold
-}
-
-log.logfileMaxNumberOfFiles = Parameters.asInt(.LOGFILE_MAX_NOF_FILES)
-
-log.logfileMaxSizeInBytes = UInt64(Parameters.asInt(.LOGFILE_MAX_SIZE) * 1024)
-
-if let threshold = SwifterLog.Level(rawValue: Parameters.asInt(.STDOUT_PRINT_AT_AND_ABOVE_LEVEL)) {
-    log.stdoutPrintAtAndAboveLevel = threshold
-}
-
-if let threshold = SwifterLog.Level(rawValue: Parameters.asInt(.CALLBACK_AT_AND_ABOVE_LEVEL)) {
-    log.callbackAtAndAboveLevel = threshold
-}
-
-if let threshold = SwifterLog.Level(rawValue: Parameters.asInt(.NETWORK_TRANSMIT_AT_AND_ABOVE_LEVEL)) {
-    log.networkTransmitAtAndAboveLevel = threshold
-}
-
-if (Parameters.asString(.NETWORK_LOGTARGET_IP_ADDRESS) != "") && (Parameters.asString(.NETWORK_LOGTARGET_PORT_NUMBER) != "") {
-    log.connectToNetworkTarget(address: Parameters.asString(.NETWORK_LOGTARGET_IP_ADDRESS), port: Parameters.asString(.NETWORK_LOGTARGET_PORT_NUMBER))
+log.networkTransmitAtAndAboveLevel = Parameters.networkTransmitAtAndAboveLevel
+if (Parameters.networkLogtargetIpAddress != "") && (Parameters.networkLogtargetPortNumber != "") {
+    let nettar = SwifterLog.NetworkTarget(address: Parameters.networkLogtargetIpAddress, port: Parameters.networkLogtargetPortNumber)
+    log.connectToNetworkTarget(nettar)
 }
 
 
@@ -122,9 +117,16 @@ if (Parameters.asString(.NETWORK_LOGTARGET_IP_ADDRESS) != "") && (Parameters.asS
 // ======================================
 
 class LogForewarder: SwifterlogCallbackProtocol {
-    func logInfo(time: NSDate, level: SwifterLog.Level, source: String, message: String) {
-        let logline = LogLine(time: time, level: level, source: source, message: message)
-        toConsole?.transferToConsole(logline.json.description)
+    
+    // Purpose: To send the logging information to the Console if a console is attached.
+    
+    // Note that this function is only called if the callback levels of the logger are set accordingly.
+    
+    func logInfo(_ time: Date, level: SwifterLog.Level, source: String, message: String) {
+        if let console = toConsole {
+            let logline = LogLine(time: time as Date, level: level, source: source, message: message)
+            console.transferToConsole(message: logline.json.description)
+        }
     }
 }
 
@@ -137,48 +139,67 @@ log.registerCallback(logforewarder)
 // Show the paremeter settings and available domains in the log destinations
 // =========================================================================
 
-Parameters.logParameterSettings()
-domains.logDomains()
+// Purpose: To provide an audit trail of the settings under which Swiftfire operates.
+
+Parameters.logParameterSettings(atLevel: .notice)
+domains.writeToLog(atLevel: .notice)
 
 
 // =========================================================
 // Initialize the port for the Command and Control interface
 // =========================================================
 
-log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Initializing M&C loop")
+log.atLevelNotice(id: -1, source: "Main", message: "Initializing M&C loop")
 
-let result: SwifterSockets.InitServerReturn = SwifterSockets.initServer(
-    port: Parameters.asString(.MAC_PORT_NUMBER),
+let result: SwifterSockets.SetupServerReturn = SwifterSockets.setupServer(
+    onPort: Parameters.macPortNumber,
     maxPendingConnectionRequest: 1)
 
 switch result {
     
-case let SwifterSockets.InitServerReturn.SOCKET(socket):
+case let SwifterSockets.SetupServerReturn.socket(socket):
     
-    log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Listening for M&C connections")
+    log.atLevelNotice(id: -1, source: "Main", message: "Listening for M&C connections")
+
+    
+    // Setup the Monotoring and control loop
+    
+    let mac = MonitoringAndControl()
+
+
+    // Autostart http server if necessary
+    
+    if Parameters.autoStartup { ServerStartCommand().execute() }
+
+    
+    // Start the monitoring and control loop (this function returns when the M&C loop ends)
+    
+    mac.acceptAndReceiveLoop(onSocket: socket)
     
     
-    // This function returns when the M&C loop ends
-    
-    mac.acceptAndReceiveLoop(socket)
+    // Cleanup
     
     SwifterSockets.closeSocket(socket)
     
+    statistics.save()
+    
     HttpHeader.closeHeaderLoggingFile()
+    
+    log.atLevelNotice(id: -1, source: "Main", message: "Swiftfire terminated normally")
     
     
     // Give other tasks time to complete
-    
+
     sleep(10)
-    
-    log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Swiftfire terminated normally")
-    
+
     exit(EXIT_SUCCESS)
     
     
-case let SwifterSockets.InitServerReturn.ERROR(errstr):
+case let SwifterSockets.SetupServerReturn.error(errstr):
     
-    log.atLevelEmergency(id: -1, source: #file.source(#function, #line), message: "Swiftfire terminated with error '\(errstr)'")
+    log.atLevelEmergency(id: -1, source: "Main", message: "Swiftfire terminated with error '\(errstr)'")
+
+    sleep(10)
     
     exit(EXIT_FAILURE)
 }

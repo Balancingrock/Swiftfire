@@ -3,7 +3,7 @@
 //  File:       Domain.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.11
+//  Version:    0.9.13
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,6 +49,7 @@
 //
 // History
 //
+// v0.9.13 - Upgraded to Swift 3 beta
 // v0.9.11 - Removed domain statistis.
 //         - Updated for VJson 0.9.8
 // v0.9.10 - Added domain statistics.
@@ -103,17 +104,21 @@ class Domain: Equatable, ReflectedStringConvertible {
     
     var name: String {
         set {
-            if _name != newValue.lowercaseString {
+            if _name != newValue.lowercased() {
     
                 // Update the _name
                 let oldValue = _name
-                self._name = newValue.lowercaseString
+                self._name = newValue.lowercased()
                 
                 // Set the new support dir url for this domain
                 if let appSupportDir = FileURLs.appSupportDir {
-                   self.domainSupportDir = appSupportDir.URLByAppendingPathComponent(name, isDirectory: true)
+                    do {
+                        self.supportDir = try appSupportDir.appendingPathComponent(name, isDirectory: true)
+                    } catch {
+                        self.supportDir = nil
+                    }
                 } else {
-                    self.domainSupportDir = nil
+                    self.supportDir = nil
                 }
 
                 // If the access log is in use, close it and create a new one if necessary
@@ -130,7 +135,7 @@ class Domain: Equatable, ReflectedStringConvertible {
                 
                 //
                 if let changeListener = nameChangeListener {
-                    changeListener.domainNameChanged(oldValue, to: newValue)
+                    changeListener.domainNameChanged(from: oldValue, to: newValue)
                 }
             }
         }
@@ -167,14 +172,14 @@ class Domain: Equatable, ReflectedStringConvertible {
             
             if newValue.isEmpty { _forwardHost = nil ; return }
             
-            let value = newValue.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceCharacterSet())
+            let value = newValue.trimmingCharacters(in: NSCharacterSet.whitespaces)
             
             if value.isEmpty { _forwardHost = nil ; return }
                 
             
             // Split at ':' character
                 
-            var strs = value.componentsSeparatedByString(":")
+            var strs = value.components(separatedBy: ":")
                 
                 
             // If there is one item, then there is no ':' in the string, the new value is then the address
@@ -187,10 +192,10 @@ class Domain: Equatable, ReflectedStringConvertible {
 
             if strs.count == 2 {
                 
-                let rawAddress = strs[0].stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceCharacterSet())
+                let rawAddress = strs[0].trimmingCharacters(in: NSCharacterSet.whitespaces)
                 let address = rawAddress.isEmpty ? "localhost" : rawAddress
                 
-                let rawPort = strs[1].stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceCharacterSet())
+                let rawPort = strs[1].trimmingCharacters(in: NSCharacterSet.whitespaces)
                 let port: String? = rawPort.isEmpty ? nil : rawPort
                 
                 _forwardHost = Host(address: address, port: port)
@@ -225,9 +230,13 @@ class Domain: Equatable, ReflectedStringConvertible {
             if accessLogEnabled {
                 if accessLog == nil {
                     guard let appSupportDir = FileURLs.appSupportDir else { return }
-                    let domainDir = appSupportDir.URLByAppendingPathComponent(name, isDirectory: true)
-                    let logDir = domainDir.URLByAppendingPathComponent("logging", isDirectory: true)
-                    accessLog = AccessLog(logDir: logDir)
+                    do {
+                        let domainDir = try appSupportDir.appendingPathComponent(name, isDirectory: true)
+                        let logDir = try domainDir.appendingPathComponent("logging", isDirectory: true)
+                        accessLog = AccessLog(logDir: logDir)
+                    } catch {
+                        log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Could not create directory URL")
+                    }
                 } else {
                     log.atLevelDebug(id: -1, source: #file.source(#function, #line), message: "\(name) accessLog unexpected nil")
                 }
@@ -248,9 +257,13 @@ class Domain: Equatable, ReflectedStringConvertible {
             if four04LogEnabled {
                 if four04Log == nil {
                     guard let appSupportDir = FileURLs.appSupportDir else { return }
-                    let domainDir = appSupportDir.URLByAppendingPathComponent(name, isDirectory: true)
-                    let logDir = domainDir.URLByAppendingPathComponent("logging", isDirectory: true)
-                    four04Log = Four04Log(logDir: logDir)
+                    do {
+                        let domainDir = try appSupportDir.appendingPathComponent(name, isDirectory: true)
+                        let logDir = try domainDir.appendingPathComponent("logging", isDirectory: true)
+                        four04Log = Four04Log(logDir: logDir)
+                    } catch {
+                        log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Could not create directory URL")
+                    }
                 } else {
                     log.atLevelDebug(id: -1, source: #file.source(#function, #line), message: "\(name) four04Log unexpected nil")
                 }
@@ -290,26 +303,26 @@ class Domain: Equatable, ReflectedStringConvertible {
     
     // The application support directory for this domain
     
-    lazy var domainSupportDir: NSURL? = {
+    lazy var supportDir: URL? = {
         guard let appSupportDir = FileURLs.appSupportDir else { return nil }
-        let url = appSupportDir.URLByAppendingPathComponent(self.name, isDirectory: true)
         do {
-            try NSFileManager.defaultManager().createDirectoryAtURL(url, withIntermediateDirectories: true, attributes: nil)
+            let url = try appSupportDir.appendingPathComponent(self.name, isDirectory: true)
+            try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
             return url
         } catch {
-            log.atLevelDebug(id: -1, source: #file.source(#function, #line), message: "Could not create domain directory at \(url.path!)")
+            log.atLevelDebug(id: -1, source: #file.source(#function, #line), message: "Could not create domain directory for \(self.name)")
             return nil
         }
     }()
     
-    lazy var loggingDir: NSURL? = {
-        guard let domainSupportDir = self.domainSupportDir else { return nil }
-        let url = domainSupportDir.URLByAppendingPathComponent("logging", isDirectory: true)
+    lazy var loggingDir: URL? = {
+        guard let domainSupportDir = self.supportDir else { return nil }
         do {
-            try NSFileManager.defaultManager().createDirectoryAtURL(url, withIntermediateDirectories: true, attributes: nil)
+            let url = try domainSupportDir.appendingPathComponent("logging", isDirectory: true)
+            try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
             return url
         } catch {
-            log.atLevelDebug(id: -1, source: #file.source(#function, #line), message: "Could not create domain logging directory at \(url.path!)")
+            log.atLevelDebug(id: -1, source: #file.source(#function, #line), message: "Could not create domain logging directory for \(self.name)")
             return nil
         }
     }()
@@ -326,7 +339,7 @@ class Domain: Equatable, ReflectedStringConvertible {
         domain["Enabled"] &= enabled
         domain["AccessLogEnabled"] &= accessLogEnabled
         domain["404LogEnabled"] &= four04LogEnabled
-        domain.add(telemetry.json("Telemetry"))
+        domain.add(telemetry.json(id: "Telemetry"))
         return domain
     }
     
@@ -402,9 +415,10 @@ class Domain: Equatable, ReflectedStringConvertible {
     
     /// Update the content of this domain with the contents of the new domain.
     
-    func updateWith(new: Domain) -> Bool {
+    @discardableResult
+    func update(withDomain new: Domain) -> Bool {
         
-        let newName = new.name.lowercaseString
+        let newName = new.name.lowercased()
         
         var changed = false
         
@@ -465,7 +479,7 @@ class Domain: Equatable, ReflectedStringConvertible {
      - Returns: Either nil, or a valid HTTP response.
      */
     
-    func httpWorkerPreprocessor(header header: HttpHeader, body: UInt8Buffer, connection: HttpConnection, mutation: Mutation) -> UInt8Buffer? {
+    func httpWorkerPreprocessor(header: HttpHeader, body: Data, connection: HttpConnection, mutation: Mutation) -> Data? {
         return nil
     }
     
@@ -482,7 +496,7 @@ class Domain: Equatable, ReflectedStringConvertible {
      - Returns: Either nil, or a valid HTTP response.
      */
     
-    func httpWorkerPostprocessor(header header: HttpHeader, body: UInt8Buffer, response: UInt8Buffer, connection: HttpConnection, mutation: Mutation) -> UInt8Buffer? {
+    func httpWorkerPostprocessor(header: HttpHeader, body: Data, response: Data, connection: HttpConnection, mutation: Mutation) -> Data? {
         return nil
     }
 }

@@ -69,12 +69,12 @@ class TelemetryItem: NSObject {
 
     var guiLabel: String
     
-    func copyFrom(t: TelemetryItem) {
+    func copyFrom(_ t: TelemetryItem) {
         self.value = t.value
         self.guiLabel = t.guiLabel
     }
     
-    func json(id: String) -> VJson {
+    func json(_ id: String) -> VJson {
         let j = VJson.object(id)
         j["Value"] &= value
         j["GuiLabel"] &= guiLabel
@@ -99,7 +99,7 @@ class TelemetryItem: NSObject {
     convenience init?(json: VJson?) {
         guard let json = json else { return nil }
         guard let jguiLabel = (json|"GuiLabel")?.stringValue else { return nil }
-        guard let jvalue = (json|"Value")?.integerValue else { return nil }
+        guard let jvalue = (json|"Value")?.intValue else { return nil }
         self.init(guiLabel: jguiLabel, value: jvalue)
     }
 }

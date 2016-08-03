@@ -74,4 +74,11 @@ final class ReadDomainsCommand {
         guard let json = json else { return nil }
         guard (json|COMMAND_NAME)?.nullValue == true else { return nil }
     }
+    
+    func execute() {
+        
+        let reply = ReadDomainsReply(domains: domains)
+        
+        toConsole?.transferToConsole(message: reply.json.description)
+    }
 }

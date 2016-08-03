@@ -62,8 +62,8 @@ final class Four04Log: Logfile {
     
     var reported: Array<String> = Array()
     
-    init?(logDir: NSURL) {
-        super.init(filename: "404Log", directory: logDir, options: .MaxFileSize(1024))
+    init?(logDir: URL) {
+        super.init(filename: "404Log", directory: logDir, options: .maxFileSize(1024))
     }
     
     
@@ -74,7 +74,7 @@ final class Four04Log: Logfile {
             if str == message { return }
         }
         reported.append(message)
-        super.record(message + "\n")
+        super.record(message: message + "\n")
         super.flush()
     }
 }

@@ -80,4 +80,21 @@ final class CreateDomainCommand {
         guard let jdomainName = (json|COMMAND_NAME)?.stringValue else { return nil }
         domainName = jdomainName
     }
+    
+    func execute() {
+        
+        // Error if this domain already exists
+        guard domains.domain(forName: domainName) == nil else {
+            log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Domain name already exists (\(domainName as String))")
+            return
+        }
+        
+        let domain = Domain()
+        domain.name = domainName
+        
+        domains.add(domain: domain)
+        
+        log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Added new domain with \(domain))")
+        log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Number of domains: \(domains.count)")
+    }
 }

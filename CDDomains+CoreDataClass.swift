@@ -1,6 +1,6 @@
 // =====================================================================================================================
 //
-//  File:       CDClients.swift
+//  File:       CDDomains+CoreDataClass.swift
 //  Project:    Swiftfire
 //
 //  Version:    0.9.11
@@ -56,15 +56,15 @@ import Foundation
 import CoreData
 
 
-private let CLIENTS = "Clients"
+private let DOMAINS = "Domains"
 
-class CDClients: NSManagedObject {
-
+class CDDomains: NSManagedObject {
+    
     var json: VJson {
         let json = VJson()
-        if let arr = json.add(VJson.array(CLIENTS)) {
-            for client in clients?.allObjects as! [CDClient] {
-                arr.append(client.json)
+        if let arr = json.add(VJson.array(DOMAINS)) {
+            for domain in domains?.allObjects as! [CDPathPart] {
+                arr.append(domain.json)
             }
         } else {
             log.atLevelError(id: -1, source:#file.source(#function, #line), message: "Could not create ARRAY for JSON item")
@@ -72,21 +72,21 @@ class CDClients: NSManagedObject {
         return json
     }
     
-    static func createFrom(json: VJson, inContext context: NSManagedObjectContext) -> CDClients? {
+    static func createFrom(json: VJson, inContext context: NSManagedObjectContext) -> CDDomains? {
         
-        let new = NSEntityDescription.insertNewObjectForEntityForName("CDClients", inManagedObjectContext: context) as! CDClients
+        let new = NSEntityDescription.insertNewObject(forEntityName: "CDDomains", into: context) as! CDDomains
         
-        if let jclients = json|CLIENTS {
-            for client in jclients {
-                if let cl = CDClient.createFrom(client, inContext: context) {
-                    cl.clients = new
+        if let jdomains = json|DOMAINS {
+            for pathPart in jdomains {
+                if let pp = CDPathPart.createFrom(json: pathPart, inContext: context) {
+                    pp.domains = new
                 } else {
-                    context.deleteObject(new)
+                    context.delete(new)
                     return nil
                 }
             }
         }
+        
         return new
     }
-
 }

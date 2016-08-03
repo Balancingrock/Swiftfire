@@ -77,32 +77,32 @@ extension HttpConnection {
     
     /// Opens a connection to the specified host and starts the receiverloop.
     
-    func forwardingOpenConnection(host: Host) {
+    func openForwardingConnection(host: Host) {
         
         do {
             
-            forwardingSocket = try SwifterSockets.initClientOrThrow(address: host.address, port: (host.port ?? Parameters.asString(ParameterId.SERVICE_PORT_NUMBER)))
+            forwardingSocket = try SwifterSockets.connectToServerOrThrow(atAddress: host.address, atPort: (host.port ?? Parameters.httpServicePortNumber))
             
             
             // Start the receiver
             
-            dispatch_async(forwardingReceiverQueue, {[unowned self] in self.forwardingReceiverLoop() })
+            forwardingReceiverQueue.async(execute: { [unowned self] in self.receiveFromForwardingTarget() })
             
         } catch {
             
             serverTelemetry.nofHttp502Replies.increment()
             log.atLevelError(id: logId, source: #file.source(#function, #line), message: "Could not open connection to \(host).")
-            let response = httpErrorResponseWithCode(.CODE_502_Bad_Gateway, andMessage: "<p>Forwarding failed, server not reachable.</p>")
-            transferToClient(response)
+            let response = httpErrorResponse(withCode: .code502_BadGateway, andMessage: "<p>Forwarding failed, server not reachable.</p>")
+            transferToClient(data: response)
             
-            forwardingCloseConnection()
+            closeForwardingConnection()
         }
     }
     
     
     /// Closes the connection to a forwarding target (if any).
     
-    func forwardingCloseConnection() {
+    func closeForwardingConnection() {
         
         SwifterSockets.closeSocket(forwardingSocket)
         forwardingSocket = nil
@@ -111,71 +111,67 @@ extension HttpConnection {
     
     /// Transmits the content of the given buffer to the forwarding target (if any).
     
-    func forwardingTransmit(buffer: UInt8Buffer) {
+    func transmitToForwardingTarget(data: Data) {
         
         if forwardingSocket == nil {
             
             serverTelemetry.nofHttp502Replies.increment()
-            let response = httpErrorResponseWithCode(.CODE_502_Bad_Gateway, andMessage: "<p>Forwarding failed, server not reachable.</p>")
-            transferToClient(response)
+            let response = httpErrorResponse(withCode: .code502_BadGateway, andMessage: "<p>Forwarding failed, server not reachable.</p>")
+            transferToClient(data: response)
             return
             
         } else {
 
             do {
                 
-                try SwifterSockets.transmitOrThrow(forwardingSocket!, buffer: buffer.ptr, timeout: 10.0, telemetry: nil)
+                try SwifterSockets.transmitOrThrow(toSocket: forwardingSocket!, data: data, timeout: 10.0, telemetry: nil)
                 
             } catch {
                 
                 serverTelemetry.nofHttp502Replies.increment()
-                let response = httpErrorResponseWithCode(.CODE_502_Bad_Gateway, andMessage: "<p>Forwarding failed, server not reachable, not responding or generating connection errors.</p>")
-                transferToClient(response)
+                let response = httpErrorResponse(withCode: .code502_BadGateway, andMessage: "<p>Forwarding failed, server not reachable, not responding or generating connection errors.</p>")
+                transferToClient(data: response)
                 
-                forwardingCloseConnection()
+                closeForwardingConnection()
             }
         }
     }
     
     
-    private func forwardingReceiverLoop() {
+    private func receiveFromForwardingTarget() {
         
         RECEIVER_LOOP: while forwardingSocket != nil {
             
 
             // The timeout guarantees that the process is terminated if the connection (socket) to the forwarding target is closed outside this process.
 
-            let result = SwifterSockets.receiveNSData(forwardingSocket!, timeout: 1.0, dataEndDetector: ForwardingReceiverEndDetector(logId: logId), telemetry: nil)
+            let result = SwifterSockets.receiveData(fromSocket: forwardingSocket!, timeout: 1.0, dataEndDetector: ForwardingReceiverEndDetector(logId: logId), telemetry: nil)
             
             switch result {
                 
-            case .BUFFER_FULL:
+            case .bufferFull:
                 // This should not be possible
                 log.atLevelError(id: forwardingSocket!, source: #file.source(#function, #line), message: "Unexpected BUFFER_FULL received")
                 break RECEIVER_LOOP
                 
-            case let .CLIENT_CLOSED(data: data) where data is NSData:
+            case let .clientClosed(data: data) where data is Data:
                 // Data is unlikely, but is possible, if there is data process it first before exiting the reciever loop
-                let buffer = UInt8Buffer(sizeInBytes: (data as! NSData).length)
-                buffer.add(data as! NSData)
                 log.atLevelDebug(id: forwardingSocket!, source: #file.source(#function, #line), message: "Client closed")
-                self.transferToClient(buffer)
+                self.transferToClient(data: data as! Data)
                 break RECEIVER_LOOP
                 
-            case let .ERROR(message: message):
+            case let .error(message: message):
                 // Log the message and exit the receiver loop
                 // Note that this is not necessarily an error
                 log.atLevelInfo(id: forwardingSocket!, source: #file.source(#function, #line), message: message)
                 break RECEIVER_LOOP
                 
-            case let .READY(data: data) where data is NSData:
+            case let .ready(data: data) where data is Data:
                 // Normal case, process the data
-                let buffer = UInt8Buffer(sizeInBytes: (data as! NSData).length)
-                buffer.add(data as! NSData)
-                log.atLevelDebug(id: forwardingSocket!, source: #file.source(#function, #line), message: "Received a total of \((data as! NSData).length) bytes")
-                transferToClient(buffer)
+                log.atLevelDebug(id: forwardingSocket!, source: #file.source(#function, #line), message: "Received a total of \((data as! Data).count) bytes")
+                transferToClient(data: data as! Data)
                 
-            case .TIMEOUT:
+            case .timeout:
                 // Normal case, repeat...
                 break
                 
@@ -186,10 +182,10 @@ extension HttpConnection {
         }
         
         // Close this side of the connection to the forwarding target
-        forwardingCloseConnection()
+        closeForwardingConnection()
         
         // Also close the connection to the client (mimick the forwarding target behavior).
         // Keep in mind that the closeConnection operation will schedule the socket closing after the transfer of pending data.
-        closeConnection()
+        close()
     }
 }

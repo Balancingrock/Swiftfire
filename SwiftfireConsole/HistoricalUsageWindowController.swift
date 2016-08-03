@@ -59,8 +59,8 @@ class HistoricalUsageWindowController: NSWindowController {
     
     var pathPart: CDPathPart
 
-    static var dateLabelFormatter: NSDateFormatter = {
-        let ltf = NSDateFormatter()
+    static var dateLabelFormatter: DateFormatter = {
+        let ltf = DateFormatter()
         ltf.dateFormat = "yyyy.MM.dd"
         return ltf
     }()
@@ -97,11 +97,11 @@ class HistoricalUsageWindowController: NSWindowController {
     }
     
     override func windowDidLoad() {
-        let today = NSCalendar.currentCalendar().startOfDayForDate(NSDate())
-        let sometimeago = NSCalendar.currentCalendar().dateByAddingUnit(NSCalendarUnit.Month, value: -1, toDate: today, options: NSCalendarOptions.MatchNextTime)
+        let today = Calendar.current.startOfDay(for: NSDate() as Date)
+        let sometimeago = Calendar.current.date(byAdding: Calendar.Unit.month, value: -1, to: today, options: Calendar.Options.matchNextTime)
         startDatePicker.dateValue = sometimeago!
         endDatePicker.dateValue = today
-        periodSelectionPopup.selectItemAtIndex(0)
+        periodSelectionPopup.selectItem(at: 0)
         urlLabel.stringValue = pathPart.fullUrl
         update()
     }
@@ -113,15 +113,15 @@ class HistoricalUsageWindowController: NSWindowController {
             let selectedPeriod = periodSelectionPopup.indexOfSelectedItem
             
             if selectedPeriod == 0 { // Daily
-                return NSDate.fromJavaDate(start).javaDateBeginOfTomorrow
+                return Date.fromJavaDate(value: start).javaDateBeginOfTomorrow
             }
             
             if selectedPeriod == 1 { // Weekly
-                return NSDate.fromJavaDate(start).javaDateBeginOfNextWeek
+                return Date.fromJavaDate(value: start).javaDateBeginOfNextWeek
             }
             
             // Monthly
-            return NSDate.fromJavaDate(start).javaDateBeginOfNextMonth
+            return Date.fromJavaDate(value: start).javaDateBeginOfNextMonth
         }
 
         // The selected duration of a point in the chart
@@ -152,13 +152,13 @@ class HistoricalUsageWindowController: NSWindowController {
         var date = chartRangeStart
         var dataPoints: Array<LineGraphView.DataPoint> = []
         while date <= chartRangeEnd {
-            let label = HistoricalUsageWindowController.dateLabelFormatter.stringFromDate(NSDate.fromJavaDate(date))
+            let label = HistoricalUsageWindowController.dateLabelFormatter.string(from: Date.fromJavaDate(value: date))
             dataPoints.append(LineGraphView.DataPoint(label: label, value: 0))
-            date = periodStep(date)
+            date = periodStep(start: date)
         }
         
         // The end of the current period
-        var periodEndsBeforeDay = periodStep(dayRangeStart)
+        var periodEndsBeforeDay = periodStep(start: dayRangeStart)
         
         // The index of the datapoint to be updated
         var periodIndex = 0
@@ -176,10 +176,10 @@ class HistoricalUsageWindowController: NSWindowController {
                 // Skip to the proper period when necessary
                 while counter.forDay >= periodEndsBeforeDay {
                     periodIndex += 1
-                    periodEndsBeforeDay = periodStep(periodEndsBeforeDay)
+                    periodEndsBeforeDay = periodStep(start: periodEndsBeforeDay)
                 }
             
-                dataPoints[periodIndex].add(counter.count)
+                dataPoints[periodIndex].add(value: counter.count)
             }
             
             counterOrNil = counter.previous

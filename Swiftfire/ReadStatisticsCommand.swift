@@ -78,6 +78,6 @@ final class ReadStatisticsCommand {
         log.atLevelDebug(id: -1, source: #file.source(#function, #line))
         let stat = statistics
         let reply = ReadStatisticsReply(statistics: stat.json)
-        toConsole?.transferToConsole(reply.json.description)
+        toConsole?.transferToConsole(message: reply.json.description)
     }
 }

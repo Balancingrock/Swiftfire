@@ -80,4 +80,13 @@ final class RemoveDomainCommand {
         guard let jdomainName = (json|COMMAND_NAME)?.stringValue else { return nil }
         domainName = jdomainName
     }
+    
+    func execute() {
+        
+        if domains.remove(domainWithName: domainName) {
+            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "REMOVE-DOMAIN Removed domain: '\(domainName)')")
+        } else {
+            log.atLevelError(id: -1, source: #file.source(#function, #line), message: "REMOVE-DOMAIN Domain does not exist: (\(domainName))")
+        }
+    }
 }

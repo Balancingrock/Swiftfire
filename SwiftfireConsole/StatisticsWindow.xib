@@ -1,8 +1,8 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
-<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="10117" systemVersion="15G31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11173.2" systemVersion="15G31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
     <dependencies>
         <deployment identifier="macosx"/>
-        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="10117"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11173.2"/>
     </dependencies>
     <objects>
         <customObject id="-2" userLabel="File's Owner" customClass="StatisticsWindowController" customModule="SwiftfireConsole" customModuleProvider="target">
@@ -17,7 +17,7 @@
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
             <rect key="contentRect" x="84" y="276" width="812" height="541"/>
-            <rect key="screenRect" x="0.0" y="0.0" width="1440" height="877"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1577"/>
             <view key="contentView" id="rU3-Lz-y2v">
                 <rect key="frame" x="0.0" y="0.0" width="812" height="541"/>
                 <autoresizingMask key="autoresizingMask"/>
@@ -58,11 +58,11 @@
                                                                 <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                                 <prototypeCellViews>
                                                                     <tableCellView id="iwn-U1-D5g">
-                                                                        <rect key="frame" x="1" y="1" width="113" height="17"/>
+                                                                        <rect key="frame" x="1" y="1" width="112" height="17"/>
                                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                         <subviews>
                                                                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="nU8-d9-IYz">
-                                                                                <rect key="frame" x="0.0" y="0.0" width="113" height="17"/>
+                                                                                <rect key="frame" x="0.0" y="0.0" width="112" height="17"/>
                                                                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="zCR-Ut-6Qg">
                                                                                     <font key="font" metaFont="system"/>
                                                                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -99,11 +99,11 @@
                                                                 <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                                 <prototypeCellViews>
                                                                     <tableCellView id="4uQ-gr-T6W">
-                                                                        <rect key="frame" x="116.5" y="1" width="553" height="17"/>
+                                                                        <rect key="frame" x="116" y="1" width="552" height="17"/>
                                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                         <subviews>
                                                                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="Wfl-Nf-Kax">
-                                                                                <rect key="frame" x="0.0" y="0.0" width="553" height="17"/>
+                                                                                <rect key="frame" x="0.0" y="0.0" width="552" height="17"/>
                                                                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="bpH-jT-xvW">
                                                                                     <font key="font" metaFont="system"/>
                                                                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -140,7 +140,7 @@
                                                                 <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                                 <prototypeCellViews>
                                                                     <tableCellView id="PG2-dh-1RY">
-                                                                        <rect key="frame" x="672" y="1" width="84" height="17"/>
+                                                                        <rect key="frame" x="671" y="1" width="84" height="17"/>
                                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                         <subviews>
                                                                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="g3a-wm-Xif">
@@ -215,7 +215,6 @@
                                                         </connections>
                                                     </outlineView>
                                                 </subviews>
-                                                <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </clipView>
                                             <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" horizontal="YES" id="lL5-EK-lM4">
                                                 <rect key="frame" x="1" y="452" width="812" height="15"/>
@@ -250,7 +249,7 @@
                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                             </datePickerCell>
                                             <connections>
-                                                <action selector="startDatePickerAction:" target="-2" id="yud-Jx-jH7"/>
+                                                <action selector="startDatePickerActionWithSender:" target="-2" id="FGc-rt-UD7"/>
                                             </connections>
                                         </datePicker>
                                         <datePicker verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="wS6-tg-ES0">
@@ -273,7 +272,7 @@
                                                 <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
                                             </datePickerCell>
                                             <connections>
-                                                <action selector="endDatePickerAction:" target="-2" id="mVS-pz-Bsy"/>
+                                                <action selector="endDatePickerActionWithSender:" target="-2" id="t76-51-n0P"/>
                                             </connections>
                                         </datePicker>
                                         <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="p7z-xo-jjc">
@@ -353,11 +352,11 @@
                                                                 <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                                 <prototypeCellViews>
                                                                     <tableCellView id="Uyo-mM-MF0">
-                                                                        <rect key="frame" x="1" y="1" width="293" height="17"/>
+                                                                        <rect key="frame" x="1" y="1" width="292" height="17"/>
                                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                         <subviews>
                                                                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="NyI-k4-vje">
-                                                                                <rect key="frame" x="0.0" y="0.0" width="293" height="17"/>
+                                                                                <rect key="frame" x="0.0" y="0.0" width="292" height="17"/>
                                                                                 <textFieldCell key="cell" lineBreakMode="truncatingTail" sendsActionOnEndEditing="YES" title="Table View Cell" id="QAv-dr-nzC">
                                                                                     <font key="font" metaFont="system"/>
                                                                                     <color key="textColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
@@ -394,7 +393,7 @@
                                                                 <tableColumnResizingMask key="resizingMask" resizeWithTable="YES" userResizable="YES"/>
                                                                 <prototypeCellViews>
                                                                     <tableCellView id="wPG-jb-4pg">
-                                                                        <rect key="frame" x="296.5" y="1" width="138" height="17"/>
+                                                                        <rect key="frame" x="296" y="1" width="138" height="17"/>
                                                                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                                                                         <subviews>
                                                                             <textField verticalHuggingPriority="750" horizontalCompressionResistancePriority="250" translatesAutoresizingMaskIntoConstraints="NO" id="qzO-SD-AcM">
@@ -550,7 +549,6 @@
                                                         </connections>
                                                     </tableView>
                                                 </subviews>
-                                                <color key="backgroundColor" name="controlBackgroundColor" catalog="System" colorSpace="catalog"/>
                                             </clipView>
                                             <scroller key="horizontalScroller" hidden="YES" verticalHuggingPriority="750" doubleValue="1" horizontal="YES" id="8ar-bp-L3T">
                                                 <rect key="frame" x="1" y="483" width="812" height="15"/>
@@ -584,7 +582,7 @@
                     <constraint firstAttribute="bottom" secondItem="atw-ZR-3JE" secondAttribute="bottom" id="zeg-Y2-0Cu"/>
                 </constraints>
             </view>
-            <point key="canvasLocation" x="481" y="537.5"/>
+            <point key="canvasLocation" x="499" y="106"/>
         </window>
         <arrayController mode="entity" entityName="CDClient" automaticallyPreparesContent="YES" automaticallyRearrangesObjects="YES" id="8UY-eM-UtJ">
             <connections>

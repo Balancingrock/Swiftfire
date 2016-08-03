@@ -1,6 +1,6 @@
 // =====================================================================================================================
 //
-//  File:       CDClient.swift
+//  File:       CDClient+CoreDataClass.swift
 //  Project:    Swiftfire
 //
 //  Version:    0.9.12
@@ -61,12 +61,12 @@ private let DO_NOT_TRACE = "D"
 private let RECORDS = "S"
 
 class CDClient: NSManagedObject {
-
+    
     var count: Int { return records?.count ?? 0 }
     
     lazy var firstAccess: Int64 = {
-        let arr = self.records?.allObjects as! [CDClientRecord]
-        let sortedArr = arr.sort({ $0.requestReceived < $1.requestReceived })
+        var arr = self.records?.allObjects as! [CDClientRecord]
+        let sortedArr = arr.sorted(isOrderedBefore: { $0.requestReceived < $1.requestReceived })
         if let record = sortedArr.first {
             return record.requestReceived
         } else {
@@ -75,8 +75,8 @@ class CDClient: NSManagedObject {
     }()
     
     lazy var lastAccess: Int64 = {
-        let arr = self.records?.allObjects as! [CDClientRecord]
-        let sortedArr = arr.sort({ $0.requestReceived < $1.requestReceived })
+        var arr = self.records?.allObjects as! [CDClientRecord]
+        let sortedArr = arr.sorted(isOrderedBefore: { $0.requestReceived < $1.requestReceived })
         if let record = sortedArr.last {
             return record.requestReceived
         } else {
@@ -85,17 +85,17 @@ class CDClient: NSManagedObject {
     }()
     
     var firstAccessString: String {
-        let fd = NSDate.fromJavaDate(firstAccess)
-        let dc = NSCalendar.currentCalendar().components(NSCalendarUnit(arrayLiteral: .Year, .Month, .Day, .Hour, .Minute, .Second), fromDate: fd)
+        let fd = Date.fromJavaDate(value: firstAccess)
+        let dc = Calendar.current.components(Calendar.Unit(arrayLiteral: .year, .month, .day, .hour, .minute, .second), from: fd)
         return "\(dc.year)-\(dc.month)-\(dc.day) \(dc.hour):\(dc.minute):\(dc.second)"
     }
     
     var lastAccessString: String {
-        let fd = NSDate.fromJavaDate(lastAccess)
-        let dc = NSCalendar.currentCalendar().components(NSCalendarUnit(arrayLiteral: .Year, .Month, .Day, .Hour, .Minute, .Second), fromDate: fd)
+        let fd = Date.fromJavaDate(value: lastAccess)
+        let dc = Calendar.current.components(Calendar.Unit(arrayLiteral: .year, .month, .day, .hour, .minute, .second), from: fd)
         return "\(dc.year)-\(dc.month)-\(dc.day) \(dc.hour):\(dc.minute):\(dc.second)"
     }
-
+    
     var json: VJson {
         let json = VJson()
         json[ADDRESS] &= address
@@ -116,13 +116,13 @@ class CDClient: NSManagedObject {
             log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Could not find 'address' item in json code")
             return nil
         }
-
+        
         guard let jdonottrace = (json|DO_NOT_TRACE)?.boolValue else {
             log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Could not find 'do not trace' item in json code")
             return nil
         }
-
-        let new = NSEntityDescription.insertNewObjectForEntityForName("CDClient", inManagedObjectContext: context) as! CDClient
+        
+        let new = NSEntityDescription.insertNewObject(forEntityName: "CDClient", into: context) as! CDClient
         
         new.address = (json|ADDRESS)?.stringValue
         new.doNotTrace = jdonottrace
@@ -130,19 +130,19 @@ class CDClient: NSManagedObject {
         if json|RECORDS == nil { return new }
         
         for record in (json|RECORDS)! {
-            if let cdClientRecord = CDClientRecord.createFrom(record, inContext: context) {
+            if let cdClientRecord = CDClientRecord.createFrom(json: record, inContext: context) {
                 cdClientRecord.client = new
             } else {
-                context.deleteObject(new)
+                context.delete(new)
                 return nil
             }
         }
         return new
     }
     
-    var _doNotTrace: NSNumber {
+    var _doNotTrace: Bool {
         get {
-            return NSNumber(bool: doNotTrace)
+            return doNotTrace
         }
         set {
             log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "New value for doNotTrace \(newValue), transmitting to Swiftfire")
@@ -150,7 +150,7 @@ class CDClient: NSManagedObject {
             let command = UpdateClientCommand(client: address!, newValue: newValue.boolValue)
             
             if toSwiftfire != nil {
-                toSwiftfire?.transferToSwiftfire(command.json.description)
+                toSwiftfire?.transferToSwiftfire(message: command.json.description)
             } else {
                 log.atLevelWarning(id: -1, source: #file.source(#function, #line), message: "Attempt to set new value for doNotTrace \(newValue), but no transmitter available")
             }

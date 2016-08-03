@@ -65,29 +65,39 @@ extension Bool {
     init?(_ str: String) {
         if str == "0" { self = false }
         else if str == "1" { self = true }
-        else if str.compare("true", options: NSStringCompareOptions([.DiacriticInsensitiveSearch, .CaseInsensitiveSearch])) == NSComparisonResult.OrderedSame { self = true }
-        else if str.compare("false", options: NSStringCompareOptions([.DiacriticInsensitiveSearch, .CaseInsensitiveSearch])) == NSComparisonResult.OrderedSame { self = false }
-        else if str.compare("yes", options: NSStringCompareOptions([.DiacriticInsensitiveSearch, .CaseInsensitiveSearch])) == NSComparisonResult.OrderedSame { self = true }
-        else if str.compare("no", options: NSStringCompareOptions([.DiacriticInsensitiveSearch, .CaseInsensitiveSearch])) == NSComparisonResult.OrderedSame { self = false }
+        else if str.compare("true", options: [.diacriticInsensitive, .caseInsensitive], range: nil, locale: nil) == ComparisonResult.orderedSame { self = true }
+        else if str.compare("false", options: [.diacriticInsensitive, .caseInsensitive]) == ComparisonResult.orderedSame { self = false }
+        else if str.compare("yes", options: [.diacriticInsensitive, .caseInsensitive]) == ComparisonResult.orderedSame { self = true }
+        else if str.compare("no", options: [.diacriticInsensitive, .caseInsensitive]) == ComparisonResult.orderedSame { self = false }
         else { return nil }
     }
 }
 
 extension Array {
     
+    @discardableResult
     mutating func removeObject<T: AnyObject>(object: T) -> T? {
-        for (i, obj) in self.enumerate() {
+        for (i, obj) in self.enumerated() {
             if obj as? T === object {
-                return self.removeAtIndex(i) as? T
+                return self.remove(at: i) as? T
             }
         }
         return nil
     }
 }
 
+extension Data {
+    
+    mutating func remove(range: Range<Int>) {
+        var dummy: UInt8 = 0
+        let empty = UnsafeBufferPointer<UInt8>(start: &dummy, count: 0)
+        self.replaceBytes(in: range, with: empty)
+    }
+}
+
 extension Dictionary {
     
-    func valuesAsArray() -> Array<Value> {
+    func arrayValue() -> Array<Value> {
         var elements: Array<Value> = []
         for (_, e) in self {
             elements.append(e)
@@ -96,17 +106,17 @@ extension Dictionary {
     }
 }
 
-extension NSDate {
+extension Date {
     
-    func yearMonthDay(calendar: NSCalendar? = nil) -> NSDateComponents {
-        let calendar = calendar ?? NSCalendar.currentCalendar()
-        let components = calendar.components(NSCalendarUnit(arrayLiteral: .Year, .Month, .Day), fromDate: self)
+    func yearMonthDay(calendar: Calendar? = nil) -> DateComponents {
+        let calendar = calendar ?? Calendar.current
+        let components = calendar.components(Calendar.Unit(arrayLiteral: .year, .month, .day), from: self)
         return components
     }
     
-    func hourMinuteSecond(calendar: NSCalendar? = nil) -> NSDateComponents {
-        let calendar = calendar ?? NSCalendar.currentCalendar()
-        let components = calendar.components(NSCalendarUnit(arrayLiteral: .Hour, .Minute, .Second), fromDate: self)
+    func hourMinuteSecond(calendar: Calendar? = nil) -> DateComponents {
+        let calendar = calendar ?? Calendar.current
+        let components = calendar.components(Calendar.Unit(arrayLiteral: .hour, .minute, .second), from: self)
         return components
     }
     
@@ -128,65 +138,65 @@ extension NSDate {
     /// The javaDate for begin-of-day of self
     
     var javaDateBeginOfDay: Int64 {
-        return NSCalendar.currentCalendar().startOfDayForDate(self).javaDate
+        return Calendar.current.startOfDay(for: self).javaDate
     }
     
     
     /// The javaDate for the beginning of tomorrow.
     
     var javaDateBeginOfTomorrow: Int64 {
-        return NSCalendar.currentCalendar().dateByAddingUnit(.Day, value: 1, toDate: self, options: .MatchNextTime)!.javaDateBeginOfDay
+        return Calendar.current.date(byAdding: .day, value: 1, to: self, options: .matchNextTime)!.javaDateBeginOfDay
     }
 
     
     /// The javaDate for the beginning of yesterday.
     
     var javaDateBeginOfYesterday: Int64 {
-        return NSCalendar.currentCalendar().dateByAddingUnit(.Day, value: -1, toDate: self, options: .MatchNextTime)!.javaDateBeginOfDay
+        return Calendar.current.date(byAdding: .day, value: -1, to: self, options: .matchNextTime)!.javaDateBeginOfDay
     }
 
     
     /// The javaDate for the beginning of the week self is in
     
     var javaDateBeginOfWeek: Int64 {
-        return NSCalendar.currentCalendar().dateBySettingUnit(.Weekday, value: 1, ofDate: self, options: .MatchNextTime)!.javaDateBeginOfDay
+        return Calendar.current.date(bySettingUnit: .weekday, value: 1, of: self, options: .matchNextTime)!.javaDateBeginOfDay
     }
     
     
     /// The javaDate for the beginning of the next week
     
     var javaDateBeginOfNextWeek: Int64 {
-        let aDate = NSCalendar.currentCalendar().dateByAddingUnit(.WeekOfYear, value: 1, toDate: self, options: .MatchNextTime)!
-        return NSCalendar.currentCalendar().dateBySettingUnit(.Weekday, value: 1, ofDate: aDate, options: .MatchNextTime)!.javaDateBeginOfDay
+        let aDate = Calendar.current.date(byAdding: .weekOfYear, value: 1, to: self, options: .matchNextTime)!
+        return Calendar.current.date(bySettingUnit: .weekday, value: 1, of: aDate, options: .matchNextTime)!.javaDateBeginOfDay
     }
     
 
     /// The javaDate for the beginning of the month self is in
     
     var javaDateBeginOfMonth: Int64 {
-        return NSCalendar.currentCalendar().dateBySettingUnit(.Day, value: 1, ofDate: self, options: .MatchNextTime)!.javaDateBeginOfDay
+        return Calendar.current.date(bySettingUnit: .day, value: 1, of: self, options: .matchNextTime)!.javaDateBeginOfDay
     }
     
     
     /// The javaData for the beginning of next month
     
     var javaDateBeginOfNextMonth: Int64 {
-        let aDate = NSCalendar.currentCalendar().dateByAddingUnit(.Month, value: 1, toDate: self, options: .MatchNextTime)!
-        return NSCalendar.currentCalendar().dateBySettingUnit(.Day, value: 1, ofDate: aDate, options: .MatchNextTime)!.javaDateBeginOfDay
+        let aDate = Calendar.current.date(byAdding: .month, value: 1, to: self, options: .matchNextTime)!
+        return Calendar.current.date(bySettingUnit: .day, value: 1, of: aDate, options: .matchNextTime)!.javaDateBeginOfDay
     }
     
     
     /// From milli seconds since 1 Jan 1970
     
-    static func fromJavaDate(value: Int64) -> NSDate {
-        return NSDate(timeIntervalSince1970: Double(value / 1000))
+    static func fromJavaDate(value: Int64) -> Date {
+        return Date(timeIntervalSince1970: Double(value / 1000))
     }
     
     
     /// From seconds since 1 Jan 1970
     
-    static func fromUnixTime(value: Int64) -> NSDate {
-        return NSDate(timeIntervalSince1970: Double(value))
+    static func fromUnixTime(value: Int64) -> Date {
+        return Date(timeIntervalSince1970: Double(value))
     }
 }
 
@@ -208,11 +218,11 @@ extension NSDateComponents {
     convenience init?(json: VJson?) {
         guard let json = json else { return nil }
         self.init()
-        if let jval = (json|"Year")?.integerValue { self.year = jval }
-        if let jval = (json|"Month")?.integerValue { self.month = jval }
-        if let jval = (json|"Day")?.integerValue { self.day = jval }
-        if let jval = (json|"Hour")?.integerValue { self.hour = jval }
-        if let jval = (json|"Minute")?.integerValue { self.minute = jval }
-        if let jval = (json|"Second")?.integerValue { self.second = jval }
+        if let jval = (json|"Year")?.intValue { self.year = jval }
+        if let jval = (json|"Month")?.intValue { self.month = jval }
+        if let jval = (json|"Day")?.intValue { self.day = jval }
+        if let jval = (json|"Hour")?.intValue { self.hour = jval }
+        if let jval = (json|"Minute")?.intValue { self.minute = jval }
+        if let jval = (json|"Second")?.intValue { self.second = jval }
     }
 }

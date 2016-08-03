@@ -75,7 +75,7 @@ class LineGraphView: NSView {
     
     static let rotateVertically: NSAffineTransform = {
         let trans = NSAffineTransform()
-        trans.rotateByDegrees(90)
+        trans.rotate(byDegrees: 90)
         return trans
     }()
 
@@ -88,9 +88,9 @@ class LineGraphView: NSView {
     var dataPoints: Array<DataPoint> = []
     
     
-    override func drawRect(dirtyRect: NSRect) {
+    override func draw(_ dirtyRect: NSRect) {
 
-        super.drawRect(dirtyRect)
+        super.draw(dirtyRect)
         
         
         // Special case: No datapoints
@@ -111,12 +111,12 @@ class LineGraphView: NSView {
     
     private func drawBackground() {
     
-        let context = NSGraphicsContext.currentContext()!.CGContext
+        let context = NSGraphicsContext.current()!.cgContext
         
-        CGContextSetFillColorWithColor(context, CGColorCreateGenericRGB(1, 1, 1, 1))
-        CGContextBeginPath(context)
-        CGContextFillRect(context, NSMakeRect(0.0, 0.0, frame.width, frame.height))
-        CGContextDrawPath(context, CGPathDrawingMode.Fill)
+        context.setFillColor(CGColor(red: 1, green: 1, blue: 1, alpha: 1))
+        context.beginPath()
+        context.fill(NSMakeRect(0.0, 0.0, frame.width, frame.height))
+        context.drawPath(using: CGPathDrawingMode.fill)
     }
     
     
@@ -131,7 +131,7 @@ class LineGraphView: NSView {
         // Draw message to say that there is no data
         
         let message = "No data available"
-        let messageRect = (message as NSString).boundingRectWithSize(NSSize(width: frame.width, height: frame.height), options: NSStringDrawingOptions.TruncatesLastVisibleLine, attributes: nil, context: nil)
+        let messageRect = (message as NSString).boundingRect(with: NSSize(width: frame.width, height: frame.height), options: NSStringDrawingOptions.truncatesLastVisibleLine, attributes: nil, context: nil)
 
         
         // Set the frame size
@@ -146,14 +146,14 @@ class LineGraphView: NSView {
         let y = (frame.size.height - messageRect.size.height) / 2
         let x = (frame.size.width - messageRect.size.width) / 2
         
-        (message as NSString).drawAtPoint(NSPoint(x: x, y: y), withAttributes: nil)
+        (message as NSString).draw(at: NSPoint(x: x, y: y), withAttributes: nil)
     }
     
     
     private func drawOneDataPoint() {
         
         let number = dataPoints[0].value.description
-        let numberRect = (number as NSString).boundingRectWithSize(NSSize(width: frame.width, height: frame.height), options: NSStringDrawingOptions.TruncatesLastVisibleLine, attributes: nil, context: nil)
+        let numberRect = (number as NSString).boundingRect(with: NSSize(width: frame.width, height: frame.height), options: NSStringDrawingOptions.truncatesLastVisibleLine, attributes: nil, context: nil)
         let yAxisPosition = LineGraphView.yLabelLeadingMargin + numberRect.size.width + LineGraphView.yLabelTrailingMargin
         
         let xAxisPosition = LineGraphView.xLabelLeadingMargin + self.maxXLabelWidth() + LineGraphView.xLabelTrailingMargin
@@ -173,43 +173,43 @@ class LineGraphView: NSView {
         
         // Draw the axes
         
-        let context = NSGraphicsContext.currentContext()!.CGContext
-        CGContextSetRGBStrokeColor(context, 0.5, 0.5, 0.5, 1.0)
-        CGContextSetLineWidth(context, 1)
-        CGContextMoveToPoint(context, yAxisPosition, xAxisPosition)
-        CGContextAddLineToPoint(context, yAxisPosition, frame.size.height - LineGraphView.topMargin)
-        CGContextDrawPath(context, CGPathDrawingMode.Stroke)
-        CGContextMoveToPoint(context, yAxisPosition, xAxisPosition)
-        CGContextAddLineToPoint(context, (frame.size.width - LineGraphView.rightMargin), xAxisPosition)
-        CGContextDrawPath(context, CGPathDrawingMode.Stroke)
+        let context = NSGraphicsContext.current()!.cgContext
+        context.setStrokeColor(red: 0.5, green: 0.5, blue: 0.5, alpha: 1.0)
+        context.setLineWidth(1)
+        context.moveTo(x: yAxisPosition, y: xAxisPosition)
+        context.addLineTo(x: yAxisPosition, y: frame.size.height - LineGraphView.topMargin)
+        context.drawPath(using: CGPathDrawingMode.stroke)
+        context.moveTo(x: yAxisPosition, y: xAxisPosition)
+        context.addLineTo(x: (frame.size.width - LineGraphView.rightMargin), y: xAxisPosition)
+        context.drawPath(using: CGPathDrawingMode.stroke)
 
         
         // Draw the number label
         
         var x = LineGraphView.yLabelLeadingMargin
         var y = ((frame.height - xAxisPosition) / 2) + xAxisPosition - (numberRect.size.height / 2)
-        (number as NSString).drawAtPoint(NSPoint(x: x, y: y), withAttributes: nil)
+        (number as NSString).draw(at: NSPoint(x: x, y: y), withAttributes: nil)
 
         
         // Draw the line for the point
         
         x = yAxisPosition
         y = ((frame.height - xAxisPosition) / 2) + xAxisPosition
-        CGContextSetRGBStrokeColor(context, 0.8, 0.8, 0.0, 1.0)
-        CGContextMoveToPoint(context, x, y)
-        CGContextAddLineToPoint(context, (frame.size.width - LineGraphView.rightMargin), y)
-        CGContextDrawPath(context, CGPathDrawingMode.Stroke)
-        CGContextSetRGBStrokeColor(context, 0.0, 0.0, 0.0, 1.0)
+        context.setStrokeColor(red: 0.8, green: 0.8, blue: 0.0, alpha: 1.0)
+        context.moveTo(x: x, y: y)
+        context.addLineTo(x: (frame.size.width - LineGraphView.rightMargin), y: y)
+        context.drawPath(using: CGPathDrawingMode.stroke)
+        context.setStrokeColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 1.0)
 
         
         // Draw the date label at the start
         
-        drawVerticalString(dataPoints[0].label, x: yAxisPosition, y: LineGraphView.xLabelLeadingMargin)
+        drawVerticalString(str: dataPoints[0].label, x: yAxisPosition, y: LineGraphView.xLabelLeadingMargin)
         
         
         // Draw the date label at the end
         
-        drawVerticalString(dataPoints[0].label, x: frame.size.width - LineGraphView.rightMargin, y: LineGraphView.xLabelLeadingMargin)
+        drawVerticalString(str: dataPoints[0].label, x: frame.size.width - LineGraphView.rightMargin, y: LineGraphView.xLabelLeadingMargin)
     }
     
     
@@ -217,9 +217,9 @@ class LineGraphView: NSView {
     
     private func maxYLabelWidth() -> CGFloat {
         return dataPoints.reduce(CGFloat(0.0), combine: {
-            let width = ($1.value.description as NSString).boundingRectWithSize(
-                MaxSize,
-                options: NSStringDrawingOptions.TruncatesLastVisibleLine,
+            let width = ($1.value.description as NSString).boundingRect(
+                with: MaxSize,
+                options: NSStringDrawingOptions.truncatesLastVisibleLine,
                 attributes: nil,
                 context: nil)
                 .size.width
@@ -232,9 +232,9 @@ class LineGraphView: NSView {
     
     private func maxXLabelWidth() -> CGFloat {
         return dataPoints.reduce(CGFloat(0.0), combine: {
-            let width = ($1.label as NSString).boundingRectWithSize(
-                MaxSize,
-                options: NSStringDrawingOptions.TruncatesLastVisibleLine,
+            let width = ($1.label as NSString).boundingRect(
+                with: MaxSize,
+                options: NSStringDrawingOptions.truncatesLastVisibleLine,
                 attributes: nil,
                 context: nil)
                 .size.width
@@ -303,15 +303,15 @@ class LineGraphView: NSView {
         drawBackground()
         
         // Draw the x and y axes
-        let context = NSGraphicsContext.currentContext()!.CGContext
-        CGContextSetRGBStrokeColor(context, 0.5, 0.5, 0.5, 1.0)
-        CGContextSetLineWidth(context, 1)
-        CGContextMoveToPoint(context, yAxisPosition, xAxisPosition)
-        CGContextAddLineToPoint(context, yAxisPosition, frame.size.height - LineGraphView.topMargin)
-        CGContextDrawPath(context, CGPathDrawingMode.Stroke)
-        CGContextMoveToPoint(context, yAxisPosition, xAxisPosition)
-        CGContextAddLineToPoint(context, frame.size.width - LineGraphView.rightMargin, xAxisPosition)
-        CGContextDrawPath(context, CGPathDrawingMode.Stroke)
+        let context = NSGraphicsContext.current()!.cgContext
+        context.setStrokeColor(red: 0.5, green: 0.5, blue: 0.5, alpha: 1.0)
+        context.setLineWidth(1)
+        context.moveTo(x: yAxisPosition, y: xAxisPosition)
+        context.addLineTo(x: yAxisPosition, y: frame.size.height - LineGraphView.topMargin)
+        context.drawPath(using: CGPathDrawingMode.stroke)
+        context.moveTo(x: yAxisPosition, y: xAxisPosition)
+        context.addLineTo(x: frame.size.width - LineGraphView.rightMargin, y: xAxisPosition)
+        context.drawPath(using: CGPathDrawingMode.stroke)
 
         
         // Draw the y-labels and support lines
@@ -319,18 +319,18 @@ class LineGraphView: NSView {
         let autorangeUpperLimit = autorangeHighLimit()
         for i in 0 ... 10 {
             let label = ((autorangeUpperLimit/10) * Int64(i)).description as NSString
-            let boundingRect = label.boundingRectWithSize(NSSize(width: frame.height, height: frame.height), options: NSStringDrawingOptions.TruncatesLastVisibleLine, attributes: nil, context: nil)
+            let boundingRect = label.boundingRect(with: NSSize(width: frame.height, height: frame.height), options: NSStringDrawingOptions.truncatesLastVisibleLine, attributes: nil, context: nil)
             var x = LineGraphView.yLabelLeadingMargin + (maxYLabelWidth - boundingRect.size.width)
             var y = xAxisPosition - (boundingRect.size.height / 2) + yPixelsPerUnit * CGFloat(i)
-            label.drawAtPoint(NSPoint(x: x, y: y), withAttributes: nil)
+            label.draw(at: NSPoint(x: x, y: y), withAttributes: nil)
             if i == 0 { continue } // Don't draw horizontal line over the x-axis
             x = yAxisPosition
             y += (boundingRect.size.height / 2)
-            CGContextSetRGBStrokeColor(context, 0.0, 0.0, 0.0, 0.1)
-            CGContextMoveToPoint(context, x, y)
-            CGContextAddLineToPoint(context, (frame.size.width - LineGraphView.rightMargin), y)
-            CGContextDrawPath(context, CGPathDrawingMode.Stroke)
-            CGContextSetRGBStrokeColor(context, 0.0, 0.0, 0.0, 1.0)
+            context.setStrokeColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 0.1)
+            context.moveTo(x: x, y: y)
+            context.addLineTo(x: (frame.size.width - LineGraphView.rightMargin), y: y)
+            context.drawPath(using: CGPathDrawingMode.stroke)
+            context.setStrokeColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 1.0)
         }
         
         
@@ -342,15 +342,15 @@ class LineGraphView: NSView {
             
             // Date label
             if pixelCountDown <= 0.0 {
-                drawVerticalString(dp.label, x: yAxisPosition + dpXOffset, y: dpY)
+                drawVerticalString(str: dp.label, x: yAxisPosition + dpXOffset, y: dpY)
                 pixelCountDown = LineGraphView.minimumNofPixelsBetweenXLabels
             }
             
             // x-Axis ticks
             if dpXOffset > 0 { // No tick on the y-Axis
-                CGContextMoveToPoint(context, yAxisPosition + dpXOffset, xAxisPosition - 2)
-                CGContextAddLineToPoint(context, yAxisPosition + dpXOffset, xAxisPosition + 2)
-                CGContextDrawPath(context, CGPathDrawingMode.Stroke)
+                context.moveTo(x: yAxisPosition + dpXOffset, y: xAxisPosition - 2)
+                context.addLineTo(x: yAxisPosition + dpXOffset, y: xAxisPosition + 2)
+                context.drawPath(using: CGPathDrawingMode.stroke)
             }
             
             pixelCountDown -= pixelsPerDataPoint
@@ -361,26 +361,26 @@ class LineGraphView: NSView {
         // Draw the chart line
         dpXOffset = 0.0
         dpY = xAxisPosition + CGFloat(dataPoints[0].value) * yPixelsPerUnit
-        CGContextSetRGBStrokeColor(context, 0.8, 0.8, 0.0, 1.0)
-        CGContextMoveToPoint(context, yAxisPosition + dpXOffset, dpY)
+        context.setStrokeColor(red: 0.8, green: 0.8, blue: 0.0, alpha: 1.0)
+        context.moveTo(x: yAxisPosition + dpXOffset, y: dpY)
         for dp in dataPoints {
             if dpXOffset > 0 { // Do not draw the first point
-                CGContextAddLineToPoint(context, yAxisPosition + dpXOffset, xAxisPosition + CGFloat(dp.value) * yPixelsPerUnit)
+                context.addLineTo(x: yAxisPosition + dpXOffset, y: xAxisPosition + CGFloat(dp.value) * yPixelsPerUnit)
             }
             dpXOffset += pixelsPerDataPoint
         }
-        CGContextDrawPath(context, CGPathDrawingMode.Stroke)
+        context.drawPath(using: CGPathDrawingMode.stroke)
     }
     
     
     private func drawVerticalString(str: String, x: CGFloat, y: CGFloat) {
-        let context = NSGraphicsContext.currentContext()!.CGContext
-        CGContextSaveGState(context)
-        let strRect = (str as NSString).boundingRectWithSize(NSSize(width: frame.height, height: frame.height), options: NSStringDrawingOptions.TruncatesLastVisibleLine, attributes: nil, context: nil)
+        let context = NSGraphicsContext.current()!.cgContext
+        context.saveGState()
+        let strRect = (str as NSString).boundingRect(with: NSSize(width: frame.height, height: frame.height), options: NSStringDrawingOptions.truncatesLastVisibleLine, attributes: nil, context: nil)
         let nx = y
         let ny = -x - (strRect.size.height / 2)
         LineGraphView.rotateVertically.concat()
-        (str as NSString).drawAtPoint(NSPoint(x: nx, y: ny), withAttributes: nil)
-        CGContextRestoreGState(context)
+        (str as NSString).draw(at: NSPoint(x: nx, y: ny), withAttributes: nil)
+        context.restoreGState()
     }
 }

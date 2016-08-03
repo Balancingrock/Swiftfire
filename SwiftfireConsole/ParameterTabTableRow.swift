@@ -102,7 +102,7 @@ final class ParameterTabTableRow: NSObject {
             return
         }
         
-        swiftfireMacInterface.sendMessages([command.json])
+        swiftfireMacInterface.sendMessages(messages: [command.json])
     }
     
     
@@ -110,8 +110,8 @@ final class ParameterTabTableRow: NSObject {
     
     func writeValueToSwiftfireServer() {
         
-        if let error = parameter.validateStringValue(valueToSet) {
-            ParameterTabTableRow.windowController.queueErrorMessage(error)
+        if let error = parameter.validateStringValue(value: valueToSet) {
+            ParameterTabTableRow.windowController.queueErrorMessage(message: error)
             return
         }
         
@@ -120,7 +120,7 @@ final class ParameterTabTableRow: NSObject {
             return
         }
         
-        swiftfireMacInterface.sendMessages([command.json])
+        swiftfireMacInterface.sendMessages(messages: [command.json])
     }
 
     

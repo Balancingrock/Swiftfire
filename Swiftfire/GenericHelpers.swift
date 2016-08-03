@@ -10,7 +10,7 @@ import Foundation
 
 infix operator ??= {}
 
-func ??=<T> (inout lhs: T?, rhs: T) {
+func ??=<T> (lhs: inout T?, rhs: T) {
     if lhs == nil { lhs = rhs }
 }
 

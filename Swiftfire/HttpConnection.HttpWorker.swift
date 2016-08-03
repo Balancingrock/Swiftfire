@@ -62,18 +62,13 @@
 import Foundation
 
 
-// For logging purposes, identifies the module which created the logging entry.
-
-private let SOURCE = ((#file as NSString).lastPathComponent as NSString).stringByDeletingPathExtension
-
-
 extension HttpConnection {
     
     
     /// Examines the http message header for a servicable request and creates the corresponding response.
     /// Implementation justification:  
     
-    func httpWorker(header header: HttpHeader, body: UInt8Buffer) {
+    func httpWorker(header: HttpHeader, body: Data) {
         
         
         // =============================================================================================================
@@ -85,7 +80,7 @@ extension HttpConnection {
         mutation.connectionAllocationCount = allocationCount
         mutation.connectionObjectId = objectId
         mutation.socket = logId
-        mutation.requestReceived = NSDate().javaDate
+        mutation.requestReceived = Date().javaDate
         
         
         // =============================================================================================================
@@ -99,44 +94,44 @@ extension HttpConnection {
             
             // Logging update
             let message = "Could not extract host from Http Request Header"
-            log.atLevelDebug(id: logId, source: SOURCE + ".\(#function).\(#line)", message: message)
+            log.atLevelDebug(id: logId, source: #file.source(#function, #line), message: message)
             
             // Reply to client
-            let response = httpErrorResponseWithCode(.CODE_400_Bad_Request, andMessage: "<p>\(message)<p>")
-            transferToClient(response)
+            let response = httpErrorResponse(withCode: .code400_BadRequest, andMessage: "<p>\(message)<p>")
+            transferToClient(data: response)
             
             // Mutation update
-            mutation.httpResponseCode = HttpResponseCode.CODE_400_Bad_Request.rawValue
+            mutation.httpResponseCode = HttpResponseCode.code400_BadRequest.rawValue
             mutation.responseDetails = message
-            mutation.requestCompleted = NSDate().javaDate
-            statistics.submit(mutation)
+            mutation.requestCompleted = Date().javaDate
+            statistics.submit(mutation: mutation)
             
             return
         }
         
-        guard let domain = domains.enabledDomainForName(host.address) else {
+        guard let domain = domains.domain(forName: host.address), domain.enabled else {
             
             // Telemetry update
             serverTelemetry.nofHttp400Replies.increment()
             
             // Logging update
             let message: String
-            if domains.domainForName(host.address) == nil {
+            if domains.domain(forName: host.address) == nil {
                 message = "Domain not found for host: \(host.address)"
             } else {
                 message = "Domain not enabled for host: \(host.address)"
             }
-            log.atLevelNotice(id: logId, source: SOURCE + ".\(#function).\(#line)", message: message)
+            log.atLevelNotice(id: logId, source: #file.source(#function, #line), message: message)
             
             // Reply to client
-            let response = httpErrorResponseWithCode(.CODE_400_Bad_Request, andMessage: "<p>\(message)</p>")
-            transferToClient(response)
+            let response = httpErrorResponse(withCode: .code400_BadRequest, andMessage: "<p>\(message)</p>")
+            transferToClient(data: response)
             
             // Mutation update
-            mutation.httpResponseCode = HttpResponseCode.CODE_400_Bad_Request.rawValue
+            mutation.httpResponseCode = HttpResponseCode.code400_BadRequest.rawValue
             mutation.responseDetails = message
-            mutation.requestCompleted = NSDate().javaDate
-            statistics.submit(mutation)
+            mutation.requestCompleted = Date().javaDate
+            statistics.submit(mutation: mutation)
 
             return
         }
@@ -154,15 +149,24 @@ extension HttpConnection {
         // In case of forwarding do not check other header fields, simply transfer everything to the new destination.
         
         if domain.forwardHost != nil {
-            if forwardingSocket == nil { forwardingOpenConnection(domain.forwardHost!) }
-            if forwardingSocket != nil { forwardingTransmit(UInt8Buffer(buffers: header.asUInt8Buffer(), body)) }
+            
+            if forwardingSocket == nil {
+                openForwardingConnection(host: domain.forwardHost!)
+            }
+
+            if forwardingSocket != nil {
+                var data: Data = header.asData()!
+                data.append(body)
+                transmitToForwardingTarget(data: data)
+            }
+            
             // The forwarding connection will be closed when the forwarding target closes its connection. Until then all data received from the forwarding target will be routed to the client.
 
             // Mutation update
             mutation.httpResponseCode = "Unavailable"
             mutation.responseDetails = "Forwarding of domain '\(host.address)'"
-            mutation.requestCompleted = NSDate().javaDate
-            statistics.submit(mutation)
+            mutation.requestCompleted = Date().javaDate
+            statistics.submit(mutation: mutation)
 
             return
         }
@@ -172,19 +176,19 @@ extension HttpConnection {
         // The domain takes over from here
         // =============================================================================================================
 
-        let response = domain.httpWorker(header, body: body, connection: self, mutation: mutation)
+        let response = domain.httpWorker(header: header, body: body, connection: self, mutation: mutation)
 
         
         // =================================================================================================================
         // Transfer the reply
         // =================================================================================================================
         
-        transferToClient(response)
+        transferToClient(data: response)
         
         // Mutation update
-        mutation.httpResponseCode ??= HttpResponseCode.CODE_200_OK.rawValue
+        mutation.httpResponseCode ??= HttpResponseCode.code200_OK.rawValue
         mutation.responseDetails ??= ""
-        mutation.requestCompleted = NSDate().javaDate
-        statistics.submit(mutation)
+        mutation.requestCompleted = Date().javaDate
+        statistics.submit(mutation: mutation)
     }
 }

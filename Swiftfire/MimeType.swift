@@ -55,15 +55,16 @@
 
 import Foundation
 
+
 /// Often used mime type
 
-let MIME_TYPE_HTML = "text/html"
+let mimeTypeHtml = "text/html"
 
 
 /// If no mime type can be determined, the default mime type can be used.
-/// - Note: intendend usage: let mime = mimeTypeForExtension("bla") ?? MIME_TYPE_DEFAULT
+/// - Note: intendend usage: let mime = mimeTypeForExtension("bla") ?? mimeTypeDefault
 
-let MIME_TYPE_DEFAULT = "application/octet-stream"
+let mimeTypeDefault = "application/octet-stream"
 
 
 /**
@@ -71,9 +72,9 @@ let MIME_TYPE_DEFAULT = "application/octet-stream"
  - Parameter url: The url for which to determine the mime type.
  - Returns: The string representing the mime type, or nil if no match could be made.
  */
-func mimeTypeForURL(url: NSURL) -> String? {
+func mimeType(forUrl url: URL) -> String? {
     guard let ext = url.pathExtension else { return nil }
-    return mimeTypeForExtension(ext)
+    return mimeType(forExtension: ext)
 }
 
 
@@ -82,8 +83,8 @@ func mimeTypeForURL(url: NSURL) -> String? {
  - Parameter fp: The file path for which to determine the mime type.
  - Returns: The string representing the mime type, or nil if no match could be made.
  */
-func mimeTypeForPath(fp: String) -> String? {
-    return mimeTypeForExtension((fp as NSString).pathExtension)
+func mimeType(forPath: String) -> String? {
+    return mimeType(forExtension: (forPath as NSString).pathExtension)
 }
 
 
@@ -92,14 +93,14 @@ func mimeTypeForPath(fp: String) -> String? {
  - Parameter ext: The file extension for which to determine the mime type.
  - Returns: The string representing the mime type, or nil if no match could be made.
  */
-func mimeTypeForExtension(ext: String) -> String? {
-    return mimemap[ext]
+func mimeType(forExtension: String) -> String? {
+    return mimeMap[forExtension]
 }
 
 
 // Maps extensions to mime strings
 
-private let mimemap: Dictionary<String, String> = [
+private let mimeMap: Dictionary<String, String> = [
     "323" : "text/h323",
     "acx" : "application/internet-property-stream",
     "ai" : "application/postscript",

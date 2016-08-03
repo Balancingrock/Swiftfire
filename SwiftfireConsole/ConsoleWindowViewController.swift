@@ -95,7 +95,6 @@ class AboveTabs: NSObject {
 // The main window controller, overriding super functions and storage requirements for the extensions.
 
 class ConsoleWindowViewController: NSViewController {
-
     
     var swiftfireMacInterface: SwiftfireMacInterface!
 
@@ -115,9 +114,9 @@ class ConsoleWindowViewController: NSViewController {
         }
 
         
-        let runLoopObserver = CFRunLoopObserverCreateWithHandler(
+/*        let runLoopObserver = CFRunLoopObserverCreateWithHandler(
             kCFAllocatorDefault,
-            CFRunLoopActivity.BeforeWaiting.rawValue,
+            CFRunLoopActivity.beforeWaiting.rawValue,
             true,
             0,
             { [unowned self] (_, _) -> Void in
@@ -125,7 +124,7 @@ class ConsoleWindowViewController: NSViewController {
                 self.displayErrorMessage()
             })
         
-        CFRunLoopAddObserver(CFRunLoopGetCurrent(), runLoopObserver, kCFRunLoopCommonModes)
+        CFRunLoopAddObserver(CFRunLoopGetCurrent(), runLoopObserver, CFRunLoopMode.commonModes)*/
     }
     
     
@@ -156,7 +155,7 @@ class ConsoleWindowViewController: NSViewController {
     @IBOutlet weak var dtDelayBetweenAutofetches: NSTextField!
     @IBOutlet weak var dtSelectDomainPopupBox: NSPopUpButton!
     
-    var domainTelemetryFetchTimer: NSTimer?
+    var domainTelemetryFetchTimer: Timer?
 
     
     // *********************************************************
@@ -175,7 +174,7 @@ class ConsoleWindowViewController: NSViewController {
 
     dynamic var telemetryTable = Array<TelemetryTabTableRow>()
     
-    var telemetryFetchTimer: NSTimer?
+    var telemetryFetchTimer: Timer?
 
     
     // *****************************
@@ -186,7 +185,7 @@ class ConsoleWindowViewController: NSViewController {
     @IBOutlet weak var displayLogLevelPopupButton: NSPopUpButton!
     @IBOutlet var logTextView: NSTextView!
     
-    private let logLinesDispatchQueue = dispatch_queue_create("log-line-queue", DISPATCH_QUEUE_SERIAL)
+    private let logLinesDispatchQueue = DispatchQueue(label: "log-line-queue", attributes: [.serial])
     private var abortReceivingLogLines = false
     
     private let queuedLogLinesLockObject = NSString()   // Dummy object to allow locking the queuedLogLines member
@@ -222,14 +221,14 @@ extension ConsoleWindowViewController {
             if !swiftfireMacInterface.communicationIsEstablished {
             
                 if let (address, port) = aboveTabs.serverAddressAndPort() {
-                    swiftfireMacInterface.openConnectionToAddress(address, onPortNumber: port)
+                    swiftfireMacInterface.openConnectionToAddress(address: address, onPortNumber: port)
                 } else {
-                    queueErrorMessage(MISSING_SERVER_ADDRESS_OR_PORT)
+                    queueErrorMessage(message: MISSING_SERVER_ADDRESS_OR_PORT)
                     return
                 }
                 
                 if !swiftfireMacInterface.communicationIsEstablished {
-                    queueErrorMessage("Connection failed, please check Swiftfire IP Address and Port Number")
+                    queueErrorMessage(message: "Connection failed, please check Swiftfire IP Address and Port Number")
                     return
                 }
             }
@@ -253,7 +252,7 @@ extension ConsoleWindowViewController {
             
             readAllParameters.append(ReadDomainsCommand().json)
             
-            swiftfireMacInterface.sendMessages(readAllParameters)
+            swiftfireMacInterface.sendMessages(messages: readAllParameters)
         
         } else {
             
@@ -268,12 +267,12 @@ extension ConsoleWindowViewController {
     
     @IBAction func startButtonAction(sender: AnyObject?) {
         guard swiftfireMacInterface.communicationIsEstablished else {
-            queueErrorMessage(NO_CONNECTION_AVAILABLE)
+            queueErrorMessage(message: NO_CONNECTION_AVAILABLE)
             return
         }
         aboveTabs.setValue(" ", forKeyPath: "serverStatus")
         // Send three commands: start, wait 5 sec, read status.
-        swiftfireMacInterface.sendMessages([
+        swiftfireMacInterface.sendMessages(messages: [
             ServerStartCommand().json,
             DeltaCommand(delay: 1)!.json,
             ReadServerTelemetryCommand(telemetryItem: .SERVER_STATUS)!.json
@@ -282,12 +281,12 @@ extension ConsoleWindowViewController {
     
     @IBAction func stopButtonAction(sender: AnyObject?) {
         guard swiftfireMacInterface.communicationIsEstablished else {
-            queueErrorMessage(NO_CONNECTION_AVAILABLE)
+            queueErrorMessage(message: NO_CONNECTION_AVAILABLE)
             return
         }
         aboveTabs.setValue(" ", forKeyPath: "serverStatus")
         // Send three commands: start, wait 10 sec, read status.
-        swiftfireMacInterface.sendMessages([
+        swiftfireMacInterface.sendMessages(messages: [
             ServerStopCommand().json,
             DeltaCommand(delay: 1)!.json,
             ReadServerTelemetryCommand(telemetryItem: .SERVER_STATUS)!.json
@@ -296,10 +295,10 @@ extension ConsoleWindowViewController {
     
     @IBAction func quitSwiftfireServerButtonAction(sender: AnyObject?) {
         guard swiftfireMacInterface.communicationIsEstablished else {
-            queueErrorMessage(MISSING_SERVER_ADDRESS_OR_PORT)
+            queueErrorMessage(message: MISSING_SERVER_ADDRESS_OR_PORT)
             return
         }
-        swiftfireMacInterface.sendMessages([ServerStopCommand().json])
+        swiftfireMacInterface.sendMessages(messages: [ServerQuitCommand().json])
     }
 }
 
@@ -321,19 +320,19 @@ extension ConsoleWindowViewController {
 
 extension ConsoleWindowViewController: NSOutlineViewDataSource, NSOutlineViewDelegate {
     
-    func outlineView(outlineView: NSOutlineView, numberOfChildrenOfItem item: AnyObject?) -> Int {
+    func outlineView(_ outlineView: NSOutlineView, numberOfChildrenOfItem item: AnyObject?) -> Int {
         if item == nil { return domains.count }
         return Domain.nofContainedItems
     }
     
-    func outlineView(outlineView: NSOutlineView, isItemExpandable item: AnyObject) -> Bool {
+    func outlineView(_ outlineView: NSOutlineView, isItemExpandable item: AnyObject) -> Bool {
         guard let ditem = item as? Domain else { return false }
         return domains.contains(ditem)
     }
     
-    func outlineView(outlineView: NSOutlineView, child index: Int, ofItem item: AnyObject?) -> AnyObject {
+    func outlineView(_ outlineView: NSOutlineView, child index: Int, ofItem item: AnyObject?) -> AnyObject {
         if item == nil {
-            for (i, d) in domains.enumerate() {
+            for (i, d) in domains.enumerated() {
                 if i == index { return d }
             }
             log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Unexpected item in call")
@@ -341,7 +340,7 @@ extension ConsoleWindowViewController: NSOutlineViewDataSource, NSOutlineViewDel
         }
         for d in domains {
             if item === d {
-                if let result = d.itemForIndex(index) { return result }
+                if let result = d.itemForIndex(index: index) { return result }
                 log.atLevelError(id: 0, source: #file.source(#function, #line), message: "Index out of range: \(index)")
             }
         }
@@ -349,28 +348,28 @@ extension ConsoleWindowViewController: NSOutlineViewDataSource, NSOutlineViewDel
     }
     
     // Using "Cell Based" content mode (specify this in IB)
-    func outlineView(outlineView: NSOutlineView, objectValueForTableColumn tableColumn: NSTableColumn?, byItem item: AnyObject?) -> AnyObject? {
+    func outlineView(_ outlineView: NSOutlineView, objectValueFor tableColumn: NSTableColumn?, byItem item: AnyObject?) -> AnyObject? {
         if tableColumn === domainNameColumn {
             for d in domains {
-                if let title = d.titleForItem(item) { return title }
+                if let title = d.titleForItem(item: item) { return title }
             }
         } else if tableColumn === domainValueColumn {
             for d in domains {
                 if item === d { return "" }
-                if let value = d.valueForItem(item) { return value }
+                if let value = d.valueForItem(item: item) { return value }
             }
         }
         return nil
     }
     
-    func outlineView(outlineView: NSOutlineView, shouldEditTableColumn tableColumn: NSTableColumn?, item: AnyObject) -> Bool {
+    func outlineView(_ outlineView: NSOutlineView, shouldEdit tableColumn: NSTableColumn?, item: AnyObject) -> Bool {
         for d in domains {
-            if let editable = d.itemIsEditable(item, inNameColumn: (tableColumn === domainNameColumn)) { return editable }
+            if let editable = d.itemIsEditable(item: item, inNameColumn: (tableColumn === domainNameColumn)) { return editable }
         }
         return false
     }
     
-    func outlineView(outlineView: NSOutlineView, setObjectValue object: AnyObject?, forTableColumn tableColumn: NSTableColumn?, byItem item: AnyObject?) {
+    func outlineView(_ outlineView: NSOutlineView, setObjectValue object: AnyObject?, for tableColumn: NSTableColumn?, byItem item: AnyObject?) {
         
         var old, new: Domain?
         
@@ -382,7 +381,7 @@ extension ConsoleWindowViewController: NSOutlineViewDataSource, NSOutlineViewDel
         for d in domains {
             old = d.copy
             var ready: Bool
-            (ready, errorMessage) = d.updateItem(item, withValue: object)
+            (ready, errorMessage) = d.updateItem(item: item, withValue: object)
             
             
             // Stop when a domain accepted the item
@@ -395,22 +394,22 @@ extension ConsoleWindowViewController: NSOutlineViewDataSource, NSOutlineViewDel
         
         if errorMessage != nil {
             
-            queueErrorMessage(errorMessage!)
+            queueErrorMessage(message: errorMessage!)
             
         } else if new != nil {
             
             if let command = UpdateDomainCommand(oldDomainName: old?.name, newDomain: new) {
-                swiftfireMacInterface.sendMessages([command.json])
+                swiftfireMacInterface.sendMessages(messages: [command.json])
             }
 
             // Re-acquire the domains
             let command = ReadDomainsCommand()
             
-            swiftfireMacInterface.sendMessages([command.json])
+            swiftfireMacInterface.sendMessages(messages: [command.json])
         
         } else {
             
-            queueErrorMessage("Program error: Could not identify item to be updated")
+            queueErrorMessage(message: "Program error: Could not identify item to be updated")
         }
     }
     
@@ -418,17 +417,17 @@ extension ConsoleWindowViewController: NSOutlineViewDataSource, NSOutlineViewDel
         
         var domainName = "Domain.com"
         
-        while domains.contains(domainName) {
+        while domains.contains(domainWithName: domainName) {
             domainName = domainName + ".new"
         }
         
         if let command = CreateDomainCommand(domainName: domainName) {
         
-            self.swiftfireMacInterface.sendMessages([command.json])
+            self.swiftfireMacInterface.sendMessages(messages: [command.json])
         
             // Re-acquire the domains
             
-            self.swiftfireMacInterface.sendMessages([ReadDomainsCommand().json])
+            self.swiftfireMacInterface.sendMessages(messages: [ReadDomainsCommand().json])
             
         } else {
             
@@ -443,7 +442,7 @@ extension ConsoleWindowViewController: NSOutlineViewDataSource, NSOutlineViewDel
         var selectedDomains: Array<Domain> = []
         
         for row in selectedRows {
-            let item = domainOutlineView.itemAtRow(row)
+            let item = domainOutlineView.item(atRow: row)
             for d in domains {
                 if item === d { if !selectedDomains.contains(d) { selectedDomains.append(d) }}
                 else if item === d.nameItemTitle { if !selectedDomains.contains(d) { selectedDomains.append(d) }}
@@ -462,19 +461,19 @@ extension ConsoleWindowViewController: NSOutlineViewDataSource, NSOutlineViewDel
         let alert = NSAlert()
         alert.messageText = "Delete Domain(s)"
         alert.informativeText = info
-        alert.addButtonWithTitle("Delete")
-        alert.addButtonWithTitle("Cancel")
+        alert.addButton(withTitle: "Delete")
+        alert.addButton(withTitle: "Cancel")
         
-        alert.beginSheetModalForWindow(self.view.window!) { [unowned self] (response) -> Void in
+        alert.beginSheetModal(for: self.view.window!) { [unowned self] (response) -> Void in
             if response == NSAlertFirstButtonReturn {
                 // Send one REMOVE command for each domain that is selected
                 for domain in selectedDomains {
                     if let command = RemoveDomainCommand(domainName: domain.name) {
-                        self.swiftfireMacInterface.sendMessages([command.json])
+                        self.swiftfireMacInterface.sendMessages(messages: [command.json])
                     }
                 }
                 // Re-acquire the domains
-                self.swiftfireMacInterface.sendMessages([ReadDomainsCommand().json])
+                self.swiftfireMacInterface.sendMessages(messages: [ReadDomainsCommand().json])
             }
         }
         
@@ -501,7 +500,7 @@ extension ConsoleWindowViewController {
         
         // Get the of which the telemetry must be displayed
         
-        let domain = domains.domainForName(selectedItemTitle)
+        let domain = domains.domain(forName: selectedItemTitle)
 
         
         // Update the telemetry items (bindings are used, hence the setValue)
@@ -511,7 +510,7 @@ extension ConsoleWindowViewController {
         
         // Also, read the current telemetry from the domain
         
-        handleRefreshDomainTelemetryButton(nil)
+        handleRefreshDomainTelemetryButton(sender: nil)
     }
     
     
@@ -534,7 +533,7 @@ extension ConsoleWindowViewController {
         
         // Send the command
         
-        swiftfireMacInterface.sendMessages([command?.json])
+        swiftfireMacInterface.sendMessages(messages: [command?.json])
     }
     
     
@@ -545,7 +544,7 @@ extension ConsoleWindowViewController {
         
         // Retrieve the interval for the timer
         
-        guard let interval = Int(dtDelayBetweenAutofetches.stringValue) where interval > 0 else { return }
+        guard let interval = Int(dtDelayBetweenAutofetches.stringValue), interval > 0 else { return }
         
         
         // Whatever happens, we need to invalidate and remove an existing timer
@@ -560,7 +559,7 @@ extension ConsoleWindowViewController {
         
         if dtAutofetchCheckbox.state == NSOnState {
             
-            domainTelemetryFetchTimer = NSTimer.scheduledTimerWithTimeInterval(Double(interval), target: self, selector: #selector(ConsoleWindowViewController.handleRefreshDomainTelemetryButton(_:)), userInfo: nil, repeats: true)
+            domainTelemetryFetchTimer = Timer.scheduledTimer(timeInterval: Double(interval), target: self, selector: #selector(ConsoleWindowViewController.handleRefreshDomainTelemetryButton(sender:)), userInfo: nil, repeats: true)
         }
     }
     
@@ -568,14 +567,14 @@ extension ConsoleWindowViewController {
         
         if let interval = Int(dtDelayBetweenAutofetches.stringValue) {
             if interval == 0 {
-                queueErrorMessage("Please provide an Autorefresh > 0")
+                queueErrorMessage(message: "Please provide an Autorefresh > 0")
                 return
             }
         } else {
-            queueErrorMessage("Please provide an Integer value > 0")
+            queueErrorMessage(message: "Please provide an Integer value > 0")
         }
         
-        dtAutofetchCheckboxAction(nil)
+        dtAutofetchCheckboxAction(sender: nil)
     }
     
     @IBAction func resetTelemetryButtonAction(sender: AnyObject?) {
@@ -592,7 +591,7 @@ extension ConsoleWindowViewController {
         
         // Send the command
         
-        swiftfireMacInterface.sendMessages([command?.json])
+        swiftfireMacInterface.sendMessages(messages: [command?.json])
     }
 }
 
@@ -614,7 +613,7 @@ extension ConsoleWindowViewController {
         
         // Make sure the interval is valid
         
-        guard let interval = Int(delayBetweenAutoFetches.stringValue) where interval > 0 else { return }
+        guard let interval = Int(delayBetweenAutoFetches.stringValue), interval > 0 else { return }
         
         
         // Whatever happens, we need to invalidate and remove an existing timer
@@ -629,7 +628,7 @@ extension ConsoleWindowViewController {
         
         if autofetchCheckbox.state == NSOnState {
             
-            telemetryFetchTimer = NSTimer.scheduledTimerWithTimeInterval(Double(interval), target: self, selector: #selector(ConsoleWindowViewController.getAllTelemetryButtonAction(_:)), userInfo: nil, repeats: true)
+            telemetryFetchTimer = Timer.scheduledTimer(timeInterval: Double(interval), target: self, selector: #selector(ConsoleWindowViewController.getAllTelemetryButtonAction(sender:)), userInfo: nil, repeats: true)
         }
     }
 
@@ -637,14 +636,14 @@ extension ConsoleWindowViewController {
         
         if let interval = Int(delayBetweenAutoFetches.stringValue) {
             if interval == 0 {
-                queueErrorMessage("Please provide an Autorefresh > 0")
+                queueErrorMessage(message: "Please provide an Autorefresh > 0")
                 return
             }
         } else {
-            queueErrorMessage("Please provide an Integer value > 0")
+            queueErrorMessage(message: "Please provide an Integer value > 0")
         }
         
-        autofetchCheckboxAction(nil)
+        autofetchCheckboxAction(sender: nil)
     }
 }
 
@@ -655,20 +654,20 @@ extension ConsoleWindowViewController {
     
     @IBAction func swiftfireSendLogLevelAction(sender: AnyObject?) {
         guard swiftfireMacInterface.communicationIsEstablished else {
-            queueErrorMessage(NO_CONNECTION_AVAILABLE)
+            queueErrorMessage(message: NO_CONNECTION_AVAILABLE)
             return
         }
         let logLevel = swiftfireSendLogLevelPopupButton.indexOfSelectedItem
-        let writeCommand = WriteServerParameterCommand(parameter: .CALLBACK_AT_AND_ABOVE_LEVEL, value: logLevel)!.json
-        let readCommand = ReadServerParameterCommand(parameter: .CALLBACK_AT_AND_ABOVE_LEVEL)!.json
-        swiftfireMacInterface.sendMessages([writeCommand, readCommand])
+        let writeCommand = WriteServerParameterCommand(parameter: .callbackAtAndAboveLevel, value: logLevel)!.json
+        let readCommand = ReadServerParameterCommand(parameter: .callbackAtAndAboveLevel)!.json
+        swiftfireMacInterface.sendMessages(messages: [writeCommand, readCommand])
     }
     
 
     @IBAction func displayLogLevelAction(sender: AnyObject?) {
         logTextView.string = ""
         for ll in acceptedLogLines {
-            addLogLineConditionallyToView(ll)
+            addLogLineConditionallyToView(ll: ll)
         }
     }
     
@@ -682,15 +681,15 @@ extension ConsoleWindowViewController {
     // Copies loglines from the queue to the displayable loglines
     
     private func addQueuedToAcceptedLogLines() {
-        synchronized(queuedLogLinesLockObject, {
+        DispatchQueue.main.sync() {
             [unowned self] in
             var ll = self.queuedLogLines.popLast()
             while ll != nil {
                 self.acceptedLogLines.append(ll!)
-                self.addLogLineConditionallyToView(ll!)
+                self.addLogLineConditionallyToView(ll: ll!)
                 ll = self.queuedLogLines.popLast()
             }
-        })
+        }
     }
     
     
@@ -698,7 +697,7 @@ extension ConsoleWindowViewController {
     private func addLogLineConditionallyToView(ll: LogLine) {
         logTextView.font = NSFont(name: "courier", size: 12.0)
         if ll.level.rawValue >= displayLogLevelPopupButton.indexOfSelectedItem {
-            logTextView.textStorage?.mutableString.appendString("\n\(ll)")
+            logTextView.textStorage?.mutableString.append("\n\(ll)")
         }
     }
 }
@@ -711,153 +710,129 @@ extension ConsoleWindowViewController: SwiftfireMacInterfaceDelegate {
     // ---------------------
     // For the error display
     
-    func swiftfireMacInterface(swiftfireMacInterface: SwiftfireMacInterface, message: String) {
-        synchronized(errorMessageLockObject, { [unowned self] in self.errorMessages.insert(message, atIndex: 0) })
+    func swiftfireMacInterface(_ swiftfireMacInterface: SwiftfireMacInterface, message: String) {
+        DispatchQueue.main.async() { [unowned self] in self.displayErrorMessage(message: message) }
+//        synchronized(errorMessageLockObject, { [unowned self] in self.errorMessages.insert(message, atIndex: 0) })
 
     }
     
     func queueErrorMessage(message: String) {
-        synchronized(errorMessageLockObject, { [unowned self] in self.errorMessages.insert(message, atIndex: 0) })
+        DispatchQueue.main.async() { [unowned self] in self.displayErrorMessage(message: message) }
+//        synchronized(errorMessageLockObject, { [unowned self] in self.errorMessages.insert(message, atIndex: 0) })
     }
 
-    func displayErrorMessage() {
+    private func displayErrorMessage(message: String) {
         
         guard !errorMessageIsActive else { return }
-        
-        if errorMessages.count == 0 {
-            previousErrorMessage = nil
-            return
-        }
-        
-        if previousErrorMessage != nil {
-            
-            var message: String
-            
-            repeat {
-                
-                guard let msg = synchronized(errorMessageLockObject, { [unowned self] in return self.errorMessages.popLast() }) else { return }
-                message = msg
-                
-            } while message != previousErrorMessage!
-            
-            previousErrorMessage = message
-            
-        } else {
-            
-            guard let msg = synchronized(errorMessageLockObject, { [unowned self] in return self.errorMessages.popLast() }) else { return }
-            previousErrorMessage = msg
-        }
         
         errorMessageIsActive = true
         
         let alert = NSAlert()
         alert.messageText = "Error"
-        alert.informativeText = previousErrorMessage!
-        alert.addButtonWithTitle("Dismiss")
-        alert.beginSheetModalForWindow(self.view.window!, completionHandler: { [unowned self] (_) in self.errorMessageIsActive = false })
+        alert.informativeText = message
+        alert.addButton(withTitle: "Dismiss")
+        alert.beginSheetModal(for: self.view.window!, completionHandler: { [unowned self] (_) in self.errorMessageIsActive = false })
     }
     
     
     // ---------------------------
     // For messages from Swiftfire
     
-    func swiftfireMacInterface(swiftfireMacInterface: SwiftfireMacInterface, reply: VJson) {
-        synchronized(queuedRepliesLockObject, { [unowned self] in self.queuedReplies.insert(reply, atIndex: 0) })
+    func swiftfireMacInterface(_ swiftfireMacInterface: SwiftfireMacInterface, reply: VJson) {
+        DispatchQueue.main.async() { [unowned self] in self.processReplies(reply: reply) }
+//        synchronized(queuedRepliesLockObject, { [unowned self] in self.queuedReplies.insert(reply, atIndex: 0) })
     }
     
-    func processQueuedReplies() {
+    private func processReplies(reply: VJson) {
         
-        while let reply = queuedReplies.popLast() {
+        // Check if the reply is a log line
+        
+        if let logLine = LogLine(json: reply) {
             
-            // Check if the reply is a log line
+            acceptedLogLines.append(logLine)
+            addLogLineConditionallyToView(ll: logLine)
             
-            if let logLine = LogLine(json: reply) {
+            
+        } else if let message = ReadDomainTelemetryReply(json: reply) {
+            
+            processReadDomainTelemetryReply(reply: message)
+            
+            
+        } else if let message = ReadServerTelemetryReply(json: reply) {
+            
+            switch message.item {
                 
-                acceptedLogLines.append(logLine)
-                addLogLineConditionallyToView(logLine)
+            case .SERVER_VERSION:
+                aboveTabs.setValue(message.value, forKeyPath: "serverVersionNumber")
+                connectButton.title = "Disconnect"
                 
+            case .SERVER_STATUS:
+                aboveTabs.setValue(message.value, forKeyPath: "serverStatus")
                 
-            } else if let message = ReadDomainTelemetryReply(json: reply) {
-                
-                processReadDomainTelemetryReply(message)
-                
-                
-            } else if let message = ReadServerTelemetryReply(json: reply) {
-                
-                switch message.item {
-                
-                case .SERVER_VERSION:
-                    aboveTabs.setValue(message.value, forKeyPath: "serverVersionNumber")
-                    connectButton.title = "Disconnect"
-                    
-                case .SERVER_STATUS:
-                    aboveTabs.setValue(message.value, forKeyPath: "serverStatus")
-                
-                default: break
-                }
-
-                for row in telemetryTable {
-                    row.updateIfParametersMatch(message.item, value: message.value)
-                }
-
-                
-            } else if let message = ReadServerParameterReply(json: reply) {
-                
-                for row in parameterTable {
-                    row.updateIfParametersMatch(message.parameter, value: message.value)
-                }
-
-                
-            } else if let message = ReadDomainsReply(json: reply) {
-                
-                domains.updateWithDomains(message.domains)
-                
-                // When updated, make sure to update the domain telemetry as well
-                
-                let selectedTitle = dtSelectDomainPopupBox.titleOfSelectedItem
-                dtSelectDomainPopupBox.removeAllItems()
-                for d in domains {
-                    dtSelectDomainPopupBox.addItemWithTitle(d.name)
-                }
-                if selectedTitle != nil {
-                    dtSelectDomainPopupBox.selectItemWithTitle(selectedTitle!)
-                }
-                if dtSelectDomainPopupBox.indexOfSelectedItem < 0 {
-                    if domains.count > 0 {
-                        dtSelectDomainPopupBox.selectItemAtIndex(0)
-                    }
-                }
-                
-                if let titleOfSelectedDomain = dtSelectDomainPopupBox.titleOfSelectedItem {
-                    if let domain = domains.domainForName(titleOfSelectedDomain) {
-                        setValue(domain.telemetry.all, forKey: "domainTelemetry")
-                    }
-                }
-                
-                domainOutlineView.reloadData()
-                
-            } else if let message = ReadStatisticsReply(json: reply) {
-                
-                log.atLevelDebug(id: -1, source: #file.source(#function, #line), message: "Received statistics: \(reply)")
-                statistics.load(message.statistics)
-                
-
-            } else if ClosingMacConnection(json: reply) != nil {
-                
-                aboveTabs.setValue(" ", forKeyPath: "serverVersionNumber")
-                aboveTabs.setValue(" ", forKeyPath: "serverStatus")
-                connectButton.title = "Connect"
-
-            } else {
-                
-                log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Cannot decode received message: \(reply)")
+            default: break
             }
+            
+            for row in telemetryTable {
+                row.updateIfParametersMatch(telemetryItem: message.item, value: message.value)
+            }
+            
+            
+        } else if let message = ReadServerParameterReply(json: reply) {
+            
+            for row in parameterTable {
+                row.updateIfParametersMatch(parameter: message.parameter, value: message.value)
+            }
+            
+            
+        } else if let message = ReadDomainsReply(json: reply) {
+            
+            domains.update(withDomains: message.domains)
+            
+            // When updated, make sure to update the domain telemetry as well
+            
+            let selectedTitle = dtSelectDomainPopupBox.titleOfSelectedItem
+            dtSelectDomainPopupBox.removeAllItems()
+            for d in domains {
+                dtSelectDomainPopupBox.addItem(withTitle: d.name)
+            }
+            if selectedTitle != nil {
+                dtSelectDomainPopupBox.selectItem(withTitle: selectedTitle!)
+            }
+            if dtSelectDomainPopupBox.indexOfSelectedItem < 0 {
+                if domains.count > 0 {
+                    dtSelectDomainPopupBox.selectItem(at: 0)
+                }
+            }
+            
+            if let titleOfSelectedDomain = dtSelectDomainPopupBox.titleOfSelectedItem {
+                if let domain = domains.domain(forName: titleOfSelectedDomain) {
+                    setValue(domain.telemetry.all, forKey: "domainTelemetry")
+                }
+            }
+            
+            domainOutlineView.reloadData()
+            
+        } else if let message = ReadStatisticsReply(json: reply) {
+            
+            log.atLevelDebug(id: -1, source: #file.source(#function, #line), message: "Received statistics: \(reply)")
+            statistics.load(json: message.statistics)
+            
+            
+        } else if ClosingMacConnection(json: reply) != nil {
+            
+            aboveTabs.setValue(" ", forKeyPath: "serverVersionNumber")
+            aboveTabs.setValue(" ", forKeyPath: "serverStatus")
+            connectButton.title = "Connect"
+            
+        } else {
+            
+            log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Cannot decode received message: \(reply)")
         }
     }
     
     private func processReadDomainTelemetryReply(reply: ReadDomainTelemetryReply) {
         
-        guard let domain = domains.domainForName(reply.domainName) else {
+        guard let domain = domains.domain(forName: reply.domainName) else {
             return
         }
         
@@ -878,33 +853,33 @@ extension ConsoleWindowViewController {
     
     @IBAction func handleMenuItemSaveParameters(sender: AnyObject?) {
         guard swiftfireMacInterface.communicationIsEstablished else {
-            queueErrorMessage(NO_CONNECTION_AVAILABLE)
+            queueErrorMessage(message: NO_CONNECTION_AVAILABLE)
             return
         }
-        swiftfireMacInterface.sendMessages([SaveServerParametersCommand().json])
+        swiftfireMacInterface.sendMessages(messages: [SaveServerParametersCommand().json])
     }
     
     @IBAction func handleMenuItemSaveDomains(sender: AnyObject?) {
         guard swiftfireMacInterface.communicationIsEstablished else {
-            queueErrorMessage(NO_CONNECTION_AVAILABLE)
+            queueErrorMessage(message: NO_CONNECTION_AVAILABLE)
             return
         }
-        swiftfireMacInterface.sendMessages([SaveDomainsCommand().json])
+        swiftfireMacInterface.sendMessages(messages: [SaveDomainsCommand().json])
     }
 
     @IBAction func handleMenuItemRestoreParameters(sender: AnyObject?) {
         guard swiftfireMacInterface.communicationIsEstablished else {
-            queueErrorMessage(NO_CONNECTION_AVAILABLE)
+            queueErrorMessage(message: NO_CONNECTION_AVAILABLE)
             return
         }
-        swiftfireMacInterface.sendMessages([RestoreServerParametersCommand().json])
+        swiftfireMacInterface.sendMessages(messages: [RestoreServerParametersCommand().json])
     }
 
     @IBAction func handleMenuItemRestoreDomains(sender: AnyObject?) {
         guard swiftfireMacInterface.communicationIsEstablished else {
-            queueErrorMessage(NO_CONNECTION_AVAILABLE)
+            queueErrorMessage(message: NO_CONNECTION_AVAILABLE)
             return
         }
-        swiftfireMacInterface.sendMessages([RestoreDomainsCommand().json, ReadDomainsCommand().json])
+        swiftfireMacInterface.sendMessages(messages: [RestoreDomainsCommand().json, ReadDomainsCommand().json])
     }
 }

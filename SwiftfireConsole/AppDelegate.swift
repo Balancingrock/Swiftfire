@@ -61,6 +61,9 @@
 
 import Cocoa
 
+// Unused, must be present because of multi-target environment
+var quitSwiftfire = false
+
 @NSApplicationMain
 class AppDelegate: NSObject, NSApplicationDelegate, GuiRequest {
 
@@ -72,20 +75,20 @@ class AppDelegate: NSObject, NSApplicationDelegate, GuiRequest {
     var statisticsWindowController: StatisticsWindowController!
     
     
-    func applicationDidFinishLaunching(aNotification: NSNotification) {
+    func applicationDidFinishLaunching(_ notification: Notification) {
         // Insert code here to initialize your application
-        log.aslFacilityRecordAtAndAboveLevel = SwifterLog.Level.NONE
-        log.fileRecordAtAndAboveLevel = SwifterLog.Level.NONE
-        log.stdoutPrintAtAndAboveLevel = SwifterLog.Level.DEBUG
-        log.networkTransmitAtAndAboveLevel = SwifterLog.Level.NONE
-        log.callbackAtAndAboveLevel = SwifterLog.Level.NONE
+        log.aslFacilityRecordAtAndAboveLevel = SwifterLog.Level.none
+        log.fileRecordAtAndAboveLevel = SwifterLog.Level.none
+        log.stdoutPrintAtAndAboveLevel = SwifterLog.Level.debug
+        log.networkTransmitAtAndAboveLevel = SwifterLog.Level.none
+        log.callbackAtAndAboveLevel = SwifterLog.Level.none
         
         statistics.gui = self
         
-        //statistics.generateTestContent()
+        statistics.generateTestContent()
     }
 
-    func applicationWillTerminate(aNotification: NSNotification) {
+    func applicationWillTerminate(_ notification: Notification) {
         // Insert code here to tear down your application
     }
     
@@ -99,7 +102,7 @@ class AppDelegate: NSObject, NSApplicationDelegate, GuiRequest {
         let macif = windowController.swiftfireMacInterface
         let readCmd = ReadStatisticsCommand()
         log.atLevelDebug(id: -1, source: #file.source(#function, #line), message: "Sending message \(readCmd.json)")
-        macif.sendMessages([readCmd.json])
+        macif?.sendMessages(messages: [readCmd.json])
     }
     
     

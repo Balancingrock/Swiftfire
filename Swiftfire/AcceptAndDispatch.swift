@@ -57,11 +57,6 @@
 import Foundation
 
 
-// For logging purposes, identifies the module which created the logging entry.
-
-private let SOURCE = ((#file as NSString).lastPathComponent as NSString).stringByDeletingPathExtension
-
-
 // This var is used to stop the HTTP server
 
 private var stopHttpServer: Bool = false
@@ -134,9 +129,7 @@ func acceptAndDispatch(socket: Int32) {
             
             connection = httpConnectionPool.allocate()
             
-            if connection != nil {
-                log.atLevelDebug(id: socket, source: SOURCE, message: "Got connection object")
-            }
+            if connection != nil { log.atLevelDebug(id: socket, source: #file.source(#function, #line), message: "Got connection object") }
             
             
             // If no connection object could be had, try again in a little while until the specified timeout
@@ -150,9 +143,9 @@ func acceptAndDispatch(socket: Int32) {
                 sleep (1) // Wait for 1 second, maybe something will be free by then
                 
                 loopCount += 1
-                if loopCount > Parameters.asInt(.MAX_WAIT_FOR_PENDING_CONNECTIONS) {
+                if loopCount > Parameters.maxWaitForPendingConnections {
                     
-                    let message = "Connection objects are no longer available (waited for \(Parameters.asInt(.MAX_WAIT_FOR_PENDING_CONNECTIONS)) seconds)"
+                    let message = "Connection objects are no longer available (waited for \(Parameters.maxWaitForPendingConnections) seconds)"
                     log.atLevelEmergency(id: 0, source: #file.source(#function, #line), message: message)
                     
                     httpConnectionPool.request()
@@ -169,48 +162,48 @@ func acceptAndDispatch(socket: Int32) {
         
         let acceptTelemetry = SwifterSockets.AcceptTelemetry()
         
-        let result = SwifterSockets.acceptNoThrow(socket, abortFlag: &stopHttpServer, abortFlagPollInterval: 2.0, timeout: nil, telemetry: acceptTelemetry)
+        let result = SwifterSockets.acceptNoThrow(onSocket: socket, abortFlag: &stopHttpServer, abortFlagPollInterval: 2.0, timeout: nil, telemetry: acceptTelemetry)
         
         switch result {
             
-        case .TIMEOUT: // Should not happen, but if it does, try to continue
+        case .timeout: // Should not happen, but if it does, try to continue
             
             log.atLevelWarning(id: socket, source: #file.source(#function, #line), message: "Unexpected timeout received... continuing")
             
-            httpConnectionPool.free(connection!)
+            httpConnectionPool.free(connection: connection!)
             
             
-        case .ABORTED: // Time to end the server ...
+        case .aborted: // Time to end the server ...
             
-            log.atLevelDebug(id: socket, source: SOURCE, message: "Accept was aborted, closing connection")
+            log.atLevelDebug(id: socket, source: #file.source(#function, #line), message: "Accept was aborted, closing connection")
 
-            httpConnectionPool.free(connection!)
+            httpConnectionPool.free(connection: connection!)
             
             break ACCEPT_LOOP
             
             
-        case .CLOSED: // Should be impossible
+        case .closed: // Should be impossible
             
             log.atLevelCritical(id: socket, source: #file.source(#function, #line), message: "Accept closed unexpectedly (Bad File Descriptor)")
             
-            httpConnectionPool.free(connection!)
+            httpConnectionPool.free(connection: connection!)
             
             break ACCEPT_LOOP
 
             
-        case let .ERROR(msg): // If there was an error, log the error message an abort the accept loop.
+        case let .error(msg): // If there was an error, log the error message an abort the accept loop.
 
             log.atLevelCritical(id: socket, source: #file.source(#function, #line), message: msg)
             
-            httpConnectionPool.free(connection!)
+            httpConnectionPool.free(connection: connection!)
 
             break ACCEPT_LOOP
             
             
-        case let .ACCEPTED(acceptedSocket): // If the connection request was accepted
+        case let .accepted(acceptedSocket): // If the connection request was accepted
         
             
-            log.atLevelDebug(id: socket, source: SOURCE, message: "Connection request accepted")
+            log.atLevelDebug(id: socket, source: #file.source(#function, #line), message: "Connection request accepted")
 
             
             // ================================================
@@ -224,7 +217,7 @@ func acceptAndDispatch(socket: Int32) {
                 SOL_SOCKET,
                 SO_NOSIGPIPE,
                 &optval,
-                socklen_t(sizeof(Int)))
+                socklen_t(sizeof(Int.self)))
             
             
             // Telemetry update
@@ -243,8 +236,8 @@ func acceptAndDispatch(socket: Int32) {
                 
             if status == -1 {
                 
-                let strError = String(UTF8String: strerror(errno)) ?? "Unknown error code"
-                connection!.closeConnection()
+                let strError = String(cString: strerror(errno)) ?? "Unknown error code"
+                connection!.close()
                 log.atLevelEmergency(id: socket, source: #file.source(#function, #line), message: strError)
                 
             } else {
@@ -253,53 +246,56 @@ func acceptAndDispatch(socket: Int32) {
                 // Start processing of the connection object in its own receiver queue
                 // ===================================================================
                 
-                log.atLevelDebug(id: socket, source: SOURCE, message: "Dispatching request")
+                log.atLevelDebug(id: socket, source: #file.source(#function, #line), message: "Dispatching request")
 
-                dispatch_async(connection!.receiverQueue, {
+                connection!.receiverQueue.async() {
                     
-                    let buffer = UnsafeMutablePointer<UInt8>.alloc(Parameters.asInt(ParameterId.CLIENT_MESSAGE_BUFFER_SIZE))
-                    let bufferPtr = UnsafeMutableBufferPointer(start: buffer, count: Parameters.asInt(ParameterId.CLIENT_MESSAGE_BUFFER_SIZE))
-
-                    log.atLevelDebug(id: socket, source: SOURCE, message: "Starting Receiver Loop")
+                    log.atLevelDebug(id: socket, source: #file.source(#function, #line), message: "Starting Receiver Loop")
 
                     RECEIVER_LOOP: while (!stopHttpServer && !connection!.abortProcessing) {
                         
-                        let result = SwifterSockets.receiveBytes(acceptedSocket, buffer: bufferPtr, timeout: Double(Parameters.asInt(ParameterId.HTTP_KEEP_ALIVE_INACTIVITY_TIMEOUT)), dataEndDetector: connection!, telemetry: nil)
+                        // Tricky: It may seem that nothing is done with the data that is received, but in fact the dataEndDetector is the one that is doiing all the data processing.
+                        let result = SwifterSockets.receiveData(
+                            fromSocket: acceptedSocket,
+                            timeout: Double(Parameters.httpKeepAliveInactivityTimeout),
+                            dataEndDetector: connection!, // <= This is doing all the work
+                            telemetry: nil
+                        )
                         
                         switch result {
-                        case .BUFFER_FULL:
+                        case .bufferFull:
                             // A client should never send more than ParameterId.MAX_CLIENT_MESSAGE_SIZE in a single message
                             log.atLevelError(id: connection!.logId, source: #file.source(#function, #line), message: "Unexpected Buffer Full received")
                             break RECEIVER_LOOP
                             
-                        case .CLIENT_CLOSED: // Normal
-                            log.atLevelDebug(id: socket, source: SOURCE, message: "Stopping Receiver Loop, client closed")
+                        case .clientClosed: // Normal
+                            log.atLevelDebug(id: socket, source: #file.source(#function, #line), message: "Stopping Receiver Loop, client closed")
                             break RECEIVER_LOOP
 
-                        case .SERVER_CLOSED: // Not currently used
-                            log.atLevelDebug(id: socket, source: SOURCE, message: "Stopping Receiver Loop, server closed")
+                        case .serverClosed: // Not currently used
+                            log.atLevelDebug(id: socket, source: #file.source(#function, #line), message: "Stopping Receiver Loop, server closed")
                             break RECEIVER_LOOP
 
-                        case .TIMEOUT: // Normal
-                            log.atLevelDebug(id: socket, source: SOURCE, message: "Stopping Receiver Loop, timeout")
+                        case .timeout: // Normal
+                            log.atLevelDebug(id: socket, source: #file.source(#function, #line), message: "Stopping Receiver Loop, timeout")
                             break RECEIVER_LOOP
                             
-                        case let .ERROR(message: msg):
+                        case let .error(message: msg):
                             log.atLevelError(id: connection!.logId, source: #file.source(#function, #line), message: msg)
                             break RECEIVER_LOOP
 
-                        case .READY:
-                            log.atLevelDebug(id: socket, source: SOURCE, message: "Continuing Receiver Loop")
+                        case .ready:
+                            log.atLevelDebug(id: socket, source: #file.source(#function, #line), message: "Continuing Receiver Loop")
                             break
                         }
                     }
                     
-                    log.atLevelDebug(id: socket, source: SOURCE, message: "Exiting Receiver Loop, closing connection")
+                    log.atLevelDebug(id: socket, source: #file.source(#function, #line), message: "Exiting Receiver Loop, closing connection")
 
                     // ***I*** (2)
                     
-                    connection!.closeConnection()
-                })
+                    connection!.close()
+                }
             }
         }
     } // End of ACCEPT_LOOP

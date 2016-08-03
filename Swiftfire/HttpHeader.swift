@@ -66,66 +66,66 @@ private let SOURCE = "HttpHeader"
 /// This enum encodes the different kinds of operations
 
 enum HttpOperation: String {
-    case GET = "GET"
-    case HEAD = "HEAD"
-    case POST = "POST"
-    case PUT = "PUT"
-    case DELETE = "DELETE"
-    case TRACE = "TRACE"
-    case CONNECT = "CONNECT"
+    case get = "GET"
+    case head = "HEAD"
+    case post = "POST"
+    case put = "PUT"
+    case delete = "DELETE"
+    case trace = "TRACE"
+    case connect = "CONNECT"
     
     // If operations are added, be sure to include them in "allValues".
     
-    static let allValues = [HttpOperation.GET, HttpOperation.HEAD, HttpOperation.POST, HttpOperation.PUT, HttpOperation.DELETE, HttpOperation.TRACE, HttpOperation.CONNECT]
+    static let all: Array<HttpOperation> = [.get, .head, .post, .put, .delete, .trace, .connect]
 }
 
 
 /// This enum encodes the different versions of the HTTP protocol
 
 enum HttpVersion: String {
-    case HTTP_1_0 = "HTTP/1.0"
-    case HTTP_1_1 = "HTTP/1.1"
-    case HTTP_1_x = "HTTP/1.x"
+    case http1_0 = "HTTP/1.0"
+    case http1_1 = "HTTP/1.1"
+    case http1_x = "HTTP/1.x"
     
     // If operations are added, be sure to include them in "allValues".
     
-    static let allValues = [HttpVersion.HTTP_1_0, HttpVersion.HTTP_1_1, HttpVersion.HTTP_1_x]
+    static let all: Array<HttpVersion> = [.http1_0, .http1_1, .http1_x]
 }
 
 
 /// This enum encodes the different kinds of header fields
 
 enum HttpHeaderField: String {
-    case ACCEPT                 = "Accept"
-    case ACCEPT_CHARSET         = "Accept-Charset"
-    case ACCEPT_ENCODING        = "Accept-Encoding"
-    case ACCEPT_LANGUAGE        = "Accept-Language"
-    case ACCEPT_DATETIME        = "Accept-Datetime"
-    case CACHE_CONTROL          = "Cache-Control"
-    case CONNECTION             = "Connection"
-    case COOKIE                 = "Cookie"
-    case CONTENT_LENGTH         = "Content-Length"
-    case CONTENT_MD5            = "Content-MD5"
-    case CONTENT_TYPE           = "Content-Type"
-    case DATE                   = "Date"
-    case EXPECT                 = "Expect"
-    case FROM                   = "From"
-    case HOST                   = "Host"
-    case IF_MATCH               = "If-Match"
-    case IF_MODIFIED_SINCE      = "If-Modified-Since"
-    case IF_NONE_MATCH          = "If-None-Match"
-    case IF_RANGE               = "If-Range"
-    case IF_UNMODIFIED_SINCE    = "If-Unmodified-Since"
-    case MAX_FORWARDS           = "Max-Forwards"
-    case ORIGIN                 = "Origin"
-    case PRAGMA                 = "Pragma"
-    case PROXY_AUTHORIZATION    = "Proxy-Authorization"
-    case RANGE                  = "Range"
-    case REFERER                = "Referer"
-    case TE                     = "TE"
-    case USER_AGENT             = "User-Agent"
-    case UPGRADE                = "Upgrade"
-    case WARNING                = "Warning"
+    case accept                 = "Accept"
+    case acceptCharset          = "Accept-Charset"
+    case acceptEncoding         = "Accept-Encoding"
+    case acceptLanguage         = "Accept-Language"
+    case acceptDatetime         = "Accept-Datetime"
+    case cacheControl           = "Cache-Control"
+    case connection             = "Connection"
+    case cookie                 = "Cookie"
+    case contentLength          = "Content-Length"
+    case contentMd5             = "Content-MD5"
+    case contentType            = "Content-Type"
+    case date                   = "Date"
+    case expect                 = "Expect"
+    case from                   = "From"
+    case host                   = "Host"
+    case ifMatch                = "If-Match"
+    case ifModifiedSince        = "If-Modified-Since"
+    case ifNoneMatch            = "If-None-Match"
+    case ifRange                = "If-Range"
+    case ifUnmodifiedRange      = "If-Unmodified-Since"
+    case maxForwards            = "Max-Forwards"
+    case origin                 = "Origin"
+    case pragma                 = "Pragma"
+    case proxyAuthorization     = "Proxy-Authorization"
+    case range                  = "Range"
+    case referer                = "Referer"
+    case te                     = "TE"
+    case userAgent              = "User-Agent"
+    case upgrade                = "Upgrade"
+    case warning                = "Warning"
 }
 
 
@@ -147,7 +147,7 @@ private func getRequestFieldValue(request: HttpHeaderField, inLine line: String)
     
     // Split the string in request and value
     
-    var subStrings = line.componentsSeparatedByString(":")
+    var subStrings = line.components(separatedBy: ":")
     
     
     // The count of the array must be 2 or more, otherwise there is something wrong
@@ -157,7 +157,7 @@ private func getRequestFieldValue(request: HttpHeaderField, inLine line: String)
     
     // The first string should be equal to the request field raw value
     
-    if subStrings[0].compare(request.rawValue, options: NSStringCompareOptions.CaseInsensitiveSearch, range: nil, locale: nil) != NSComparisonResult.OrderedSame { return nil }
+    if subStrings[0].compare(request.rawValue, options: NSString.CompareOptions.caseInsensitive, range: nil, locale: nil) != ComparisonResult.orderedSame { return nil }
     
     
     // Remove the raw field value
@@ -169,7 +169,7 @@ private func getRequestFieldValue(request: HttpHeaderField, inLine line: String)
     
     var strValue = ""
     
-    for (i, str) in subStrings.enumerate() {
+    for (i, str) in subStrings.enumerated() {
         strValue += str
         if i < (subStrings.count - 1) { strValue += ":" }
     }
@@ -177,7 +177,7 @@ private func getRequestFieldValue(request: HttpHeaderField, inLine line: String)
     
     // Strip leading and trailing blanks
     
-    return strValue.stringByTrimmingCharactersInSet(NSCharacterSet.whitespaceAndNewlineCharacterSet())
+    return strValue.trimmingCharacters(in: NSCharacterSet.whitespaces)
 }
 
 
@@ -186,36 +186,67 @@ private func getRequestFieldValue(request: HttpHeaderField, inLine line: String)
 final class HttpHeader {
     
     
+    // The end-of-header sequence
+    
+    static let endOfHeaderSequence = Data(bytes: [ASCII_CR, ASCII_LF, ASCII_CR, ASCII_LF])
+    
+    
     // The lines in the header
     
     private var lines: [String]
     
     
-    // Used to instantiate an object
+    /// The number of bytes in the header (including the CRLFCRLF)
     
-    init(lines: [String]) {
+    let headerLength: Int
+    
+    
+    /// - Note: The headerLength is not used internally, its just a place to keep this information handy - if necessary.
+    
+    init(lines: [String], headerLength: Int) {
         self.lines = lines
+        self.headerLength = headerLength
+    }
+    
+    
+    /// Returns a HTTP header from the given data if the data contains a complete header. Otherwise returns nil.
+    
+    init?(data: Data) {
+        
+        // Check if the header is complete by searching for the end of the CRLFCRLF sequence
+        guard let endOfHeaderRange = data.range(of: HttpHeader.endOfHeaderSequence) else { return nil }
+        
+        // Convert the header to lines
+        let headerRange = Range(uncheckedBounds: (lower: 0, upper: endOfHeaderRange.lowerBound))
+        guard let headerString = String(data: data.subdata(in: headerRange), encoding: String.Encoding.utf8) else {
+            log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Cannot create string from received data")
+            return nil
+        }
+        lines = headerString.components(separatedBy: CRLF)
+        
+        // Set the headerlength
+        headerLength = endOfHeaderRange.upperBound
     }
     
     
     // Create and return a copy from self
     
     var copy: HttpHeader {
-        let cp = HttpHeader(lines: self.lines)
+        let cp = HttpHeader(lines: self.lines, headerLength: self.headerLength)
         // Don't copy the lazy variables, they will be recreated when necessary.
         return cp
     }
     
     
-    /// - Returns: The header as a UInt8Buffer object containing the lines as an UTF8 encoded string separated by CRLF en closed by a CRLFCRLF sequence. Nil if the lines could not be encoded as an UTF8 coding.
+    /// - Returns: The header as a Data object containing the lines as an UTF8 encoded string separated by CRLF en closed by a CRLFCRLF sequence. Nil if the lines could not be encoded as an UTF8 coding.
     
-    func asUInt8Buffer() -> UInt8Buffer? {
+    func asData() -> Data? {
         var str = ""
         for line in lines {
             str += line + CRLF
         }
         str += CRLF
-        return UInt8Buffer(buffers: str.dataUsingEncoding(NSUTF8StringEncoding))
+        return str.data(using: String.Encoding.utf8)
     }
     
     
@@ -234,10 +265,10 @@ final class HttpHeader {
     /// Returns the operation or nil if none present
     
     lazy var operation: HttpOperation? = {
-        for t in HttpOperation.allValues {
-            let operatorRange = self.lines[0].rangeOfString(t.rawValue, options: NSStringCompareOptions(), range: nil, locale: nil)
+        for t in HttpOperation.all {
+            let operatorRange = self.lines[0].range(of: t.rawValue, options: NSString.CompareOptions(), range: nil, locale: nil)
             if let range = operatorRange {
-                if range.startIndex == self.lines[0].startIndex { return t }
+                if range.lowerBound == self.lines[0].startIndex { return t }
             }
         }
         return nil
@@ -253,7 +284,7 @@ final class HttpHeader {
         set {
             _url = newValue
             
-            var parts = self.lines[0].componentsSeparatedByString(" ")
+            var parts = self.lines[0].components(separatedBy: " ")
             
             if parts.count == 3 {
                 parts[1] = newValue ?? ""
@@ -267,7 +298,7 @@ final class HttpHeader {
         
         // The first line should in 3 parts: Operation, url and version
         
-        let parts = self.lines[0].componentsSeparatedByString(" ")
+        let parts = self.lines[0].components(separatedBy: " ")
         
         if parts.count == 3 { return parts[1] }
         
@@ -282,22 +313,22 @@ final class HttpHeader {
         
         // The first line should in 3 parts: Operation, url and version
 
-        let parts = self.lines[0].componentsSeparatedByString(" ")
+        let parts = self.lines[0].components(separatedBy: " ")
         
         if parts.count == 3 {
             
             
             // The last part should be equal to the raw value of a HttpVersion enum
             
-            for version in HttpVersion.allValues {
+            for version in HttpVersion.all {
                 
-                if let range = parts[2].rangeOfString(
-                    version.rawValue,
-                    options: NSStringCompareOptions.CaseInsensitiveSearch,
+                if let range = parts[2].range(
+                    of: version.rawValue,
+                    options: NSString.CompareOptions.caseInsensitive,
                     range: nil,
                     locale: nil) {
                     
-                    if range.startIndex == self.lines[0].startIndex { return version }
+                    if range.lowerBound == self.lines[0].startIndex { return version }
                 }
             }
         }
@@ -312,7 +343,7 @@ final class HttpHeader {
         
         for line in self.lines {
             
-            if let str = getRequestFieldValue(HttpHeaderField.CONTENT_LENGTH, inLine: line) {
+            if let str = getRequestFieldValue(request: HttpHeaderField.contentLength, inLine: line) {
                 
                 if let val = Int(str) {
                     
@@ -331,9 +362,9 @@ final class HttpHeader {
         
         for line in self.lines {
             
-            if let str = getRequestFieldValue(HttpHeaderField.CONNECTION, inLine: line) {
+            if let str = getRequestFieldValue(request: HttpHeaderField.connection, inLine: line) {
                 
-                if (str as NSString).compare("keep-alive", options: NSStringCompareOptions.CaseInsensitiveSearch) == NSComparisonResult.OrderedSame {
+                if (str as NSString).compare("keep-alive", options: NSString.CompareOptions.caseInsensitive) == ComparisonResult.orderedSame {
                     return true;
                 } else {
                     return false;
@@ -355,13 +386,13 @@ final class HttpHeader {
         set {
             _host = newValue
             
-            for (i, line) in lines.enumerate() {
+            for (i, line) in lines.enumerated() {
                 
-                var subStrings = line.componentsSeparatedByString(":")
+                var subStrings = line.components(separatedBy: ":")
                 
-                if subStrings[0].compare(HttpHeaderField.HOST.rawValue, options: NSStringCompareOptions.CaseInsensitiveSearch, range: nil, locale: nil) == NSComparisonResult.OrderedSame {
+                if subStrings[0].compare(HttpHeaderField.host.rawValue, options: NSString.CompareOptions.caseInsensitive, range: nil, locale: nil) == ComparisonResult.orderedSame {
                     
-                    lines[i] = HttpHeaderField.HOST.rawValue + ": " + (newValue?.description ?? "")
+                    lines[i] = HttpHeaderField.host.rawValue + ": " + (newValue?.description ?? "")
                     
                     break
                 }
@@ -372,9 +403,9 @@ final class HttpHeader {
        
         for line in self.lines {
             
-            if let val = getRequestFieldValue(HttpHeaderField.HOST, inLine: line) {
+            if let val = getRequestFieldValue(request: HttpHeaderField.host, inLine: line) {
                                 
-                let values = val.componentsSeparatedByString(":")
+                let values = val.components(separatedBy: ":")
                 
                 if values.count == 0 { return nil }
                 
@@ -392,7 +423,7 @@ final class HttpHeader {
     
     // MARK: Header logging
     
-    private static var headerLogFile = Logfile(filename: "HeaderLog", fileExtension: "txt", directory: FileURLs.headerLoggingDir, options: .NewFileDailyAt(WallclockTime(hour: 0, minute: 0, second: 0)), .MaxFileSize(Parameters.asInt(.MAX_FILE_SIZE_FOR_HEADER_LOGGING)))
+    private static var headerLogFile = Logfile(filename: "HeaderLog", fileExtension: "txt", directory: FileURLs.headerLoggingDir, options: .newFileDailyAt(WallclockTime(hour: 0, minute: 0, second: 0)), .maxFileSize(Parameters.maxFileSizeForHeaderLogging))
 
     static func closeHeaderLoggingFile() {
         if let file = self.headerLogFile {
@@ -406,14 +437,14 @@ final class HttpHeader {
         if let file = HttpHeader.headerLogFile {
             
             var message = "--------------------------------------------------------------------------------\n"
-            message += "Time      : \(Logfile.dateFormatter.stringFromDate(connection.timeOfAccept))\n"
+            message += "Time      : \(Logfile.dateFormatter.string(from: connection.timeOfAccept as Date))\n"
             message += "IP Address: \(connection.clientIp)\n"
             message += "Log Id    : \(connection.logId)\n\n"
             message = self.lines.reduce(message, combine: { $0 + $1 + "\n"})
             message += "\n"
             
-            file.record(message)
-            if Parameters.asBool(.FLUSH_HEADER_LOGFILE_AFTER_EACH_WRITE) { file.flush() }
+            file.record(message: message)
+            if Parameters.flushHeaderLogfileAfterEachWrite { file.flush() }
         }
     }
 }

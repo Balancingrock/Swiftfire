@@ -74,4 +74,29 @@ final class ServerQuitCommand {
         guard let json = json else { return nil }
         guard (json|COMMAND_NAME)?.nullValue == true else { return nil }
     }
+    
+    func execute() {
+        
+        // Stop the http server if it is running
+        
+        if httpServerIsRunning() {
+            
+            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Stopping HTTP Server")
+            
+            stopAcceptAndDispatch()
+        }
+        
+        
+        // Wait a little to give the stop command time to run through the system
+        
+        sleep(5)
+        
+        
+        log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Quitting Swiftfire")
+        
+        
+        // Now quit the server
+        
+        quitSwiftfire = true
+    }
 }

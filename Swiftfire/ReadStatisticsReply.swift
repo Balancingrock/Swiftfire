@@ -65,7 +65,7 @@ final class ReadStatisticsReply {
     
     var json: VJson {
         let json = VJson()
-        json.add(statistics, forName: STATISTICS)
+        json[REPLY_NAME].add(statistics, forName: STATISTICS)
         return json
     }
     
@@ -75,7 +75,7 @@ final class ReadStatisticsReply {
     
     init?(json: VJson?) {
         guard let json = json else { return nil }
-        guard let jstat = json|STATISTICS else { return nil }
+        guard let jstat = json|REPLY_NAME|STATISTICS else { return nil }
         statistics = jstat
     }
 }

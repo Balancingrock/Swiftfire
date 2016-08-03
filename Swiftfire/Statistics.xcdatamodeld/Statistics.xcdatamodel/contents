@@ -1,20 +1,20 @@
 <?xml version="1.0" encoding="UTF-8" standalone="yes"?>
-<model userDefinedModelVersionIdentifier="" type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="10174" systemVersion="15G31" minimumToolsVersion="Xcode 7.0">
+<model type="com.apple.IDECoreDataModeler.DataModel" documentVersion="1.0" lastSavedToolsVersion="11198.3" systemVersion="15G31" minimumToolsVersion="Xcode 7.0" sourceLanguage="Swift" userDefinedModelVersionIdentifier="">
     <entity name="CDClient" representedClassName=".CDClient" syncable="YES">
         <attribute name="address" attributeType="String" syncable="YES"/>
-        <attribute name="doNotTrace" attributeType="Boolean" defaultValueString="NO" syncable="YES"/>
+        <attribute name="doNotTrace" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
         <relationship name="clients" maxCount="1" deletionRule="Nullify" destinationEntity="CDClients" inverseName="clients" inverseEntity="CDClients" syncable="YES"/>
         <relationship name="records" optional="YES" toMany="YES" deletionRule="Cascade" destinationEntity="CDClientRecord" inverseName="client" inverseEntity="CDClientRecord" syncable="YES"/>
     </entity>
     <entity name="CDClientRecord" representedClassName=".CDClientRecord" syncable="YES">
-        <attribute name="connectionAllocationCount" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
-        <attribute name="connectionObjectId" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <attribute name="connectionAllocationCount" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="connectionObjectId" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="host" optional="YES" attributeType="String" syncable="YES"/>
         <attribute name="httpResponseCode" attributeType="String" syncable="YES"/>
-        <attribute name="requestCompleted" attributeType="Integer 64" defaultValueString="0.0" syncable="YES"/>
-        <attribute name="requestReceived" attributeType="Integer 64" defaultValueString="0.0" syncable="YES"/>
+        <attribute name="requestCompleted" attributeType="Integer 64" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="requestReceived" attributeType="Integer 64" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="responseDetails" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="socket" attributeType="Integer 32" defaultValueString="0" syncable="YES"/>
+        <attribute name="socket" attributeType="Integer 32" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="url" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="client" maxCount="1" deletionRule="Nullify" destinationEntity="CDClient" inverseName="records" inverseEntity="CDClient" syncable="YES"/>
         <relationship name="urlCounter" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CDCounter" inverseName="clientRecords" inverseEntity="CDCounter" syncable="YES"/>
@@ -23,9 +23,9 @@
         <relationship name="clients" toMany="YES" deletionRule="Cascade" destinationEntity="CDClient" inverseName="clients" inverseEntity="CDClient" syncable="YES"/>
     </entity>
     <entity name="CDCounter" representedClassName=".CDCounter" syncable="YES">
-        <attribute name="count" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
-        <attribute name="forDay" attributeType="Integer 64" defaultValueString="0.0" syncable="YES"/>
-        <attribute name="instanceId" attributeType="Integer 64" syncable="YES"/>
+        <attribute name="count" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="forDay" attributeType="Integer 64" defaultValueString="0.0" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="instanceId" attributeType="Integer 64" usesScalarValueType="YES" syncable="YES"/>
         <relationship name="clientRecords" optional="YES" toMany="YES" deletionRule="Nullify" destinationEntity="CDClientRecord" inverseName="urlCounter" inverseEntity="CDClientRecord" syncable="YES"/>
         <relationship name="next" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="CDCounter" inverseName="previous" inverseEntity="CDCounter" syncable="YES"/>
         <relationship name="pathPart" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CDPathPart" inverseName="counterList" inverseEntity="CDPathPart" syncable="YES"/>
@@ -36,23 +36,23 @@
     </entity>
     <entity name="CDMutation" representedClassName=".CDMutation" syncable="YES">
         <attribute name="client" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="connectionAllocationCount" optional="YES" attributeType="Integer 32" syncable="YES"/>
-        <attribute name="connectionObjectId" optional="YES" attributeType="Integer 16" defaultValueString="0" syncable="YES"/>
+        <attribute name="connectionAllocationCount" optional="YES" attributeType="Integer 32" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="connectionObjectId" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="domain" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="doNotTrace" optional="YES" attributeType="Boolean" syncable="YES"/>
+        <attribute name="doNotTrace" optional="YES" attributeType="Boolean" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="httpResponseCode" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="kind" attributeType="Integer 16" syncable="YES"/>
-        <attribute name="requestCompleted" optional="YES" attributeType="Integer 64" syncable="YES"/>
-        <attribute name="requestReceived" optional="YES" attributeType="Integer 64" syncable="YES"/>
+        <attribute name="kind" attributeType="Integer 16" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="requestCompleted" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="requestReceived" optional="YES" attributeType="Integer 64" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="responseDetails" optional="YES" attributeType="String" syncable="YES"/>
-        <attribute name="socket" optional="YES" attributeType="Integer 32" syncable="YES"/>
+        <attribute name="socket" optional="YES" attributeType="Integer 32" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="url" optional="YES" attributeType="String" syncable="YES"/>
         <relationship name="next" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CDMutation" inverseName="previous" inverseEntity="CDMutation" syncable="YES"/>
         <relationship name="previous" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CDMutation" inverseName="next" inverseEntity="CDMutation" syncable="YES"/>
     </entity>
     <entity name="CDPathPart" representedClassName=".CDPathPart" syncable="YES">
-        <attribute name="doNotTrace" attributeType="Boolean" defaultValueString="NO" syncable="YES"/>
-        <attribute name="foreverCount" attributeType="Integer 64" defaultValueString="0" syncable="YES"/>
+        <attribute name="doNotTrace" attributeType="Boolean" defaultValueString="NO" usesScalarValueType="YES" syncable="YES"/>
+        <attribute name="foreverCount" attributeType="Integer 64" defaultValueString="0" usesScalarValueType="YES" syncable="YES"/>
         <attribute name="pathPart" attributeType="String" syncable="YES"/>
         <relationship name="counterList" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="CDCounter" inverseName="pathPart" inverseEntity="CDCounter" syncable="YES"/>
         <relationship name="domains" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CDDomains" inverseName="domains" inverseEntity="CDDomains" syncable="YES"/>
@@ -60,12 +60,12 @@
         <relationship name="previous" optional="YES" maxCount="1" deletionRule="Nullify" destinationEntity="CDPathPart" inverseName="next" inverseEntity="CDPathPart" syncable="YES"/>
     </entity>
     <elements>
-        <element name="CDClient" positionX="-720" positionY="-360" width="128" height="103"/>
-        <element name="CDClientRecord" positionX="-281" positionY="-486" width="128" height="208"/>
-        <element name="CDClients" positionX="-936" positionY="-360" width="128" height="58"/>
+        <element name="CDClient" positionX="-720" positionY="-360" width="128" height="105"/>
+        <element name="CDClientRecord" positionX="-281" positionY="-486" width="128" height="210"/>
+        <element name="CDClients" positionX="-936" positionY="-360" width="128" height="60"/>
         <element name="CDCounter" positionX="-504" positionY="-648" width="128" height="150"/>
-        <element name="CDDomains" positionX="-936" positionY="-643" width="128" height="58"/>
-        <element name="CDMutation" positionX="-936" positionY="-144" width="128" height="253"/>
-        <element name="CDPathPart" positionX="-720" positionY="-648" width="128" height="148"/>
+        <element name="CDDomains" positionX="-936" positionY="-643" width="128" height="60"/>
+        <element name="CDMutation" positionX="-936" positionY="-144" width="128" height="255"/>
+        <element name="CDPathPart" positionX="-720" positionY="-648" width="128" height="150"/>
     </elements>
 </model>

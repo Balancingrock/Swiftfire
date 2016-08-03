@@ -81,4 +81,66 @@ final class ReadServerTelemetryCommand {
         guard let jtelemetryItem = ServerTelemetryItem(rawValue: jname) else { return nil }
         telemetryItem = jtelemetryItem
     }
+    
+    
+    func execute() {
+        
+        switch telemetryItem {
+            
+            
+        case .NOF_ACCEPTED_HTTP_REQUESTS:
+            
+            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Reading, telemetry.nofAcceptedHttpRequests = \(serverTelemetry.nofAcceptedHttpRequests.intValue)")
+            
+            let reply = ReadServerTelemetryReply(item: telemetryItem, value: serverTelemetry.nofAcceptedHttpRequests.intValue)
+            
+            toConsole?.transferToConsole(message: reply.json.description)
+            
+            
+        case .NOF_ACCEPT_WAITS_FOR_CONNECTION_OBJECT:
+            
+            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Reading, telemetry.nofAcceptWaitsForConnectionObject = \(serverTelemetry.nofAcceptWaitsForConnectionObject.intValue)")
+            
+            let reply = ReadServerTelemetryReply(item: telemetryItem, value: serverTelemetry.nofAcceptWaitsForConnectionObject.intValue)
+            
+            toConsole?.transferToConsole(message: reply.json.description)
+            
+            
+        case .NOF_HTTP_400_REPLIES:
+            
+            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Reading, telemetry.nofHttp400Replies = \(serverTelemetry.nofHttp400Replies.intValue)")
+            
+            let reply = ReadServerTelemetryReply(item: telemetryItem, value: serverTelemetry.nofHttp400Replies.intValue)
+            
+            toConsole?.transferToConsole(message: reply.json.description)
+            
+        case .NOF_HTTP_502_REPLIES:
+            
+            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Reading, telemetry.nofHttp502Replies = \(serverTelemetry.nofHttp502Replies.intValue)")
+            
+            let reply = ReadServerTelemetryReply(item: telemetryItem, value: serverTelemetry.nofHttp502Replies.intValue)
+            
+            toConsole?.transferToConsole(message: reply.json.description)
+            
+            
+        case .SERVER_STATUS:
+            
+            let rs = httpServerIsRunning()
+            
+            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Reading, at_RunningStatus = \(rs)")
+            
+            let reply = ReadServerTelemetryReply(item: telemetryItem, value: (rs ? "Running" : "Not Running"))
+            
+            toConsole?.transferToConsole(message: reply.json.description)
+            
+            
+        case .SERVER_VERSION:
+            
+            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Reading, ap_Version = \(Parameters.version)")
+            
+            let reply = ReadServerTelemetryReply(item: telemetryItem, value: Parameters.version)
+            
+            toConsole?.transferToConsole(message: reply.json.description)
+        }
+    }
 }

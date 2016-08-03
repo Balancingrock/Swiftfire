@@ -62,6 +62,12 @@ private let COMMAND_NAME = "ServerStartCommand"
 
 final class ServerStartCommand {
     
+    
+    // The queue on which Swiftfire will accept client connection requests
+    
+    private static let acceptQueue: DispatchQueue = DispatchQueue(label: "Accept queue", attributes: [.serial, .qosUserInteractive])
+
+    
     var json: VJson {
         let j = VJson()
         j[COMMAND_NAME].nullValue = true
@@ -73,5 +79,49 @@ final class ServerStartCommand {
     init?(json: VJson?) {
         guard let json = json else { return nil }
         guard (json|COMMAND_NAME)?.nullValue == true else { return nil }
+    }
+    
+    func execute() {
+        
+        
+        // If the server is running, don't do anything
+        
+        if httpServerIsRunning() { return }
+        
+        
+        // Start the server
+        
+        do {
+            
+            // Reset available connections
+            
+            httpConnectionPool.create()
+            
+            
+            // Initialize the server
+            
+            let acceptSocket = try SwifterSockets.setupServerOrThrow(onPort: Parameters.httpServicePortNumber, maxPendingConnectionRequest: Parameters.maxNofPendingConnections)
+            
+            
+            // Start accepting connection requests
+            
+            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Starting Accept and Dispatch loop")
+            
+            ServerStartCommand.acceptQueue.async() {
+                acceptAndDispatch(socket: acceptSocket)
+                log.atLevelNotice(id: acceptSocket, source: #file.source(#function, #line), message: "Accept and Dispatch loop stopped")
+                SwifterSockets.closeSocket(acceptSocket)
+            }
+            
+        } catch let error as SwifterSockets.SetupServerException {
+            
+            log.atLevelError(id: -1, source: #file.source(#function, #line), message: error.description)
+            
+        } catch {
+            
+            log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Programming error")
+        }
+        
+        log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Completed")
     }
 }

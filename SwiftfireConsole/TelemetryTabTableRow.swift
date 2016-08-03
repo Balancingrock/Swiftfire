@@ -100,7 +100,7 @@ final class TelemetryTabTableRow: NSObject {
             return
         }
         
-        swiftfireMacInterface.sendMessages([command.json])
+        swiftfireMacInterface.sendMessages(messages: [command.json])
     }
     
     

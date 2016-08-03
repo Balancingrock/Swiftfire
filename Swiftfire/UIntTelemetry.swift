@@ -59,23 +59,25 @@ import Foundation
 
 class UIntTelemetry: NSObject, TelemetryProtocol {
     
+    static let syncQueue = DispatchQueue(label: "UIntTelemetry Sync Queue", attributes: [.serial, .qosUserInitiated])
+    
     private var value: UInt = 0
     
     override init() { super.init() }
     
     convenience init(initialValue: UInt) { self.init(); value = initialValue }
     
-    override var description: String { return synchronized(self, { [unowned self] in return self.value.description })}
+    override var description: String { return UIntTelemetry.syncQueue.sync(execute: { [unowned self] in return self.value.description })}
     
-    var stringValue: String { return synchronized(self, { [unowned self] in return self.value.description })}
+    var stringValue: String { return UIntTelemetry.syncQueue.sync(execute: { [unowned self] in return self.value.description })}
     
-    var intValue: Int { return synchronized(self, { [unowned self] in return Int(self.value) })}
+    var intValue: Int { return UIntTelemetry.syncQueue.sync(execute: { [unowned self] in return Int(self.value) })}
     
-    func initializeTo(newValue: UInt) { synchronized(self, { [unowned self] in self.value = newValue }) }
+    func initialize(to newValue: UInt) { UIntTelemetry.syncQueue.sync(execute: { [unowned self] in self.value = newValue }) }
     
-    func reinitialize() { synchronized(self, { [unowned self] in self.value = 0 })}
+    func reinitialize() { UIntTelemetry.syncQueue.sync(execute: { [unowned self] in self.value = 0 })}
     
-    func increment() { synchronized(self, { [unowned self] in if self.value < 999_999 { self.value += 1 } else { self.value = 0 }})}
+    func increment() { UIntTelemetry.syncQueue.sync(execute: { [unowned self] in if self.value < 999_999 { self.value += 1 } else { self.value = 0 }})}
     
-    func decrement() { synchronized(self, { [unowned self] in if self.value != 0 { self.value -= 1 }})}
+    func decrement() { UIntTelemetry.syncQueue.sync(execute: { [unowned self] in if self.value != 0 { self.value -= 1 }})}
 }

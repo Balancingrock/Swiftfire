@@ -60,11 +60,6 @@
 import Foundation
 
 
-// For logging purposes, identifies the module which created the logging entry.
-
-private let SOURCE = ((#file as NSString).lastPathComponent as NSString).stringByDeletingPathExtension
-
-
 // To allow buffer capture for transmissions
 
 private var bufferCapture: Int = 0
@@ -74,40 +69,38 @@ private var bufferCapture: Int = 0
 
 final class HttpConnection {
     
-    // Keep track of the object ID for correlation mapping between statistics and logfile (debug level)
+    
+    // A unique object id allows a correlation between statistics and the logfile (debug level)
+    
     static var objectIdCount: Int16 = 0
+    
     var objectId: Int16 = 0
+    
     init() {
         self.objectId = HttpConnection.objectIdCount
         HttpConnection.objectIdCount += 1
     }
     
     
-    /**
-     Any process that services a HTTP-Request must monitor this flag and close the connection (and terminate itself) when this flag is set to 'true'.
+    /// Any process that services a HTTP-Request must monitor this flag and close the connection (and terminate itself) when this flag is set to 'true'.
+    
+    /// This flag is used to achieve some kind of gracefull performance degradation in case of a system overload. An overload is characterized by an inability of Swiftfire to accept HTTP Connection requests in time (See AcceptConnectionRequests and the ap_MaxWaitForWaitingHttpConnections). When this condition arises the "abortProcessing" flag of the oldest connection will be set to 'true'. However nothing else will be done by AcceptConnectionRequests. The process that services the request must monitor this flag and terminate itself to free up this connection.
      
-     This flag is used to achieve some kind of gracefull performance degradation in case of a system overload. An overload is characterized by an inability of Swiftfire to accept HTTP Connection requests in time (See AcceptConnectionRequests and the ap_MaxWaitForWaitingHttpConnections). When this condition arises the "abortProcessing" flag of the oldest connection will be set to 'true'. However nothing else will be done by AcceptConnectionRequests. The process that services the request must monitor this flag and terminate itself to free up this connection.
-     
-     It is of course possible that under very heavy loads this may result in an inability to complete any request. For now that is deemed acceptable, but this must be evaluated in a future release for improvement. ***I*** (1)
-     */
+    /// It is of course possible that under very heavy loads this may result in an inability to complete any request. For now that is deemed acceptable, but this must be evaluated in a future release for improvement. ***I*** (1)
     
     var abortProcessing = false
     
     
-    /**
-     The socket descriptor to use for sending and receiving. Once the connection is closed, the socket is set to nil.
-     
-     By default a connection is kept open until either the client closes it or the time out as specified in ap_HttpKeepAliveInactivityTimeout expires.
-     
-     This value is set when the client connection is accepted in AcceptAndDispatch. It is read and set to nil during either ReceiveAndDispatch or ProcessHttpMessage.
-     */
+    /// The socket descriptor to use for sending and receiving. Once the connection is closed, the socket is set to nil.
+    
+    /// By default a connection is kept open until either the client closes it or the time out as specified in ap_HttpKeepAliveInactivityTimeout expires.
+    
+    /// This value is set when the client connection is accepted in AcceptAndDispatch. It is read and set to nil during either ReceiveAndDispatch or ProcessHttpMessage.
     
     var socket: Int32?
     
     
-    /**
-     The ID to be used when logging. It is normally set to the socket id, but when the socket ID is no longer available it defaults to -1.
-     */
+    /// The ID to be used when logging. It is normally set to the socket id, but when the socket ID is no longer available it defaults to -1.
     
     var logId: Int32 { return socket ?? -1 }
     
@@ -133,29 +126,24 @@ final class HttpConnection {
     var timeOfAccept: NSDate = NSDate()
     
     
-    /// Accessor for the first message completeness
-    
-    var firstMessageIsComplete: Bool { return messageBuffer.firstMessageIsComplete }
-    
-    
     /// The dispatch queue on wich the connections receive data from the client
     
-    let receiverQueue = dispatch_queue_create("Receiver", DISPATCH_QUEUE_SERIAL)
+    let receiverQueue = DispatchQueue(label: "Receiver", attributes: [.concurrent, .qosUserInitiated])
     
     
     /// The dispatch queue on which connections transmit data to the client
 
-    let transmitterQueue = dispatch_queue_create("Transmitter", DISPATCH_QUEUE_SERIAL)
+    let transmitterQueue = DispatchQueue(label: "Transmitter", attributes: [.serial, .qosUserInitiated])
 
     
     /// The dispatch queue on which connections process the data from the client
     
-    let workerQueue = dispatch_queue_create("Worker", DISPATCH_QUEUE_SERIAL)
+    let workerQueue = DispatchQueue(label: "Worker", attributes: [.serial, .qosUserInitiated])
     
     
     /// The file manager to be used for this connection object
     
-    let filemanager = NSFileManager()
+    let filemanager = FileManager()
     
     
     /// The size of the send buffer at OS level, set during socket accept
@@ -174,7 +162,7 @@ final class HttpConnection {
 
     /// The data received from a client.
 
-    var messageBuffer = HttpMessageBuffer(sizeInBytes: Parameters.asInt(ParameterId.CLIENT_MESSAGE_BUFFER_SIZE))
+    var messageBuffer = Data()
 
     
     // MARK: - For the forwarding function
@@ -187,7 +175,7 @@ final class HttpConnection {
     
     // The queue on which received replies will be send to our client
     
-    var forwardingReceiverQueue = dispatch_queue_create("ForwardingReceiverQueue", DISPATCH_QUEUE_SERIAL)
+    var forwardingReceiverQueue = DispatchQueue(label: "ForwardingReceiverQueue", attributes: [.serial, .qosUtility])
 
 }
 
@@ -203,9 +191,9 @@ extension HttpConnection {
      - Returns: true if the transfer was successful, false if not.
      */
 
-    func transferToClient(buffer: UInt8Buffer) {
+    func transferToClient(data: Data) {
         
-        guard buffer.fill > 0 else { return }
+        guard data.count > 0 else { return }
 
         guard let socket = self.socket else {
             log.atLevelError(id: logId, source: #file.source(#function, #line), message: "Socket already closed")
@@ -213,10 +201,10 @@ extension HttpConnection {
         }
         
         SwifterSockets.transmitAsync(
-            transmitterQueue,
-            socket: socket,
-            buffer: buffer.ptr,
-            timeout: Double(Parameters.asInt(ParameterId.HTTP_RESPONSE_CLIENT_TIMEOUT)),
+            onQueue: transmitterQueue,
+            toSocket: socket,
+            data: data,
+            timeout: Double(Parameters.httpResponseClientTimeout),
             telemetry: nil,
             postProcessor: {
                 
@@ -229,30 +217,30 @@ extension HttpConnection {
                 
                 switch result {
                 
-                case .READY:
+                case .ready:
                     
                     log.atLevelDebug(id: socket, source: "HttpConnection.transferToClient", message: "Transferred \(telemetry.bytesTransferred ?? -1) bytes"); break
                 
                     
-                case .SERVER_CLOSED:
+                case .serverClosed:
                     
                     log.atLevelDebug(id: socket, source: "HttpConnection.transferToClient", message: "Connection was closed by server"); break
 
                     
-                case .CLIENT_CLOSED:
+                case .clientClosed:
                     
                     log.atLevelDebug(id: socket, source: "HttpConnection.transferToClient", message: "Connection was closed by client"); break
 
                 
-                case .TIMEOUT:
+                case .timeout:
                     
                     log.atLevelError(id: socket, source: #file.source(#function, #line), message: "Timeout transmitting reply")
                 
                     
-                case let .ERROR(msg):
+                case let .error(msg):
                     
                     log.atLevelError(id: socket, source: #file.source(#function, #line), message: msg)
-                    bufferCapture = buffer.fill // Dummy assignment to enforce buffer capture
+                    bufferCapture = data.count // Dummy assignment to enforce buffer capture
                 }
         })
     }
@@ -260,11 +248,11 @@ extension HttpConnection {
     
     /// Close the connection and free this connection object.
     
-    func closeConnection() {
+    func close() {
         
         // To prevent closing a connection while there is a transmission going on, push the closing on the transmitter queue
         
-        dispatch_async(transmitterQueue,  {
+        transmitterQueue.async {
             
             [unowned self] in
             
@@ -286,9 +274,9 @@ extension HttpConnection {
             // Record the duration
             
             let now = NSDate()
-            let duration = now.timeIntervalSinceDate(self.timeOfAccept)
+            let duration = now.timeIntervalSince(self.timeOfAccept as Date)
             let message = "Duration from accept to close: \(duration * 1000.0) mSec"
-            log.atLevelInfo(id: id, source: SOURCE + ".closeConnection", message: message)
+            log.atLevelInfo(id: id, source: #file.source(#function, #line), message: message)
             
             
             // Close a potential forwarding socket
@@ -299,7 +287,7 @@ extension HttpConnection {
             
             // Clean out old stuff so a new client can use this object
             
-            self.messageBuffer = HttpMessageBuffer(sizeInBytes: Parameters.asInt(ParameterId.CLIENT_MESSAGE_BUFFER_SIZE))
+            self.messageBuffer = Data()
             self.httpHeader = nil
             self.maxSendBufferSize = nil
             self.abortProcessing = false
@@ -307,8 +295,8 @@ extension HttpConnection {
             
             // Free this connection object
             
-            httpConnectionPool.free(self)
-        })
+            httpConnectionPool.free(connection: self)
+        }
     }
 }
 
@@ -328,7 +316,7 @@ extension HttpConnection {
      - Note: If the message contains characters that cannot be converted to an UTF8 string, then the response will not contain any visible data.
      */
     
-    func httpErrorResponseWithCode(code: HttpResponseCode, andMessage message: String? = nil) -> UInt8Buffer {
+    func httpErrorResponse(withCode code: HttpResponseCode, andMessage message: String? = nil) -> Data {
         
         let message = message ?? "HTTP Request rejected with: \(code.rawValue)"
         
@@ -337,9 +325,9 @@ extension HttpConnection {
                 "<html><head><title>\(code.rawValue)</title></head>" + CRLF +
                 "<body>\(message)</body></html>" + CRLF
         
-        let bodyData = body.dataUsingEncoding(NSUTF8StringEncoding, allowLossyConversion: true) ?? NSData()
+        let bodyData = body.data(using: String.Encoding.utf8, allowLossyConversion: true) ?? Data()
         
-        let response = httpResponseWithCode(code, mimeType: MIME_TYPE_HTML, andBody: bodyData)
+        let response = httpResponse(withCode: code, mimeType: mimeTypeHtml, andBody: bodyData)
         
         return response
     }
@@ -354,16 +342,17 @@ extension HttpConnection {
      - Return: A buffer with the response.
      */
     
-    func httpResponseWithCode(code: HttpResponseCode, mimeType: String, andBody body: NSData) -> UInt8Buffer {
+    func httpResponse(withCode code: HttpResponseCode, mimeType: String, andBody body: Data) -> Data {
         
         let header = "HTTP/1.1 " + code.rawValue + CRLF +
-            "Date: \(NSDate())" + CRLF +
+            "Date: \(Date())" + CRLF +
             "Server: Swiftfire/\(Parameters.version)" + CRLF +
             "Content-Type: \(mimeType); charset=UTF-8" + CRLF +
-            "Content-Length: \(body.length)" + CRLFCRLF
+            "Content-Length: \(body.count)" + CRLFCRLF
         
-        let headerData = header.dataUsingEncoding(NSUTF8StringEncoding)
+        var headerData = header.data(using: String.Encoding.utf8)!
+        headerData.append(body)
         
-        return UInt8Buffer(buffers: headerData, body)
+        return headerData
     }
 }

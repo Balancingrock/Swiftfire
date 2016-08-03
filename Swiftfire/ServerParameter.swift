@@ -62,57 +62,57 @@ import Foundation
 
 enum ServerParameter: String {
     
-    case SERVICE_PORT_NUMBER = "ServicePortNumber"
-    case MAX_NOF_ACCEPTED_CONNECTIONS = "MaxNofAcceptedConnections"
-    case MAX_NOF_PENDING_CONNECTIONS = "MaxNofPendingConnections"
-    case MAX_WAIT_FOR_PENDING_CONNECTIONS = "MaxWaitForPendingConnections"
-    case CLIENT_MESSAGE_BUFFER_SIZE = "ClientMessageBufferSize"
-    case HTTP_KEEP_ALIVE_INACTIVITY_TIMEOUT = "HttpKeepAliveInactivityTimeout"
-    case HTTP_RESPONSE_CLIENT_TIMEOUT = "HttpResponseClientTimeout"
-    case DEBUG_MODE = "DebugMode"
-    case ASL_FACILITY_RECORD_AT_AND_ABOVE_LEVEL = "AslLogLevel"
-    case STDOUT_PRINT_AT_AND_ABOVE_LEVEL = "StdoutLogLevel"
-    case FILE_RECORD_AT_AND_ABOVE_LEVEL = "FileLogLevel"
-    case CALLBACK_AT_AND_ABOVE_LEVEL = "CallbackLogLevel"
-    case NETWORK_TRANSMIT_AT_AND_ABOVE_LEVEL = "NetworkLogLevel"
-    case NETWORK_LOGTARGET_IP_ADDRESS = "NetworkLogTargetAddress"
-    case NETWORK_LOGTARGET_PORT_NUMBER = "NetworkLogTargetPort"
-    case AUTO_STARTUP = "AutoStartup"
-    case MAC_PORT_NUMBER = "MonitoringAndControlPortNumber"
-    case MAC_INACTIVITY_TIMEOUT = "MacInactivityTimeout"
-    case LOGFILE_MAX_NOF_FILES = "LogfileMaxNofFiles"
-    case LOGFILE_MAX_SIZE = "LogfileMaxSize"
+    case servicePortNumber = "ServicePortNumber"
+    case maxNumberOfAcceptedConnections = "MaxNofAcceptedConnections"
+    case maxNumberOfPendingConnections = "MaxNofPendingConnections"
+    case maxWaitForPendingConnections = "MaxWaitForPendingConnections"
+    case clienMessageBufferSize = "ClientMessageBufferSize"
+    case httpKeepAliveInactivityTimeout = "HttpKeepAliveInactivityTimeout"
+    case httpResponseClientTimeout = "HttpResponseClientTimeout"
+    case debugMode = "DebugMode"
+    case aslFacilityRecordAtAndAboveLevel = "AslLogLevel"
+    case stdoutPrintAtAndAboveLevel = "StdoutLogLevel"
+    case fileRecordAtAndAboveLevel = "FileLogLevel"
+    case callbackAtAndAboveLevel = "CallbackLogLevel"
+    case networkTransmitAtAndAboveLevel = "NetworkLogLevel"
+    case networkLogtargetIpAddress = "NetworkLogTargetAddress"
+    case networkLogtargetPortNumber = "NetworkLogTargetPort"
+    case autoStartup = "AutoStartup"
+    case macPortNumber = "MonitoringAndControlPortNumber"
+    case macInactivityTimeout = "MacInactivityTimeout"
+    case logfileMaxNofFiles = "LogfileMaxNofFiles"
+    case logfileMaxSize = "LogfileMaxSize"
 
-    case HEADER_LOGGING_ENABLED = "HeaderLoggingEnabled"
-    case MAX_FILE_SIZE_FOR_HEADER_LOGGING = "MaxFileSizeForHeaderLogging"
-    case FLUSH_HEADER_LOGFILE_AFTER_EACH_WRITE = "FlushHeaderLogfileAfterEachWrite"
+    case headerLoggingEnabled = "HeaderLoggingEnabled"
+    case maxFileSizeForHeaderLogging = "MaxFileSizeForHeaderLogging"
+    case flushHeaderLogfileAfterEachWrite = "FlushHeaderLogfileAfterEachWrite"
 
     var guiLabel: String {
         switch self {
-        case .SERVICE_PORT_NUMBER: return "HTTP Service Port Number (usually: 80)"
-        case .MAX_NOF_ACCEPTED_CONNECTIONS: return "Maximum Number of Client Connections in Parallel"
-        case .MAX_NOF_PENDING_CONNECTIONS: return "Maximum Number of Pending Client Connections"
-        case .MAX_WAIT_FOR_PENDING_CONNECTIONS: return "Maximum Wait for Pending Client Connections"
-        case .CLIENT_MESSAGE_BUFFER_SIZE: return "Size of the Client Message Buffer in Bytes"
-        case .HTTP_KEEP_ALIVE_INACTIVITY_TIMEOUT: return "Inactivity Timeout for accepted connections with 'keep-alive' set to 'true'"
-        case .HTTP_RESPONSE_CLIENT_TIMEOUT: return "Timeout for a client to accept a response"
-        case .DEBUG_MODE: return "Enable more Debug Information to be Logged"
-        case .ASL_FACILITY_RECORD_AT_AND_ABOVE_LEVEL: return "Send Logging at this -and above- level to the ASL Facility"
-        case .STDOUT_PRINT_AT_AND_ABOVE_LEVEL: return "Send Logging at this -and above- level to stdout (console)"
-        case .FILE_RECORD_AT_AND_ABOVE_LEVEL: return "Send Logging at this -and above- level to the Logfiles"
-        case .NETWORK_TRANSMIT_AT_AND_ABOVE_LEVEL: return "Send Logging at this -and above- level to a Network Target"
-        case .CALLBACK_AT_AND_ABOVE_LEVEL: return "Send Logging at this -and above- level to the Callback Targets"
-        case .NETWORK_LOGTARGET_IP_ADDRESS: return "The Network Target IP Address for Logging"
-        case .NETWORK_LOGTARGET_PORT_NUMBER: return "The Network Target Port for logging"
-        case .AUTO_STARTUP: return "Goto 'Running' on application start"
-        case .MAC_PORT_NUMBER: return "Number of M&C port (on next start, if saved)"
-        case .MAC_INACTIVITY_TIMEOUT: return "Close M&C connection after it was inactive for this long"
-        case .LOGFILE_MAX_NOF_FILES: return "Maximum number of logfiles"
-        case .LOGFILE_MAX_SIZE: return "Maximum size of a logfile"
+        case .servicePortNumber: return "HTTP Service Port Number (usually: 80)"
+        case .maxNumberOfAcceptedConnections: return "Maximum Number of Client Connections in Parallel"
+        case .maxNumberOfPendingConnections: return "Maximum Number of Pending Client Connections"
+        case .maxWaitForPendingConnections: return "Maximum Wait for Pending Client Connections"
+        case .clienMessageBufferSize: return "Size of the Client Message Buffer in Bytes"
+        case .httpKeepAliveInactivityTimeout: return "Inactivity Timeout for accepted connections with 'keep-alive' set to 'true'"
+        case .httpResponseClientTimeout: return "Timeout for a client to accept a response"
+        case .debugMode: return "Enable more Debug Information to be Logged"
+        case .aslFacilityRecordAtAndAboveLevel: return "Send Logging at this -and above- level to the ASL Facility"
+        case .stdoutPrintAtAndAboveLevel: return "Send Logging at this -and above- level to stdout (console)"
+        case .fileRecordAtAndAboveLevel: return "Send Logging at this -and above- level to the Logfiles"
+        case .networkTransmitAtAndAboveLevel: return "Send Logging at this -and above- level to a Network Target"
+        case .callbackAtAndAboveLevel: return "Send Logging at this -and above- level to the Callback Targets"
+        case .networkLogtargetIpAddress: return "The Network Target IP Address for Logging"
+        case .networkLogtargetPortNumber: return "The Network Target Port for logging"
+        case .autoStartup: return "Goto 'Running' on application start"
+        case .macPortNumber: return "Number of M&C port (on next start, if saved)"
+        case .macInactivityTimeout: return "Close M&C connection after it was inactive for this long"
+        case .logfileMaxNofFiles: return "Maximum number of logfiles"
+        case .logfileMaxSize: return "Maximum size of a logfile"
             
-        case HEADER_LOGGING_ENABLED: return "Enables logging of the full HTTP header"
-        case MAX_FILE_SIZE_FOR_HEADER_LOGGING: return "Maximum File Size of a Header Logfile"
-        case FLUSH_HEADER_LOGFILE_AFTER_EACH_WRITE: return "Forces a file-write after each received HTTP header"
+        case .headerLoggingEnabled: return "Enables logging of the full HTTP header"
+        case .maxFileSizeForHeaderLogging: return "Maximum File Size of a Header Logfile"
+        case .flushHeaderLogfileAfterEachWrite: return "Forces a file-write after each received HTTP header"
         }
     }
 
@@ -122,24 +122,24 @@ enum ServerParameter: String {
         
         switch self {
             
-        case .SERVICE_PORT_NUMBER,
-             .NETWORK_LOGTARGET_IP_ADDRESS,
-             .NETWORK_LOGTARGET_PORT_NUMBER,
-             .MAC_PORT_NUMBER:
+        case .servicePortNumber,
+             .networkLogtargetIpAddress,
+             .networkLogtargetPortNumber,
+             .macPortNumber:
             
             return nil
             
             
-        case .MAX_NOF_ACCEPTED_CONNECTIONS,
-             .MAX_NOF_PENDING_CONNECTIONS,
-             .MAX_WAIT_FOR_PENDING_CONNECTIONS,
-             .CLIENT_MESSAGE_BUFFER_SIZE,
-             .HTTP_KEEP_ALIVE_INACTIVITY_TIMEOUT,
-             .LOGFILE_MAX_NOF_FILES,
-             .LOGFILE_MAX_SIZE,
-             .MAX_FILE_SIZE_FOR_HEADER_LOGGING,
-             .HTTP_RESPONSE_CLIENT_TIMEOUT,
-             .MAC_INACTIVITY_TIMEOUT:
+        case .maxNumberOfAcceptedConnections,
+             .maxNumberOfPendingConnections,
+             .maxWaitForPendingConnections,
+             .clienMessageBufferSize,
+             .httpKeepAliveInactivityTimeout,
+             .logfileMaxNofFiles,
+             .logfileMaxSize,
+             .maxFileSizeForHeaderLogging,
+             .httpResponseClientTimeout,
+             .macInactivityTimeout:
             
             if let iv = Int(v) {
                 if v == iv.description { return nil }
@@ -149,11 +149,11 @@ enum ServerParameter: String {
             }
             
             
-        case .ASL_FACILITY_RECORD_AT_AND_ABOVE_LEVEL,
-             .STDOUT_PRINT_AT_AND_ABOVE_LEVEL,
-             .FILE_RECORD_AT_AND_ABOVE_LEVEL,
-             .CALLBACK_AT_AND_ABOVE_LEVEL,
-             .NETWORK_TRANSMIT_AT_AND_ABOVE_LEVEL:
+        case .aslFacilityRecordAtAndAboveLevel,
+             .stdoutPrintAtAndAboveLevel,
+             .fileRecordAtAndAboveLevel,
+             .callbackAtAndAboveLevel,
+             .networkTransmitAtAndAboveLevel:
             
             if let iv = Int(v) {
                 if v != iv.description { return "Invalid characters in integer" }
@@ -164,10 +164,10 @@ enum ServerParameter: String {
             }
             
             
-        case .DEBUG_MODE,
-             .AUTO_STARTUP,
-             .HEADER_LOGGING_ENABLED,
-             .FLUSH_HEADER_LOGFILE_AFTER_EACH_WRITE:
+        case .debugMode,
+             .autoStartup,
+             .headerLoggingEnabled,
+             .flushHeaderLogfileAfterEachWrite:
             
             if let _ = Bool(v) {
                 return nil
@@ -177,5 +177,5 @@ enum ServerParameter: String {
         }
     }
 
-    static let all: Array<ServerParameter> = [.SERVICE_PORT_NUMBER, .MAX_NOF_ACCEPTED_CONNECTIONS, .MAX_NOF_PENDING_CONNECTIONS, .MAX_WAIT_FOR_PENDING_CONNECTIONS, .CLIENT_MESSAGE_BUFFER_SIZE, .HTTP_KEEP_ALIVE_INACTIVITY_TIMEOUT, .HTTP_RESPONSE_CLIENT_TIMEOUT, .DEBUG_MODE, .ASL_FACILITY_RECORD_AT_AND_ABOVE_LEVEL, .STDOUT_PRINT_AT_AND_ABOVE_LEVEL, .FILE_RECORD_AT_AND_ABOVE_LEVEL, .CALLBACK_AT_AND_ABOVE_LEVEL, .NETWORK_TRANSMIT_AT_AND_ABOVE_LEVEL, .NETWORK_LOGTARGET_IP_ADDRESS, .NETWORK_LOGTARGET_PORT_NUMBER, .AUTO_STARTUP, .MAC_PORT_NUMBER, .MAC_INACTIVITY_TIMEOUT, .LOGFILE_MAX_SIZE, .LOGFILE_MAX_NOF_FILES, .MAX_FILE_SIZE_FOR_HEADER_LOGGING, .HEADER_LOGGING_ENABLED, .FLUSH_HEADER_LOGFILE_AFTER_EACH_WRITE]
+    static let all: Array<ServerParameter> = [.servicePortNumber, .maxNumberOfAcceptedConnections, .maxNumberOfPendingConnections, .maxWaitForPendingConnections, .clienMessageBufferSize, .httpKeepAliveInactivityTimeout, .httpResponseClientTimeout, .debugMode, .aslFacilityRecordAtAndAboveLevel, .stdoutPrintAtAndAboveLevel, .fileRecordAtAndAboveLevel, .callbackAtAndAboveLevel, .networkTransmitAtAndAboveLevel, .networkLogtargetIpAddress, .networkLogtargetPortNumber, .autoStartup, .macPortNumber, .macInactivityTimeout, .logfileMaxSize, .logfileMaxNofFiles, .maxFileSizeForHeaderLogging, .headerLoggingEnabled, .flushHeaderLogfileAfterEachWrite]
 }
