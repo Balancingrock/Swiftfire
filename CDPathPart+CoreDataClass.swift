@@ -3,7 +3,7 @@
 //  File:       CDPathPart+CoreDataClass.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.12
+//  Version:    0.9.13
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,6 +49,7 @@
 //
 // History
 //
+// v0.9.13 - Upgraded to Swift 3 beta
 // v0.9.12 - Added manipulation of doNotTrace
 //         - Changed CDCounter startDate to Int64 (javaDate)
 //         - Added "fullUrl" and "showChart"
@@ -166,8 +167,10 @@ class CDPathPart: NSManagedObject {
             log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "New value for doNotTrace \(newValue), transmitting to Swiftfire")
             
             var url: NSString = pathPart!
-            while let pp = previous {
-                url = (pp.pathPart! as NSString).appendingPathComponent(url as String)
+            var pp = previous
+            while pp != nil {
+                url = (pp!.pathPart! as NSString).appendingPathComponent(url as String)
+                pp = pp!.previous
             }
             let command = UpdatePathPartCommand(url: url as String, newValue: newValue.boolValue)
             

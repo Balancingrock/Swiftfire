@@ -3,7 +3,7 @@
 //  File:       Parameters.swift
 //  Project:    Swiftfire
 //
-private let VERSION = "0.9.13b1"
+private let VERSION = "0.9.13"
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl

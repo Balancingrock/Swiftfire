@@ -3,7 +3,7 @@
 //  File:       AppDelegate.swift
 //  Project:    SwiftfireConsole
 //
-//  Version:    0.9.12
+//  Version:    0.9.13
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -29,7 +29,7 @@
 //   - You can send payment via paypal to: sales@balancingrock.nl
 //   - Or wire bitcoins to: 1GacSREBxPy1yskLMc9de2nofNv2SNdwqH
 //
-//  I prefer the above two, but if these options don't suit you, you can also send me a gift from my amazon.co.uk
+//  I prefer the above two, but if these options don't suit you, you may also send me a gift from my amazon.co.uk
 //  whishlist: http://www.amazon.co.uk/gp/registry/wishlist/34GNMPZKAQ0OO/ref=cm_sw_em_r_wsl_cE3Tub013CKN6_wb
 //
 //  If you like to pay in another way, please contact me at rien@balancingrock.nl
@@ -49,6 +49,7 @@
 //
 // History
 //
+// v0.9.13 - Upgraded to Swift 3 beta
 // v0.9.12 - Added initialization of the statisticsWindowController in the statistics object.
 //         - Added conformance to GuiRequest protocol
 //         - Moved testcontent generation to Statistics

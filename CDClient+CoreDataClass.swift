@@ -3,7 +3,7 @@
 //  File:       CDClient+CoreDataClass.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.12
+//  Version:    0.9.13
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,6 +49,7 @@
 //
 // History
 //
+// v0.9.13 - Upgraded to Swift 3 beta
 // v0.9.12 - Added manipulation of doNotTrace
 // v0.9.11 - Initial release
 // =====================================================================================================================
@@ -87,13 +88,13 @@ class CDClient: NSManagedObject {
     var firstAccessString: String {
         let fd = Date.fromJavaDate(value: firstAccess)
         let dc = Calendar.current.components(Calendar.Unit(arrayLiteral: .year, .month, .day, .hour, .minute, .second), from: fd)
-        return "\(dc.year)-\(dc.month)-\(dc.day) \(dc.hour):\(dc.minute):\(dc.second)"
+        return "\(dc.year!)-\(dc.month!)-\(dc.day!) \(dc.hour!):\(dc.minute!):\(dc.second!)"
     }
     
     var lastAccessString: String {
         let fd = Date.fromJavaDate(value: lastAccess)
         let dc = Calendar.current.components(Calendar.Unit(arrayLiteral: .year, .month, .day, .hour, .minute, .second), from: fd)
-        return "\(dc.year)-\(dc.month)-\(dc.day) \(dc.hour):\(dc.minute):\(dc.second)"
+        return "\(dc.year!)-\(dc.month!)-\(dc.day!) \(dc.hour!):\(dc.minute!):\(dc.second!)"
     }
     
     var json: VJson {
@@ -140,9 +141,9 @@ class CDClient: NSManagedObject {
         return new
     }
     
-    var _doNotTrace: Bool {
+    var _doNotTrace: NSNumber {
         get {
-            return doNotTrace
+            return NSNumber(value: doNotTrace)
         }
         set {
             log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "New value for doNotTrace \(newValue), transmitting to Swiftfire")

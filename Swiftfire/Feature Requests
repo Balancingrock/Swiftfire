@@ -25,11 +25,14 @@ Before redirecting (See FR-0001) each domainshould have it own custom redirect p
 Disallows directory access, but implement a list -per domain- that allows some directories to be accessed. I.e. if a user requests a directory listing this should be disallowed by default, unless the directory is listed in the list of allowed directories.
 
 
-0006: IP Address logging
-
-Maintain a list that shows which IP address acessed which URL how often and when.
+0006: IP Address logging (done)
 
 
 0007: IP Address blacklist
 
 Disallow specified IP addresses from accessing any content at all.
+
+
+0008: Support HTTP 1.0
+
+HTTP 1.0 seems to be used to fetch the "robots.txt" file.

@@ -3,7 +3,7 @@
 //  File:       Four04Log.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.9
+//  Version:    0.9.13
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,10 +49,11 @@
 //
 // History
 //
-// v0.9.9 - Renamed FileLog to Logfile.
-//        - Lowered maxsize of file to 1MB
-//        - Fixed bug where a 404 URL would occur more than once and missing line breaks in the logfile
-// v0.9.7 - Initial release
+// v0.9.13 - Upgraded to Swift 3 beta
+// v0.9.9  - Renamed FileLog to Logfile.
+//         - Lowered maxsize of file to 1MB
+//         - Fixed bug where a 404 URL would occur more than once and missing line breaks in the logfile
+// v0.9.7  - Initial release
 // =====================================================================================================================
 
 import Foundation

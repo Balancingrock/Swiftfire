@@ -3,7 +3,7 @@
 //  File:       ReadServerTelemetryCommand.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.11
+//  Version:    0.9.13
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,6 +49,7 @@
 //
 // History
 //
+// v0.9.13 - Upgraded to Swift 3 beta
 // v0.9.11 - Updated for VJson 0.9.8
 // v0.9.6  - Header update
 // v0.9.4  - Initial release (replaces part of MacDef.swift)
@@ -88,7 +89,7 @@ final class ReadServerTelemetryCommand {
         switch telemetryItem {
             
             
-        case .NOF_ACCEPTED_HTTP_REQUESTS:
+        case .nofAcceptedHttpRequests:
             
             log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Reading, telemetry.nofAcceptedHttpRequests = \(serverTelemetry.nofAcceptedHttpRequests.intValue)")
             
@@ -97,7 +98,7 @@ final class ReadServerTelemetryCommand {
             toConsole?.transferToConsole(message: reply.json.description)
             
             
-        case .NOF_ACCEPT_WAITS_FOR_CONNECTION_OBJECT:
+        case .nofAcceptWaitsForConnectionObject:
             
             log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Reading, telemetry.nofAcceptWaitsForConnectionObject = \(serverTelemetry.nofAcceptWaitsForConnectionObject.intValue)")
             
@@ -106,7 +107,7 @@ final class ReadServerTelemetryCommand {
             toConsole?.transferToConsole(message: reply.json.description)
             
             
-        case .NOF_HTTP_400_REPLIES:
+        case .nofHttp400Replies:
             
             log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Reading, telemetry.nofHttp400Replies = \(serverTelemetry.nofHttp400Replies.intValue)")
             
@@ -114,7 +115,7 @@ final class ReadServerTelemetryCommand {
             
             toConsole?.transferToConsole(message: reply.json.description)
             
-        case .NOF_HTTP_502_REPLIES:
+        case .nofHttp502Replies:
             
             log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Reading, telemetry.nofHttp502Replies = \(serverTelemetry.nofHttp502Replies.intValue)")
             
@@ -123,7 +124,7 @@ final class ReadServerTelemetryCommand {
             toConsole?.transferToConsole(message: reply.json.description)
             
             
-        case .SERVER_STATUS:
+        case .serverStatus:
             
             let rs = httpServerIsRunning()
             
@@ -134,7 +135,7 @@ final class ReadServerTelemetryCommand {
             toConsole?.transferToConsole(message: reply.json.description)
             
             
-        case .SERVER_VERSION:
+        case .serverVersion:
             
             log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Reading, ap_Version = \(Parameters.version)")
             

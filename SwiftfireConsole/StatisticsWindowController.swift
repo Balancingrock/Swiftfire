@@ -3,7 +3,7 @@
 //  File:       StatisticsWindowController.swift
 //  Project:    SwiftfireConsole
 //
-//  Version:    0.9.12
+//  Version:    0.9.13
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -29,7 +29,7 @@
 //   - You can send payment via paypal to: sales@balancingrock.nl
 //   - Or wire bitcoins to: 1GacSREBxPy1yskLMc9de2nofNv2SNdwqH
 //
-//  I prefer the above two, but if these options don't suit you, you can also send me a gift from my amazon.co.uk
+//  I prefer the above two, but if these options don't suit you, you may also send me a gift from my amazon.co.uk
 //  whishlist: http://www.amazon.co.uk/gp/registry/wishlist/34GNMPZKAQ0OO/ref=cm_sw_em_r_wsl_cE3Tub013CKN6_wb
 //
 //  If you like to pay in another way, please contact me at rien@balancingrock.nl
@@ -49,6 +49,7 @@
 //
 // History
 //
+// v0.9.13 - Upgraded to Swift 3 beta
 // v0.9.12 - Added time-boxing for domains tab
 // v0.9.11 - Initial release
 // =====================================================================================================================
@@ -84,8 +85,8 @@ class StatisticsWindowController: NSWindowController {
     // Recalculates the count value for the time period between the dates.
     
     func recalculateCountValue() {
-        let startDate = startDatePicker.dateValue.javaDate
-        let endDate = endDatePicker.dateValue.javaDate + 24*60*60*1000 // The end date is inclusive, thus the cutoff should be the day after the day in the endDatePicker
+        let startDate = startDatePicker.dateValue.javaDateBeginOfDay
+        let endDate = endDatePicker.dateValue.javaDateBeginOfTomorrow // The end date is inclusive, thus the cutoff should be the day after the day in the endDatePicker
         for pp in statistics.cdDomains.domains?.allObjects as! [CDPathPart] {
             pp.recalculateCount(from: startDate, to: endDate)
         }
@@ -96,9 +97,9 @@ class StatisticsWindowController: NSWindowController {
     
     override func awakeFromNib() {
         super.awakeFromNib()
-        let today = Calendar.current.startOfDay(for: NSDate() as Date)
-        let sometimeago = Calendar.current.date(byAdding: Calendar.Unit.month, value: -1, to: today, options: Calendar.Options.matchNextTime)
-        startDatePicker.dateValue = sometimeago!
+        let today = Calendar.current.startOfDay(for: Date())
+        let aMonthAgo = Calendar.current.date(byAdding: Calendar.Unit.month, value: -1, to: today, options: Calendar.Options.matchNextTime)
+        startDatePicker.dateValue = aMonthAgo!
         endDatePicker.dateValue = today
         recalculateCountValue()
     }    

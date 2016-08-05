@@ -760,7 +760,7 @@
         <window title="SwiftfireConsole" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" releasedWhenClosed="NO" animationBehavior="default" id="QvC-M9-y7g">
             <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
             <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
-            <rect key="contentRect" x="243" y="93" width="931" height="765"/>
+            <rect key="contentRect" x="50" y="50" width="931" height="765"/>
             <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1577"/>
             <view key="contentView" id="EiT-Mj-1SZ">
                 <rect key="frame" x="0.0" y="0.0" width="931" height="765"/>
@@ -1847,6 +1847,7 @@
                     <constraint firstItem="hGY-Zx-jVf" firstAttribute="top" secondItem="EiT-Mj-1SZ" secondAttribute="top" constant="20" id="G5M-24-VCV"/>
                     <constraint firstItem="nbY-q9-BwB" firstAttribute="top" secondItem="hGY-Zx-jVf" secondAttribute="bottom" constant="8" id="QHO-kg-GB3"/>
                     <constraint firstAttribute="bottom" secondItem="nbY-q9-BwB" secondAttribute="bottom" id="YlH-rh-nbJ"/>
+                    <constraint firstAttribute="trailing" secondItem="hGY-Zx-jVf" secondAttribute="trailing" constant="20" id="cAe-fa-lDN"/>
                     <constraint firstItem="hGY-Zx-jVf" firstAttribute="leading" secondItem="EiT-Mj-1SZ" secondAttribute="leading" constant="20" id="j3D-ag-PbB"/>
                     <constraint firstItem="nbY-q9-BwB" firstAttribute="leading" secondItem="EiT-Mj-1SZ" secondAttribute="leading" id="tIt-NB-jii"/>
                     <constraint firstAttribute="trailing" secondItem="nbY-q9-BwB" secondAttribute="trailing" id="vow-Zu-lqq"/>

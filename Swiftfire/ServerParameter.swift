@@ -3,7 +3,7 @@
 //  File:       ServerParameter.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.7
+//  Version:    0.9.13
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,13 +49,14 @@
 //
 // History
 //
-// v0.9.7 - Added HEADER_LOGGING_ENABLED, MAX_FILE_SIZE_FOR_HEADER_LOGGING,
-//          MAX_FILE_SIZE_FOR_ACCESS_LOGGING, FLUSH_HEADER_LOGFILE_AFTER_EACH_WRITE
-//        - Added missing parameters from parameter version 1, harmonized names between ParameterIds and ServerParameters
-// v0.9.6 - Header update
-//        - Merged MAX_NOF_PENDING_CLIENT_MESSAGES and MAX_CLIENT_MESSAGE_SIZE into CLIENT_MESSAGE_BUFFER_SIZE
-//        - Merged Auto-Startup into Parameters, added configuration of more logging options
-// v0.9.4 - Initial release (replaces part of MacDef.swift)
+// v0.9.13 - Upgraded to Swift 3 beta
+// v0.9.7  - Added HEADER_LOGGING_ENABLED, MAX_FILE_SIZE_FOR_HEADER_LOGGING,
+//           MAX_FILE_SIZE_FOR_ACCESS_LOGGING, FLUSH_HEADER_LOGFILE_AFTER_EACH_WRITE
+//         - Added missing parameters from parameter version 1, harmonized names between ParameterIds and ServerParameters
+// v0.9.6  - Header update
+//         - Merged MAX_NOF_PENDING_CLIENT_MESSAGES and MAX_CLIENT_MESSAGE_SIZE into CLIENT_MESSAGE_BUFFER_SIZE
+//         - Merged Auto-Startup into Parameters, added configuration of more logging options
+// v0.9.4  - Initial release (replaces part of MacDef.swift)
 // =====================================================================================================================
 
 import Foundation

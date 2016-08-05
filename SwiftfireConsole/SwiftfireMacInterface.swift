@@ -3,7 +3,7 @@
 //  File:       SwiftfireMacInterface.swift
 //  Project:    SwiftfireConsole
 //
-//  Version:    0.9.12
+//  Version:    0.9.13
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -29,7 +29,7 @@
 //   - You can send payment via paypal to: sales@balancingrock.nl
 //   - Or wire bitcoins to: 1GacSREBxPy1yskLMc9de2nofNv2SNdwqH
 //
-//  I prefer the above two, but if these options don't suit you, you can also send me a gift from my amazon.co.uk
+//  I prefer the above two, but if these options don't suit you, you may also send me a gift from my amazon.co.uk
 //  whishlist: http://www.amazon.co.uk/gp/registry/wishlist/34GNMPZKAQ0OO/ref=cm_sw_em_r_wsl_cE3Tub013CKN6_wb
 //
 //  If you like to pay in another way, please contact me at rien@balancingrock.nl
@@ -49,6 +49,7 @@
 //
 // History
 //
+// v0.9.13 - Upgraded to Swift 3 beta
 // v0.9.12 - Added TransferToSwiftfire protocol
 // v0.9.11 - Merged into Swiftfire project
 // v0.9.4  - Header update
@@ -70,7 +71,7 @@ protocol SwiftfireMacInterfaceDelegate {
      - Parameter swiftfireMacInterface: The originating interface.
      - Parameter message: The error message to be displayed.
      
-     - Note: This operation is initiated from a thread that runs asynchrously. It would be prudent to implement a mechanism that only updates the GUI from an end-of-runloop observer.
+     - Note: This operation is initiated from a thread that runs asynchrously. It would be prudent to implement a mechanism that only updates the GUI from an end-of-runloop observer or from a process scheduled on the main thread.
      */
     
     func swiftfireMacInterface(_ swiftfireMacInterface: SwiftfireMacInterface, message: String)
@@ -82,7 +83,7 @@ protocol SwiftfireMacInterfaceDelegate {
      - Parameter swiftfireMacInterface: The originating interface.
      - Parameter reply: The VJson object as received from the server.
      
-     - Note: This operation is initiated from a thread that runs (asynchrously) in the background. It is presumed that this will occur while the runloop is paused, but this cannot be guaranteed. It would be prudent to implement a mechanism that only updates a GUI from an end-of-runloop observer.
+     - Note: This operation is initiated from a thread that runs asynchrously. It would be prudent to implement a mechanism that only updates a GUI from an end-of-runloop observer or from a process scheduled on the main thread.
      */
     
     func swiftfireMacInterface(_ swiftfireMacInterface: SwiftfireMacInterface, reply: VJson)
@@ -373,8 +374,6 @@ class SwiftfireMacInterface: NSObject, TransferToSwiftfire {
     
     private func processReceivedData(data: inout Data) {
         
-        let SOURCE = "SwiftfireMacInterface.processReceivedData"
-        
         PROCESS_LOOP: while true {
             
             var json: VJson?
@@ -412,7 +411,7 @@ class SwiftfireMacInterface: NSObject, TransferToSwiftfire {
             }
             
             
-            log.atLevelDebug(id: -1, source: SOURCE, message: "Received JSON code \(json!)")
+            log.atLevelDebug(id: -1, source: #file.source(#function, #line), message: "Received JSON code \(json!)")
             
             
             if let d = self.delegate { d.swiftfireMacInterface(self, reply: json!) }

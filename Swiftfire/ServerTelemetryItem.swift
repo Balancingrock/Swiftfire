@@ -3,7 +3,7 @@
 //  File:       ServerTelemetryItems.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.6
+//  Version:    0.9.13
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,42 +49,43 @@
 //
 // History
 //
-// v0.9.6 - Header update
-// v0.9.4 - Initial release (replaces part of MacDef.swift)
+// v0.9.13 - Upgraded to Swift 3 beta
+// v0.9.6  - Header update
+// v0.9.4  - Initial release (replaces part of MacDef.swift)
 // =====================================================================================================================
 
 import Foundation
 
 enum ServerTelemetryItem: String {
     
-    case SERVER_VERSION = "ServerVersion"
-    case SERVER_STATUS = "ServerStatus"
-    case NOF_ACCEPT_WAITS_FOR_CONNECTION_OBJECT = "NofAcceptWaitsForConnectionObject"
-    case NOF_ACCEPTED_HTTP_REQUESTS = "NofAcceptedHttpRequests"
-    case NOF_HTTP_400_REPLIES = "NofHttp400Replies"
-    case NOF_HTTP_502_REPLIES = "NofHttp502Replies"
+    case serverVersion = "ServerVersion"
+    case serverStatus = "ServerStatus"
+    case nofAcceptWaitsForConnectionObject = "NofAcceptWaitsForConnectionObject"
+    case nofAcceptedHttpRequests = "NofAcceptedHttpRequests"
+    case nofHttp400Replies = "NofHttp400Replies"
+    case nofHttp502Replies = "NofHttp502Replies"
     
     var guiLabel: String {
         switch self {
-        case NOF_ACCEPT_WAITS_FOR_CONNECTION_OBJECT: return "Number of times the accept call had to wait for a connection"
-        case SERVER_VERSION: return "The Version Number of Swiftfire"
-        case SERVER_STATUS: return "The Status of Swiftfire"
-        case NOF_ACCEPTED_HTTP_REQUESTS: return "The Total Number of Accepted Http Requests"
-        case NOF_HTTP_400_REPLIES: return "The Total Number of HTTP 400 Errors Generated"
-        case NOF_HTTP_502_REPLIES: return "The Total Number of HTTP 502 Errors Generated"
+        case nofAcceptWaitsForConnectionObject: return "Number of times the accept call had to wait for a connection"
+        case serverVersion: return "The Version Number of Swiftfire"
+        case serverStatus: return "The Status of Swiftfire"
+        case nofAcceptedHttpRequests: return "The Total Number of Accepted Http Requests"
+        case nofHttp400Replies: return "The Total Number of HTTP 400 Errors Generated"
+        case nofHttp502Replies: return "The Total Number of HTTP 502 Errors Generated"
         }
     }
     
     var toolTip: String {
         switch self {
-        case NOF_ACCEPT_WAITS_FOR_CONNECTION_OBJECT: return "Number of times the accept call had to wait for a connection"
-        case SERVER_VERSION: return "The Version Number of Swiftfire"
-        case SERVER_STATUS: return "The Status of Swiftfire"
-        case NOF_ACCEPTED_HTTP_REQUESTS: return "The Total Number of Accepted Http Requests"
-        case NOF_HTTP_400_REPLIES: return "The Total Number of HTTP 400 Errors Generated"
-        case NOF_HTTP_502_REPLIES: return "The Total Number of HTTP 502 Errors Generated"
+        case nofAcceptWaitsForConnectionObject: return "Number of times the accept call had to wait for a connection"
+        case serverVersion: return "The Version Number of Swiftfire"
+        case serverStatus: return "The Status of Swiftfire"
+        case nofAcceptedHttpRequests: return "The Total Number of Accepted Http Requests"
+        case nofHttp400Replies: return "The Total Number of HTTP 400 Errors Generated"
+        case nofHttp502Replies: return "The Total Number of HTTP 502 Errors Generated"
         }
     }
 
-    static let all: Array<ServerTelemetryItem> = [.SERVER_VERSION, .SERVER_STATUS, .NOF_ACCEPT_WAITS_FOR_CONNECTION_OBJECT, .NOF_ACCEPTED_HTTP_REQUESTS, .NOF_HTTP_400_REPLIES, .NOF_HTTP_502_REPLIES]
+    static let all: Array<ServerTelemetryItem> = [.serverVersion, .serverStatus, .nofAcceptWaitsForConnectionObject, .nofAcceptedHttpRequests, .nofHttp400Replies, .nofHttp502Replies]
 }

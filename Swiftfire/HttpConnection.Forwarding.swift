@@ -3,7 +3,7 @@
 //  File:       HttpConnection.Forwarding.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.6
+//  Version:    0.9.13
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,11 +49,12 @@
 //
 // History
 //
-// v0.9.6 - Header update
-// v0.9.3 - Added a telemetry counter to the "bad gateway" errors
-// v0.9.2 - Minor adjustment to forwardingOpenConnection
-//        - Replaced sendMessageWithCode with httpErrorResponseWithCode
-// v0.9.0 - Initial release
+// v0.9.13 - Upgraded to Swift 3 beta
+// v0.9.6  - Header update
+// v0.9.3  - Added a telemetry counter to the "bad gateway" errors
+// v0.9.2  - Minor adjustment to forwardingOpenConnection
+//         - Replaced sendMessageWithCode with httpErrorResponseWithCode
+// v0.9.0  - Initial release
 // =====================================================================================================================
 
 import Foundation

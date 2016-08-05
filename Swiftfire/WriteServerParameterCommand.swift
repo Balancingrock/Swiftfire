@@ -3,7 +3,7 @@
 //  File:       WriteServerParameterCommand.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.11
+//  Version:    0.9.13
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,6 +49,7 @@
 //
 // History
 //
+// v0.9.13 - Upgraded to Swift 3 beta
 // v0.9.11 - Updated for VJson 0.9.8
 // v0.9.6  - Header update
 // v0.9.4  - Initial release (replaces part of MacDef.swift)
@@ -202,47 +203,27 @@ final class WriteServerParameterCommand {
         // Update parameter
         
         switch parameter {
-            
         case .debugMode: updateBool(name: parameter.rawValue, value: value, setter: { Parameters.debugMode = $0 }, getter: { Parameters.debugMode })
-            
         case .autoStartup: updateBool(name: parameter.rawValue, value: value, setter: { Parameters.autoStartup = $0 }, getter: { Parameters.autoStartup })
-            
         case .headerLoggingEnabled: updateBool(name: parameter.rawValue, value: value, setter: { Parameters.headerLoggingEnabled = $0 }, getter: { Parameters.headerLoggingEnabled })
-            
         case .flushHeaderLogfileAfterEachWrite: updateBool(name: parameter.rawValue, value: value, setter: { Parameters.flushHeaderLogfileAfterEachWrite = $0 }, getter: { Parameters.flushHeaderLogfileAfterEachWrite })
-            
         case .clienMessageBufferSize: updateInt(name: parameter.rawValue, value: value, setter: { Parameters.clientMessageBufferSize = $0 }, getter: { Parameters.clientMessageBufferSize })
-            
         case .httpKeepAliveInactivityTimeout: updateInt(name: parameter.rawValue, value: value, setter: { Parameters.httpKeepAliveInactivityTimeout = $0 }, getter: { Parameters.httpKeepAliveInactivityTimeout })
-            
         case .maxNumberOfAcceptedConnections: updateInt(name: parameter.rawValue, value: value, setter: { Parameters.maxNofAcceptedConnections = $0 }, getter: { Parameters.maxNofAcceptedConnections })
-            
         case .maxNumberOfPendingConnections: updateInt32(name: parameter.rawValue, value: value, setter: { Parameters.maxNofPendingConnections = $0 }, getter: { Parameters.maxNofPendingConnections })
-        
         case .maxWaitForPendingConnections: updateInt(name: parameter.rawValue, value: value, setter: { Parameters.maxWaitForPendingConnections = $0 }, getter: { Parameters.maxWaitForPendingConnections })
-        
         case .logfileMaxSize: updateInt(name: parameter.rawValue, value: value, setter: { Parameters.logfileMaxSize = $0; log.logfileMaxSizeInBytes = UInt64($0 * 1024) }, getter: { Int(log.logfileMaxSizeInBytes) * 1024 })
-            
         case .logfileMaxNofFiles: updateInt(name: parameter.rawValue, value: value, setter: { Parameters.logfileMaxNofFiles = $0; log.logfileMaxNumberOfFiles = $0 }, getter: { log.logfileMaxNumberOfFiles })
-            
         case .maxFileSizeForHeaderLogging: updateInt(name: parameter.rawValue, value: value, setter: { Parameters.maxFileSizeForHeaderLogging = $0 }, getter: { Parameters.maxFileSizeForHeaderLogging })
-            
         case .httpResponseClientTimeout: updateDouble(name: parameter.rawValue, value: value, setter: { Parameters.httpResponseClientTimeout = $0 }, getter: { Parameters.httpResponseClientTimeout })
-            
         case .aslFacilityRecordAtAndAboveLevel: updateLevel(name: parameter.rawValue, value: value, setter: { Parameters.aslFacilityRecordAtAndAboveLevel = $0; log.aslFacilityRecordAtAndAboveLevel = $0 }, getter: { log.aslFacilityRecordAtAndAboveLevel })
-            
         case .fileRecordAtAndAboveLevel: updateLevel(name: parameter.rawValue, value: value, setter: { Parameters.fileRecordAtAndAboveLevel = $0; log.fileRecordAtAndAboveLevel = $0 }, getter: { log.fileRecordAtAndAboveLevel })
-        
         case .callbackAtAndAboveLevel: updateLevel(name: parameter.rawValue, value: value, setter: { Parameters.callbackAtAndAboveLevel = $0; log.callbackAtAndAboveLevel = $0 }, getter: { log.callbackAtAndAboveLevel })
-            
         case .networkTransmitAtAndAboveLevel: updateLevel(name: parameter.rawValue, value: value, setter: { Parameters.networkTransmitAtAndAboveLevel = $0; log.networkTransmitAtAndAboveLevel = $0 }, getter: { log.networkTransmitAtAndAboveLevel })
-            
         case .stdoutPrintAtAndAboveLevel: updateLevel(name: parameter.rawValue, value: value, setter: { Parameters.stdoutPrintAtAndAboveLevel = $0; log.stdoutPrintAtAndAboveLevel = $0 }, getter: { log.stdoutPrintAtAndAboveLevel })
-            
         case .servicePortNumber: keepOrUpdate(name: parameter.rawValue, value: value, setter: { Parameters.httpServicePortNumber = $0 }, getter: { Parameters.httpServicePortNumber })
-        
         case .macPortNumber: keepOrUpdate(name: parameter.rawValue, value: value, setter: { Parameters.macPortNumber = $0 }, getter: { Parameters.macPortNumber })
-            
+
         case .networkLogtargetIpAddress:
             keepOrUpdate(
                 name: parameter.rawValue,
@@ -256,7 +237,7 @@ final class WriteServerParameterCommand {
                     log.networkTarget?.address ?? ""
                 }
             )
-            
+
         case .networkLogtargetPortNumber:
             keepOrUpdate(
                 name: parameter.rawValue,
@@ -272,7 +253,6 @@ final class WriteServerParameterCommand {
             )
             
         case .macInactivityTimeout: updateDouble(name: parameter.rawValue, value: value, setter: { Parameters.macInactivityTimeout = $0 }, getter: { Parameters.macInactivityTimeout })
-            
         }
     }
 }

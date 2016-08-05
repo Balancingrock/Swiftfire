@@ -3,7 +3,7 @@
 //  File:       ConsoleWindowViewController.swift
 //  Project:    SwiftfireConsole
 //
-//  Version:    0.9.11
+//  Version:    0.9.13
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -29,7 +29,7 @@
 //   - You can send payment via paypal to: sales@balancingrock.nl
 //   - Or wire bitcoins to: 1GacSREBxPy1yskLMc9de2nofNv2SNdwqH
 //
-//  I prefer the above two, but if these options don't suit you, you can also send me a gift from my amazon.co.uk
+//  I prefer the above two, but if these options don't suit you, you may also send me a gift from my amazon.co.uk
 //  whishlist: http://www.amazon.co.uk/gp/registry/wishlist/34GNMPZKAQ0OO/ref=cm_sw_em_r_wsl_cE3Tub013CKN6_wb
 //
 //  If you like to pay in another way, please contact me at rien@balancingrock.nl
@@ -49,6 +49,7 @@
 //
 // History
 //
+// v0.9.13 - Upgraded to Swift 3 beta
 // v0.9.11 - Merged into Swiftfire project
 // v0.9.5  - Minor updates to accomodate parameter updates on Swiftfire
 // v0.9.4  - Header update
@@ -112,19 +113,6 @@ class ConsoleWindowViewController: NSViewController {
         for t in ServerTelemetryItem.all {
             telemetryTable.append(TelemetryTabTableRow(telemetryItem: t, swiftfireMacInterface: swiftfireMacInterface))
         }
-
-        
-/*        let runLoopObserver = CFRunLoopObserverCreateWithHandler(
-            kCFAllocatorDefault,
-            CFRunLoopActivity.beforeWaiting.rawValue,
-            true,
-            0,
-            { [unowned self] (_, _) -> Void in
-                self.processQueuedReplies()
-                self.displayErrorMessage()
-            })
-        
-        CFRunLoopAddObserver(CFRunLoopGetCurrent(), runLoopObserver, CFRunLoopMode.commonModes)*/
     }
     
     
@@ -188,25 +176,15 @@ class ConsoleWindowViewController: NSViewController {
     private let logLinesDispatchQueue = DispatchQueue(label: "log-line-queue", attributes: [.serial])
     private var abortReceivingLogLines = false
     
-    private let queuedLogLinesLockObject = NSString()   // Dummy object to allow locking the queuedLogLines member
-    private var queuedLogLines: Array<LogLine> = []     // Collects the updates from other threads until the runloop observer is triggered
+//    private var queuedLogLines: Array<LogLine> = []     // Collects the updates from other threads until the runloop observer is triggered
     private var acceptedLogLines: Array<LogLine> = []   // Holds all LogLines
 
     
     // ************************************************************
     // MARK: Storage for the SwiftfireMacInterfaceDelegate protocol
     // ************************************************************
-    
-    private let parameterUpdateLockObject = NSString()
-    private var parameterUpdates: Dictionary<ServerParameter, VJson> = [:]
-    
-    private let errorMessageLockObject = NSString()
+
     private var errorMessageIsActive = false
-    private var errorMessages: Array<String> = []
-    private var previousErrorMessage: String?
-    
-    private let queuedRepliesLockObject = NSString()
-    private var queuedReplies: Array<VJson> = [] // Holds all replies from a Swiftfire server
 }
 
 
@@ -275,7 +253,7 @@ extension ConsoleWindowViewController {
         swiftfireMacInterface.sendMessages(messages: [
             ServerStartCommand().json,
             DeltaCommand(delay: 1)!.json,
-            ReadServerTelemetryCommand(telemetryItem: .SERVER_STATUS)!.json
+            ReadServerTelemetryCommand(telemetryItem: .serverStatus)!.json
             ])
     }
     
@@ -289,7 +267,7 @@ extension ConsoleWindowViewController {
         swiftfireMacInterface.sendMessages(messages: [
             ServerStopCommand().json,
             DeltaCommand(delay: 1)!.json,
-            ReadServerTelemetryCommand(telemetryItem: .SERVER_STATUS)!.json
+            ReadServerTelemetryCommand(telemetryItem: .serverStatus)!.json
             ])
     }
     
@@ -678,21 +656,6 @@ extension ConsoleWindowViewController {
     }
 
     
-    // Copies loglines from the queue to the displayable loglines
-    
-    private func addQueuedToAcceptedLogLines() {
-        DispatchQueue.main.sync() {
-            [unowned self] in
-            var ll = self.queuedLogLines.popLast()
-            while ll != nil {
-                self.acceptedLogLines.append(ll!)
-                self.addLogLineConditionallyToView(ll: ll!)
-                ll = self.queuedLogLines.popLast()
-            }
-        }
-    }
-    
-    
     // Adds a logline to the view, based on the level of
     private func addLogLineConditionallyToView(ll: LogLine) {
         logTextView.font = NSFont(name: "courier", size: 12.0)
@@ -712,13 +675,11 @@ extension ConsoleWindowViewController: SwiftfireMacInterfaceDelegate {
     
     func swiftfireMacInterface(_ swiftfireMacInterface: SwiftfireMacInterface, message: String) {
         DispatchQueue.main.async() { [unowned self] in self.displayErrorMessage(message: message) }
-//        synchronized(errorMessageLockObject, { [unowned self] in self.errorMessages.insert(message, atIndex: 0) })
 
     }
     
     func queueErrorMessage(message: String) {
         DispatchQueue.main.async() { [unowned self] in self.displayErrorMessage(message: message) }
-//        synchronized(errorMessageLockObject, { [unowned self] in self.errorMessages.insert(message, atIndex: 0) })
     }
 
     private func displayErrorMessage(message: String) {
@@ -740,7 +701,6 @@ extension ConsoleWindowViewController: SwiftfireMacInterfaceDelegate {
     
     func swiftfireMacInterface(_ swiftfireMacInterface: SwiftfireMacInterface, reply: VJson) {
         DispatchQueue.main.async() { [unowned self] in self.processReplies(reply: reply) }
-//        synchronized(queuedRepliesLockObject, { [unowned self] in self.queuedReplies.insert(reply, atIndex: 0) })
     }
     
     private func processReplies(reply: VJson) {
@@ -762,11 +722,11 @@ extension ConsoleWindowViewController: SwiftfireMacInterfaceDelegate {
             
             switch message.item {
                 
-            case .SERVER_VERSION:
+            case .serverVersion:
                 aboveTabs.setValue(message.value, forKeyPath: "serverVersionNumber")
                 connectButton.title = "Disconnect"
                 
-            case .SERVER_STATUS:
+            case .serverStatus:
                 aboveTabs.setValue(message.value, forKeyPath: "serverStatus")
                 
             default: break

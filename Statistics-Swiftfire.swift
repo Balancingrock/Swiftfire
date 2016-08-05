@@ -3,7 +3,7 @@
 //  File:       Statistics-Swiftfire.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.12
+//  Version:    0.9.13
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,6 +49,7 @@
 //
 // History
 //
+// v0.9.13 - Upgraded to Swift 3 beta
 // v0.9.12 - Changed cd counters to daily counters
 //         - Added support for 'doNotTrace' options
 //         - Changed timestamps from double to int64
@@ -314,16 +315,14 @@ final class Statistics: NSObject {
     }
     
     
-    /**
-     - Returns: The existing CDPathPart for the given part or -if absent- creates a new one.
-     */
+    /// - Returns: The existing CDPathPart for the given domain name or -if absent- creates a new one.
     
-    private func getPathPart(forPart part: String?) -> CDPathPart? {
+    private func getDomain(forName name: String?) -> CDPathPart? {
         
         // Find and return an existing one
         for p in cdDomains.domains! {
             let pp = p as! CDPathPart
-            if pp.pathPart! == part {
+            if pp.pathPart! == name {
                 if pp.doNotTrace { return nil }
                 return pp
             }
@@ -331,7 +330,7 @@ final class Statistics: NSObject {
         
         // Create a new one
         let pp = NSEntityDescription.insertNewObject(forEntityName: "CDPathPart", into: managedObjectContext) as! CDPathPart
-        pp.pathPart = part
+        pp.pathPart = name
         pp.domains = cdDomains
         
         // Add a counter to it
@@ -344,9 +343,7 @@ final class Statistics: NSObject {
     }
     
     
-    /**
-     - Returns: Nil if the part already exists and has its "doNotTrace" member set to 'true'. Otherwise it returns the found part or creates a new one (and returns that).
-     */
+    /// - Returns: Nil if the part already exists and has its "doNotTrace" member set to 'true'. Otherwise it returns the found part or creates a new one (and returns that).
     
     private func getPathPart(forPart part: String, fromPathPart pathPart: CDPathPart) -> CDPathPart? {
         
@@ -376,6 +373,52 @@ final class Statistics: NSObject {
         return pp
     }
     
+    
+    /// - Returns: The last PathPart belonging to the end of the given URL string or nil if that could not be found. Will not create a new PathPart if none is found.
+    
+    private func getPartPart(atPath: String?) -> CDPathPart? {
+        
+        guard let urlstr = atPath else { return nil }
+        
+        // Create an array of path components
+        let url = URL(string: urlstr) ?? URL(string: "")!
+        var pathParts = url.pathComponents ?? [""]
+        
+        // If the first part is a "/", then remove it
+        if pathParts.count > 0 && pathParts[0] == "/" { pathParts.remove(at: 0) }
+        
+        // Get the domain for the first path part
+        let matchedDomains = (cdDomains.domains?.allObjects as! [CDPathPart]).filter(){ $0.pathPart! == pathParts[0]}
+        if matchedDomains.count != 1 {
+            log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Unknown or ambiguous domain in URL of UpdatePathPartCommand")
+            return nil
+        }
+        var result = matchedDomains[0]
+        
+        while pathParts.count > 0 {
+            
+            // Matched this part, remove it
+            pathParts.remove(at: 0)
+            
+            if pathParts.count == 0 { return result }
+            
+            // Check for the next level path parts
+            if result.next != nil || result.next?.count == 0 {
+                log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Unknown path part \(pathParts[0]) in URL of UpdatePathPartCommand")
+                return nil
+            }
+            let matchedParts = (result.next!.allObjects as! [CDPathPart]).filter(){ $0.pathPart! == pathParts[0]}
+            if matchedParts.count != 1 {
+                log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Unknown or ambigious path part \(pathParts[0]) in URL of UpdatePathPartCommand")
+                return nil
+            }
+            
+            // Advance down the tree
+            result = matchedDomains[0]
+        }
+        
+        return nil // the 'result' is not the path part we are looking for
+    }
     
     /**
      Performs the requested mutation.
@@ -522,7 +565,7 @@ final class Statistics: NSObject {
         if pathParts.count > 0 && pathParts[0] == "/" { pathParts.remove(at: 0) }
         
         // Get the root of the path parts
-        var current = getPathPart(forPart: domainStr)
+        var current = getDomain(forName: domainStr)
         
         // Exit if tracing is disabled
         if current == nil { return }
@@ -573,6 +616,10 @@ final class Statistics: NSObject {
         
         // If the first part is a "/", then remove it
         if pathParts.count > 0 && pathParts[0] == "/" { pathParts.remove(at: 0) }
+        if pathParts.count == 0 {
+            log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Empty or '/' URL in UpdatePathPartCommand")
+            return
+        }
         
         // Get the root of the path parts
         let matchedDomains = (cdDomains.domains?.allObjects as! [CDPathPart]).filter(){ $0.pathPart! == pathParts[0]}
@@ -582,26 +629,27 @@ final class Statistics: NSObject {
         }
         var current = matchedDomains[0]
         
-        while pathParts.count > 0 {
+        while true {
             
             // Matched this part, remove it
             pathParts.remove(at: 0)
             
+            // If this was the last, then current is the needed pathpart
             if pathParts.count == 0 { break }
             
             // Check for more
-            if current.next != nil || current.next?.count == 0 {
+            if let matchedParts = ((current.next?.allObjects as? [CDPathPart])?.filter(){ $0.pathPart! == pathParts[0]})  {
+                if matchedParts.count != 1 {
+                    log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Unknown or ambigious path part \(pathParts[0]) in URL of UpdatePathPartCommand")
+                    return
+                } else {
+                    // Advance down the tree
+                    current = matchedParts[0]
+                }
+            } else {
                 log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Unknown path part \(pathParts[0]) in URL of UpdatePathPartCommand")
                 return
             }
-            let matchedParts = (current.next!.allObjects as! [CDPathPart]).filter(){ $0.pathPart! == pathParts[0]}
-            if matchedParts.count != 1 {
-                log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Unknown or ambigious path part \(pathParts[0]) in URL of UpdatePathPartCommand")
-                return
-            }
-            
-            // Advance down the tree
-            current = matchedDomains[0]
         }
         
         // current now contains the sought after path part, update the doNotTrace status

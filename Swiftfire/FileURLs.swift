@@ -3,7 +3,7 @@
 //  File:       FileURLs.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.11
+//  Version:    0.9.13
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,6 +49,7 @@
 //
 // History
 //
+// v0.9.13 - Upgraded to Swift 3 beta
 // v0.9.11 - Added statistics support
 // v0.9.7  - Added header logging and application log directory
 //         - Removed startup file

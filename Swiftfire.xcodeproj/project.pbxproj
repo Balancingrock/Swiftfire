@@ -80,9 +80,7 @@
 		866F9ADE1D129F9600A23CE6 /* WallclockTime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8678225C1D002ECB00A93401 /* WallclockTime.swift */; };
 		866F9ADF1D129F9600A23CE6 /* WallclockTime.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8678225C1D002ECB00A93401 /* WallclockTime.swift */; };
 		866F9AE01D129F9B00A23CE6 /* WallclockTimeTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86935EA81D0EB753009367B2 /* WallclockTimeTest.swift */; };
-		8675641E1D0C5FF700AE2451 /* SwiftfireUnitTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 8675641D1D0C5FF700AE2451 /* SwiftfireUnitTests.swift */; };
 		867564231D0C5FFD00AE2451 /* DomainTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F5B1CC2406600C60220 /* DomainTest.swift */; };
-		867564241D0C600100AE2451 /* UInt8BufferTest.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F5C1CC2406600C60220 /* UInt8BufferTest.swift */; };
 		867564261D0C601900AE2451 /* Domain.swift in Sources */ = {isa = PBXBuildFile; fileRef = 864C6F221CC23F5200C60220 /* Domain.swift */; };
 		86775ABD1CFF258500C8B34C /* AccessLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = 86775ABC1CFF258500C8B34C /* AccessLog.swift */; };
 		867CD0531CFDB103009B9868 /* Logfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = 867CD0521CFDB103009B9868 /* Logfile.swift */; };
@@ -298,7 +296,6 @@
 		864C6F4C1CC23FE400C60220 /* Improvements */ = {isa = PBXFileReference; lastKnownFileType = text; path = Improvements; sourceTree = "<group>"; };
 		864C6F4D1CC23FE400C60220 /* Feature Requests */ = {isa = PBXFileReference; lastKnownFileType = text; path = "Feature Requests"; sourceTree = "<group>"; };
 		864C6F5B1CC2406600C60220 /* DomainTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = DomainTest.swift; path = ../UnitTesting/DomainTest.swift; sourceTree = "<group>"; };
-		864C6F5C1CC2406600C60220 /* UInt8BufferTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = UInt8BufferTest.swift; path = ../UnitTesting/UInt8BufferTest.swift; sourceTree = "<group>"; };
 		864C6F5F1CC243AF00C60220 /* asl-bridge.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; name = "asl-bridge.h"; path = "../../../SwifterLog/SwifterLog/SwifterLog/asl-bridge.h"; sourceTree = "<group>"; };
 		864C6F601CC243AF00C60220 /* asl-bridge.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; name = "asl-bridge.m"; path = "../../../SwifterLog/SwifterLog/SwifterLog/asl-bridge.m"; sourceTree = "<group>"; };
 		864C6F611CC243AF00C60220 /* SwifterLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = SwifterLog.swift; path = ../../../SwifterLog/SwifterLog/SwifterLog/SwifterLog.swift; sourceTree = "<group>"; };
@@ -344,7 +341,6 @@
 		866F8D371D1DB615009EA66D /* GenericHelpers.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = GenericHelpers.swift; sourceTree = "<group>"; };
 		867564141D0C27D000AE2451 /* ValueStatisticsTest.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; name = ValueStatisticsTest.swift; path = ../UnitTesting/ValueStatisticsTest.swift; sourceTree = "<group>"; };
 		8675641B1D0C5FF700AE2451 /* SwiftfireUnitTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = SwiftfireUnitTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		8675641D1D0C5FF700AE2451 /* SwiftfireUnitTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwiftfireUnitTests.swift; sourceTree = "<group>"; };
 		8675641F1D0C5FF700AE2451 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		86775ABC1CFF258500C8B34C /* AccessLog.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = AccessLog.swift; sourceTree = "<group>"; };
 		8678225C1D002ECB00A93401 /* WallclockTime.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = WallclockTime.swift; sourceTree = "<group>"; };
@@ -415,11 +411,10 @@
 				864C6F0C1CC23EF200C60220 /* SwifterLog */,
 				864C6F111CC23F1700C60220 /* SwifterJSON */,
 				864C6F1E1CC23F3400C60220 /* SwifterSockets */,
-				864C6F391CC23F6500C60220 /* Utils */,
 				864C6EFA1CC23DE400C60220 /* Swiftfire */,
-				864C6F4E1CC23FEC00C60220 /* Documentation */,
-				8675641C1D0C5FF700AE2451 /* SwiftfireUnitTests */,
 				8696165B1D22603C00CE264A /* SwiftfireConsole */,
+				8675641C1D0C5FF700AE2451 /* SwiftfireUnitTests */,
+				864C6F4E1CC23FEC00C60220 /* Documentation */,
 				864C6EF91CC23DE400C60220 /* Products */,
 			);
 			sourceTree = "<group>";
@@ -437,6 +432,7 @@
 		864C6EFA1CC23DE400C60220 /* Swiftfire */ = {
 			isa = PBXGroup;
 			children = (
+				864C6F391CC23F6500C60220 /* Utils */,
 				868340701D52257200EF0C2F /* Main */,
 				8663FDE71D15362F00ADC731 /* StatisticsDataModel */,
 				86F49FBD1CE1CF0000AFEE55 /* Domains */,
@@ -503,7 +499,6 @@
 				866F8D371D1DB615009EA66D /* GenericHelpers.swift */,
 			);
 			name = Utils;
-			path = Swiftfire;
 			sourceTree = "<group>";
 		};
 		864C6F491CC23FA900C60220 /* Monitoring and Control */ = {
@@ -596,10 +591,8 @@
 			isa = PBXGroup;
 			children = (
 				864C6F5B1CC2406600C60220 /* DomainTest.swift */,
-				864C6F5C1CC2406600C60220 /* UInt8BufferTest.swift */,
 				867564141D0C27D000AE2451 /* ValueStatisticsTest.swift */,
 				86935EA81D0EB753009367B2 /* WallclockTimeTest.swift */,
-				8675641D1D0C5FF700AE2451 /* SwiftfireUnitTests.swift */,
 				8675641F1D0C5FF700AE2451 /* Info.plist */,
 			);
 			path = SwiftfireUnitTests;
@@ -915,11 +908,9 @@
 				868C1FBD1D0D44B600B36719 /* asl-bridge.m in Sources */,
 				868C1FB11D0D446600B36719 /* HttpHeader.swift in Sources */,
 				868C1FE21D0D455E00B36719 /* ClosingMacConnection.swift in Sources */,
-				8675641E1D0C5FF700AE2451 /* SwiftfireUnitTests.swift in Sources */,
 				868C1FC41D0D450600B36719 /* SwifterSockets.Accept.swift in Sources */,
 				868C1FE31D0D455E00B36719 /* ResetDomainTelemetryCommand.swift in Sources */,
 				868C1FBA1D0D447500B36719 /* DomainTelemetry.swift in Sources */,
-				867564241D0C600100AE2451 /* UInt8BufferTest.swift in Sources */,
 				867564231D0C5FFD00AE2451 /* DomainTest.swift in Sources */,
 				868C1FA21D0D445B00B36719 /* TimedClosure.swift in Sources */,
 				868C1FDA1D0D455E00B36719 /* RemoveDomainCommand.swift in Sources */,

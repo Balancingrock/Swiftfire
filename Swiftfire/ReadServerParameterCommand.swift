@@ -3,7 +3,7 @@
 //  File:       ReadServerParameterCommand.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.11
+//  Version:    0.9.13
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,6 +49,7 @@
 //
 // History
 //
+// v0.9.13 - Upgraded to Swift 3 beta
 // v0.9.11 - Updated for VJson 0.9.8
 // v0.9.6  - Header update
 // v0.9.4  - Initial release (replaces part of MacDef.swift)
@@ -108,51 +109,28 @@ final class ReadServerParameterCommand {
         var result: VJson
 
         switch parameter {
-            
         case .debugMode: result = createBoolReply(parameter: parameter, value: Parameters.debugMode)
-
         case .autoStartup: result = createBoolReply(parameter: parameter, value: Parameters.autoStartup)
-            
         case .headerLoggingEnabled: result = createBoolReply(parameter: parameter, value: Parameters.headerLoggingEnabled)
-            
         case .flushHeaderLogfileAfterEachWrite: result = createBoolReply(parameter: parameter, value: Parameters.flushHeaderLogfileAfterEachWrite)
-            
         case .servicePortNumber: result = createStringReply(parameter: parameter, value: Parameters.httpServicePortNumber)
-        
         case .macPortNumber: result = createStringReply(parameter: parameter, value: Parameters.macPortNumber)
-            
         case .clienMessageBufferSize: result = createIntReply(parameter: parameter, value: Parameters.clientMessageBufferSize)
-            
         case .httpKeepAliveInactivityTimeout: result = createIntReply(parameter: parameter, value: Parameters.httpKeepAliveInactivityTimeout)
-            
         case .maxNumberOfAcceptedConnections: result = createIntReply(parameter: parameter, value: Parameters.maxNofAcceptedConnections)
-            
         case .maxNumberOfPendingConnections: result = createIntReply(parameter: parameter, value: Int(Parameters.maxNofPendingConnections))
-            
         case .maxWaitForPendingConnections: result = createIntReply(parameter: parameter, value: Parameters.maxWaitForPendingConnections)
-            
         case .logfileMaxNofFiles: result = createIntReply(parameter: parameter, value: log.logfileMaxNumberOfFiles)
-            
         case .logfileMaxSize: result = createIntReply(parameter: parameter, value: Parameters.logfileMaxSize)
-            
         case .maxFileSizeForHeaderLogging: result = createIntReply(parameter: parameter, value: Parameters.maxFileSizeForHeaderLogging)
-            
         case .httpResponseClientTimeout: result = createDoubleReply(parameter: parameter, value: Parameters.httpResponseClientTimeout)
-            
         case .macInactivityTimeout: result = createDoubleReply(parameter: parameter, value: Parameters.macInactivityTimeout)
-            
         case .aslFacilityRecordAtAndAboveLevel: result = createIntReply(parameter: parameter, value: log.aslFacilityRecordAtAndAboveLevel.rawValue)
-            
         case .fileRecordAtAndAboveLevel: result = createIntReply(parameter: parameter, value: log.fileRecordAtAndAboveLevel.rawValue)
-            
         case .stdoutPrintAtAndAboveLevel: result = createIntReply(parameter: parameter, value: log.stdoutPrintAtAndAboveLevel.rawValue)
-            
         case .callbackAtAndAboveLevel: result = createIntReply(parameter: parameter, value: log.callbackAtAndAboveLevel.rawValue)
-            
         case .networkTransmitAtAndAboveLevel: result = createIntReply(parameter: parameter, value: log.networkTransmitAtAndAboveLevel.rawValue)
-            
         case .networkLogtargetIpAddress: result = createStringReply(parameter: parameter, value: log.networkTarget?.address ?? "")
-            
         case .networkLogtargetPortNumber: result = createStringReply(parameter: parameter, value: log.networkTarget?.port ?? "")
         }
         

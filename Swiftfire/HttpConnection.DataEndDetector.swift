@@ -3,7 +3,7 @@
 //  File:       HttpConnection.DataEndDetector.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.7
+//  Version:    0.9.13
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,9 +49,10 @@
 //
 // History
 //
-// v0.9.7 - Changed recording of the header from the swifterlog to the header logfile.
-// v0.9.6 - Header update
-// v0.9.0 - Initial release
+// v0.9.13 - Upgraded to Swift 3 beta
+// v0.9.7  - Changed recording of the header from the swifterlog to the header logfile.
+// v0.9.6  - Header update
+// v0.9.0  - Initial release
 // =====================================================================================================================
 
 import Foundation
