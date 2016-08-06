@@ -1,14 +1,11 @@
-This does not constitute a promise for implementation, just a list of features that I am thinking about.
+This does not constitute a promise for implementation, just a list of features that I am thinking about or have been requested.
 
 0001: Redirect file
 
 Add a redirect file that maps Http requests to a new destination. I.e. the file should contain something like an "old URL" to "new URL" mapping."
 
 
-0002: 404 URL list
-
-Automaticall create a file with all URLs that caused a 404 to occur. This file should probably have a counter field for every time a certain URL was accessed. The layout should be very similar to the "Redirect file" (see FR-0001) so that the user may use the content of the 404 URL file to update the Redirect file.
-
+0002: 404 URL list (done)
 
 0003: Custom 404 page
 
@@ -20,10 +17,7 @@ Each domain should have its own custom 404 page that is returned for a 404 error
 Before redirecting (See FR-0001) each domainshould have it own custom redirect page that informs a user that the URL is outdated.
 
 
-0005: Deny directory access
-
-Disallows directory access, but implement a list -per domain- that allows some directories to be accessed. I.e. if a user requests a directory listing this should be disallowed by default, unless the directory is listed in the list of allowed directories.
-
+0005: Deny/Allow directory access (rejected, better solution is anticipated in a future relase.)
 
 0006: IP Address logging (done)
 
@@ -33,6 +27,4 @@ Disallows directory access, but implement a list -per domain- that allows some d
 Disallow specified IP addresses from accessing any content at all.
 
 
-0008: Support HTTP 1.0
-
-HTTP 1.0 seems to be used to fetch the "robots.txt" file.
+0008: Support HTTP 1.0 (done, v0.9.14)
