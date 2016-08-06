@@ -3,7 +3,7 @@
 //  File:       RestoreDomainsCommand.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.13
+//  Version:    0.9.14
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,6 +49,7 @@
 //
 // History
 //
+// v0.9.14 - Added logging of parameters after restoring them
 // v0.9.13 - Upgraded to Swift 3 beta
 // v0.9.11 - Updated for VJson 0.9.8
 // v0.9.6  - Header update
@@ -79,5 +80,6 @@ final class RestoreDomainsCommand {
     func execute() {
         log.atLevelNotice(id: -1, source: #file.source(#function, #line))
         domains.restore()
+        domains.writeToLog(atLevel: SwifterLog.Level.notice)
     }
 }

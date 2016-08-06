@@ -3,7 +3,7 @@
 //  File:       HttpConnection.HttpWorker.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.13
+//  Version:    0.9.14
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,6 +49,7 @@
 //
 // History
 //
+// v0.9.14 - Added support for HTTP 1.0
 // v0.9.13 - Upgraded to Swift 3 beta
 // v0.9.11 - Added support for usage statistics
 // v0.9.6  - Header update
@@ -85,22 +86,28 @@ extension HttpConnection {
         
         
         // =============================================================================================================
-        // Find the domain this request is for
+        // Check which protocol version is used
         // =============================================================================================================
         
-        guard let host = header.host else {
+        // =============================================================================================================
+        // Special case for HTTP version 1.0
+        // =============================================================================================================
+        
+        // HTTP/1.0 does not contain a "Host" field. It is therefore handled seperately.
+
+        guard let httpVersion = header.httpVersion else {
             
             // Telemetry update
             serverTelemetry.nofHttp400Replies.increment()
             
-            // Logging update
-            let message = "Could not extract host from Http Request Header"
+            // Log update
+            let message = "HTTP Version not present"
             log.atLevelDebug(id: logId, source: #file.source(#function, #line), message: message)
             
             // Reply to client
-            let response = httpErrorResponse(withCode: .code400_BadRequest, andMessage: "<p>\(message)<p>")
+            let response = httpErrorResponse(withCode: .code400_BadRequest, httpVersion: .http1_1, message: "<p>\(message)</p>")
             transferToClient(data: response)
-            
+
             // Mutation update
             mutation.httpResponseCode = HttpResponseCode.code400_BadRequest.rawValue
             mutation.responseDetails = message
@@ -108,6 +115,66 @@ extension HttpConnection {
             statistics.submit(mutation: mutation)
             
             return
+        }
+        
+
+        // =============================================================================================================
+        // Find the domain this request is for
+        // =============================================================================================================
+
+        var host: Host
+        
+        if httpVersion == HttpVersion.http1_0 {
+            
+            if domains.domain(forName: Parameters.http1_0DomainName) == nil {
+                
+                // Telemetry update
+                serverTelemetry.nofHttp500Replies.increment()
+                
+                // Logging update
+                let message = "Domain name for HTTP 1.0 requests not defined or domain not present"
+                log.atLevelDebug(id: logId, source: #file.source(#function, #line), message: message)
+                
+                // Reply to client
+                let response = httpErrorResponse(withCode: .code500_InternalServerError, httpVersion: httpVersion, message: "<p>\(message)</p>")
+                transferToClient(data: response)
+                
+                // Mutation update
+                mutation.httpResponseCode = HttpResponseCode.code500_InternalServerError.rawValue
+                mutation.responseDetails = message
+                mutation.requestCompleted = Date().javaDate
+                statistics.submit(mutation: mutation)
+                
+                return
+            }
+            
+            host = Host(address: Parameters.http1_0DomainName, port: nil)
+
+        } else {
+        
+            guard let _host = header.host else {
+                
+                // Telemetry update
+                serverTelemetry.nofHttp400Replies.increment()
+                
+                // Logging update
+                let message = "Could not extract host from Http Request Header"
+                log.atLevelDebug(id: logId, source: #file.source(#function, #line), message: message)
+                
+                // Reply to client
+                let response = httpErrorResponse(withCode: .code400_BadRequest, httpVersion: httpVersion, message: "<p>\(message)</p>")
+                transferToClient(data: response)
+                
+                // Mutation update
+                mutation.httpResponseCode = HttpResponseCode.code400_BadRequest.rawValue
+                mutation.responseDetails = message
+                mutation.requestCompleted = Date().javaDate
+                statistics.submit(mutation: mutation)
+                
+                return
+            }
+            
+            host = _host
         }
         
         guard let domain = domains.domain(forName: host.address), domain.enabled else {
@@ -125,7 +192,7 @@ extension HttpConnection {
             log.atLevelNotice(id: logId, source: #file.source(#function, #line), message: message)
             
             // Reply to client
-            let response = httpErrorResponse(withCode: .code400_BadRequest, andMessage: "<p>\(message)</p>")
+            let response = httpErrorResponse(withCode: .code400_BadRequest, httpVersion: httpVersion, message: "<p>\(message)</p>")
             transferToClient(data: response)
             
             // Mutation update
@@ -136,8 +203,7 @@ extension HttpConnection {
 
             return
         }
-        
-        
+            
         // Update mutation
         
         mutation.domain = domain.name
@@ -192,4 +258,9 @@ extension HttpConnection {
         mutation.requestCompleted = Date().javaDate
         statistics.submit(mutation: mutation)
     }
+    
+    func processHttp1_0Request(header: HttpHeader, mutation: Mutation) {
+        
+    }
+
 }

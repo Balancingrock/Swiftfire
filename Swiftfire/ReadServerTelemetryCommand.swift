@@ -115,6 +115,16 @@ final class ReadServerTelemetryCommand {
             
             toConsole?.transferToConsole(message: reply.json.description)
             
+            
+        case .nofHttp500Replies:
+            
+            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Reading, telemetry.nofHttp500Replies = \(serverTelemetry.nofHttp500Replies.intValue)")
+            
+            let reply = ReadServerTelemetryReply(item: telemetryItem, value: serverTelemetry.nofHttp500Replies.intValue)
+            
+            toConsole?.transferToConsole(message: reply.json.description)
+            
+            
         case .nofHttp502Replies:
             
             log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Reading, telemetry.nofHttp502Replies = \(serverTelemetry.nofHttp502Replies.intValue)")

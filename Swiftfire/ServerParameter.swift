@@ -3,7 +3,7 @@
 //  File:       ServerParameter.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.13
+//  Version:    0.9.14
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,6 +49,7 @@
 //
 // History
 //
+// v0.9.14 - Added http1_0DomainName
 // v0.9.13 - Upgraded to Swift 3 beta
 // v0.9.7  - Added HEADER_LOGGING_ENABLED, MAX_FILE_SIZE_FOR_HEADER_LOGGING,
 //           MAX_FILE_SIZE_FOR_ACCESS_LOGGING, FLUSH_HEADER_LOGFILE_AFTER_EACH_WRITE
@@ -83,10 +84,10 @@ enum ServerParameter: String {
     case macInactivityTimeout = "MacInactivityTimeout"
     case logfileMaxNofFiles = "LogfileMaxNofFiles"
     case logfileMaxSize = "LogfileMaxSize"
-
     case headerLoggingEnabled = "HeaderLoggingEnabled"
     case maxFileSizeForHeaderLogging = "MaxFileSizeForHeaderLogging"
     case flushHeaderLogfileAfterEachWrite = "FlushHeaderLogfileAfterEachWrite"
+    case http1_0DomainName = "Http1_0DomainName"
 
     var guiLabel: String {
         switch self {
@@ -110,10 +111,10 @@ enum ServerParameter: String {
         case .macInactivityTimeout: return "Close M&C connection after it was inactive for this long"
         case .logfileMaxNofFiles: return "Maximum number of logfiles"
         case .logfileMaxSize: return "Maximum size of a logfile"
-            
         case .headerLoggingEnabled: return "Enables logging of the full HTTP header"
         case .maxFileSizeForHeaderLogging: return "Maximum File Size of a Header Logfile"
         case .flushHeaderLogfileAfterEachWrite: return "Forces a file-write after each received HTTP header"
+        case .http1_0DomainName: return "Maps HTTP 1.0 requests to a domain specification"
         }
     }
 
@@ -126,7 +127,8 @@ enum ServerParameter: String {
         case .servicePortNumber,
              .networkLogtargetIpAddress,
              .networkLogtargetPortNumber,
-             .macPortNumber:
+             .macPortNumber,
+             .http1_0DomainName:
             
             return nil
             
@@ -178,5 +180,5 @@ enum ServerParameter: String {
         }
     }
 
-    static let all: Array<ServerParameter> = [.servicePortNumber, .maxNumberOfAcceptedConnections, .maxNumberOfPendingConnections, .maxWaitForPendingConnections, .clienMessageBufferSize, .httpKeepAliveInactivityTimeout, .httpResponseClientTimeout, .debugMode, .aslFacilityRecordAtAndAboveLevel, .stdoutPrintAtAndAboveLevel, .fileRecordAtAndAboveLevel, .callbackAtAndAboveLevel, .networkTransmitAtAndAboveLevel, .networkLogtargetIpAddress, .networkLogtargetPortNumber, .autoStartup, .macPortNumber, .macInactivityTimeout, .logfileMaxSize, .logfileMaxNofFiles, .maxFileSizeForHeaderLogging, .headerLoggingEnabled, .flushHeaderLogfileAfterEachWrite]
+    static let all: Array<ServerParameter> = [.servicePortNumber, .maxNumberOfAcceptedConnections, .maxNumberOfPendingConnections, .maxWaitForPendingConnections, .clienMessageBufferSize, .httpKeepAliveInactivityTimeout, .httpResponseClientTimeout, .debugMode, .aslFacilityRecordAtAndAboveLevel, .stdoutPrintAtAndAboveLevel, .fileRecordAtAndAboveLevel, .callbackAtAndAboveLevel, .networkTransmitAtAndAboveLevel, .networkLogtargetIpAddress, .networkLogtargetPortNumber, .autoStartup, .macPortNumber, .macInactivityTimeout, .logfileMaxSize, .logfileMaxNofFiles, .maxFileSizeForHeaderLogging, .headerLoggingEnabled, .flushHeaderLogfileAfterEachWrite, .http1_0DomainName]
 }

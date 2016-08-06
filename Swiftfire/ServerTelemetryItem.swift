@@ -3,7 +3,7 @@
 //  File:       ServerTelemetryItems.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.13
+//  Version:    0.9.14
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,6 +49,7 @@
 //
 // History
 //
+// v0.9.14 - Added NofHttp500Replies
 // v0.9.13 - Upgraded to Swift 3 beta
 // v0.9.6  - Header update
 // v0.9.4  - Initial release (replaces part of MacDef.swift)
@@ -63,6 +64,7 @@ enum ServerTelemetryItem: String {
     case nofAcceptWaitsForConnectionObject = "NofAcceptWaitsForConnectionObject"
     case nofAcceptedHttpRequests = "NofAcceptedHttpRequests"
     case nofHttp400Replies = "NofHttp400Replies"
+    case nofHttp500Replies = "NofHttp500Replies"
     case nofHttp502Replies = "NofHttp502Replies"
     
     var guiLabel: String {
@@ -72,6 +74,7 @@ enum ServerTelemetryItem: String {
         case serverStatus: return "The Status of Swiftfire"
         case nofAcceptedHttpRequests: return "The Total Number of Accepted Http Requests"
         case nofHttp400Replies: return "The Total Number of HTTP 400 Errors Generated"
+        case nofHttp500Replies: return "The Total Number of HTTP 500 Errors Generated"
         case nofHttp502Replies: return "The Total Number of HTTP 502 Errors Generated"
         }
     }
@@ -82,10 +85,11 @@ enum ServerTelemetryItem: String {
         case serverVersion: return "The Version Number of Swiftfire"
         case serverStatus: return "The Status of Swiftfire"
         case nofAcceptedHttpRequests: return "The Total Number of Accepted Http Requests"
-        case nofHttp400Replies: return "The Total Number of HTTP 400 Errors Generated"
-        case nofHttp502Replies: return "The Total Number of HTTP 502 Errors Generated"
+        case nofHttp400Replies: return "The Total Number of Bad Request Errors Generated"
+        case nofHttp500Replies: return "The Total Number of Internal Server Errors Generated"
+        case nofHttp502Replies: return "The Total Number of Bad Gateway Errors Generated"
         }
     }
 
-    static let all: Array<ServerTelemetryItem> = [.serverVersion, .serverStatus, .nofAcceptWaitsForConnectionObject, .nofAcceptedHttpRequests, .nofHttp400Replies, .nofHttp502Replies]
+    static let all: Array<ServerTelemetryItem> = [.serverVersion, .serverStatus, .nofAcceptWaitsForConnectionObject, .nofAcceptedHttpRequests, .nofHttp400Replies, .nofHttp500Replies, .nofHttp502Replies]
 }

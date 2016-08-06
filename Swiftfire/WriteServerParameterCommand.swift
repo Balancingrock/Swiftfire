@@ -253,6 +253,8 @@ final class WriteServerParameterCommand {
             )
             
         case .macInactivityTimeout: updateDouble(name: parameter.rawValue, value: value, setter: { Parameters.macInactivityTimeout = $0 }, getter: { Parameters.macInactivityTimeout })
+        case .http1_0DomainName: keepOrUpdate(name: parameter.rawValue, value: value, setter: { Parameters.http1_0DomainName = $0 }, getter: { Parameters.http1_0DomainName })
+
         }
     }
 }

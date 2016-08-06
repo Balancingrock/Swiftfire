@@ -93,7 +93,7 @@ extension HttpConnection {
             
             serverTelemetry.nofHttp502Replies.increment()
             log.atLevelError(id: logId, source: #file.source(#function, #line), message: "Could not open connection to \(host).")
-            let response = httpErrorResponse(withCode: .code502_BadGateway, andMessage: "<p>Forwarding failed, server not reachable.</p>")
+            let response = httpErrorResponse(withCode: .code502_BadGateway, httpVersion: .http1_1, message: "<p>Forwarding failed, server not reachable.</p>")
             transferToClient(data: response)
             
             closeForwardingConnection()
@@ -117,7 +117,7 @@ extension HttpConnection {
         if forwardingSocket == nil {
             
             serverTelemetry.nofHttp502Replies.increment()
-            let response = httpErrorResponse(withCode: .code502_BadGateway, andMessage: "<p>Forwarding failed, server not reachable.</p>")
+            let response = httpErrorResponse(withCode: .code502_BadGateway, httpVersion: .http1_1, message: "<p>Forwarding failed, server not reachable.</p>")
             transferToClient(data: response)
             return
             
@@ -130,7 +130,7 @@ extension HttpConnection {
             } catch {
                 
                 serverTelemetry.nofHttp502Replies.increment()
-                let response = httpErrorResponse(withCode: .code502_BadGateway, andMessage: "<p>Forwarding failed, server not reachable, not responding or generating connection errors.</p>")
+                let response = httpErrorResponse(withCode: .code502_BadGateway, httpVersion: .http1_1, message: "<p>Forwarding failed, server not reachable, not responding or generating connection errors.</p>")
                 transferToClient(data: response)
                 
                 closeForwardingConnection()

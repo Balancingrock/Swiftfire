@@ -132,6 +132,7 @@ final class ReadServerParameterCommand {
         case .networkTransmitAtAndAboveLevel: result = createIntReply(parameter: parameter, value: log.networkTransmitAtAndAboveLevel.rawValue)
         case .networkLogtargetIpAddress: result = createStringReply(parameter: parameter, value: log.networkTarget?.address ?? "")
         case .networkLogtargetPortNumber: result = createStringReply(parameter: parameter, value: log.networkTarget?.port ?? "")
+        case .http1_0DomainName: result = createStringReply(parameter: parameter, value: Parameters.http1_0DomainName)
         }
         
         toConsole?.transferToConsole(message: result.description)

@@ -3,7 +3,7 @@
 //  File:       Parameters.swift
 //  Project:    Swiftfire
 //
-private let VERSION = "0.9.13"
+private let VERSION = "0.9.14b1"
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,8 +49,8 @@ private let VERSION = "0.9.13"
 //
 // History
 //
-// v0.9.13 - Updated version number
-//         - Simplified implementation
+// v0.9.14 - Added http1_0DomainName
+// v0.9.13 - Simplified implementation
 // v0.9.12 - Updated version number
 // v0.9.11 - Updated version number
 // v0.9.10 - Updated version number
@@ -99,6 +99,7 @@ private let NETWORK_LOGTARGET_PORT_NUMBER = "NetworkLogtargetPortNumber"
 private let HEADER_LOGGING_ENABLED = "HeaderLoggingEnabled"
 private let MAX_FILE_SIZE_FOR_HEADER_LOGGING = "MaxFileSizeForHeaderLogging"
 private let FLUSH_HEADER_LOGFILE_AFTER_EACH_WRITE = "FlushHeaderLogfileAfterEachWrite"
+private let HTTP1_0_DOMAIN_NAME = "Http1.0DomainName"
 
 
 final class Parameters {
@@ -225,6 +226,11 @@ final class Parameters {
     static var flushHeaderLogfileAfterEachWrite = false
 
     
+    /// The domain name for http 1.0 requests
+    
+    static var http1_0DomainName = ""
+    
+    
     // No instantiations
     
     private init() {}
@@ -274,7 +280,8 @@ final class Parameters {
             if let value = (json|HEADER_LOGGING_ENABLED)?.boolValue { headerLoggingEnabled = value ; json.removeChildren(withName: HEADER_LOGGING_ENABLED) }
             if let value = (json|MAX_FILE_SIZE_FOR_HEADER_LOGGING)?.intValue { maxFileSizeForHeaderLogging = value ; json.removeChildren(withName: MAX_FILE_SIZE_FOR_HEADER_LOGGING) }
             if let value = (json|FLUSH_HEADER_LOGFILE_AFTER_EACH_WRITE)?.boolValue { flushHeaderLogfileAfterEachWrite = value ; json.removeChildren(withName: FLUSH_HEADER_LOGFILE_AFTER_EACH_WRITE) }
-            
+            if let value = (json|HTTP1_0_DOMAIN_NAME)?.stringValue { http1_0DomainName = value ; json.removeChildren(withName: HTTP1_0_DOMAIN_NAME) }
+
             
             // If the json object still contains children, log them as warnings
             
@@ -322,6 +329,7 @@ final class Parameters {
             json[HEADER_LOGGING_ENABLED] &= headerLoggingEnabled
             json[MAX_FILE_SIZE_FOR_HEADER_LOGGING] &= maxFileSizeForHeaderLogging
             json[FLUSH_HEADER_LOGFILE_AFTER_EACH_WRITE] &= flushHeaderLogfileAfterEachWrite
+            json[HTTP1_0_DOMAIN_NAME] &= http1_0DomainName
             
             json.save(to: file)
         
@@ -357,6 +365,7 @@ final class Parameters {
         log.atLevel(level, id: -1, source: "Parameters", message: "\(HEADER_LOGGING_ENABLED) = \(headerLoggingEnabled)")
         log.atLevel(level, id: -1, source: "Parameters", message: "\(MAX_FILE_SIZE_FOR_HEADER_LOGGING) = \(maxFileSizeForHeaderLogging)")
         log.atLevel(level, id: -1, source: "Parameters", message: "\(FLUSH_HEADER_LOGFILE_AFTER_EACH_WRITE) = \(flushHeaderLogfileAfterEachWrite)")
+        log.atLevel(level, id: -1, source: "Parameters", message: "\(HTTP1_0_DOMAIN_NAME) = \(http1_0DomainName)")
     }
 }
 

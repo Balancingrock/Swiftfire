@@ -3,7 +3,7 @@
 //  File:       HttpConnection.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.13
+//  Version:    0.9.14
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,6 +49,7 @@
 //
 // History
 //
+// v0.9.14 - Changed return of http version number to fit the request header http version
 // v0.9.13 - Upgraded to Swift 3 beta
 // v0.9.11 - Added "allocationCount", "objectId" and "objectIdCount"
 // v0.9.6  - Header update
@@ -317,7 +318,7 @@ extension HttpConnection {
      - Note: If the message contains characters that cannot be converted to an UTF8 string, then the response will not contain any visible data.
      */
     
-    func httpErrorResponse(withCode code: HttpResponseCode, andMessage message: String? = nil) -> Data {
+    func httpErrorResponse(withCode code: HttpResponseCode, httpVersion: HttpVersion, message: String? = nil) -> Data {
         
         let message = message ?? "HTTP Request rejected with: \(code.rawValue)"
         
@@ -328,7 +329,7 @@ extension HttpConnection {
         
         let bodyData = body.data(using: String.Encoding.utf8, allowLossyConversion: true) ?? Data()
         
-        let response = httpResponse(withCode: code, mimeType: mimeTypeHtml, andBody: bodyData)
+        let response = httpResponse(withCode: code, httpVersion: httpVersion, mimeType: mimeTypeHtml, body: bodyData)
         
         return response
     }
@@ -343,9 +344,9 @@ extension HttpConnection {
      - Return: A buffer with the response.
      */
     
-    func httpResponse(withCode code: HttpResponseCode, mimeType: String, andBody body: Data) -> Data {
+    func httpResponse(withCode code: HttpResponseCode, httpVersion: HttpVersion, mimeType: String, body: Data) -> Data {
         
-        let header = "HTTP/1.1 " + code.rawValue + CRLF +
+        let header = "\(httpVersion.rawValue) \(code.rawValue)" + CRLF +
             "Date: \(Date())" + CRLF +
             "Server: Swiftfire/\(Parameters.version)" + CRLF +
             "Content-Type: \(mimeType); charset=UTF-8" + CRLF +

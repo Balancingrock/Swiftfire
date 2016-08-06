@@ -3,7 +3,7 @@
 //  File:       Domain.HttpWorker.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.13
+//  Version:    0.9.14
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,6 +49,7 @@
 //
 // History
 //
+// v0.9.14 - Added support for HTTP 1.0
 // v0.9.13 - Upgraded to Swift 3 beta
 // v0.9.11 - Added statistics, partial rewrite of some code parts.
 // v0.9.7  - Added Access logging
@@ -112,7 +113,7 @@ extension Domain {
         
         
         // =============================================================================================================
-        // The header must be HTTP version 1.1
+        // The header must be HTTP version 1.0 or 1.1
         // =============================================================================================================
         
         guard let httpVersion = header.httpVersion else {
@@ -129,10 +130,10 @@ extension Domain {
             mutation.responseDetails = message
             
             // Response
-            return connection.httpErrorResponse(withCode: .code505_HttpVersionNotSupported)
+            return connection.httpErrorResponse(withCode: .code505_HttpVersionNotSupported, httpVersion: .http1_1)
         }
             
-        guard httpVersion == HttpVersion.http1_1 else {
+        guard httpVersion == HttpVersion.http1_0 || httpVersion == HttpVersion.http1_1 else {
             
             // Telemetry update
             telemetry.nof505.increment()
@@ -146,7 +147,7 @@ extension Domain {
             mutation.responseDetails = message
 
             // Response
-            return connection.httpErrorResponse(withCode: .code505_HttpVersionNotSupported)
+            return connection.httpErrorResponse(withCode: .code505_HttpVersionNotSupported, httpVersion: httpVersion)
         }
         
         
@@ -168,7 +169,7 @@ extension Domain {
             mutation.responseDetails = message
             
             // Response
-            return connection.httpErrorResponse(withCode: .code400_BadRequest)
+            return connection.httpErrorResponse(withCode: .code400_BadRequest, httpVersion: httpVersion)
         }
         
         guard (operation == HttpOperation.get || operation == HttpOperation.post) else {
@@ -185,7 +186,7 @@ extension Domain {
             mutation.responseDetails = message
             
             // Response
-            return connection.httpErrorResponse(withCode: .code501_NotImplemented)
+            return connection.httpErrorResponse(withCode: .code501_NotImplemented, httpVersion: httpVersion)
         }
         
         
@@ -207,7 +208,7 @@ extension Domain {
             mutation.responseDetails = message
             
             // Response
-            return connection.httpErrorResponse(withCode: .code400_BadRequest)
+            return connection.httpErrorResponse(withCode: .code400_BadRequest, httpVersion: httpVersion)
         }
         
         // Mutation update
@@ -237,7 +238,7 @@ extension Domain {
                 mutation.responseDetails = "Resource for url '\(partialPath)' not found"
                 
                 // Response
-                return connection.httpErrorResponse(withCode: .code404_NotFound)
+                return connection.httpErrorResponse(withCode: .code404_NotFound, httpVersion: httpVersion)
                 
             } else if errorReason == .AccessNotAllowed {
                 
@@ -250,7 +251,7 @@ extension Domain {
                 mutation.responseDetails = message
                 
                 // Response
-                return connection.httpErrorResponse(withCode: HttpResponseCode.code403_Forbidden, andMessage: "<p>\(message)</p>")
+                return connection.httpErrorResponse(withCode: HttpResponseCode.code403_Forbidden, httpVersion: httpVersion, message: "<p>\(message)</p>")
             
             } else {
                 assert(false, "error reason should not be .Available")
@@ -278,7 +279,7 @@ extension Domain {
             mutation.responseDetails ??= message
             
             // Response
-            return connection.httpErrorResponse(withCode: .code500_InternalServerError, andMessage: "<p>A Server side error occured, the error has been logged.</p>")
+            return connection.httpErrorResponse(withCode: .code500_InternalServerError, httpVersion: httpVersion, message: "<p>A Server side error occured, the error has been logged.</p>")
         }
         
         
@@ -287,7 +288,7 @@ extension Domain {
         // =============================================================================================================
         
         let responseMimeType = mimeType(forPath: newPartialPath!) ?? mimeTypeDefault
-        let response = connection.httpResponse(withCode: .code200_OK, mimeType: responseMimeType, andBody: responsePayload!)
+        let response = connection.httpResponse(withCode: .code200_OK, httpVersion: httpVersion, mimeType: responseMimeType, body: responsePayload!)
         
         telemetry.nof200.increment()
         

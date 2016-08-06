@@ -3,7 +3,7 @@
 //  File:       ServerTelemetry.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.13
+//  Version:    0.9.14
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,6 +49,8 @@
 //
 // History
 //
+// v0.9.14 - Updated description for nofHttp400Replies
+//         - Added nofHttp500Replies
 // v0.9.13 - Upgraded to Swift 3 beta
 // v0.9.11 - Moved global definition from main.swift to here.
 // v0.9.6  - Header update
@@ -82,6 +84,7 @@ final class ServerTelemetry: CustomStringConvertible, CustomDebugStringConvertib
         nofAcceptedHttpRequests.reinitialize()
         
         nofHttp400Replies.reinitialize()
+        nofHttp500Replies.reinitialize()
         nofHttp502Replies.reinitialize()
     }
 
@@ -107,7 +110,7 @@ final class ServerTelemetry: CustomStringConvertible, CustomDebugStringConvertib
     /**
      The number of bad HTTP requests. Wraps around at 999_999.
      
-     It is incremented in HttpConnection.HttpWorker when a request cannot be mapped to a (hosted) domain. Check the logfile and see why the domain could not be mapped. If necessary enable the domain or fix/add a domain.
+     It is incremented in HttpConnection.HttpWorker when a request cannot be mapped to a (hosted) domain or when no HTTP version is present in the request. Check the logfile and see why the domain could not be mapped. If necessary enable the domain or fix/add a domain.
      */
     
     let nofHttp400Replies = UIntTelemetry()
@@ -120,6 +123,15 @@ final class ServerTelemetry: CustomStringConvertible, CustomDebugStringConvertib
      */
     
     let nofHttp502Replies = UIntTelemetry()
+    
+    
+    /**
+     The number of "Server Error" replies for HTTP 1.0 requests. Wraps around at 999_999.
+     
+     The parameter "http1_0DomainName" does not refer to an existing domain specification. Update the parameter or add the domain specification.
+     */
+    
+    let nofHttp500Replies = UIntTelemetry()
 
     
     // MARK: - CustomStringConvertible protocol
@@ -128,6 +140,7 @@ final class ServerTelemetry: CustomStringConvertible, CustomDebugStringConvertib
         return "nofAcceptWaitsForConnectionObject = \(nofAcceptWaitsForConnectionObject),\n" +
             "nofAcceptedHttpRequests = \(nofAcceptedHttpRequests),\n" +
             "nofHttp400Replies = \(nofHttp400Replies),\n" +
+            "nofHttp500Replies = \(nofHttp500Replies),\n" +
             "nofHttp502Replies = \(nofHttp502Replies),\n"
     }
     
