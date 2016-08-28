@@ -3,7 +3,7 @@
 //  File:       ReadServerTelemetryCommand.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.13
+//  Version:    0.9.14
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,7 +49,8 @@
 //
 // History
 //
-// v0.9.13 - Upgraded to Swift 3 beta
+// v0.9.14 - Updated Command & Reply structure
+// v0.9.13 - Upgraded to Xcode 8 beta 3 (Swift 3)
 // v0.9.11 - Updated for VJson 0.9.8
 // v0.9.6  - Header update
 // v0.9.4  - Initial release (replaces part of MacDef.swift)
@@ -61,97 +62,31 @@ import Foundation
 private let COMMAND_NAME = "ReadServerTelemetryCommand"
 
 
-final class ReadServerTelemetryCommand {
+final class ReadServerTelemetryCommand: MacMessage {
     
-    let telemetryItem: ServerTelemetryItem
+    
+    // MARK: - MacMessage protocol
     
     var json: VJson {
         let j = VJson()
-        j[COMMAND_NAME].stringValue = telemetryItem.rawValue
+        j[COMMAND_NAME] &= telemetryName.rawValue
         return j
-    }
-    
-    init?(telemetryItem: ServerTelemetryItem?) {
-        guard let telemetryItem = telemetryItem else { return nil }
-        self.telemetryItem = telemetryItem
     }
     
     init?(json: VJson?) {
         guard let json = json else { return nil }
         guard let jname = (json|COMMAND_NAME)?.stringValue else { return nil }
-        guard let jtelemetryItem = ServerTelemetryItem(rawValue: jname) else { return nil }
-        telemetryItem = jtelemetryItem
+        guard let jtelemetryItem = ServerTelemetryName(rawValue: jname) else { return nil }
+        telemetryName = jtelemetryItem
     }
     
+
+    // MARK: - Class specific
     
-    func execute() {
-        
-        switch telemetryItem {
-            
-            
-        case .nofAcceptedHttpRequests:
-            
-            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Reading, telemetry.nofAcceptedHttpRequests = \(serverTelemetry.nofAcceptedHttpRequests.intValue)")
-            
-            let reply = ReadServerTelemetryReply(item: telemetryItem, value: serverTelemetry.nofAcceptedHttpRequests.intValue)
-            
-            toConsole?.transferToConsole(message: reply.json.description)
-            
-            
-        case .nofAcceptWaitsForConnectionObject:
-            
-            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Reading, telemetry.nofAcceptWaitsForConnectionObject = \(serverTelemetry.nofAcceptWaitsForConnectionObject.intValue)")
-            
-            let reply = ReadServerTelemetryReply(item: telemetryItem, value: serverTelemetry.nofAcceptWaitsForConnectionObject.intValue)
-            
-            toConsole?.transferToConsole(message: reply.json.description)
-            
-            
-        case .nofHttp400Replies:
-            
-            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Reading, telemetry.nofHttp400Replies = \(serverTelemetry.nofHttp400Replies.intValue)")
-            
-            let reply = ReadServerTelemetryReply(item: telemetryItem, value: serverTelemetry.nofHttp400Replies.intValue)
-            
-            toConsole?.transferToConsole(message: reply.json.description)
-            
-            
-        case .nofHttp500Replies:
-            
-            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Reading, telemetry.nofHttp500Replies = \(serverTelemetry.nofHttp500Replies.intValue)")
-            
-            let reply = ReadServerTelemetryReply(item: telemetryItem, value: serverTelemetry.nofHttp500Replies.intValue)
-            
-            toConsole?.transferToConsole(message: reply.json.description)
-            
-            
-        case .nofHttp502Replies:
-            
-            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Reading, telemetry.nofHttp502Replies = \(serverTelemetry.nofHttp502Replies.intValue)")
-            
-            let reply = ReadServerTelemetryReply(item: telemetryItem, value: serverTelemetry.nofHttp502Replies.intValue)
-            
-            toConsole?.transferToConsole(message: reply.json.description)
-            
-            
-        case .serverStatus:
-            
-            let rs = httpServerIsRunning()
-            
-            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Reading, at_RunningStatus = \(rs)")
-            
-            let reply = ReadServerTelemetryReply(item: telemetryItem, value: (rs ? "Running" : "Not Running"))
-            
-            toConsole?.transferToConsole(message: reply.json.description)
-            
-            
-        case .serverVersion:
-            
-            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Reading, ap_Version = \(Parameters.version)")
-            
-            let reply = ReadServerTelemetryReply(item: telemetryItem, value: Parameters.version)
-            
-            toConsole?.transferToConsole(message: reply.json.description)
-        }
+    let telemetryName: ServerTelemetryName
+    
+    init?(telemetryName: ServerTelemetryName?) {
+        guard let telemetryName = telemetryName else { return nil }
+        self.telemetryName = telemetryName
     }
 }

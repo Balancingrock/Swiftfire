@@ -3,7 +3,7 @@
 //  File:       WriteServerParameterCommand.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.13
+//  Version:    0.9.14
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,7 +49,8 @@
 //
 // History
 //
-// v0.9.13 - Upgraded to Swift 3 beta
+// v0.9.14 - Updated Command & Reply structure
+// v0.9.13 - Upgraded to Xcode 8 beta 3 (Swift 3)
 // v0.9.11 - Updated for VJson 0.9.8
 // v0.9.6  - Header update
 // v0.9.4  - Initial release (replaces part of MacDef.swift)
@@ -63,64 +64,22 @@ private let PARAMETER = "Parameter"
 private let VALUE = "Value"
 
 
-final class WriteServerParameterCommand {
+final class WriteServerParameterCommand: MacMessage {
     
-    static let JSON_ID = "WriteServerParameterCommand"
     
-    let parameter: ServerParameter
-    let value: String
+    // MARK: - MacMessage protocol
     
-    var intValue: Int? {
-        return Int(value)
-    }
-    
-    var boolValue: Bool? {
-        return Bool(value)
-    }
-    
-    var doubleValue: Double? {
-        return Double(value)
-    }
-
     var json: VJson {
         let j = VJson()
         j[COMMAND_NAME][PARAMETER].stringValue = parameter.rawValue
         j[COMMAND_NAME][VALUE].stringValue = value
         return j
     }
-    
-    init?(parameter: ServerParameter?, value: String?) {
-        guard let parameter = parameter else { return nil }
-        guard let value = value else { return nil }
-        self.parameter = parameter
-        self.value = value
-    }
-    
-    init?(parameter: ServerParameter?, value: Bool?) {
-        guard let parameter = parameter else { return nil }
-        guard let value = value else { return nil }
-        self.parameter = parameter
-        self.value = value ? "true" : "false"
-    }
-
-    init?(parameter: ServerParameter?, value: Int?) {
-        guard let parameter = parameter else { return nil }
-        guard let value = value else { return nil }
-        self.parameter = parameter
-        self.value = value.description
-    }
-    
-    init?(parameter: ServerParameter?, value: Double?) {
-        guard let parameter = parameter else { return nil }
-        guard let value = value else { return nil }
-        self.parameter = parameter
-        self.value = value.description
-    }
 
     init?(json: VJson?) {
         guard let json = json else { return nil }
         guard let jparameterName = (json|COMMAND_NAME|PARAMETER)?.stringValue else { return nil }
-        guard let jparameter = ServerParameter(rawValue: jparameterName) else { return nil }
+        guard let jparameter = ServerParameterName(rawValue: jparameterName) else { return nil }
         guard let jvalue = (json|COMMAND_NAME|VALUE)?.stringValue else { return nil }
 
         parameter = jparameter
@@ -128,133 +87,45 @@ final class WriteServerParameterCommand {
     }
     
     
+    // MARK: - Class specific
+    
+    let parameter: ServerParameterName
+    let value: String
+    
+    var intValue: Int? { return Int(value) }
+    var boolValue: Bool? { return Bool(value) }
+    var doubleValue: Double? { return Double(value) }
+    
+    init?(parameter: ServerParameterName?, value: String?) {
+        guard let parameter = parameter else { return nil }
+        guard let value = value else { return nil }
+        self.parameter = parameter
+        self.value = value
+    }
+    
+    init?(parameter: ServerParameterName?, value: Bool?) {
+        guard let parameter = parameter else { return nil }
+        guard let value = value else { return nil }
+        self.parameter = parameter
+        self.value = value ? "true" : "false"
+    }
+    
+    init?(parameter: ServerParameterName?, value: Int?) {
+        guard let parameter = parameter else { return nil }
+        guard let value = value else { return nil }
+        self.parameter = parameter
+        self.value = value.description
+    }
+    
+    init?(parameter: ServerParameterName?, value: Double?) {
+        guard let parameter = parameter else { return nil }
+        guard let value = value else { return nil }
+        self.parameter = parameter
+        self.value = value.description
+    }
+    
+    
     // The network target for the logger
     
-    private static var networkLogTarget = SwifterLog.NetworkTarget("","")
-    
-    
-    /// Checks if the networkLogTarget contains two non-empty fields, and if so, tries to connect the logger to the target. After a connection attempt it will empty the fields.
-    /// - Returns: True if the connection attempt was made, false otherwise.
-    /// - Note: It does not report the sucess/failure of the connection attempt.
-    
-    @discardableResult
-    private static func conditionallySetNetworkLogTarget() -> Bool {
-        if networkLogTarget.address.isEmpty { return false }
-        if networkLogTarget.port.isEmpty { return false }
-        log.connectToNetworkTarget(networkLogTarget)
-        log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Setting the network logtarget to: \(networkLogTarget.address):\(networkLogTarget.port)")
-        networkLogTarget.address = ""
-        networkLogTarget.port = ""
-        return true
-    }
-
-    func execute() {
-        
-        func keepOrUpdate<T: Equatable>(name: String, value: T, setter: (T)->(), getter: () -> T) {
-            if value != getter() {
-                log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "\(name) updating from \(getter()) to \(value)")
-                setter(value)
-            } else {
-                log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "\(name) new value same as old value: \(value)")
-            }
-        }
-        
-        func updateBool(name: String, value: String, setter: (Bool)->(), getter: () -> Bool) {
-            if let val = Bool(value) {
-                keepOrUpdate(name: name, value: val, setter: setter, getter: getter)
-            } else {
-                log.atLevelWarning(id: -1, source: #file.source(#function, #line), message: "\(name) should contain a Bool value")
-            }
-        }
-        
-        func updateInt(name: String, value: String, setter: (Int)->(), getter: () -> Int) {
-            if let val = Int(value) {
-                keepOrUpdate(name: name, value: val, setter: setter, getter: getter)
-            } else {
-                log.atLevelWarning(id: -1, source: #file.source(#function, #line), message: "\(name) should contain an Int value")
-            }
-        }
-        
-        func updateInt32(name: String, value: String, setter: (Int32)->(), getter: () -> Int32) {
-            if let val = Int32(value) {
-                keepOrUpdate(name: name, value: val, setter: setter, getter: getter)
-            } else {
-                log.atLevelWarning(id: -1, source: #file.source(#function, #line), message: "\(name) should contain an Int32 value")
-            }
-        }
-        
-        func updateDouble(name: String, value: String, setter: (Double)->(), getter: () -> Double) {
-            if let val = Double(value) {
-                keepOrUpdate(name: name, value: val, setter: setter, getter: getter)
-            } else {
-                log.atLevelWarning(id: -1, source: #file.source(#function, #line), message: "\(name) should contain a Double value")
-            }
-        }
-
-        func updateLevel(name: String, value: String, setter: (SwifterLog.Level)->(), getter: () -> SwifterLog.Level) {
-            if let intVal = Int(value), let val = SwifterLog.Level(rawValue: intVal) {
-                keepOrUpdate(name: name, value: val, setter: setter, getter: getter)
-            } else {
-                log.atLevelWarning(id: -1, source: #file.source(#function, #line), message: "\(name) should contain an Int value convertible to SwifterLog.Level")
-            }
-        }
-
-        
-        // Update parameter
-        
-        switch parameter {
-        case .debugMode: updateBool(name: parameter.rawValue, value: value, setter: { Parameters.debugMode = $0 }, getter: { Parameters.debugMode })
-        case .autoStartup: updateBool(name: parameter.rawValue, value: value, setter: { Parameters.autoStartup = $0 }, getter: { Parameters.autoStartup })
-        case .headerLoggingEnabled: updateBool(name: parameter.rawValue, value: value, setter: { Parameters.headerLoggingEnabled = $0 }, getter: { Parameters.headerLoggingEnabled })
-        case .flushHeaderLogfileAfterEachWrite: updateBool(name: parameter.rawValue, value: value, setter: { Parameters.flushHeaderLogfileAfterEachWrite = $0 }, getter: { Parameters.flushHeaderLogfileAfterEachWrite })
-        case .clienMessageBufferSize: updateInt(name: parameter.rawValue, value: value, setter: { Parameters.clientMessageBufferSize = $0 }, getter: { Parameters.clientMessageBufferSize })
-        case .httpKeepAliveInactivityTimeout: updateInt(name: parameter.rawValue, value: value, setter: { Parameters.httpKeepAliveInactivityTimeout = $0 }, getter: { Parameters.httpKeepAliveInactivityTimeout })
-        case .maxNumberOfAcceptedConnections: updateInt(name: parameter.rawValue, value: value, setter: { Parameters.maxNofAcceptedConnections = $0 }, getter: { Parameters.maxNofAcceptedConnections })
-        case .maxNumberOfPendingConnections: updateInt32(name: parameter.rawValue, value: value, setter: { Parameters.maxNofPendingConnections = $0 }, getter: { Parameters.maxNofPendingConnections })
-        case .maxWaitForPendingConnections: updateInt(name: parameter.rawValue, value: value, setter: { Parameters.maxWaitForPendingConnections = $0 }, getter: { Parameters.maxWaitForPendingConnections })
-        case .logfileMaxSize: updateInt(name: parameter.rawValue, value: value, setter: { Parameters.logfileMaxSize = $0; log.logfileMaxSizeInBytes = UInt64($0 * 1024) }, getter: { Int(log.logfileMaxSizeInBytes) * 1024 })
-        case .logfileMaxNofFiles: updateInt(name: parameter.rawValue, value: value, setter: { Parameters.logfileMaxNofFiles = $0; log.logfileMaxNumberOfFiles = $0 }, getter: { log.logfileMaxNumberOfFiles })
-        case .maxFileSizeForHeaderLogging: updateInt(name: parameter.rawValue, value: value, setter: { Parameters.maxFileSizeForHeaderLogging = $0 }, getter: { Parameters.maxFileSizeForHeaderLogging })
-        case .httpResponseClientTimeout: updateDouble(name: parameter.rawValue, value: value, setter: { Parameters.httpResponseClientTimeout = $0 }, getter: { Parameters.httpResponseClientTimeout })
-        case .aslFacilityRecordAtAndAboveLevel: updateLevel(name: parameter.rawValue, value: value, setter: { Parameters.aslFacilityRecordAtAndAboveLevel = $0; log.aslFacilityRecordAtAndAboveLevel = $0 }, getter: { log.aslFacilityRecordAtAndAboveLevel })
-        case .fileRecordAtAndAboveLevel: updateLevel(name: parameter.rawValue, value: value, setter: { Parameters.fileRecordAtAndAboveLevel = $0; log.fileRecordAtAndAboveLevel = $0 }, getter: { log.fileRecordAtAndAboveLevel })
-        case .callbackAtAndAboveLevel: updateLevel(name: parameter.rawValue, value: value, setter: { Parameters.callbackAtAndAboveLevel = $0; log.callbackAtAndAboveLevel = $0 }, getter: { log.callbackAtAndAboveLevel })
-        case .networkTransmitAtAndAboveLevel: updateLevel(name: parameter.rawValue, value: value, setter: { Parameters.networkTransmitAtAndAboveLevel = $0; log.networkTransmitAtAndAboveLevel = $0 }, getter: { log.networkTransmitAtAndAboveLevel })
-        case .stdoutPrintAtAndAboveLevel: updateLevel(name: parameter.rawValue, value: value, setter: { Parameters.stdoutPrintAtAndAboveLevel = $0; log.stdoutPrintAtAndAboveLevel = $0 }, getter: { log.stdoutPrintAtAndAboveLevel })
-        case .servicePortNumber: keepOrUpdate(name: parameter.rawValue, value: value, setter: { Parameters.httpServicePortNumber = $0 }, getter: { Parameters.httpServicePortNumber })
-        case .macPortNumber: keepOrUpdate(name: parameter.rawValue, value: value, setter: { Parameters.macPortNumber = $0 }, getter: { Parameters.macPortNumber })
-
-        case .networkLogtargetIpAddress:
-            keepOrUpdate(
-                name: parameter.rawValue,
-                value: value,
-                setter: {
-                    Parameters.networkLogtargetIpAddress = $0
-                    WriteServerParameterCommand.networkLogTarget.address = $0
-                    WriteServerParameterCommand.conditionallySetNetworkLogTarget()
-                },
-                getter: {
-                    log.networkTarget?.address ?? ""
-                }
-            )
-
-        case .networkLogtargetPortNumber:
-            keepOrUpdate(
-                name: parameter.rawValue,
-                value: value,
-                setter: {
-                    Parameters.networkLogtargetPortNumber = $0
-                    WriteServerParameterCommand.networkLogTarget.port = $0
-                    WriteServerParameterCommand.conditionallySetNetworkLogTarget()
-                },
-                getter: {
-                    log.networkTarget?.port ?? ""
-                }
-            )
-            
-        case .macInactivityTimeout: updateDouble(name: parameter.rawValue, value: value, setter: { Parameters.macInactivityTimeout = $0 }, getter: { Parameters.macInactivityTimeout })
-        case .http1_0DomainName: keepOrUpdate(name: parameter.rawValue, value: value, setter: { Parameters.http1_0DomainName = $0 }, getter: { Parameters.http1_0DomainName })
-
-        }
-    }
+    static var networkLogTarget = SwifterLog.NetworkTarget("","")
 }

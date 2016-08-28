@@ -50,7 +50,8 @@
 // History
 //
 // v0.9.14 - Changed return of http version number to fit the request header http version
-// v0.9.13 - Upgraded to Swift 3 beta
+//         - Upgraded to Xcode 8 beta 6
+// v0.9.13 - Upgraded to Xcode 8 beta 3 (Swift 3)
 // v0.9.11 - Added "allocationCount", "objectId" and "objectIdCount"
 // v0.9.6  - Header update
 //         - Merged MAX_NOF_PENDING_CLIENT_MESSAGES with MAX_CLIENT_MESSAGE_SIZE into CLIENT_MESSAGE_BUFFER_SIZE
@@ -130,17 +131,17 @@ final class HttpConnection {
     
     /// The dispatch queue on wich the connections receive data from the client
     
-    let receiverQueue = DispatchQueue(label: "Receiver", attributes: [.concurrent, .qosUserInitiated])
+    let receiverQueue = DispatchQueue(label: "Receiver", attributes: [.concurrent])
     
     
     /// The dispatch queue on which connections transmit data to the client
 
-    let transmitterQueue = DispatchQueue(label: "Transmitter", attributes: [.serial, .qosUserInitiated])
+    let transmitterQueue = DispatchQueue(label: "Transmitter")
 
     
     /// The dispatch queue on which connections process the data from the client
     
-    let workerQueue = DispatchQueue(label: "Worker", attributes: [.serial, .qosUserInitiated])
+    let workerQueue = DispatchQueue(label: "Worker")
     
     
     /// The file manager to be used for this connection object
@@ -177,8 +178,12 @@ final class HttpConnection {
     
     // The queue on which received replies will be send to our client
     
-    var forwardingReceiverQueue = DispatchQueue(label: "ForwardingReceiverQueue", attributes: [.serial, .qosUtility])
+    var forwardingReceiverQueue = DispatchQueue(label: "ForwardingReceiverQueue")
 
+    
+    // If set to 'true' the connection will be closed asap
+    
+    var mustClose = false
 }
 
 
@@ -206,7 +211,7 @@ extension HttpConnection {
             onQueue: transmitterQueue,
             toSocket: socket,
             data: data,
-            timeout: Double(Parameters.httpResponseClientTimeout),
+            timeout: Double(parameters.httpResponseClientTimeout),
             telemetry: nil,
             postProcessor: {
                 
@@ -293,6 +298,7 @@ extension HttpConnection {
             self.httpHeader = nil
             self.maxSendBufferSize = nil
             self.abortProcessing = false
+            self.mustClose = false
             
             
             // Free this connection object
@@ -348,7 +354,7 @@ extension HttpConnection {
         
         let header = "\(httpVersion.rawValue) \(code.rawValue)" + CRLF +
             "Date: \(Date())" + CRLF +
-            "Server: Swiftfire/\(Parameters.version)" + CRLF +
+            "Server: Swiftfire/\(parameters.version)" + CRLF +
             "Content-Type: \(mimeType); charset=UTF-8" + CRLF +
             "Content-Length: \(body.count)" + CRLFCRLF
         

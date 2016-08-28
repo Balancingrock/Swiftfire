@@ -49,13 +49,16 @@
 //
 // History
 //
-// v0.9.13 - Upgraded to Swift 3 beta
+// v0.9.13 - Upgraded to Xcode 8 beta 3 (Swift 3)
 // v0.9.12 - Initial release
 // =====================================================================================================================
 
+
 import Foundation
 
-infix operator ??= {}
+
+infix operator ??=
+
 
 func ??=<T> (lhs: inout T?, rhs: T) {
     if lhs == nil { lhs = rhs }

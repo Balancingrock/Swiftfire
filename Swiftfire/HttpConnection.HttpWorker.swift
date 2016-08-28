@@ -50,7 +50,8 @@
 // History
 //
 // v0.9.14 - Added support for HTTP 1.0
-// v0.9.13 - Upgraded to Swift 3 beta
+//         - Upgraded to Xcode 8 beta 6
+// v0.9.13 - Upgraded to Xcode 8 beta 3 (Swift 3)
 // v0.9.11 - Added support for usage statistics
 // v0.9.6  - Header update
 // v0.9.3  - Added incrementing of serverTelemetry.nofHttp400Replies if the host cannot be mapped to a domain
@@ -98,7 +99,7 @@ extension HttpConnection {
         guard let httpVersion = header.httpVersion else {
             
             // Telemetry update
-            serverTelemetry.nofHttp400Replies.increment()
+            telemetry.nofHttp400Replies.increment()
             
             // Log update
             let message = "HTTP Version not present"
@@ -124,38 +125,46 @@ extension HttpConnection {
 
         var host: Host
         
-        if httpVersion == HttpVersion.http1_0 {
+        if let _host = header.host {
             
-            if domains.domain(forName: Parameters.http1_0DomainName) == nil {
-                
-                // Telemetry update
-                serverTelemetry.nofHttp500Replies.increment()
-                
-                // Logging update
-                let message = "Domain name for HTTP 1.0 requests not defined or domain not present"
-                log.atLevelDebug(id: logId, source: #file.source(#function, #line), message: message)
-                
-                // Reply to client
-                let response = httpErrorResponse(withCode: .code500_InternalServerError, httpVersion: httpVersion, message: "<p>\(message)</p>")
-                transferToClient(data: response)
-                
-                // Mutation update
-                mutation.httpResponseCode = HttpResponseCode.code500_InternalServerError.rawValue
-                mutation.responseDetails = message
-                mutation.requestCompleted = Date().javaDate
-                statistics.submit(mutation: mutation)
-                
-                return
-            }
-            
-            host = Host(address: Parameters.http1_0DomainName, port: nil)
-
-        } else {
+            host = _host
         
-            guard let _host = header.host else {
+        } else {
+            
+            // No host found, if this is a HTTP1.0 request, then use the spefied domain as the 'host'.
+            
+            if httpVersion == HttpVersion.http1_0 {
+                
+                if domains.domain(forName: parameters.http1_0DomainName) != nil {
+                    
+                    host = Host(address: parameters.http1_0DomainName, port: nil)
+                    
+                } else {
+                
+                    // Telemetry update
+                    telemetry.nofHttp500Replies.increment()
+                    
+                    // Logging update
+                    let message = "Domain name for HTTP 1.0 requests not defined or domain not present"
+                    log.atLevelDebug(id: logId, source: #file.source(#function, #line), message: message)
+                    
+                    // Reply to client
+                    let response = httpErrorResponse(withCode: .code500_InternalServerError, httpVersion: httpVersion, message: "<p>\(message)</p>")
+                    transferToClient(data: response)
+                    
+                    // Mutation update
+                    mutation.httpResponseCode = HttpResponseCode.code500_InternalServerError.rawValue
+                    mutation.responseDetails = message
+                    mutation.requestCompleted = Date().javaDate
+                    statistics.submit(mutation: mutation)
+                    
+                    return
+                }
+
+            } else {
                 
                 // Telemetry update
-                serverTelemetry.nofHttp400Replies.increment()
+                telemetry.nofHttp400Replies.increment()
                 
                 // Logging update
                 let message = "Could not extract host from Http Request Header"
@@ -173,14 +182,12 @@ extension HttpConnection {
                 
                 return
             }
-            
-            host = _host
         }
         
         guard let domain = domains.domain(forName: host.address), domain.enabled else {
             
             // Telemetry update
-            serverTelemetry.nofHttp400Replies.increment()
+            telemetry.nofHttp400Replies.increment()
             
             // Logging update
             let message: String
@@ -243,24 +250,20 @@ extension HttpConnection {
         // The domain takes over from here
         // =============================================================================================================
 
-        let response = domain.httpWorker(header: header, body: body, connection: self, mutation: mutation)
-
+        if let response = domain.httpWorker(header: header, body: body, connection: self, mutation: mutation) {
+            
+            transferToClient(data: response)
         
-        // =================================================================================================================
-        // Transfer the reply
-        // =================================================================================================================
+            // Mutation update
+            mutation.httpResponseCode ??= HttpResponseCode.code200_OK.rawValue
+            mutation.responseDetails ??= ""
+            mutation.requestCompleted = Date().javaDate
+            statistics.submit(mutation: mutation)
         
-        transferToClient(data: response)
+        } else {
         
-        // Mutation update
-        mutation.httpResponseCode ??= HttpResponseCode.code200_OK.rawValue
-        mutation.responseDetails ??= ""
-        mutation.requestCompleted = Date().javaDate
-        statistics.submit(mutation: mutation)
+            // If no data is returned the domain does not want to serve the client, in that case the statistics are not updated and the connection should close asap.
+            mustClose = true
+        }
     }
-    
-    func processHttp1_0Request(header: HttpHeader, mutation: Mutation) {
-        
-    }
-
 }

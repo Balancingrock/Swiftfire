@@ -3,7 +3,7 @@
 //  File:       main.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.13
+//  Version:    0.9.14
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -29,7 +29,7 @@
 //   - You can send payment via paypal to: sales@balancingrock.nl
 //   - Or wire bitcoins to: 1GacSREBxPy1yskLMc9de2nofNv2SNdwqH
 //
-//  I prefer the above two, but if these options don't suit you, you can also send me a gift from my amazon.co.uk
+//  I prefer the above two, but if these options don't suit you, you might also send me a gift from my amazon.co.uk
 //  whishlist: http://www.amazon.co.uk/gp/registry/wishlist/34GNMPZKAQ0OO/ref=cm_sw_em_r_wsl_cE3Tub013CKN6_wb
 //
 //  If you like to pay in another way, please contact me at rien@balancingrock.nl
@@ -49,7 +49,9 @@
 //
 // History
 //
-// v0.9.13 - Upgraded to Swift 3 beta
+// v0.9.14 - Added loading of server level blacklisted clients
+//         - Upgraded to Xcode 8 beta 6
+// v0.9.13 - Upgraded to Xcode 8 beta 3 (Swift 3)
 // v0.9.12 - Switched to 'toConsole' protocol (in Comms.swift) for communication with the console.
 // v0.9.11 - Moved some global definitions to other files
 // v0.9.7  - Added closing of header logging file on normal termination
@@ -80,35 +82,29 @@ log.callbackAtAndAboveLevel = SwifterLog.Level.none
 log.networkTransmitAtAndAboveLevel = SwifterLog.Level.none
 
 
-// ====================================================
-// Load parameters and domains from file (if available)
-// ====================================================
+// =========================
+// Initialize the parameters
+// =========================
 
-Parameters.restore()
-
-if !domains.restore()  {
-    log.atLevelEmergency(id: -1, source: "Main", message: "Swiftfire terminated because the default domains could not be read")
-    sleep(5)
-    exit(EXIT_FAILURE)
-}
+parameters.restore()
 
 
 // =======================================
 // Start of application: Configure logging
 // =======================================
 
-log.fileRecordAtAndAboveLevel = Parameters.fileRecordAtAndAboveLevel
-log.logfileDirectoryPath = FileURLs.applicationLogDir!.path!
-log.logfileMaxNumberOfFiles = Parameters.logfileMaxNofFiles
-log.logfileMaxSizeInBytes = UInt64(Parameters.logfileMaxSize) * 1024
+log.fileRecordAtAndAboveLevel = parameters.fileRecordAtAndAboveLevel
+log.logfileDirectoryPath = FileURLs.applicationLogDir!.path
+log.logfileMaxNumberOfFiles = parameters.logfileMaxNofFiles
+log.logfileMaxSizeInBytes = UInt64(parameters.logfileMaxSize) * 1024
 
-log.aslFacilityRecordAtAndAboveLevel = Parameters.aslFacilityRecordAtAndAboveLevel
-log.stdoutPrintAtAndAboveLevel = Parameters.stdoutPrintAtAndAboveLevel
-log.callbackAtAndAboveLevel = Parameters.callbackAtAndAboveLevel
+log.aslFacilityRecordAtAndAboveLevel = parameters.aslFacilityRecordAtAndAboveLevel
+log.stdoutPrintAtAndAboveLevel = parameters.stdoutPrintAtAndAboveLevel
+log.callbackAtAndAboveLevel = parameters.callbackAtAndAboveLevel
 
-log.networkTransmitAtAndAboveLevel = Parameters.networkTransmitAtAndAboveLevel
-if (Parameters.networkLogtargetIpAddress != "") && (Parameters.networkLogtargetPortNumber != "") {
-    let nettar = SwifterLog.NetworkTarget(address: Parameters.networkLogtargetIpAddress, port: Parameters.networkLogtargetPortNumber)
+log.networkTransmitAtAndAboveLevel = parameters.networkTransmitAtAndAboveLevel
+if (parameters.networkLogtargetIpAddress != "") && (parameters.networkLogtargetPortNumber != "") {
+    let nettar = SwifterLog.NetworkTarget(address: parameters.networkLogtargetIpAddress, port: parameters.networkLogtargetPortNumber)
     log.connectToNetworkTarget(nettar)
 }
 
@@ -124,9 +120,9 @@ class LogForewarder: SwifterlogCallbackProtocol {
     // Note that this function is only called if the callback levels of the logger are set accordingly.
     
     func logInfo(_ time: Date, level: SwifterLog.Level, source: String, message: String) {
-        if let console = toConsole {
+        if let toConsole = toConsole {
             let logline = LogLine(time: time as Date, level: level, source: source, message: message)
-            console.transferToConsole(message: logline.json.description)
+            toConsole.transfer(LogLineReply(logline))
         }
     }
 }
@@ -136,13 +132,52 @@ let logforewarder = LogForewarder()
 log.registerCallback(logforewarder)
     
 
-// =========================================================================
-// Show the paremeter settings and available domains in the log destinations
-// =========================================================================
+// ======================================
+// Provide an audit trail of the settings
+// ======================================
 
-// Purpose: To provide an audit trail of the settings under which Swiftfire operates.
+log.atLevelNotice(id: -1, source: "Main", message: "Parameter values initialized to:")
+parameters.logParameterSettings(atLevel: .notice)
 
-Parameters.logParameterSettings(atLevel: .notice)
+
+// ===============================================
+// Initialize the server level blacklisted clients
+// ===============================================
+
+let serverBlacklist = Blacklist()
+
+if let url = FileURLs.serverBlacklist {
+    if serverBlacklist.load(fromFileLocation: url) {
+        log.atLevelNotice(id: -1, source: "Main", message: "Server blacklist loaded.")
+        serverBlacklist.writeToLog(atLevel: SwifterLog.Level.notice)
+    } else {
+        if FileManager.default.isReadableFile(atPath: url.path) {
+            log.atLevelEmergency(id: -1, source: "Main", message: "Swiftfire terminated because the server blacklist file contains an error")
+            sleep(5)
+            exit(EXIT_FAILURE)
+        } else {
+            log.atLevelEmergency(id: -1, source: "Main", message: "No (readable)file for server blacklist found")
+        }
+    }
+} else {
+    log.atLevelEmergency(id: -1, source: "Main", message: "Swiftfire terminated because the directory for the server blacklist file could not be found/created")
+    sleep(5)
+    exit(EXIT_FAILURE)
+}
+
+
+// ======================
+// Initialize the domains
+// ======================
+
+if !domains.restore()  {
+    log.atLevelEmergency(id: -1, source: "Main", message: "Swiftfire terminated because the default domains could not be read")
+    sleep(5)
+    exit(EXIT_FAILURE)
+}
+
+// Audit trail
+
 domains.writeToLog(atLevel: .notice)
 
 
@@ -153,7 +188,7 @@ domains.writeToLog(atLevel: .notice)
 log.atLevelNotice(id: -1, source: "Main", message: "Initializing M&C loop")
 
 let result: SwifterSockets.SetupServerReturn = SwifterSockets.setupServer(
-    onPort: Parameters.macPortNumber,
+    onPort: parameters.macPortNumber,
     maxPendingConnectionRequest: 1)
 
 switch result {
@@ -161,16 +196,11 @@ switch result {
 case let SwifterSockets.SetupServerReturn.socket(socket):
     
     log.atLevelNotice(id: -1, source: "Main", message: "Listening for M&C connections")
-
     
-    // Setup the Monotoring and control loop
-    
-    let mac = MonitoringAndControl()
-
 
     // Autostart http server if necessary
     
-    if Parameters.autoStartup { ServerStartCommand().execute() }
+    if parameters.autoStartup { ServerStartCommand().execute() }
 
     
     // Start the monitoring and control loop (this function returns when the M&C loop ends)
@@ -181,10 +211,20 @@ case let SwifterSockets.SetupServerReturn.socket(socket):
     // Cleanup
     
     SwifterSockets.closeSocket(socket)
+    log.atLevelNotice(id: -1, source: "Main", message: "Closed accept socket")
     
     statistics.save()
+    log.atLevelNotice(id: -1, source: "Main", message: "Saved statistics")
     
     HttpHeader.closeHeaderLoggingFile()
+    log.atLevelNotice(id: -1, source: "Main", message: "Closed header logging file")
+    
+    if let url = FileURLs.serverBlacklist {
+        serverBlacklist.save(toFileLocation: url)
+        log.atLevelNotice(id: -1, source: "Main", message: "Saved server blacklist")
+    }
+    
+    domains.serverShutdown()
     
     log.atLevelNotice(id: -1, source: "Main", message: "Swiftfire terminated normally")
     

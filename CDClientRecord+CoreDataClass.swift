@@ -78,14 +78,14 @@ class CDClientRecord: NSManagedObject {
         let json = VJson()
         json[CONNECTION_ALLOCATION_COUNT] &= connectionAllocationCount
         json[CONNECTION_OBJECT_ID] &= connectionObjectId
-        json[HOST] &= host
-        json[HTTP_RESPONSE_CODE] &= httpResponseCode
-        json[RESPONSE_DETAILS] &= responseDetails
+        json[HOST] &= host ?? ""
+        json[HTTP_RESPONSE_CODE] &= httpResponseCode ?? ""
+        json[RESPONSE_DETAILS] &= responseDetails ?? ""
         json[REQUEST_RECEIVED] &= requestReceived
         json[REQUEST_COMPLETED] &= requestCompleted
         json[SOCKET] &= socket
-        json[URLSTR] &= url
-        json[URL_COUNTER] &= urlCounter?.instanceId
+        json[URLSTR] &= url ?? ""
+        json[URL_COUNTER] &= urlCounter?.instanceId ?? 0
         return json
     }
     

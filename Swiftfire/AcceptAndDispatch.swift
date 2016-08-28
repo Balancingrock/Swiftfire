@@ -3,7 +3,7 @@
 //  File:       AcceptAndDispatch.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.13
+//  Version:    0.9.14
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,11 +49,14 @@
 //
 // History
 //
-// v0.9.13 - Upgraded to Swift 3 beta
+// v0.9.14 - Added rejection of blacklisted clients with option close immediately
+//         - Upgraded to Xcode 8 beta 6
+// v0.9.13 - Upgraded to Xcode 8 beta 3 (Swift 3)
 // v0.9.6  - Header update
 // v0.9.3  - Renamed telemetry to serverTelemetry
 // v0.9.0  - Initial release
 // =====================================================================================================================
+
 
 import Foundation
 
@@ -139,14 +142,14 @@ func acceptAndDispatch(socket: Int32) {
             
                 // Update telemetry
                 
-                serverTelemetry.nofAcceptWaitsForConnectionObject.increment()
+                telemetry.nofAcceptWaitsForConnectionObject.increment()
                 
                 sleep (1) // Wait for 1 second, maybe something will be free by then
                 
                 loopCount += 1
-                if loopCount > Parameters.maxWaitForPendingConnections {
+                if loopCount > parameters.maxWaitForPendingConnections {
                     
-                    let message = "Connection objects are no longer available (waited for \(Parameters.maxWaitForPendingConnections) seconds)"
+                    let message = "Connection objects are no longer available (waited for \(parameters.maxWaitForPendingConnections) seconds)"
                     log.atLevelEmergency(id: 0, source: #file.source(#function, #line), message: message)
                     
                     httpConnectionPool.request()
@@ -203,9 +206,8 @@ func acceptAndDispatch(socket: Int32) {
             
         case let .accepted(acceptedSocket): // If the connection request was accepted
         
-            
             log.atLevelDebug(id: socket, source: #file.source(#function, #line), message: "Connection request accepted")
-
+            
             
             // ================================================
             // Set the socket option: prevent SIGPIPE exception
@@ -218,12 +220,12 @@ func acceptAndDispatch(socket: Int32) {
                 SOL_SOCKET,
                 SO_NOSIGPIPE,
                 &optval,
-                socklen_t(sizeof(Int.self)))
+                socklen_t(MemoryLayout<Int>.size))
             
             
             // Telemetry update
                 
-            serverTelemetry.nofAcceptedHttpRequests.increment()
+            telemetry.nofAcceptedHttpRequests.increment()
                 
                 
             // ====================================================================
@@ -237,12 +239,46 @@ func acceptAndDispatch(socket: Int32) {
                 
             if status == -1 {
                 
-                let strError = String(cString: strerror(errno)) ?? "Unknown error code"
+                let strError = String(cString: strerror(errno)) 
                 connection!.close()
                 log.atLevelEmergency(id: socket, source: #file.source(#function, #line), message: strError)
                 
             } else {
 
+                // =======================================
+                // Exclude access from blacklisted clients
+                // =======================================
+                
+                switch serverBlacklist.action(forAddress: acceptTelemetry.clientAddress ?? "Unknown") {
+                
+                case nil: break // No blacklisting action required
+                    
+                case Blacklist.Action.closeConnection?:
+                    
+                    connection!.close()
+                    log.atLevelNotice(id: acceptedSocket, source: #file.source(#function, #line), message: "Rejected blacklisted client \(acceptTelemetry.clientAddress ?? "Unknown") by closing the connection")
+                    continue ACCEPT_LOOP
+
+                
+                case Blacklist.Action.send401Unauthorized?:
+                    
+                    let reply = connection!.httpErrorResponse(withCode: HttpResponseCode.code401_Unauthorized, httpVersion: HttpVersion.http1_1)
+                    connection!.transferToClient(data: reply)
+                    connection!.close()
+                    log.atLevelNotice(id: acceptedSocket, source: #file.source(#function, #line), message: "Rejected blacklisted client \(acceptTelemetry.clientAddress ?? "Unknown") with 401 reply")
+                    continue ACCEPT_LOOP
+                    
+                    
+                case Blacklist.Action.send503ServiceUnavailable?:
+                    
+                    let reply = connection!.httpErrorResponse(withCode: HttpResponseCode.code503_ServiceUnavailable, httpVersion: HttpVersion.http1_1)
+                    connection!.transferToClient(data: reply)
+                    connection!.close()
+                    log.atLevelNotice(id: acceptedSocket, source: #file.source(#function, #line), message: "Rejected blacklisted client \(acceptTelemetry.clientAddress ?? "Unknown") with 503 reply")
+                    continue ACCEPT_LOOP
+                }
+
+                
                 // ===================================================================
                 // Start processing of the connection object in its own receiver queue
                 // ===================================================================
@@ -258,11 +294,16 @@ func acceptAndDispatch(socket: Int32) {
                         // Tricky: It may seem that nothing is done with the data that is received, but in fact the dataEndDetector is the one that is doiing all the data processing.
                         let result = SwifterSockets.receiveData(
                             fromSocket: acceptedSocket,
-                            timeout: Double(Parameters.httpKeepAliveInactivityTimeout),
+                            timeout: Double(parameters.httpKeepAliveInactivityTimeout),
                             dataEndDetector: connection!, // <= This is doing all the work
                             telemetry: nil
                         )
+
                         
+                        // Check for refused clients
+                        
+                        if connection!.mustClose { break RECEIVER_LOOP }
+
                         switch result {
                         case .bufferFull:
                             // A client should never send more than ParameterId.MAX_CLIENT_MESSAGE_SIZE in a single message

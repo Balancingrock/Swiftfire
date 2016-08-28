@@ -3,7 +3,7 @@
 //  File:       TimedClosure.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.13
+//  Version:    0.9.14
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,16 +49,20 @@
 //
 // History
 //
-// v0.9.13 - Upgraded to Swift 3 beta
+// v0.9.14 - Upgraded to Xcode 8 beta 6
+// v0.9.13 - Upgraded to Xcode 8 beta 3 (Swift 3)
 // v0.9.10 - Added debuggin output
 //         - Moved request for execution to observer of nextExecution
 //         - Removed private from 'once'.
 // v0.9.7  - Initial release
 // =====================================================================================================================
 
+
 import Foundation
 
+
 typealias NoParametersNoReturn = () -> ()
+
 
 final class TimedClosure {
     
@@ -79,7 +83,7 @@ final class TimedClosure {
             if delta < 0 { delta = 0 }
             log.atLevelDebug(id: -1, source: #file.source(#function, #line), message: "Delay = \(delta)")
             let dpt = DispatchTime.now() + delta * Double(NSEC_PER_SEC)
-            queue.after(when: dpt) { [weak self] in self?.execute() }
+            queue.asyncAfter(deadline: dpt) { [weak self] in self?.execute() }
         }
     }
 
@@ -200,7 +204,7 @@ final class TimedClosure {
             } else if let wallclockDelay = wallclockDelay {
                 nextExecution = previousExecution + wallclockDelay
             } else {
-                nextExecution = calendar.date(byAdding: Calendar.Unit.day, value: 1, to: previousExecution as Date, options: Calendar.Options.matchFirst)!
+                nextExecution = calendar.date(byAdding: .day, value: 1, to: previousExecution as Date)!
             }
         }
     }

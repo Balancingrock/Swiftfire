@@ -3,7 +3,7 @@
 //  File:       Logfile.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.13
+//  Version:    0.9.14
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,7 +49,9 @@
 //
 // History
 //
-// v0.9.13 - Upgraded to Swift 3 beta
+// v0.9.14 - Upgraded to Xcode 8 beta 6
+//         - Changed LogQueue to DispatchQueue()
+// v0.9.13 - Upgraded to Xcode 8 beta 3 (Swift 3)
 // v0.9.10 - Fixed newFileDailyAt and newFileAfterDelay to accept setting to nil after creation.
 // v0.9.9  - Renamed FileLog to Logfile and general overhaul for publication on Swiftrien.
 //         - Fixed several bugs that messed up file creation (sorry!).
@@ -95,14 +97,14 @@ class Logfile {
     
     // The queue on which all file logging activity will take place for thread-safety
     
-    private static let queue = DispatchQueue(label: "Logfile")
+    private static let queue = DispatchQueue(label: "Logfile Sync Queue", qos: .background, attributes: DispatchQueue.Attributes(), autoreleaseFrequency: DispatchQueue.AutoreleaseFrequency.inherit, target: nil)
     
     
     // The date formatter used to generate filenames (can also be used for loggin info inside the files)
     
     static var dateFormatter: DateFormatter = {
         let ltf = DateFormatter()
-        ltf.dateFormat = "yyyy-MM-dd'T'HH:mm:ss.SSSZ"
+        ltf.dateFormat = "yyyy-MM-dd'T'HH.mm.ss.SSSZ"
         return ltf
     }()
 
@@ -118,13 +120,13 @@ class Logfile {
             
             if let fileUrl = fileUrl {
                 
-                if FileManager.default.createFile(atPath: fileUrl.path!, contents: nil, attributes: [FileAttributeKey.posixPermissions.rawValue : NSNumber(value: 0o640)]) {
-                    _fileHandle = FileHandle(forUpdatingAtPath: fileUrl.path!)
+                if FileManager.default.createFile(atPath: fileUrl.path, contents: nil, attributes: [FileAttributeKey.posixPermissions.rawValue : NSNumber(value: 0o640)]) {
+                    _fileHandle = FileHandle(forUpdatingAtPath: fileUrl.path)
                     if let startData = createFileStart()?.data(using: String.Encoding.utf8, allowLossyConversion: true) { _fileHandle?.write(startData) }
-                    log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Created new logfile at: \(fileUrl.path!)")
-                    _filepathForNotice = fileUrl.path!
+                    log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Created new logfile at: \(fileUrl.path)")
+                    _filepathForNotice = fileUrl.path
                 } else {
-                    log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Could not generate logfile at: \(fileUrl.path!)")
+                    log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Could not generate logfile at: \(fileUrl.path)")
                     _fileHandle = nil
                 }
                 
@@ -144,12 +146,12 @@ class Logfile {
                         
                         // Remove all files that do not contain the choosen filename
                         
-                        let onlyLogfiles = files.flatMap({$0.path!.contains(filename) ? $0 : nil})
+                        let onlyLogfiles = files.flatMap({$0.path.contains(filename) ? $0 : nil})
                         
                         if onlyLogfiles.count > maxNofFiles! {
-                            let sortedLogfiles = onlyLogfiles.sorted(isOrderedBefore: { $0.lastPathComponent < $1.lastPathComponent })
+                            let sortedLogfiles = onlyLogfiles.sorted(by: { $0.lastPathComponent < $1.lastPathComponent })
                             try FileManager.default.removeItem(at: sortedLogfiles.first!)
-                            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Removed oldest logfile at: \(sortedLogfiles.first!.path!)")
+                            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Removed oldest logfile at: \(sortedLogfiles.first!.path)")
                         }
                     } catch {
                         log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Could not remove 'oldest' logfile")
@@ -238,14 +240,14 @@ class Logfile {
             
             do {
                 let applicationSupportDirectory =
-                    try FileManager.default.urlForDirectory(
-                        FileManager.SearchPathDirectory.applicationSupportDirectory,
+                    try FileManager.default.url(
+                        for: FileManager.SearchPathDirectory.applicationSupportDirectory,
                         in: FileManager.SearchPathDomainMask.userDomainMask,
                         appropriateFor: nil,
-                        create: true).path!
+                        create: true).path
                 
                 let appName = ProcessInfo.processInfo.processName
-                let url = try URL(fileURLWithPath: applicationSupportDirectory, isDirectory: true).appendingPathComponent(appName).appendingPathComponent("logfiles")
+                let url = URL(fileURLWithPath: applicationSupportDirectory, isDirectory: true).appendingPathComponent(appName).appendingPathComponent("logfiles")
                 
                 try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
                 
@@ -253,7 +255,7 @@ class Logfile {
                 
             } catch let error as NSError {
                 
-                let message: String = "Could not get application support directory, error = " + (error.localizedDescription ?? "Unknown reason")
+                let message: String = "Could not get application support directory, error = \(error.localizedDescription)"
                 log.atLevelError(id: -1, source: #file.source(#function, #line), message: message)
                 return nil
             }
@@ -295,11 +297,7 @@ class Logfile {
     // Create a new file URL
     
     private var fileUrl: URL? {
-        do {
-            return try directory.appendingPathComponent(fullFilename)
-        } catch {
-            return nil
-        }
+        return directory.appendingPathComponent(fullFilename)
     }
     
     
@@ -313,7 +311,7 @@ class Logfile {
     /// - Note: If a new 'record' call is made after this operation was called then a new logfile will be created.
     
     func close() {
-        _ = Logfile.queue.sync(execute: { [weak self] in self?._close() }) // Use weak because the app may have removed the Filelog object
+        _ = Logfile.queue.sync() { [weak self] in self?._close() } // Use weak because the app may have removed the Filelog object
     }
     
     
@@ -334,15 +332,13 @@ class Logfile {
     /// Force possible buffer content to permanent storage
     
     func flush() {
-        _ = Logfile.queue.sync(execute: { [weak self] in self?._flush() }) // Use weak because the app may have removed the Filelog object
+        _ = Logfile.queue.sync() { [weak self] in self?._flush() } // Use weak because the app may have removed the Filelog object
     }
 
     // Force possible buffer content to permanent storage
     
     private func _flush() {
-        if let file = self._fileHandle {
-            file.synchronizeFile()
-        }
+        _fileHandle?.synchronizeFile()
     }
     
     

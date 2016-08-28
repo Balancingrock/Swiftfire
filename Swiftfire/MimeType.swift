@@ -49,7 +49,7 @@
 //
 // History
 //
-// v0.9.13 - Upgraded to Swift 3 beta
+// v0.9.13 - Upgraded to Xcode 8 beta 3 (Swift 3)
 // v0.9.6  - Header update
 // v0.9.5  - Initial release
 // =====================================================================================================================
@@ -68,32 +68,28 @@ let mimeTypeHtml = "text/html"
 let mimeTypeDefault = "application/octet-stream"
 
 
-/**
- Returns the MIME type for the extension of the given URL.
- - Parameter url: The url for which to determine the mime type.
- - Returns: The string representing the mime type, or nil if no match could be made.
- */
+/// Returns the MIME type for the extension of the given URL.
+/// - Parameter url: The url for which to determine the mime type.
+/// - Returns: The string representing the mime type, or nil if no match could be made.
+
 func mimeType(forUrl url: URL) -> String? {
-    guard let ext = url.pathExtension else { return nil }
-    return mimeType(forExtension: ext)
+    return mimeType(forExtension: url.pathExtension)
 }
 
 
-/**
- Returns the MIME type for the extension of the given file path.
- - Parameter fp: The file path for which to determine the mime type.
- - Returns: The string representing the mime type, or nil if no match could be made.
- */
+/// Returns the MIME type for the extension of the given file path.
+/// - Parameter fp: The file path for which to determine the mime type.
+/// - Returns: The string representing the mime type, or nil if no match could be made.
+
 func mimeType(forPath: String) -> String? {
     return mimeType(forExtension: (forPath as NSString).pathExtension)
 }
 
 
-/**
- Returns the MIME type for the given file extension.
- - Parameter ext: The file extension for which to determine the mime type.
- - Returns: The string representing the mime type, or nil if no match could be made.
- */
+/// Returns the MIME type for the given file extension.
+/// - Parameter ext: The file extension for which to determine the mime type.
+/// - Returns: The string representing the mime type, or nil if no match could be made.
+
 func mimeType(forExtension: String) -> String? {
     return mimeMap[forExtension]
 }

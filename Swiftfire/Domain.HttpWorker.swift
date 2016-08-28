@@ -50,7 +50,8 @@
 // History
 //
 // v0.9.14 - Added support for HTTP 1.0
-// v0.9.13 - Upgraded to Swift 3 beta
+//         - Upgraded to Xcode 8 beta 6
+// v0.9.13 - Upgraded to Xcode 8 beta 3 (Swift 3)
 // v0.9.11 - Added statistics, partial rewrite of some code parts.
 // v0.9.7  - Added Access logging
 // v0.9.6  - Header update
@@ -69,16 +70,47 @@ extension Domain {
     
 
     /**
-     Handles client requests for this domain.
+     Handles client requests for this domain. If no data is returned then the client should not be serviced and the connection should be closed asap.
      
      - Parameter header: The HTTP Header from the client.
      - Parameter body: The HTTP body as received from the client (may have length zero).
      - Parameter connection: The active connection for this request.
      
-     - Returns: The buffer with the response, ready for transmission back to the client.
+     - Returns: The buffer with the response, ready for transmission back to the client. Nil if the client should not be serviced and the connection should be closed.
      */
     
-    func httpWorker(header: HttpHeader, body: Data, connection: HttpConnection, mutation: Mutation) -> Data {
+    func httpWorker(header: HttpHeader, body: Data, connection: HttpConnection, mutation: Mutation) -> Data? {
+        
+        
+        // =============================================================================================================
+        // Prevent access from blacklisted clients
+        // =============================================================================================================
+
+        switch blacklist.action(forAddress: connection.clientIp) {
+            
+        case nil: break // No blacklisting action required
+            
+        case Blacklist.Action.closeConnection?:
+            
+            log.atLevelNotice(id: connection.logId, source: #file.source(#function, #line), message: "Domain rejected blacklisted client \(connection.clientIp) by closing the connection")
+            return nil
+
+
+        case Blacklist.Action.send401Unauthorized?:
+            
+            log.atLevelNotice(id: connection.logId, source: #file.source(#function, #line), message: "Domain rejected blacklisted client \(connection.clientIp) with 401 reply")
+            let reply = errorMessage(forCode: HttpResponseCode.code401_Unauthorized, connection: connection, httpVersion: header.httpVersion!)
+            connection.transferToClient(data: reply)
+            return nil
+
+
+        case Blacklist.Action.send503ServiceUnavailable?:
+            
+            log.atLevelNotice(id: connection.logId, source: #file.source(#function, #line), message: "Domain rejected blacklisted client \(connection.clientIp) with 503 reply")
+            let reply = errorMessage(forCode: HttpResponseCode.code503_ServiceUnavailable, connection: connection, httpVersion: header.httpVersion!)
+            connection.transferToClient(data: reply)
+            return nil
+        }
         
         
         // =============================================================================================================
@@ -130,7 +162,7 @@ extension Domain {
             mutation.responseDetails = message
             
             // Response
-            return connection.httpErrorResponse(withCode: .code505_HttpVersionNotSupported, httpVersion: .http1_1)
+            return errorMessage(forCode: HttpResponseCode.code505_HttpVersionNotSupported, connection: connection, httpVersion: .http1_1)
         }
             
         guard httpVersion == HttpVersion.http1_0 || httpVersion == HttpVersion.http1_1 else {
@@ -147,7 +179,7 @@ extension Domain {
             mutation.responseDetails = message
 
             // Response
-            return connection.httpErrorResponse(withCode: .code505_HttpVersionNotSupported, httpVersion: httpVersion)
+            return errorMessage(forCode: HttpResponseCode.code505_HttpVersionNotSupported, connection: connection, httpVersion: httpVersion)
         }
         
         
@@ -169,7 +201,7 @@ extension Domain {
             mutation.responseDetails = message
             
             // Response
-            return connection.httpErrorResponse(withCode: .code400_BadRequest, httpVersion: httpVersion)
+            return errorMessage(forCode: HttpResponseCode.code400_BadRequest, connection: connection, httpVersion: httpVersion)
         }
         
         guard (operation == HttpOperation.get || operation == HttpOperation.post) else {
@@ -186,7 +218,7 @@ extension Domain {
             mutation.responseDetails = message
             
             // Response
-            return connection.httpErrorResponse(withCode: .code501_NotImplemented, httpVersion: httpVersion)
+            return errorMessage(forCode: HttpResponseCode.code501_NotImplemented, connection: connection, httpVersion: httpVersion)
         }
         
         
@@ -208,7 +240,7 @@ extension Domain {
             mutation.responseDetails = message
             
             // Response
-            return connection.httpErrorResponse(withCode: .code400_BadRequest, httpVersion: httpVersion)
+            return errorMessage(forCode: HttpResponseCode.code400_BadRequest, connection: connection, httpVersion: httpVersion)
         }
         
         // Mutation update
@@ -238,7 +270,7 @@ extension Domain {
                 mutation.responseDetails = "Resource for url '\(partialPath)' not found"
                 
                 // Response
-                return connection.httpErrorResponse(withCode: .code404_NotFound, httpVersion: httpVersion)
+                return errorMessage(forCode: HttpResponseCode.code404_NotFound, connection: connection, httpVersion: httpVersion)
                 
             } else if errorReason == .AccessNotAllowed {
                 
@@ -251,7 +283,8 @@ extension Domain {
                 mutation.responseDetails = message
                 
                 // Response
-                return connection.httpErrorResponse(withCode: HttpResponseCode.code403_Forbidden, httpVersion: httpVersion, message: "<p>\(message)</p>")
+                return errorMessage(forCode: HttpResponseCode.code403_Forbidden, connection: connection, httpVersion: httpVersion)
+                //return connection.httpErrorResponse(withCode: HttpResponseCode.code403_Forbidden, httpVersion: httpVersion, message: "<p>\(message)</p>")
             
             } else {
                 assert(false, "error reason should not be .Available")
@@ -279,7 +312,8 @@ extension Domain {
             mutation.responseDetails ??= message
             
             // Response
-            return connection.httpErrorResponse(withCode: .code500_InternalServerError, httpVersion: httpVersion, message: "<p>A Server side error occured, the error has been logged.</p>")
+            return errorMessage(forCode: HttpResponseCode.code500_InternalServerError, connection: connection, httpVersion: httpVersion)
+            //return connection.httpErrorResponse(withCode: .code500_InternalServerError, httpVersion: httpVersion, message: "<p>A Server side error occured, the error has been logged.</p>")
         }
         
         
@@ -326,7 +360,7 @@ extension Domain {
      - Returns: The path at which the resource was found, note that this may be changed because of the automatic mapping of index.html and index.htm. If the path is nil then rge error reason will detail which errorcode must be returned to the client.
      */
 
-    private func resourceIsAvailable(forRequestUrl path: String, connection: HttpConnection) -> (atPath: String?, errorReason: ResourceAvailability?) {
+    func resourceIsAvailable(forRequestUrl path: String, connection: HttpConnection) -> (atPath: String?, errorReason: ResourceAvailability?) {
         
 
         // Build the full path
@@ -343,7 +377,7 @@ extension Domain {
 
             // There is something, if it is a directory, check for index.html or index.htm
             
-            if isDirectory {
+            if isDirectory.boolValue {
                 
                 
                 // Check for an 'index.html' file
@@ -421,7 +455,7 @@ extension Domain {
             
             // There is something, if it is a directory, check for index.html or index.htm
             
-            if isDirectory {
+            if isDirectory.boolValue {
                 
                 
                 // Neither file exists, and directory access is not allowed

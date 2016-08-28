@@ -3,7 +3,7 @@
 //  File:       FileURLs.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.13
+//  Version:    0.9.14
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -29,7 +29,7 @@
 //   - You can send payment via paypal to: sales@balancingrock.nl
 //   - Or wire bitcoins to: 1GacSREBxPy1yskLMc9de2nofNv2SNdwqH
 //
-//  I prefer the above two, but if these options don't suit you, you can also send me a gift from my amazon.co.uk
+//  I prefer the above two, but if these options don't suit you, you might also send me a gift from my amazon.co.uk
 //  whishlist: http://www.amazon.co.uk/gp/registry/wishlist/34GNMPZKAQ0OO/ref=cm_sw_em_r_wsl_cE3Tub013CKN6_wb
 //
 //  If you like to pay in another way, please contact me at rien@balancingrock.nl
@@ -49,7 +49,9 @@
 //
 // History
 //
-// v0.9.13 - Upgraded to Swift 3 beta
+// v0.9.14 - Added serverBlacklist
+//         - Upgraded to Xcode 8 beta 6
+// v0.9.13 - Upgraded to Xcode 8 beta 3 (Swift 3)
 // v0.9.11 - Added statistics support
 // v0.9.7  - Added header logging and application log directory
 //         - Removed startup file
@@ -71,24 +73,19 @@ final class FileURLs {
         let filemanager = FileManager.default
         
         do {
-            
-            let appSupportRootpath = try filemanager.urlForDirectory(
-                FileManager.SearchPathDirectory.applicationSupportDirectory,
+            let appSupportRootpath = try filemanager.url(
+                for: FileManager.SearchPathDirectory.applicationSupportDirectory,
                 in: FileManager.SearchPathDomainMask.userDomainMask,
                 appropriateFor: nil,
                 create: true)
             
             let appName = ProcessInfo.processInfo.processName
-            let dirpath = try appSupportRootpath.appendingPathComponent(appName)
-            
-            try filemanager.createDirectory(atPath: dirpath.path!, withIntermediateDirectories: true, attributes: nil)
+            let dirpath = appSupportRootpath.appendingPathComponent(appName)
+            try filemanager.createDirectory(atPath: dirpath.path, withIntermediateDirectories: true, attributes: nil)
             
             return dirpath
             
-        } catch {
-            
-            return nil
-        }
+        } catch { return nil }
     }()
     
     
@@ -101,16 +98,11 @@ final class FileURLs {
         let filemanager = FileManager.default
         
         do {
-            
-            let dirpath = try appSupportDir.appendingPathComponent("settings")
-            try filemanager.createDirectory(atPath: dirpath.path!, withIntermediateDirectories: true, attributes: nil)
-            
+            let dirpath = appSupportDir.appendingPathComponent("settings")
+            try filemanager.createDirectory(atPath: dirpath.path, withIntermediateDirectories: true, attributes: nil)
             return dirpath
             
-        } catch {
-            
-            return nil
-        }
+        } catch { return nil }
     }()
     
     
@@ -123,16 +115,11 @@ final class FileURLs {
         let filemanager = FileManager.default
         
         do {
-            
-            let dirpath = try appSupportDir.appendingPathComponent("logging")
-            try filemanager.createDirectory(atPath: dirpath.path!, withIntermediateDirectories: true, attributes: nil)
-            
+            let dirpath = appSupportDir.appendingPathComponent("logging")
+            try filemanager.createDirectory(atPath: dirpath.path, withIntermediateDirectories: true, attributes: nil)
             return dirpath
             
-        } catch {
-            
-            return nil
-        }
+        } catch { return nil }
     }()
 
     
@@ -145,16 +132,11 @@ final class FileURLs {
         let filemanager = FileManager.default
         
         do {
-            
-            let dirpath = try loggingDir.appendingPathComponent("headers")
+            let dirpath = loggingDir.appendingPathComponent("headers")
             try filemanager.createDirectory(at: dirpath, withIntermediateDirectories: true, attributes: nil)
-            
             return dirpath
             
-        } catch {
-            
-            return nil
-        }
+        } catch { return nil }
     }()
 
     
@@ -167,16 +149,11 @@ final class FileURLs {
         let filemanager = FileManager.default
         
         do {
-            
-            let dirpath = try loggingDir.appendingPathComponent("application")
+            let dirpath = loggingDir.appendingPathComponent("application")
             try filemanager.createDirectory(at: dirpath, withIntermediateDirectories: true, attributes: nil)
-            
             return dirpath
             
-        } catch {
-            
-            return nil
-        }
+        } catch { return nil }
     }()
 
     
@@ -189,63 +166,45 @@ final class FileURLs {
         let filemanager = FileManager.default
 
         do {
-            
-            let dirpath = try appSupportDir.appendingPathComponent("statistics")
+            let dirpath = appSupportDir.appendingPathComponent("statistics")
             try filemanager.createDirectory(at: dirpath, withIntermediateDirectories: true, attributes: nil)
-            
             return dirpath
         
-        } catch {
-
-            return nil
-        }
+        } catch { return nil }
     }()
 
     
     /// The file with parameter defaults
     
     static var parameterDefaults: URL? = {
-        
         guard let dirpath = settingsDir else { return nil }
-        
-        do {
-            
-            return try dirpath.appendingPathComponent("parameter-defaults.json")
-
-        } catch {
-            
-            return nil
-        }
+        return dirpath.appendingPathComponent("parameter-defaults.json")
     }()
     
     
     /// The file with domain defaults
     
     static var domainDefaults: URL? = {
-        
         guard let dirpath = settingsDir else { return nil }
-        
-        do {
-            
-            return try dirpath.appendingPathComponent("domain-defaults.json")
-            
-        } catch {
-            
-            return nil
-        }
+        return dirpath.appendingPathComponent("domain-defaults.json")
+    }()
+    
+    
+    /// The file with blacklisted addresses
+    
+    static var serverBlacklist: URL? = {
+        guard let dirpath = settingsDir else { return nil }
+        return dirpath.appendingPathComponent("server-blacklist.json")
     }()
 
     
     /// Determines if a file exists and is not a directory
     
     static func exists(url: URL?) -> Bool {
-        
         if url == nil { return false }
-        
         var isDir: ObjCBool = false
-        
-        let exists = FileManager.default.fileExists(atPath: url!.path!, isDirectory: &isDir)
-        
-        return exists && !isDir
+        let exists = FileManager.default.fileExists(atPath: url!.path, isDirectory: &isDir)
+        if isDir.boolValue { return false }
+        return exists
     }
 }

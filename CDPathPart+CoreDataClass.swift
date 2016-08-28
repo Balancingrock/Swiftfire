@@ -3,7 +3,7 @@
 //  File:       CDPathPart+CoreDataClass.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.13
+//  Version:    0.9.14
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,7 +49,8 @@
 //
 // History
 //
-// v0.9.13 - Upgraded to Swift 3 beta
+// v0.9.14 - Split Console and Swiftfire targets
+// v0.9.13 - Upgraded to Xcode 8 beta 3 (Swift 3)
 // v0.9.12 - Added manipulation of doNotTrace
 //         - Changed CDCounter startDate to Int64 (javaDate)
 //         - Added "fullUrl" and "showChart"
@@ -164,29 +165,10 @@ class CDPathPart: NSManagedObject {
             return NSNumber(value: doNotTrace)
         }
         set {
-            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "New value for doNotTrace \(newValue), transmitting to Swiftfire")
-            
-            var url: NSString = pathPart!
-            var pp = previous
-            while pp != nil {
-                url = (pp!.pathPart! as NSString).appendingPathComponent(url as String)
-                pp = pp!.previous
-            }
-            let command = UpdatePathPartCommand(url: url as String, newValue: newValue.boolValue)
-            
-            if toSwiftfire != nil {
-                toSwiftfire?.transferToSwiftfire(message: command.json.description)
-            } else {
-                log.atLevelWarning(id: -1, source: #file.source(#function, #line), message: "Attempt to set new value for doNotTrace \(newValue), but no transmitter available")
-            }
+            updateDoNotTrace(to: newValue.boolValue)
         }
     }
-    
-    func showChart() {
-        log.atLevelDebug(id: -1, source: #file.source(#function, #line))
-        statistics.gui?.displayHistory(pathPart: self)
-    }
-    
+        
     var fullUrl: String {
         var urlstr = self.pathPart!
         var current = self.previous

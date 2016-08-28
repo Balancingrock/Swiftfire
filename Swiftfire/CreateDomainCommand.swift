@@ -3,7 +3,7 @@
 //  File:       CreateDomainCommand.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.13
+//  Version:    0.9.14
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,7 +49,8 @@
 //
 // History
 //
-// v0.9.13 - Upgraded to Swift 3 beta
+// v0.9.14 - Updated Command & Reply structure
+// v0.9.13 - Upgraded to Xcode 8 beta 3 (Swift 3)
 // v0.9.11 - Updated for VJson 0.9.8
 // v0.9.6  - Header update
 // v0.9.4  - Initial release (replaces part of MacDef.swift)
@@ -61,9 +62,10 @@ import Foundation
 private let COMMAND_NAME = "CreateDomainCommand"
 
 
-final class CreateDomainCommand {
+final class CreateDomainCommand: MacMessage {
     
-    let domainName: String
+    
+    // MARK: - MacMessage protocol
     
     var json: VJson {
         let j = VJson()
@@ -71,31 +73,19 @@ final class CreateDomainCommand {
         return j
     }
     
-    init?(domainName: String?) {
-        guard let domainName = domainName else { return nil }
-        self.domainName = domainName
-    }
-    
     init?(json: VJson?) {
         guard let json = json else { return nil }
         guard let jdomainName = (json|COMMAND_NAME)?.stringValue else { return nil }
         domainName = jdomainName
     }
+        
+
+    // MARK: - Class specific
     
-    func execute() {
-        
-        // Error if this domain already exists
-        guard domains.domain(forName: domainName) == nil else {
-            log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Domain name already exists (\(domainName as String))")
-            return
-        }
-        
-        let domain = Domain()
-        domain.name = domainName
-        
-        domains.add(domain: domain)
-        
-        log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Added new domain with \(domain))")
-        log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Number of domains: \(domains.count)")
+    let domainName: String
+    
+    init?(domainName: String?) {
+        guard let domainName = domainName else { return nil }
+        self.domainName = domainName
     }
 }

@@ -22,6 +22,8 @@ This is an early public release and I do not consider this code ready for prime 
 
 However: It does work! :-)
 
+__Special note__: The current version 0.9.14 compiles under Xcode 8 beta 6 only. It has not been deployed and only tested on a development machine. It is intended as an interim build for developpers only.
+
 #Usage
 
 Swiftfire needs the files from SwifterLog, SwifterSockets and SwifterJSON as source files.
@@ -34,7 +36,13 @@ Then I drag & drop the group with the source files from (for example) SwifterLog
 - Handles multiple domains
 - Client forwarding (to other hosts or a different port on the same host)
 - Integrated usage statistics (page visits)
+- Blacklisting (refusal of service) on IP basis for Server and per domain
+- Supports HTTP1.0 and HTTP1.1
+- Custom pages for errors (for example the infamous 404 page not found)
+- Logging of received headers possible
+- Logging of missing pages (404)
 - Includes a console application
+- Compiles with Xcode 8 beta 6 (Swift 3)
 
 #Version history
 
@@ -54,17 +62,22 @@ Note: Planned releases are for information only and subject to change without no
 - Code improvements
 - Build with final version of Swift 3
 
-####v0.9.14 (Planned)
+####v0.9.15 (Planned)
 
-- Add IP Address block list
 - Add URL redirection list
-- Add custom 404 support
 
-####v0.9.13 (Planned)
+####v0.9.14 (Current)
 
-- Upgrade to Swift 3 (Xcode 8 prerelease)
+- Added IP Address block list (blacklists)
+- Added custom error pages (for example the 404 error) support
+- Upgrade to Xcode 8 beta 6 (Swift 3)
+- Major improvements of the GUI console
 
-####v0.9.12 (Current)
+####V0.9.13
+
+- Updated for Xcode 8 beta 3 (Swift 3)
+
+####v0.9.12
 
 - Added usage charts that track the number of page visits over time
 - Added enabling/disabling of visit counting for specific resources

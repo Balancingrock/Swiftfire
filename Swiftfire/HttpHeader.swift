@@ -49,11 +49,11 @@
 //
 // History
 //
-// v0.9.13 - Upgraded to Swift 3 beta
-// v0.9.9 - Replaced header logging code by Logfile usage
-// v0.9.7 - Added header logging
-// v0.9.6 - Header update
-// v0.9.0 - Initial release
+// v0.9.13 - Upgraded to Xcode 8 beta 3 (Swift 3)
+// v0.9.9  - Replaced header logging code by Logfile usage
+// v0.9.7  - Added header logging
+// v0.9.6  - Header update
+// v0.9.0  - Initial release
 // =====================================================================================================================
 
 import Foundation
@@ -424,7 +424,7 @@ final class HttpHeader {
     
     // MARK: Header logging
     
-    private static var headerLogFile = Logfile(filename: "HeaderLog", fileExtension: "txt", directory: FileURLs.headerLoggingDir, options: .newFileDailyAt(WallclockTime(hour: 0, minute: 0, second: 0)), .maxFileSize(Parameters.maxFileSizeForHeaderLogging))
+    private static var headerLogFile = Logfile(filename: "HeaderLog", fileExtension: "txt", directory: FileURLs.headerLoggingDir, options: .newFileDailyAt(WallclockTime(hour: 0, minute: 0, second: 0)), .maxFileSize(parameters.maxFileSizeForHeaderLogging))
 
     static func closeHeaderLoggingFile() {
         if let file = self.headerLogFile {
@@ -441,11 +441,11 @@ final class HttpHeader {
             message += "Time      : \(Logfile.dateFormatter.string(from: connection.timeOfAccept as Date))\n"
             message += "IP Address: \(connection.clientIp)\n"
             message += "Log Id    : \(connection.logId)\n\n"
-            message = self.lines.reduce(message, combine: { $0 + $1 + "\n"})
+            message = self.lines.reduce(message) { $0 + $1 + "\n" }
             message += "\n"
             
             file.record(message: message)
-            if Parameters.flushHeaderLogfileAfterEachWrite { file.flush() }
+            if parameters.flushHeaderLogfileAfterEachWrite { file.flush() }
         }
     }
 }

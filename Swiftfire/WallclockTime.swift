@@ -3,7 +3,7 @@
 //  File:       WallclockTime.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.13
+//  Version:    0.9.14
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,13 +49,16 @@
 //
 // History
 //
-// v0.9.13 - Upgraded to Swift 3 beta
+// v0.9.14 - Upgraded to Xcode 8 beta 6
+// v0.9.13 - Upgraded to Xcode 8 beta 3 (Swift 3)
 // v0.9.10 - Improved init of WallclockTime, added init from string, added compliance to Equatable and CustomStringConvertible
 // v0.9.9  - Replaced NSCalendarOptions.MatchFirst with NSCalendarOptions.MatchNextTime because the former caused an exception in playground
 // v0.9.7  - Initial release
 // =====================================================================================================================
 
+
 import Foundation
+
 
 public func == (lhs: WallclockTime, rhs: WallclockTime) -> Bool {
     if lhs.hour != rhs.hour { return false }
@@ -110,7 +113,7 @@ public func + (lhs: WallclockTime, rhs: WallclockTime) -> (time: WallclockTime, 
 }
 
 public func + (lhs: Date, rhs: WallclockTime) -> Date {
-    return Calendar.current.date(byAdding: rhs.dateComponents as DateComponents, to: lhs as Date, options: Calendar.Options.matchNextTime)!
+    return Calendar.current.date(byAdding: rhs.dateComponents as DateComponents, to: lhs as Date)!
 }
 
 /// A 24-hour wallclock implementation
@@ -225,12 +228,16 @@ public extension Date {
     
     /// The wallclock time from self in the current calendar
     public var wallclockTime: WallclockTime {
-        let comp = Calendar.current.components([Calendar.Unit.hour, Calendar.Unit.minute, Calendar.Unit.second], from: self as Date)
+        let comp = Calendar.current.dateComponents([.hour, .minute, .second], from: self as Date)
         return WallclockTime(hour: comp.hour!, minute: comp.minute!, second: comp.second!)
     }
     
     /// A new NSDate set to the first future wallclock time in the current calendar
     public static func firstFutureDate(with wallclockTime: WallclockTime) -> Date {
-        return Calendar.current.nextDate(after: Date(), matchingHour: wallclockTime.hour, minute: wallclockTime.minute, second: wallclockTime.second, options: Calendar.Options.matchNextTime)!
+        var components = DateComponents()
+        components.hour = wallclockTime.hour
+        components.minute = wallclockTime.minute
+        components.second = wallclockTime.second
+        return Calendar.current.nextDate(after: Date(), matching: components, matchingPolicy: Calendar.MatchingPolicy.nextTime)!
     }
 }

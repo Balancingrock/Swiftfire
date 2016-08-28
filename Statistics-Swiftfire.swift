@@ -3,7 +3,7 @@
 //  File:       Statistics-Swiftfire.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.13
+//  Version:    0.9.14
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,7 +49,8 @@
 //
 // History
 //
-// v0.9.13 - Upgraded to Swift 3 beta
+// v0.9.14 - Upgraded to Xcode 8 beta 6
+// v0.9.13 - Upgraded to Xcode 8 beta 3 (Swift 3)
 // v0.9.12 - Changed cd counters to daily counters
 //         - Added support for 'doNotTrace' options
 //         - Changed timestamps from double to int64
@@ -65,24 +66,17 @@ import CoreData
 let statistics = Statistics()
 
 
-// In order to avoid having to link Cocoa with Swiftfire, a protocl is used to request GUI services.
-// These services will only be used from the SwiftfireConsole.
-
-protocol GuiRequest {
-    func displayHistory(pathPart: CDPathPart)
-}
-
 final class Statistics: NSObject {
-    
-    
-    // The Gui Request protocl handler (nil for Swiftfire)
-    
-    var gui: GuiRequest?
-    
+
     
     // The queue on which all mutations will take place
     
-    private static let queue = DispatchQueue(label: "CoreDataStatistics", attributes: [.serial, .qosDefault])
+    private static let queue = DispatchQueue(
+        label: "CoreDataStatistics",
+        qos: .default,
+        attributes: DispatchQueue.Attributes(),
+        autoreleaseFrequency: DispatchQueue.AutoreleaseFrequency.inherit,
+        target: nil)
     
     
     /// The store coordinator
@@ -163,11 +157,11 @@ final class Statistics: NSObject {
     /// Creates a new instance of the statistics object.
     /// - Note: There should be only 1 instance for each target.
     
-    override private init() {
+    override fileprivate init() {
         
         log.atLevelDebug(id: -1, source: #file.source(#function, #line), message: "Creating statistics singleton")
         
-        guard let modelUrl = Bundle.main.urlForResource("Statistics", withExtension:"momd") else {
+        guard let modelUrl = Bundle.main.url(forResource: "Statistics", withExtension:"momd") else {
             log.atLevelEmergency(id: -1, source: #file.source(#function, #line), message: "Error loading domain statistics model from bundle")
             sleep(1)
             fatalError("Error loading domain statistics model from bundle")
@@ -191,13 +185,14 @@ final class Statistics: NSObject {
             queue: DispatchQueue.main,
             delay: WallclockTime(hour: 0, minute: 0, second: 0),
             closure: {
-                [unowned self] in
-                self.managedObjectContext.perform({
-                    [unowned self] in
-                    self.today = Calendar.current.startOfDay(for: Date()).javaDate
+                [weak self] in
+                self?.managedObjectContext.perform({
+                    [weak self] in
+                    self?.today = Calendar.current.startOfDay(for: Date()).javaDate
                 })
             },
-            once: false)
+            once: false
+        )
         
         guard let statisticsDir = FileURLs.statisticsDir else {
             log.atLevelCritical(id: -1, source: #file.source(#function, #line), message: "Unable to retrieve statistics directory")
@@ -206,7 +201,7 @@ final class Statistics: NSObject {
         
         managedObjectContext.perform({
             do {
-                let storeURL = try statisticsDir.appendingPathComponent("StatisticsModel.sqlite")
+                let storeURL = statisticsDir.appendingPathComponent("StatisticsModel.sqlite")
                 try self.persistentStoreCoordinator.addPersistentStore(ofType: NSSQLiteStoreType, configurationName: nil, at: storeURL, options: nil)
             } catch {
                 log.atLevelEmergency(id: -1, source: #file.source(#function, #line), message: "Error migrating store: \(error)")
@@ -276,9 +271,7 @@ final class Statistics: NSObject {
     }
     
     
-    /**
-     - Returns: The Client Managed Object for the given address. Creates a new one if necessary.
-     */
+    /// - Returns: The Client Managed Object for the given address. Creates a new one if necessary.
     
     private func getClient(forAddress address: String?) throws -> CDClient? {
         
@@ -286,7 +279,7 @@ final class Statistics: NSObject {
         guard let address = address else { return nil }
         
         let fetchRequest = NSFetchRequest<CDClient>(entityName: "CDClient")
-        fetchRequest.predicate = Predicate(format: "address == %@", address)
+        fetchRequest.predicate = NSPredicate(format: "address == %@", address)
         
         let clients = try managedObjectContext.fetch(fetchRequest)
         
@@ -382,7 +375,7 @@ final class Statistics: NSObject {
         
         // Create an array of path components
         let url = URL(string: urlstr) ?? URL(string: "")!
-        var pathParts = url.pathComponents ?? [""]
+        var pathParts = url.pathComponents
         
         // If the first part is a "/", then remove it
         if pathParts.count > 0 && pathParts[0] == "/" { pathParts.remove(at: 0) }
@@ -420,11 +413,9 @@ final class Statistics: NSObject {
         return nil // the 'result' is not the path part we are looking for
     }
     
-    /**
-     Performs the requested mutation.
-     
-     - Parameter mutation: The mutation to be performed.
-     */
+    /// Performs the requested mutation.
+    ///
+    /// - Parameter mutation: The mutation to be performed.
     
     func submit(mutation: Mutation) {
         
@@ -548,9 +539,11 @@ final class Statistics: NSObject {
         
         // Ensure the domain exists
         guard let domainStr = mutation.domain else { return }
+        record.host = domainStr
         
         // And that it has a url
         guard let urlStr = mutation.url else { return }
+        record.url = urlStr
         
         
         // ================================
@@ -589,6 +582,7 @@ final class Statistics: NSObject {
                 let newCounter = NSEntityDescription.insertNewObject(forEntityName: "CDCounter", into: managedObjectContext) as! CDCounter
                 newCounter.next = current!.counterList!
                 newCounter.pathPart = current
+                newCounter.forDay = today
             }
             current!.counterList!.count += 1
             current!.counterList!.mutableSetValue(forKey: "clientRecords").add(record)
@@ -656,8 +650,8 @@ final class Statistics: NSObject {
         current.doNotTrace = newState
         
         // Try to signal the console (if any) that the path part is updated
-        let message = ReadStatisticsReply(statistics: self.json).json.description
-        toConsole?.transferToConsole(message: message)
+        let message = ReadStatisticsReply(statistics: self.json)
+        toConsole?.transfer(message)
     }
     
     
@@ -685,8 +679,8 @@ final class Statistics: NSObject {
         client.doNotTrace = newState
         
         // Try to signal the console (if any) that the path part is updated
-        let message = ReadStatisticsReply(statistics: self.json).json.description
-        toConsole?.transferToConsole(message: message)
+        let message = ReadStatisticsReply(statistics: self.json)
+        toConsole?.transfer(message)
     }
     
 /*

@@ -3,7 +3,7 @@
 //  File:       UpdatePathPartCommand.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.13
+//  Version:    0.9.14
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -29,7 +29,7 @@
 //   - You can send payment via paypal to: sales@balancingrock.nl
 //   - Or wire bitcoins to: 1GacSREBxPy1yskLMc9de2nofNv2SNdwqH
 //
-//  I prefer the above two, but if these options don't suit you, you may also send me a gift from my amazon.co.uk
+//  I prefer the above two, but if these options don't suit you, you can also send me a gift from my amazon.co.uk
 //  whishlist: http://www.amazon.co.uk/gp/registry/wishlist/34GNMPZKAQ0OO/ref=cm_sw_em_r_wsl_cE3Tub013CKN6_wb
 //
 //  If you like to pay in another way, please contact me at rien@balancingrock.nl
@@ -49,7 +49,8 @@
 //
 // History
 //
-// v0.9.13 - Upgraded to Swift 3 beta
+// v0.9.14 - Updated Command & Reply structure
+// v0.9.13 - Upgraded to Xcode 8 beta 3 (Swift 3)
 // v0.9.12 - Initial release
 // =====================================================================================================================
 
@@ -60,23 +61,18 @@ private let NEW_VALUE = "NewValue"
 private let COMMAND_NAME = "UpdatePathPartCommand"
 
 
-final class UpdatePathPartCommand {
+final class UpdatePathPartCommand: MacMessage {
     
-    var url: String
-    var newValue: Bool
     
+    // MacMessage: - MacCommand protocol
+
     var json: VJson {
         let j = VJson()
         j[COMMAND_NAME][URLSTR] &= url
         j[COMMAND_NAME][NEW_VALUE] &= newValue
         return j
     }
-    
-    init(url: String, newValue: Bool) {
-        self.url = url
-        self.newValue = newValue
-    }
-    
+
     init?(json: VJson?) {
         guard let json = json else { return nil }
         guard let jurl = (json|COMMAND_NAME|URLSTR)?.stringValue else { return nil }
@@ -85,11 +81,14 @@ final class UpdatePathPartCommand {
         newValue = jnewvalue
     }
     
-    func execute() {
-        log.atLevelDebug(id: -1, source: #file.source(#function, #line))
-        let mutation = Mutation.createUpdatePathPart()
-        mutation.url = url
-        mutation.doNotTrace = newValue
-        statistics.submit(mutation: mutation)
+    
+    // MARK: - Class specific
+    
+    var url: String
+    var newValue: Bool
+
+    init(url: String, newValue: Bool) {
+        self.url = url
+        self.newValue = newValue
     }
 }

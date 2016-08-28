@@ -3,7 +3,7 @@
 //  File:       RemoveDomainCommand.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.13
+//  Version:    0.9.14
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,7 +49,8 @@
 //
 // History
 //
-// v0.9.13 - Upgraded to Swift 3 beta
+// v0.9.14 - Updated Command & Reply structure
+// v0.9.13 - Upgraded to Xcode 8 beta 3 (Swift 3)
 // v0.9.11 - Updated for VJson 0.9.8
 // v0.9.6  - Header update
 // v0.9.4  - Initial release (replaces part of MacDef.swift)
@@ -61,19 +62,15 @@ import Foundation
 private let COMMAND_NAME = "RemoveDomainCommand"
 
 
-final class RemoveDomainCommand {
+final class RemoveDomainCommand: MacMessage {
     
-    let domainName: String
     
+    // MARK: - MacMessage protocol
+
     var json: VJson {
         let j = VJson()
         j[COMMAND_NAME].stringValue = domainName
         return j
-    }
-    
-    init?(domainName: String?) {
-        guard let domainName = domainName else { return nil }
-        self.domainName = domainName
     }
     
     init?(json: VJson?) {
@@ -81,13 +78,14 @@ final class RemoveDomainCommand {
         guard let jdomainName = (json|COMMAND_NAME)?.stringValue else { return nil }
         domainName = jdomainName
     }
-    
-    func execute() {
         
-        if domains.remove(domainWithName: domainName) {
-            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "REMOVE-DOMAIN Removed domain: '\(domainName)')")
-        } else {
-            log.atLevelError(id: -1, source: #file.source(#function, #line), message: "REMOVE-DOMAIN Domain does not exist: (\(domainName))")
-        }
+
+    // MARK: - Class specific
+    
+    let domainName: String
+
+    init?(domainName: String?) {
+        guard let domainName = domainName else { return nil }
+        self.domainName = domainName
     }
 }

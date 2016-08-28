@@ -3,7 +3,7 @@
 //  File:       CDClient+CoreDataClass.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.13
+//  Version:    0.9.14
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,7 +49,8 @@
 //
 // History
 //
-// v0.9.13 - Upgraded to Swift 3 beta
+// v0.9.14 - Split Console and Swiftfire targets
+// v0.9.13 - Upgraded to Xcode 8 beta 3 (Swift 3)
 // v0.9.12 - Added manipulation of doNotTrace
 // v0.9.11 - Initial release
 // =====================================================================================================================
@@ -67,7 +68,7 @@ class CDClient: NSManagedObject {
     
     lazy var firstAccess: Int64 = {
         var arr = self.records?.allObjects as! [CDClientRecord]
-        let sortedArr = arr.sorted(isOrderedBefore: { $0.requestReceived < $1.requestReceived })
+        let sortedArr = arr.sorted(by: { $0.requestReceived < $1.requestReceived })
         if let record = sortedArr.first {
             return record.requestReceived
         } else {
@@ -77,7 +78,7 @@ class CDClient: NSManagedObject {
     
     lazy var lastAccess: Int64 = {
         var arr = self.records?.allObjects as! [CDClientRecord]
-        let sortedArr = arr.sorted(isOrderedBefore: { $0.requestReceived < $1.requestReceived })
+        let sortedArr = arr.sorted(by: { $0.requestReceived < $1.requestReceived })
         if let record = sortedArr.last {
             return record.requestReceived
         } else {
@@ -87,13 +88,13 @@ class CDClient: NSManagedObject {
     
     var firstAccessString: String {
         let fd = Date.fromJavaDate(value: firstAccess)
-        let dc = Calendar.current.components(Calendar.Unit(arrayLiteral: .year, .month, .day, .hour, .minute, .second), from: fd)
+        let dc = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute, .second], from: fd)
         return "\(dc.year!)-\(dc.month!)-\(dc.day!) \(dc.hour!):\(dc.minute!):\(dc.second!)"
     }
     
     var lastAccessString: String {
         let fd = Date.fromJavaDate(value: lastAccess)
-        let dc = Calendar.current.components(Calendar.Unit(arrayLiteral: .year, .month, .day, .hour, .minute, .second), from: fd)
+        let dc = Calendar.current.dateComponents([.year, .month, .day, .hour, .minute, .second], from: fd)
         return "\(dc.year!)-\(dc.month!)-\(dc.day!) \(dc.hour!):\(dc.minute!):\(dc.second!)"
     }
     
@@ -146,15 +147,7 @@ class CDClient: NSManagedObject {
             return NSNumber(value: doNotTrace)
         }
         set {
-            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "New value for doNotTrace \(newValue), transmitting to Swiftfire")
-            
-            let command = UpdateClientCommand(client: address!, newValue: newValue.boolValue)
-            
-            if toSwiftfire != nil {
-                toSwiftfire?.transferToSwiftfire(message: command.json.description)
-            } else {
-                log.atLevelWarning(id: -1, source: #file.source(#function, #line), message: "Attempt to set new value for doNotTrace \(newValue), but no transmitter available")
-            }
+            updateDoNotTrace(to: newValue.boolValue)
         }
     }
 }

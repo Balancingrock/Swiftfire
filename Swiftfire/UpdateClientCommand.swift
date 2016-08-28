@@ -3,7 +3,7 @@
 //  File:       UpdateClientCommand.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.13
+//  Version:    0.9.14
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -29,7 +29,7 @@
 //   - You can send payment via paypal to: sales@balancingrock.nl
 //   - Or wire bitcoins to: 1GacSREBxPy1yskLMc9de2nofNv2SNdwqH
 //
-//  I prefer the above two, but if these options don't suit you, you may also send me a gift from my amazon.co.uk
+//  I prefer the above two, but if these options don't suit you, you can also send me a gift from my amazon.co.uk
 //  whishlist: http://www.amazon.co.uk/gp/registry/wishlist/34GNMPZKAQ0OO/ref=cm_sw_em_r_wsl_cE3Tub013CKN6_wb
 //
 //  If you like to pay in another way, please contact me at rien@balancingrock.nl
@@ -49,7 +49,8 @@
 //
 // History
 //
-// v0.9.13 - Upgraded to Swift 3 beta
+// v0.9.14 - Updated Command & Reply structure
+// v0.9.13 - Upgraded to Xcode 8 beta 3 (Swift 3)
 // v0.9.12 - Initial release
 // =====================================================================================================================
 
@@ -60,21 +61,16 @@ private let NEW_VALUE = "NewValue"
 private let COMMAND_NAME = "UpdateClientCommand"
 
 
-final class UpdateClientCommand {
+final class UpdateClientCommand: MacMessage {
     
-    var client: String
-    var newValue: Bool
     
+    // MARK: - MacMessage protocol
+
     var json: VJson {
         let j = VJson()
         j[COMMAND_NAME][CLIENT] &= client
         j[COMMAND_NAME][NEW_VALUE] &= newValue
         return j
-    }
-    
-    init(client: String, newValue: Bool) {
-        self.client = client
-        self.newValue = newValue
     }
     
     init?(json: VJson?) {
@@ -85,11 +81,15 @@ final class UpdateClientCommand {
         newValue = jnewvalue
     }
     
-    func execute() {
-        log.atLevelDebug(id: -1, source: #file.source(#function, #line))
-        let mutation = Mutation.createUpdateClient()
-        mutation.client = client
-        mutation.doNotTrace = newValue
-        statistics.submit(mutation: mutation)
+    
+    // MARK: - Class specific
+    
+    var client: String
+    var newValue: Bool
+
+    
+    init(client: String, newValue: Bool) {
+        self.client = client
+        self.newValue = newValue
     }
 }

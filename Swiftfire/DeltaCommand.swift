@@ -3,7 +3,7 @@
 //  File:       DeltaCommand.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.13
+//  Version:    0.9.14
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -29,7 +29,7 @@
 //   - You can send payment via paypal to: sales@balancingrock.nl
 //   - Or wire bitcoins to: 1GacSREBxPy1yskLMc9de2nofNv2SNdwqH
 //
-//  I prefer the above two, but if these options don't suit you, you may also send me a gift from my amazon.co.uk
+//  I prefer the above two, but if these options don't suit you, you can also send me a gift from my amazon.co.uk
 //  whishlist: http://www.amazon.co.uk/gp/registry/wishlist/34GNMPZKAQ0OO/ref=cm_sw_em_r_wsl_cE3Tub013CKN6_wb
 //
 //  If you like to pay in another way, please contact me at rien@balancingrock.nl
@@ -49,7 +49,8 @@
 //
 // History
 //
-// v0.9.13 - Upgraded to Swift 3 beta
+// v0.9.14 - Updated Command & Reply structure
+// v0.9.13 - Upgraded to Xcode 8 beta 3 (Swift 3)
 // v0.9.11 - Updated for VJson 0.9.8
 // v0.9.6  - Header update
 // v0.9.4  - Initial release (replaces part of MacDef.swift)
@@ -61,9 +62,10 @@ import Foundation
 private let COMMAND_NAME = "DeltaCommand"
 
 
-final class DeltaCommand {
+final class DeltaCommand: MacMessage{
     
-    let delay: Int
+    
+    // MARK: - MacMessage protocol
     
     var json: VJson {
         let j = VJson()
@@ -71,22 +73,19 @@ final class DeltaCommand {
         return j
     }
     
-    init?(delay: Int?) {
-        guard let delay = delay else { return nil }
-        self.delay = delay
-    }
-    
     init?(json: VJson?) {
         guard let json = json else { return nil }
         guard let jdelay = (json|COMMAND_NAME)?.intValue else { return nil }
         delay = jdelay
     }
+        
     
-    func execute() {
-        log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Start")
-        if delay > 0 {
-            sleep(UInt32(min(delay, 10))) // Never more than 10 seconds
-        }
-        log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Completed")
+    // MARK: - Class specific
+    
+    let delay: Int
+
+    init?(delay: Int?) {
+        guard let delay = delay else { return nil }
+        self.delay = delay
     }
 }

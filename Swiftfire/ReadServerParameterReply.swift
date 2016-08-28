@@ -3,7 +3,7 @@
 //  File:       ReadServerParameterReply.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.13
+//  Version:    0.9.14
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,13 +49,15 @@
 //
 // History
 //
-// v0.9.13 - Upgraded to Swift 3 beta
+// v0.9.14 - Updated Command & Reply structure
+// v0.9.13 - Upgraded to Xcode 8 beta 3 (Swift 3)
 // v0.9.11 - Updated for VJson 0.9.8
 // v0.9.6  - Header update
 // v0.9.4  - Initial release (replaces part of MacDef.swift)
 // =====================================================================================================================
 
 import Foundation
+import Cocoa
 
 
 private let REPLY_NAME = "ReadServerParameterReply"
@@ -63,57 +65,50 @@ private let PARAMETER = "Parameter"
 private let VALUE = "Value"
 
 
-final class ReadServerParameterReply {
-        
-    var parameter: ServerParameter
-    var value: String
+final class ReadServerParameterReply: MacMessage {
     
-    var intValue: Int? {
-        return Int(value)
-    }
-    
-    var boolValue: Bool? {
-        return Bool(value)
-    }
-    
-    var doubleValue: Double? {
-        return Double(value)
-    }
+    // MARK: - MacMessage protocol
     
     var json: VJson {
         let j = VJson()
-        j[REPLY_NAME][PARAMETER].stringValue = parameter.rawValue
-        j[REPLY_NAME][VALUE].stringValue = value
+        j[REPLY_NAME][PARAMETER] &= parameter.rawValue
+        j[REPLY_NAME][VALUE] &= value
         return j
-    }
-    
-    init(parameter: ServerParameter, value: String) {
-        self.parameter = parameter
-        self.value = value
-    }
-    
-    init(parameter: ServerParameter, value: Bool) {
-        self.parameter = parameter
-        self.value = value ? "true" : "false"
-    }
-    
-    init(parameter: ServerParameter, value: Int) {
-        self.parameter = parameter
-        self.value = value.description
-    }
-    
-    init(parameter: ServerParameter, value: Double) {
-        self.parameter = parameter
-        self.value = value.description
     }
     
     init?(json: VJson?) {
         guard let json = json else { return nil }
         guard let jname = (json|REPLY_NAME|PARAMETER)?.stringValue else { return nil }
-        guard let jparameter = ServerParameter(rawValue: jname) else { return nil }
+        guard let jparameter = ServerParameterName(rawValue: jname) else { return nil }
         guard let jvalue = (json|REPLY_NAME|VALUE)?.stringValue else { return nil }
         
         self.parameter = jparameter
         self.value = jvalue
+    }
+    
+
+    // MARK: - Class specific
+    
+    var parameter: ServerParameterName
+    var value: String
+
+    init(parameter: ServerParameterName, value: String) {
+        self.parameter = parameter
+        self.value = value
+    }
+    
+    init(parameter: ServerParameterName, value: Bool) {
+        self.parameter = parameter
+        self.value = value ? "true" : "false"
+    }
+    
+    init(parameter: ServerParameterName, value: Int) {
+        self.parameter = parameter
+        self.value = value.description
+    }
+    
+    init(parameter: ServerParameterName, value: Double) {
+        self.parameter = parameter
+        self.value = value.description
     }
 }

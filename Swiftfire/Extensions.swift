@@ -3,7 +3,7 @@
 //  File:       Extensions.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.13
+//  Version:    0.9.14
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -29,7 +29,7 @@
 //   - You can send payment via paypal to: sales@balancingrock.nl
 //   - Or wire bitcoins to: 1GacSREBxPy1yskLMc9de2nofNv2SNdwqH
 //
-//  I prefer the above two, but if these options don't suit you, you might also send me a gift from my amazon.co.uk
+//  I prefer the above two, but if these options don't suit you, you can also send me a gift from my amazon.co.uk
 //  whishlist: http://www.amazon.co.uk/gp/registry/wishlist/34GNMPZKAQ0OO/ref=cm_sw_em_r_wsl_cE3Tub013CKN6_wb
 //
 //  If you like to pay in another way, please contact me at rien@balancingrock.nl
@@ -49,7 +49,8 @@
 //
 // History
 //
-// v0.9.13 - Upgraded to Swift 3 beta
+// v0.9.14 - Upgraded to Xcode 8 beta 6
+// v0.9.13 - Upgraded to Xcode 8 beta 3 (Swift 3)
 // v0.9.12 - Added javaDate & unixDate to NSDate extension
 // v0.9.11 - Added NSDate and NSDateComponents extensions
 //         - Removed faulty 'descriptionWithSeparator'
@@ -59,9 +60,14 @@
 // v0.9.0  - Initial release
 // =====================================================================================================================
 
+
 import Foundation
 
+
 extension Bool {
+    
+    
+    /// Initializes a bool from '0', '1', 'yes', 'no', 'true' or 'false'. Case insensitive.
     
     init?(_ str: String) {
         if str == "0" { self = false }
@@ -74,7 +80,10 @@ extension Bool {
     }
 }
 
+
 extension Array {
+    
+    /// Removes the given object from the array.
     
     @discardableResult
     mutating func removeObject<T: AnyObject>(object: T) -> T? {
@@ -89,14 +98,29 @@ extension Array {
 
 extension Data {
     
+    
+    /// Removes the given range from the data while the data is interpreted as a UInt8 area.
+    
     mutating func remove(range: Range<Int>) {
         var dummy: UInt8 = 0
         let empty = UnsafeBufferPointer<UInt8>(start: &dummy, count: 0)
-        self.replaceBytes(in: range, with: empty)
+        self.replaceSubrange(range, with: empty)
+    }
+    
+    
+    /// Removes all data fro the object.
+    
+    mutating func removeAll() {
+        var dummy: UInt8 = 0
+        let empty = UnsafeBufferPointer<UInt8>(start: &dummy, count: 0)
+        self.replaceSubrange(Range(uncheckedBounds: (lower: 0, upper: self.count - 1)), with: empty)
     }
 }
 
 extension Dictionary {
+    
+    
+    /// Returns the values in the dictionary in an array.
     
     func arrayValue() -> Array<Value> {
         var elements: Array<Value> = []
@@ -109,15 +133,20 @@ extension Dictionary {
 
 extension Date {
     
+    /// Returns a DateComponents object that includes the .year, .month, .day of self for the given calendar or (if absent) the current calendar.
+    
     func yearMonthDay(calendar: Calendar? = nil) -> DateComponents {
         let calendar = calendar ?? Calendar.current
-        let components = calendar.components(Calendar.Unit(arrayLiteral: .year, .month, .day), from: self)
+        let components = calendar.dateComponents([.year, .month, .day], from: self)
         return components
     }
     
+    
+    /// Returns a DateComponents object that includes the .hour, .minute, .second of self for the given calendar or (if absent) the current calendar.
+
     func hourMinuteSecond(calendar: Calendar? = nil) -> DateComponents {
         let calendar = calendar ?? Calendar.current
-        let components = calendar.components(Calendar.Unit(arrayLiteral: .hour, .minute, .second), from: self)
+        let components = calendar.dateComponents([.hour, .minute, .second], from: self)
         return components
     }
     
@@ -146,44 +175,44 @@ extension Date {
     /// The javaDate for the beginning of tomorrow.
     
     var javaDateBeginOfTomorrow: Int64 {
-        return Calendar.current.date(byAdding: .day, value: 1, to: self, options: .matchNextTime)!.javaDateBeginOfDay
+        return Calendar.current.date(byAdding: .day, value: 1, to: self)!.javaDateBeginOfDay
     }
 
     
     /// The javaDate for the beginning of yesterday.
     
     var javaDateBeginOfYesterday: Int64 {
-        return Calendar.current.date(byAdding: .day, value: -1, to: self, options: .matchNextTime)!.javaDateBeginOfDay
+        return Calendar.current.date(byAdding: .day, value: -1, to: self)!.javaDateBeginOfDay
     }
 
     
     /// The javaDate for the beginning of the week self is in
     
     var javaDateBeginOfWeek: Int64 {
-        return Calendar.current.date(bySettingUnit: .weekday, value: 1, of: self, options: .matchNextTime)!.javaDateBeginOfDay
+        return Calendar.current.date(bySetting: .weekday, value: 1, of: self)!.javaDateBeginOfDay
     }
     
     
     /// The javaDate for the beginning of the next week
     
     var javaDateBeginOfNextWeek: Int64 {
-        let aDate = Calendar.current.date(byAdding: .weekOfYear, value: 1, to: self, options: .matchNextTime)!
-        return Calendar.current.date(bySettingUnit: .weekday, value: 1, of: aDate, options: .matchNextTime)!.javaDateBeginOfDay
+        let aDate = Calendar.current.date(byAdding: .weekOfYear, value: 1, to: self)!
+        return Calendar.current.date(bySetting: .weekday, value: 1, of: aDate)!.javaDateBeginOfDay
     }
     
 
     /// The javaDate for the beginning of the month self is in
     
     var javaDateBeginOfMonth: Int64 {
-        return Calendar.current.date(bySettingUnit: .day, value: 1, of: self, options: .matchNextTime)!.javaDateBeginOfDay
+        return Calendar.current.date(bySetting: .day, value: 1, of: self)!.javaDateBeginOfDay
     }
     
     
     /// The javaData for the beginning of next month
     
     var javaDateBeginOfNextMonth: Int64 {
-        let aDate = Calendar.current.date(byAdding: .month, value: 1, to: self, options: .matchNextTime)!
-        return Calendar.current.date(bySettingUnit: .day, value: 1, of: aDate, options: .matchNextTime)!.javaDateBeginOfDay
+        let aDate = Calendar.current.date(byAdding: .month, value: 1, to: self)!
+        return Calendar.current.date(bySetting: .day, value: 1, of: aDate)!.javaDateBeginOfDay
     }
     
     
@@ -203,6 +232,9 @@ extension Date {
 
 extension NSDateComponents {
     
+    
+    /// Stores the items .year, .month, .day, .hour, .minute and .second in the returned VJson object.
+    
     var json: VJson {
         let j = VJson.object()
         if self.year != NSDateComponentUndefined { j["Year"] &= self.year }
@@ -214,7 +246,10 @@ extension NSDateComponents {
         return j
     }
     
-    /// - Note: Values that are not present will be undefined. I.e. have value: NSDateComponentUndefined
+    
+    /// Creates a date components from  the given VJson object.
+    ///
+    /// - Note: Values that are not present will be set to NSDateComponentUndefined
     
     convenience init?(json: VJson?) {
         guard let json = json else { return nil }

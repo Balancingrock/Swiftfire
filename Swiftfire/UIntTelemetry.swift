@@ -3,7 +3,7 @@
 //  File:       UIntTelemetry.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.13
+//  Version:    0.9.14
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -29,7 +29,7 @@
 //   - You can send payment via paypal to: sales@balancingrock.nl
 //   - Or wire bitcoins to: 1GacSREBxPy1yskLMc9de2nofNv2SNdwqH
 //
-//  I prefer the above two, but if these options don't suit you, you might also send me a gift from my amazon.co.uk
+//  I prefer the above two, but if these options don't suit you, you can also send me a gift from my amazon.co.uk
 //  whishlist: http://www.amazon.co.uk/gp/registry/wishlist/34GNMPZKAQ0OO/ref=cm_sw_em_r_wsl_cE3Tub013CKN6_wb
 //
 //  If you like to pay in another way, please contact me at rien@balancingrock.nl
@@ -49,36 +49,106 @@
 //
 // History
 //
-// v0.9.13 - Upgraded to Swift 3 beta
-// v0.9.6 - Header update
-// v0.9.3 - Initial release
+// v0.9.14 - Upgraded to Xcode 8 beta 6
+// v0.9.13 - Upgraded to Xcode 8 beta 3 (Swift 3)
+// v0.9.6  - Header update
+// v0.9.3  - Initial release
 // =====================================================================================================================
+
 
 import Foundation
 
+
 /// The UInt telemetry type, the integer this class represents has a range from 0 .. 1_000_000. It wraps around while incrementing but does not wrap around while decrementing.
 
-class UIntTelemetry: NSObject, TelemetryProtocol {
+class UIntTelemetry: NSObject {
     
-    static let syncQueue = DispatchQueue(label: "UIntTelemetry Sync Queue", attributes: [.serial, .qosUserInitiated])
+    static let syncQueue = DispatchQueue(label: "UIntTelemetry Sync Queue")
     
     private var value: UInt = 0
     
-    override init() { super.init() }
+    override init() {
+        super.init()
+    }
     
-    convenience init(initialValue: UInt) { self.init(); value = initialValue }
+    convenience init(initialValue: UInt) {
+        self.init()
+        value = initialValue
+    }
     
-    override var description: String { return UIntTelemetry.syncQueue.sync(execute: { [unowned self] in return self.value.description })}
     
-    var stringValue: String { return UIntTelemetry.syncQueue.sync(execute: { [unowned self] in return self.value.description })}
+    /// - Returns: The contained value as a string.
     
-    var intValue: Int { return UIntTelemetry.syncQueue.sync(execute: { [unowned self] in return Int(self.value) })}
+    override var description: String {
+        return UIntTelemetry.syncQueue.sync() {
+            [unowned self] in
+            return self.value.description
+        }
+    }
     
-    func initialize(to newValue: UInt) { UIntTelemetry.syncQueue.sync(execute: { [unowned self] in self.value = newValue }) }
+
+    /// - Returns: The contained value as a string.
+
+    var stringValue: String {
+        return UIntTelemetry.syncQueue.sync() {
+            [unowned self] in
+            return self.value.description
+        }
+    }
     
-    func reinitialize() { UIntTelemetry.syncQueue.sync(execute: { [unowned self] in self.value = 0 })}
     
-    func increment() { UIntTelemetry.syncQueue.sync(execute: { [unowned self] in if self.value < 999_999 { self.value += 1 } else { self.value = 0 }})}
+    /// - Returns: The contained value.
     
-    func decrement() { UIntTelemetry.syncQueue.sync(execute: { [unowned self] in if self.value != 0 { self.value -= 1 }})}
+    var intValue: Int {
+        return UIntTelemetry.syncQueue.sync() {
+            [unowned self] in
+            return Int(self.value)
+        }
+    }
+    
+    
+    /// Sets the contained value to the given value.
+    
+    func initialize(to newValue: UInt) {
+        UIntTelemetry.syncQueue.sync() {
+            [unowned self] in
+            self.value = newValue
+        }
+    }
+    
+    
+    /// Resets the contained value to zero.
+    
+    func reinitialize() {
+        UIntTelemetry.syncQueue.sync() {
+            [unowned self] in
+            self.value = 0
+        }
+    }
+    
+    
+    /// Increments the contained value by 1 and wraps to zero afer 999.999.
+    
+    func increment() {
+        UIntTelemetry.syncQueue.sync() {
+            [unowned self] in
+            if self.value < 999_999 {
+                self.value += 1
+            } else {
+                self.value = 0
+            }
+        }
+    }
+    
+    
+    /// Decrements  the contained value by 1 but never goes below zero.
+    
+    func decrement() {
+        UIntTelemetry.syncQueue.sync() {
+            [unowned self] in
+            if self.value != 0 {
+                self.value -= 1
+            }
+        }
+    }
 }

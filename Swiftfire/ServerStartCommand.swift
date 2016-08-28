@@ -3,7 +3,7 @@
 //  File:       ServerStartCommand.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.13
+//  Version:    0.9.14
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,7 +49,8 @@
 //
 // History
 //
-// v0.9.13 - Upgraded to Swift 3 beta
+// v0.9.14 - Updated Command & Reply structure
+// v0.9.13 - Upgraded to Xcode 8 beta 3 (Swift 3)
 // v0.9.11 - Updated for VJson 0.9.8
 // v0.9.6  - Header update
 // v0.9.4  - Initial release (replaces part of MacDef.swift)
@@ -61,68 +62,34 @@ import Foundation
 private let COMMAND_NAME = "ServerStartCommand"
 
 
-final class ServerStartCommand {
+final class ServerStartCommand: MacMessage {
     
     
-    // The queue on which Swiftfire will accept client connection requests
-    
-    private static let acceptQueue: DispatchQueue = DispatchQueue(label: "Accept queue", attributes: [.serial, .qosUserInteractive])
+    // MARK: - MacMessage protocol
 
-    
     var json: VJson {
         let j = VJson()
         j[COMMAND_NAME].nullValue = true
         return j
     }
     
-    init() {}
-    
     init?(json: VJson?) {
         guard let json = json else { return nil }
         guard (json|COMMAND_NAME)?.nullValue == true else { return nil }
     }
+        
     
-    func execute() {
-        
-        
-        // If the server is running, don't do anything
-        
-        if httpServerIsRunning() { return }
-        
-        
-        // Start the server
-        
-        do {
-            
-            // Reset available connections
-            
-            httpConnectionPool.create()
-            
-            
-            // Initialize the server
-            
-            let acceptSocket = try SwifterSockets.setupServerOrThrow(onPort: Parameters.httpServicePortNumber, maxPendingConnectionRequest: Parameters.maxNofPendingConnections)
-            
-            
-            // Start accepting connection requests
-            
-            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Starting Accept and Dispatch loop")
-            
-            ServerStartCommand.acceptQueue.async() {
-                acceptAndDispatch(socket: acceptSocket)
-                log.atLevelNotice(id: acceptSocket, source: #file.source(#function, #line), message: "Accept and Dispatch loop stopped")
-                SwifterSockets.closeSocket(acceptSocket)
-            }
-            
-        } catch let error as SwifterSockets.SetupServerException {
-            
-            log.atLevelError(id: -1, source: #file.source(#function, #line), message: error.description)
-            
-        } catch {
-            
-            log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Programming error")
-        }
-        
-        log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Completed")
-    }
+    // MARK: - Class specific
+    
+    // The queue on which Swiftfire will accept client connection requests
+    
+    static let acceptQueue: DispatchQueue = DispatchQueue(
+        label: "Accept queue",
+        qos: .userInteractive,
+        attributes: DispatchQueue.Attributes(),
+        autoreleaseFrequency: DispatchQueue.AutoreleaseFrequency.inherit,
+        target: nil)
+    
+
+    init() {}
 }

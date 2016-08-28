@@ -60,7 +60,6 @@ import CoreData
 
 
 private let COUNT = "C"
-private let END_DATE = "E"
 private let INSTANCE_ID = "I"
 private let START_DATE = "S"
 private let NEXT = "N"
@@ -70,17 +69,17 @@ class CDCounter: NSManagedObject {
     
     // MARK: - Create unique int identifier
     
-    private static var queue = DispatchQueue(label: "nl.balancingrock.swiftfire.cdcounter", attributes: [.serial])
+    private static var queue = DispatchQueue(label: "nl.balancingrock.swiftfire.cdcounter")
     
     private static var instanceCounter: Int64 = { return Date().javaDate * 1_000 }()
     
     override func awakeFromInsert() {
         super.awakeFromInsert()
         
-        CDCounter.queue.sync(execute: { [unowned self] in
+        CDCounter.queue.sync() { [unowned self] in
             self.instanceId = CDCounter.instanceCounter
             CDCounter.instanceCounter += 1
-            })
+        }
     }
     
     

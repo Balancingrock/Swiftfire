@@ -3,7 +3,7 @@
 //  File:       ReadServerTelemetryReply.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.13
+//  Version:    0.9.14
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,6 +49,7 @@
 //
 // History
 //
+// v0.9.14 - Updated Command & Reply structure
 // v0.9.13 - Upgraded to Swift 3 beta
 // v0.9.11 - Updated for VJson 0.9.8
 // v0.9.6  - Header update
@@ -63,9 +64,32 @@ private let ITEM = "Item"
 private let VALUE = "Value"
 
 
-final class ReadServerTelemetryReply {
+final class ReadServerTelemetryReply: MacMessage {
     
-    var item: ServerTelemetryItem
+    
+    // MARK: - MacMessage protocol
+    
+    var json: VJson {
+        let j = VJson()
+        j[REPLY_NAME][ITEM] &= item.rawValue
+        j[REPLY_NAME][VALUE] &= value
+        return j
+    }
+    
+    init?(json: VJson?) {
+        guard let json = json else { return nil }
+        guard let jname = (json|REPLY_NAME|ITEM)?.stringValue else { return nil }
+        guard let jitem = ServerTelemetryName(rawValue: jname) else { return nil }
+        guard let jvalue = (json|REPLY_NAME|VALUE)?.stringValue else { return nil }
+        
+        self.item = jitem
+        self.value = jvalue
+    }
+    
+    
+    // MARK: - Class specific
+
+    var item: ServerTelemetryName
     var value: String
     
     var intValue: Int? {
@@ -80,40 +104,23 @@ final class ReadServerTelemetryReply {
         return Double(value)
     }
     
-    var json: VJson {
-        let j = VJson()
-        j[REPLY_NAME][ITEM].stringValue = item.rawValue
-        j[REPLY_NAME][VALUE].stringValue = value
-        return j
-    }
-    
-    init(item: ServerTelemetryItem, value: String) {
+    init(item: ServerTelemetryName, value: String) {
         self.item = item
         self.value = value
     }
     
-    init(item: ServerTelemetryItem, value: Bool) {
+    init(item: ServerTelemetryName, value: Bool) {
         self.item = item
         self.value = value ? "true" : "false"
     }
     
-    init(item: ServerTelemetryItem, value: Int) {
+    init(item: ServerTelemetryName, value: Int) {
         self.item = item
         self.value = value.description
     }
     
-    init(item: ServerTelemetryItem, value: Double) {
+    init(item: ServerTelemetryName, value: Double) {
         self.item = item
         self.value = value.description
-    }
-    
-    init?(json: VJson?) {
-        guard let json = json else { return nil }
-        guard let jname = (json|REPLY_NAME|ITEM)?.stringValue else { return nil }
-        guard let jitem = ServerTelemetryItem(rawValue: jname) else { return nil }
-        guard let jvalue = (json|REPLY_NAME|VALUE)?.stringValue else { return nil }
-        
-        self.item = jitem
-        self.value = jvalue
     }
 }

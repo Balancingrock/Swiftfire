@@ -3,13 +3,13 @@
 //  File:       SwiftfireMacInterface.swift
 //  Project:    SwiftfireConsole
 //
-//  Version:    0.9.13
+//  Version:    0.9.14
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
 //  Website:    http://swiftfire.nl/
 //  Blog:       http://swiftrien.blogspot.com
-//  Git:        https://github.com/Swiftrien/SwiftfireConsole
+//  Git:        https://github.com/Swiftrien/Swiftfire
 //
 //  Copyright:  (c) 2014-2016 Marinus van der Lugt, All rights reserved.
 //
@@ -29,7 +29,7 @@
 //   - You can send payment via paypal to: sales@balancingrock.nl
 //   - Or wire bitcoins to: 1GacSREBxPy1yskLMc9de2nofNv2SNdwqH
 //
-//  I prefer the above two, but if these options don't suit you, you may also send me a gift from my amazon.co.uk
+//  I prefer the above two, but if these options don't suit you, you can also send me a gift from my amazon.co.uk
 //  whishlist: http://www.amazon.co.uk/gp/registry/wishlist/34GNMPZKAQ0OO/ref=cm_sw_em_r_wsl_cE3Tub013CKN6_wb
 //
 //  If you like to pay in another way, please contact me at rien@balancingrock.nl
@@ -49,7 +49,9 @@
 //
 // History
 //
-// v0.9.13 - Upgraded to Swift 3 beta
+// v0.9.14 - Improved reply processing
+//         - Fixed bug that could corrupt received data
+// v0.9.13 - Upgraded to Xcode 8 beta 3 (Swift 3)
 // v0.9.12 - Added TransferToSwiftfire protocol
 // v0.9.11 - Merged into Swiftfire project
 // v0.9.4  - Header update
@@ -63,38 +65,36 @@
 import Foundation
 
 
-protocol SwiftfireMacInterfaceDelegate {
+var smi = SwiftfireMacInterface()
+
+
+protocol TransferToSwiftfire {
     
-    /**
-     Asks the delegate to display the given error message.
-     
-     - Parameter swiftfireMacInterface: The originating interface.
-     - Parameter message: The error message to be displayed.
-     
-     - Note: This operation is initiated from a thread that runs asynchrously. It would be prudent to implement a mechanism that only updates the GUI from an end-of-runloop observer or from a process scheduled on the main thread.
-     */
+    /// Attempts to transfer the given reply to the console. The SW using this call should be written such that success (or failure) becomes appearent to the user asap.
+    /// - Note: There is no mechanism to guarantee successful transmission.
     
-    func swiftfireMacInterface(_ swiftfireMacInterface: SwiftfireMacInterface, message: String)
-    
-    
-    /**
-     Allows the delegate to process the received data from a Swiftfire server.
-     
-     - Parameter swiftfireMacInterface: The originating interface.
-     - Parameter reply: The VJson object as received from the server.
-     
-     - Note: This operation is initiated from a thread that runs asynchrously. It would be prudent to implement a mechanism that only updates a GUI from an end-of-runloop observer or from a process scheduled on the main thread.
-     */
-    
-    func swiftfireMacInterface(_ swiftfireMacInterface: SwiftfireMacInterface, reply: VJson)
+    func transfer(_ command: MacMessage?)
 }
 
+var toSwiftfire: TransferToSwiftfire?
 
-class SwiftfireMacInterface: NSObject, TransferToSwiftfire {
 
-    // The queue for synchronization
+final class SwiftfireMacInterface: NSObject, TransferToSwiftfire {
     
-    let syncQueue = DispatchQueue(label: "SwiftfireMacInterface Sync Queue", attributes: [.serial, .qosUtility])
+
+    // All reply factories must be registered at startup
+    
+    private var replyFactories: Array<MacReplyFactory> = []
+
+    
+    override init() {
+        replyFactories.append(ReadDomainsReply.factory)
+        replyFactories.append(ReadServerParameterReply.factory)
+        replyFactories.append(ReadServerTelemetryReply.factory)
+        replyFactories.append(ClosingMacConnection.factory)
+        replyFactories.append(ReadStatisticsReply.factory)
+        replyFactories.append(ReadBlacklistReply.factory)
+    }
     
     
     /// Indicates if this M&C interface is operational
@@ -103,7 +103,7 @@ class SwiftfireMacInterface: NSObject, TransferToSwiftfire {
     
 
     /**
-     Attempts to open a connection with the Swiftfire server. If the connection succeeds, it will also start the receiver loop that listens for telemetry and logline updates. If the delegate is set, the delegate will be called for telemetry and logline updates.
+     Attempts to open a connection with the Swiftfire server. If the connection succeeds, it will also start the receiver loop.
      
      - Returns: True if the operation was successful. False otherwise.
      */
@@ -111,7 +111,7 @@ class SwiftfireMacInterface: NSObject, TransferToSwiftfire {
     @discardableResult
     func openConnectionToAddress(address: String, onPortNumber portNumber: String) -> Bool {
         
-        return syncQueue.sync() { [unowned self] () -> Bool in
+        return toServerQueue.sync() { [unowned self] () -> Bool in
             
             if self.swiftfireSocket == nil {
                 
@@ -120,7 +120,7 @@ class SwiftfireMacInterface: NSObject, TransferToSwiftfire {
                 switch result {
                     
                 case let .error(msg):
-                    log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Connection failed with message: \(msg)")
+                    showErrorInKeyWindow(message: "Connection failed with message: \(msg)")
                     return false
                     
                 case let .socket(socket):
@@ -144,86 +144,19 @@ class SwiftfireMacInterface: NSObject, TransferToSwiftfire {
     func closeConnection() {
         SwifterSockets.closeSocket(swiftfireSocket)
         swiftfireSocket = nil
+        toSwiftfire = nil
+    }
+    
+    func transfer(_ command: MacMessage?) {
+        guard let command = command else { return }
+        return transmit(message: command.json.code)
     }
     
     
-    /**
-     This function attempts to send JSON formatted messages to the Swiftfire server.
-  
-     - Parameter messages: A list of VJson messages to be sent.
-     
-     - Returns: True if the status flag "communicationIsEstablished" is set, false otherwise.
-     */
-
-    @discardableResult
-    func sendMessages(messages: [VJson?]) -> Bool {
-        
-        let textMessages = messages.flatMap(){ $0?.description }
-        
-        return sendMessages(messages: textMessages)
-    }
+    // The queues on which the communication attempts are made. It uses the same serial queue as the setParameter and sendCommand functions, hence all user interactions will be send in the sequence they were requested.
     
-    @discardableResult
-    func transferToSwiftfire(message: String) -> Bool {
-        return sendMessages(messages: [message])
-    }
-    
-    /**
-     This function attempts to send string formatted messages to the Swiftfire server.
-     
-     - Parameter address: The IP address of the Swiftfire server.
-     - Parameter port: The port number of the Swiftfire server that it is listening for M&C messages.
-     - Parameter messages: A list of VJson messages to be sent.
-     - Parameter errorDisplay: Some object that can display error messages to the end-user.
-     
-     - Returns: True if the transfer attempt will be made (asynchronously). False if not. Note that in fact the status flag "communicationIsEstablished" is returned.
-     */
-    
-    @discardableResult
-    func sendMessages(messages: [String]) -> Bool {
-        
-        return syncQueue.sync() { [unowned self] () -> Bool in
-            
-            
-            // Check if a connection has been established
-            
-            if self.swiftfireSocket != nil {
-                
-                
-                // Transmit the messages
-                
-                for message in messages {
-                    self.toServerQueue.async() {
-                        self.transmitMessage(message: message)
-                    }
-                }
-            }
-            
-            return (self.swiftfireSocket != nil)
-        }
-    }
-
-
-    /**
-     Initializes a new object with the given delegate. Without a delegate it is only possible to send messages. Without a delegate no errors, telemetry or remote logging will be available.
-     
-     - Parameter delegate: The delegate.
-     */
-    
-    init(delegate: SwiftfireMacInterfaceDelegate?) {
-        self.delegate = delegate
-    }
-    
-    
-    // The delegate for the error messages and telemetry updates
-    
-    private var delegate: SwiftfireMacInterfaceDelegate?
-    
-    
-    // The queues on which the communication attempts are made. It uses the same serial queue as the setParameter and sendCommand functions, hence all user intercations will be send in the sequence they were requested.
-    
-    private let toServerQueue = DispatchQueue(label: "to-server-queue", attributes: [.serial, .qosUtility])
-    private let fromServerQueue = DispatchQueue(label: "from-server-queue", attributes: [.serial, .qosUtility])
+    private let toServerQueue = DispatchQueue(label: "to-server-queue")
+    private let fromServerQueue = DispatchQueue(label: "from-server-queue")
     
     
     // The socket for the connection to the server
@@ -241,67 +174,72 @@ class SwiftfireMacInterface: NSObject, TransferToSwiftfire {
     private var swiftfireMacPortNumber: String?
 
     
-    // Send a message to the server. Execute this function on the server queue only.
+    // The time of the last transmission error
     
-    private func transmitMessage(message: String) {
-        
-        if swiftfireSocket != nil {
-        
-            let transmitResult = SwifterSockets.transmit(toSocket: swiftfireSocket!, string: message, timeout: 2.0, telemetry: nil)
-            
-            switch transmitResult {
-                
-            case let .error(message: str):
-                
-                let message = "Error occured on transmission to Swiftfire M&C connection: \(str)"
-                log.atLevelError(id: swiftfireSocket!, source: #file.source(#function, #line), message: message)
-                if let d = delegate { d.swiftfireMacInterface(self, message: message) }
-                closeConnection()
-                
-            case .timeout:
-                
-                let message = "Timeout occured on Swiftfire M&C connection"
-                log.atLevelError(id: swiftfireSocket!, source: #file.source(#function, #line), message: message)
-                if let d = delegate { d.swiftfireMacInterface(self, message: message) }
-                closeConnection()
-                
-                
-            case .ready:
-                
-                log.atLevelDebug(id: swiftfireSocket!, source: "SwiftfireMacInterface.transmitMessage", message: "Transmitted json code: \(message)")
-            
+    private var lastTransmitErrorMessage: Date = Date.distantPast
 
-            case .serverClosed:
-
-                let message = "Swiftfire M&C connection unexpectedly closed"
-                log.atLevelError(id: swiftfireSocket!, source: #file.source(#function, #line), message: message)
-                if let d = delegate { d.swiftfireMacInterface(self, message: message) }
-                closeConnection()
-
-                
-            case .clientClosed:
-                
-                let message = "Swiftfire M&C connection closed by Swiftfire"
-                log.atLevelError(id: swiftfireSocket!, source: #file.source(#function, #line), message: message)
-                if let d = delegate { d.swiftfireMacInterface(self, message: message) }
-                closeConnection()
-            }
+    
+    // Send a message to the server.
+    
+    private func transmit(message: String) {
+        toServerQueue.async() {
             
-        } else {
+            [unowned self] in
             
-            if lastTransmitErrorMessage.timeIntervalSinceNow < -1.0 {
-                let message = "Swiftfire server not connected"
-                log.atLevelError(id: -1, source: #file.source(#function, #line), message: message)
-                if let d = delegate { d.swiftfireMacInterface(self, message: message) }
-                lastTransmitErrorMessage = NSDate()
+            if self.swiftfireSocket != nil {
+                
+                let transmitResult = SwifterSockets.transmit(toSocket:  self.swiftfireSocket!, string: message, timeout: 2.0, telemetry: nil)
+                
+                switch transmitResult {
+                    
+                case let .error(message: str):
+                    
+                    let message = "Error occured on transmission to Swiftfire M&C connection: \(str)"
+                    log.atLevelError(id:  self.swiftfireSocket!, source: #file.source(#function, #line), message: message)
+                    showErrorInKeyWindow(message: message)
+                    self.closeConnection()
+                    
+                case .timeout:
+                    
+                    let message = "Timeout occured on Swiftfire M&C connection"
+                    log.atLevelError(id:  self.swiftfireSocket!, source: #file.source(#function, #line), message: message)
+                    showErrorInKeyWindow(message: message)
+                    self.closeConnection()
+                    
+                    
+                case .ready:
+                    
+                    log.atLevelDebug(id:  self.swiftfireSocket!, source: "SwiftfireMacInterface.transmitMessage", message: "Transmitted json code: \(message)")
+                    
+                    
+                case .serverClosed:
+                    
+                    let message = "Swiftfire M&C connection unexpectedly closed"
+                    log.atLevelError(id:  self.swiftfireSocket!, source: #file.source(#function, #line), message: message)
+                    showErrorInKeyWindow(message: message)
+                    self.closeConnection()
+                    
+                    
+                case .clientClosed:
+                    
+                    let message = "Swiftfire M&C connection closed by Swiftfire"
+                    log.atLevelError(id:  self.swiftfireSocket!, source: #file.source(#function, #line), message: message)
+                    showErrorInKeyWindow(message: message)
+                    self.closeConnection()
+                }
+                
+            } else {
+                
+                if  self.lastTransmitErrorMessage.timeIntervalSinceNow < -1.0 {
+                    let message = "Swiftfire server not connected"
+                    log.atLevelError(id: -1, source: #file.source(#function, #line), message: message)
+                    showErrorInKeyWindow(message: message)
+                    self.lastTransmitErrorMessage = Date()
+                }
             }
         }
     }
-
-    private var lastTransmitErrorMessage: NSDate = NSDate.distantPast
     
-    
-    // Starts the receiver loop
     
     private func startReceiverLoop() {
         
@@ -312,13 +250,17 @@ class SwiftfireMacInterface: NSObject, TransferToSwiftfire {
             
             toSwiftfire = self
             
+
+            // The buffer to contain all received data
+            
+            var receivedData = Data()
+
             
             // Start receiving
             
             RECEIVER_LOOP: while self.swiftfireSocket != nil {
-            
+                
                 let jsonEndDetector = SwifterSockets.JsonEndDetector()
-                var receivedData = Data()
                 
                 let result = SwifterSockets.receiveData(fromSocket: self.swiftfireSocket!, timeout: 5.0, dataEndDetector: jsonEndDetector, telemetry: nil)
                 
@@ -328,22 +270,22 @@ class SwiftfireMacInterface: NSObject, TransferToSwiftfire {
                     // This should not be possible
                     log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Unexpected BUFFER_FULL received")
                     break RECEIVER_LOOP
-
+                    
                 case let .clientClosed(data: data) where data is Data:
                     receivedData.append(data as! Data)
                     if receivedData.count > 0 { self.processReceivedData(data: &receivedData) }
                     self.closeConnection()
                     break RECEIVER_LOOP
-
+                    
                 case let .serverClosed(data: data) where data is Data:
                     receivedData.append(data as! Data)
                     if receivedData.count > 0 { self.processReceivedData(data: &receivedData) }
                     self.closeConnection()
                     break RECEIVER_LOOP
-
+                    
                 case let .error(message: message):
                     log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Connection to Swiftfire closed with message: '\(message)'")
-                    if let d = self.delegate { d.swiftfireMacInterface(self, message: "Connection to Swiftfire closed with message: '\(message)'") }
+                    showErrorInKeyWindow(message: "Connection to Swiftfire closed with message: '\(message)'")
                     break RECEIVER_LOOP
                     
                 case let .ready(data: data) where data is Data:
@@ -351,7 +293,7 @@ class SwiftfireMacInterface: NSObject, TransferToSwiftfire {
                     log.atLevelDebug(id: -1, source: "SwiftfireMacInterface.startReceiverLoop", message: "Received a total of \(receivedData.count) bytes")
                     self.processReceivedData(data: &receivedData)
                     log.atLevelDebug(id: -1, source: "SwiftfireMacInterface.startReceiverLoop", message: "Unprocessed: \(receivedData.count) bytes")
-
+                    
                 case .timeout:
                     // Simply try again...
                     break
@@ -376,26 +318,47 @@ class SwiftfireMacInterface: NSObject, TransferToSwiftfire {
         
         PROCESS_LOOP: while true {
             
-            var json: VJson?
-            
             do {
                 
                 if data.count == 0 { break PROCESS_LOOP }
                 
-                // Create the JSON hierarchy
+                let json = try VJson.parse(data: &data)
                 
-                json = try VJson.parse(data: &data)
+                if let logLineMessage = LogLineReply(json: json) {
+                    
+                    logLineMessage.process()
+                    
+                } else {
+                    
+                    log.atLevelDebug(id: -1, source: #file.source(#function, #line), message: "Received: \(json.code)")
+
+                    var replyProcessed = false
+
+                    for factory in replyFactories {
+                        if let reply = factory(json) {
+                            // Dispatch all processing to the main queue, such that no GUI update conflict occur.
+                            DispatchQueue.main.sync { reply.process() }
+                            replyProcessed = true
+                            break
+                        }
+                    }
+                    
+                    if !replyProcessed {
+                        
+                        log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Message was not recognized: \(json.code)")
+                        showErrorInKeyWindow(message: "Message from Swiftfire was not processed. See error log.")
+                    }
+                }
                 
             } catch let error as VJson.Exception {
                 
-                if case let .reason(_, incomplete, msg) = error {
+                if case let .reason(_, incomplete, msg) = error, !incomplete {
                     
-                    if !incomplete {
-                        
-                        log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Error occured when parsing JSON message: \(msg)")
-                        
-                        if let d = delegate { d.swiftfireMacInterface(self, message: "Error occured when parsing JSON message: \(msg)") }
-                    }
+                    log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Error occured when parsing JSON message: \(msg)")
+                    showErrorInKeyWindow(message: "Error parsing received JSON message from Swiftfire. See error log.")
+
+                    // Try to recover by emptying all data
+                    data.removeAll()
                 }
                 
                 break PROCESS_LOOP
@@ -405,16 +368,13 @@ class SwiftfireMacInterface: NSObject, TransferToSwiftfire {
                 
                 let message = "Unknown error occured while creating VJson object"
                 log.atLevelError(id: -1, source: #file.source(#function, #line), message: message)
-                if let d = delegate { d.swiftfireMacInterface(self, message: message) }
-                
+                showErrorInKeyWindow(message: message)
+
+                // Try to recover by emptying all data
+                data.removeAll()
+
                 break PROCESS_LOOP
             }
-            
-            
-            log.atLevelDebug(id: -1, source: #file.source(#function, #line), message: "Received JSON code \(json!)")
-            
-            
-            if let d = self.delegate { d.swiftfireMacInterface(self, reply: json!) }
         }
     }
 }

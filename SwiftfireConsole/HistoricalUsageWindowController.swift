@@ -9,7 +9,7 @@
 //  Company:    http://balancingrock.nl
 //  Website:    http://swiftfire.nl/
 //  Blog:       http://swiftrien.blogspot.com
-//  Git:        https://github.com/Swiftrien/SwiftfireConsole
+//  Git:        https://github.com/Swiftrien/Swiftfire
 //
 //  Copyright:  (c) 2014-2016 Marinus van der Lugt, All rights reserved.
 //
@@ -99,7 +99,7 @@ class HistoricalUsageWindowController: NSWindowController {
     
     override func windowDidLoad() {
         let today = Calendar.current.startOfDay(for: Date())
-        let aMonthAgo = Calendar.current.date(byAdding: Calendar.Unit.month, value: -1, to: today, options: Calendar.Options.matchNextTime)
+        let aMonthAgo = Calendar.current.date(byAdding: .month, value: -1, to: today)
         startDatePicker.dateValue = aMonthAgo!
         endDatePicker.dateValue = today
         periodSelectionPopup.selectItem(at: 0)

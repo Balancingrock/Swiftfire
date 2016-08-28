@@ -3,7 +3,7 @@
 //  File:       Domains.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.13
+//  Version:    0.9.14
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,7 +49,10 @@
 //
 // History
 //
-// v0.9.13 - Upgraded to Swift 3 beta
+// v0.9.14 - Updated writeToLog
+//           Fixed bug that prevented loading of saved domains
+//         - Upgraded to Xcode 8 beta 6
+// v0.9.13 - Upgraded to Xcode 8 beta 3 (Swift 3)
 // v0.9.11 - Added local definition of "domains"
 //         - Updated for VJson 0.9.8
 // v0.9.7  - Fixed bug where domains were added without using the 'add' function.
@@ -59,13 +62,14 @@
 // v0.9.0  - Initial release
 // =====================================================================================================================
 
+
 import Foundation
 
 
 let domains = Domains()
 
 
-final class Domains: DomainNameChangeListener, Sequence {
+final class Domains: Sequence {
     
     
     // The managed domains
@@ -78,20 +82,16 @@ final class Domains: DomainNameChangeListener, Sequence {
     var count: Int { return domains.count }
     
     
-    /**
-     - Returns: True if the given domain name is contained explicitly (domain.name) or implicitly ("www." and domain.name if wwwIncluded is true) in the managed domains.
-     - Note: If a domain is disabled, it will not be examined for a match.
-     */
-     
+    /// - Returns: True if the given domain name is contained explicitly (domain.name) or implicitly ("www." and domain.name if wwwIncluded is true) in the managed domains.
+    /// - Note: If a domain is disabled, it will not be examined for a match.
+    
     func contains(domainWithName name: String) -> Bool {
         return domain(forName: name) != nil
     }
 
     
-    /**
-     - Returns: The domain for the given name. Nil if none can be found.
-     - Note: The "wwwIncluded" property is also evaluated.
-     */
+    /// - Returns: The domain for the given name. Nil if none can be found.
+    /// - Note: The "wwwIncluded" property is also evaluated.
     
     func domain(forName name: String?) -> Domain? {
         
@@ -101,7 +101,7 @@ final class Domains: DomainNameChangeListener, Sequence {
         
         for (_, d) in domains {
             if d.name == lname { return d }
-            if d.wwwIncluded.boolValue {
+            if d.wwwIncluded {
                 if lname == "www." + d.name { return d }
             }
         }
@@ -110,28 +110,10 @@ final class Domains: DomainNameChangeListener, Sequence {
     }
     
     
-    /**
-     - Returns: The enabled domain for the given name. Nil if none can be found.
-     - Note: The "wwwIncluded" property is also evaluated.
-     *
-    
-    func domainIsEnabled(forName name: String) -> Domain? {
-        
-        let d = domain(forName: name)
-        
-        if let f = d?.enabled, f == true { return d }
-        
-        return nil
-    }*/
-
-    
-    /**
-     Adds the given domain as a new domain. Adds self as the name change listener, overwriting a previous value if there was one.
-     
-     - Parameter domain: The domain to be added.
-     
-     - Returns: True if the domain was added, false if there was already a domain with that name.
-     */
+    /// Adds the given domain as a new domain. Adds self as the name change listener, overwriting a previous value if there was one.
+    ///
+    /// - Parameter domain: The domain to be added.
+    /// - Returns: True if the domain was added, false if there was already a domain with that name.
     
     @discardableResult
     func add(domain: Domain) -> Bool {
@@ -139,27 +121,25 @@ final class Domains: DomainNameChangeListener, Sequence {
         if contains(domainWithName: domain.name) { return false }
         
         domains[domain.name.lowercased()] = domain
-        domain.nameChangeListener = self
+        NotificationCenter.default.addObserver(forName: Domain.nameChangedNotificationName, object: domain, queue: nil, using: nameChangeListener)
         
         return true
     }
     
     
-    /**
-     Removes the given domain from the managed domains.
-    
-     - Parameter name: The name of the domain to be removed. Note that this must match the domain name exactly, the "wwwIncluded" property will not be tested.
-    
-     - Return True if the domain was found and removed, false if not.
-     */
+    /// Removes the given domain from the managed domains.
+    ///
+    /// - Parameter name: The name of the domain to be removed. Note that this must match the domain name exactly, the "wwwIncluded" property will not be tested.
+    ///
+    /// - Return True if the domain was found and removed, false if not.
     
     @discardableResult
     func remove(domainWithName name: String) -> Bool {
         
         let lname = name.lowercased()
 
-        if domains[lname] != nil {
-            domains.removeValue(forKey: lname)
+        if let domain = domains.removeValue(forKey: lname) {
+            NotificationCenter.default.removeObserver(self, name: Domain.nameChangedNotificationName, object: domain)
             return true
         } else {
             return false
@@ -167,13 +147,11 @@ final class Domains: DomainNameChangeListener, Sequence {
     }
     
     
-    /**
-     Update the contents for the domain with the given name with the values from the given domain.
-     
-     - Parameter name: The name of the domain to be updated.
-     
-     - Returns: True if the update was successful, false if nothing was changed or the domain for the given name did not exist.
-     */
+    /// Update the contents for the domain with the given name with the values from the given domain.
+    ///
+    /// - Parameter name: The name of the domain to be updated.
+    ///
+    /// - Returns: True if the update was successful, false if nothing was changed or the domain for the given name did not exist.
     
     @discardableResult
     func update(domainWithName name: String, withDomain domain: Domain) -> Bool {
@@ -195,13 +173,10 @@ final class Domains: DomainNameChangeListener, Sequence {
     }
     
     
-    /**
-     This will merge the changes from the new set of domains into this domains set.
-     When names are identical, it will update the properties of the local domains to those of the new domains. If there are more domains in the new set than in the domains of this set, then the new domains will be added. If this domain contains one or more domains that are not in the new set, they will be removed, unless there are remaining domains in the new set that have no corresponding domain in this set. Then the domains in this set will be updated to the remaining domains in the new set.
-     
-     - Note: The most common example is when the number of domains is equal, but the new set has one domain that is not in the old set. This means that the name of the domain has changed, and the not-covered domain in the old set will be renamed to the domain name of the new set. (Any changed properties will also be updated.
-     */
-     
+    /// This will merge the changes from the new set of domains into this domains set.
+    /// When names are identical, it will update the properties of the local domains to those of the new domains. If there are more domains in the new set than in the domains of this set, then the new domains will be added. If this domain contains one or more domains that are not in the new set, they will be removed, unless there are remaining domains in the new set that have no corresponding domain in this set. Then the domains in this set will be updated to the remaining domains in the new set.
+     /// - Note: The most common example is when the number of domains is equal, but the new set has one domain that is not in the old set. This means that the name of the domain has changed, and the not-covered domain in the old set will be renamed to the domain name of the new set. (Any changed properties will also be updated.
+    
     func update(withDomains newDomains: Domains) {
         
         // These keep references to domains that have not yet been processed
@@ -297,7 +272,7 @@ final class Domains: DomainNameChangeListener, Sequence {
             if source.domains.values.count > 0 {
                 
                 let values = source.domains.values
-                let sortedValues = values.sorted(isOrderedBefore: {$0.name < $1.name})
+                let sortedValues = values.sorted(by: {$0.name < $1.name})
                 
                 // Find a value that has not been sent already
                 OUTER: for i in sortedValues {
@@ -328,11 +303,19 @@ final class Domains: DomainNameChangeListener, Sequence {
     }
     
     
-    // MARK: - DomainNameChangedListener protocol
+    // MARK: - NameChanged notification listener
     
-    func domainNameChanged(from: String, to: String) {
-        if let d = domains.removeValue(forKey: from) {
-            domains[to] = d
+    func nameChangeListener(notification: Notification) {
+        guard let oldName = notification.userInfo?["Old"] as? String else {
+            log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Missing 'Old' value in userInfo")
+            return
+        }
+        guard let newName = notification.userInfo?["New"] as? String else {
+            log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Missing 'New' value in userInfo")
+            return
+        }
+        if let d = domains.removeValue(forKey: oldName) {
+            domains[newName] = d
         }
     }
     
@@ -353,74 +336,82 @@ final class Domains: DomainNameChangeListener, Sequence {
         
         // Read the JSON code from the file and construct a hierarchy from it.
         
-        if let file = FileURLs.domainDefaults {
+        let file = FileURLs.domainDefaults!
             
-            let json: VJson
+        let json: VJson
+        
+        do {
             
-            do {
-                
-                json = try VJson.parse(file: file)
-                
-                for j in json["Domains"] {
-                    if let d = Domain(json: j["Domain"]) {
-                        self.add(domain: d)
-                    } else {
-                        log.atLevelWarning(id: -1, source: #file.source(#function, #line), message: "Error reading domain from domains-default file.")
-                    }
+            
+            // Read domains from file
+            
+            json = try VJson.parse(file: file)
+            
+            
+            // Remove the current domains
+            
+            domains.removeAll()
+            
+            
+            // Add the new domains
+            
+            for j in json["Domains"] {
+                if let d = Domain(json: j) {
+                    self.add(domain: d)
+                } else {
+                    log.atLevelWarning(id: -1, source: #file.source(#function, #line), message: "Error reading domain from domains-default file.")
                 }
-                
-                return true
-
-            } catch let error as VJson.Exception {
-                log.atLevelWarning(id: -1, source: #file.source(#function, #line), message: "Could not retrieve JSON code from domains-defaults file. Error = \(error).")
-                return false
-                
-            } catch {
-                log.atLevelWarning(id: -1, source: #file.source(#function, #line), message: "Could not retrieve JSON code from domains-defaults file. Unspecified error.")
-                return false
             }
             
+            return true
             
-        } else {
+        } catch let error as VJson.Exception {
+            log.atLevelWarning(id: -1, source: #file.source(#function, #line), message: "Could not retrieve JSON code from domains-defaults file. Error = \(error).")
+            return false
             
-            log.atLevelError(id: -1, source: #file.source(#function, #line), message: "No domains-defaults file URL available")
+        } catch {
+            log.atLevelWarning(id: -1, source: #file.source(#function, #line), message: "Could not retrieve JSON code from domains-defaults file. Unspecified error.")
             return false
         }
     }
     
     
+    /// Invokes serverShutdown on each domain.
+    
+    func serverShutdown() {
+        domains.forEach({ $0.value.serverShutdown() })
+    }
+    
+    
+    /// Saves the settings of the domains to file.
+    
     func save() {
         
-        if let file = FileURLs.domainDefaults {
+        let file = FileURLs.domainDefaults!
             
-            let json = VJson()
+        let json = VJson()
+        
+        for (i, d) in self.enumerated() {
             
-            for (i, d) in self.enumerated() {
-                
-                let jd = d.json
-                jd.removeChildren(withName: "Telemetry")
-                json["Domains"][i] = jd
-            }
-            
-            if let errorMsg = json.save(to: file) {
-                log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Could not write domains-defaults to file, error: \(errorMsg)")
-            }
-            
-        } else {
-            
-            log.atLevelError(id: -1, source: #file.source(#function, #line), message: "No domains-defaults file URL available")
+            let jd = d.json
+            jd.removeChildren(withName: "Telemetry")
+            json["Domains"][i] = jd
+        }
+        
+        if let errorMsg = json.save(to: file) {
+            log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Could not write domains-defaults to file, error: \(errorMsg)")
         }
     }
     
     
-    // Write all domains to the log at level NOTICE
+    /// Write all domains to the log
     
-    func writeToLog(atLevel: SwifterLog.Level) {
+    func writeToLog(atLevel level: SwifterLog.Level) {
         if self.count == 0 {
-            log.atLevel(atLevel, id: -1, source: #file.source(#function, #line), message: "No domains defined")
+            log.atLevel(level, id: -1, source: #file.source(#function, #line), message: "No domains defined")
         } else {
             for d in self {
-                log.atLevel(atLevel, id: -1, source: #file.source(#function, #line), message: d.description)
+                d.writeToLog(atLevel: level)
             }
         }
     }

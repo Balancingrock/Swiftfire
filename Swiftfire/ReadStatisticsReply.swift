@@ -3,7 +3,7 @@
 //  File:       ReadStatisticsReply.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.13
+//  Version:    0.9.14
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -29,7 +29,7 @@
 //   - You can send payment via paypal to: sales@balancingrock.nl
 //   - Or wire bitcoins to: 1GacSREBxPy1yskLMc9de2nofNv2SNdwqH
 //
-//  I prefer the above two, but if these options don't suit you, you may also send me a gift from my amazon.co.uk
+//  I prefer the above two, but if these options don't suit you, you can also send me a gift from my amazon.co.uk
 //  whishlist: http://www.amazon.co.uk/gp/registry/wishlist/34GNMPZKAQ0OO/ref=cm_sw_em_r_wsl_cE3Tub013CKN6_wb
 //
 //  If you like to pay in another way, please contact me at rien@balancingrock.nl
@@ -49,7 +49,8 @@
 //
 // History
 //
-// v0.9.13 - Upgraded to Swift 3 beta
+// v0.9.14 - Updated Command & Reply structure
+// v0.9.13 - Upgraded to Xcode 8 beta 3 (Swift 3)
 // v0.9.11 - Initial release
 // =====================================================================================================================
 
@@ -60,23 +61,30 @@ private let REPLY_NAME = "ReadStatisticsReply"
 private let STATISTICS = "Statistics"
 
 
-final class ReadStatisticsReply {
+final class ReadStatisticsReply: MacMessage {
     
-    var statistics: VJson
+
+    // MARK: - MacMessage protocol
     
     var json: VJson {
         let json = VJson()
-        json[REPLY_NAME].add(statistics, forName: STATISTICS)
+        json[REPLY_NAME][STATISTICS] &= statistics.json
         return json
     }
     
-    init(statistics: VJson) {
-        self.statistics = statistics
-    }
     
     init?(json: VJson?) {
         guard let json = json else { return nil }
         guard let jstat = json|REPLY_NAME|STATISTICS else { return nil }
-        statistics = jstat
+        stats = jstat
+    }
+    
+    
+    // MARK: - Class specific
+
+    var stats: VJson
+    
+    init(statistics: VJson) {
+        self.stats = statistics
     }
 }

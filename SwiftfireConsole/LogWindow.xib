@@ -1,0 +1,183 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.Cocoa.XIB" version="3.0" toolsVersion="11198.2" systemVersion="15G31" targetRuntime="MacOSX.Cocoa" propertyAccessControl="none" useAutolayout="YES" customObjectInstantitationMethod="direct">
+    <dependencies>
+        <deployment identifier="macosx"/>
+        <plugIn identifier="com.apple.InterfaceBuilder.CocoaPlugin" version="11198.2"/>
+    </dependencies>
+    <objects>
+        <customObject id="-2" userLabel="File's Owner" customClass="LogWindowController" customModule="SwiftfireConsole" customModuleProvider="target">
+            <connections>
+                <outlet property="displayLogLevelPopUpButton" destination="35V-W7-2Jw" id="EpW-st-og5"/>
+                <outlet property="displayTextView" destination="2l4-NQ-E0z" id="tsm-ig-aG7"/>
+                <outlet property="sendLogLevelPopUpButton" destination="dIy-92-gXQ" id="J4k-eb-MUb"/>
+                <outlet property="window" destination="QvC-M9-y7g" id="JUi-Sp-TSv"/>
+            </connections>
+        </customObject>
+        <customObject id="-1" userLabel="First Responder" customClass="FirstResponder"/>
+        <customObject id="-3" userLabel="Application" customClass="NSObject"/>
+        <window title="Server Log" allowsToolTipsWhenApplicationIsInactive="NO" autorecalculatesKeyViewLoop="NO" oneShot="NO" releasedWhenClosed="NO" animationBehavior="default" id="QvC-M9-y7g">
+            <windowStyleMask key="styleMask" titled="YES" closable="YES" miniaturizable="YES" resizable="YES"/>
+            <windowPositionMask key="initialPositionMask" leftStrut="YES" rightStrut="YES" topStrut="YES" bottomStrut="YES"/>
+            <rect key="contentRect" x="196" y="240" width="867" height="603"/>
+            <rect key="screenRect" x="0.0" y="0.0" width="2560" height="1577"/>
+            <view key="contentView" wantsLayer="YES" id="EiT-Mj-1SZ">
+                <rect key="frame" x="0.0" y="0.0" width="867" height="603"/>
+                <autoresizingMask key="autoresizingMask"/>
+                <subviews>
+                    <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="dIy-92-gXQ">
+                        <rect key="frame" x="264" y="568" width="110" height="26"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="105" id="OOZ-Qf-dJv"/>
+                            <constraint firstAttribute="height" constant="21" id="gC5-Sq-INl"/>
+                        </constraints>
+                        <popUpButtonCell key="cell" type="push" title="None" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="4Ra-Ec-6nZ" id="b69-1e-yBG">
+                            <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="menu"/>
+                            <menu key="menu" id="dgL-IB-HTT">
+                                <items>
+                                    <menuItem title="Debug" id="Ptu-YW-XcX"/>
+                                    <menuItem title="Info" id="QN4-8p-4DW"/>
+                                    <menuItem title="Notice" id="PTh-TV-dIB"/>
+                                    <menuItem title="Warning" id="FqR-5v-nlQ"/>
+                                    <menuItem title="Error" id="iN9-Pw-9vS"/>
+                                    <menuItem title="Critical" id="usc-tj-aEK"/>
+                                    <menuItem title="Alert" id="BAY-Nv-dEj"/>
+                                    <menuItem title="Emergency" id="wYg-BN-689"/>
+                                    <menuItem title="None" state="on" id="4Ra-Ec-6nZ"/>
+                                </items>
+                            </menu>
+                        </popUpButtonCell>
+                        <connections>
+                            <action selector="sendLogLevelPopUpButtonActionWithSender:" target="-2" id="tTg-A9-aQg"/>
+                        </connections>
+                    </popUpButton>
+                    <popUpButton verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="35V-W7-2Jw">
+                        <rect key="frame" x="740" y="567" width="110" height="26"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="105" id="W5M-Dh-jik"/>
+                            <constraint firstAttribute="height" constant="21" id="d1t-07-FM6"/>
+                        </constraints>
+                        <popUpButtonCell key="cell" type="push" title="Debug" bezelStyle="rounded" alignment="left" lineBreakMode="truncatingTail" state="on" borderStyle="borderAndBezel" imageScaling="proportionallyDown" inset="2" selectedItem="uMt-d9-4TL" id="4h4-1k-4Nz">
+                            <behavior key="behavior" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="menu"/>
+                            <menu key="menu" id="PwJ-WN-mi9">
+                                <items>
+                                    <menuItem title="Debug" state="on" id="uMt-d9-4TL"/>
+                                    <menuItem title="Info" id="Yif-M4-neE"/>
+                                    <menuItem title="Notice" id="NZo-xd-P77"/>
+                                    <menuItem title="Warning" id="oLQ-z7-v5F"/>
+                                    <menuItem title="Error" id="WLp-fk-OZ0"/>
+                                    <menuItem title="Critical" id="R3e-cC-aVm"/>
+                                    <menuItem title="Alert" id="Tnw-D1-gkv"/>
+                                    <menuItem title="Emergency" id="JYG-dQ-uj9"/>
+                                    <menuItem title="None" id="33Y-MM-I0F"/>
+                                </items>
+                            </menu>
+                        </popUpButtonCell>
+                        <connections>
+                            <action selector="displayLogLevelPopUpButtonWithSender:" target="-2" id="ABY-5p-IxM"/>
+                        </connections>
+                    </popUpButton>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="Y5f-8Y-BCF">
+                        <rect key="frame" x="542" y="573" width="194" height="17"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="17" id="ZP8-s6-cQb"/>
+                            <constraint firstAttribute="width" constant="190" id="i5Z-gg-LXx"/>
+                        </constraints>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Display At and Above LogLevel:" id="2XY-VH-d6D">
+                            <font key="font" metaFont="system"/>
+                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="zey-no-z71">
+                        <rect key="frame" x="737" y="-2" width="131" height="32"/>
+                        <constraints>
+                            <constraint firstAttribute="width" constant="119" id="0Xa-UE-Ga1"/>
+                            <constraint firstAttribute="height" constant="21" id="JJp-N2-8IV"/>
+                        </constraints>
+                        <buttonCell key="cell" type="push" title="Clear Log View" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="5Of-4l-qkb">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="clearDisplayButtonActionWithSender:" target="-2" id="oyW-jJ-P2q"/>
+                        </connections>
+                    </button>
+                    <scrollView horizontalLineScroll="10" horizontalPageScroll="10" verticalLineScroll="10" verticalPageScroll="10" usesPredominantAxisScrolling="NO" translatesAutoresizingMaskIntoConstraints="NO" id="y0K-h9-rDi">
+                        <rect key="frame" x="-1" y="31" width="869" height="531"/>
+                        <clipView key="contentView" id="E3S-w6-0P4">
+                            <rect key="frame" x="1" y="1" width="852" height="514"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                            <subviews>
+                                <textView editable="NO" importsGraphics="NO" usesFontPanel="YES" findStyle="panel" allowsUndo="YES" usesRuler="YES" allowsNonContiguousLayout="YES" quoteSubstitution="YES" dashSubstitution="YES" smartInsertDelete="YES" id="2l4-NQ-E0z">
+                                    <rect key="frame" x="0.0" y="0.0" width="852" height="514"/>
+                                    <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                                    <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                                    <size key="minSize" width="852" height="514"/>
+                                    <size key="maxSize" width="992" height="10000000"/>
+                                    <color key="insertionPointColor" name="controlTextColor" catalog="System" colorSpace="catalog"/>
+                                </textView>
+                            </subviews>
+                            <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        </clipView>
+                        <scroller key="horizontalScroller" verticalHuggingPriority="750" doubleValue="1" horizontal="YES" id="Wyt-nf-KQN">
+                            <rect key="frame" x="1" y="515" width="852" height="15"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </scroller>
+                        <scroller key="verticalScroller" verticalHuggingPriority="750" horizontal="NO" id="Nld-FG-dkt">
+                            <rect key="frame" x="853" y="1" width="15" height="514"/>
+                            <autoresizingMask key="autoresizingMask"/>
+                        </scroller>
+                    </scrollView>
+                    <textField horizontalHuggingPriority="251" verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="cDS-Ij-aJR">
+                        <rect key="frame" x="18" y="574" width="242" height="17"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="17" id="6yw-8U-FrO"/>
+                            <constraint firstAttribute="width" constant="238" id="wr9-wW-chz"/>
+                        </constraints>
+                        <textFieldCell key="cell" scrollable="YES" lineBreakMode="clipping" sendsActionOnEndEditing="YES" title="Swiftfire Sends At and Above LogLevel:" id="1kT-bD-jdi">
+                            <font key="font" metaFont="system"/>
+                            <color key="textColor" name="labelColor" catalog="System" colorSpace="catalog"/>
+                            <color key="backgroundColor" name="controlColor" catalog="System" colorSpace="catalog"/>
+                        </textFieldCell>
+                    </textField>
+                    <button verticalHuggingPriority="750" translatesAutoresizingMaskIntoConstraints="NO" id="E20-rp-w12">
+                        <rect key="frame" x="-1" y="-2" width="70" height="32"/>
+                        <constraints>
+                            <constraint firstAttribute="height" constant="21" id="Nzu-VS-nF7"/>
+                            <constraint firstAttribute="width" constant="58" id="el1-jH-x7m"/>
+                        </constraints>
+                        <buttonCell key="cell" type="push" title="Save" bezelStyle="rounded" alignment="center" borderStyle="border" imageScaling="proportionallyDown" inset="2" id="bQP-P1-F36">
+                            <behavior key="behavior" pushIn="YES" lightByBackground="YES" lightByGray="YES"/>
+                            <font key="font" metaFont="system"/>
+                        </buttonCell>
+                        <connections>
+                            <action selector="saveButtonActionWithSender:" target="-2" id="bID-0H-3pY"/>
+                        </connections>
+                    </button>
+                </subviews>
+                <constraints>
+                    <constraint firstItem="E20-rp-w12" firstAttribute="leading" secondItem="EiT-Mj-1SZ" secondAttribute="leading" constant="5" id="4pQ-Xs-LRe"/>
+                    <constraint firstAttribute="trailing" secondItem="35V-W7-2Jw" secondAttribute="trailing" constant="20" id="CXA-vH-FrR"/>
+                    <constraint firstItem="cDS-Ij-aJR" firstAttribute="leading" secondItem="EiT-Mj-1SZ" secondAttribute="leading" constant="20" id="JKO-Yj-kvG"/>
+                    <constraint firstAttribute="bottom" secondItem="E20-rp-w12" secondAttribute="bottom" constant="5" id="RdC-LZ-WXa"/>
+                    <constraint firstItem="35V-W7-2Jw" firstAttribute="top" secondItem="EiT-Mj-1SZ" secondAttribute="top" constant="12" id="WqQ-MJ-de9"/>
+                    <constraint firstItem="y0K-h9-rDi" firstAttribute="leading" secondItem="EiT-Mj-1SZ" secondAttribute="leading" constant="-1" id="YYS-WU-AoH"/>
+                    <constraint firstItem="cDS-Ij-aJR" firstAttribute="top" secondItem="EiT-Mj-1SZ" secondAttribute="top" constant="12" id="eVq-8N-O5l"/>
+                    <constraint firstItem="35V-W7-2Jw" firstAttribute="leading" secondItem="Y5f-8Y-BCF" secondAttribute="trailing" constant="8" id="g5N-Se-C8N"/>
+                    <constraint firstAttribute="trailing" secondItem="zey-no-z71" secondAttribute="trailing" constant="5" id="h3O-Ip-kFY"/>
+                    <constraint firstAttribute="bottom" secondItem="zey-no-z71" secondAttribute="bottom" constant="5" id="mEH-Bu-6lB"/>
+                    <constraint firstItem="Y5f-8Y-BCF" firstAttribute="top" secondItem="EiT-Mj-1SZ" secondAttribute="top" constant="13" id="n2M-gu-OuY"/>
+                    <constraint firstItem="dIy-92-gXQ" firstAttribute="top" secondItem="EiT-Mj-1SZ" secondAttribute="top" constant="11" id="pFL-2p-wQG"/>
+                    <constraint firstItem="y0K-h9-rDi" firstAttribute="top" secondItem="35V-W7-2Jw" secondAttribute="bottom" constant="8" id="pbe-Q1-6w1"/>
+                    <constraint firstAttribute="trailing" secondItem="y0K-h9-rDi" secondAttribute="trailing" constant="-1" id="tbS-sI-Eff"/>
+                    <constraint firstItem="dIy-92-gXQ" firstAttribute="leading" secondItem="cDS-Ij-aJR" secondAttribute="trailing" constant="8" id="uOw-SU-3t2"/>
+                    <constraint firstItem="zey-no-z71" firstAttribute="top" secondItem="y0K-h9-rDi" secondAttribute="bottom" constant="5" id="ynJ-ay-3jo"/>
+                    <constraint firstItem="E20-rp-w12" firstAttribute="top" secondItem="y0K-h9-rDi" secondAttribute="bottom" constant="5" id="zxX-hS-UcW"/>
+                </constraints>
+            </view>
+            <point key="canvasLocation" x="396.5" y="328.5"/>
+        </window>
+    </objects>
+</document>

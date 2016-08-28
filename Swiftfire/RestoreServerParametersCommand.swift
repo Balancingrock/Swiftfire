@@ -50,7 +50,8 @@
 // History
 //
 // v0.9.14 - Added logging of parameters after restore
-// v0.9.13 - Upgraded to Swift 3 beta
+//         - Updated Command & Reply structure
+// v0.9.13 - Upgraded to Xcode 8 beta 3 (Swift 3)
 // v0.9.11 - Updated for VJson 0.9.8
 // v0.9.6  - Header update
 // v0.9.4  - Initial release (replaces part of MacDef.swift)
@@ -62,7 +63,10 @@ import Foundation
 private let COMMAND_NAME = "RestoreServerParametersCommand"
 
 
-final class RestoreServerParametersCommand {
+final class RestoreServerParametersCommand: MacMessage {
+    
+    
+    // MARK: - MacMessage protocol
     
     var json: VJson {
         let j = VJson()
@@ -70,16 +74,13 @@ final class RestoreServerParametersCommand {
         return j
     }
     
-    init() {}
-    
     init?(json: VJson?) {
         guard let json = json else { return nil }
         guard (json|COMMAND_NAME)?.nullValue == true else { return nil }
     }
-    
-    func execute() {
-        log.atLevelNotice(id: -1, source: #file.source(#function, #line))
-        Parameters.restore()
-        Parameters.logParameterSettings(atLevel: SwifterLog.Level.notice)
-    }
+        
+
+    // MARK: - Class specific
+
+    init() {}
 }

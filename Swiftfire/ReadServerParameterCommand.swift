@@ -3,7 +3,7 @@
 //  File:       ReadServerParameterCommand.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.13
+//  Version:    0.9.14
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,7 +49,8 @@
 //
 // History
 //
-// v0.9.13 - Upgraded to Swift 3 beta
+// v0.9.14 - Updated Command & Reply structure
+// v0.9.13 - Upgraded to Xcode 8 beta 3 (Swift 3)
 // v0.9.11 - Updated for VJson 0.9.8
 // v0.9.6  - Header update
 // v0.9.4  - Initial release (replaces part of MacDef.swift)
@@ -61,9 +62,10 @@ import Foundation
 private let COMMAND_NAME = "ReadServerParameterCommand"
 
 
-final class ReadServerParameterCommand {
+final class ReadServerParameterCommand: MacMessage {
+
     
-    let parameter: ServerParameter
+    // MARK: - MacMessage protocol
     
     var json: VJson {
         let j = VJson()
@@ -71,70 +73,20 @@ final class ReadServerParameterCommand {
         return j
     }
     
-    init?(parameter: ServerParameter?) {
-        guard let parameter = parameter else { return nil }
-        self.parameter = parameter
-    }
-    
     init?(json: VJson?) {
         guard let json = json else { return nil }
         guard let jname = (json|COMMAND_NAME)?.stringValue else { return nil }
-        guard let jparameter = ServerParameter(rawValue: jname) else { return nil }
+        guard let jparameter = ServerParameterName(rawValue: jname) else { return nil }
         parameter = jparameter
     }
     
-    func execute() {
-        
-        func createBoolReply(parameter: ServerParameter, value: Bool) -> VJson {
-            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Reading, \(parameter.rawValue) = \(value)")
-            return ReadServerParameterReply(parameter: parameter, value: value).json
-        }
-        
-        func createStringReply(parameter: ServerParameter, value: String) -> VJson {
-            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Reading, \(parameter.rawValue) = \(value)")
-            return ReadServerParameterReply(parameter: parameter, value: value).json
-        }
-        
-        func createIntReply(parameter: ServerParameter, value: Int) -> VJson {
-            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Reading, \(parameter.rawValue) = \(value)")
-            return ReadServerParameterReply(parameter: parameter, value: value).json
-        }
-        
-        func createDoubleReply(parameter: ServerParameter, value: Double) -> VJson {
-            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Reading, \(parameter.rawValue) = \(value)")
-            return ReadServerParameterReply(parameter: parameter, value: value).json
-        }
+    
+    // MARK: - Class specific
 
-        
-        var result: VJson
-
-        switch parameter {
-        case .debugMode: result = createBoolReply(parameter: parameter, value: Parameters.debugMode)
-        case .autoStartup: result = createBoolReply(parameter: parameter, value: Parameters.autoStartup)
-        case .headerLoggingEnabled: result = createBoolReply(parameter: parameter, value: Parameters.headerLoggingEnabled)
-        case .flushHeaderLogfileAfterEachWrite: result = createBoolReply(parameter: parameter, value: Parameters.flushHeaderLogfileAfterEachWrite)
-        case .servicePortNumber: result = createStringReply(parameter: parameter, value: Parameters.httpServicePortNumber)
-        case .macPortNumber: result = createStringReply(parameter: parameter, value: Parameters.macPortNumber)
-        case .clienMessageBufferSize: result = createIntReply(parameter: parameter, value: Parameters.clientMessageBufferSize)
-        case .httpKeepAliveInactivityTimeout: result = createIntReply(parameter: parameter, value: Parameters.httpKeepAliveInactivityTimeout)
-        case .maxNumberOfAcceptedConnections: result = createIntReply(parameter: parameter, value: Parameters.maxNofAcceptedConnections)
-        case .maxNumberOfPendingConnections: result = createIntReply(parameter: parameter, value: Int(Parameters.maxNofPendingConnections))
-        case .maxWaitForPendingConnections: result = createIntReply(parameter: parameter, value: Parameters.maxWaitForPendingConnections)
-        case .logfileMaxNofFiles: result = createIntReply(parameter: parameter, value: log.logfileMaxNumberOfFiles)
-        case .logfileMaxSize: result = createIntReply(parameter: parameter, value: Parameters.logfileMaxSize)
-        case .maxFileSizeForHeaderLogging: result = createIntReply(parameter: parameter, value: Parameters.maxFileSizeForHeaderLogging)
-        case .httpResponseClientTimeout: result = createDoubleReply(parameter: parameter, value: Parameters.httpResponseClientTimeout)
-        case .macInactivityTimeout: result = createDoubleReply(parameter: parameter, value: Parameters.macInactivityTimeout)
-        case .aslFacilityRecordAtAndAboveLevel: result = createIntReply(parameter: parameter, value: log.aslFacilityRecordAtAndAboveLevel.rawValue)
-        case .fileRecordAtAndAboveLevel: result = createIntReply(parameter: parameter, value: log.fileRecordAtAndAboveLevel.rawValue)
-        case .stdoutPrintAtAndAboveLevel: result = createIntReply(parameter: parameter, value: log.stdoutPrintAtAndAboveLevel.rawValue)
-        case .callbackAtAndAboveLevel: result = createIntReply(parameter: parameter, value: log.callbackAtAndAboveLevel.rawValue)
-        case .networkTransmitAtAndAboveLevel: result = createIntReply(parameter: parameter, value: log.networkTransmitAtAndAboveLevel.rawValue)
-        case .networkLogtargetIpAddress: result = createStringReply(parameter: parameter, value: log.networkTarget?.address ?? "")
-        case .networkLogtargetPortNumber: result = createStringReply(parameter: parameter, value: log.networkTarget?.port ?? "")
-        case .http1_0DomainName: result = createStringReply(parameter: parameter, value: Parameters.http1_0DomainName)
-        }
-        
-        toConsole?.transferToConsole(message: result.description)
+    let parameter: ServerParameterName
+    
+    init?(parameter: ServerParameterName?) {
+        guard let parameter = parameter else { return nil }
+        self.parameter = parameter
     }
 }

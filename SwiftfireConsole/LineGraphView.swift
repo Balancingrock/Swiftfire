@@ -9,7 +9,7 @@
 //  Company:    http://balancingrock.nl
 //  Website:    http://swiftfire.nl/
 //  Blog:       http://swiftrien.blogspot.com
-//  Git:        https://github.com/Swiftrien/SwiftfireConsole
+//  Git:        https://github.com/Swiftrien/Swiftfire
 //
 //  Copyright:  (c) 2014-2016 Marinus van der Lugt, All rights reserved.
 //
@@ -177,11 +177,11 @@ class LineGraphView: NSView {
         let context = NSGraphicsContext.current()!.cgContext
         context.setStrokeColor(red: 0.5, green: 0.5, blue: 0.5, alpha: 1.0)
         context.setLineWidth(1)
-        context.moveTo(x: yAxisPosition, y: xAxisPosition)
-        context.addLineTo(x: yAxisPosition, y: frame.size.height - LineGraphView.topMargin)
+        context.move(to: CGPoint(x: yAxisPosition, y: xAxisPosition))
+        context.addLine(to: CGPoint(x: yAxisPosition, y: frame.size.height - LineGraphView.topMargin))
         context.drawPath(using: CGPathDrawingMode.stroke)
-        context.moveTo(x: yAxisPosition, y: xAxisPosition)
-        context.addLineTo(x: (frame.size.width - LineGraphView.rightMargin), y: xAxisPosition)
+        context.move(to: CGPoint(x: yAxisPosition, y: xAxisPosition))
+        context.addLine(to: CGPoint(x: (frame.size.width - LineGraphView.rightMargin), y: xAxisPosition))
         context.drawPath(using: CGPathDrawingMode.stroke)
 
         
@@ -197,8 +197,8 @@ class LineGraphView: NSView {
         x = yAxisPosition
         y = ((frame.height - xAxisPosition) / 2) + xAxisPosition
         context.setStrokeColor(red: 0.8, green: 0.8, blue: 0.0, alpha: 1.0)
-        context.moveTo(x: x, y: y)
-        context.addLineTo(x: (frame.size.width - LineGraphView.rightMargin), y: y)
+        context.move(to: CGPoint(x: x, y: y))
+        context.addLine(to: CGPoint(x: (frame.size.width - LineGraphView.rightMargin), y: y))
         context.drawPath(using: CGPathDrawingMode.stroke)
         context.setStrokeColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 1.0)
 
@@ -217,7 +217,7 @@ class LineGraphView: NSView {
     // Determines the maximum necessary size for the Y-labels (based on the numeric value of the 'value' field in the datapoints array)
     
     private func maxYLabelWidth() -> CGFloat {
-        return dataPoints.reduce(CGFloat(0.0), combine: {
+        return dataPoints.reduce(CGFloat(0.0)) {
             let width = ($1.value.description as NSString).boundingRect(
                 with: MaxSize,
                 options: NSStringDrawingOptions.truncatesLastVisibleLine,
@@ -225,14 +225,14 @@ class LineGraphView: NSView {
                 context: nil)
                 .size.width
             return $0 > width ? $0 : width
-        })
+        }
     }
     
     
     // Determines the maximum necessary size for the X-labels (based on the 'label' field in the datapoints array)
     
     private func maxXLabelWidth() -> CGFloat {
-        return dataPoints.reduce(CGFloat(0.0), combine: {
+        return dataPoints.reduce(CGFloat(0.0)) {
             let width = ($1.label as NSString).boundingRect(
                 with: MaxSize,
                 options: NSStringDrawingOptions.truncatesLastVisibleLine,
@@ -240,7 +240,7 @@ class LineGraphView: NSView {
                 context: nil)
                 .size.width
             return $0 > width ? $0 : width
-        })
+        }
     }
 
     
@@ -249,7 +249,7 @@ class LineGraphView: NSView {
     private func autorangeHighLimit() -> Int64 {
         
         // Find highest value in datapoints
-        let maxValue = dataPoints.reduce(0, combine: { $0 > $1.value ? $0 : $1.value })
+        let maxValue = dataPoints.reduce(0) { $0 > $1.value ? $0 : $1.value }
         
         // Auto ranging values
         let autorangeArray: Array<Int64> = [10, 20, 50]
@@ -307,11 +307,11 @@ class LineGraphView: NSView {
         let context = NSGraphicsContext.current()!.cgContext
         context.setStrokeColor(red: 0.5, green: 0.5, blue: 0.5, alpha: 1.0)
         context.setLineWidth(1)
-        context.moveTo(x: yAxisPosition, y: xAxisPosition)
-        context.addLineTo(x: yAxisPosition, y: frame.size.height - LineGraphView.topMargin)
+        context.move(to: CGPoint(x: yAxisPosition, y: xAxisPosition))
+        context.addLine(to: CGPoint(x: yAxisPosition, y: frame.size.height - LineGraphView.topMargin))
         context.drawPath(using: CGPathDrawingMode.stroke)
-        context.moveTo(x: yAxisPosition, y: xAxisPosition)
-        context.addLineTo(x: frame.size.width - LineGraphView.rightMargin, y: xAxisPosition)
+        context.move(to: CGPoint(x: yAxisPosition, y: xAxisPosition))
+        context.addLine(to: CGPoint(x: frame.size.width - LineGraphView.rightMargin, y: xAxisPosition))
         context.drawPath(using: CGPathDrawingMode.stroke)
 
         
@@ -328,8 +328,8 @@ class LineGraphView: NSView {
             x = yAxisPosition
             y += (boundingRect.size.height / 2)
             context.setStrokeColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 0.1)
-            context.moveTo(x: x, y: y)
-            context.addLineTo(x: (frame.size.width - LineGraphView.rightMargin), y: y)
+            context.move(to: CGPoint(x: x, y: y))
+            context.addLine(to: CGPoint(x: (frame.size.width - LineGraphView.rightMargin), y: y))
             context.drawPath(using: CGPathDrawingMode.stroke)
             context.setStrokeColor(red: 0.0, green: 0.0, blue: 0.0, alpha: 1.0)
         }
@@ -349,8 +349,8 @@ class LineGraphView: NSView {
             
             // x-Axis ticks
             if dpXOffset > 0 { // No tick on the y-Axis
-                context.moveTo(x: yAxisPosition + dpXOffset, y: xAxisPosition - 2)
-                context.addLineTo(x: yAxisPosition + dpXOffset, y: xAxisPosition + 2)
+                context.move(to: CGPoint(x: yAxisPosition + dpXOffset, y: xAxisPosition - 2))
+                context.addLine(to: CGPoint(x: yAxisPosition + dpXOffset, y: xAxisPosition + 2))
                 context.drawPath(using: CGPathDrawingMode.stroke)
             }
             
@@ -363,10 +363,10 @@ class LineGraphView: NSView {
         dpXOffset = 0.0
         dpY = xAxisPosition + CGFloat(dataPoints[0].value) * yPixelsPerUnit
         context.setStrokeColor(red: 0.8, green: 0.8, blue: 0.0, alpha: 1.0)
-        context.moveTo(x: yAxisPosition + dpXOffset, y: dpY)
+        context.move(to: CGPoint(x: yAxisPosition + dpXOffset, y: dpY))
         for dp in dataPoints {
             if dpXOffset > 0 { // Do not draw the first point
-                context.addLineTo(x: yAxisPosition + dpXOffset, y: xAxisPosition + CGFloat(dp.value) * yPixelsPerUnit)
+                context.addLine(to: CGPoint(x: yAxisPosition + dpXOffset, y: xAxisPosition + CGFloat(dp.value) * yPixelsPerUnit))
             }
             dpXOffset += pixelsPerDataPoint
         }

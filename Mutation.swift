@@ -49,7 +49,7 @@
 //
 // History
 //
-// v0.9.13 - Upgraded to Swift 3 beta
+// v0.9.13 - Upgraded to Xcode 8 beta 3 (Swift 3)
 // v0.9.12 - Added support for UpdatePathPart and UpdateClient
 //         - Switched time intervals to javaDate (Int64)
 // v0.9.11 - Initial release

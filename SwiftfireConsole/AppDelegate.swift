@@ -3,13 +3,13 @@
 //  File:       AppDelegate.swift
 //  Project:    SwiftfireConsole
 //
-//  Version:    0.9.13
+//  Version:    0.9.14
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
 //  Website:    http://swiftfire.nl/
 //  Blog:       http://swiftrien.blogspot.com
-//  Git:        https://github.com/Swiftrien/SwiftfireConsole
+//  Git:        https://github.com/Swiftrien/Swiftfire
 //
 //  Copyright:  (c) 2014-2016 Marinus van der Lugt, All rights reserved.
 //
@@ -29,7 +29,7 @@
 //   - You can send payment via paypal to: sales@balancingrock.nl
 //   - Or wire bitcoins to: 1GacSREBxPy1yskLMc9de2nofNv2SNdwqH
 //
-//  I prefer the above two, but if these options don't suit you, you may also send me a gift from my amazon.co.uk
+//  I prefer the above two, but if these options don't suit you, you can also send me a gift from my amazon.co.uk
 //  whishlist: http://www.amazon.co.uk/gp/registry/wishlist/34GNMPZKAQ0OO/ref=cm_sw_em_r_wsl_cE3Tub013CKN6_wb
 //
 //  If you like to pay in another way, please contact me at rien@balancingrock.nl
@@ -49,7 +49,9 @@
 //
 // History
 //
-// v0.9.13 - Upgraded to Swift 3 beta
+// v0.9.14 - Upgraded to Xcode 8 beta 6
+//         - Major update: split main window tab into several window/controller combinations.
+// v0.9.13 - Upgraded to Xcode 8 beta 3 (Swift 3)
 // v0.9.12 - Added initialization of the statisticsWindowController in the statistics object.
 //         - Added conformance to GuiRequest protocol
 //         - Moved testcontent generation to Statistics
@@ -61,49 +63,117 @@
 // =====================================================================================================================
 
 import Cocoa
+import CoreData
 
-// Unused, must be present because of multi-target environment
-var quitSwiftfire = false
+
+func showErrorInKeyWindow(message: String) {
+    
+    if let window = NSApp.keyWindow {
+        
+        DispatchQueue.main.async {
+            
+            let alert = NSAlert()
+            alert.messageText = "Error"
+            alert.informativeText = message
+            alert.addButton(withTitle: "Dismiss")
+            alert.beginSheetModal(for: window, completionHandler: nil)
+        }
+        
+    }
+    else {
+        log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Could not send error message '\(message)' to key window")
+    }
+}
 
 @NSApplicationMain
-class AppDelegate: NSObject, NSApplicationDelegate, GuiRequest {
-
-    @IBOutlet weak var window: NSWindow!
+class AppDelegate: NSObject, NSApplicationDelegate {
 
     @IBOutlet weak var windowController: ConsoleWindowViewController!
 
 
-    var statisticsWindowController: StatisticsWindowController!
-    
-    
     func applicationDidFinishLaunching(_ notification: Notification) {
-        // Insert code here to initialize your application
+        
         log.aslFacilityRecordAtAndAboveLevel = SwifterLog.Level.none
         log.fileRecordAtAndAboveLevel = SwifterLog.Level.none
         log.stdoutPrintAtAndAboveLevel = SwifterLog.Level.debug
         log.networkTransmitAtAndAboveLevel = SwifterLog.Level.none
         log.callbackAtAndAboveLevel = SwifterLog.Level.none
-        
-        statistics.gui = self
-        
-        statistics.generateTestContent()
     }
 
     func applicationWillTerminate(_ notification: Notification) {
         // Insert code here to tear down your application
     }
     
-    @IBAction func showStatisticsWindow(sender: AnyObject?) {
-        statisticsWindowController = StatisticsWindowController(windowNibName: "StatisticsWindow")
-        statisticsWindowController.showWindow(nil)
-        statistics.statisticsWindowController = statisticsWindowController
+    
+    // MARK: - Server Parameters Window
+    
+    var serverParametersWindowController: ServerParametersWindowController?
+    
+    @IBAction func serverParametersWindow(sender: AnyObject?) {
+        if serverParametersWindowController == nil {
+            serverParametersWindowController = ServerParametersWindowController(windowNibName: "ServerParametersWindow")
+        }
+        serverParametersWindowController!.showWindow(nil)
     }
     
-    @IBAction func refreshStatistics(sender: AnyObject?) {
-        let macif = windowController.swiftfireMacInterface
-        let readCmd = ReadStatisticsCommand()
-        log.atLevelDebug(id: -1, source: #file.source(#function, #line), message: "Sending message \(readCmd.json)")
-        macif?.sendMessages(messages: [readCmd.json])
+    
+    // MARK: - Server Telemetry Window
+
+    var serverTelemetryWindowController: ServerTelemetryWindowController?
+
+    @IBAction func serverTelemetryWindow(sender: AnyObject?) {
+        if serverTelemetryWindowController == nil {
+            serverTelemetryWindowController = ServerTelemetryWindowController(windowNibName: "ServerTelemetryWindow")
+        }
+        serverTelemetryWindowController!.showWindow(nil)
+    }
+    
+    
+    // MARK: - Server Log Window
+
+    var logWindowController: LogWindowController?
+
+    @IBAction func serverLogWindow(sender: AnyObject?) {
+        if logWindowController == nil {
+            logWindowController = LogWindowController(windowNibName: "LogWindow")
+        }
+        logWindowController!.showWindow(nil)
+    }
+    
+    
+    // MARK: - Domains Window
+
+    var domainsWindowController: DomainsWindowController?
+
+    @IBAction func domainsWindow(sender: AnyObject?) {
+        if domainsWindowController == nil {
+            domainsWindowController = DomainsWindowController(windowNibName: "DomainsWindow")
+        }
+        domainsWindowController!.showWindow(nil)
+    }
+    
+    
+    // MARK: - Statistics Window
+    
+    var statisticsWindowController: StatisticsWindowController?
+
+    @IBAction func statisticsWindow(sender: AnyObject?) {
+        if statisticsWindowController == nil {
+            statisticsWindowController = StatisticsWindowController(windowNibName: "StatisticsWindow")
+        }
+        statisticsWindowController!.showWindow(nil)
+    }
+    
+    
+    // MARK: - Blacklists Window
+    
+    var blacklistWindowController: BlacklistWindowController?
+
+    @IBAction func blacklistsWindow(sender: AnyObject?) {
+        if blacklistWindowController == nil {
+            blacklistWindowController = BlacklistWindowController(windowNibName: "BlacklistWindow")
+        }
+        blacklistWindowController!.showWindow(nil)
     }
     
     
@@ -112,7 +182,8 @@ class AppDelegate: NSObject, NSApplicationDelegate, GuiRequest {
     func displayHistory(pathPart: CDPathPart) {
         if let hwc = historyControllers[pathPart.pathPart!] {
             hwc.showWindow(nil)
-        } else {
+        }
+        else {
             let hwc = HistoricalUsageWindowController(pathPart: pathPart)
             historyControllers[pathPart.pathPart!] = hwc
             hwc.showWindow(nil)

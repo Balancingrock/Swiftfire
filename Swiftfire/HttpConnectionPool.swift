@@ -3,7 +3,7 @@
 //  File:       HttpConnectionPool.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.13
+//  Version:    0.9.14
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,7 +49,8 @@
 //
 // History
 //
-// v0.9.13 - Upgraded to Swift 3 beta
+// v0.9.14 - Upgraded to Xcode 8 beta 6
+// v0.9.13 - Upgraded to Xcode 8 beta 3 (Swift 3)
 // v0.9.11 - Added allocation counter
 // v0.9.6  - Header update
 // v0.9.0  - Initial release
@@ -73,12 +74,17 @@ final class HttpConnectionPool: NSObject {
     
     // Used to secure atomic access to the pool.
     
-    private static let syncQueue = DispatchQueue(label: "HttpConnectionPool synchronize queue", attributes: [.serial, .qosUserInteractive])
-    
+    private static let syncQueue = DispatchQueue(
+        label: "HttpConnectionPool synchronize queue",
+        qos: .userInteractive,
+        attributes: DispatchQueue.Attributes(),
+        autoreleaseFrequency: DispatchQueue.AutoreleaseFrequency.inherit,
+        target: nil)
+        
     
     // Only one connection pool
     
-    private override init() { super.init() }
+    fileprivate override init() { super.init() }
     
     
     // All available connection objects
@@ -189,8 +195,8 @@ final class HttpConnectionPool: NSObject {
                 log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Current status: Connections available = \(self.available.count), used = \(self.used.count)")
                 self.available = []
                 if self.used.count == 0 {
-                    log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Creatng \(Parameters.maxNofAcceptedConnections) new connection objects")
-                    for _ in 0 ..< Parameters.maxNofAcceptedConnections {
+                    log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Creatng \(parameters.maxNofAcceptedConnections) new connection objects")
+                    for _ in 0 ..< parameters.maxNofAcceptedConnections {
                         self.available.append(HttpConnection())
                     }
                     success = true

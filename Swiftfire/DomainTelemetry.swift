@@ -3,7 +3,7 @@
 //  File:       DomainTelemetry.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.13
+//  Version:    0.9.14
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,7 +49,9 @@
 //
 // History
 //
-// v0.9.13 - Upgraded to Swift 3 beta
+// v0.9.14 - Upgraded to Xcode 8 beta 6
+//         - Code upgrade
+// v0.9.13 - Upgraded to Xcode 8 beta 3 (Swift 3)
 // v0.9.11 - Updated for VJson 0.9.8
 // v0.9.6  - Header update
 // v0.9.3  - Initial release
@@ -58,142 +60,133 @@
 
 import Foundation
 
-func == (left: TelemetryItem, right: TelemetryItem) -> Bool {
+func == (left: DomainTelemetry.Item, right: DomainTelemetry.Item) -> Bool {
     if left.value != right.value { return false }
-    if left.guiLabel != right.guiLabel { return false }
+    if left.name != right.name { return false }
     return true
 }
 
-class TelemetryItem: NSObject {
-    
-    var value: Int = 0
-
-    var guiLabel: String
-    
-    func copyFrom(_ t: TelemetryItem) {
-        self.value = t.value
-        self.guiLabel = t.guiLabel
-    }
-    
-    func json(_ id: String) -> VJson {
-        let j = VJson.object(id)
-        j["Value"] &= value
-        j["GuiLabel"] &= guiLabel
-        return j
-    }
-    
-    func increment() {
-        value += 1
-        if value == 1_000_000 { value = 0 }
-    }
-    
-    init(guiLabel: String) {
-        self.guiLabel = guiLabel
-        super.init()
-    }
-    
-    convenience init(guiLabel: String, value: Int) {
-        self.init(guiLabel: guiLabel)
-        self.value = value
-    }
-    
-    convenience init?(json: VJson?) {
-        guard let json = json else { return nil }
-        guard let jguiLabel = (json|"GuiLabel")?.stringValue else { return nil }
-        guard let jvalue = (json|"Value")?.intValue else { return nil }
-        self.init(guiLabel: jguiLabel, value: jvalue)
-    }
-}
-
-
 func == (left: DomainTelemetry, right: DomainTelemetry) -> Bool {
-    if left.nofRequests != right.nofRequests { return false }
-    if left.nof200 != right.nof200 { return false }
-    if left.nof400 != right.nof400 { return false }
-    if left.nof403 != right.nof403 { return false }
-    if left.nof404 != right.nof400 { return false }
-    if left.nof500 != right.nof500 { return false }
-    if left.nof501 != right.nof501 { return false }
-    if left.nof505 != right.nof500 { return false }
+    for lItem in left.all {
+        for rItem in right.all {
+            if lItem.name == rItem.name {
+                if lItem.value != rItem.value { return false }
+                continue
+            }
+        }
+    }
     return true
 }
 
 class DomainTelemetry: NSObject {
     
+    class Item: NSObject {
+        
+        var name: String
+        var value: Int = 0
+        
+        func copyFrom(_ t: Item) {
+            self.name = t.name
+            self.value = t.value
+        }
+        
+        var json: VJson {
+            let j = VJson()
+            j["Name"] &= name
+            j["Value"] &= value
+            return j
+        }
+        
+        func increment() {
+            value += 1
+            if value == 1_000_000 { value = 0 }
+        }
+        
+        init(name: String) {
+            self.name = name
+            super.init()
+        }
+        
+        convenience init(name: String, value: Int) {
+            self.init(name: name)
+            self.value = value
+        }
+        
+        convenience init?(json: VJson?) {
+            guard let json = json else { return nil }
+            guard let jname = (json|"Name")?.stringValue else { return nil }
+            guard let jvalue = (json|"Value")?.intValue else { return nil }
+            self.init(name: jname, value: jvalue)
+        }
+    }
+
     
     /// The total number of requests processed. Includes error replies, but excludes forwarding.
     
-    let nofRequests = TelemetryItem(guiLabel: "Total Number of Requests")
+    let nofRequests = Item(name: "NofRequests")
     
     
     /// The number of 200 (Successfull reply)
     
-    let nof200 = TelemetryItem(guiLabel: "Number of Succesfull Replies (200)")
+    let nof200 = Item(name: "Nof200")
     
     
     /// The number of 400 (Bad Request)
     
-    let nof400 = TelemetryItem(guiLabel: "Number of Bad Requests (400)")
+    let nof400 = Item(name: "Nof400")
     
     
     /// The number of 403 (Forbidden)
     
-    let nof403 = TelemetryItem(guiLabel: "Number of Forbidden (403)")
+    let nof403 = Item(name: "Nof403")
     
     
     /// The number of 404 (File/Resource Not Found)
     
-    let nof404 = TelemetryItem(guiLabel: "Number of Not Found (404)")
+    let nof404 = Item(name: "Nof404")
     
     
     /// The number of 500 (Server Error)
     
-    let nof500 = TelemetryItem(guiLabel: "Number of Server Errors (500)")
+    let nof500 = Item(name: "Nof500")
     
     
     /// The number of 501 (Not Implemented)
     
-    let nof501 = TelemetryItem(guiLabel: "Number of Not Implemented (501)")
+    let nof501 = Item(name: "Nof501")
     
     
     /// The number of 505 (HTTP version not supported)
     
-    let nof505 = TelemetryItem(guiLabel: "Number of HTTP Version Not Supported (505)")
+    let nof505 = Item(name: "Nof505")
     
     
     /// All the telemetry in an array
     
-    var all: Array<TelemetryItem>
+    var all: Array<Item>
     
     
     /// Creates a duplicate of the telemetry and returns that
     
     var duplicate: DomainTelemetry {
         let new = DomainTelemetry()
-        new.nofRequests.value = self.nofRequests.value
-        new.nof200.value = self.nof200.value
-        new.nof400.value = self.nof400.value
-        new.nof403.value = self.nof403.value
-        new.nof404.value = self.nof404.value
-        new.nof500.value = self.nof500.value
-        new.nof501.value = self.nof501.value
-        new.nof505.value = self.nof505.value
+        new.all.forEach({
+            for item in all {
+                if $0.name == item.name {
+                    $0.value = item.value
+                    continue
+                }
+            }
+        })
         return new
     }
 
     
     /// The JSON representation for this object
     
-    func json(id: String) -> VJson {
-        let j = VJson.object(id)
-        j.add(nofRequests.json("NofRequests"))
-        j.add(nof200.json("Nof200"))
-        j.add(nof400.json("Nof400"))
-        j.add(nof403.json("Nof403"))
-        j.add(nof404.json("Nof404"))
-        j.add(nof500.json("Nof500"))
-        j.add(nof501.json("Nof501"))
-        j.add(nof505.json("Nof505"))
+    var json: VJson {
+        let j = VJson.array()
+        all.forEach({ j.append($0.json) })
         return j
     }
     
@@ -211,40 +204,54 @@ class DomainTelemetry: NSObject {
     convenience init?(json: VJson?) {
         
         guard let json = json else { return nil }
+        guard json.isArray else { return nil }
+
+        // Read all the new items in the json object
+        // Make sure all the items are present in the json code by creating a set of all the names
+        var itemNames: Set<String> = []
+        var items: Set<Item> = []
         
-        guard let jnofRequests = TelemetryItem(json: json|"NofRequests") else { return nil }
-        guard let jNof200 = TelemetryItem(json: json|"Nof200") else { return nil }
-        guard let jNof400 = TelemetryItem(json: json|"Nof400") else { return nil }
-        guard let jNof403 = TelemetryItem(json: json|"Nof403") else { return nil }
-        guard let jNof404 = TelemetryItem(json: json|"Nof404") else { return nil }
-        guard let jNof500 = TelemetryItem(json: json|"Nof500") else { return nil }
-        guard let jNof501 = TelemetryItem(json: json|"Nof501") else { return nil }
-        guard let jNof505 = TelemetryItem(json: json|"Nof505") else { return nil }
+        for jitem in json.arrayValue! {
+            if let item = Item(json: jitem) {
+                items.insert(item)
+                itemNames.insert(item.name)
+            }
+        }
 
         self.init()
 
-        nofRequests.copyFrom(jnofRequests)
-        nof200.copyFrom(jNof200)
-        nof400.copyFrom(jNof400)
-        nof403.copyFrom(jNof403)
-        nof404.copyFrom(jNof404)
-        nof500.copyFrom(jNof500)
-        nof501.copyFrom(jNof501)
-        nof505.copyFrom(jNof505)
+        // Guarantee that all necessary items are present
+        guard itemNames.count == all.count else { return nil }
+        
+        // Update all telemetry in self with the new values
+        all.forEach({
+            for item in items {
+                if $0.name == item.name {
+                    $0.value = item.value
+                    continue
+                }
+            }
+        })
     }
     
     
     /// Reset all telemetry values to their default value.
     
     func reset() {
-        
-        nofRequests.value = 0
-        nof200.value = 0
-        nof400.value = 0
-        nof403.value = 0
-        nof404.value = 0
-        nof500.value = 0
-        nof501.value = 0
-        nof505.value = 0
+        all.forEach( { $0.value = 0 } )
+    }
+    
+    
+    /// Copies the values from the other telemetry to self
+    
+    func updateWithValues(from otherTelemetry: DomainTelemetry) {
+        all.forEach({
+            for item in otherTelemetry.all {
+                if $0.name == item.name {
+                    $0.value = item.value
+                    continue
+                }
+            }
+        })
     }
 }

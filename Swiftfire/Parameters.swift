@@ -3,7 +3,7 @@
 //  File:       Parameters.swift
 //  Project:    Swiftfire
 //
-private let VERSION = "0.9.14b1"
+private let VERSION = "0.9.14"
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -50,7 +50,10 @@ private let VERSION = "0.9.14b1"
 // History
 //
 // v0.9.14 - Added http1_0DomainName
+//         - Restructured to singleton instead of statics
+//         - Upgraded to Xcode 8 beta 6
 // v0.9.13 - Simplified implementation
+//         - Upgraded to Xcode 8 beta 3 (Swift 3)
 // v0.9.12 - Updated version number
 // v0.9.11 - Updated version number
 // v0.9.10 - Updated version number
@@ -76,30 +79,33 @@ import Foundation
 
 // JSON identifiers (also used for logging)
 
-private let DEBUG_MODE = "DebugMode"
-private let SERVICE_PORT_NUMBER = "ServicePortNumber"
-private let MAX_NOF_ACCEPTED_CONNECTIONS = "MaxNumberOfAcceptedConnections"
-private let MAX_NOF_PENDING_CONNECTIONS = "MaxNumberOfPendingConnections"
-private let MAX_WAIT_FOR_PENDING_CONNECTIONS = "MaxWaitForPendingConnections"
-private let CLIENT_MESSAGE_BUFFER_SIZE = "ClienMessageBufferSize"
-private let HTTP_KEEP_ALIVE_INACTIVITY_TIMEOUT = "HttpKeepAliveInactivityTimeout"
-private let HTTP_RESPONSE_CLIENT_TIMEOUT = "HttpResponseClientTimeout"
-private let MAC_INACTIVITY_TIMEOUT = "MacInactivityTimeout"
-private let AUTO_STARTUP = "AutoStartup"
-private let MAC_PORT_NUMBER = "MonitoringAndControlPortNumber"
-private let ASL_FACILITY_RECORD_AT_AND_ABOVE_LEVEL = "AslFacilityRecordAtAndAboveLevel"
-private let STDOUT_PRINT_AT_AND_ABOVE_LEVEL = "StdoutPrintAtAndAboveLevel"
-private let CALLBACK_AT_AND_ABOVE_LEVEL = "CallbackAtAndAboveLevel"
-private let FILE_RECORD_AT_AND_ABOVE_LEVEL = "FileRecordAtAndAboveLevel"
-private let LOGFILE_MAX_SIZE = "LogfileMaxSize"
-private let LOGFILE_MAX_NOF_FILES = "LogfileMaxNofFiles"
-private let NETWORK_TRANSMIT_AT_AND_ABOVE_LEVEL = "NetworkTransmitAtAndAboveLevel"
-private let NETWORK_LOGTARGET_IP_ADDRESS = "NetworkLogtargetIpAddress"
-private let NETWORK_LOGTARGET_PORT_NUMBER = "NetworkLogtargetPortNumber"
-private let HEADER_LOGGING_ENABLED = "HeaderLoggingEnabled"
-private let MAX_FILE_SIZE_FOR_HEADER_LOGGING = "MaxFileSizeForHeaderLogging"
-private let FLUSH_HEADER_LOGFILE_AFTER_EACH_WRITE = "FlushHeaderLogfileAfterEachWrite"
-private let HTTP1_0_DOMAIN_NAME = "Http1.0DomainName"
+fileprivate let DEBUG_MODE = ServerParameterName.debugMode.rawValue
+fileprivate let SERVICE_PORT_NUMBER = ServerParameterName.servicePortNumber.rawValue
+fileprivate let MAX_NOF_ACCEPTED_CONNECTIONS = ServerParameterName.maxNumberOfAcceptedConnections.rawValue
+fileprivate let MAX_NOF_PENDING_CONNECTIONS = ServerParameterName.maxNumberOfPendingConnections.rawValue
+fileprivate let MAX_WAIT_FOR_PENDING_CONNECTIONS = ServerParameterName.maxWaitForPendingConnections.rawValue
+fileprivate let CLIENT_MESSAGE_BUFFER_SIZE = ServerParameterName.clientMessageBufferSize.rawValue
+fileprivate let HTTP_KEEP_ALIVE_INACTIVITY_TIMEOUT = ServerParameterName.httpKeepAliveInactivityTimeout.rawValue
+fileprivate let HTTP_RESPONSE_CLIENT_TIMEOUT = ServerParameterName.httpResponseClientTimeout.rawValue
+fileprivate let MAC_INACTIVITY_TIMEOUT = ServerParameterName.macInactivityTimeout.rawValue
+fileprivate let AUTO_STARTUP = ServerParameterName.autoStartup.rawValue
+fileprivate let MAC_PORT_NUMBER = ServerParameterName.macPortNumber.rawValue
+fileprivate let ASL_FACILITY_RECORD_AT_AND_ABOVE_LEVEL = ServerParameterName.aslFacilityRecordAtAndAboveLevel.rawValue
+fileprivate let STDOUT_PRINT_AT_AND_ABOVE_LEVEL = ServerParameterName.stdoutPrintAtAndAboveLevel.rawValue
+fileprivate let CALLBACK_AT_AND_ABOVE_LEVEL = ServerParameterName.callbackAtAndAboveLevel.rawValue
+fileprivate let FILE_RECORD_AT_AND_ABOVE_LEVEL = ServerParameterName.fileRecordAtAndAboveLevel.rawValue
+fileprivate let LOGFILE_MAX_SIZE = ServerParameterName.logfileMaxSize.rawValue
+fileprivate let LOGFILE_MAX_NOF_FILES = ServerParameterName.logfileMaxNofFiles.rawValue
+fileprivate let NETWORK_TRANSMIT_AT_AND_ABOVE_LEVEL = ServerParameterName.networkTransmitAtAndAboveLevel.rawValue
+fileprivate let NETWORK_LOGTARGET_IP_ADDRESS = ServerParameterName.networkLogtargetIpAddress.rawValue
+fileprivate let NETWORK_LOGTARGET_PORT_NUMBER = ServerParameterName.networkLogtargetPortNumber.rawValue
+fileprivate let HEADER_LOGGING_ENABLED = ServerParameterName.headerLoggingEnabled.rawValue
+fileprivate let MAX_FILE_SIZE_FOR_HEADER_LOGGING = ServerParameterName.maxFileSizeForHeaderLogging.rawValue
+fileprivate let FLUSH_HEADER_LOGFILE_AFTER_EACH_WRITE = ServerParameterName.flushHeaderLogfileAfterEachWrite.rawValue
+fileprivate let HTTP1_0_DOMAIN_NAME = ServerParameterName.http1_0DomainName.rawValue
+
+
+let parameters = Parameters()
 
 
 final class Parameters {
@@ -107,140 +113,170 @@ final class Parameters {
     
     /// The version number of Swiftfire
     
-    static let version = VERSION // Always hard coded, never read from the parameter defaults file
+    let version = VERSION // Always hard coded, never read from the parameter defaults file
 
     
     /// When this variable is "true" additional code may be executed to generate debug information
     /// - Note: This variable is independant of the logging levels
 
-    static var debugMode = false
+    var debugMode = false
     
     
     /// This is the port number upon which new connection requests will be accepted
 
-    static var httpServicePortNumber = "6678"
+    var httpServicePortNumber = "6678"
     
 
     /// This is the maximum number of (parralel) http connection requests that Swiftfire accepts. Any more than this will become pending.
 
-    static var maxNofAcceptedConnections = 20
+    var maxNofAcceptedConnections = 20
     
     
     /// This is the maximum number of http connection requests that are kept pending. Any more than this and will be rejected.
 
-    static var maxNofPendingConnections: Int32 = 20
+    var maxNofPendingConnections: Int32 = 20
     
     
     /// This is the maximum time a pending connection request is kept waiting before it is rejected.
 
-    static var maxWaitForPendingConnections = 30 // In seconds
+    var maxWaitForPendingConnections = 30 // In seconds
     
     
     /// The maximum size of a http message that can be received from client.
 
-    static var clientMessageBufferSize = 100_000 // In bytes
+    var clientMessageBufferSize = 100_000 // In bytes
     
     
     /// When a HTTP request has the "keep alive" option set, the connection will remain open for this time after the last data block was processed from that client.
 
-    static var httpKeepAliveInactivityTimeout = 1 // In seconds
+    var httpKeepAliveInactivityTimeout = 1 // In seconds
     
     
     /// When data has to be transferred to a client, this is the timeout for the transmit operation.
 
-    static var httpResponseClientTimeout = 10.0 // In seconds
+    var httpResponseClientTimeout = 10.0 // In seconds
     
     
     /// When the M&C connection has been established, it will remain locked to the given connection until no activity has been detected for this amount of time. Note that when a console periodically retrieves telemetry, that interval should be shorter than this inactvity timeout or else another console could take over. Time is in seconds.
 
-    static var macInactivityTimeout = 600.0 // In seconds
+    var macInactivityTimeout = 600.0 // In seconds
     
     
     /// When set to true the http server will automatically be started upon start of the application. Note that domains should be defined and active for this to have any effect.
 
-    static var autoStartup = true
+    var autoStartup = true
     
     
     /// The port number on which Swiftfire will listen for M&C connections.
 
-    static var macPortNumber = "2043"
+    var macPortNumber = "2043"
     
 
     /// The ASL threshold, logging information at this level (or above) will be written to the ASL Facility
 
-    static var aslFacilityRecordAtAndAboveLevel = SwifterLog.Level.notice
+    var aslFacilityRecordAtAndAboveLevel = SwifterLog.Level.notice
     
     
     /// The stdout threshold, logging information at this level (or above) will be written to stdout (terminal/xcode console)
 
-    static var stdoutPrintAtAndAboveLevel = SwifterLog.Level.none
+    var stdoutPrintAtAndAboveLevel = SwifterLog.Level.none
     
     
     /// The callback threshold, logging information at this level (or above) will be send to the Swiftfire Console
 
-    static var callbackAtAndAboveLevel = SwifterLog.Level.none
+    var callbackAtAndAboveLevel = SwifterLog.Level.none
     
     
     /// The file logging threshold, logging information at this level (or above) will be written to the logfile.
 
-    static var fileRecordAtAndAboveLevel = SwifterLog.Level.none
+    var fileRecordAtAndAboveLevel = SwifterLog.Level.none
     
     
     /// The maximum size of a single logfile (in kbytes)
 
-    static var logfileMaxSize = 1000 // 1MB
+    var logfileMaxSize = 1000 // 1MB
     
     
     /// The maximum number of logfiles that will be kept in the logfile directory
 
-    static var logfileMaxNofFiles = 20
+    var logfileMaxNofFiles = 20
     
     
     /// The network target threshold, logging information at this level (or above) will be sent to the network destination.
 
-    static var networkTransmitAtAndAboveLevel = SwifterLog.Level.none
+    var networkTransmitAtAndAboveLevel = SwifterLog.Level.none
     
     
     /// The IP Address for the network logging target
     
-    static var networkLogtargetIpAddress = ""
+    var networkLogtargetIpAddress = ""
     
     
     /// The port number for the network logging target
     
-    static var networkLogtargetPortNumber = ""
+    var networkLogtargetPortNumber = ""
     
     
     /// Enables/Disables logging of all request headers
 
-    static var headerLoggingEnabled = false
+    var headerLoggingEnabled = false
     
     
     /// The maximum file size for header logging (in kbytes)
 
-    static var maxFileSizeForHeaderLogging = 1000 // 1MB
+    var maxFileSizeForHeaderLogging = 1000 // 1MB
     
     
     /// Synchronize the header logging file after each write
 
-    static var flushHeaderLogfileAfterEachWrite = false
+    var flushHeaderLogfileAfterEachWrite = false
 
     
     /// The domain name for http 1.0 requests
     
-    static var http1_0DomainName = ""
+    var http1_0DomainName = ""
     
     
-    // No instantiations
+    /// The string value for the requested parameter
     
-    private init() {}
+    func stringValue(for name: ServerParameterName) -> String {
+        
+        switch name {
+        case .servicePortNumber: return httpServicePortNumber
+        case .maxNumberOfAcceptedConnections: return maxNofAcceptedConnections.description
+        case .maxNumberOfPendingConnections: return maxNofPendingConnections.description
+        case .maxWaitForPendingConnections: return maxWaitForPendingConnections.description
+        case .clientMessageBufferSize: return clientMessageBufferSize.description
+        case .httpKeepAliveInactivityTimeout: return httpKeepAliveInactivityTimeout.description
+        case .httpResponseClientTimeout: return httpResponseClientTimeout.description
+        case .debugMode: return debugMode.description
+        case .aslFacilityRecordAtAndAboveLevel: return aslFacilityRecordAtAndAboveLevel.rawValue.description
+        case .stdoutPrintAtAndAboveLevel: return stdoutPrintAtAndAboveLevel.rawValue.description
+        case .fileRecordAtAndAboveLevel: return fileRecordAtAndAboveLevel.rawValue.description
+        case .callbackAtAndAboveLevel: return callbackAtAndAboveLevel.rawValue.description
+        case .networkTransmitAtAndAboveLevel: return networkTransmitAtAndAboveLevel.rawValue.description
+        case .networkLogtargetIpAddress: return networkLogtargetIpAddress
+        case .networkLogtargetPortNumber: return networkLogtargetPortNumber
+        case .autoStartup: return autoStartup.description
+        case .macPortNumber: return macPortNumber
+        case .macInactivityTimeout: return macInactivityTimeout.description
+        case .logfileMaxSize, .logfileMaxNofFiles: return logfileMaxSize.description
+        case .maxFileSizeForHeaderLogging: return maxFileSizeForHeaderLogging.description
+        case .headerLoggingEnabled: return headerLoggingEnabled.description
+        case .flushHeaderLogfileAfterEachWrite: return flushHeaderLogfileAfterEachWrite.description
+        case .http1_0DomainName: return http1_0DomainName
+        }
+    }
     
     
-    /**
-     Updates the parameter values from the parameter-defaults.json file if that file exists. It only updates those values that are found in the defaults file. All other parameters remain at their hard-coded default values. Parameters found in the defaults file that are not (no longer?) used will be flagged as errors in the log.
-     */
+    // No instantiations except for the singleton
     
-    static func restore() {
+    fileprivate init() {}
+    
+    
+    /// Updates the parameter values from the parameter-defaults.json file if that file exists. It only updates those values that are found in the defaults file. All other parameters remain at their hard-coded default values. Parameters found in the defaults file that are not (no longer?) used will be flagged as errors in the log.
+    
+    func restore() {
                 
         // Does the parameter defaults file exist?
         
@@ -296,51 +332,44 @@ final class Parameters {
     }
     
     
-    /**
-     Save the parameter dictionary contents to the 'domains-default.json' file.
-     */
+    /// Save the parameter dictionary contents to the 'domains-default.json' file.
 
-    static func save() {
+    func save() {
         
-        if let file = FileURLs.parameterDefaults {
-            
-            let json = VJson()
+        let file = FileURLs.parameterDefaults!
         
-            json[DEBUG_MODE] &= debugMode
-            json[SERVICE_PORT_NUMBER] &= httpServicePortNumber
-            json[MAX_NOF_ACCEPTED_CONNECTIONS] &= maxNofAcceptedConnections
-            json[MAX_NOF_PENDING_CONNECTIONS] &= maxNofPendingConnections
-            json[MAX_WAIT_FOR_PENDING_CONNECTIONS] &= maxWaitForPendingConnections
-            json[CLIENT_MESSAGE_BUFFER_SIZE] &= clientMessageBufferSize
-            json[HTTP_KEEP_ALIVE_INACTIVITY_TIMEOUT] &= httpKeepAliveInactivityTimeout
-            json[HTTP_RESPONSE_CLIENT_TIMEOUT] &= httpResponseClientTimeout
-            json[MAC_INACTIVITY_TIMEOUT] &= macInactivityTimeout
-            json[AUTO_STARTUP] &= autoStartup
-            json[MAC_PORT_NUMBER] &= macPortNumber
-            json[ASL_FACILITY_RECORD_AT_AND_ABOVE_LEVEL] &= aslFacilityRecordAtAndAboveLevel.rawValue
-            json[STDOUT_PRINT_AT_AND_ABOVE_LEVEL] &= stdoutPrintAtAndAboveLevel.rawValue
-            json[CALLBACK_AT_AND_ABOVE_LEVEL] &= callbackAtAndAboveLevel.rawValue
-            json[FILE_RECORD_AT_AND_ABOVE_LEVEL] &= fileRecordAtAndAboveLevel.rawValue
-            json[LOGFILE_MAX_SIZE] &= logfileMaxSize
-            json[LOGFILE_MAX_NOF_FILES] &= logfileMaxNofFiles
-            json[NETWORK_TRANSMIT_AT_AND_ABOVE_LEVEL] &= networkTransmitAtAndAboveLevel.rawValue
-            json[NETWORK_LOGTARGET_IP_ADDRESS] &= networkLogtargetIpAddress
-            json[NETWORK_LOGTARGET_PORT_NUMBER] &= networkLogtargetPortNumber
-            json[HEADER_LOGGING_ENABLED] &= headerLoggingEnabled
-            json[MAX_FILE_SIZE_FOR_HEADER_LOGGING] &= maxFileSizeForHeaderLogging
-            json[FLUSH_HEADER_LOGFILE_AFTER_EACH_WRITE] &= flushHeaderLogfileAfterEachWrite
-            json[HTTP1_0_DOMAIN_NAME] &= http1_0DomainName
-            
-            json.save(to: file)
+        let json = VJson()
         
-        } else {
+        json[DEBUG_MODE] &= debugMode
+        json[SERVICE_PORT_NUMBER] &= httpServicePortNumber
+        json[MAX_NOF_ACCEPTED_CONNECTIONS] &= maxNofAcceptedConnections
+        json[MAX_NOF_PENDING_CONNECTIONS] &= maxNofPendingConnections
+        json[MAX_WAIT_FOR_PENDING_CONNECTIONS] &= maxWaitForPendingConnections
+        json[CLIENT_MESSAGE_BUFFER_SIZE] &= clientMessageBufferSize
+        json[HTTP_KEEP_ALIVE_INACTIVITY_TIMEOUT] &= httpKeepAliveInactivityTimeout
+        json[HTTP_RESPONSE_CLIENT_TIMEOUT] &= httpResponseClientTimeout
+        json[MAC_INACTIVITY_TIMEOUT] &= macInactivityTimeout
+        json[AUTO_STARTUP] &= autoStartup
+        json[MAC_PORT_NUMBER] &= macPortNumber
+        json[ASL_FACILITY_RECORD_AT_AND_ABOVE_LEVEL] &= aslFacilityRecordAtAndAboveLevel.rawValue
+        json[STDOUT_PRINT_AT_AND_ABOVE_LEVEL] &= stdoutPrintAtAndAboveLevel.rawValue
+        json[CALLBACK_AT_AND_ABOVE_LEVEL] &= callbackAtAndAboveLevel.rawValue
+        json[FILE_RECORD_AT_AND_ABOVE_LEVEL] &= fileRecordAtAndAboveLevel.rawValue
+        json[LOGFILE_MAX_SIZE] &= logfileMaxSize
+        json[LOGFILE_MAX_NOF_FILES] &= logfileMaxNofFiles
+        json[NETWORK_TRANSMIT_AT_AND_ABOVE_LEVEL] &= networkTransmitAtAndAboveLevel.rawValue
+        json[NETWORK_LOGTARGET_IP_ADDRESS] &= networkLogtargetIpAddress
+        json[NETWORK_LOGTARGET_PORT_NUMBER] &= networkLogtargetPortNumber
+        json[HEADER_LOGGING_ENABLED] &= headerLoggingEnabled
+        json[MAX_FILE_SIZE_FOR_HEADER_LOGGING] &= maxFileSizeForHeaderLogging
+        json[FLUSH_HEADER_LOGFILE_AFTER_EACH_WRITE] &= flushHeaderLogfileAfterEachWrite
+        json[HTTP1_0_DOMAIN_NAME] &= http1_0DomainName
         
-            log.atLevelError(id: -1, source: "Parameters", message: "Could not save parameters to file")
-        }
+        json.save(to: file)
     }
     
     
-    static func logParameterSettings(atLevel level: SwifterLog.Level) {
+    func logParameterSettings(atLevel level: SwifterLog.Level) {
         
         log.atLevel(level, id: -1, source: "Parameters", message: "\(DEBUG_MODE) = \(debugMode)")
         log.atLevel(level, id: -1, source: "Parameters", message: "\(SERVICE_PORT_NUMBER) = \(httpServicePortNumber)")

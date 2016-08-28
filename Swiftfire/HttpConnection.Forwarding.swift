@@ -3,7 +3,7 @@
 //  File:       HttpConnection.Forwarding.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.13
+//  Version:    0.9.14
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,13 +49,15 @@
 //
 // History
 //
-// v0.9.13 - Upgraded to Swift 3 beta
+// v0.9.14 - Upgraded to Xcode 8 beta 6
+// v0.9.13 - Upgraded to Xcode 8 beta 3 (Swift 3)
 // v0.9.6  - Header update
 // v0.9.3  - Added a telemetry counter to the "bad gateway" errors
 // v0.9.2  - Minor adjustment to forwardingOpenConnection
 //         - Replaced sendMessageWithCode with httpErrorResponseWithCode
 // v0.9.0  - Initial release
 // =====================================================================================================================
+
 
 import Foundation
 
@@ -82,7 +84,7 @@ extension HttpConnection {
         
         do {
             
-            forwardingSocket = try SwifterSockets.connectToServerOrThrow(atAddress: host.address, atPort: (host.port ?? Parameters.httpServicePortNumber))
+            forwardingSocket = try SwifterSockets.connectToServerOrThrow(atAddress: host.address, atPort: (host.port ?? parameters.httpServicePortNumber))
             
             
             // Start the receiver
@@ -91,7 +93,7 @@ extension HttpConnection {
             
         } catch {
             
-            serverTelemetry.nofHttp502Replies.increment()
+            telemetry.nofHttp502Replies.increment()
             log.atLevelError(id: logId, source: #file.source(#function, #line), message: "Could not open connection to \(host).")
             let response = httpErrorResponse(withCode: .code502_BadGateway, httpVersion: .http1_1, message: "<p>Forwarding failed, server not reachable.</p>")
             transferToClient(data: response)
@@ -116,7 +118,7 @@ extension HttpConnection {
         
         if forwardingSocket == nil {
             
-            serverTelemetry.nofHttp502Replies.increment()
+            telemetry.nofHttp502Replies.increment()
             let response = httpErrorResponse(withCode: .code502_BadGateway, httpVersion: .http1_1, message: "<p>Forwarding failed, server not reachable.</p>")
             transferToClient(data: response)
             return
@@ -129,7 +131,7 @@ extension HttpConnection {
                 
             } catch {
                 
-                serverTelemetry.nofHttp502Replies.increment()
+                telemetry.nofHttp502Replies.increment()
                 let response = httpErrorResponse(withCode: .code502_BadGateway, httpVersion: .http1_1, message: "<p>Forwarding failed, server not reachable, not responding or generating connection errors.</p>")
                 transferToClient(data: response)
                 

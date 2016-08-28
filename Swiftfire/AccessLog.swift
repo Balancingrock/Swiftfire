@@ -49,7 +49,7 @@
 //
 // History
 //
-// v0.9.13 - Upgraded to Swift 3 beta
+// v0.9.13 - Upgraded to Xcode 8 beta 3 (Swift 3)
 // v0.9.9  - Changed maxsize to 1MB
 //         - Renamed FileLog to Logfile.
 // v0.9.7  - Initial release

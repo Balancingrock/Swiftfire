@@ -3,7 +3,7 @@
 //  File:       ReadDomainsReply.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.13
+//  Version:    0.9.14
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,7 +49,8 @@
 //
 // History
 //
-// v0.9.13 - Upgraded to Swift 3 beta
+// v0.9.14 - Updated Command & Reply structure
+// v0.9.13 - Upgraded to Xcode 8 beta 3 (Swift 3)
 // v0.9.11 - Updated for VJson 0.9.8
 // v0.9.6  - Header update
 // v0.9.4  - Initial release (replaces part of MacDef.swift)
@@ -62,28 +63,33 @@ private let REPLY_NAME = "ReadDomainsReply"
 private let DOMAINS = "Domains"
 
 
-final class ReadDomainsReply {
+final class ReadDomainsReply: MacMessage {
     
-    var domains: Domains
+    // MARK: - MacMessage protocol
     
     var json: VJson {
         let j = VJson()
-        for d in domains {
+        for d in localDomains {
             j[REPLY_NAME][DOMAINS].append(d.json)
         }
         return j
     }
     
-    init(domains: Domains) {
-        self.domains = domains
-    }
-    
     init?(json: VJson?) {
         guard let json = json else { return nil }
         guard (json|REPLY_NAME|DOMAINS) != nil else { return nil }
-        self.domains = Domains()
+        self.localDomains = Domains()
         for j in (json|REPLY_NAME|DOMAINS)! {
-            if let d = Domain(json: j) { domains.add(domain: d) } else { return nil }
+            if let d = Domain(json: j) { localDomains.add(domain: d) } else { return nil }
         }
+    }
+    
+    
+    // MARK: - Class specific
+
+    var localDomains: Domains
+
+    init(domains: Domains) {
+        self.localDomains = domains
     }
 }

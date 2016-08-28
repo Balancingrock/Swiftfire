@@ -3,7 +3,7 @@
 //  File:       Statistics-Console.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.13
+//  Version:    0.9.14
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,7 +49,8 @@
 //
 // History
 //
-// v0.9.13 - Upgraded to Swift 3 beta
+// v0.9.14 - Upgraded to Xcode 8 beta 6
+// v0.9.13 - Upgraded to Xcode 8 beta 3 (Swift 3)
 // v0.9.12 - Added statisticsWindowController to recalculate the count values after loading
 //         - Added 'updatePathPart' and 'updateClient' to mutation switch statements
 //         - Changed timestamps from double to Int64
@@ -65,25 +66,9 @@ import CoreData
 let statistics = Statistics()
 
 
-// In order to avoid having to link Cocoa with Swiftfire, a protocl is used to request GUI services.
-// These services will only be used from the SwiftfireConsole.
-
-protocol GuiRequest {
-    func displayHistory(pathPart: CDPathPart)
-}
-
-
 final class Statistics: NSObject {
     
-    
-    // The Gui Request protocol handler (nil for Swiftfire)
-    
-    var gui: GuiRequest?
-    
-    
-    var statisticsWindowController: StatisticsWindowController?
-    
-    
+
     /// The store coordinator
     
     private let persistentStoreCoordinator: NSPersistentStoreCoordinator
@@ -162,11 +147,11 @@ final class Statistics: NSObject {
     /// Creates a new instance of the statistics object.
     /// - Note: There should be only 1 instance for each target.
     
-    override private init() {
+    override fileprivate init() {
         
         log.atLevelDebug(id: -1, source: #file.source(#function, #line), message: "Creating statistics singleton")
         
-        guard let modelUrl = Bundle.main.urlForResource("Statistics", withExtension:"momd") else {
+        guard let modelUrl = Bundle.main.url(forResource: "Statistics", withExtension: "momd") else {
             log.atLevelEmergency(id: -1, source: #file.source(#function, #line), message: "Error loading domain statistics model from bundle")
             sleep(1)
             fatalError("Error loading domain statistics model from bundle")
@@ -194,7 +179,7 @@ final class Statistics: NSObject {
             
         
         do {
-            let storeURL = try statisticsDir.appendingPathComponent("StatisticsModel.sqlite")
+            let storeURL = statisticsDir.appendingPathComponent("StatisticsModel.sqlite")
             try self.persistentStoreCoordinator.addPersistentStore(ofType: NSSQLiteStoreType, configurationName: nil, at: storeURL, options: nil)
         } catch {
             log.atLevelEmergency(id: -1, source: #file.source(#function, #line), message: "Error migrating store: \(error)")
@@ -228,8 +213,6 @@ final class Statistics: NSObject {
         
         _ = CDDomains.createFrom(json: jdomains, inContext: managedObjectContext)
         _ = CDClients.createFrom(json: jclients, inContext: managedObjectContext)
-        
-        statisticsWindowController?.recalculateCountValue()
     }
     
     
@@ -266,11 +249,21 @@ final class Statistics: NSObject {
         d1.pathPart = "overbeterleven.nl"
         d1.domains = cdDomains
         
+        let d2 = NSEntityDescription.insertNewObject(forEntityName: "CDPathPart", into: managedObjectContext) as! CDPathPart
+        d2.previous = d1
+        d2.pathPart = "index.html"
+        d2.domains = cdDomains
+
         let d1c1 = NSEntityDescription.insertNewObject(forEntityName: "CDCounter", into: managedObjectContext) as! CDCounter
         d1c1.pathPart = d1
         d1c1.count = 1
         d1c1.forDay = Date().javaDateBeginOfDay
-        
+
+        let d2c1 = NSEntityDescription.insertNewObject(forEntityName: "CDCounter", into: managedObjectContext) as! CDCounter
+        d2c1.pathPart = d2
+        d2c1.count = 3
+        d2c1.forDay = Date().javaDateBeginOfDay
+
         let d1c2 = NSEntityDescription.insertNewObject(forEntityName: "CDCounter", into: managedObjectContext) as! CDCounter
         d1c2.previous = d1c1
         d1c2.count = 2
@@ -283,16 +276,14 @@ final class Statistics: NSObject {
     }
     
     
-    /**
-     - Returns: The Client Managed Object for the given address. Creates a new one if necessary.
-     */
+    /// - Returns: The Client Managed Object for the given address. Creates a new one if necessary.
     
     private func getClient(forAddress address: String?) throws -> CDClient? {
         
         guard let address = address else { return nil }
         
         let fetchRequest = NSFetchRequest<CDClient>(entityName: "CDClient")
-        fetchRequest.predicate = Predicate(format: "address == %@", address)
+        fetchRequest.predicate = NSPredicate(format: "address == %@", address)
 
         let clients = try managedObjectContext.fetch(fetchRequest)
         
@@ -321,9 +312,7 @@ final class Statistics: NSObject {
     }
     
     
-    /**
-     - Returns: The existing CDPathPart for the given part or -if absent- creates a new one.
-     */
+    /// - Returns: The existing CDPathPart for the given part or -if absent- creates a new one.
     
     private func getPathPart(forPart part: String?) -> CDPathPart? {
         
@@ -351,9 +340,7 @@ final class Statistics: NSObject {
     }
     
     
-    /**
-     - Returns: Nil if the part already exists and has its "doNotTrace" member set to 'true'. Otherwise it returns the found part or creates a new one (and returns that).
-     */
+    /// - Returns: Nil if the part already exists and has its "doNotTrace" member set to 'true'. Otherwise it returns the found part or creates a new one (and returns that).
     
     private func getPathPart(forPart part: String, fromPathPart pathPart: CDPathPart) -> CDPathPart? {
         
@@ -384,11 +371,8 @@ final class Statistics: NSObject {
     }
     
     
-    /**
-     Performs the requested mutation.
-     
-     - Parameter mutation: The mutation to be performed.
-     */
+    /// Performs the requested mutation.
+    /// - Parameter mutation: The mutation to be performed.
     
     func submit(mutation: Mutation) {
         

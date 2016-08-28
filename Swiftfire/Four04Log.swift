@@ -49,7 +49,7 @@
 //
 // History
 //
-// v0.9.13 - Upgraded to Swift 3 beta
+// v0.9.13 - Upgraded to Xcode 8 beta 3 (Swift 3)
 // v0.9.9  - Renamed FileLog to Logfile.
 //         - Lowered maxsize of file to 1MB
 //         - Fixed bug where a 404 URL would occur more than once and missing line breaks in the logfile
