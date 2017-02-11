@@ -1,23 +1,12 @@
 # Swiftfire
-A webserver in pure Swift
+The next generation personal webserver written in Swift.
 
-Swifterfire is the end product of 4 packages that make up the [Swiftfire](http://swiftfire.nl) webserver:
-
-#####[SwifterSockets](https://github.com/Swiftrien/SwifterSockets)
-
-General purpose socket utilities.
-
-#####[SwifterLog](https://github.com/Swiftrien/SwifterLog)
-
-General purpose logging utility.
-
-#####[SwifterJSON](https://github.com/Swiftrien/SwifterJSON)
-
-General purpose JSON framework.
-
-There is a 5th package called [SwiftfireTester](https://github.com/Swiftrien/SwiftfireTester) that can be used to challenge a webserver (any webserver) and verify the response.
+Visit the [Swiftfire](http://swiftfire.nl) homepage at [http://swiftfire.nl](http://swiftfire.nl).
 
 #Note
+
+__Due to the move to a package/framework based distribution the current version of Swiftfire is not compatible with the most up-to-date versions of the other subprojects.__
+
 This is an early public release and I do not consider this code ready for prime time. It is experimental in nature and subject to severe rewrites as development continues.
 
 However: It does work! :-)

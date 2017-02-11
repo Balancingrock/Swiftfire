@@ -71,7 +71,7 @@ extension HttpConnection {
     /// Examines the http message header for a servicable request and creates the corresponding response.
     /// Implementation justification:  
     
-    func httpWorker(header: HttpHeader, body: Data) {
+    func worker(header: HttpHeader, body: Data) {
         
         
         // =============================================================================================================
@@ -224,14 +224,12 @@ extension HttpConnection {
         
         if domain.forwardHost != nil {
             
-            if forwardingSocket == nil {
-                openForwardingConnection(host: domain.forwardHost!)
-            }
-
-            if forwardingSocket != nil {
+            forwarder = forwarder ?? Forwarder(httpConnection: self, targetAddress: domain.forwardHost!.address, targetPort: (domain.forwardHost!.port ?? "80"))
+            
+            if forwarder != nil {
                 var data: Data = header.asData()!
                 data.append(body)
-                transmitToForwardingTarget(data: data)
+                forwarder?.target.transmit(data, callback: nil, progress: nil)
             }
             
             // The forwarding connection will be closed when the forwarding target closes its connection. Until then all data received from the forwarding target will be routed to the client.
