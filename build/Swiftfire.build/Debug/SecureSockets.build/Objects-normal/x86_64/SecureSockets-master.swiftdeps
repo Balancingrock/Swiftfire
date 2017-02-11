@@ -1,0 +1,14 @@
+version: "Apple Swift version 3.0.2 (swiftlang-800.0.63 clang-800.0.42.1)"
+options: "a736d7f5abd111cd49cbaadd0c26d6b4"
+build_time: [539978877, 535904000]
+inputs:
+  "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/SecureSockets-0.3.3/Sources/SecureSockets.Accept.swift": [539978668, 0]
+  "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/SecureSockets-0.3.3/Sources/SecureSockets.Client.swift": [539978668, 0]
+  "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/SecureSockets-0.3.3/Sources/SecureSockets.Ctx.swift": [539978668, 0]
+  "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/SecureSockets-0.3.3/Sources/SecureSockets.Pkey.swift": [539978668, 0]
+  "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/SecureSockets-0.3.3/Sources/SecureSockets.Receive.swift": [539978668, 0]
+  "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/SecureSockets-0.3.3/Sources/SecureSockets.Server.swift": [539978668, 0]
+  "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/SecureSockets-0.3.3/Sources/SecureSockets.Ssl.swift": [539978668, 0]
+  "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/SecureSockets-0.3.3/Sources/SecureSockets.swift": [539978668, 0]
+  "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/SecureSockets-0.3.3/Sources/SecureSockets.Transmit.swift": [539978668, 0]
+  "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/SecureSockets-0.3.3/Sources/SecureSockets.X509.swift": [539978668, 0]

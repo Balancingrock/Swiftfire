@@ -1,0 +1,107 @@
+### Swift dependencies file v0 ###
+provides-top-level:
+provides-nominal:
+- "C9Swiftfire18ReadDomainsCommand"
+provides-member:
+- ["C9Swiftfire18ReadDomainsCommand", ""]
+provides-dynamic-lookup:
+depends-top-level:
+- "ReadDomainsCommand"
+- "VJson"
+- !private "ReadDomainsReply"
+- "MacCommand"
+- !private "mac"
+- !private "domains"
+depends-member:
+- !private ["Ps9AnyObject", "ReadDomainsCommand"]
+- !private ["Ps9AnyObject", "ReadDomainsReply"]
+- !private ["Ps9AnyObject", "domains"]
+- ["Ps9AnyObject", "execute"]
+- ["Ps9AnyObject", "factory"]
+- !private ["Ps9AnyObject", "init"]
+- !private ["Ps9AnyObject", "mac"]
+- !private ["Ps9AnyObject", "transfer"]
+- !private ["C14SwifterSockets10Connection", "transfer"]
+- ["C9Swiftfire7Domains", "deinit"]
+- !private ["P9Swiftfire10MacCommand", "ReadDomainsCommand"]
+- !private ["P9Swiftfire10MacCommand", "ReadDomainsReply"]
+- !private ["P9Swiftfire10MacCommand", "domains"]
+- ["P9Swiftfire10MacCommand", "execute"]
+- ["P9Swiftfire10MacCommand", "factory"]
+- !private ["P9Swiftfire10MacCommand", "init"]
+- !private ["P9Swiftfire10MacCommand", "mac"]
+- ["P9Swiftfire10MacCommand", ""]
+- !private ["P9Swiftfire10MacMessage", "ReadDomainsCommand"]
+- !private ["P9Swiftfire10MacMessage", "ReadDomainsReply"]
+- !private ["P9Swiftfire10MacMessage", "domains"]
+- ["P9Swiftfire10MacMessage", "execute"]
+- ["P9Swiftfire10MacMessage", "factory"]
+- !private ["P9Swiftfire10MacMessage", "init"]
+- !private ["P9Swiftfire10MacMessage", "mac"]
+- !private ["C9Swiftfire30MonitoringAndControlConnection", "transfer"]
+- ["Sq", "deinit"]
+- ["C9Swiftfire18ReadDomainsCommand", "MacCommand"]
+- !private ["C9Swiftfire18ReadDomainsCommand", "ReadDomainsCommand"]
+- !private ["C9Swiftfire18ReadDomainsCommand", "ReadDomainsReply"]
+- ["C9Swiftfire18ReadDomainsCommand", "VJson"]
+- ["C9Swiftfire18ReadDomainsCommand", "deinit"]
+- !private ["C9Swiftfire18ReadDomainsCommand", "domains"]
+- ["C9Swiftfire18ReadDomainsCommand", "execute"]
+- ["C9Swiftfire18ReadDomainsCommand", "factory"]
+- !private ["C9Swiftfire18ReadDomainsCommand", "init"]
+- !private ["C9Swiftfire18ReadDomainsCommand", "mac"]
+- ["C9Swiftfire16ReadDomainsReply", "deinit"]
+- !private ["C9Swiftfire16ReadDomainsReply", "init"]
+- !private ["P14SwifterSockets16ReceiverProtocol", "transfer"]
+- !private ["P14SwifterSockets19TransmitterProtocol", "transfer"]
+- !private ["P11SwifterJSON19VJsonDeserializable", "ReadDomainsCommand"]
+- !private ["P11SwifterJSON19VJsonDeserializable", "ReadDomainsReply"]
+- !private ["P11SwifterJSON19VJsonDeserializable", "domains"]
+- ["P11SwifterJSON19VJsonDeserializable", "execute"]
+- ["P11SwifterJSON19VJsonDeserializable", "factory"]
+- !private ["P11SwifterJSON19VJsonDeserializable", "init"]
+- !private ["P11SwifterJSON19VJsonDeserializable", "mac"]
+- !private ["P11SwifterJSON17VJsonSerializable", "ReadDomainsCommand"]
+- !private ["P11SwifterJSON17VJsonSerializable", "ReadDomainsReply"]
+- !private ["P11SwifterJSON17VJsonSerializable", "domains"]
+- ["P11SwifterJSON17VJsonSerializable", "execute"]
+- ["P11SwifterJSON17VJsonSerializable", "factory"]
+- !private ["P11SwifterJSON17VJsonSerializable", "init"]
+- !private ["P11SwifterJSON17VJsonSerializable", "mac"]
+depends-nominal:
+- "Ps9AnyObject"
+- !private "C14SwifterSockets10Connection"
+- "C9Swiftfire7Domains"
+- "P9Swiftfire10MacCommand"
+- "P9Swiftfire10MacMessage"
+- !private "C9Swiftfire30MonitoringAndControlConnection"
+- "Sq"
+- "C9Swiftfire18ReadDomainsCommand"
+- "C9Swiftfire16ReadDomainsReply"
+- !private "P14SwifterSockets16ReceiverProtocol"
+- !private "P14SwifterSockets19TransmitterProtocol"
+- "P11SwifterJSON19VJsonDeserializable"
+- "P11SwifterJSON17VJsonSerializable"
+depends-dynamic-lookup:
+depends-external:
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/Swift.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/SwiftOnoneSupport.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/Foundation.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/Darwin.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/Dispatch.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/ObjectiveC.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreGraphics.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/IOKit.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterLog.framework/Modules/SwifterLog.swiftmodule/x86_64.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/CAsl-0.1.0/Sources/include/CAsl.h"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/CAsl.framework/Modules/module.modulemap"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterJSON.framework/Modules/SwifterJSON.swiftmodule/x86_64.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/Ascii.framework/Modules/Ascii.swiftmodule/x86_64.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterSockets.framework/Modules/SwifterSockets.swiftmodule/x86_64.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/COpenSsl-0.1.0/module.modulemap"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/AppKit.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreData.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/QuartzCore.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/XPC.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreImage.swiftmodule"
+interface-hash: "62eb34a3b6d9ec86efd96a20d770dd67"

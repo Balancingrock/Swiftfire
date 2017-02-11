@@ -1,0 +1,11 @@
+version: "Apple Swift version 3.0.2 (swiftlang-800.0.63 clang-800.0.42.1)"
+options: "5622295351e86c42ff8d1e156c77ced0"
+build_time: [539978832, 178046000]
+inputs:
+  "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/SwifterSockets-0.9.13/Sources/SwifterSockets.Accept.swift": [539978669, 0]
+  "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/SwifterSockets-0.9.13/Sources/SwifterSockets.Client.swift": [539978669, 0]
+  "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/SwifterSockets-0.9.13/Sources/SwifterSockets.Connection.swift": [539978669, 0]
+  "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/SwifterSockets-0.9.13/Sources/SwifterSockets.Receive.swift": [539978669, 0]
+  "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/SwifterSockets-0.9.13/Sources/SwifterSockets.Server.swift": [539978669, 0]
+  "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/SwifterSockets-0.9.13/Sources/SwifterSockets.swift": [539978669, 0]
+  "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/SwifterSockets-0.9.13/Sources/SwifterSockets.Transmit.swift": [539978669, 0]

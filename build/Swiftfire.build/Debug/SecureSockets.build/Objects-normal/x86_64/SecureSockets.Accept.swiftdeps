@@ -1,0 +1,255 @@
+### Swift dependencies file v0 ###
+provides-top-level:
+- "SslSessionHandler"
+- "SslAcceptResult"
+- "sslAccept"
+provides-nominal:
+- "O13SecureSockets15SslAcceptResult"
+provides-member:
+- ["O13SecureSockets15SslAcceptResult", ""]
+provides-dynamic-lookup:
+depends-top-level:
+- !private "tipAccept"
+- "AssignmentPrecedence"
+- "SslAcceptResult"
+- !private "errPrintErrors"
+- !private "Date"
+- !private "??"
+- "sslAccept"
+- !private "waitForSelect"
+- "Bool"
+- "Ctx"
+- "TimeInterval"
+- !private "BooleanLiteralType"
+- "AddressHandler"
+- "Ssl"
+- !private "StringLiteralType"
+- "String"
+- "Int32"
+- "SslSessionHandler"
+- !private "!"
+- !private "close"
+depends-member:
+- !private ["Ps9AnyObject", "accept"]
+- !private ["Ps9AnyObject", "init"]
+- !private ["Ps9AnyObject", "setFd"]
+- !private ["Sb", "_getBuiltinLogicValue"]
+- ["Sb", "deinit"]
+- !private ["Ps7CVarArg", "init"]
+- !private ["Vs9Character", "deinit"]
+- !private ["Ps10Comparable", "addingTimeInterval"]
+- !private ["Ps10Comparable", "init"]
+- ["C13SecureSockets3Ctx", "deinit"]
+- !private ["Ps28CustomDebugStringConvertible", "addingTimeInterval"]
+- !private ["Ps28CustomDebugStringConvertible", "init"]
+- !private ["Ps29CustomPlaygroundQuickLookable", "_getBuiltinLogicValue"]
+- !private ["Ps29CustomPlaygroundQuickLookable", "addingTimeInterval"]
+- !private ["Ps29CustomPlaygroundQuickLookable", "init"]
+- !private ["Ps17CustomReflectable", "_getBuiltinLogicValue"]
+- !private ["Ps17CustomReflectable", "addingTimeInterval"]
+- !private ["Ps17CustomReflectable", "init"]
+- !private ["Ps23CustomStringConvertible", "_getBuiltinLogicValue"]
+- !private ["Ps23CustomStringConvertible", "addingTimeInterval"]
+- ["Ps23CustomStringConvertible", "bios_errno"]
+- ["Ps23CustomStringConvertible", "completed"]
+- !private ["Ps23CustomStringConvertible", "description"]
+- ["Ps23CustomStringConvertible", "errorMessage"]
+- !private ["Ps23CustomStringConvertible", "init"]
+- ["Ps23CustomStringConvertible", "ssl"]
+- ["Ps23CustomStringConvertible", "syscall"]
+- ["Ps23CustomStringConvertible", "undocumentedSslError"]
+- ["Ps23CustomStringConvertible", "undocumentedSslFunctionResult"]
+- ["Ps23CustomStringConvertible", "wantAccept"]
+- ["Ps23CustomStringConvertible", "wantAsync"]
+- ["Ps23CustomStringConvertible", "wantAsyncJob"]
+- ["Ps23CustomStringConvertible", "wantConnect"]
+- ["Ps23CustomStringConvertible", "wantRead"]
+- ["Ps23CustomStringConvertible", "wantWrite"]
+- ["Ps23CustomStringConvertible", "wantX509Lookup"]
+- ["Ps23CustomStringConvertible", "zeroReturn"]
+- !private ["V10Foundation4Date", "addingTimeInterval"]
+- ["V10Foundation4Date", "deinit"]
+- !private ["V10Foundation4Date", "init"]
+- ["Sd", "deinit"]
+- !private ["Ps9Equatable", "_getBuiltinLogicValue"]
+- !private ["Ps9Equatable", "addingTimeInterval"]
+- ["Ps9Equatable", "bios_errno"]
+- ["Ps9Equatable", "completed"]
+- !private ["Ps9Equatable", "description"]
+- ["Ps9Equatable", "errorMessage"]
+- !private ["Ps9Equatable", "init"]
+- ["Ps9Equatable", "ssl"]
+- ["Ps9Equatable", "syscall"]
+- ["Ps9Equatable", "undocumentedSslError"]
+- ["Ps9Equatable", "undocumentedSslFunctionResult"]
+- ["Ps9Equatable", "wantAccept"]
+- ["Ps9Equatable", "wantAsync"]
+- ["Ps9Equatable", "wantAsyncJob"]
+- ["Ps9Equatable", "wantConnect"]
+- ["Ps9Equatable", "wantRead"]
+- ["Ps9Equatable", "wantWrite"]
+- ["Ps9Equatable", "wantX509Lookup"]
+- ["Ps9Equatable", "zeroReturn"]
+- !private ["Ps27ExpressibleByBooleanLiteral", "_getBuiltinLogicValue"]
+- !private ["Ps43ExpressibleByExtendedGraphemeClusterLiteral", "init"]
+- !private ["Ps32ExpressibleByStringInterpolation", "init"]
+- !private ["Ps26ExpressibleByStringLiteral", "init"]
+- !private ["Ps33ExpressibleByUnicodeScalarLiteral", "init"]
+- !private ["Sf", "deinit"]
+- !private ["Ps8Hashable", "_getBuiltinLogicValue"]
+- !private ["Ps8Hashable", "addingTimeInterval"]
+- !private ["Ps8Hashable", "init"]
+- !private ["Si", "deinit"]
+- !private ["Vs5Int16", "deinit"]
+- ["Vs5Int32", "deinit"]
+- !private ["Vs5Int64", "deinit"]
+- !private ["Vs4Int8", "deinit"]
+- !private ["Ps25LosslessStringConvertible", "_getBuiltinLogicValue"]
+- !private ["Ps25LosslessStringConvertible", "init"]
+- !private ["Ps10MirrorPath", "init"]
+- !private ["PSo8NSCoding", "init"]
+- !private ["PSo9NSCopying", "init"]
+- !private ["PSo16NSMutableCopying", "init"]
+- !private ["CSo8NSObject", "init"]
+- !private ["PSo16NSObjectProtocol", "init"]
+- !private ["PSo14NSSecureCoding", "init"]
+- !private ["CSo8NSString", "init"]
+- ["Sq", "deinit"]
+- !private ["P10Foundation20ReferenceConvertible", "addingTimeInterval"]
+- !private ["P10Foundation20ReferenceConvertible", "init"]
+- ["O14SwifterSockets6Result", "deinit"]
+- ["O14SwifterSockets6Result", "error"]
+- ["O14SwifterSockets6Result", "success"]
+- ["OC13SecureSockets3Ssl6Result", "bios_errno"]
+- ["OC13SecureSockets3Ssl6Result", "completed"]
+- ["OC13SecureSockets3Ssl6Result", "deinit"]
+- !private ["OC13SecureSockets3Ssl6Result", "description"]
+- ["OC13SecureSockets3Ssl6Result", "errorMessage"]
+- ["OC13SecureSockets3Ssl6Result", "ssl"]
+- ["OC13SecureSockets3Ssl6Result", "syscall"]
+- ["OC13SecureSockets3Ssl6Result", "undocumentedSslError"]
+- ["OC13SecureSockets3Ssl6Result", "undocumentedSslFunctionResult"]
+- ["OC13SecureSockets3Ssl6Result", "wantAccept"]
+- ["OC13SecureSockets3Ssl6Result", "wantAsync"]
+- ["OC13SecureSockets3Ssl6Result", "wantAsyncJob"]
+- ["OC13SecureSockets3Ssl6Result", "wantConnect"]
+- ["OC13SecureSockets3Ssl6Result", "wantRead"]
+- ["OC13SecureSockets3Ssl6Result", "wantWrite"]
+- ["OC13SecureSockets3Ssl6Result", "wantX509Lookup"]
+- ["OC13SecureSockets3Ssl6Result", "zeroReturn"]
+- ["O14SwifterSockets12SelectResult", "closed"]
+- ["O14SwifterSockets12SelectResult", "deinit"]
+- ["O14SwifterSockets12SelectResult", "error"]
+- ["O14SwifterSockets12SelectResult", "ready"]
+- ["O14SwifterSockets12SelectResult", "timeout"]
+- !private ["C13SecureSockets3Ssl", "accept"]
+- ["C13SecureSockets3Ssl", "deinit"]
+- !private ["C13SecureSockets3Ssl", "init"]
+- !private ["C13SecureSockets3Ssl", "setFd"]
+- ["O13SecureSockets15SslAcceptResult", "Int32"]
+- ["O13SecureSockets15SslAcceptResult", "Ssl"]
+- ["O13SecureSockets15SslAcceptResult", "String"]
+- ["O13SecureSockets15SslAcceptResult", "accepted"]
+- ["O13SecureSockets15SslAcceptResult", "closed"]
+- ["O13SecureSockets15SslAcceptResult", "deinit"]
+- ["O13SecureSockets15SslAcceptResult", "error"]
+- ["O13SecureSockets15SslAcceptResult", "timeout"]
+- ["SS", "deinit"]
+- !private ["SS", "init"]
+- !private ["Ps16TextOutputStream", "init"]
+- !private ["Ps20TextOutputStreamable", "init"]
+- ["O14SwifterSockets15TipAcceptResult", "accepted"]
+- ["O14SwifterSockets15TipAcceptResult", "closed"]
+- ["O14SwifterSockets15TipAcceptResult", "deinit"]
+- ["O14SwifterSockets15TipAcceptResult", "error"]
+- ["O14SwifterSockets15TipAcceptResult", "timeout"]
+- !private ["Su", "deinit"]
+- !private ["Vs6UInt16", "deinit"]
+- !private ["Vs6UInt32", "deinit"]
+- !private ["Vs6UInt64", "deinit"]
+- !private ["Vs5UInt8", "deinit"]
+- !private ["Sc", "deinit"]
+- !private ["Ps35_ExpressibleByBuiltinBooleanLiteral", "_getBuiltinLogicValue"]
+- !private ["Ps51_ExpressibleByBuiltinExtendedGraphemeClusterLiteral", "init"]
+- !private ["Ps34_ExpressibleByBuiltinStringLiteral", "init"]
+- !private ["Ps39_ExpressibleByBuiltinUTF16StringLiteral", "init"]
+- !private ["Ps41_ExpressibleByBuiltinUnicodeScalarLiteral", "init"]
+- !private ["Ps35_HasCustomAnyHashableRepresentation", "init"]
+- !private ["Ps9_Hashable", "_getBuiltinLogicValue"]
+- !private ["Ps9_Hashable", "addingTimeInterval"]
+- !private ["Ps9_Hashable", "init"]
+- !private ["Ps21_ObjectiveCBridgeable", "_getBuiltinLogicValue"]
+- !private ["Ps21_ObjectiveCBridgeable", "addingTimeInterval"]
+- !private ["Ps21_ObjectiveCBridgeable", "init"]
+depends-nominal:
+- !private "Ps9AnyObject"
+- "Sb"
+- !private "Ps7CVarArg"
+- !private "Vs9Character"
+- !private "Ps10Comparable"
+- "C13SecureSockets3Ctx"
+- !private "Ps28CustomDebugStringConvertible"
+- !private "Ps29CustomPlaygroundQuickLookable"
+- !private "Ps17CustomReflectable"
+- "Ps23CustomStringConvertible"
+- "V10Foundation4Date"
+- "Sd"
+- "Ps9Equatable"
+- !private "Ps27ExpressibleByBooleanLiteral"
+- !private "Ps43ExpressibleByExtendedGraphemeClusterLiteral"
+- !private "Ps32ExpressibleByStringInterpolation"
+- !private "Ps26ExpressibleByStringLiteral"
+- !private "Ps33ExpressibleByUnicodeScalarLiteral"
+- !private "Sf"
+- !private "Ps8Hashable"
+- !private "Si"
+- !private "Vs5Int16"
+- "Vs5Int32"
+- !private "Vs5Int64"
+- !private "Vs4Int8"
+- !private "Ps25LosslessStringConvertible"
+- !private "Ps10MirrorPath"
+- !private "PSo8NSCoding"
+- !private "PSo9NSCopying"
+- !private "PSo16NSMutableCopying"
+- !private "CSo8NSObject"
+- !private "PSo16NSObjectProtocol"
+- !private "PSo14NSSecureCoding"
+- !private "CSo8NSString"
+- "Sq"
+- !private "P10Foundation20ReferenceConvertible"
+- "O14SwifterSockets6Result"
+- "OC13SecureSockets3Ssl6Result"
+- "O14SwifterSockets12SelectResult"
+- "C13SecureSockets3Ssl"
+- "O13SecureSockets15SslAcceptResult"
+- "SS"
+- !private "Ps16TextOutputStream"
+- !private "Ps20TextOutputStreamable"
+- "O14SwifterSockets15TipAcceptResult"
+- !private "Su"
+- !private "Vs6UInt16"
+- !private "Vs6UInt32"
+- !private "Vs6UInt64"
+- !private "Vs5UInt8"
+- !private "Sc"
+- !private "Ps35_ExpressibleByBuiltinBooleanLiteral"
+- !private "Ps51_ExpressibleByBuiltinExtendedGraphemeClusterLiteral"
+- !private "Ps34_ExpressibleByBuiltinStringLiteral"
+- !private "Ps39_ExpressibleByBuiltinUTF16StringLiteral"
+- !private "Ps41_ExpressibleByBuiltinUnicodeScalarLiteral"
+- !private "Ps35_HasCustomAnyHashableRepresentation"
+- !private "Ps9_Hashable"
+- !private "Ps21_ObjectiveCBridgeable"
+depends-dynamic-lookup:
+depends-external:
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/Swift.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/SwiftOnoneSupport.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/Foundation.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/Darwin.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/Dispatch.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/ObjectiveC.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreGraphics.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/IOKit.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterSockets.framework/Modules/SwifterSockets.swiftmodule/x86_64.swiftmodule"
+interface-hash: "90e59c5bf6abe0dfe98a581f85ef0350"

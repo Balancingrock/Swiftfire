@@ -1,0 +1,176 @@
+### Swift dependencies file v0 ###
+provides-top-level:
+- "RestoreBlacklistCommand"
+provides-nominal:
+- "C9Swiftfire23RestoreBlacklistCommand"
+provides-member:
+- ["C9Swiftfire23RestoreBlacklistCommand", ""]
+provides-dynamic-lookup:
+depends-top-level:
+- "AssignmentPrecedence"
+- "RestoreBlacklistCommand"
+- !private "|"
+- !private "SOURCE"
+- "VJson"
+- !private "&="
+- !private "COMMAND_NAME"
+- "StringLiteralType"
+- "String"
+- "MacMessage"
+depends-member:
+- !private ["Ps9AnyObject", "COMMAND_NAME"]
+- !private ["Ps9AnyObject", "SOURCE"]
+- !private ["Ps9AnyObject", "VJson"]
+- ["Ps9AnyObject", "init"]
+- ["Ps9AnyObject", "json"]
+- !private ["Ps9AnyObject", "source"]
+- !private ["Ps9AnyObject", "stringValue"]
+- !private ["Ps9AnyObject", "subscript"]
+- ["Ps9AnyObject", ""]
+- ["Ps7CVarArg", "init"]
+- ["Ps10Comparable", "init"]
+- ["Ps28CustomDebugStringConvertible", "init"]
+- ["Ps29CustomPlaygroundQuickLookable", "init"]
+- ["Ps17CustomReflectable", "init"]
+- ["Ps23CustomStringConvertible", "init"]
+- !private ["Ps23CustomStringConvertible", "stringValue"]
+- !private ["Ps23CustomStringConvertible", "subscript"]
+- ["Ps9Equatable", "init"]
+- !private ["Ps9Equatable", "stringValue"]
+- !private ["Ps9Equatable", "subscript"]
+- ["Ps43ExpressibleByExtendedGraphemeClusterLiteral", "init"]
+- ["Ps32ExpressibleByStringInterpolation", "init"]
+- ["Ps26ExpressibleByStringLiteral", "init"]
+- ["Ps33ExpressibleByUnicodeScalarLiteral", "init"]
+- ["Ps8Hashable", "init"]
+- ["Ps25LosslessStringConvertible", "init"]
+- !private ["P9Swiftfire10MacCommand", "COMMAND_NAME"]
+- !private ["P9Swiftfire10MacCommand", "SOURCE"]
+- !private ["P9Swiftfire10MacCommand", "VJson"]
+- ["P9Swiftfire10MacCommand", "init"]
+- ["P9Swiftfire10MacCommand", "json"]
+- !private ["P9Swiftfire10MacCommand", "source"]
+- !private ["P9Swiftfire10MacMessage", "COMMAND_NAME"]
+- !private ["P9Swiftfire10MacMessage", "SOURCE"]
+- !private ["P9Swiftfire10MacMessage", "VJson"]
+- ["P9Swiftfire10MacMessage", "init"]
+- ["P9Swiftfire10MacMessage", "json"]
+- !private ["P9Swiftfire10MacMessage", "source"]
+- ["P9Swiftfire10MacMessage", ""]
+- ["Ps10MirrorPath", "init"]
+- ["PSo8NSCoding", "init"]
+- ["PSo9NSCopying", "init"]
+- ["PSo16NSMutableCopying", "init"]
+- ["CSo8NSObject", "init"]
+- ["PSo16NSObjectProtocol", "init"]
+- ["PSo19NSPasteboardReading", "init"]
+- ["PSo19NSPasteboardWriting", "init"]
+- ["PSo14NSSecureCoding", "init"]
+- ["CSo8NSString", "init"]
+- ["Sq", "deinit"]
+- !private ["C9Swiftfire23RestoreBlacklistCommand", "COMMAND_NAME"]
+- !private ["C9Swiftfire23RestoreBlacklistCommand", "SOURCE"]
+- ["C9Swiftfire23RestoreBlacklistCommand", "String"]
+- ["C9Swiftfire23RestoreBlacklistCommand", "VJson"]
+- ["C9Swiftfire23RestoreBlacklistCommand", "deinit"]
+- ["C9Swiftfire23RestoreBlacklistCommand", "init"]
+- ["C9Swiftfire23RestoreBlacklistCommand", "json"]
+- ["C9Swiftfire23RestoreBlacklistCommand", "source"]
+- !private ["Ps8Sequence", "init"]
+- !private ["Ps8Sequence", "stringValue"]
+- !private ["Ps8Sequence", "subscript"]
+- ["SS", "deinit"]
+- ["SS", "init"]
+- ["Ps16TextOutputStream", "init"]
+- ["Ps20TextOutputStreamable", "init"]
+- ["C11SwifterJSON5VJson", "deinit"]
+- !private ["C11SwifterJSON5VJson", "init"]
+- !private ["C11SwifterJSON5VJson", "stringValue"]
+- !private ["C11SwifterJSON5VJson", "subscript"]
+- !private ["P11SwifterJSON19VJsonDeserializable", "COMMAND_NAME"]
+- !private ["P11SwifterJSON19VJsonDeserializable", "SOURCE"]
+- !private ["P11SwifterJSON19VJsonDeserializable", "VJson"]
+- ["P11SwifterJSON19VJsonDeserializable", "init"]
+- ["P11SwifterJSON19VJsonDeserializable", "json"]
+- !private ["P11SwifterJSON19VJsonDeserializable", "source"]
+- ["P11SwifterJSON19VJsonDeserializable", ""]
+- !private ["P11SwifterJSON17VJsonSerializable", "COMMAND_NAME"]
+- !private ["P11SwifterJSON17VJsonSerializable", "SOURCE"]
+- !private ["P11SwifterJSON17VJsonSerializable", "VJson"]
+- ["P11SwifterJSON17VJsonSerializable", "init"]
+- ["P11SwifterJSON17VJsonSerializable", "json"]
+- !private ["P11SwifterJSON17VJsonSerializable", "source"]
+- ["P11SwifterJSON17VJsonSerializable", ""]
+- ["Ps51_ExpressibleByBuiltinExtendedGraphemeClusterLiteral", "init"]
+- ["Ps34_ExpressibleByBuiltinStringLiteral", "init"]
+- ["Ps39_ExpressibleByBuiltinUTF16StringLiteral", "init"]
+- ["Ps41_ExpressibleByBuiltinUnicodeScalarLiteral", "init"]
+- ["Ps35_HasCustomAnyHashableRepresentation", "init"]
+- ["Ps9_Hashable", "init"]
+- ["Ps21_ObjectiveCBridgeable", "init"]
+depends-nominal:
+- "Ps9AnyObject"
+- "Ps7CVarArg"
+- "Ps10Comparable"
+- "Ps28CustomDebugStringConvertible"
+- "Ps29CustomPlaygroundQuickLookable"
+- "Ps17CustomReflectable"
+- "Ps23CustomStringConvertible"
+- "Ps9Equatable"
+- "Ps43ExpressibleByExtendedGraphemeClusterLiteral"
+- "Ps32ExpressibleByStringInterpolation"
+- "Ps26ExpressibleByStringLiteral"
+- "Ps33ExpressibleByUnicodeScalarLiteral"
+- "Ps8Hashable"
+- "Ps25LosslessStringConvertible"
+- "P9Swiftfire10MacCommand"
+- "P9Swiftfire10MacMessage"
+- "Ps10MirrorPath"
+- "PSo8NSCoding"
+- "PSo9NSCopying"
+- "PSo16NSMutableCopying"
+- "CSo8NSObject"
+- "PSo16NSObjectProtocol"
+- "PSo19NSPasteboardReading"
+- "PSo19NSPasteboardWriting"
+- "PSo14NSSecureCoding"
+- "CSo8NSString"
+- "Sq"
+- "C9Swiftfire23RestoreBlacklistCommand"
+- !private "Ps8Sequence"
+- "SS"
+- "Ps16TextOutputStream"
+- "Ps20TextOutputStreamable"
+- "C11SwifterJSON5VJson"
+- "P11SwifterJSON19VJsonDeserializable"
+- "P11SwifterJSON17VJsonSerializable"
+- "Ps51_ExpressibleByBuiltinExtendedGraphemeClusterLiteral"
+- "Ps34_ExpressibleByBuiltinStringLiteral"
+- "Ps39_ExpressibleByBuiltinUTF16StringLiteral"
+- "Ps41_ExpressibleByBuiltinUnicodeScalarLiteral"
+- "Ps35_HasCustomAnyHashableRepresentation"
+- "Ps9_Hashable"
+- "Ps21_ObjectiveCBridgeable"
+depends-dynamic-lookup:
+depends-external:
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/Swift.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/SwiftOnoneSupport.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/Foundation.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/Darwin.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/Dispatch.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/ObjectiveC.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreGraphics.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/IOKit.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterLog.framework/Modules/SwifterLog.swiftmodule/x86_64.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/CAsl-0.1.0/Sources/include/CAsl.h"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/CAsl.framework/Modules/module.modulemap"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterJSON.framework/Modules/SwifterJSON.swiftmodule/x86_64.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/Ascii.framework/Modules/Ascii.swiftmodule/x86_64.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterSockets.framework/Modules/SwifterSockets.swiftmodule/x86_64.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/COpenSsl-0.1.0/module.modulemap"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/AppKit.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreData.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/QuartzCore.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/XPC.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreImage.swiftmodule"
+interface-hash: "f436b86705bbc4e0fca6ef7acf491e33"

@@ -1,0 +1,508 @@
+### Swift dependencies file v0 ###
+provides-top-level:
+- "quitSwiftfire"
+- "LogForewarder"
+- "logforewarder"
+- "serverBlacklist"
+- "httpServer"
+- "macServer"
+provides-nominal:
+- "C9Swiftfire13LogForewarder"
+provides-member:
+- ["C9Swiftfire13LogForewarder", ""]
+provides-dynamic-lookup:
+depends-top-level:
+- "acceptQueue"
+- "Blacklist"
+- "domains"
+- "httpServerErrorHandler"
+- !private "LogLine"
+- "AssignmentPrecedence"
+- "SwifterLog"
+- "*"
+- "serverBlacklist"
+- "CastingPrecedence"
+- "httpServer"
+- "Bool"
+- "Array"
+- "logforewarder"
+- "IntegerLiteralType"
+- "httpConnectionFactory"
+- "parameters"
+- "sleep"
+- "macConnectionFactory"
+- "&&"
+- "FloatLiteralType"
+- !private "LogLineReply"
+- !private "mac"
+- "EXIT_SUCCESS"
+- "UnicodeScalarType"
+- "quitSwiftfire"
+- "macAcceptQueue"
+- "DispatchQueue"
+- "UInt64"
+- "Int"
+- "String"
+- "statistics"
+- "Date"
+- "log"
+- "exit"
+- "macErrorHandler"
+- "FileURLs"
+- "SwifterSockets"
+- "SwifterlogCallbackProtocol"
+- "BooleanLiteralType"
+- "FileManager"
+- "EXIT_FAILURE"
+- "macServer"
+- "LogForewarder"
+- "!"
+- "ServerStartCommand"
+- "HttpHeader"
+- "!="
+- "StringLiteralType"
+depends-member:
+- ["Ps9AnyObject", "AutoreleaseFrequency"]
+- ["Ps9AnyObject", "Level"]
+- !private ["Ps9AnyObject", "LogLine"]
+- !private ["Ps9AnyObject", "LogLineReply"]
+- ["Ps9AnyObject", "NetworkTarget"]
+- ["Ps9AnyObject", "applicationLogDir"]
+- ["Ps9AnyObject", "aslFacilityRecordAtAndAboveLevel"]
+- ["Ps9AnyObject", "atLevelEmergency"]
+- ["Ps9AnyObject", "atLevelNotice"]
+- ["Ps9AnyObject", "autoStartup"]
+- ["Ps9AnyObject", "callbackAtAndAboveLevel"]
+- ["Ps9AnyObject", "closeHeaderLoggingFile"]
+- ["Ps9AnyObject", "connectToNetworkTarget"]
+- ["Ps9AnyObject", "default"]
+- ["Ps9AnyObject", "execute"]
+- ["Ps9AnyObject", "fileRecordAtAndAboveLevel"]
+- ["Ps9AnyObject", "httpServicePortNumber"]
+- ["Ps9AnyObject", "init"]
+- ["Ps9AnyObject", "isReadableFile"]
+- ["Ps9AnyObject", "load"]
+- ["Ps9AnyObject", "logInfo"]
+- ["Ps9AnyObject", "logParameterSettings"]
+- ["Ps9AnyObject", "logfileDirectoryPath"]
+- ["Ps9AnyObject", "logfileMaxNofFiles"]
+- ["Ps9AnyObject", "logfileMaxNumberOfFiles"]
+- ["Ps9AnyObject", "logfileMaxSize"]
+- ["Ps9AnyObject", "logfileMaxSizeInBytes"]
+- !private ["Ps9AnyObject", "mac"]
+- ["Ps9AnyObject", "macPortNumber"]
+- ["Ps9AnyObject", "maxNofPendingConnections"]
+- ["Ps9AnyObject", "networkLogtargetIpAddress"]
+- ["Ps9AnyObject", "networkLogtargetPortNumber"]
+- ["Ps9AnyObject", "networkTransmitAtAndAboveLevel"]
+- ["Ps9AnyObject", "registerCallback"]
+- ["Ps9AnyObject", "restore"]
+- ["Ps9AnyObject", "save"]
+- ["Ps9AnyObject", "serverBlacklist"]
+- ["Ps9AnyObject", "serverShutdown"]
+- ["Ps9AnyObject", "start"]
+- ["Ps9AnyObject", "stdoutPrintAtAndAboveLevel"]
+- !private ["Ps9AnyObject", "transfer"]
+- ["Ps9AnyObject", "writeToLog"]
+- ["Ps9AnyObject", ""]
+- ["VE8DispatchCSo13DispatchQueue10Attributes", "Element"]
+- ["VE8DispatchCSo13DispatchQueue10Attributes", "deinit"]
+- ["OE8DispatchCSo13DispatchQueue20AutoreleaseFrequency", "deinit"]
+- ["OE8DispatchCSo13DispatchQueue20AutoreleaseFrequency", "inherit"]
+- ["Ps17BitwiseOperations", "init"]
+- ["C9Swiftfire9Blacklist", "deinit"]
+- ["C9Swiftfire9Blacklist", "init"]
+- ["C9Swiftfire9Blacklist", "load"]
+- ["C9Swiftfire9Blacklist", "save"]
+- ["C9Swiftfire9Blacklist", "writeToLog"]
+- ["Sb", "_getBuiltinLogicValue"]
+- ["Sb", "deinit"]
+- ["Ps7CVarArg", "AutoreleaseFrequency"]
+- ["Ps7CVarArg", "default"]
+- ["Ps7CVarArg", "init"]
+- ["Ps7CVarArg", "isReadableFile"]
+- ["Vs9Character", "deinit"]
+- ["Ps10Comparable", "init"]
+- !private ["C14SwifterSockets10Connection", "transfer"]
+- ["Ps28CustomDebugStringConvertible", "AutoreleaseFrequency"]
+- ["Ps28CustomDebugStringConvertible", "default"]
+- ["Ps28CustomDebugStringConvertible", "init"]
+- ["Ps28CustomDebugStringConvertible", "isReadableFile"]
+- ["Ps28CustomDebugStringConvertible", "path"]
+- ["Ps29CustomPlaygroundQuickLookable", "_getBuiltinLogicValue"]
+- ["Ps29CustomPlaygroundQuickLookable", "init"]
+- ["Ps29CustomPlaygroundQuickLookable", "path"]
+- ["Ps17CustomReflectable", "_getBuiltinLogicValue"]
+- ["Ps17CustomReflectable", "init"]
+- ["Ps23CustomStringConvertible", "AutoreleaseFrequency"]
+- ["Ps23CustomStringConvertible", "_getBuiltinLogicValue"]
+- ["Ps23CustomStringConvertible", "debug"]
+- ["Ps23CustomStringConvertible", "default"]
+- ["Ps23CustomStringConvertible", "init"]
+- ["Ps23CustomStringConvertible", "isReadableFile"]
+- ["Ps23CustomStringConvertible", "none"]
+- ["Ps23CustomStringConvertible", "notice"]
+- ["Ps23CustomStringConvertible", "path"]
+- ["V10Foundation4Date", "deinit"]
+- ["CSo14DispatchObject", "AutoreleaseFrequency"]
+- ["CSo14DispatchObject", "init"]
+- ["V8Dispatch11DispatchQoS", "deinit"]
+- ["V8Dispatch11DispatchQoS", "userInteractive"]
+- ["CSo13DispatchQueue", "AutoreleaseFrequency"]
+- ["CSo13DispatchQueue", "deinit"]
+- ["CSo13DispatchQueue", "init"]
+- ["C9Swiftfire7Domains", "deinit"]
+- ["C9Swiftfire7Domains", "restore"]
+- ["C9Swiftfire7Domains", "serverShutdown"]
+- ["C9Swiftfire7Domains", "writeToLog"]
+- ["Sd", "deinit"]
+- ["Ps9Equatable", "AutoreleaseFrequency"]
+- ["Ps9Equatable", "Element"]
+- ["Ps9Equatable", "_getBuiltinLogicValue"]
+- ["Ps9Equatable", "debug"]
+- ["Ps9Equatable", "default"]
+- ["Ps9Equatable", "inherit"]
+- ["Ps9Equatable", "init"]
+- ["Ps9Equatable", "isReadableFile"]
+- ["Ps9Equatable", "none"]
+- ["Ps9Equatable", "notice"]
+- ["Ps9Equatable", "path"]
+- ["Ps9Equatable", "userInteractive"]
+- ["Ps25ExpressibleByArrayLiteral", "Element"]
+- ["Ps27ExpressibleByBooleanLiteral", "_getBuiltinLogicValue"]
+- ["Ps43ExpressibleByExtendedGraphemeClusterLiteral", "init"]
+- ["Ps27ExpressibleByIntegerLiteral", "init"]
+- ["Ps23ExpressibleByNilLiteral", "init"]
+- ["Ps32ExpressibleByStringInterpolation", "init"]
+- ["Ps26ExpressibleByStringLiteral", "init"]
+- ["Ps33ExpressibleByUnicodeScalarLiteral", "init"]
+- ["CSo11FileManager", "default"]
+- ["CSo11FileManager", "deinit"]
+- ["CSo11FileManager", "isReadableFile"]
+- ["C9Swiftfire8FileURLs", "applicationLogDir"]
+- ["C9Swiftfire8FileURLs", "serverBlacklist"]
+- ["Sf", "deinit"]
+- ["Ps8Hashable", "AutoreleaseFrequency"]
+- ["Ps8Hashable", "_getBuiltinLogicValue"]
+- ["Ps8Hashable", "debug"]
+- ["Ps8Hashable", "default"]
+- ["Ps8Hashable", "inherit"]
+- ["Ps8Hashable", "init"]
+- ["Ps8Hashable", "isReadableFile"]
+- ["Ps8Hashable", "none"]
+- ["Ps8Hashable", "notice"]
+- ["Ps8Hashable", "path"]
+- ["C9Swiftfire10HttpHeader", "closeHeaderLoggingFile"]
+- ["Si", "deinit"]
+- ["Si", "init"]
+- ["Vs5Int16", "deinit"]
+- ["Vs5Int32", "deinit"]
+- ["Vs5Int64", "deinit"]
+- ["Vs4Int8", "deinit"]
+- ["Ps7Integer", "init"]
+- ["Ps17IntegerArithmetic", "init"]
+- ["OC10SwifterLog10SwifterLog5Level", "debug"]
+- ["OC10SwifterLog10SwifterLog5Level", "deinit"]
+- ["OC10SwifterLog10SwifterLog5Level", "none"]
+- ["OC10SwifterLog10SwifterLog5Level", "notice"]
+- ["C9Swiftfire13LogForewarder", "Date"]
+- !private ["C9Swiftfire13LogForewarder", "LogLine"]
+- !private ["C9Swiftfire13LogForewarder", "LogLineReply"]
+- ["C9Swiftfire13LogForewarder", "String"]
+- ["C9Swiftfire13LogForewarder", "SwifterLog"]
+- ["C9Swiftfire13LogForewarder", "deinit"]
+- ["C9Swiftfire13LogForewarder", "init"]
+- ["C9Swiftfire13LogForewarder", "logInfo"]
+- !private ["C9Swiftfire13LogForewarder", "mac"]
+- ["V10SwifterLog7LogLine", "deinit"]
+- !private ["V10SwifterLog7LogLine", "init"]
+- ["C9Swiftfire12LogLineReply", "deinit"]
+- !private ["C9Swiftfire12LogLineReply", "init"]
+- ["Ps25LosslessStringConvertible", "_getBuiltinLogicValue"]
+- ["Ps25LosslessStringConvertible", "init"]
+- ["P9Swiftfire10MacCommand", "execute"]
+- ["P9Swiftfire10MacCommand", "init"]
+- ["P9Swiftfire10MacMessage", "execute"]
+- ["P9Swiftfire10MacMessage", "init"]
+- ["Ps10MirrorPath", "init"]
+- ["C9Swiftfire30MonitoringAndControlConnection", "deinit"]
+- !private ["C9Swiftfire30MonitoringAndControlConnection", "transfer"]
+- ["PSo8NSCoding", "init"]
+- ["PSo9NSCopying", "init"]
+- ["PSo16NSMutableCopying", "init"]
+- ["CSo8NSObject", "AutoreleaseFrequency"]
+- ["CSo8NSObject", "default"]
+- ["CSo8NSObject", "init"]
+- ["CSo8NSObject", "isReadableFile"]
+- ["PSo16NSObjectProtocol", "AutoreleaseFrequency"]
+- ["PSo16NSObjectProtocol", "default"]
+- ["PSo16NSObjectProtocol", "init"]
+- ["PSo16NSObjectProtocol", "isReadableFile"]
+- ["PSo19NSPasteboardReading", "init"]
+- ["PSo19NSPasteboardWriting", "init"]
+- ["PSo14NSSecureCoding", "init"]
+- ["CSo8NSString", "init"]
+- ["Os5Never", "deinit"]
+- ["CSo9OS_object", "AutoreleaseFrequency"]
+- ["CSo9OS_object", "init"]
+- ["OC14SwifterSockets9TipServer6Option", "acceptLoopDuration"]
+- ["OC14SwifterSockets9TipServer6Option", "acceptQueue"]
+- ["OC14SwifterSockets9TipServer6Option", "connectionObjectFactory"]
+- ["OC14SwifterSockets9TipServer6Option", "deinit"]
+- ["OC14SwifterSockets9TipServer6Option", "errorHandler"]
+- ["OC14SwifterSockets9TipServer6Option", "maxPendingConnectionRequests"]
+- ["OC14SwifterSockets9TipServer6Option", "port"]
+- ["Ps9OptionSet", "Element"]
+- ["Sq", "deinit"]
+- ["Sq", "init"]
+- ["C9Swiftfire10Parameters", "aslFacilityRecordAtAndAboveLevel"]
+- ["C9Swiftfire10Parameters", "autoStartup"]
+- ["C9Swiftfire10Parameters", "callbackAtAndAboveLevel"]
+- ["C9Swiftfire10Parameters", "deinit"]
+- ["C9Swiftfire10Parameters", "fileRecordAtAndAboveLevel"]
+- ["C9Swiftfire10Parameters", "httpServicePortNumber"]
+- ["C9Swiftfire10Parameters", "logParameterSettings"]
+- ["C9Swiftfire10Parameters", "logfileMaxNofFiles"]
+- ["C9Swiftfire10Parameters", "logfileMaxSize"]
+- ["C9Swiftfire10Parameters", "macPortNumber"]
+- ["C9Swiftfire10Parameters", "maxNofPendingConnections"]
+- ["C9Swiftfire10Parameters", "networkLogtargetIpAddress"]
+- ["C9Swiftfire10Parameters", "networkLogtargetPortNumber"]
+- ["C9Swiftfire10Parameters", "networkTransmitAtAndAboveLevel"]
+- ["C9Swiftfire10Parameters", "restore"]
+- ["C9Swiftfire10Parameters", "stdoutPrintAtAndAboveLevel"]
+- ["Ps16RawRepresentable", "Element"]
+- ["Ps16RawRepresentable", "debug"]
+- ["Ps16RawRepresentable", "none"]
+- ["Ps16RawRepresentable", "notice"]
+- !private ["P14SwifterSockets16ReceiverProtocol", "transfer"]
+- ["P10Foundation20ReferenceConvertible", "path"]
+- ["O14SwifterSockets6Result", "deinit"]
+- ["O14SwifterSockets6Result", "error"]
+- ["O14SwifterSockets6Result", "success"]
+- ["Ps8Sequence", "restore"]
+- ["Ps8Sequence", "serverShutdown"]
+- ["Ps8Sequence", "writeToLog"]
+- ["P14SwifterSockets14ServerProtocol", "init"]
+- ["P14SwifterSockets14ServerProtocol", "start"]
+- ["C9Swiftfire18ServerStartCommand", "deinit"]
+- ["C9Swiftfire18ServerStartCommand", "execute"]
+- ["C9Swiftfire18ServerStartCommand", "init"]
+- ["Ps10SetAlgebra", "Element"]
+- ["Ps13SignedInteger", "init"]
+- ["Ps12SignedNumber", "init"]
+- ["C9Swiftfire10Statistics", "deinit"]
+- ["C9Swiftfire10Statistics", "save"]
+- ["Ps10Strideable", "init"]
+- ["SS", "deinit"]
+- ["SS", "init"]
+- ["C10SwifterLog10SwifterLog", "Level"]
+- ["C10SwifterLog10SwifterLog", "NetworkTarget"]
+- ["C10SwifterLog10SwifterLog", "aslFacilityRecordAtAndAboveLevel"]
+- ["C10SwifterLog10SwifterLog", "atLevelEmergency"]
+- ["C10SwifterLog10SwifterLog", "atLevelNotice"]
+- ["C10SwifterLog10SwifterLog", "callbackAtAndAboveLevel"]
+- ["C10SwifterLog10SwifterLog", "connectToNetworkTarget"]
+- ["C10SwifterLog10SwifterLog", "deinit"]
+- ["C10SwifterLog10SwifterLog", "fileRecordAtAndAboveLevel"]
+- ["C10SwifterLog10SwifterLog", "logfileDirectoryPath"]
+- ["C10SwifterLog10SwifterLog", "logfileMaxNumberOfFiles"]
+- ["C10SwifterLog10SwifterLog", "logfileMaxSizeInBytes"]
+- ["C10SwifterLog10SwifterLog", "networkTransmitAtAndAboveLevel"]
+- ["C10SwifterLog10SwifterLog", "registerCallback"]
+- ["C10SwifterLog10SwifterLog", "stdoutPrintAtAndAboveLevel"]
+- !private ["P10SwifterLog26SwifterlogCallbackProtocol", "LogLine"]
+- !private ["P10SwifterLog26SwifterlogCallbackProtocol", "LogLineReply"]
+- ["P10SwifterLog26SwifterlogCallbackProtocol", "init"]
+- ["P10SwifterLog26SwifterlogCallbackProtocol", "logInfo"]
+- !private ["P10SwifterLog26SwifterlogCallbackProtocol", "mac"]
+- ["P10SwifterLog26SwifterlogCallbackProtocol", ""]
+- ["Ps16TextOutputStream", "init"]
+- ["Ps20TextOutputStreamable", "init"]
+- ["C14SwifterSockets9TipServer", "deinit"]
+- ["C14SwifterSockets9TipServer", "init"]
+- ["C14SwifterSockets9TipServer", "start"]
+- !private ["P14SwifterSockets19TransmitterProtocol", "transfer"]
+- ["Su", "deinit"]
+- ["Vs6UInt16", "deinit"]
+- ["Vs6UInt32", "deinit"]
+- ["Vs6UInt64", "deinit"]
+- ["Vs6UInt64", "init"]
+- ["Vs5UInt8", "deinit"]
+- ["V10Foundation3URL", "deinit"]
+- ["V10Foundation3URL", "path"]
+- ["Sc", "deinit"]
+- ["Ps15UnsignedInteger", "init"]
+- ["P11SwifterJSON19VJsonDeserializable", "execute"]
+- ["P11SwifterJSON19VJsonDeserializable", "init"]
+- ["P11SwifterJSON19VJsonDeserializable", "load"]
+- ["P11SwifterJSON19VJsonDeserializable", "save"]
+- ["P11SwifterJSON19VJsonDeserializable", "writeToLog"]
+- ["P11SwifterJSON17VJsonSerializable", "execute"]
+- ["P11SwifterJSON17VJsonSerializable", "init"]
+- ["P11SwifterJSON17VJsonSerializable", "load"]
+- ["P11SwifterJSON17VJsonSerializable", "save"]
+- ["P11SwifterJSON17VJsonSerializable", "writeToLog"]
+- ["Ps15_CVarArgAligned", "init"]
+- ["Ps28_DisallowMixedSignArithmetic", "init"]
+- ["Ps35_ExpressibleByBuiltinBooleanLiteral", "_getBuiltinLogicValue"]
+- ["Ps51_ExpressibleByBuiltinExtendedGraphemeClusterLiteral", "init"]
+- ["Ps35_ExpressibleByBuiltinIntegerLiteral", "init"]
+- ["Ps34_ExpressibleByBuiltinStringLiteral", "init"]
+- ["Ps39_ExpressibleByBuiltinUTF16StringLiteral", "init"]
+- ["Ps41_ExpressibleByBuiltinUnicodeScalarLiteral", "init"]
+- ["Ps34_ExpressibleByFileReferenceLiteral", "path"]
+- ["Ps35_HasCustomAnyHashableRepresentation", "init"]
+- ["Ps9_Hashable", "AutoreleaseFrequency"]
+- ["Ps9_Hashable", "_getBuiltinLogicValue"]
+- ["Ps9_Hashable", "debug"]
+- ["Ps9_Hashable", "default"]
+- ["Ps9_Hashable", "inherit"]
+- ["Ps9_Hashable", "init"]
+- ["Ps9_Hashable", "isReadableFile"]
+- ["Ps9_Hashable", "none"]
+- ["Ps9_Hashable", "notice"]
+- ["Ps9_Hashable", "path"]
+- ["Ps14_Incrementable", "init"]
+- ["Ps8_Integer", "init"]
+- ["Ps18_IntegerArithmetic", "init"]
+- ["Ps21_ObjectiveCBridgeable", "_getBuiltinLogicValue"]
+- ["Ps21_ObjectiveCBridgeable", "init"]
+- ["Ps21_ObjectiveCBridgeable", "path"]
+- ["Ps14_SignedInteger", "init"]
+- ["Ps11_Strideable", "init"]
+depends-nominal:
+- "Ps9AnyObject"
+- "VE8DispatchCSo13DispatchQueue10Attributes"
+- "OE8DispatchCSo13DispatchQueue20AutoreleaseFrequency"
+- "Ps17BitwiseOperations"
+- "C9Swiftfire9Blacklist"
+- "Sb"
+- "Ps7CVarArg"
+- "Vs9Character"
+- "Ps10Comparable"
+- !private "C14SwifterSockets10Connection"
+- "Ps28CustomDebugStringConvertible"
+- "Ps29CustomPlaygroundQuickLookable"
+- "Ps17CustomReflectable"
+- "Ps23CustomStringConvertible"
+- "V10Foundation4Date"
+- "CSo14DispatchObject"
+- "V8Dispatch11DispatchQoS"
+- "CSo13DispatchQueue"
+- "C9Swiftfire7Domains"
+- "Sd"
+- "Ps9Equatable"
+- "Ps25ExpressibleByArrayLiteral"
+- "Ps27ExpressibleByBooleanLiteral"
+- "Ps43ExpressibleByExtendedGraphemeClusterLiteral"
+- "Ps27ExpressibleByIntegerLiteral"
+- "Ps23ExpressibleByNilLiteral"
+- "Ps32ExpressibleByStringInterpolation"
+- "Ps26ExpressibleByStringLiteral"
+- "Ps33ExpressibleByUnicodeScalarLiteral"
+- "CSo11FileManager"
+- "C9Swiftfire8FileURLs"
+- "Sf"
+- "Ps8Hashable"
+- "C9Swiftfire10HttpHeader"
+- "Si"
+- "Vs5Int16"
+- "Vs5Int32"
+- "Vs5Int64"
+- "Vs4Int8"
+- "Ps7Integer"
+- "Ps17IntegerArithmetic"
+- "OC10SwifterLog10SwifterLog5Level"
+- "C9Swiftfire13LogForewarder"
+- "V10SwifterLog7LogLine"
+- "C9Swiftfire12LogLineReply"
+- "Ps25LosslessStringConvertible"
+- "P9Swiftfire10MacCommand"
+- "P9Swiftfire10MacMessage"
+- "Ps10MirrorPath"
+- "C9Swiftfire30MonitoringAndControlConnection"
+- "PSo8NSCoding"
+- "PSo9NSCopying"
+- "PSo16NSMutableCopying"
+- "CSo8NSObject"
+- "PSo16NSObjectProtocol"
+- "PSo19NSPasteboardReading"
+- "PSo19NSPasteboardWriting"
+- "PSo14NSSecureCoding"
+- "CSo8NSString"
+- "Os5Never"
+- "CSo9OS_object"
+- "OC14SwifterSockets9TipServer6Option"
+- "Ps9OptionSet"
+- "Sq"
+- "C9Swiftfire10Parameters"
+- "Ps16RawRepresentable"
+- !private "P14SwifterSockets16ReceiverProtocol"
+- "P10Foundation20ReferenceConvertible"
+- "O14SwifterSockets6Result"
+- "Ps8Sequence"
+- "P14SwifterSockets14ServerProtocol"
+- "C9Swiftfire18ServerStartCommand"
+- "Ps10SetAlgebra"
+- "Ps13SignedInteger"
+- "Ps12SignedNumber"
+- "C9Swiftfire10Statistics"
+- "Ps10Strideable"
+- "SS"
+- "C10SwifterLog10SwifterLog"
+- "P10SwifterLog26SwifterlogCallbackProtocol"
+- "Ps16TextOutputStream"
+- "Ps20TextOutputStreamable"
+- "C14SwifterSockets9TipServer"
+- !private "P14SwifterSockets19TransmitterProtocol"
+- "Su"
+- "Vs6UInt16"
+- "Vs6UInt32"
+- "Vs6UInt64"
+- "Vs5UInt8"
+- "V10Foundation3URL"
+- "Sc"
+- "Ps15UnsignedInteger"
+- "P11SwifterJSON19VJsonDeserializable"
+- "P11SwifterJSON17VJsonSerializable"
+- "Ps15_CVarArgAligned"
+- "Ps28_DisallowMixedSignArithmetic"
+- "Ps35_ExpressibleByBuiltinBooleanLiteral"
+- "Ps51_ExpressibleByBuiltinExtendedGraphemeClusterLiteral"
+- "Ps35_ExpressibleByBuiltinIntegerLiteral"
+- "Ps34_ExpressibleByBuiltinStringLiteral"
+- "Ps39_ExpressibleByBuiltinUTF16StringLiteral"
+- "Ps41_ExpressibleByBuiltinUnicodeScalarLiteral"
+- "Ps34_ExpressibleByFileReferenceLiteral"
+- "Ps35_HasCustomAnyHashableRepresentation"
+- "Ps9_Hashable"
+- "Ps14_Incrementable"
+- "Ps8_Integer"
+- "Ps18_IntegerArithmetic"
+- "Ps21_ObjectiveCBridgeable"
+- "Ps14_SignedInteger"
+- "Ps11_Strideable"
+depends-dynamic-lookup:
+depends-external:
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/Swift.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/SwiftOnoneSupport.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/Foundation.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/Darwin.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/Dispatch.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/ObjectiveC.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreGraphics.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/IOKit.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterLog.framework/Modules/SwifterLog.swiftmodule/x86_64.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/CAsl-0.1.0/Sources/include/CAsl.h"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/CAsl.framework/Modules/module.modulemap"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterJSON.framework/Modules/SwifterJSON.swiftmodule/x86_64.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/Ascii.framework/Modules/Ascii.swiftmodule/x86_64.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterSockets.framework/Modules/SwifterSockets.swiftmodule/x86_64.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/COpenSsl-0.1.0/module.modulemap"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/AppKit.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreData.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/QuartzCore.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/XPC.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreImage.swiftmodule"
+interface-hash: "2df9e984fff1c01b6b1be8c3b087217f"

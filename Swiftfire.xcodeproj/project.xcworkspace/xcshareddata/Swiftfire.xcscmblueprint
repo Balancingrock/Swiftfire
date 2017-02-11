@@ -4,41 +4,55 @@
 
   },
   "DVTSourceControlWorkspaceBlueprintWorkingCopyStatesKey" : {
-    "022A86DEEE661F9F16A60B17A9A92D02A7AEF71B" : 0,
-    "39D294A3A0619F7440CBCF677E29AAE955CC1617" : 0,
-    "5B20DC5A3688C85EB1A5785522EE90A45D6C6FB2" : 0,
-    "4112BE80E1590C6E997D243FD2B2107DD98EDD52" : 0
+    "022A86DEEE661F9F16A60B17A9A92D02A7AEF71B" : 9223372036854775807,
+    "14F0A7FA95A08688CE263586500388EDDF6AD709" : 9223372036854775807,
+    "5B20DC5A3688C85EB1A5785522EE90A45D6C6FB2" : 9223372036854775807,
+    "4112BE80E1590C6E997D243FD2B2107DD98EDD52" : 9223372036854775807,
+    "6610181D0EA22D8216C8D9C10BC89518F82EB63F" : 9223372036854775807,
+    "ACB900593AFBAA918E902BFC95EA466C9AFC1110" : 9223372036854775807
   },
-  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "C445D5E9-C2B7-459B-BD6E-A74D58AED0BB",
+  "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "9AB59C01-0CDC-4C24-BD80-592017D2A576",
   "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
     "022A86DEEE661F9F16A60B17A9A92D02A7AEF71B" : "Swiftfire\/",
-    "39D294A3A0619F7440CBCF677E29AAE955CC1617" : "..\/SwifterJSON\/SwifterJSON",
-    "5B20DC5A3688C85EB1A5785522EE90A45D6C6FB2" : "..\/SwifterSockets\/SwifterSockets",
-    "4112BE80E1590C6E997D243FD2B2107DD98EDD52" : "..\/SwifterLog\/SwifterLog"
+    "14F0A7FA95A08688CE263586500388EDDF6AD709" : "Swiftfire\/Packages\/Ascii-1.0.0\/",
+    "5B20DC5A3688C85EB1A5785522EE90A45D6C6FB2" : "Swiftfire\/Packages\/SwifterSockets-0.9.13\/",
+    "4112BE80E1590C6E997D243FD2B2107DD98EDD52" : "Swiftfire\/Packages\/SwifterLog-0.9.18\/",
+    "6610181D0EA22D8216C8D9C10BC89518F82EB63F" : "Swiftfire\/Packages\/CAsl-0.1.0\/",
+    "ACB900593AFBAA918E902BFC95EA466C9AFC1110" : "Swiftfire\/Packages\/SecureSockets-0.3.3\/"
   },
   "DVTSourceControlWorkspaceBlueprintNameKey" : "Swiftfire",
   "DVTSourceControlWorkspaceBlueprintVersion" : 204,
   "DVTSourceControlWorkspaceBlueprintRelativePathToProjectKey" : "Swiftfire.xcodeproj",
   "DVTSourceControlWorkspaceBlueprintRemoteRepositoriesKey" : [
     {
-      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/starbase56.local\/git\/Swiftfire.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/Swiftrien\/Swiftfire.git",
       "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
       "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "022A86DEEE661F9F16A60B17A9A92D02A7AEF71B"
     },
     {
-      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/starbase56.local\/git\/SwifterJSON.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/Balancingrock\/Ascii",
       "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
-      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "39D294A3A0619F7440CBCF677E29AAE955CC1617"
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "14F0A7FA95A08688CE263586500388EDDF6AD709"
     },
     {
-      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/starbase56.local\/git\/SwifterLog.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "\/Volumes\/Home\/Users\/Rien\/Documents\/Projects\/SwifterLog",
       "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
       "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "4112BE80E1590C6E997D243FD2B2107DD98EDD52"
     },
     {
-      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/starbase56.local\/git\/SwifterSockets.git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "\/Volumes\/Home\/Users\/Rien\/Documents\/Projects\/SwifterSockets",
       "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
       "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "5B20DC5A3688C85EB1A5785522EE90A45D6C6FB2"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "https:\/\/github.com\/Balancingrock\/CAsl",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "6610181D0EA22D8216C8D9C10BC89518F82EB63F"
+    },
+    {
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryURLKey" : "\/Volumes\/Home\/Users\/Rien\/Documents\/Projects\/SecureSockets",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositorySystemKey" : "com.apple.dt.Xcode.sourcecontrol.Git",
+      "DVTSourceControlWorkspaceBlueprintRemoteRepositoryIdentifierKey" : "ACB900593AFBAA918E902BFC95EA466C9AFC1110"
     }
   ]
 }

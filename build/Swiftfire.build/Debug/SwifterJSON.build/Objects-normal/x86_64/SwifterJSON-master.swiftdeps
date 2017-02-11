@@ -1,0 +1,5 @@
+version: "Apple Swift version 3.0.2 (swiftlang-800.0.63 clang-800.0.42.1)"
+options: "d5f0c9db1c89398cbf5a5724cbcbe3ec"
+build_time: [539978874, 115832000]
+inputs:
+  "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/SwifterJSON-0.9.16/Sources/VJson.swift": [539978676, 0]

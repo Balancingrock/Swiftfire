@@ -1,0 +1,3 @@
+framework module Ascii {
+    header "Ascii-Swift.h"
+}

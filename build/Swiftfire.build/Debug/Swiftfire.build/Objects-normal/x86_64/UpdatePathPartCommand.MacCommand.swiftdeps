@@ -1,0 +1,260 @@
+### Swift dependencies file v0 ###
+provides-top-level:
+provides-nominal:
+- "C9Swiftfire21UpdatePathPartCommand"
+provides-member:
+- ["C9Swiftfire21UpdatePathPartCommand", ""]
+provides-dynamic-lookup:
+depends-top-level:
+- "AssignmentPrecedence"
+- !private "log"
+- !private "IntegerLiteralType"
+- !private "mac"
+- "VJson"
+- !private "ReadStatisticsReply"
+- !private "Mutation"
+- "UpdatePathPartCommand"
+- !private "statistics"
+- "MacCommand"
+- !private "StringLiteralType"
+depends-member:
+- !private ["Ps9AnyObject", "Mutation"]
+- !private ["Ps9AnyObject", "ReadStatisticsReply"]
+- !private ["Ps9AnyObject", "UpdatePathPartCommand"]
+- !private ["Ps9AnyObject", "atLevelDebug"]
+- !private ["Ps9AnyObject", "createUpdatePathPart"]
+- !private ["Ps9AnyObject", "doNotTrace"]
+- ["Ps9AnyObject", "execute"]
+- ["Ps9AnyObject", "factory"]
+- !private ["Ps9AnyObject", "init"]
+- !private ["Ps9AnyObject", "json"]
+- !private ["Ps9AnyObject", "log"]
+- !private ["Ps9AnyObject", "mac"]
+- !private ["Ps9AnyObject", "newValue"]
+- !private ["Ps9AnyObject", "source"]
+- !private ["Ps9AnyObject", "statistics"]
+- !private ["Ps9AnyObject", "submit"]
+- !private ["Ps9AnyObject", "transfer"]
+- !private ["Ps9AnyObject", "url"]
+- !private ["Ps7CVarArg", "init"]
+- !private ["Ps7CVarArg", "source"]
+- !private ["Ps10Comparable", "init"]
+- !private ["Ps10Comparable", "source"]
+- !private ["C14SwifterSockets10Connection", "transfer"]
+- !private ["Ps28CustomDebugStringConvertible", "init"]
+- !private ["Ps28CustomDebugStringConvertible", "source"]
+- !private ["Ps29CustomPlaygroundQuickLookable", "init"]
+- !private ["Ps29CustomPlaygroundQuickLookable", "source"]
+- !private ["Ps17CustomReflectable", "init"]
+- !private ["Ps17CustomReflectable", "source"]
+- !private ["Ps23CustomStringConvertible", "init"]
+- !private ["Ps23CustomStringConvertible", "source"]
+- !private ["Ps9Equatable", "init"]
+- !private ["Ps9Equatable", "source"]
+- !private ["Ps43ExpressibleByExtendedGraphemeClusterLiteral", "init"]
+- !private ["Ps43ExpressibleByExtendedGraphemeClusterLiteral", "source"]
+- !private ["Ps32ExpressibleByStringInterpolation", "init"]
+- !private ["Ps32ExpressibleByStringInterpolation", "source"]
+- !private ["Ps26ExpressibleByStringLiteral", "init"]
+- !private ["Ps26ExpressibleByStringLiteral", "source"]
+- !private ["Ps33ExpressibleByUnicodeScalarLiteral", "init"]
+- !private ["Ps33ExpressibleByUnicodeScalarLiteral", "source"]
+- !private ["Ps8Hashable", "init"]
+- !private ["Ps8Hashable", "source"]
+- ["Si", "deinit"]
+- ["Vs5Int32", "deinit"]
+- !private ["Ps25LosslessStringConvertible", "init"]
+- !private ["Ps25LosslessStringConvertible", "source"]
+- !private ["P9Swiftfire10MacCommand", "Mutation"]
+- !private ["P9Swiftfire10MacCommand", "ReadStatisticsReply"]
+- !private ["P9Swiftfire10MacCommand", "UpdatePathPartCommand"]
+- ["P9Swiftfire10MacCommand", "execute"]
+- ["P9Swiftfire10MacCommand", "factory"]
+- !private ["P9Swiftfire10MacCommand", "init"]
+- !private ["P9Swiftfire10MacCommand", "log"]
+- !private ["P9Swiftfire10MacCommand", "mac"]
+- !private ["P9Swiftfire10MacCommand", "newValue"]
+- !private ["P9Swiftfire10MacCommand", "statistics"]
+- !private ["P9Swiftfire10MacCommand", "url"]
+- ["P9Swiftfire10MacCommand", ""]
+- !private ["P9Swiftfire10MacMessage", "Mutation"]
+- !private ["P9Swiftfire10MacMessage", "ReadStatisticsReply"]
+- !private ["P9Swiftfire10MacMessage", "UpdatePathPartCommand"]
+- ["P9Swiftfire10MacMessage", "execute"]
+- ["P9Swiftfire10MacMessage", "factory"]
+- !private ["P9Swiftfire10MacMessage", "init"]
+- !private ["P9Swiftfire10MacMessage", "log"]
+- !private ["P9Swiftfire10MacMessage", "mac"]
+- !private ["P9Swiftfire10MacMessage", "newValue"]
+- !private ["P9Swiftfire10MacMessage", "statistics"]
+- !private ["P9Swiftfire10MacMessage", "url"]
+- !private ["Ps10MirrorPath", "init"]
+- !private ["Ps10MirrorPath", "source"]
+- !private ["C9Swiftfire30MonitoringAndControlConnection", "transfer"]
+- !private ["C9Swiftfire8Mutation", "createUpdatePathPart"]
+- ["C9Swiftfire8Mutation", "deinit"]
+- !private ["C9Swiftfire8Mutation", "doNotTrace"]
+- !private ["C9Swiftfire8Mutation", "url"]
+- !private ["PSo8NSCoding", "init"]
+- !private ["PSo8NSCoding", "source"]
+- !private ["PSo9NSCopying", "init"]
+- !private ["PSo9NSCopying", "source"]
+- !private ["PSo16NSMutableCopying", "init"]
+- !private ["PSo16NSMutableCopying", "source"]
+- !private ["CSo8NSObject", "init"]
+- !private ["CSo8NSObject", "source"]
+- !private ["PSo16NSObjectProtocol", "init"]
+- !private ["PSo16NSObjectProtocol", "source"]
+- !private ["PSo19NSPasteboardReading", "init"]
+- !private ["PSo19NSPasteboardReading", "source"]
+- !private ["PSo19NSPasteboardWriting", "init"]
+- !private ["PSo19NSPasteboardWriting", "source"]
+- !private ["PSo14NSSecureCoding", "init"]
+- !private ["PSo14NSSecureCoding", "source"]
+- !private ["CSo8NSString", "init"]
+- !private ["CSo8NSString", "source"]
+- ["Sq", "deinit"]
+- !private ["C9Swiftfire19ReadStatisticsReply", "deinit"]
+- !private ["C9Swiftfire19ReadStatisticsReply", "init"]
+- !private ["P14SwifterSockets16ReceiverProtocol", "transfer"]
+- ["C9Swiftfire10Statistics", "deinit"]
+- !private ["C9Swiftfire10Statistics", "json"]
+- !private ["C9Swiftfire10Statistics", "submit"]
+- ["SS", "deinit"]
+- !private ["SS", "init"]
+- !private ["SS", "source"]
+- !private ["C10SwifterLog10SwifterLog", "atLevelDebug"]
+- ["C10SwifterLog10SwifterLog", "deinit"]
+- !private ["Ps16TextOutputStream", "init"]
+- !private ["Ps16TextOutputStream", "source"]
+- !private ["Ps20TextOutputStreamable", "init"]
+- !private ["Ps20TextOutputStreamable", "source"]
+- !private ["P14SwifterSockets19TransmitterProtocol", "transfer"]
+- ["C9Swiftfire21UpdatePathPartCommand", "MacCommand"]
+- !private ["C9Swiftfire21UpdatePathPartCommand", "Mutation"]
+- !private ["C9Swiftfire21UpdatePathPartCommand", "ReadStatisticsReply"]
+- !private ["C9Swiftfire21UpdatePathPartCommand", "UpdatePathPartCommand"]
+- ["C9Swiftfire21UpdatePathPartCommand", "VJson"]
+- ["C9Swiftfire21UpdatePathPartCommand", "deinit"]
+- ["C9Swiftfire21UpdatePathPartCommand", "execute"]
+- ["C9Swiftfire21UpdatePathPartCommand", "factory"]
+- !private ["C9Swiftfire21UpdatePathPartCommand", "init"]
+- !private ["C9Swiftfire21UpdatePathPartCommand", "log"]
+- !private ["C9Swiftfire21UpdatePathPartCommand", "mac"]
+- !private ["C9Swiftfire21UpdatePathPartCommand", "newValue"]
+- !private ["C9Swiftfire21UpdatePathPartCommand", "statistics"]
+- !private ["C9Swiftfire21UpdatePathPartCommand", "url"]
+- !private ["C11SwifterJSON5VJson", "deinit"]
+- !private ["P11SwifterJSON19VJsonDeserializable", "Mutation"]
+- !private ["P11SwifterJSON19VJsonDeserializable", "ReadStatisticsReply"]
+- !private ["P11SwifterJSON19VJsonDeserializable", "UpdatePathPartCommand"]
+- ["P11SwifterJSON19VJsonDeserializable", "execute"]
+- ["P11SwifterJSON19VJsonDeserializable", "factory"]
+- !private ["P11SwifterJSON19VJsonDeserializable", "init"]
+- !private ["P11SwifterJSON19VJsonDeserializable", "log"]
+- !private ["P11SwifterJSON19VJsonDeserializable", "mac"]
+- !private ["P11SwifterJSON19VJsonDeserializable", "newValue"]
+- !private ["P11SwifterJSON19VJsonDeserializable", "statistics"]
+- !private ["P11SwifterJSON19VJsonDeserializable", "url"]
+- !private ["P11SwifterJSON17VJsonSerializable", "Mutation"]
+- !private ["P11SwifterJSON17VJsonSerializable", "ReadStatisticsReply"]
+- !private ["P11SwifterJSON17VJsonSerializable", "UpdatePathPartCommand"]
+- ["P11SwifterJSON17VJsonSerializable", "execute"]
+- ["P11SwifterJSON17VJsonSerializable", "factory"]
+- !private ["P11SwifterJSON17VJsonSerializable", "init"]
+- !private ["P11SwifterJSON17VJsonSerializable", "json"]
+- !private ["P11SwifterJSON17VJsonSerializable", "log"]
+- !private ["P11SwifterJSON17VJsonSerializable", "mac"]
+- !private ["P11SwifterJSON17VJsonSerializable", "newValue"]
+- !private ["P11SwifterJSON17VJsonSerializable", "statistics"]
+- !private ["P11SwifterJSON17VJsonSerializable", "submit"]
+- !private ["P11SwifterJSON17VJsonSerializable", "url"]
+- !private ["Ps51_ExpressibleByBuiltinExtendedGraphemeClusterLiteral", "init"]
+- !private ["Ps51_ExpressibleByBuiltinExtendedGraphemeClusterLiteral", "source"]
+- !private ["Ps34_ExpressibleByBuiltinStringLiteral", "init"]
+- !private ["Ps34_ExpressibleByBuiltinStringLiteral", "source"]
+- !private ["Ps39_ExpressibleByBuiltinUTF16StringLiteral", "init"]
+- !private ["Ps39_ExpressibleByBuiltinUTF16StringLiteral", "source"]
+- !private ["Ps41_ExpressibleByBuiltinUnicodeScalarLiteral", "init"]
+- !private ["Ps41_ExpressibleByBuiltinUnicodeScalarLiteral", "source"]
+- !private ["Ps35_HasCustomAnyHashableRepresentation", "init"]
+- !private ["Ps35_HasCustomAnyHashableRepresentation", "source"]
+- !private ["Ps9_Hashable", "init"]
+- !private ["Ps9_Hashable", "source"]
+- !private ["Ps21_ObjectiveCBridgeable", "init"]
+- !private ["Ps21_ObjectiveCBridgeable", "source"]
+depends-nominal:
+- "Ps9AnyObject"
+- !private "Ps7CVarArg"
+- !private "Ps10Comparable"
+- !private "C14SwifterSockets10Connection"
+- !private "Ps28CustomDebugStringConvertible"
+- !private "Ps29CustomPlaygroundQuickLookable"
+- !private "Ps17CustomReflectable"
+- !private "Ps23CustomStringConvertible"
+- !private "Ps9Equatable"
+- !private "Ps43ExpressibleByExtendedGraphemeClusterLiteral"
+- !private "Ps32ExpressibleByStringInterpolation"
+- !private "Ps26ExpressibleByStringLiteral"
+- !private "Ps33ExpressibleByUnicodeScalarLiteral"
+- !private "Ps8Hashable"
+- "Si"
+- "Vs5Int32"
+- !private "Ps25LosslessStringConvertible"
+- "P9Swiftfire10MacCommand"
+- "P9Swiftfire10MacMessage"
+- !private "Ps10MirrorPath"
+- !private "C9Swiftfire30MonitoringAndControlConnection"
+- "C9Swiftfire8Mutation"
+- !private "PSo8NSCoding"
+- !private "PSo9NSCopying"
+- !private "PSo16NSMutableCopying"
+- !private "CSo8NSObject"
+- !private "PSo16NSObjectProtocol"
+- !private "PSo19NSPasteboardReading"
+- !private "PSo19NSPasteboardWriting"
+- !private "PSo14NSSecureCoding"
+- !private "CSo8NSString"
+- "Sq"
+- !private "C9Swiftfire19ReadStatisticsReply"
+- !private "P14SwifterSockets16ReceiverProtocol"
+- "C9Swiftfire10Statistics"
+- "SS"
+- "C10SwifterLog10SwifterLog"
+- !private "Ps16TextOutputStream"
+- !private "Ps20TextOutputStreamable"
+- !private "P14SwifterSockets19TransmitterProtocol"
+- "C9Swiftfire21UpdatePathPartCommand"
+- !private "C11SwifterJSON5VJson"
+- "P11SwifterJSON19VJsonDeserializable"
+- "P11SwifterJSON17VJsonSerializable"
+- !private "Ps51_ExpressibleByBuiltinExtendedGraphemeClusterLiteral"
+- !private "Ps34_ExpressibleByBuiltinStringLiteral"
+- !private "Ps39_ExpressibleByBuiltinUTF16StringLiteral"
+- !private "Ps41_ExpressibleByBuiltinUnicodeScalarLiteral"
+- !private "Ps35_HasCustomAnyHashableRepresentation"
+- !private "Ps9_Hashable"
+- !private "Ps21_ObjectiveCBridgeable"
+depends-dynamic-lookup:
+depends-external:
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/Swift.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/SwiftOnoneSupport.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/Foundation.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/Darwin.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/Dispatch.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/ObjectiveC.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreGraphics.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/IOKit.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterLog.framework/Modules/SwifterLog.swiftmodule/x86_64.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/CAsl-0.1.0/Sources/include/CAsl.h"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/CAsl.framework/Modules/module.modulemap"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterJSON.framework/Modules/SwifterJSON.swiftmodule/x86_64.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/Ascii.framework/Modules/Ascii.swiftmodule/x86_64.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterSockets.framework/Modules/SwifterSockets.swiftmodule/x86_64.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/COpenSsl-0.1.0/module.modulemap"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/AppKit.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreData.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/QuartzCore.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/XPC.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreImage.swiftmodule"
+interface-hash: "0eb1b0ab42ce9b6c9c321bfc3046a2ad"
