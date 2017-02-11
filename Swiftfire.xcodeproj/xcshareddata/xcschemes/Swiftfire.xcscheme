@@ -14,7 +14,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "OBJ_144"
+               BlueprintIdentifier = "OBJ_156"
                BuildableName = "SwifterSockets.framework"
                BlueprintName = "SwifterSockets"
                ReferencedContainer = "container:Swiftfire.xcodeproj">
@@ -28,7 +28,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "OBJ_157"
+               BlueprintIdentifier = "OBJ_169"
                BuildableName = "SecureSockets.framework"
                BlueprintName = "SecureSockets"
                ReferencedContainer = "container:Swiftfire.xcodeproj">
@@ -42,7 +42,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "OBJ_175"
+               BlueprintIdentifier = "OBJ_187"
                BuildableName = "CAsl.framework"
                BlueprintName = "CAsl"
                ReferencedContainer = "container:Swiftfire.xcodeproj">
@@ -56,7 +56,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "OBJ_183"
+               BlueprintIdentifier = "OBJ_195"
                BuildableName = "Ascii.framework"
                BlueprintName = "Ascii"
                ReferencedContainer = "container:Swiftfire.xcodeproj">
@@ -70,7 +70,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "OBJ_190"
+               BlueprintIdentifier = "OBJ_202"
                BuildableName = "SwifterJSON.framework"
                BlueprintName = "SwifterJSON"
                ReferencedContainer = "container:Swiftfire.xcodeproj">
@@ -84,7 +84,7 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "OBJ_199"
+               BlueprintIdentifier = "OBJ_211"
                BuildableName = "SwifterLog.framework"
                BlueprintName = "SwifterLog"
                ReferencedContainer = "container:Swiftfire.xcodeproj">
@@ -98,7 +98,21 @@
             buildForAnalyzing = "YES">
             <BuildableReference
                BuildableIdentifier = "primary"
-               BlueprintIdentifier = "OBJ_215"
+               BlueprintIdentifier = "OBJ_227"
+               BuildableName = "SwiftfireCore.framework"
+               BlueprintName = "SwiftfireCore"
+               ReferencedContainer = "container:Swiftfire.xcodeproj">
+            </BuildableReference>
+         </BuildActionEntry>
+         <BuildActionEntry
+            buildForTesting = "YES"
+            buildForRunning = "YES"
+            buildForProfiling = "YES"
+            buildForArchiving = "YES"
+            buildForAnalyzing = "YES">
+            <BuildableReference
+               BuildableIdentifier = "primary"
+               BlueprintIdentifier = "OBJ_253"
                BuildableName = "Swiftfire"
                BlueprintName = "Swiftfire"
                ReferencedContainer = "container:Swiftfire.xcodeproj">
@@ -129,7 +143,7 @@
       <MacroExpansion>
          <BuildableReference
             BuildableIdentifier = "primary"
-            BlueprintIdentifier = "OBJ_144"
+            BlueprintIdentifier = "OBJ_156"
             BuildableName = "SwifterSockets.framework"
             BlueprintName = "SwifterSockets"
             ReferencedContainer = "container:Swiftfire.xcodeproj">

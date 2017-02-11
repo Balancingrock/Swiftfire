@@ -68,6 +68,7 @@
 import Foundation
 import SwifterLog
 import SwifterSockets
+import SwiftfireCore
 
 
 // Every thread that runs for more than a few milliseconds should poll this variable and terminate itself when it finds that this flag is 'true'.

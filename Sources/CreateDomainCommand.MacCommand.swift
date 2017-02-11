@@ -56,6 +56,7 @@
 import Foundation
 import SwifterJSON
 import SwifterLog
+import SwiftfireCore
 
 
 extension CreateDomainCommand: MacCommand {

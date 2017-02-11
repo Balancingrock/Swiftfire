@@ -1,0 +1,5 @@
+module CAsl {
+    umbrella header "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/CAsl-0.1.0/Sources/include/CAsl.h"
+    link "CAsl"
+    export *
+}

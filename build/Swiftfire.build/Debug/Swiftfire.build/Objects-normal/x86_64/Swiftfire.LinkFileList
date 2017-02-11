@@ -1,5 +1,3 @@
-/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Swiftfire.build/Debug/Swiftfire.build/Objects-normal/x86_64/AccessLog.o
-/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Swiftfire.build/Debug/Swiftfire.build/Objects-normal/x86_64/Blacklist.o
 /Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Swiftfire.build/Debug/Swiftfire.build/Objects-normal/x86_64/ClosingMacConnection.o
 /Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Swiftfire.build/Debug/Swiftfire.build/Objects-normal/x86_64/CreateDomainCommand.MacCommand.o
 /Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Swiftfire.build/Debug/Swiftfire.build/Objects-normal/x86_64/CreateDomainCommand.o
@@ -7,16 +5,10 @@
 /Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Swiftfire.build/Debug/Swiftfire.build/Objects-normal/x86_64/DeltaCommand.o
 /Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Swiftfire.build/Debug/Swiftfire.build/Objects-normal/x86_64/Domain.DefaultErrorReplies.o
 /Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Swiftfire.build/Debug/Swiftfire.build/Objects-normal/x86_64/Domain.HttpWorker.o
-/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Swiftfire.build/Debug/Swiftfire.build/Objects-normal/x86_64/Domain.o
-/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Swiftfire.build/Debug/Swiftfire.build/Objects-normal/x86_64/Domains.o
-/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Swiftfire.build/Debug/Swiftfire.build/Objects-normal/x86_64/DomainTelemetry.o
-/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Swiftfire.build/Debug/Swiftfire.build/Objects-normal/x86_64/Extensions.o
 /Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Swiftfire.build/Debug/Swiftfire.build/Objects-normal/x86_64/FileURLs.o
 /Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Swiftfire.build/Debug/Swiftfire.build/Objects-normal/x86_64/Forwarder.o
-/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Swiftfire.build/Debug/Swiftfire.build/Objects-normal/x86_64/Four04Log.o
 /Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Swiftfire.build/Debug/Swiftfire.build/Objects-normal/x86_64/FunctionResult.o
 /Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Swiftfire.build/Debug/Swiftfire.build/Objects-normal/x86_64/GenericHelpers.o
-/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Swiftfire.build/Debug/Swiftfire.build/Objects-normal/x86_64/Host.o
 /Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Swiftfire.build/Debug/Swiftfire.build/Objects-normal/x86_64/HttpConnection.o
 /Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Swiftfire.build/Debug/Swiftfire.build/Objects-normal/x86_64/HttpConnection.Worker.o
 /Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Swiftfire.build/Debug/Swiftfire.build/Objects-normal/x86_64/HttpConnectionPool.o
@@ -24,7 +16,6 @@
 /Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Swiftfire.build/Debug/Swiftfire.build/Objects-normal/x86_64/HttpResponse.o
 /Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Swiftfire.build/Debug/Swiftfire.build/Objects-normal/x86_64/HttpResponseCodes.o
 /Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Swiftfire.build/Debug/Swiftfire.build/Objects-normal/x86_64/HttpServerHandlers.o
-/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Swiftfire.build/Debug/Swiftfire.build/Objects-normal/x86_64/Logfile.o
 /Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Swiftfire.build/Debug/Swiftfire.build/Objects-normal/x86_64/LogLineMessage.o
 /Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Swiftfire.build/Debug/Swiftfire.build/Objects-normal/x86_64/MacMessage.o
 /Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Swiftfire.build/Debug/Swiftfire.build/Objects-normal/x86_64/main.o
@@ -89,6 +80,5 @@
 /Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Swiftfire.build/Debug/Swiftfire.build/Objects-normal/x86_64/UpdateDomainCommand.o
 /Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Swiftfire.build/Debug/Swiftfire.build/Objects-normal/x86_64/UpdatePathPartCommand.MacCommand.o
 /Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Swiftfire.build/Debug/Swiftfire.build/Objects-normal/x86_64/UpdatePathPartCommand.o
-/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Swiftfire.build/Debug/Swiftfire.build/Objects-normal/x86_64/WallclockTime.o
 /Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Swiftfire.build/Debug/Swiftfire.build/Objects-normal/x86_64/WriteServerParameterCommand.MacCommand.o
 /Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Swiftfire.build/Debug/Swiftfire.build/Objects-normal/x86_64/WriteServerParameterCommand.o

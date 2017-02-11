@@ -55,6 +55,7 @@
 
 
 import Foundation
+import SwiftfireCore
 
 
 extension Domain {
