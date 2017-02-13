@@ -7,17 +7,17 @@ provides-member:
 - ["C9Swiftfire16ReadDomainsReply", ""]
 provides-dynamic-lookup:
 depends-top-level:
-- "ReadDomainsReply"
-- !private "REPLY_NAME"
-- !private "!="
 - "Domains"
+- !private "!="
 - "AssignmentPrecedence"
 - "MacMessage"
-- !private "Domain"
-- !private "|"
-- "VJson"
 - !private "DOMAINS"
+- !private "Domain"
+- "VJson"
+- "ReadDomainsReply"
 - "StringLiteralType"
+- !private "|"
+- !private "REPLY_NAME"
 depends-member:
 - !private ["Ps9AnyObject", "DOMAINS"]
 - !private ["Ps9AnyObject", "Domain"]
@@ -47,15 +47,14 @@ depends-member:
 - ["Ps23CustomStringConvertible", "init"]
 - !private ["Ps23CustomStringConvertible", "json"]
 - !private ["Ps23CustomStringConvertible", "subscript"]
-- ["C9Swiftfire6Domain", "deinit"]
-- !private ["C9Swiftfire6Domain", "init"]
-- !private ["C9Swiftfire6Domain", "json"]
-- !private ["VC9Swiftfire7Domains15DomainGenerator", "Element"]
-- !private ["VC9Swiftfire7Domains15DomainGenerator", "deinit"]
-- !private ["C9Swiftfire7Domains", "Iterator"]
-- !private ["C9Swiftfire7Domains", "add"]
-- ["C9Swiftfire7Domains", "deinit"]
-- !private ["C9Swiftfire7Domains", "init"]
+- ["C13SwiftfireCore6Domain", "deinit"]
+- !private ["C13SwiftfireCore6Domain", "init"]
+- !private ["C13SwiftfireCore6Domain", "json"]
+- !private ["VC13SwiftfireCore7Domains15DomainGenerator", "Element"]
+- !private ["C13SwiftfireCore7Domains", "Iterator"]
+- !private ["C13SwiftfireCore7Domains", "add"]
+- ["C13SwiftfireCore7Domains", "deinit"]
+- !private ["C13SwiftfireCore7Domains", "init"]
 - !private ["Ps9Equatable", "Iterator"]
 - !private ["Ps9Equatable", "_getBuiltinLogicValue"]
 - !private ["Ps9Equatable", "append"]
@@ -156,9 +155,9 @@ depends-nominal:
 - "Ps29CustomPlaygroundQuickLookable"
 - "Ps17CustomReflectable"
 - "Ps23CustomStringConvertible"
-- "C9Swiftfire6Domain"
-- !private "VC9Swiftfire7Domains15DomainGenerator"
-- "C9Swiftfire7Domains"
+- "C13SwiftfireCore6Domain"
+- !private "VC13SwiftfireCore7Domains15DomainGenerator"
+- "C13SwiftfireCore7Domains"
 - "Ps9Equatable"
 - !private "Ps27ExpressibleByBooleanLiteral"
 - "Ps43ExpressibleByExtendedGraphemeClusterLiteral"
@@ -209,16 +208,17 @@ depends-external:
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/ObjectiveC.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreGraphics.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/IOKit.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterJSON.framework/Modules/SwifterJSON.swiftmodule/x86_64.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/Ascii.framework/Modules/Ascii.swiftmodule/x86_64.swiftmodule"
 - "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterLog.framework/Modules/SwifterLog.swiftmodule/x86_64.swiftmodule"
 - "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/CAsl-0.1.0/Sources/include/CAsl.h"
 - "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/CAsl.framework/Modules/module.modulemap"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterJSON.framework/Modules/SwifterJSON.swiftmodule/x86_64.swiftmodule"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/Ascii.framework/Modules/Ascii.swiftmodule/x86_64.swiftmodule"
 - "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterSockets.framework/Modules/SwifterSockets.swiftmodule/x86_64.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwiftfireCore.framework/Modules/SwiftfireCore.swiftmodule/x86_64.swiftmodule"
 - "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/COpenSsl-0.1.0/module.modulemap"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/AppKit.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreData.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/QuartzCore.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/XPC.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreImage.swiftmodule"
-interface-hash: "a19d6008a6f152fb48a4eb9311dcbe6e"
+interface-hash: "0d1d3f60f74941cd9011a6debc28153c"

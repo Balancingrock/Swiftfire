@@ -7,13 +7,13 @@ provides-member:
 provides-dynamic-lookup:
 depends-top-level:
 - !private "log"
-- !private "SwifterLog"
-- !private "IntegerLiteralType"
-- "VJson"
-- !private "domains"
-- "RestoreDomainsCommand"
 - "MacCommand"
 - !private "StringLiteralType"
+- "RestoreDomainsCommand"
+- !private "domains"
+- !private "IntegerLiteralType"
+- !private "SwifterLog"
+- "VJson"
 depends-member:
 - !private ["Ps9AnyObject", "Level"]
 - !private ["Ps9AnyObject", "RestoreDomainsCommand"]
@@ -27,7 +27,6 @@ depends-member:
 - !private ["Ps9AnyObject", "restore"]
 - !private ["Ps9AnyObject", "source"]
 - !private ["Ps9AnyObject", "writeToLog"]
-- ["Sb", "deinit"]
 - !private ["Ps7CVarArg", "init"]
 - !private ["Ps7CVarArg", "source"]
 - !private ["Ps10Comparable", "init"]
@@ -41,9 +40,9 @@ depends-member:
 - !private ["Ps23CustomStringConvertible", "init"]
 - !private ["Ps23CustomStringConvertible", "notice"]
 - !private ["Ps23CustomStringConvertible", "source"]
-- ["C9Swiftfire7Domains", "deinit"]
-- !private ["C9Swiftfire7Domains", "restore"]
-- !private ["C9Swiftfire7Domains", "writeToLog"]
+- ["C13SwiftfireCore7Domains", "deinit"]
+- !private ["C13SwiftfireCore7Domains", "restore"]
+- !private ["C13SwiftfireCore7Domains", "writeToLog"]
 - !private ["Ps9Equatable", "init"]
 - !private ["Ps9Equatable", "notice"]
 - !private ["Ps9Equatable", "source"]
@@ -154,14 +153,13 @@ depends-member:
 - !private ["Ps21_ObjectiveCBridgeable", "source"]
 depends-nominal:
 - "Ps9AnyObject"
-- "Sb"
 - !private "Ps7CVarArg"
 - !private "Ps10Comparable"
 - !private "Ps28CustomDebugStringConvertible"
 - !private "Ps29CustomPlaygroundQuickLookable"
 - !private "Ps17CustomReflectable"
 - !private "Ps23CustomStringConvertible"
-- "C9Swiftfire7Domains"
+- "C13SwiftfireCore7Domains"
 - !private "Ps9Equatable"
 - !private "Ps43ExpressibleByExtendedGraphemeClusterLiteral"
 - !private "Ps32ExpressibleByStringInterpolation"
@@ -211,16 +209,17 @@ depends-external:
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/ObjectiveC.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreGraphics.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/IOKit.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterJSON.framework/Modules/SwifterJSON.swiftmodule/x86_64.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/Ascii.framework/Modules/Ascii.swiftmodule/x86_64.swiftmodule"
 - "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterLog.framework/Modules/SwifterLog.swiftmodule/x86_64.swiftmodule"
 - "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/CAsl-0.1.0/Sources/include/CAsl.h"
 - "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/CAsl.framework/Modules/module.modulemap"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterJSON.framework/Modules/SwifterJSON.swiftmodule/x86_64.swiftmodule"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/Ascii.framework/Modules/Ascii.swiftmodule/x86_64.swiftmodule"
 - "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterSockets.framework/Modules/SwifterSockets.swiftmodule/x86_64.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwiftfireCore.framework/Modules/SwiftfireCore.swiftmodule/x86_64.swiftmodule"
 - "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/COpenSsl-0.1.0/module.modulemap"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/AppKit.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreData.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/QuartzCore.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/XPC.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreImage.swiftmodule"
-interface-hash: "5dc89cd55367e7e11d97339f44b8d187"
+interface-hash: "64cf8bb0e3583ef2de3eed015bf664b9"

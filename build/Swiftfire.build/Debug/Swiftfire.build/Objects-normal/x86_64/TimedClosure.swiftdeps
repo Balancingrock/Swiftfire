@@ -8,26 +8,26 @@ provides-member:
 - ["C9Swiftfire12TimedClosure", ""]
 provides-dynamic-lookup:
 depends-top-level:
-- "DispatchQueue"
-- !private "<"
-- "Calendar"
-- !private "NSEC_PER_SEC"
-- "Date"
 - !private "!"
+- "DispatchQueue"
+- !private "Double"
+- !private "+"
+- "TimeInterval"
+- "WallclockTime"
+- "Calendar"
+- !private "DispatchTime"
+- !private "CastingPrecedence"
 - "AssignmentPrecedence"
 - !private "log"
-- !private "CastingPrecedence"
-- "WallclockTime"
+- "TimedClosure"
+- !private "StringLiteralType"
+- !private "<"
+- !private "*"
+- !private "NSEC_PER_SEC"
 - "NoParametersNoReturn"
-- !private "Double"
-- "TimeInterval"
-- !private "DispatchTime"
+- "Date"
 - "Bool"
 - "BooleanLiteralType"
-- "TimedClosure"
-- !private "+"
-- !private "*"
-- !private "StringLiteralType"
 depends-member:
 - !private ["Ps16AbsoluteValuable", "init"]
 - ["Ps9AnyObject", "Calendar"]
@@ -232,7 +232,7 @@ depends-member:
 - !private ["Vs5UInt8", "deinit"]
 - !private ["Sc", "deinit"]
 - !private ["VCSo10NSCalendar4Unit", "day"]
-- ["V9Swiftfire13WallclockTime", "deinit"]
+- ["V13SwiftfireCore13WallclockTime", "deinit"]
 - !private ["Ps15_CVarArgAligned", "init"]
 - !private ["Ps22_CVarArgPassedAsDouble", "init"]
 - !private ["Ps35_ExpressibleByBuiltinBooleanLiteral", "_getBuiltinLogicValue"]
@@ -337,7 +337,7 @@ depends-nominal:
 - !private "Vs5UInt8"
 - !private "Sc"
 - !private "VCSo10NSCalendar4Unit"
-- "V9Swiftfire13WallclockTime"
+- "V13SwiftfireCore13WallclockTime"
 - !private "Ps15_CVarArgAligned"
 - !private "Ps22_CVarArgPassedAsDouble"
 - !private "Ps35_ExpressibleByBuiltinBooleanLiteral"
@@ -362,16 +362,17 @@ depends-external:
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/ObjectiveC.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreGraphics.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/IOKit.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterJSON.framework/Modules/SwifterJSON.swiftmodule/x86_64.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/Ascii.framework/Modules/Ascii.swiftmodule/x86_64.swiftmodule"
 - "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterLog.framework/Modules/SwifterLog.swiftmodule/x86_64.swiftmodule"
 - "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/CAsl-0.1.0/Sources/include/CAsl.h"
 - "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/CAsl.framework/Modules/module.modulemap"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterJSON.framework/Modules/SwifterJSON.swiftmodule/x86_64.swiftmodule"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/Ascii.framework/Modules/Ascii.swiftmodule/x86_64.swiftmodule"
 - "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterSockets.framework/Modules/SwifterSockets.swiftmodule/x86_64.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwiftfireCore.framework/Modules/SwiftfireCore.swiftmodule/x86_64.swiftmodule"
 - "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/COpenSsl-0.1.0/module.modulemap"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/AppKit.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreData.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/QuartzCore.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/XPC.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreImage.swiftmodule"
-interface-hash: "07252ebc2614b14c8461fb12ec0298ae"
+interface-hash: "4319230769ce3d2bc823aa90e3a1b278"

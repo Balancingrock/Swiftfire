@@ -8,20 +8,20 @@ provides-member:
 - ["C9Swiftfire9Forwarder", ""]
 provides-dynamic-lookup:
 depends-top-level:
-- !private "log"
-- "AssignmentPrecedence"
-- "Forwarder"
-- !private "HttpResponse"
-- "String"
 - !private "Array"
-- !private "HttpVersion"
-- "Bool"
-- "forwardingConnectionFactory"
 - !private "BooleanLiteralType"
-- !private "StringLiteralType"
-- "SwifterSockets"
+- !private "HttpResponse"
 - "UInt8"
 - "UnsafeBufferPointer"
+- "forwardingConnectionFactory"
+- "SwifterSockets"
+- !private "StringLiteralType"
+- !private "HttpVersion"
+- "Bool"
+- "AssignmentPrecedence"
+- !private "log"
+- "Forwarder"
+- "String"
 depends-member:
 - !private ["Ps9AnyObject", "HttpResponse"]
 - !private ["Ps9AnyObject", "HttpVersion"]

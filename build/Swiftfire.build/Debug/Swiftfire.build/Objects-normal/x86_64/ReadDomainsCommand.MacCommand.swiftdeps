@@ -6,12 +6,12 @@ provides-member:
 - ["C9Swiftfire18ReadDomainsCommand", ""]
 provides-dynamic-lookup:
 depends-top-level:
-- "MacCommand"
-- !private "mac"
-- "VJson"
-- !private "ReadDomainsReply"
-- !private "domains"
 - "ReadDomainsCommand"
+- "VJson"
+- !private "mac"
+- "MacCommand"
+- !private "domains"
+- !private "ReadDomainsReply"
 depends-member:
 - !private ["Ps9AnyObject", "ReadDomainsCommand"]
 - !private ["Ps9AnyObject", "ReadDomainsReply"]
@@ -22,6 +22,7 @@ depends-member:
 - !private ["Ps9AnyObject", "mac"]
 - !private ["Ps9AnyObject", "transfer"]
 - !private ["C14SwifterSockets10Connection", "transfer"]
+- ["C13SwiftfireCore7Domains", "deinit"]
 - !private ["P9Swiftfire10MacCommand", "ReadDomainsCommand"]
 - !private ["P9Swiftfire10MacCommand", "ReadDomainsReply"]
 - !private ["P9Swiftfire10MacCommand", "domains"]
@@ -49,8 +50,8 @@ depends-member:
 - ["C9Swiftfire18ReadDomainsCommand", "factory"]
 - !private ["C9Swiftfire18ReadDomainsCommand", "init"]
 - !private ["C9Swiftfire18ReadDomainsCommand", "mac"]
-- !private ["C9Swiftfire16ReadDomainsReply", "deinit"]
-- ["C9Swiftfire16ReadDomainsReply", "init"]
+- ["C9Swiftfire16ReadDomainsReply", "deinit"]
+- !private ["C9Swiftfire16ReadDomainsReply", "init"]
 - !private ["P14SwifterSockets16ReceiverProtocol", "transfer"]
 - !private ["P14SwifterSockets19TransmitterProtocol", "transfer"]
 - !private ["P11SwifterJSON19VJsonDeserializable", "ReadDomainsCommand"]
@@ -70,6 +71,7 @@ depends-member:
 depends-nominal:
 - "Ps9AnyObject"
 - !private "C14SwifterSockets10Connection"
+- "C13SwiftfireCore7Domains"
 - "P9Swiftfire10MacCommand"
 - "P9Swiftfire10MacMessage"
 - !private "C9Swiftfire30MonitoringAndControlConnection"

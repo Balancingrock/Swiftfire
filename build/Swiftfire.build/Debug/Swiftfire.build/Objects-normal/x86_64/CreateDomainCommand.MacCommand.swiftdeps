@@ -6,19 +6,19 @@ provides-member:
 - ["C9Swiftfire19CreateDomainCommand", ""]
 provides-dynamic-lookup:
 depends-top-level:
-- !private "StringLiteralType"
-- !private "Domain"
-- "MacCommand"
-- !private "=="
-- !private "String"
-- "AssignmentPrecedence"
-- "CastingPrecedence"
-- !private "UnicodeScalarType"
-- !private "domains"
-- "CreateDomainCommand"
-- !private "log"
-- "VJson"
 - !private "IntegerLiteralType"
+- !private "log"
+- "CreateDomainCommand"
+- "MacCommand"
+- "VJson"
+- "CastingPrecedence"
+- !private "String"
+- !private "=="
+- "AssignmentPrecedence"
+- !private "Domain"
+- !private "domains"
+- !private "StringLiteralType"
+- !private "UnicodeScalarType"
 depends-member:
 - !private ["Ps9AnyObject", "CreateDomainCommand"]
 - !private ["Ps9AnyObject", "Domain"]

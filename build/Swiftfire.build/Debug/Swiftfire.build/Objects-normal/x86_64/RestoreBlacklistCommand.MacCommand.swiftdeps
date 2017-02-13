@@ -6,18 +6,18 @@ provides-member:
 - ["C9Swiftfire23RestoreBlacklistCommand", ""]
 provides-dynamic-lookup:
 depends-top-level:
-- !private "IntegerLiteralType"
-- !private "ReadBlacklistReply"
-- !private "domains"
-- "VJson"
-- !private "log"
-- !private "FileURLs"
-- !private "=="
-- !private "mac"
 - "RestoreBlacklistCommand"
-- !private "StringLiteralType"
-- "MacCommand"
+- !private "IntegerLiteralType"
+- !private "FileURLs"
+- !private "ReadBlacklistReply"
+- !private "log"
+- !private "=="
+- "VJson"
 - !private "serverBlacklist"
+- !private "StringLiteralType"
+- !private "domains"
+- !private "mac"
+- "MacCommand"
 depends-member:
 - !private ["Ps9AnyObject", "FileURLs"]
 - !private ["Ps9AnyObject", "ReadBlacklistReply"]
@@ -36,8 +36,8 @@ depends-member:
 - !private ["Ps9AnyObject", "serverBlacklist"]
 - !private ["Ps9AnyObject", "source"]
 - !private ["Ps9AnyObject", "transfer"]
-- ["C9Swiftfire9Blacklist", "deinit"]
-- !private ["C9Swiftfire9Blacklist", "load"]
+- ["C13SwiftfireCore9Blacklist", "deinit"]
+- !private ["C13SwiftfireCore9Blacklist", "load"]
 - !private ["Sb", "_getBuiltinLogicValue"]
 - ["Sb", "deinit"]
 - !private ["Ps7CVarArg", "init"]
@@ -58,11 +58,11 @@ depends-member:
 - !private ["Ps23CustomStringConvertible", "init"]
 - !private ["Ps23CustomStringConvertible", "restoreBlacklist"]
 - !private ["Ps23CustomStringConvertible", "source"]
-- !private ["C9Swiftfire6Domain", "blacklist"]
-- ["C9Swiftfire6Domain", "deinit"]
-- !private ["C9Swiftfire6Domain", "restoreBlacklist"]
-- ["C9Swiftfire7Domains", "deinit"]
-- !private ["C9Swiftfire7Domains", "domain"]
+- !private ["C13SwiftfireCore6Domain", "blacklist"]
+- ["C13SwiftfireCore6Domain", "deinit"]
+- !private ["C13SwiftfireCore6Domain", "restoreBlacklist"]
+- ["C13SwiftfireCore7Domains", "deinit"]
+- !private ["C13SwiftfireCore7Domains", "domain"]
 - !private ["Ps9Equatable", "_getBuiltinLogicValue"]
 - !private ["Ps9Equatable", "blacklist"]
 - !private ["Ps9Equatable", "init"]
@@ -205,7 +205,7 @@ depends-member:
 - !private ["Ps21_ObjectiveCBridgeable", "source"]
 depends-nominal:
 - "Ps9AnyObject"
-- "C9Swiftfire9Blacklist"
+- "C13SwiftfireCore9Blacklist"
 - "Sb"
 - !private "Ps7CVarArg"
 - !private "Ps10Comparable"
@@ -214,8 +214,8 @@ depends-nominal:
 - !private "Ps29CustomPlaygroundQuickLookable"
 - !private "Ps17CustomReflectable"
 - !private "Ps23CustomStringConvertible"
-- "C9Swiftfire6Domain"
-- "C9Swiftfire7Domains"
+- "C13SwiftfireCore6Domain"
+- "C13SwiftfireCore7Domains"
 - !private "Ps9Equatable"
 - !private "Ps27ExpressibleByBooleanLiteral"
 - !private "Ps43ExpressibleByExtendedGraphemeClusterLiteral"
@@ -272,16 +272,17 @@ depends-external:
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/ObjectiveC.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreGraphics.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/IOKit.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterJSON.framework/Modules/SwifterJSON.swiftmodule/x86_64.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/Ascii.framework/Modules/Ascii.swiftmodule/x86_64.swiftmodule"
 - "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterLog.framework/Modules/SwifterLog.swiftmodule/x86_64.swiftmodule"
 - "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/CAsl-0.1.0/Sources/include/CAsl.h"
 - "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/CAsl.framework/Modules/module.modulemap"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterJSON.framework/Modules/SwifterJSON.swiftmodule/x86_64.swiftmodule"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/Ascii.framework/Modules/Ascii.swiftmodule/x86_64.swiftmodule"
 - "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterSockets.framework/Modules/SwifterSockets.swiftmodule/x86_64.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwiftfireCore.framework/Modules/SwiftfireCore.swiftmodule/x86_64.swiftmodule"
 - "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/COpenSsl-0.1.0/module.modulemap"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/AppKit.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreData.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/QuartzCore.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/XPC.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreImage.swiftmodule"
-interface-hash: "3ddb5de9ea9bcf4600f01bcbdfd50f62"
+interface-hash: "8d20437bc5e1bbbae7c2c2c8972016c8"

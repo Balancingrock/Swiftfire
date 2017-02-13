@@ -7,15 +7,15 @@ provides-member:
 - ["C9Swiftfire20ReadBlacklistCommand", ""]
 provides-dynamic-lookup:
 depends-top-level:
-- "String"
-- !private "|"
 - !private "COMMAND_NAME"
-- !private "SOURCE"
-- "ReadBlacklistCommand"
-- "AssignmentPrecedence"
 - "StringLiteralType"
-- "VJson"
+- !private "SOURCE"
 - !private "&="
+- !private "|"
+- "VJson"
+- "ReadBlacklistCommand"
+- "String"
+- "AssignmentPrecedence"
 - "MacMessage"
 depends-member:
 - !private ["Ps9AnyObject", "COMMAND_NAME"]

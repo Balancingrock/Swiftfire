@@ -56,6 +56,7 @@
 import Foundation
 import SwifterJSON
 import SwifterLog
+import SwiftfireCore
 
 
 extension RestoreBlacklistCommand: MacCommand {
@@ -69,7 +70,7 @@ extension RestoreBlacklistCommand: MacCommand {
         log.atLevelNotice(id: -1, source: #file.source(#function, #line))
         
         if source == "Server" {
-            if let url = FileURLs.serverBlacklist { serverBlacklist.load(fromFileLocation: url) }
+            if let url = FileURLs.serverBlacklist { serverBlacklist.load(fromFile: url) }
             let reply = ReadBlacklistReply(source: "Server", list: serverBlacklist)
             mac?.transfer(reply)
         }

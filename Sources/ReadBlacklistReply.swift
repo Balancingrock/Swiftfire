@@ -55,6 +55,7 @@
 
 import Foundation
 import SwifterJSON
+import SwiftfireCore
 
 
 private let REPLY_NAME = "ReadBlacklistReply"

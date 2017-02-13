@@ -6,20 +6,23 @@ provides-member:
 - ["C9Swiftfire22ModifyBlacklistCommand", ""]
 provides-dynamic-lookup:
 depends-top-level:
-- !private "mac"
 - !private "IntegerLiteralType"
-- !private "=="
-- !private "serverBlacklist"
-- !private "domains"
-- "MacCommand"
-- !private "StringLiteralType"
-- !private "UnicodeScalarType"
-- "ModifyBlacklistCommand"
-- !private "log"
-- "VJson"
-- !private "Blacklist"
 - !private "ReadBlacklistReply"
+- !private "Blacklist"
+- !private "serverBlacklist"
+- !private "UnicodeScalarType"
+- !private "domains"
+- "VJson"
+- !private "=="
+- !private "mac"
+- !private "StringLiteralType"
+- "MacCommand"
+- !private "log"
+- "ModifyBlacklistCommand"
 depends-member:
+- ["OC13SwiftfireCore9Blacklist6Action", "deinit"]
+- !private ["OC13SwiftfireCore9Blacklist6Action", "init"]
+- !private ["Ps9AnyObject", "Action"]
 - !private ["Ps9AnyObject", "Blacklist"]
 - !private ["Ps9AnyObject", "ModifyBlacklistCommand"]
 - !private ["Ps9AnyObject", "ReadBlacklistReply"]
@@ -40,6 +43,7 @@ depends-member:
 - !private ["Ps9AnyObject", "serverBlacklist"]
 - !private ["Ps9AnyObject", "source"]
 - !private ["Ps9AnyObject", "transfer"]
+- !private ["C13SwiftfireCore9Blacklist", "Action"]
 - !private ["C13SwiftfireCore9Blacklist", "add"]
 - ["C13SwiftfireCore9Blacklist", "deinit"]
 - !private ["C13SwiftfireCore9Blacklist", "remove"]
@@ -163,8 +167,9 @@ depends-member:
 - !private ["CSo8NSString", "source"]
 - ["Sq", "deinit"]
 - !private ["Sq", "init"]
-- !private ["C9Swiftfire18ReadBlacklistReply", "deinit"]
-- ["C9Swiftfire18ReadBlacklistReply", "init"]
+- !private ["Ps16RawRepresentable", "init"]
+- ["C9Swiftfire18ReadBlacklistReply", "deinit"]
+- !private ["C9Swiftfire18ReadBlacklistReply", "init"]
 - !private ["P14SwifterSockets16ReceiverProtocol", "transfer"]
 - !private ["P10SwifterLog26ReflectedStringConvertible", "blacklist"]
 - !private ["Ps8Sequence", "domain"]
@@ -185,6 +190,7 @@ depends-member:
 - !private ["Vs6UInt64", "deinit"]
 - !private ["Vs5UInt8", "deinit"]
 - !private ["Sc", "deinit"]
+- !private ["P11SwifterJSON19VJsonDeserializable", "Action"]
 - !private ["P11SwifterJSON19VJsonDeserializable", "Blacklist"]
 - !private ["P11SwifterJSON19VJsonDeserializable", "ModifyBlacklistCommand"]
 - !private ["P11SwifterJSON19VJsonDeserializable", "ReadBlacklistReply"]
@@ -200,6 +206,7 @@ depends-member:
 - !private ["P11SwifterJSON19VJsonDeserializable", "remove"]
 - !private ["P11SwifterJSON19VJsonDeserializable", "serverBlacklist"]
 - !private ["P11SwifterJSON19VJsonDeserializable", "source"]
+- !private ["P11SwifterJSON17VJsonSerializable", "Action"]
 - !private ["P11SwifterJSON17VJsonSerializable", "Blacklist"]
 - !private ["P11SwifterJSON17VJsonSerializable", "ModifyBlacklistCommand"]
 - !private ["P11SwifterJSON17VJsonSerializable", "ReadBlacklistReply"]
@@ -233,6 +240,7 @@ depends-member:
 - !private ["Ps21_ObjectiveCBridgeable", "init"]
 - !private ["Ps21_ObjectiveCBridgeable", "source"]
 depends-nominal:
+- "OC13SwiftfireCore9Blacklist6Action"
 - "Ps9AnyObject"
 - "C13SwiftfireCore9Blacklist"
 - "Sb"
@@ -277,6 +285,7 @@ depends-nominal:
 - !private "PSo14NSSecureCoding"
 - !private "CSo8NSString"
 - "Sq"
+- !private "Ps16RawRepresentable"
 - "C9Swiftfire18ReadBlacklistReply"
 - !private "P14SwifterSockets16ReceiverProtocol"
 - !private "P10SwifterLog26ReflectedStringConvertible"
@@ -325,5 +334,4 @@ depends-external:
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/QuartzCore.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/XPC.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreImage.swiftmodule"
-- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/simd.swiftmodule"
-interface-hash: "386b843bd829714e4cf38ef7b16e3e5a"
+interface-hash: "fd4e3f617f8c2aacd1731bace4c972ce"

@@ -61,6 +61,7 @@
 
 import Foundation
 import SwifterLog
+import SwiftfireCore
 
 
 typealias NoParametersNoReturn = () -> ()

@@ -7,20 +7,20 @@ provides-member:
 - ["C9Swiftfire22ModifyBlacklistCommand", ""]
 provides-dynamic-lookup:
 depends-top-level:
-- "MacMessage"
-- !private "ADDRESS"
-- "Bool"
-- "ModifyBlacklistCommand"
-- !private "COMMAND_NAME"
-- "StringLiteralType"
-- "VJson"
-- !private "REMOVE"
-- "AssignmentPrecedence"
-- !private "|"
-- !private "SOURCE"
-- "String"
-- !private "&="
 - !private "ACTION"
+- "MacMessage"
+- "String"
+- "ModifyBlacklistCommand"
+- "StringLiteralType"
+- !private "COMMAND_NAME"
+- "VJson"
+- "AssignmentPrecedence"
+- !private "SOURCE"
+- !private "&="
+- !private "ADDRESS"
+- !private "|"
+- !private "REMOVE"
+- "Bool"
 depends-member:
 - !private ["Ps9AnyObject", "ACTION"]
 - !private ["Ps9AnyObject", "ADDRESS"]

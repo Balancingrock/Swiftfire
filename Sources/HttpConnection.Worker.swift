@@ -67,6 +67,7 @@ import Foundation
 import SwifterJSON
 import SwifterLog
 import SwifterSockets
+import SwiftfireCore
 
 
 extension HttpConnection {

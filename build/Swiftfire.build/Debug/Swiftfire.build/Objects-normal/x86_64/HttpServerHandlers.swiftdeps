@@ -6,21 +6,21 @@ provides-nominal:
 provides-member:
 provides-dynamic-lookup:
 depends-top-level:
-- !private "log"
-- "SwifterSockets"
+- !private "httpConnectionPool"
 - "httpConnectionFactory"
+- "SwifterSockets"
+- !private "NSDate"
 - !private "parameters"
 - !private "!"
-- "String"
-- !private "StringLiteralType"
-- !private "Array"
+- !private "serverBlacklist"
 - "AssignmentPrecedence"
 - !private "telemetry"
-- !private "httpConnectionPool"
-- !private "NSDate"
-- !private "serverBlacklist"
-- "httpServerErrorHandler"
 - !private "!="
+- !private "StringLiteralType"
+- "String"
+- "httpServerErrorHandler"
+- !private "Array"
+- !private "log"
 depends-member:
 - !private ["Ps9AnyObject", "action"]
 - !private ["Ps9AnyObject", "allocateOrTimeout"]

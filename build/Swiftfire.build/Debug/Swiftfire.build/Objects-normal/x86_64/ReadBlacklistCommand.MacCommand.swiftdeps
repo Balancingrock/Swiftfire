@@ -6,17 +6,17 @@ provides-member:
 - ["C9Swiftfire20ReadBlacklistCommand", ""]
 provides-dynamic-lookup:
 depends-top-level:
+- !private "log"
 - !private "IntegerLiteralType"
-- "ReadBlacklistCommand"
+- "VJson"
 - "MacCommand"
 - !private "=="
-- !private "log"
 - !private "ReadBlacklistReply"
-- !private "mac"
-- !private "serverBlacklist"
+- "ReadBlacklistCommand"
 - !private "StringLiteralType"
-- "VJson"
 - !private "domains"
+- !private "serverBlacklist"
+- !private "mac"
 depends-member:
 - !private ["Ps9AnyObject", "ReadBlacklistCommand"]
 - !private ["Ps9AnyObject", "ReadBlacklistReply"]
@@ -32,6 +32,7 @@ depends-member:
 - !private ["Ps9AnyObject", "serverBlacklist"]
 - !private ["Ps9AnyObject", "source"]
 - !private ["Ps9AnyObject", "transfer"]
+- ["C13SwiftfireCore9Blacklist", "deinit"]
 - !private ["Sb", "_getBuiltinLogicValue"]
 - ["Sb", "deinit"]
 - !private ["Ps7CVarArg", "init"]
@@ -52,6 +53,7 @@ depends-member:
 - !private ["Ps23CustomStringConvertible", "init"]
 - !private ["Ps23CustomStringConvertible", "source"]
 - !private ["C13SwiftfireCore6Domain", "blacklist"]
+- ["C13SwiftfireCore6Domain", "deinit"]
 - ["C13SwiftfireCore7Domains", "deinit"]
 - !private ["C13SwiftfireCore7Domains", "domain"]
 - !private ["Ps9Equatable", "_getBuiltinLogicValue"]
@@ -131,8 +133,8 @@ depends-member:
 - !private ["C9Swiftfire20ReadBlacklistCommand", "mac"]
 - !private ["C9Swiftfire20ReadBlacklistCommand", "serverBlacklist"]
 - !private ["C9Swiftfire20ReadBlacklistCommand", "source"]
-- !private ["C9Swiftfire18ReadBlacklistReply", "deinit"]
-- ["C9Swiftfire18ReadBlacklistReply", "init"]
+- ["C9Swiftfire18ReadBlacklistReply", "deinit"]
+- !private ["C9Swiftfire18ReadBlacklistReply", "init"]
 - !private ["P14SwifterSockets16ReceiverProtocol", "transfer"]
 - !private ["P10SwifterLog26ReflectedStringConvertible", "blacklist"]
 - !private ["Ps8Sequence", "domain"]
@@ -185,6 +187,7 @@ depends-member:
 - !private ["Ps21_ObjectiveCBridgeable", "source"]
 depends-nominal:
 - "Ps9AnyObject"
+- "C13SwiftfireCore9Blacklist"
 - "Sb"
 - !private "Ps7CVarArg"
 - !private "Ps10Comparable"
@@ -193,7 +196,7 @@ depends-nominal:
 - !private "Ps29CustomPlaygroundQuickLookable"
 - !private "Ps17CustomReflectable"
 - !private "Ps23CustomStringConvertible"
-- !private "C13SwiftfireCore6Domain"
+- "C13SwiftfireCore6Domain"
 - "C13SwiftfireCore7Domains"
 - !private "Ps9Equatable"
 - !private "Ps27ExpressibleByBooleanLiteral"
@@ -262,4 +265,4 @@ depends-external:
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/QuartzCore.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/XPC.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreImage.swiftmodule"
-interface-hash: "fe9dc448f6bfbc11752556d78ac77c79"
+interface-hash: "a2597f7d2cd63ff6a8c5c071b00f12ed"

@@ -7,21 +7,21 @@ provides-member:
 - ["C9Swiftfire12HttpResponse", ""]
 provides-dynamic-lookup:
 depends-top-level:
+- "HttpResponse"
+- !private "CRLF"
 - "HttpVersion"
+- "HttpResponseCode"
+- !private "??"
+- !private "parameters"
+- !private "+"
 - !private "UnicodeScalarType"
 - !private "Date"
-- "HttpResponse"
-- "HttpResponseCode"
 - "String"
-- !private "??"
-- !private "CRLFCRLF"
 - !private "StringLiteralType"
-- !private "BooleanLiteralType"
-- !private "parameters"
-- !private "mimeTypeHtml"
-- !private "+"
-- !private "CRLF"
+- !private "CRLFCRLF"
 - "Data"
+- !private "mimeTypeHtml"
+- !private "BooleanLiteralType"
 depends-member:
 - !private ["Ps9AnyObject", "CRLF"]
 - !private ["Ps9AnyObject", "CRLFCRLF"]

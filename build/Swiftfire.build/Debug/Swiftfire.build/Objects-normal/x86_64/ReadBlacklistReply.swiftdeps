@@ -7,18 +7,18 @@ provides-member:
 - ["C9Swiftfire18ReadBlacklistReply", ""]
 provides-dynamic-lookup:
 depends-top-level:
-- !private "&="
-- !private "|"
-- "AssignmentPrecedence"
-- "StringLiteralType"
-- "MacMessage"
-- "ReadBlacklistReply"
-- "Blacklist"
-- !private "LIST"
-- !private "REPLY_NAME"
-- "String"
 - "VJson"
+- "StringLiteralType"
+- !private "REPLY_NAME"
+- "MacMessage"
+- !private "LIST"
+- "Blacklist"
+- !private "|"
+- "ReadBlacklistReply"
 - !private "SOURCE"
+- "String"
+- !private "&="
+- "AssignmentPrecedence"
 depends-member:
 - !private ["Ps9AnyObject", "Blacklist"]
 - !private ["Ps9AnyObject", "LIST"]
@@ -32,6 +32,9 @@ depends-member:
 - !private ["Ps9AnyObject", "stringValue"]
 - !private ["Ps9AnyObject", "subscript"]
 - ["Ps9AnyObject", ""]
+- ["C13SwiftfireCore9Blacklist", "deinit"]
+- !private ["C13SwiftfireCore9Blacklist", "init"]
+- !private ["C13SwiftfireCore9Blacklist", "json"]
 - ["Ps7CVarArg", "init"]
 - ["Ps10Comparable", "init"]
 - ["Ps28CustomDebugStringConvertible", "init"]
@@ -76,7 +79,7 @@ depends-member:
 - !private ["C9Swiftfire18ReadBlacklistReply", "SOURCE"]
 - ["C9Swiftfire18ReadBlacklistReply", "String"]
 - ["C9Swiftfire18ReadBlacklistReply", "VJson"]
-- !private ["C9Swiftfire18ReadBlacklistReply", "blist"]
+- ["C9Swiftfire18ReadBlacklistReply", "blist"]
 - ["C9Swiftfire18ReadBlacklistReply", "deinit"]
 - ["C9Swiftfire18ReadBlacklistReply", "init"]
 - ["C9Swiftfire18ReadBlacklistReply", "json"]
@@ -121,6 +124,7 @@ depends-member:
 - ["Ps21_ObjectiveCBridgeable", "init"]
 depends-nominal:
 - "Ps9AnyObject"
+- "C13SwiftfireCore9Blacklist"
 - "Ps7CVarArg"
 - "Ps10Comparable"
 - "Ps28CustomDebugStringConvertible"
@@ -184,5 +188,4 @@ depends-external:
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/QuartzCore.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/XPC.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreImage.swiftmodule"
-- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/simd.swiftmodule"
-interface-hash: "475e8aa65c79bf8171ea022cd0ade793"
+interface-hash: "129e6918dbde4bd591c7f31e337bdbe8"

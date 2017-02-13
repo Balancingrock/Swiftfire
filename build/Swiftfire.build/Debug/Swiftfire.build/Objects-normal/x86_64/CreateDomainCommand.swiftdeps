@@ -7,14 +7,14 @@ provides-member:
 - ["C9Swiftfire19CreateDomainCommand", ""]
 provides-dynamic-lookup:
 depends-top-level:
-- !private "|"
-- "CreateDomainCommand"
 - !private "COMMAND_NAME"
-- "String"
-- "StringLiteralType"
+- "CreateDomainCommand"
+- !private "|"
 - "AssignmentPrecedence"
-- "VJson"
+- "StringLiteralType"
 - "MacMessage"
+- "String"
+- "VJson"
 depends-member:
 - !private ["Ps9AnyObject", "COMMAND_NAME"]
 - !private ["Ps9AnyObject", "VJson"]

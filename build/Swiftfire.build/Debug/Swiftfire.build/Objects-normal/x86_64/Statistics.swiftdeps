@@ -8,35 +8,34 @@ provides-member:
 - ["C9Swiftfire10Statistics", ""]
 provides-dynamic-lookup:
 depends-top-level:
-- !private "FileManager"
-- "Date"
-- !private "??"
-- "AssignmentPrecedence"
-- !private "log"
-- "VJsonSerializable"
-- !private "NSURL"
-- !private "ST_ClientRecord"
-- !private "=="
-- !private ">"
-- !private "FileURLs"
 - !private "WallclockTime"
-- !private "|"
-- "ST_Domains"
-- "Mutation"
-- !private "&&"
-- "ST_Clients"
-- !private "UnicodeScalarType"
-- !private "&="
-- "statistics"
-- !private "BooleanLiteralType"
-- "Statistics"
-- !private "Array"
-- "VJson"
-- "TimedClosure"
-- "DispatchQueue"
+- "VJsonSerializable"
 - !private "Calendar"
-- "Int64"
+- !private "UnicodeScalarType"
+- !private "ST_ClientRecord"
+- !private "NSURL"
+- !private "FileURLs"
+- !private "??"
+- "VJson"
+- !private "log"
+- !private ">"
+- "AssignmentPrecedence"
+- !private "=="
+- "Statistics"
+- !private "&="
+- !private "|"
 - "StringLiteralType"
+- "Mutation"
+- "DispatchQueue"
+- !private "&&"
+- "Int64"
+- "Date"
+- "ST_Domains"
+- "TimedClosure"
+- !private "FileManager"
+- !private "BooleanLiteralType"
+- "statistics"
+- "ST_Clients"
 depends-member:
 - ["Ps9AnyObject", "Attributes"]
 - ["Ps9AnyObject", "AutoreleaseFrequency"]
@@ -91,7 +90,6 @@ depends-member:
 - !private ["Ps9AnyObject", "statistics"]
 - !private ["Ps9AnyObject", "statisticsDir"]
 - !private ["Ps9AnyObject", "subscript"]
-- !private ["Ps9AnyObject", "today"]
 - !private ["Ps9AnyObject", "updateClient"]
 - !private ["Ps9AnyObject", "updateCounter"]
 - !private ["Ps9AnyObject", "updatePathPart"]
@@ -169,9 +167,6 @@ depends-member:
 - !private ["Ps7CVarArg", "remove"]
 - !private ["Ps7CVarArg", "source"]
 - !private ["Ps7CVarArg", "subscript"]
-- !private ["V10Foundation8Calendar", "current"]
-- !private ["V10Foundation8Calendar", "deinit"]
-- !private ["V10Foundation8Calendar", "startOfDay"]
 - !private ["Vs9Character", "deinit"]
 - !private ["Ps10Collection", "Element"]
 - !private ["Ps10Collection", "Index"]
@@ -188,7 +183,6 @@ depends-member:
 - !private ["Ps10Comparable", "Stride"]
 - !private ["Ps10Comparable", "_DisabledRangeIndex"]
 - ["Ps10Comparable", "init"]
-- !private ["Ps10Comparable", "javaDate"]
 - ["Ps10Comparable", "javaDateBeginOfDay"]
 - !private ["Ps10Comparable", "source"]
 - ["Ps28CustomDebugStringConvertible", "Attributes"]
@@ -203,18 +197,15 @@ depends-member:
 - !private ["Ps28CustomDebugStringConvertible", "appendingPathComponent"]
 - !private ["Ps28CustomDebugStringConvertible", "async"]
 - !private ["Ps28CustomDebugStringConvertible", "count"]
-- !private ["Ps28CustomDebugStringConvertible", "current"]
 - !private ["Ps28CustomDebugStringConvertible", "default"]
 - !private ["Ps28CustomDebugStringConvertible", "fileExists"]
 - ["Ps28CustomDebugStringConvertible", "init"]
-- !private ["Ps28CustomDebugStringConvertible", "javaDate"]
 - ["Ps28CustomDebugStringConvertible", "javaDateBeginOfDay"]
 - !private ["Ps28CustomDebugStringConvertible", "main"]
 - !private ["Ps28CustomDebugStringConvertible", "path"]
 - !private ["Ps28CustomDebugStringConvertible", "pathComponents"]
 - !private ["Ps28CustomDebugStringConvertible", "remove"]
 - !private ["Ps28CustomDebugStringConvertible", "source"]
-- !private ["Ps28CustomDebugStringConvertible", "startOfDay"]
 - !private ["Ps28CustomDebugStringConvertible", "subscript"]
 - !private ["Ps29CustomPlaygroundQuickLookable", "IntegerLiteralType"]
 - !private ["Ps29CustomPlaygroundQuickLookable", "Stride"]
@@ -222,7 +213,6 @@ depends-member:
 - !private ["Ps29CustomPlaygroundQuickLookable", "_getBuiltinLogicValue"]
 - !private ["Ps29CustomPlaygroundQuickLookable", "appendingPathComponent"]
 - ["Ps29CustomPlaygroundQuickLookable", "init"]
-- !private ["Ps29CustomPlaygroundQuickLookable", "javaDate"]
 - ["Ps29CustomPlaygroundQuickLookable", "javaDateBeginOfDay"]
 - !private ["Ps29CustomPlaygroundQuickLookable", "path"]
 - !private ["Ps29CustomPlaygroundQuickLookable", "pathComponents"]
@@ -239,13 +229,10 @@ depends-member:
 - !private ["Ps17CustomReflectable", "_getBuiltinLogicValue"]
 - !private ["Ps17CustomReflectable", "append"]
 - !private ["Ps17CustomReflectable", "count"]
-- !private ["Ps17CustomReflectable", "current"]
 - ["Ps17CustomReflectable", "init"]
-- !private ["Ps17CustomReflectable", "javaDate"]
 - ["Ps17CustomReflectable", "javaDateBeginOfDay"]
 - !private ["Ps17CustomReflectable", "remove"]
 - !private ["Ps17CustomReflectable", "source"]
-- !private ["Ps17CustomReflectable", "startOfDay"]
 - !private ["Ps17CustomReflectable", "subscript"]
 - ["Ps23CustomStringConvertible", "Attributes"]
 - ["Ps23CustomStringConvertible", "AutoreleaseFrequency"]
@@ -264,12 +251,10 @@ depends-member:
 - !private ["Ps23CustomStringConvertible", "appendingPathComponent"]
 - !private ["Ps23CustomStringConvertible", "async"]
 - !private ["Ps23CustomStringConvertible", "count"]
-- !private ["Ps23CustomStringConvertible", "current"]
 - !private ["Ps23CustomStringConvertible", "default"]
 - !private ["Ps23CustomStringConvertible", "description"]
 - !private ["Ps23CustomStringConvertible", "fileExists"]
 - ["Ps23CustomStringConvertible", "init"]
-- !private ["Ps23CustomStringConvertible", "javaDate"]
 - ["Ps23CustomStringConvertible", "javaDateBeginOfDay"]
 - !private ["Ps23CustomStringConvertible", "main"]
 - !private ["Ps23CustomStringConvertible", "parse"]
@@ -278,11 +263,9 @@ depends-member:
 - !private ["Ps23CustomStringConvertible", "remove"]
 - !private ["Ps23CustomStringConvertible", "save"]
 - !private ["Ps23CustomStringConvertible", "source"]
-- !private ["Ps23CustomStringConvertible", "startOfDay"]
 - !private ["Ps23CustomStringConvertible", "subscript"]
 - ["V10Foundation4Date", "deinit"]
 - ["V10Foundation4Date", "init"]
-- !private ["V10Foundation4Date", "javaDate"]
 - ["V10Foundation4Date", "javaDateBeginOfDay"]
 - !private ["Vs27DefaultBidirectionalIndices", "Index"]
 - !private ["Vs27DefaultBidirectionalIndices", "Iterator"]
@@ -321,12 +304,10 @@ depends-member:
 - !private ["Ps9Equatable", "appendingPathComponent"]
 - !private ["Ps9Equatable", "async"]
 - ["Ps9Equatable", "background"]
-- !private ["Ps9Equatable", "current"]
 - !private ["Ps9Equatable", "default"]
 - !private ["Ps9Equatable", "fileExists"]
 - ["Ps9Equatable", "inherit"]
 - ["Ps9Equatable", "init"]
-- !private ["Ps9Equatable", "javaDate"]
 - ["Ps9Equatable", "javaDateBeginOfDay"]
 - !private ["Ps9Equatable", "main"]
 - !private ["Ps9Equatable", "parse"]
@@ -334,7 +315,6 @@ depends-member:
 - !private ["Ps9Equatable", "pathComponents"]
 - !private ["Ps9Equatable", "save"]
 - !private ["Ps9Equatable", "source"]
-- !private ["Ps9Equatable", "startOfDay"]
 - !private ["Ps9Equatable", "subscript"]
 - !private ["Ps9Equatable", "updateClient"]
 - !private ["Ps9Equatable", "updatePathPart"]
@@ -380,18 +360,15 @@ depends-member:
 - !private ["Ps8Hashable", "addClientRecord"]
 - !private ["Ps8Hashable", "appendingPathComponent"]
 - !private ["Ps8Hashable", "async"]
-- !private ["Ps8Hashable", "current"]
 - !private ["Ps8Hashable", "default"]
 - !private ["Ps8Hashable", "fileExists"]
 - ["Ps8Hashable", "inherit"]
 - ["Ps8Hashable", "init"]
-- !private ["Ps8Hashable", "javaDate"]
 - ["Ps8Hashable", "javaDateBeginOfDay"]
 - !private ["Ps8Hashable", "main"]
 - !private ["Ps8Hashable", "path"]
 - !private ["Ps8Hashable", "pathComponents"]
 - !private ["Ps8Hashable", "source"]
-- !private ["Ps8Hashable", "startOfDay"]
 - !private ["Ps8Hashable", "updateClient"]
 - !private ["Ps8Hashable", "updatePathPart"]
 - !private ["Ps9Indexable", "Element"]
@@ -584,12 +561,9 @@ depends-member:
 - !private ["Ps16RawRepresentable", "updateClient"]
 - !private ["Ps16RawRepresentable", "updatePathPart"]
 - !private ["P10Foundation20ReferenceConvertible", "appendingPathComponent"]
-- !private ["P10Foundation20ReferenceConvertible", "current"]
 - ["P10Foundation20ReferenceConvertible", "init"]
-- !private ["P10Foundation20ReferenceConvertible", "javaDate"]
 - ["P10Foundation20ReferenceConvertible", "javaDateBeginOfDay"]
 - !private ["P10Foundation20ReferenceConvertible", "path"]
-- !private ["P10Foundation20ReferenceConvertible", "startOfDay"]
 - !private ["C9Swiftfire9ST_Client", "deinit"]
 - !private ["C9Swiftfire9ST_Client", "doNotTrace"]
 - !private ["C9Swiftfire9ST_Client", "records"]
@@ -682,7 +656,6 @@ depends-member:
 - ["Ps20TextOutputStreamable", "init"]
 - !private ["Ps20TextOutputStreamable", "source"]
 - ["C9Swiftfire12TimedClosure", "deinit"]
-- !private ["C9Swiftfire12TimedClosure", "init"]
 - !private ["Su", "deinit"]
 - !private ["Vs6UInt16", "deinit"]
 - !private ["Vs6UInt32", "deinit"]
@@ -745,14 +718,11 @@ depends-member:
 - !private ["P11SwifterJSON17VJsonSerializable", "records"]
 - !private ["P11SwifterJSON17VJsonSerializable", "refreshToday"]
 - !private ["P11SwifterJSON17VJsonSerializable", "statistics"]
-- !private ["P11SwifterJSON17VJsonSerializable", "today"]
 - !private ["P11SwifterJSON17VJsonSerializable", "updateClient"]
 - !private ["P11SwifterJSON17VJsonSerializable", "updateCounter"]
 - !private ["P11SwifterJSON17VJsonSerializable", "updatePathPart"]
 - !private ["P11SwifterJSON17VJsonSerializable", "url"]
 - ["P11SwifterJSON17VJsonSerializable", ""]
-- !private ["V9Swiftfire13WallclockTime", "deinit"]
-- !private ["V9Swiftfire13WallclockTime", "init"]
 - !private ["Ps14_ArrayProtocol", "Element"]
 - !private ["Ps14_ArrayProtocol", "Index"]
 - !private ["Ps14_ArrayProtocol", "IndexDistance"]
@@ -799,18 +769,15 @@ depends-member:
 - !private ["Ps9_Hashable", "addClientRecord"]
 - !private ["Ps9_Hashable", "appendingPathComponent"]
 - !private ["Ps9_Hashable", "async"]
-- !private ["Ps9_Hashable", "current"]
 - !private ["Ps9_Hashable", "default"]
 - !private ["Ps9_Hashable", "fileExists"]
 - ["Ps9_Hashable", "inherit"]
 - ["Ps9_Hashable", "init"]
-- !private ["Ps9_Hashable", "javaDate"]
 - ["Ps9_Hashable", "javaDateBeginOfDay"]
 - !private ["Ps9_Hashable", "main"]
 - !private ["Ps9_Hashable", "path"]
 - !private ["Ps9_Hashable", "pathComponents"]
 - !private ["Ps9_Hashable", "source"]
-- !private ["Ps9_Hashable", "startOfDay"]
 - !private ["Ps9_Hashable", "updateClient"]
 - !private ["Ps9_Hashable", "updatePathPart"]
 - !private ["Ps14_Incrementable", "IntegerLiteralType"]
@@ -822,8 +789,6 @@ depends-member:
 - !private ["Ps18_IntegerArithmetic", "IntegerLiteralType"]
 - !private ["Ps18_IntegerArithmetic", "Stride"]
 - !private ["Ps18_IntegerArithmetic", "_DisabledRangeIndex"]
-- !private ["P10Foundation14_MutableBoxing", "current"]
-- !private ["P10Foundation14_MutableBoxing", "startOfDay"]
 - !private ["Ps21_ObjectiveCBridgeable", "Element"]
 - !private ["Ps21_ObjectiveCBridgeable", "Index"]
 - !private ["Ps21_ObjectiveCBridgeable", "IndexDistance"]
@@ -837,14 +802,11 @@ depends-member:
 - !private ["Ps21_ObjectiveCBridgeable", "append"]
 - !private ["Ps21_ObjectiveCBridgeable", "appendingPathComponent"]
 - !private ["Ps21_ObjectiveCBridgeable", "count"]
-- !private ["Ps21_ObjectiveCBridgeable", "current"]
 - ["Ps21_ObjectiveCBridgeable", "init"]
-- !private ["Ps21_ObjectiveCBridgeable", "javaDate"]
 - ["Ps21_ObjectiveCBridgeable", "javaDateBeginOfDay"]
 - !private ["Ps21_ObjectiveCBridgeable", "path"]
 - !private ["Ps21_ObjectiveCBridgeable", "remove"]
 - !private ["Ps21_ObjectiveCBridgeable", "source"]
-- !private ["Ps21_ObjectiveCBridgeable", "startOfDay"]
 - !private ["Ps21_ObjectiveCBridgeable", "subscript"]
 - !private ["Vs26_OptionalNilComparisonType", "deinit"]
 - !private ["Ps14_SignedInteger", "IntegerLiteralType"]
@@ -864,7 +826,6 @@ depends-nominal:
 - !private "Ps17BitwiseOperations"
 - "Sb"
 - "Ps7CVarArg"
-- !private "V10Foundation8Calendar"
 - !private "Vs9Character"
 - !private "Ps10Collection"
 - "Ps10Comparable"
@@ -960,7 +921,6 @@ depends-nominal:
 - "P11SwifterJSON16VJsonConvertible"
 - "P11SwifterJSON19VJsonDeserializable"
 - "P11SwifterJSON17VJsonSerializable"
-- !private "V9Swiftfire13WallclockTime"
 - !private "Ps14_ArrayProtocol"
 - !private "Ps24_DestructorSafeContainer"
 - !private "Ps35_ExpressibleByBuiltinBooleanLiteral"
@@ -975,7 +935,6 @@ depends-nominal:
 - !private "Ps14_Incrementable"
 - !private "Ps8_Integer"
 - !private "Ps18_IntegerArithmetic"
-- !private "P10Foundation14_MutableBoxing"
 - "Ps21_ObjectiveCBridgeable"
 - !private "Vs26_OptionalNilComparisonType"
 - !private "Ps14_SignedInteger"
@@ -990,16 +949,18 @@ depends-external:
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/ObjectiveC.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreGraphics.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/IOKit.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterJSON.framework/Modules/SwifterJSON.swiftmodule/x86_64.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/Ascii.framework/Modules/Ascii.swiftmodule/x86_64.swiftmodule"
 - "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterLog.framework/Modules/SwifterLog.swiftmodule/x86_64.swiftmodule"
 - "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/CAsl-0.1.0/Sources/include/CAsl.h"
 - "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/CAsl.framework/Modules/module.modulemap"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterJSON.framework/Modules/SwifterJSON.swiftmodule/x86_64.swiftmodule"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/Ascii.framework/Modules/Ascii.swiftmodule/x86_64.swiftmodule"
 - "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterSockets.framework/Modules/SwifterSockets.swiftmodule/x86_64.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwiftfireCore.framework/Modules/SwiftfireCore.swiftmodule/x86_64.swiftmodule"
 - "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/COpenSsl-0.1.0/module.modulemap"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/AppKit.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreData.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/QuartzCore.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/XPC.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreImage.swiftmodule"
+- "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/simd.swiftmodule"
 interface-hash: "f4190f3a55509d8757b4602555ce2b40"

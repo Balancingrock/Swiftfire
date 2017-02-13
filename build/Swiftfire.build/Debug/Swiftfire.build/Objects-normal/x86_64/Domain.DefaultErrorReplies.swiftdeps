@@ -6,13 +6,13 @@ provides-member:
 - ["C13SwiftfireCore6Domain", "errorMessage"]
 provides-dynamic-lookup:
 depends-top-level:
-- !private "HttpResponse"
-- "HttpConnection"
-- "HttpVersion"
-- "HttpResponseCode"
-- !private "StringLiteralType"
 - !private "URL"
+- !private "StringLiteralType"
+- !private "HttpResponse"
+- "HttpResponseCode"
 - "Domain"
+- "HttpVersion"
+- "HttpConnection"
 - "Data"
 depends-member:
 - !private ["Ps9AnyObject", "Data"]
