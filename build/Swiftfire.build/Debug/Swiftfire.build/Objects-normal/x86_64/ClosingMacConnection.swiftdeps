@@ -7,14 +7,14 @@ provides-member:
 - ["C9Swiftfire20ClosingMacConnection", ""]
 provides-dynamic-lookup:
 depends-top-level:
-- "MacMessage"
 - !private "BooleanLiteralType"
 - "VJson"
-- "StringLiteralType"
 - !private "NAME"
+- "MacMessage"
+- "StringLiteralType"
 - "AssignmentPrecedence"
-- !private "|"
 - "ClosingMacConnection"
+- !private "|"
 depends-member:
 - !private ["Ps9AnyObject", "NAME"]
 - !private ["Ps9AnyObject", "VJson"]

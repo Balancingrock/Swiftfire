@@ -7,14 +7,14 @@ provides-member:
 - ["C9Swiftfire12DeltaCommand", ""]
 provides-dynamic-lookup:
 depends-top-level:
-- !private "&="
-- "AssignmentPrecedence"
-- "VJson"
-- "StringLiteralType"
-- !private "COMMAND_NAME"
 - "DeltaCommand"
 - "MacMessage"
 - "Int"
+- "StringLiteralType"
+- "VJson"
+- "AssignmentPrecedence"
+- !private "&="
+- !private "COMMAND_NAME"
 - !private "|"
 depends-member:
 - !private ["Ps9AnyObject", "COMMAND_NAME"]

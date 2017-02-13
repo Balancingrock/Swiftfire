@@ -18,46 +18,46 @@ provides-member:
 - ["C9Swiftfire10HttpHeader", ""]
 provides-dynamic-lookup:
 depends-top-level:
-- "Array"
-- "String"
-- "Ascii"
-- "Bool"
-- !private "Date"
-- "HttpHeader"
-- !private "<"
-- "=="
-- !private "~="
-- !private "SOURCE"
-- !private "NSString"
-- !private "log"
-- "Host"
-- "HttpHeaderField"
-- "CastingPrecedence"
-- "WallclockTime"
-- "Int32"
 - "HttpVersion"
-- !private "+="
-- !private "Range"
-- "AssignmentPrecedence"
 - "HttpConnection"
-- "Int"
+- "Bool"
+- !private "log"
+- !private "NSString"
+- !private "??"
+- !private "!="
 - "CRLFCRLF"
 - !private "-"
-- !private "getRequestFieldValue"
-- !private "UnicodeScalarType"
-- !private "NSCharacterSet"
-- "Logfile"
-- "parameters"
-- !private "!="
+- "String"
+- "Ascii"
+- "Array"
 - !private "ComparisonResult"
-- "Data"
-- !private "??"
-- "CRLF"
+- "WallclockTime"
+- !private "UnicodeScalarType"
+- "=="
+- !private "~="
+- "AssignmentPrecedence"
+- "CastingPrecedence"
 - "HttpOperation"
-- "ExtendedGraphemeClusterType"
-- "FileURLs"
-- !private "+"
+- "CRLF"
+- "HttpHeaderField"
 - "StringLiteralType"
+- "Int32"
+- "SwiftfireCore"
+- !private "Date"
+- !private "NSCharacterSet"
+- !private "Host"
+- "FileURLs"
+- !private "getRequestFieldValue"
+- "ExtendedGraphemeClusterType"
+- "HttpHeader"
+- !private "Range"
+- !private "+"
+- !private "<"
+- "Logfile"
+- !private "+="
+- "Data"
+- "Int"
+- "parameters"
 depends-member:
 - ["Ps9AnyObject", "Ascii"]
 - !private ["Ps9AnyObject", "CRLF"]
@@ -75,7 +75,6 @@ depends-member:
 - ["Ps9AnyObject", "Logfile"]
 - !private ["Ps9AnyObject", "NSString"]
 - !private ["Ps9AnyObject", "Range"]
-- !private ["Ps9AnyObject", "SOURCE"]
 - !private ["Ps9AnyObject", "String"]
 - ["Ps9AnyObject", "WallclockTime"]
 - !private ["Ps9AnyObject", "_host"]
@@ -538,9 +537,10 @@ depends-member:
 - !private ["Ps8Hashable", "utf8"]
 - !private ["Ps8Hashable", "whitespaces"]
 - ["Ps8Hashable", ""]
-- ["V9Swiftfire4Host", "deinit"]
-- !private ["V9Swiftfire4Host", "description"]
-- !private ["V9Swiftfire4Host", "init"]
+- !private ["CSo4Host", "init"]
+- ["V13SwiftfireCore4Host", "deinit"]
+- !private ["V13SwiftfireCore4Host", "description"]
+- !private ["V13SwiftfireCore4Host", "init"]
 - ["C9Swiftfire14HttpConnection", "deinit"]
 - !private ["C9Swiftfire14HttpConnection", "logId"]
 - !private ["C9Swiftfire14HttpConnection", "remoteAddress"]
@@ -552,7 +552,7 @@ depends-member:
 - ["C9Swiftfire10HttpHeader", "Data"]
 - !private ["C9Swiftfire10HttpHeader", "Date"]
 - ["C9Swiftfire10HttpHeader", "FileURLs"]
-- ["C9Swiftfire10HttpHeader", "Host"]
+- !private ["C9Swiftfire10HttpHeader", "Host"]
 - ["C9Swiftfire10HttpHeader", "HttpConnection"]
 - ["C9Swiftfire10HttpHeader", "HttpHeader"]
 - !private ["C9Swiftfire10HttpHeader", "HttpHeaderField"]
@@ -563,8 +563,8 @@ depends-member:
 - ["C9Swiftfire10HttpHeader", "Logfile"]
 - !private ["C9Swiftfire10HttpHeader", "NSString"]
 - !private ["C9Swiftfire10HttpHeader", "Range"]
-- !private ["C9Swiftfire10HttpHeader", "SOURCE"]
 - ["C9Swiftfire10HttpHeader", "String"]
+- ["C9Swiftfire10HttpHeader", "SwiftfireCore"]
 - ["C9Swiftfire10HttpHeader", "WallclockTime"]
 - !private ["C9Swiftfire10HttpHeader", "_host"]
 - !private ["C9Swiftfire10HttpHeader", "_host.storage"]
@@ -690,9 +690,9 @@ depends-member:
 - !private ["Ps13IndexableBase", "subdata"]
 - !private ["Ps13IndexableBase", "subscript"]
 - !private ["Vs16IndexingIterator", "Element"]
-- ["OC9Swiftfire7Logfile10InitOption", "deinit"]
-- ["OC9Swiftfire7Logfile10InitOption", "maxFileSize"]
-- ["OC9Swiftfire7Logfile10InitOption", "newFileDailyAt"]
+- ["OC13SwiftfireCore7Logfile10InitOption", "deinit"]
+- ["OC13SwiftfireCore7Logfile10InitOption", "maxFileSize"]
+- ["OC13SwiftfireCore7Logfile10InitOption", "newFileDailyAt"]
 - !private ["Si", "IntegerLiteralType"]
 - !private ["Si", "Stride"]
 - !private ["Si", "_DisabledRangeIndex"]
@@ -717,12 +717,12 @@ depends-member:
 - !private ["Ps17IntegerArithmetic", "hashValue"]
 - !private ["Ps17IntegerArithmetic", "init"]
 - !private ["Ps16IteratorProtocol", "Element"]
-- !private ["C9Swiftfire7Logfile", "close"]
-- !private ["C9Swiftfire7Logfile", "dateFormatter"]
-- ["C9Swiftfire7Logfile", "deinit"]
-- !private ["C9Swiftfire7Logfile", "flush"]
-- ["C9Swiftfire7Logfile", "init"]
-- !private ["C9Swiftfire7Logfile", "record"]
+- !private ["C13SwiftfireCore7Logfile", "close"]
+- !private ["C13SwiftfireCore7Logfile", "dateFormatter"]
+- ["C13SwiftfireCore7Logfile", "deinit"]
+- !private ["C13SwiftfireCore7Logfile", "flush"]
+- ["C13SwiftfireCore7Logfile", "init"]
+- !private ["C13SwiftfireCore7Logfile", "record"]
 - !private ["Ps25LosslessStringConvertible", "Encoding"]
 - !private ["Ps25LosslessStringConvertible", "Iterator"]
 - !private ["Ps25LosslessStringConvertible", "Stride"]
@@ -1081,8 +1081,8 @@ depends-member:
 - !private ["Vs6UInt64", "deinit"]
 - ["Vs5UInt8", "deinit"]
 - !private ["Sc", "deinit"]
-- ["V9Swiftfire13WallclockTime", "deinit"]
-- ["V9Swiftfire13WallclockTime", "init"]
+- ["V13SwiftfireCore13WallclockTime", "deinit"]
+- ["V13SwiftfireCore13WallclockTime", "init"]
 - ["Ps14_ArrayProtocol", "Element"]
 - !private ["Ps14_ArrayProtocol", "Index"]
 - !private ["Ps14_ArrayProtocol", "IndexDistance"]
@@ -1319,7 +1319,8 @@ depends-nominal:
 - !private "Sf"
 - !private "CSo9Formatter"
 - "Ps8Hashable"
-- "V9Swiftfire4Host"
+- !private "CSo4Host"
+- "V13SwiftfireCore4Host"
 - "C9Swiftfire14HttpConnection"
 - "C9Swiftfire10HttpHeader"
 - "O9Swiftfire15HttpHeaderField"
@@ -1329,7 +1330,7 @@ depends-nominal:
 - "Ps9Indexable"
 - "Ps13IndexableBase"
 - !private "Vs16IndexingIterator"
-- "OC9Swiftfire7Logfile10InitOption"
+- "OC13SwiftfireCore7Logfile10InitOption"
 - "Si"
 - !private "Vs5Int16"
 - "Vs5Int32"
@@ -1338,7 +1339,7 @@ depends-nominal:
 - !private "Ps7Integer"
 - !private "Ps17IntegerArithmetic"
 - !private "Ps16IteratorProtocol"
-- "C9Swiftfire7Logfile"
+- "C13SwiftfireCore7Logfile"
 - "Ps25LosslessStringConvertible"
 - "Ps10MirrorPath"
 - "Ps17MutableCollection"
@@ -1382,7 +1383,7 @@ depends-nominal:
 - !private "Vs6UInt64"
 - "Vs5UInt8"
 - !private "Sc"
-- "V9Swiftfire13WallclockTime"
+- "V13SwiftfireCore13WallclockTime"
 - "Ps14_ArrayProtocol"
 - "Ps24_DestructorSafeContainer"
 - !private "Ps35_ExpressibleByBuiltinBooleanLiteral"
@@ -1411,16 +1412,17 @@ depends-external:
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/ObjectiveC.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreGraphics.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/IOKit.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterJSON.framework/Modules/SwifterJSON.swiftmodule/x86_64.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/Ascii.framework/Modules/Ascii.swiftmodule/x86_64.swiftmodule"
 - "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterLog.framework/Modules/SwifterLog.swiftmodule/x86_64.swiftmodule"
 - "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/CAsl-0.1.0/Sources/include/CAsl.h"
 - "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/CAsl.framework/Modules/module.modulemap"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterJSON.framework/Modules/SwifterJSON.swiftmodule/x86_64.swiftmodule"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/Ascii.framework/Modules/Ascii.swiftmodule/x86_64.swiftmodule"
 - "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterSockets.framework/Modules/SwifterSockets.swiftmodule/x86_64.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwiftfireCore.framework/Modules/SwiftfireCore.swiftmodule/x86_64.swiftmodule"
 - "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/COpenSsl-0.1.0/module.modulemap"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/AppKit.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreData.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/QuartzCore.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/XPC.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreImage.swiftmodule"
-interface-hash: "9ef086f856b2961044692646054a2200"
+interface-hash: "fbe79749e28297f20aaaa09bc6c2ebdc"

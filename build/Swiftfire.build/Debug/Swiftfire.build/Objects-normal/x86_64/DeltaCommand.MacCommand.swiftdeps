@@ -7,13 +7,13 @@ provides-member:
 provides-dynamic-lookup:
 depends-top-level:
 - "DeltaCommand"
-- !private "StringLiteralType"
-- "MacCommand"
-- !private ">"
 - "VJson"
-- !private "sleep"
+- !private "StringLiteralType"
 - !private "log"
+- !private ">"
+- "MacCommand"
 - !private "UInt32"
+- !private "sleep"
 - !private "min"
 - !private "IntegerLiteralType"
 depends-member:

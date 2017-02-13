@@ -59,6 +59,7 @@
 
 import Foundation
 import SwifterJSON
+import SwiftfireCore
 
 
 private let COMMAND_NAME = "UpdateDomainCommand"

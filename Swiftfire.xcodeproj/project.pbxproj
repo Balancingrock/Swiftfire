@@ -56,7 +56,6 @@
 		OBJ_263 /* DeltaCommand.MacCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_56 /* DeltaCommand.MacCommand.swift */; };
 		OBJ_264 /* DeltaCommand.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_57 /* DeltaCommand.swift */; };
 		OBJ_265 /* Domain.DefaultErrorReplies.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_58 /* Domain.DefaultErrorReplies.swift */; };
-		OBJ_266 /* Domain.HttpWorker.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_59 /* Domain.HttpWorker.swift */; };
 		OBJ_271 /* FileURLs.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_64 /* FileURLs.swift */; };
 		OBJ_272 /* Forwarder.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_65 /* Forwarder.swift */; };
 		OBJ_274 /* FunctionResult.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_67 /* FunctionResult.swift */; };
@@ -586,7 +585,7 @@
 			path = "Packages/SwiftfireCore-0.1.0/Sources";
 			sourceTree = SOURCE_ROOT;
 		};
-		OBJ_5 /*  */ = {
+		OBJ_5 = {
 			isa = PBXGroup;
 			children = (
 				OBJ_6 /* Package.swift */,
@@ -595,7 +594,6 @@
 				OBJ_146 /* build */,
 				OBJ_147 /* Products */,
 			);
-			name = "";
 			sourceTree = "<group>";
 		};
 		OBJ_50 /* Swiftfire */ = {
@@ -885,7 +883,7 @@
 			knownRegions = (
 				en,
 			);
-			mainGroup = OBJ_5 /*  */;
+			mainGroup = OBJ_5;
 			productRefGroup = OBJ_147 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
@@ -1006,7 +1004,6 @@
 				OBJ_263 /* DeltaCommand.MacCommand.swift in Sources */,
 				OBJ_264 /* DeltaCommand.swift in Sources */,
 				OBJ_265 /* Domain.DefaultErrorReplies.swift in Sources */,
-				OBJ_266 /* Domain.HttpWorker.swift in Sources */,
 				OBJ_271 /* FileURLs.swift in Sources */,
 				OBJ_272 /* Forwarder.swift in Sources */,
 				OBJ_274 /* FunctionResult.swift in Sources */,

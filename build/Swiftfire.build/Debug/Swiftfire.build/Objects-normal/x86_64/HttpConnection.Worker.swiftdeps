@@ -6,32 +6,32 @@ provides-member:
 - ["C9Swiftfire14HttpConnection", "worker"]
 provides-dynamic-lookup:
 depends-top-level:
-- "AssignmentPrecedence"
-- "Data"
-- "CastingPrecedence"
-- !private "Date"
-- !private "Forwarder"
-- !private "String"
-- !private "=="
-- !private "SwifterSockets"
 - !private "UnicodeScalarType"
-- !private "!="
 - !private "??="
-- !private "telemetry"
-- !private "Mutation"
-- !private "domains"
-- "HttpHeader"
-- !private "parameters"
-- "HttpConnection"
+- !private "!="
+- "Data"
+- !private "Date"
+- "CastingPrecedence"
+- "AssignmentPrecedence"
+- !private "=="
+- !private "Forwarder"
 - !private "HttpResponse"
-- !private "forwardingConnectionFactory"
+- !private "domains"
+- !private "SwifterSockets"
+- !private "Mutation"
 - !private "Host"
-- !private "HttpVersion"
-- !private "log"
+- !private "String"
 - !private "??"
+- !private "statistics"
+- !private "HttpVersion"
+- "HttpHeader"
+- !private "forwardingConnectionFactory"
+- "HttpConnection"
+- !private "parameters"
+- !private "log"
 - !private "StringLiteralType"
 - !private "HttpResponseCode"
-- !private "statistics"
+- !private "telemetry"
 depends-member:
 - !private ["Ps9AnyObject", "Date"]
 - !private ["Ps9AnyObject", "Host"]
@@ -40,6 +40,7 @@ depends-member:
 - !private ["Ps9AnyObject", "HttpVersion"]
 - !private ["Ps9AnyObject", "Mutation"]
 - !private ["Ps9AnyObject", "SwifterSockets"]
+- !private ["Ps9AnyObject", "address"]
 - !private ["Ps9AnyObject", "allocationCount"]
 - !private ["Ps9AnyObject", "asData"]
 - !private ["Ps9AnyObject", "atLevelDebug"]
@@ -87,6 +88,7 @@ depends-member:
 - !private ["Ps22BidirectionalIndexable", "append"]
 - !private ["Sb", "_getBuiltinLogicValue"]
 - ["Sb", "deinit"]
+- !private ["Ps7CVarArg", "address"]
 - !private ["Ps7CVarArg", "increment"]
 - !private ["Ps7CVarArg", "init"]
 - !private ["Ps7CVarArg", "source"]
@@ -122,6 +124,7 @@ depends-member:
 - !private ["C14SwifterSockets10Connection", "telemetry"]
 - !private ["C14SwifterSockets10Connection", "transfer"]
 - ["C14SwifterSockets10Connection", "worker"]
+- !private ["Ps28CustomDebugStringConvertible", "address"]
 - !private ["Ps28CustomDebugStringConvertible", "append"]
 - !private ["Ps28CustomDebugStringConvertible", "increment"]
 - !private ["Ps28CustomDebugStringConvertible", "init"]
@@ -139,6 +142,7 @@ depends-member:
 - !private ["Ps17CustomReflectable", "javaDate"]
 - !private ["Ps17CustomReflectable", "source"]
 - !private ["Ps23CustomStringConvertible", "_getBuiltinLogicValue"]
+- !private ["Ps23CustomStringConvertible", "address"]
 - !private ["Ps23CustomStringConvertible", "append"]
 - !private ["Ps23CustomStringConvertible", "enabled"]
 - !private ["Ps23CustomStringConvertible", "forwardHost"]
@@ -155,13 +159,13 @@ depends-member:
 - ["V10Foundation4Date", "deinit"]
 - !private ["V10Foundation4Date", "init"]
 - !private ["V10Foundation4Date", "javaDate"]
-- ["C9Swiftfire6Domain", "deinit"]
-- !private ["C9Swiftfire6Domain", "enabled"]
-- !private ["C9Swiftfire6Domain", "forwardHost"]
-- !private ["C9Swiftfire6Domain", "httpWorker"]
-- !private ["C9Swiftfire6Domain", "name"]
-- ["C9Swiftfire7Domains", "deinit"]
-- !private ["C9Swiftfire7Domains", "domain"]
+- ["C13SwiftfireCore6Domain", "deinit"]
+- !private ["C13SwiftfireCore6Domain", "enabled"]
+- !private ["C13SwiftfireCore6Domain", "forwardHost"]
+- !private ["C13SwiftfireCore6Domain", "httpWorker"]
+- !private ["C13SwiftfireCore6Domain", "name"]
+- ["C13SwiftfireCore7Domains", "deinit"]
+- !private ["C13SwiftfireCore7Domains", "domain"]
 - !private ["Sd", "deinit"]
 - !private ["Ps9Equatable", "RawValue"]
 - !private ["Ps9Equatable", "_getBuiltinLogicValue"]
@@ -197,6 +201,7 @@ depends-member:
 - !private ["C9Swiftfire9Forwarder", "transfer"]
 - !private ["Ps8Hashable", "RawValue"]
 - !private ["Ps8Hashable", "_getBuiltinLogicValue"]
+- !private ["Ps8Hashable", "address"]
 - !private ["Ps8Hashable", "append"]
 - !private ["Ps8Hashable", "code200_OK"]
 - !private ["Ps8Hashable", "code400_BadRequest"]
@@ -208,10 +213,12 @@ depends-member:
 - !private ["Ps8Hashable", "javaDate"]
 - !private ["Ps8Hashable", "rawValue"]
 - !private ["Ps8Hashable", "source"]
-- !private ["V9Swiftfire4Host", "address"]
-- ["V9Swiftfire4Host", "deinit"]
-- !private ["V9Swiftfire4Host", "init"]
-- !private ["V9Swiftfire4Host", "port"]
+- !private ["CSo4Host", "address"]
+- !private ["CSo4Host", "deinit"]
+- ["CSo4Host", "init"]
+- !private ["V13SwiftfireCore4Host", "address"]
+- ["V13SwiftfireCore4Host", "deinit"]
+- !private ["V13SwiftfireCore4Host", "port"]
 - ["C9Swiftfire14HttpConnection", "Data"]
 - !private ["C9Swiftfire14HttpConnection", "Date"]
 - !private ["C9Swiftfire14HttpConnection", "Forwarder"]
@@ -283,9 +290,11 @@ depends-member:
 - !private ["PSo9NSCopying", "source"]
 - !private ["PSo16NSMutableCopying", "init"]
 - !private ["PSo16NSMutableCopying", "source"]
+- !private ["CSo8NSObject", "address"]
 - !private ["CSo8NSObject", "increment"]
-- !private ["CSo8NSObject", "init"]
+- ["CSo8NSObject", "init"]
 - !private ["CSo8NSObject", "source"]
+- !private ["PSo16NSObjectProtocol", "address"]
 - !private ["PSo16NSObjectProtocol", "increment"]
 - !private ["PSo16NSObjectProtocol", "init"]
 - !private ["PSo16NSObjectProtocol", "source"]
@@ -405,6 +414,7 @@ depends-member:
 - !private ["Ps35_HasCustomAnyHashableRepresentation", "source"]
 - !private ["Ps9_Hashable", "RawValue"]
 - !private ["Ps9_Hashable", "_getBuiltinLogicValue"]
+- !private ["Ps9_Hashable", "address"]
 - !private ["Ps9_Hashable", "append"]
 - !private ["Ps9_Hashable", "code200_OK"]
 - !private ["Ps9_Hashable", "code400_BadRequest"]
@@ -439,8 +449,8 @@ depends-nominal:
 - !private "Ps23CustomStringConvertible"
 - "V10Foundation4Data"
 - "V10Foundation4Date"
-- "C9Swiftfire6Domain"
-- "C9Swiftfire7Domains"
+- "C13SwiftfireCore6Domain"
+- "C13SwiftfireCore7Domains"
 - !private "Sd"
 - !private "Ps9Equatable"
 - !private "Ps27ExpressibleByBooleanLiteral"
@@ -451,7 +461,8 @@ depends-nominal:
 - !private "Sf"
 - "C9Swiftfire9Forwarder"
 - !private "Ps8Hashable"
-- "V9Swiftfire4Host"
+- "CSo4Host"
+- "V13SwiftfireCore4Host"
 - "C9Swiftfire14HttpConnection"
 - "C9Swiftfire10HttpHeader"
 - !private "C9Swiftfire12HttpResponse"
@@ -472,7 +483,7 @@ depends-nominal:
 - !private "PSo8NSCoding"
 - !private "PSo9NSCopying"
 - !private "PSo16NSMutableCopying"
-- !private "CSo8NSObject"
+- "CSo8NSObject"
 - !private "PSo16NSObjectProtocol"
 - !private "PSo19NSPasteboardReading"
 - !private "PSo19NSPasteboardWriting"
@@ -525,12 +536,13 @@ depends-external:
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/ObjectiveC.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreGraphics.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/IOKit.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterJSON.framework/Modules/SwifterJSON.swiftmodule/x86_64.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/Ascii.framework/Modules/Ascii.swiftmodule/x86_64.swiftmodule"
 - "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterLog.framework/Modules/SwifterLog.swiftmodule/x86_64.swiftmodule"
 - "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/CAsl-0.1.0/Sources/include/CAsl.h"
 - "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/CAsl.framework/Modules/module.modulemap"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterJSON.framework/Modules/SwifterJSON.swiftmodule/x86_64.swiftmodule"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/Ascii.framework/Modules/Ascii.swiftmodule/x86_64.swiftmodule"
 - "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterSockets.framework/Modules/SwifterSockets.swiftmodule/x86_64.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwiftfireCore.framework/Modules/SwiftfireCore.swiftmodule/x86_64.swiftmodule"
 - "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/COpenSsl-0.1.0/module.modulemap"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/AppKit.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreData.swiftmodule"

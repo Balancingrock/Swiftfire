@@ -60,11 +60,7 @@
 import Foundation
 import Ascii
 import SwifterLog
-
-
-// For logging purposes, identifies the module which created the logging entry.
-
-private let SOURCE = "HttpHeader"
+import SwiftfireCore
 
 
 /// This enum encodes the different kinds of operations
@@ -260,7 +256,7 @@ final class HttpHeader {
         var i = 0
         for line in lines {
             let message = "Line " + i.description + ": " + line
-            log.atLevelDebug(id: logId, source: SOURCE + ".writeToDebugLog", message: message)
+            log.atLevelDebug(id: logId, source: #file.source(#function, #line), message: message)
             i += 1
         }
     }
@@ -383,7 +379,7 @@ final class HttpHeader {
     /// - Returns: The host field components if available, nil otherwise.
     /// - Note: If the port is not specified, this component is set to 'nil'.
     
-    var host: Host? {
+    var host: SwiftfireCore.Host? {
         get {
             return _host
         }
@@ -403,7 +399,7 @@ final class HttpHeader {
             }
         }
     }
-    private lazy var _host: Host? = {
+    private lazy var _host: SwiftfireCore.Host? = {
        
         for line in self.lines {
             
@@ -427,7 +423,7 @@ final class HttpHeader {
     
     // MARK: Header logging
     
-    private static var headerLogFile = Logfile(filename: "HeaderLog", fileExtension: "txt", directory: FileURLs.headerLoggingDir, options: .newFileDailyAt(WallclockTime(hour: 0, minute: 0, second: 0)), .maxFileSize(parameters.maxFileSizeForHeaderLogging))
+    private static var headerLogFile = Logfile(name: "HeaderLog", ext: "txt", dir: FileURLs.headerLoggingDir!, options: .newFileDailyAt(WallclockTime(hour: 0, minute: 0, second: 0)), .maxFileSize(parameters.maxFileSizeForHeaderLogging))
 
     static func closeHeaderLoggingFile() {
         if let file = self.headerLogFile {

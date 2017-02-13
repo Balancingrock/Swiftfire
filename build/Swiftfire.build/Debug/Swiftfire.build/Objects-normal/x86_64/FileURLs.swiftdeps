@@ -7,15 +7,15 @@ provides-member:
 - ["C9Swiftfire8FileURLs", ""]
 provides-dynamic-lookup:
 depends-top-level:
-- !private "ObjCBool"
-- "URL"
-- "Bool"
-- "FileManager"
-- "BooleanLiteralType"
-- "StringLiteralType"
 - !private "=="
-- "FileURLs"
+- "BooleanLiteralType"
+- "URL"
 - "ProcessInfo"
+- "FileManager"
+- "Bool"
+- "StringLiteralType"
+- "FileURLs"
+- !private "ObjCBool"
 depends-member:
 - ["Ps9AnyObject", "FileManager"]
 - ["Ps9AnyObject", "ProcessInfo"]

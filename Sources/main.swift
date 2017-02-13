@@ -150,7 +150,7 @@ parameters.logParameterSettings(atLevel: .notice)
 let serverBlacklist = Blacklist()
 
 if let url = FileURLs.serverBlacklist {
-    if serverBlacklist.load(fromFileLocation: url) {
+    if serverBlacklist.load(fromFile: url) {
         log.atLevelNotice(id: -1, source: "Main", message: "Server blacklist loaded.")
         serverBlacklist.writeToLog(atLevel: SwifterLog.Level.notice)
     } else {
@@ -173,7 +173,9 @@ if let url = FileURLs.serverBlacklist {
 // Initialize the domains
 // ======================
 
-if !domains.restore()  {
+let domains = Domains()
+
+if !domains.restore(fromFile: FileURLs.domainDefaults!)  {
     log.atLevelEmergency(id: -1, source: "Main", message: "Swiftfire terminated because the default domains could not be read")
     sleep(5)
     exit(EXIT_FAILURE)
@@ -264,7 +266,7 @@ case .success:
     log.atLevelNotice(id: -1, source: "Main", message: "Closed header logging file")
     
     if let url = FileURLs.serverBlacklist {
-        serverBlacklist.save(toFileLocation: url)
+        serverBlacklist.save(toFile: url)
         log.atLevelNotice(id: -1, source: "Main", message: "Saved server blacklist")
     }
     
