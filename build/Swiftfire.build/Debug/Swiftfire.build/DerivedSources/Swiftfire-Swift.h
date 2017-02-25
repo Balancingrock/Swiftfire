@@ -115,67 +115,8 @@ typedef unsigned int swift_uint4  __attribute__((__ext_vector_type__(4)));
 # define SWIFT_UNAVAILABLE __attribute__((unavailable))
 #endif
 #if defined(__has_feature) && __has_feature(modules)
-@import ObjectiveC;
-@import Foundation;
 #endif
 
 #pragma clang diagnostic ignored "-Wproperty-attribute-mismatch"
 #pragma clang diagnostic ignored "-Wduplicate-method-arg"
-@class Item;
-
-SWIFT_CLASS("_TtC9Swiftfire15DomainTelemetry")
-@interface DomainTelemetry : NSObject
-@property (nonatomic, readonly, strong) Item * _Nonnull nofRequests;
-@property (nonatomic, readonly, strong) Item * _Nonnull nof200;
-@property (nonatomic, readonly, strong) Item * _Nonnull nof400;
-@property (nonatomic, readonly, strong) Item * _Nonnull nof403;
-@property (nonatomic, readonly, strong) Item * _Nonnull nof404;
-@property (nonatomic, readonly, strong) Item * _Nonnull nof500;
-@property (nonatomic, readonly, strong) Item * _Nonnull nof501;
-@property (nonatomic, readonly, strong) Item * _Nonnull nof505;
-@property (nonatomic, copy) NSArray<Item *> * _Nonnull all;
-@property (nonatomic, readonly, strong) DomainTelemetry * _Nonnull duplicate;
-- (nonnull instancetype)init OBJC_DESIGNATED_INITIALIZER;
-- (void)reset;
-- (void)updateWithValuesFrom:(DomainTelemetry * _Nonnull)otherTelemetry;
-@end
-
-
-SWIFT_CLASS("_TtC9Swiftfire18HttpConnectionPool")
-@interface HttpConnectionPool : NSObject
-- (nonnull instancetype)init SWIFT_UNAVAILABLE;
-- (void)request;
-- (void)create;
-@end
-
-
-@interface NSDateComponents (SWIFT_EXTENSION(Swiftfire))
-@end
-
-@class NSCoder;
-
-SWIFT_CLASS("_TtC9Swiftfire7SFError")
-@interface SFError : NSError
-- (nonnull instancetype)initWithMessage:(NSString * _Nonnull)message OBJC_DESIGNATED_INITIALIZER;
-- (nullable instancetype)initWithCoder:(NSCoder * _Nonnull)aDecoder OBJC_DESIGNATED_INITIALIZER;
-- (nonnull instancetype)initWithDomain:(NSString * _Nonnull)domain code:(NSInteger)code userInfo:(NSDictionary * _Nullable)dict SWIFT_UNAVAILABLE;
-@end
-
-@class OS_dispatch_queue;
-
-SWIFT_CLASS("_TtC9Swiftfire13UIntTelemetry")
-@interface UIntTelemetry : NSObject
-SWIFT_CLASS_PROPERTY(@property (nonatomic, class, readonly, strong) OS_dispatch_queue * _Nonnull syncQueue;)
-+ (OS_dispatch_queue * _Nonnull)syncQueue;
-- (nonnull instancetype)init OBJC_DESIGNATED_INITIALIZER;
-- (nonnull instancetype)initWithInitialValue:(NSUInteger)initialValue;
-@property (nonatomic, readonly, copy) NSString * _Nonnull description;
-@property (nonatomic, readonly, copy) NSString * _Nonnull stringValue;
-@property (nonatomic, readonly) NSInteger intValue;
-- (void)initializeTo:(NSUInteger)newValue SWIFT_METHOD_FAMILY(none);
-- (void)reinitialize;
-- (void)increment;
-- (void)decrement;
-@end
-
 #pragma clang diagnostic pop

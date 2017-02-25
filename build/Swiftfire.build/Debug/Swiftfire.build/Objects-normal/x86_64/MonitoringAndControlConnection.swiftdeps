@@ -10,66 +10,70 @@ provides-member:
 - ["C9Swiftfire30MonitoringAndControlConnection", ""]
 provides-dynamic-lookup:
 depends-top-level:
-- !private "-"
-- !private "UpdateClientCommand"
-- "StringLiteralType"
-- !private "RemoveDomainCommand"
-- !private "log"
-- !private "+="
-- !private "BooleanLiteralType"
-- !private "-="
-- "UInt8"
-- "UnsafeBufferPointer"
-- !private "ServerStopCommand"
-- !private "ReadDomainsCommand"
-- !private "DeltaCommand"
-- !private "RestoreServerParametersCommand"
-- "DispatchQueue"
-- !private "UpdateDomainCommand"
-- !private "ReadBlacklistCommand"
-- !private "!"
-- "SwifterSockets"
-- "MacCommandFactory"
-- "macErrorHandler"
-- !private "SaveDomainsCommand"
-- !private "SaveServerParametersCommand"
-- !private "ResetDomainTelemetryCommand"
-- "MonitoringAndControlConnection"
-- !private "ModifyBlacklistCommand"
-- "Array"
-- "UnsafeMutableRawPointer"
-- "mac"
-- "macConnectionFactory"
-- !private "SaveBlacklistCommand"
 - !private "WriteServerParameterCommand"
-- !private "RestoreDomainsCommand"
-- !private "RestoreBlacklistCommand"
-- !private "ReadStatisticsCommand"
-- "*"
-- !private "CreateDomainCommand"
-- "String"
-- !private "ReadServerTelemetryCommand"
-- !private "ServerQuitCommand"
-- !private "memcpy"
-- "MacMessage"
-- "Bool"
 - !private "UpdatePathPartCommand"
-- !private "UnsafeRawPointer"
-- "AssignmentPrecedence"
-- !private "ServerStartCommand"
-- !private "ReadServerParameterCommand"
+- !private "UpdateClientCommand"
+- !private "SaveBlacklistCommand"
+- !private "memcpy"
+- !private "+="
+- !private "SwifterLog"
+- !private "ReadServerTelemetryCommand"
 - !private "VJson"
+- !private "DeltaCommand"
+- "MonitoringAndControlConnection"
+- !private "UpdateServicesCommand"
+- "AssignmentPrecedence"
+- !private "=="
+- !private "CreateDomainCommand"
+- "StringLiteralType"
+- !private "RestoreBlacklistCommand"
+- !private "ServerQuitCommand"
+- !private "ReadDomainsCommand"
+- !private "RestoreServerParametersCommand"
+- !private "RemoveDomainCommand"
+- !private "BooleanLiteralType"
+- !private "ResetDomainTelemetryCommand"
+- "macErrorHandler"
+- "MacCommandFactory"
+- "mac"
+- "SwifterSockets"
+- !private "log"
+- !private "UnsafeRawPointer"
+- "UnsafeMutableRawPointer"
+- !private "ServerStartCommand"
+- !private "ReadStatisticsCommand"
+- "UnsafeBufferPointer"
+- "MacMessage"
+- !private "SaveDomainsCommand"
+- "*"
+- "UInt8"
+- !private "-="
+- !private "ReadServerParameterCommand"
+- "String"
+- "DispatchQueue"
+- !private "!"
+- !private "ReadBlacklistCommand"
+- !private "-"
+- !private "ReadServicesCommand"
+- !private "SaveServerParametersCommand"
+- !private "UpdateDomainCommand"
+- !private "RestoreDomainsCommand"
+- "macConnectionFactory"
+- !private "UpdateBlacklistCommand"
+- "Array"
+- "Bool"
+- !private "ServerStopCommand"
 depends-member:
 - !private ["Ps9AnyObject", "CreateDomainCommand"]
 - !private ["Ps9AnyObject", "DeltaCommand"]
 - ["Ps9AnyObject", "DispatchQueue"]
 - !private ["Ps9AnyObject", "Exception"]
-- !private ["Ps9AnyObject", "ModifyBlacklistCommand"]
 - !private ["Ps9AnyObject", "Option"]
 - !private ["Ps9AnyObject", "ReadBlacklistCommand"]
 - !private ["Ps9AnyObject", "ReadDomainsCommand"]
 - !private ["Ps9AnyObject", "ReadServerParameterCommand"]
 - !private ["Ps9AnyObject", "ReadServerTelemetryCommand"]
+- !private ["Ps9AnyObject", "ReadServicesCommand"]
 - !private ["Ps9AnyObject", "ReadStatisticsCommand"]
 - !private ["Ps9AnyObject", "RemoveDomainCommand"]
 - !private ["Ps9AnyObject", "ResetDomainTelemetryCommand"]
@@ -82,12 +86,16 @@ depends-member:
 - !private ["Ps9AnyObject", "ServerQuitCommand"]
 - !private ["Ps9AnyObject", "ServerStartCommand"]
 - !private ["Ps9AnyObject", "ServerStopCommand"]
+- !private ["Ps9AnyObject", "SwifterLog"]
 - !private ["Ps9AnyObject", "SwifterSockets"]
+- !private ["Ps9AnyObject", "Target"]
 - !private ["Ps9AnyObject", "UnsafeMutableRawPointer"]
 - !private ["Ps9AnyObject", "UnsafeRawPointer"]
+- !private ["Ps9AnyObject", "UpdateBlacklistCommand"]
 - !private ["Ps9AnyObject", "UpdateClientCommand"]
 - !private ["Ps9AnyObject", "UpdateDomainCommand"]
 - !private ["Ps9AnyObject", "UpdatePathPartCommand"]
+- !private ["Ps9AnyObject", "UpdateServicesCommand"]
 - !private ["Ps9AnyObject", "VJson"]
 - !private ["Ps9AnyObject", "WriteServerParameterCommand"]
 - ["Ps9AnyObject", "abortConnection"]
@@ -155,12 +163,12 @@ depends-member:
 - ["C14SwifterSockets10Connection", "DispatchQueue"]
 - ["C14SwifterSockets10Connection", "MacCommandFactory"]
 - ["C14SwifterSockets10Connection", "MacMessage"]
-- !private ["C14SwifterSockets10Connection", "ModifyBlacklistCommand"]
 - !private ["C14SwifterSockets10Connection", "Option"]
 - !private ["C14SwifterSockets10Connection", "ReadBlacklistCommand"]
 - !private ["C14SwifterSockets10Connection", "ReadDomainsCommand"]
 - !private ["C14SwifterSockets10Connection", "ReadServerParameterCommand"]
 - !private ["C14SwifterSockets10Connection", "ReadServerTelemetryCommand"]
+- !private ["C14SwifterSockets10Connection", "ReadServicesCommand"]
 - !private ["C14SwifterSockets10Connection", "ReadStatisticsCommand"]
 - !private ["C14SwifterSockets10Connection", "RemoveDomainCommand"]
 - !private ["C14SwifterSockets10Connection", "ResetDomainTelemetryCommand"]
@@ -174,14 +182,17 @@ depends-member:
 - !private ["C14SwifterSockets10Connection", "ServerStartCommand"]
 - !private ["C14SwifterSockets10Connection", "ServerStopCommand"]
 - ["C14SwifterSockets10Connection", "String"]
+- !private ["C14SwifterSockets10Connection", "SwifterLog"]
 - ["C14SwifterSockets10Connection", "SwifterSockets"]
 - ["C14SwifterSockets10Connection", "UInt8"]
 - ["C14SwifterSockets10Connection", "UnsafeBufferPointer"]
 - ["C14SwifterSockets10Connection", "UnsafeMutableRawPointer"]
 - !private ["C14SwifterSockets10Connection", "UnsafeRawPointer"]
+- !private ["C14SwifterSockets10Connection", "UpdateBlacklistCommand"]
 - !private ["C14SwifterSockets10Connection", "UpdateClientCommand"]
 - !private ["C14SwifterSockets10Connection", "UpdateDomainCommand"]
 - !private ["C14SwifterSockets10Connection", "UpdatePathPartCommand"]
+- !private ["C14SwifterSockets10Connection", "UpdateServicesCommand"]
 - !private ["C14SwifterSockets10Connection", "VJson"]
 - !private ["C14SwifterSockets10Connection", "WriteServerParameterCommand"]
 - ["C14SwifterSockets10Connection", "abortConnection"]
@@ -201,7 +212,7 @@ depends-member:
 - ["C14SwifterSockets10Connection", "receiverData"]
 - ["C14SwifterSockets10Connection", "transfer"]
 - ["C14SwifterSockets10Connection", ""]
-- !private ["C9Swiftfire19CreateDomainCommand", "factory"]
+- !private ["C13SwiftfireCore19CreateDomainCommand", "factory"]
 - !private ["Ps28CustomDebugStringConvertible", "IndexDistance"]
 - !private ["Ps28CustomDebugStringConvertible", "Iterator"]
 - !private ["Ps28CustomDebugStringConvertible", "_Element"]
@@ -239,11 +250,12 @@ depends-member:
 - ["Ps23CustomStringConvertible", "init"]
 - !private ["Ps23CustomStringConvertible", "parse"]
 - ["Ps23CustomStringConvertible", "reason"]
-- !private ["C9Swiftfire12DeltaCommand", "factory"]
+- !private ["C13SwiftfireCore12DeltaCommand", "factory"]
 - ["CSo14DispatchObject", "init"]
 - ["CSo13DispatchQueue", "deinit"]
 - ["CSo13DispatchQueue", "init"]
 - !private ["Sd", "deinit"]
+- !private ["Ps9Equatable", "ALL_NON_RECURSIVE"]
 - !private ["Ps9Equatable", "Exception"]
 - !private ["Ps9Equatable", "_getBuiltinLogicValue"]
 - !private ["Ps9Equatable", "advanced"]
@@ -270,6 +282,7 @@ depends-member:
 - ["Ps26ExpressibleByStringLiteral", "init"]
 - ["Ps33ExpressibleByUnicodeScalarLiteral", "init"]
 - !private ["Sf", "deinit"]
+- !private ["Ps8Hashable", "ALL_NON_RECURSIVE"]
 - !private ["Ps8Hashable", "_getBuiltinLogicValue"]
 - !private ["Ps8Hashable", "advanced"]
 - !private ["Ps8Hashable", "allocate"]
@@ -299,15 +312,14 @@ depends-member:
 - !private ["Ps16IteratorProtocol", "Element"]
 - !private ["Ps25LosslessStringConvertible", "_getBuiltinLogicValue"]
 - ["Ps25LosslessStringConvertible", "init"]
-- ["P9Swiftfire10MacCommand", "deinit"]
-- !private ["P9Swiftfire10MacCommand", "execute"]
-- !private ["P9Swiftfire10MacCommand", "factory"]
-- ["P9Swiftfire10MacMessage", "deinit"]
-- !private ["P9Swiftfire10MacMessage", "execute"]
-- !private ["P9Swiftfire10MacMessage", "factory"]
-- !private ["P9Swiftfire10MacMessage", "json"]
+- ["P13SwiftfireCore10MacCommand", "deinit"]
+- !private ["P13SwiftfireCore10MacCommand", "execute"]
+- !private ["P13SwiftfireCore10MacCommand", "factory"]
+- ["P13SwiftfireCore10MacMessage", "deinit"]
+- !private ["P13SwiftfireCore10MacMessage", "execute"]
+- !private ["P13SwiftfireCore10MacMessage", "factory"]
+- !private ["P13SwiftfireCore10MacMessage", "json"]
 - ["Ps10MirrorPath", "init"]
-- !private ["C9Swiftfire22ModifyBlacklistCommand", "factory"]
 - ["C9Swiftfire30MonitoringAndControlConnection", "Array"]
 - ["C9Swiftfire30MonitoringAndControlConnection", "Bool"]
 - !private ["C9Swiftfire30MonitoringAndControlConnection", "CreateDomainCommand"]
@@ -315,11 +327,11 @@ depends-member:
 - ["C9Swiftfire30MonitoringAndControlConnection", "DispatchQueue"]
 - ["C9Swiftfire30MonitoringAndControlConnection", "MacCommandFactory"]
 - ["C9Swiftfire30MonitoringAndControlConnection", "MacMessage"]
-- !private ["C9Swiftfire30MonitoringAndControlConnection", "ModifyBlacklistCommand"]
 - !private ["C9Swiftfire30MonitoringAndControlConnection", "ReadBlacklistCommand"]
 - !private ["C9Swiftfire30MonitoringAndControlConnection", "ReadDomainsCommand"]
 - !private ["C9Swiftfire30MonitoringAndControlConnection", "ReadServerParameterCommand"]
 - !private ["C9Swiftfire30MonitoringAndControlConnection", "ReadServerTelemetryCommand"]
+- !private ["C9Swiftfire30MonitoringAndControlConnection", "ReadServicesCommand"]
 - !private ["C9Swiftfire30MonitoringAndControlConnection", "ReadStatisticsCommand"]
 - !private ["C9Swiftfire30MonitoringAndControlConnection", "RemoveDomainCommand"]
 - !private ["C9Swiftfire30MonitoringAndControlConnection", "ResetDomainTelemetryCommand"]
@@ -333,14 +345,17 @@ depends-member:
 - !private ["C9Swiftfire30MonitoringAndControlConnection", "ServerStartCommand"]
 - !private ["C9Swiftfire30MonitoringAndControlConnection", "ServerStopCommand"]
 - ["C9Swiftfire30MonitoringAndControlConnection", "String"]
+- !private ["C9Swiftfire30MonitoringAndControlConnection", "SwifterLog"]
 - ["C9Swiftfire30MonitoringAndControlConnection", "SwifterSockets"]
 - ["C9Swiftfire30MonitoringAndControlConnection", "UInt8"]
 - ["C9Swiftfire30MonitoringAndControlConnection", "UnsafeBufferPointer"]
 - ["C9Swiftfire30MonitoringAndControlConnection", "UnsafeMutableRawPointer"]
 - !private ["C9Swiftfire30MonitoringAndControlConnection", "UnsafeRawPointer"]
+- !private ["C9Swiftfire30MonitoringAndControlConnection", "UpdateBlacklistCommand"]
 - !private ["C9Swiftfire30MonitoringAndControlConnection", "UpdateClientCommand"]
 - !private ["C9Swiftfire30MonitoringAndControlConnection", "UpdateDomainCommand"]
 - !private ["C9Swiftfire30MonitoringAndControlConnection", "UpdatePathPartCommand"]
+- !private ["C9Swiftfire30MonitoringAndControlConnection", "UpdateServicesCommand"]
 - !private ["C9Swiftfire30MonitoringAndControlConnection", "VJson"]
 - !private ["C9Swiftfire30MonitoringAndControlConnection", "WriteServerParameterCommand"]
 - ["C9Swiftfire30MonitoringAndControlConnection", "abortConnection"]
@@ -400,20 +415,21 @@ depends-member:
 - !private ["Ps25RangeReplaceableIndexable", "Iterator"]
 - !private ["Ps25RangeReplaceableIndexable", "_Element"]
 - !private ["Ps25RangeReplaceableIndexable", "append"]
-- !private ["C9Swiftfire20ReadBlacklistCommand", "factory"]
-- !private ["C9Swiftfire18ReadDomainsCommand", "factory"]
-- !private ["C9Swiftfire26ReadServerParameterCommand", "factory"]
-- !private ["C9Swiftfire26ReadServerTelemetryCommand", "factory"]
-- !private ["C9Swiftfire21ReadStatisticsCommand", "factory"]
+- !private ["C13SwiftfireCore20ReadBlacklistCommand", "factory"]
+- !private ["C13SwiftfireCore18ReadDomainsCommand", "factory"]
+- !private ["C13SwiftfireCore26ReadServerParameterCommand", "factory"]
+- !private ["C13SwiftfireCore26ReadServerTelemetryCommand", "factory"]
+- !private ["C13SwiftfireCore19ReadServicesCommand", "factory"]
+- !private ["C13SwiftfireCore21ReadStatisticsCommand", "factory"]
 - !private ["P14SwifterSockets16ReceiverProtocol", "CreateDomainCommand"]
 - !private ["P14SwifterSockets16ReceiverProtocol", "DeltaCommand"]
 - ["P14SwifterSockets16ReceiverProtocol", "DispatchQueue"]
-- !private ["P14SwifterSockets16ReceiverProtocol", "ModifyBlacklistCommand"]
 - !private ["P14SwifterSockets16ReceiverProtocol", "Option"]
 - !private ["P14SwifterSockets16ReceiverProtocol", "ReadBlacklistCommand"]
 - !private ["P14SwifterSockets16ReceiverProtocol", "ReadDomainsCommand"]
 - !private ["P14SwifterSockets16ReceiverProtocol", "ReadServerParameterCommand"]
 - !private ["P14SwifterSockets16ReceiverProtocol", "ReadServerTelemetryCommand"]
+- !private ["P14SwifterSockets16ReceiverProtocol", "ReadServicesCommand"]
 - !private ["P14SwifterSockets16ReceiverProtocol", "ReadStatisticsCommand"]
 - !private ["P14SwifterSockets16ReceiverProtocol", "RemoveDomainCommand"]
 - !private ["P14SwifterSockets16ReceiverProtocol", "ResetDomainTelemetryCommand"]
@@ -426,12 +442,15 @@ depends-member:
 - !private ["P14SwifterSockets16ReceiverProtocol", "ServerQuitCommand"]
 - !private ["P14SwifterSockets16ReceiverProtocol", "ServerStartCommand"]
 - !private ["P14SwifterSockets16ReceiverProtocol", "ServerStopCommand"]
+- !private ["P14SwifterSockets16ReceiverProtocol", "SwifterLog"]
 - !private ["P14SwifterSockets16ReceiverProtocol", "SwifterSockets"]
 - !private ["P14SwifterSockets16ReceiverProtocol", "UnsafeMutableRawPointer"]
 - !private ["P14SwifterSockets16ReceiverProtocol", "UnsafeRawPointer"]
+- !private ["P14SwifterSockets16ReceiverProtocol", "UpdateBlacklistCommand"]
 - !private ["P14SwifterSockets16ReceiverProtocol", "UpdateClientCommand"]
 - !private ["P14SwifterSockets16ReceiverProtocol", "UpdateDomainCommand"]
 - !private ["P14SwifterSockets16ReceiverProtocol", "UpdatePathPartCommand"]
+- !private ["P14SwifterSockets16ReceiverProtocol", "UpdateServicesCommand"]
 - !private ["P14SwifterSockets16ReceiverProtocol", "VJson"]
 - !private ["P14SwifterSockets16ReceiverProtocol", "WriteServerParameterCommand"]
 - ["P14SwifterSockets16ReceiverProtocol", "abortConnection"]
@@ -450,14 +469,14 @@ depends-member:
 - ["P14SwifterSockets16ReceiverProtocol", "receiverData"]
 - ["P14SwifterSockets16ReceiverProtocol", "transfer"]
 - ["P14SwifterSockets16ReceiverProtocol", ""]
-- !private ["C9Swiftfire19RemoveDomainCommand", "factory"]
-- !private ["C9Swiftfire27ResetDomainTelemetryCommand", "factory"]
-- !private ["C9Swiftfire23RestoreBlacklistCommand", "factory"]
-- !private ["C9Swiftfire21RestoreDomainsCommand", "factory"]
-- !private ["C9Swiftfire30RestoreServerParametersCommand", "factory"]
-- !private ["C9Swiftfire20SaveBlacklistCommand", "factory"]
-- !private ["C9Swiftfire18SaveDomainsCommand", "factory"]
-- !private ["C9Swiftfire27SaveServerParametersCommand", "factory"]
+- !private ["C13SwiftfireCore19RemoveDomainCommand", "factory"]
+- !private ["C13SwiftfireCore27ResetDomainTelemetryCommand", "factory"]
+- !private ["C13SwiftfireCore23RestoreBlacklistCommand", "factory"]
+- !private ["C13SwiftfireCore21RestoreDomainsCommand", "factory"]
+- !private ["C13SwiftfireCore30RestoreServerParametersCommand", "factory"]
+- !private ["C13SwiftfireCore20SaveBlacklistCommand", "factory"]
+- !private ["C13SwiftfireCore18SaveDomainsCommand", "factory"]
+- !private ["C13SwiftfireCore27SaveServerParametersCommand", "factory"]
 - !private ["Ps8Sequence", "Element"]
 - !private ["Ps8Sequence", "Exception"]
 - !private ["Ps8Sequence", "IndexDistance"]
@@ -469,9 +488,10 @@ depends-member:
 - !private ["Ps8Sequence", "count"]
 - !private ["Ps8Sequence", "findPossibleJsonCode"]
 - !private ["Ps8Sequence", "parse"]
-- !private ["C9Swiftfire17ServerQuitCommand", "factory"]
-- !private ["C9Swiftfire18ServerStartCommand", "factory"]
-- !private ["C9Swiftfire17ServerStopCommand", "factory"]
+- !private ["C13SwiftfireCore17ServerQuitCommand", "factory"]
+- !private ["C13SwiftfireCore18ServerStartCommand", "factory"]
+- !private ["C13SwiftfireCore17ServerStopCommand", "factory"]
+- ["Vs3Set", "deinit"]
 - ["Vs12StaticString", "deinit"]
 - !private ["Vs12StaticString", "init"]
 - !private ["Ps10Strideable", "advanced"]
@@ -481,21 +501,24 @@ depends-member:
 - !private ["Ps10Strideable", "init"]
 - ["SS", "deinit"]
 - ["SS", "init"]
+- !private ["C10SwifterLog10SwifterLog", "Target"]
 - !private ["C10SwifterLog10SwifterLog", "atLevelDebug"]
 - !private ["C10SwifterLog10SwifterLog", "atLevelError"]
 - !private ["C10SwifterLog10SwifterLog", "atLevelNotice"]
 - ["C10SwifterLog10SwifterLog", "deinit"]
+- !private ["OC10SwifterLog10SwifterLog6Target", "ALL_NON_RECURSIVE"]
 - ["Ps16TextOutputStream", "init"]
 - ["Ps20TextOutputStreamable", "init"]
+- ["O14SwifterSockets14TransferResult", "deinit"]
 - !private ["P14SwifterSockets19TransmitterProtocol", "CreateDomainCommand"]
 - !private ["P14SwifterSockets19TransmitterProtocol", "DeltaCommand"]
 - ["P14SwifterSockets19TransmitterProtocol", "DispatchQueue"]
-- !private ["P14SwifterSockets19TransmitterProtocol", "ModifyBlacklistCommand"]
 - !private ["P14SwifterSockets19TransmitterProtocol", "Option"]
 - !private ["P14SwifterSockets19TransmitterProtocol", "ReadBlacklistCommand"]
 - !private ["P14SwifterSockets19TransmitterProtocol", "ReadDomainsCommand"]
 - !private ["P14SwifterSockets19TransmitterProtocol", "ReadServerParameterCommand"]
 - !private ["P14SwifterSockets19TransmitterProtocol", "ReadServerTelemetryCommand"]
+- !private ["P14SwifterSockets19TransmitterProtocol", "ReadServicesCommand"]
 - !private ["P14SwifterSockets19TransmitterProtocol", "ReadStatisticsCommand"]
 - !private ["P14SwifterSockets19TransmitterProtocol", "RemoveDomainCommand"]
 - !private ["P14SwifterSockets19TransmitterProtocol", "ResetDomainTelemetryCommand"]
@@ -508,12 +531,15 @@ depends-member:
 - !private ["P14SwifterSockets19TransmitterProtocol", "ServerQuitCommand"]
 - !private ["P14SwifterSockets19TransmitterProtocol", "ServerStartCommand"]
 - !private ["P14SwifterSockets19TransmitterProtocol", "ServerStopCommand"]
+- !private ["P14SwifterSockets19TransmitterProtocol", "SwifterLog"]
 - !private ["P14SwifterSockets19TransmitterProtocol", "SwifterSockets"]
 - !private ["P14SwifterSockets19TransmitterProtocol", "UnsafeMutableRawPointer"]
 - !private ["P14SwifterSockets19TransmitterProtocol", "UnsafeRawPointer"]
+- !private ["P14SwifterSockets19TransmitterProtocol", "UpdateBlacklistCommand"]
 - !private ["P14SwifterSockets19TransmitterProtocol", "UpdateClientCommand"]
 - !private ["P14SwifterSockets19TransmitterProtocol", "UpdateDomainCommand"]
 - !private ["P14SwifterSockets19TransmitterProtocol", "UpdatePathPartCommand"]
+- !private ["P14SwifterSockets19TransmitterProtocol", "UpdateServicesCommand"]
 - !private ["P14SwifterSockets19TransmitterProtocol", "VJson"]
 - !private ["P14SwifterSockets19TransmitterProtocol", "WriteServerParameterCommand"]
 - ["P14SwifterSockets19TransmitterProtocol", "abortConnection"]
@@ -551,9 +577,11 @@ depends-member:
 - ["SV", "deinit"]
 - !private ["SV", "distance"]
 - !private ["SV", "init"]
-- !private ["C9Swiftfire19UpdateClientCommand", "factory"]
-- !private ["C9Swiftfire19UpdateDomainCommand", "factory"]
-- !private ["C9Swiftfire21UpdatePathPartCommand", "factory"]
+- !private ["C13SwiftfireCore22UpdateBlacklistCommand", "factory"]
+- !private ["C13SwiftfireCore19UpdateClientCommand", "factory"]
+- !private ["C13SwiftfireCore19UpdateDomainCommand", "factory"]
+- !private ["C13SwiftfireCore21UpdatePathPartCommand", "factory"]
+- !private ["C13SwiftfireCore21UpdateServicesCommand", "factory"]
 - !private ["C11SwifterJSON5VJson", "Exception"]
 - !private ["C11SwifterJSON5VJson", "code"]
 - ["C11SwifterJSON5VJson", "deinit"]
@@ -564,8 +592,9 @@ depends-member:
 - !private ["P11SwifterJSON19VJsonDeserializable", "json"]
 - !private ["P11SwifterJSON17VJsonSerializable", "execute"]
 - !private ["P11SwifterJSON17VJsonSerializable", "factory"]
+- ["P11SwifterJSON17VJsonSerializable", "init"]
 - !private ["P11SwifterJSON17VJsonSerializable", "json"]
-- !private ["C9Swiftfire27WriteServerParameterCommand", "factory"]
+- !private ["C13SwiftfireCore27WriteServerParameterCommand", "factory"]
 - !private ["Ps14_ArrayProtocol", "Iterator"]
 - !private ["Ps14_ArrayProtocol", "_Element"]
 - !private ["Ps14_ArrayProtocol", "append"]
@@ -578,6 +607,7 @@ depends-member:
 - ["Ps39_ExpressibleByBuiltinUTF16StringLiteral", "init"]
 - ["Ps41_ExpressibleByBuiltinUnicodeScalarLiteral", "init"]
 - ["Ps35_HasCustomAnyHashableRepresentation", "init"]
+- !private ["Ps9_Hashable", "ALL_NON_RECURSIVE"]
 - !private ["Ps9_Hashable", "_getBuiltinLogicValue"]
 - !private ["Ps9_Hashable", "advanced"]
 - !private ["Ps9_Hashable", "allocate"]
@@ -611,12 +641,12 @@ depends-nominal:
 - !private "Ps10Collection"
 - "Ps10Comparable"
 - "C14SwifterSockets10Connection"
-- !private "C9Swiftfire19CreateDomainCommand"
+- !private "C13SwiftfireCore19CreateDomainCommand"
 - "Ps28CustomDebugStringConvertible"
 - "Ps29CustomPlaygroundQuickLookable"
 - "Ps17CustomReflectable"
 - "Ps23CustomStringConvertible"
-- !private "C9Swiftfire12DeltaCommand"
+- !private "C13SwiftfireCore12DeltaCommand"
 - "CSo14DispatchObject"
 - "CSo13DispatchQueue"
 - !private "Sd"
@@ -644,10 +674,9 @@ depends-nominal:
 - "P14SwifterSockets15InterfaceAccess"
 - !private "Ps16IteratorProtocol"
 - "Ps25LosslessStringConvertible"
-- "P9Swiftfire10MacCommand"
-- "P9Swiftfire10MacMessage"
+- "P13SwiftfireCore10MacCommand"
+- "P13SwiftfireCore10MacMessage"
 - "Ps10MirrorPath"
-- !private "C9Swiftfire22ModifyBlacklistCommand"
 - "C9Swiftfire30MonitoringAndControlConnection"
 - !private "Ps17MutableCollection"
 - !private "Ps16MutableIndexable"
@@ -668,30 +697,34 @@ depends-nominal:
 - !private "Ps21RandomAccessIndexable"
 - !private "Ps26RangeReplaceableCollection"
 - !private "Ps25RangeReplaceableIndexable"
-- !private "C9Swiftfire20ReadBlacklistCommand"
-- !private "C9Swiftfire18ReadDomainsCommand"
-- !private "C9Swiftfire26ReadServerParameterCommand"
-- !private "C9Swiftfire26ReadServerTelemetryCommand"
-- !private "C9Swiftfire21ReadStatisticsCommand"
+- !private "C13SwiftfireCore20ReadBlacklistCommand"
+- !private "C13SwiftfireCore18ReadDomainsCommand"
+- !private "C13SwiftfireCore26ReadServerParameterCommand"
+- !private "C13SwiftfireCore26ReadServerTelemetryCommand"
+- !private "C13SwiftfireCore19ReadServicesCommand"
+- !private "C13SwiftfireCore21ReadStatisticsCommand"
 - "P14SwifterSockets16ReceiverProtocol"
-- !private "C9Swiftfire19RemoveDomainCommand"
-- !private "C9Swiftfire27ResetDomainTelemetryCommand"
-- !private "C9Swiftfire23RestoreBlacklistCommand"
-- !private "C9Swiftfire21RestoreDomainsCommand"
-- !private "C9Swiftfire30RestoreServerParametersCommand"
-- !private "C9Swiftfire20SaveBlacklistCommand"
-- !private "C9Swiftfire18SaveDomainsCommand"
-- !private "C9Swiftfire27SaveServerParametersCommand"
+- !private "C13SwiftfireCore19RemoveDomainCommand"
+- !private "C13SwiftfireCore27ResetDomainTelemetryCommand"
+- !private "C13SwiftfireCore23RestoreBlacklistCommand"
+- !private "C13SwiftfireCore21RestoreDomainsCommand"
+- !private "C13SwiftfireCore30RestoreServerParametersCommand"
+- !private "C13SwiftfireCore20SaveBlacklistCommand"
+- !private "C13SwiftfireCore18SaveDomainsCommand"
+- !private "C13SwiftfireCore27SaveServerParametersCommand"
 - !private "Ps8Sequence"
-- !private "C9Swiftfire17ServerQuitCommand"
-- !private "C9Swiftfire18ServerStartCommand"
-- !private "C9Swiftfire17ServerStopCommand"
+- !private "C13SwiftfireCore17ServerQuitCommand"
+- !private "C13SwiftfireCore18ServerStartCommand"
+- !private "C13SwiftfireCore17ServerStopCommand"
+- "Vs3Set"
 - "Vs12StaticString"
 - !private "Ps10Strideable"
 - "SS"
 - "C10SwifterLog10SwifterLog"
+- !private "OC10SwifterLog10SwifterLog6Target"
 - "Ps16TextOutputStream"
 - "Ps20TextOutputStreamable"
+- "O14SwifterSockets14TransferResult"
 - "P14SwifterSockets19TransmitterProtocol"
 - "Su"
 - !private "Vs6UInt16"
@@ -703,13 +736,15 @@ depends-nominal:
 - "Sv"
 - "SP"
 - "SV"
-- !private "C9Swiftfire19UpdateClientCommand"
-- !private "C9Swiftfire19UpdateDomainCommand"
-- !private "C9Swiftfire21UpdatePathPartCommand"
+- !private "C13SwiftfireCore22UpdateBlacklistCommand"
+- !private "C13SwiftfireCore19UpdateClientCommand"
+- !private "C13SwiftfireCore19UpdateDomainCommand"
+- !private "C13SwiftfireCore21UpdatePathPartCommand"
+- !private "C13SwiftfireCore21UpdateServicesCommand"
 - "C11SwifterJSON5VJson"
 - !private "P11SwifterJSON19VJsonDeserializable"
-- !private "P11SwifterJSON17VJsonSerializable"
-- !private "C9Swiftfire27WriteServerParameterCommand"
+- "P11SwifterJSON17VJsonSerializable"
+- !private "C13SwiftfireCore27WriteServerParameterCommand"
 - !private "Ps14_ArrayProtocol"
 - !private "Ps24_DestructorSafeContainer"
 - !private "Ps35_ExpressibleByBuiltinBooleanLiteral"
@@ -732,17 +767,16 @@ depends-external:
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/ObjectiveC.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreGraphics.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/IOKit.swiftmodule"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterJSON.framework/Modules/SwifterJSON.swiftmodule/x86_64.swiftmodule"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/Ascii.framework/Modules/Ascii.swiftmodule/x86_64.swiftmodule"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterLog.framework/Modules/SwifterLog.swiftmodule/x86_64.swiftmodule"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/CAsl-0.1.0/Sources/include/CAsl.h"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/CAsl.framework/Modules/module.modulemap"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterSockets.framework/Modules/SwifterSockets.swiftmodule/x86_64.swiftmodule"
 - "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwiftfireCore.framework/Modules/SwiftfireCore.swiftmodule/x86_64.swiftmodule"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/COpenSsl-0.1.0/module.modulemap"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/Ascii.framework/Modules/Ascii.swiftmodule/x86_64.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/AppKit.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreData.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/QuartzCore.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/XPC.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreImage.swiftmodule"
-interface-hash: "18b91d9b617722c34a9d4fc08b1a1928"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterJSON.framework/Modules/SwifterJSON.swiftmodule/x86_64.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterLog.framework/Modules/SwifterLog.swiftmodule/x86_64.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/CAsl-0.1.0/Sources/include/CAsl.h"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/CAsl.framework/Modules/module.modulemap"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterSockets.framework/Modules/SwifterSockets.swiftmodule/x86_64.swiftmodule"
+interface-hash: "33dc9f41bf18e65c556d212d4ea5019b"

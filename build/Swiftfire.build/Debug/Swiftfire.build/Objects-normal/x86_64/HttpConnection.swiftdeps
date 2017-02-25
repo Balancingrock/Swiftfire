@@ -1,39 +1,48 @@
 ### Swift dependencies file v0 ###
 provides-top-level:
 - "HttpConnection"
+- "httpConnectionFactory"
 provides-nominal:
 - "C9Swiftfire14HttpConnection"
 provides-member:
 - ["C9Swiftfire14HttpConnection", ""]
 provides-dynamic-lookup:
 depends-top-level:
-- !private "+="
-- !private "log"
-- "HttpHeader"
-- !private "httpConnectionPool"
-- !private ">"
-- "String"
+- "Int32"
+- !private "Array"
 - "Data"
-- "SwifterSockets"
-- "FileManager"
-- "AssignmentPrecedence"
-- !private "=="
-- !private "+"
-- !private "Range"
-- "Int"
-- "DispatchQueue"
+- !private "serverBlacklist"
 - "Bool"
-- "UInt8"
-- "UnsafeBufferPointer"
 - "StringLiteralType"
+- "Int64"
+- "httpConnectionFactory"
+- !private "connectionPool"
+- !private "Date"
+- "UnsafeBufferPointer"
+- "FileManager"
+- "UInt8"
+- !private "telemetry"
+- "BooleanLiteralType"
+- !private ">"
+- "Int"
+- "Int16"
+- "DispatchQueue"
 - "HttpConnection"
+- "HttpHeader"
+- !private "??"
+- !private "log"
 - !private "parameters"
 - !private "!"
-- "NSDate"
-- "BooleanLiteralType"
-- "Int32"
-- "Int16"
-- !private "??"
+- "SwifterSockets"
+- !private "+"
+- !private "headerLogger"
+- "AssignmentPrecedence"
+- !private "=="
+- !private "!="
+- "CastingPrecedence"
+- !private "Range"
+- "String"
+- !private "+="
 - "Forwarder"
 depends-member:
 - ["Ps9AnyObject", "Data"]
@@ -41,49 +50,49 @@ depends-member:
 - ["Ps9AnyObject", "FileManager"]
 - !private ["Ps9AnyObject", "HttpConnection"]
 - !private ["Ps9AnyObject", "HttpHeader"]
-- ["Ps9AnyObject", "NSDate"]
-- !private ["Ps9AnyObject", "Option"]
 - !private ["Ps9AnyObject", "Range"]
-- !private ["Ps9AnyObject", "SwifterSockets"]
 - ["Ps9AnyObject", "_allocationCount"]
 - ["Ps9AnyObject", "abortConnection"]
 - ["Ps9AnyObject", "abortProcessing"]
+- !private ["Ps9AnyObject", "action"]
+- !private ["Ps9AnyObject", "allocateOrTimeout"]
 - ["Ps9AnyObject", "allocationCount"]
 - !private ["Ps9AnyObject", "async"]
 - !private ["Ps9AnyObject", "atLevelDebug"]
+- !private ["Ps9AnyObject", "atLevelEmergency"]
 - !private ["Ps9AnyObject", "atLevelError"]
 - !private ["Ps9AnyObject", "atLevelInfo"]
-- !private ["Ps9AnyObject", "closeConnection"]
+- !private ["Ps9AnyObject", "connectionPool"]
 - !private ["Ps9AnyObject", "contentLength"]
 - ["Ps9AnyObject", "filemanager"]
 - ["Ps9AnyObject", "forwarder"]
 - !private ["Ps9AnyObject", "free"]
 - !private ["Ps9AnyObject", "headerLength"]
+- !private ["Ps9AnyObject", "headerLogger"]
 - !private ["Ps9AnyObject", "headerLoggingEnabled"]
-- !private ["Ps9AnyObject", "httpConnectionPool"]
 - ["Ps9AnyObject", "httpHeader"]
+- !private ["Ps9AnyObject", "increment"]
 - ["Ps9AnyObject", "incrementAllocationCounter"]
 - ["Ps9AnyObject", "init"]
 - !private ["Ps9AnyObject", "interface"]
 - !private ["Ps9AnyObject", "log"]
 - ["Ps9AnyObject", "logId"]
 - ["Ps9AnyObject", "maxSendBufferSize"]
+- !private ["Ps9AnyObject", "maxWaitForPendingConnections"]
 - ["Ps9AnyObject", "messageBuffer"]
 - ["Ps9AnyObject", "mustClose"]
+- !private ["Ps9AnyObject", "nofAcceptedHttpRequests"]
 - ["Ps9AnyObject", "objectId"]
 - ["Ps9AnyObject", "objectIdCount"]
 - !private ["Ps9AnyObject", "parameters"]
 - ["Ps9AnyObject", "prepare"]
-- ["Ps9AnyObject", "rQueue"]
 - ["Ps9AnyObject", "receiverClosed"]
 - ["Ps9AnyObject", "receiverData"]
 - ["Ps9AnyObject", "receiverError"]
 - ["Ps9AnyObject", "receiverLoop"]
 - !private ["Ps9AnyObject", "record"]
 - !private ["Ps9AnyObject", "source"]
-- ["Ps9AnyObject", "tQueue"]
 - ["Ps9AnyObject", "timeOfAccept"]
-- ["Ps9AnyObject", "transfer"]
 - ["Ps9AnyObject", "transmitterClosed"]
 - ["Ps9AnyObject", "transmitterError"]
 - ["Ps9AnyObject", "transmitterReady"]
@@ -91,25 +100,32 @@ depends-member:
 - !private ["Ps9AnyObject", "worker"]
 - ["Ps9AnyObject", "workerQueue"]
 - ["Ps9AnyObject", ""]
+- !private ["Sa", "Element"]
+- ["Sa", "deinit"]
+- !private ["Ps23BidirectionalCollection", "Element"]
 - !private ["Ps23BidirectionalCollection", "IndexDistance"]
 - !private ["Ps23BidirectionalCollection", "Iterator"]
 - !private ["Ps23BidirectionalCollection", "append"]
 - !private ["Ps23BidirectionalCollection", "count"]
 - ["Ps23BidirectionalCollection", "init"]
 - !private ["Ps23BidirectionalCollection", "subdata"]
+- !private ["Ps22BidirectionalIndexable", "Element"]
 - !private ["Ps22BidirectionalIndexable", "IndexDistance"]
 - !private ["Ps22BidirectionalIndexable", "Iterator"]
 - !private ["Ps22BidirectionalIndexable", "append"]
 - !private ["Ps22BidirectionalIndexable", "count"]
 - ["Ps22BidirectionalIndexable", "init"]
 - !private ["Ps22BidirectionalIndexable", "subdata"]
+- !private ["C13SwiftfireCore9Blacklist", "action"]
+- ["C13SwiftfireCore9Blacklist", "deinit"]
 - !private ["Sb", "_getBuiltinLogicValue"]
 - ["Sb", "deinit"]
+- !private ["Ps7CVarArg", "Element"]
 - !private ["Ps7CVarArg", "async"]
-- !private ["Ps7CVarArg", "free"]
 - ["Ps7CVarArg", "init"]
 - !private ["Ps7CVarArg", "source"]
 - !private ["Vs9Character", "deinit"]
+- !private ["Ps10Collection", "Element"]
 - !private ["Ps10Collection", "IndexDistance"]
 - !private ["Ps10Collection", "Iterator"]
 - !private ["Ps10Collection", "append"]
@@ -117,6 +133,7 @@ depends-member:
 - ["Ps10Collection", "init"]
 - !private ["Ps10Collection", "subdata"]
 - ["Ps10Comparable", "init"]
+- !private ["Ps10Comparable", "javaDate"]
 - !private ["Ps10Comparable", "source"]
 - ["C14SwifterSockets10Connection", "Bool"]
 - ["C14SwifterSockets10Connection", "Data"]
@@ -128,7 +145,7 @@ depends-member:
 - ["C14SwifterSockets10Connection", "Int"]
 - ["C14SwifterSockets10Connection", "Int16"]
 - ["C14SwifterSockets10Connection", "Int32"]
-- ["C14SwifterSockets10Connection", "NSDate"]
+- ["C14SwifterSockets10Connection", "Int64"]
 - ["C14SwifterSockets10Connection", "Option"]
 - !private ["C14SwifterSockets10Connection", "Range"]
 - ["C14SwifterSockets10Connection", "String"]
@@ -139,11 +156,11 @@ depends-member:
 - ["C14SwifterSockets10Connection", "abortConnection"]
 - ["C14SwifterSockets10Connection", "abortProcessing"]
 - ["C14SwifterSockets10Connection", "allocationCount"]
-- !private ["C14SwifterSockets10Connection", "closeConnection"]
+- !private ["C14SwifterSockets10Connection", "connectionPool"]
 - ["C14SwifterSockets10Connection", "deinit"]
 - ["C14SwifterSockets10Connection", "filemanager"]
 - ["C14SwifterSockets10Connection", "forwarder"]
-- !private ["C14SwifterSockets10Connection", "httpConnectionPool"]
+- !private ["C14SwifterSockets10Connection", "headerLogger"]
 - ["C14SwifterSockets10Connection", "httpHeader"]
 - ["C14SwifterSockets10Connection", "incrementAllocationCounter"]
 - ["C14SwifterSockets10Connection", "init"]
@@ -157,14 +174,11 @@ depends-member:
 - ["C14SwifterSockets10Connection", "objectIdCount"]
 - !private ["C14SwifterSockets10Connection", "parameters"]
 - ["C14SwifterSockets10Connection", "prepare"]
-- ["C14SwifterSockets10Connection", "rQueue"]
 - ["C14SwifterSockets10Connection", "receiverClosed"]
 - ["C14SwifterSockets10Connection", "receiverData"]
 - ["C14SwifterSockets10Connection", "receiverError"]
 - ["C14SwifterSockets10Connection", "receiverLoop"]
-- ["C14SwifterSockets10Connection", "tQueue"]
 - ["C14SwifterSockets10Connection", "timeOfAccept"]
-- ["C14SwifterSockets10Connection", "transfer"]
 - ["C14SwifterSockets10Connection", "transmitterClosed"]
 - ["C14SwifterSockets10Connection", "transmitterError"]
 - ["C14SwifterSockets10Connection", "transmitterReady"]
@@ -172,34 +186,42 @@ depends-member:
 - !private ["C14SwifterSockets10Connection", "worker"]
 - ["C14SwifterSockets10Connection", "workerQueue"]
 - ["C14SwifterSockets10Connection", ""]
+- !private ["C14SwifterSockets14ConnectionPool", "allocateOrTimeout"]
+- ["C14SwifterSockets14ConnectionPool", "deinit"]
+- !private ["C14SwifterSockets14ConnectionPool", "free"]
+- !private ["Ps28CustomDebugStringConvertible", "Element"]
 - !private ["Ps28CustomDebugStringConvertible", "IndexDistance"]
 - !private ["Ps28CustomDebugStringConvertible", "Iterator"]
 - !private ["Ps28CustomDebugStringConvertible", "append"]
 - !private ["Ps28CustomDebugStringConvertible", "async"]
 - !private ["Ps28CustomDebugStringConvertible", "count"]
-- !private ["Ps28CustomDebugStringConvertible", "free"]
 - ["Ps28CustomDebugStringConvertible", "init"]
+- !private ["Ps28CustomDebugStringConvertible", "javaDate"]
 - !private ["Ps28CustomDebugStringConvertible", "source"]
 - !private ["Ps28CustomDebugStringConvertible", "subdata"]
 - !private ["Ps29CustomPlaygroundQuickLookable", "_getBuiltinLogicValue"]
 - ["Ps29CustomPlaygroundQuickLookable", "init"]
+- !private ["Ps29CustomPlaygroundQuickLookable", "javaDate"]
 - !private ["Ps29CustomPlaygroundQuickLookable", "source"]
+- !private ["Ps17CustomReflectable", "Element"]
 - !private ["Ps17CustomReflectable", "IndexDistance"]
 - !private ["Ps17CustomReflectable", "Iterator"]
 - !private ["Ps17CustomReflectable", "_getBuiltinLogicValue"]
 - !private ["Ps17CustomReflectable", "append"]
 - !private ["Ps17CustomReflectable", "count"]
 - ["Ps17CustomReflectable", "init"]
+- !private ["Ps17CustomReflectable", "javaDate"]
 - !private ["Ps17CustomReflectable", "source"]
 - !private ["Ps17CustomReflectable", "subdata"]
+- !private ["Ps23CustomStringConvertible", "Element"]
 - !private ["Ps23CustomStringConvertible", "IndexDistance"]
 - !private ["Ps23CustomStringConvertible", "Iterator"]
 - !private ["Ps23CustomStringConvertible", "_getBuiltinLogicValue"]
 - !private ["Ps23CustomStringConvertible", "append"]
 - !private ["Ps23CustomStringConvertible", "async"]
 - !private ["Ps23CustomStringConvertible", "count"]
-- !private ["Ps23CustomStringConvertible", "free"]
 - ["Ps23CustomStringConvertible", "init"]
+- !private ["Ps23CustomStringConvertible", "javaDate"]
 - !private ["Ps23CustomStringConvertible", "source"]
 - !private ["Ps23CustomStringConvertible", "subdata"]
 - !private ["V10Foundation4Data", "IndexDistance"]
@@ -209,6 +231,9 @@ depends-member:
 - ["V10Foundation4Data", "deinit"]
 - ["V10Foundation4Data", "init"]
 - !private ["V10Foundation4Data", "subdata"]
+- ["V10Foundation4Date", "deinit"]
+- !private ["V10Foundation4Date", "init"]
+- !private ["V10Foundation4Date", "javaDate"]
 - !private ["CSo14DispatchObject", "async"]
 - ["CSo14DispatchObject", "init"]
 - !private ["CSo13DispatchQueue", "async"]
@@ -221,10 +246,11 @@ depends-member:
 - !private ["Ps9Equatable", "append"]
 - !private ["Ps9Equatable", "async"]
 - !private ["Ps9Equatable", "count"]
-- !private ["Ps9Equatable", "free"]
 - ["Ps9Equatable", "init"]
+- !private ["Ps9Equatable", "javaDate"]
 - !private ["Ps9Equatable", "source"]
 - !private ["Ps9Equatable", "subdata"]
+- !private ["Ps25ExpressibleByArrayLiteral", "Element"]
 - !private ["Ps27ExpressibleByBooleanLiteral", "_getBuiltinLogicValue"]
 - ["Ps43ExpressibleByExtendedGraphemeClusterLiteral", "init"]
 - !private ["Ps43ExpressibleByExtendedGraphemeClusterLiteral", "source"]
@@ -244,8 +270,8 @@ depends-member:
 - !private ["Ps8Hashable", "append"]
 - !private ["Ps8Hashable", "async"]
 - !private ["Ps8Hashable", "count"]
-- !private ["Ps8Hashable", "free"]
 - ["Ps8Hashable", "init"]
+- !private ["Ps8Hashable", "javaDate"]
 - !private ["Ps8Hashable", "source"]
 - !private ["Ps8Hashable", "subdata"]
 - ["C9Swiftfire14HttpConnection", "Bool"]
@@ -258,7 +284,7 @@ depends-member:
 - ["C9Swiftfire14HttpConnection", "Int"]
 - ["C9Swiftfire14HttpConnection", "Int16"]
 - ["C9Swiftfire14HttpConnection", "Int32"]
-- ["C9Swiftfire14HttpConnection", "NSDate"]
+- ["C9Swiftfire14HttpConnection", "Int64"]
 - ["C9Swiftfire14HttpConnection", "Option"]
 - !private ["C9Swiftfire14HttpConnection", "Range"]
 - ["C9Swiftfire14HttpConnection", "String"]
@@ -269,11 +295,11 @@ depends-member:
 - ["C9Swiftfire14HttpConnection", "abortConnection"]
 - ["C9Swiftfire14HttpConnection", "abortProcessing"]
 - ["C9Swiftfire14HttpConnection", "allocationCount"]
-- !private ["C9Swiftfire14HttpConnection", "closeConnection"]
+- !private ["C9Swiftfire14HttpConnection", "connectionPool"]
 - ["C9Swiftfire14HttpConnection", "deinit"]
 - ["C9Swiftfire14HttpConnection", "filemanager"]
 - ["C9Swiftfire14HttpConnection", "forwarder"]
-- !private ["C9Swiftfire14HttpConnection", "httpConnectionPool"]
+- !private ["C9Swiftfire14HttpConnection", "headerLogger"]
 - ["C9Swiftfire14HttpConnection", "httpHeader"]
 - ["C9Swiftfire14HttpConnection", "incrementAllocationCounter"]
 - ["C9Swiftfire14HttpConnection", "init"]
@@ -287,32 +313,31 @@ depends-member:
 - ["C9Swiftfire14HttpConnection", "objectIdCount"]
 - !private ["C9Swiftfire14HttpConnection", "parameters"]
 - ["C9Swiftfire14HttpConnection", "prepare"]
-- !private ["C9Swiftfire14HttpConnection", "rQueue"]
 - ["C9Swiftfire14HttpConnection", "receiverClosed"]
 - ["C9Swiftfire14HttpConnection", "receiverData"]
 - ["C9Swiftfire14HttpConnection", "receiverError"]
 - ["C9Swiftfire14HttpConnection", "receiverLoop"]
-- !private ["C9Swiftfire14HttpConnection", "tQueue"]
 - ["C9Swiftfire14HttpConnection", "timeOfAccept"]
-- ["C9Swiftfire14HttpConnection", "transfer"]
 - ["C9Swiftfire14HttpConnection", "transmitterClosed"]
 - ["C9Swiftfire14HttpConnection", "transmitterError"]
 - ["C9Swiftfire14HttpConnection", "transmitterReady"]
 - ["C9Swiftfire14HttpConnection", "transmitterTimeout"]
 - !private ["C9Swiftfire14HttpConnection", "worker"]
 - ["C9Swiftfire14HttpConnection", "workerQueue"]
-- !private ["C9Swiftfire18HttpConnectionPool", "free"]
-- !private ["C9Swiftfire10HttpHeader", "contentLength"]
-- ["C9Swiftfire10HttpHeader", "deinit"]
-- !private ["C9Swiftfire10HttpHeader", "headerLength"]
-- !private ["C9Swiftfire10HttpHeader", "init"]
-- !private ["C9Swiftfire10HttpHeader", "record"]
+- !private ["C13SwiftfireCore10HttpHeader", "contentLength"]
+- ["C13SwiftfireCore10HttpHeader", "deinit"]
+- !private ["C13SwiftfireCore10HttpHeader", "headerLength"]
+- !private ["C13SwiftfireCore10HttpHeader", "init"]
+- ["C9Swiftfire16HttpHeaderLogger", "deinit"]
+- !private ["C9Swiftfire16HttpHeaderLogger", "record"]
+- !private ["Ps9Indexable", "Element"]
 - !private ["Ps9Indexable", "IndexDistance"]
 - !private ["Ps9Indexable", "Iterator"]
 - !private ["Ps9Indexable", "append"]
 - !private ["Ps9Indexable", "count"]
 - ["Ps9Indexable", "init"]
 - !private ["Ps9Indexable", "subdata"]
+- !private ["Ps13IndexableBase", "Element"]
 - !private ["Ps13IndexableBase", "IndexDistance"]
 - !private ["Ps13IndexableBase", "Iterator"]
 - !private ["Ps13IndexableBase", "append"]
@@ -322,23 +347,26 @@ depends-member:
 - ["Si", "deinit"]
 - ["Vs5Int16", "deinit"]
 - ["Vs5Int32", "deinit"]
-- !private ["Vs5Int64", "deinit"]
+- ["Vs5Int64", "deinit"]
 - !private ["Vs4Int8", "deinit"]
 - ["P14SwifterSockets15InterfaceAccess", "deinit"]
 - !private ["P14SwifterSockets15InterfaceAccess", "logId"]
 - !private ["VV10Foundation4Data8Iterator", "Element"]
 - !private ["Ps16IteratorProtocol", "Element"]
+- !private ["C13SwiftfireCore7Logfile", "record"]
 - !private ["Ps25LosslessStringConvertible", "_getBuiltinLogicValue"]
 - ["Ps25LosslessStringConvertible", "init"]
 - !private ["Ps25LosslessStringConvertible", "source"]
 - ["Ps10MirrorPath", "init"]
 - !private ["Ps10MirrorPath", "source"]
+- !private ["Ps17MutableCollection", "Element"]
 - !private ["Ps17MutableCollection", "IndexDistance"]
 - !private ["Ps17MutableCollection", "Iterator"]
 - !private ["Ps17MutableCollection", "append"]
 - !private ["Ps17MutableCollection", "count"]
 - ["Ps17MutableCollection", "init"]
 - !private ["Ps17MutableCollection", "subdata"]
+- !private ["Ps16MutableIndexable", "Element"]
 - !private ["Ps16MutableIndexable", "IndexDistance"]
 - !private ["Ps16MutableIndexable", "Iterator"]
 - !private ["Ps16MutableIndexable", "append"]
@@ -349,16 +377,12 @@ depends-member:
 - !private ["PSo8NSCoding", "source"]
 - ["PSo9NSCopying", "init"]
 - !private ["PSo9NSCopying", "source"]
-- ["CSo6NSDate", "deinit"]
-- ["CSo6NSDate", "init"]
 - ["PSo16NSMutableCopying", "init"]
 - !private ["PSo16NSMutableCopying", "source"]
 - !private ["CSo8NSObject", "async"]
-- !private ["CSo8NSObject", "free"]
 - ["CSo8NSObject", "init"]
 - !private ["CSo8NSObject", "source"]
 - !private ["PSo16NSObjectProtocol", "async"]
-- !private ["PSo16NSObjectProtocol", "free"]
 - ["PSo16NSObjectProtocol", "init"]
 - !private ["PSo16NSObjectProtocol", "source"]
 - ["PSo19NSPasteboardReading", "init"]
@@ -371,19 +395,21 @@ depends-member:
 - !private ["CSo8NSString", "source"]
 - !private ["CSo9OS_object", "async"]
 - ["CSo9OS_object", "init"]
-- ["OC14SwifterSockets10Connection6Option", "deinit"]
-- !private ["OC14SwifterSockets10Connection6Option", "receiverQueue"]
-- !private ["OC14SwifterSockets10Connection6Option", "transmitterQueue"]
+- !private ["OC14SwifterSockets10Connection6Option", "Element"]
+- !private ["OC14SwifterSockets10Connection6Option", "deinit"]
 - ["Sq", "deinit"]
 - !private ["Sq", "init"]
-- ["C9Swiftfire10Parameters", "deinit"]
-- !private ["C9Swiftfire10Parameters", "headerLoggingEnabled"]
+- ["C13SwiftfireCore10Parameters", "deinit"]
+- !private ["C13SwiftfireCore10Parameters", "headerLoggingEnabled"]
+- !private ["C13SwiftfireCore10Parameters", "maxWaitForPendingConnections"]
+- !private ["Ps22RandomAccessCollection", "Element"]
 - !private ["Ps22RandomAccessCollection", "IndexDistance"]
 - !private ["Ps22RandomAccessCollection", "Iterator"]
 - !private ["Ps22RandomAccessCollection", "append"]
 - !private ["Ps22RandomAccessCollection", "count"]
 - ["Ps22RandomAccessCollection", "init"]
 - !private ["Ps22RandomAccessCollection", "subdata"]
+- !private ["Ps21RandomAccessIndexable", "Element"]
 - !private ["Ps21RandomAccessIndexable", "IndexDistance"]
 - !private ["Ps21RandomAccessIndexable", "Iterator"]
 - !private ["Ps21RandomAccessIndexable", "append"]
@@ -392,12 +418,14 @@ depends-member:
 - !private ["Ps21RandomAccessIndexable", "subdata"]
 - ["Vs5Range", "deinit"]
 - !private ["Vs5Range", "init"]
+- !private ["Ps26RangeReplaceableCollection", "Element"]
 - !private ["Ps26RangeReplaceableCollection", "IndexDistance"]
 - !private ["Ps26RangeReplaceableCollection", "Iterator"]
 - !private ["Ps26RangeReplaceableCollection", "append"]
 - !private ["Ps26RangeReplaceableCollection", "count"]
 - ["Ps26RangeReplaceableCollection", "init"]
 - !private ["Ps26RangeReplaceableCollection", "subdata"]
+- !private ["Ps25RangeReplaceableIndexable", "Element"]
 - !private ["Ps25RangeReplaceableIndexable", "IndexDistance"]
 - !private ["Ps25RangeReplaceableIndexable", "Iterator"]
 - !private ["Ps25RangeReplaceableIndexable", "append"]
@@ -409,18 +437,15 @@ depends-member:
 - ["P14SwifterSockets16ReceiverProtocol", "FileManager"]
 - !private ["P14SwifterSockets16ReceiverProtocol", "HttpConnection"]
 - !private ["P14SwifterSockets16ReceiverProtocol", "HttpHeader"]
-- ["P14SwifterSockets16ReceiverProtocol", "NSDate"]
-- !private ["P14SwifterSockets16ReceiverProtocol", "Option"]
 - !private ["P14SwifterSockets16ReceiverProtocol", "Range"]
-- !private ["P14SwifterSockets16ReceiverProtocol", "SwifterSockets"]
 - ["P14SwifterSockets16ReceiverProtocol", "_allocationCount"]
 - ["P14SwifterSockets16ReceiverProtocol", "abortConnection"]
 - ["P14SwifterSockets16ReceiverProtocol", "abortProcessing"]
 - ["P14SwifterSockets16ReceiverProtocol", "allocationCount"]
-- !private ["P14SwifterSockets16ReceiverProtocol", "closeConnection"]
+- !private ["P14SwifterSockets16ReceiverProtocol", "connectionPool"]
 - ["P14SwifterSockets16ReceiverProtocol", "filemanager"]
 - ["P14SwifterSockets16ReceiverProtocol", "forwarder"]
-- !private ["P14SwifterSockets16ReceiverProtocol", "httpConnectionPool"]
+- !private ["P14SwifterSockets16ReceiverProtocol", "headerLogger"]
 - ["P14SwifterSockets16ReceiverProtocol", "httpHeader"]
 - ["P14SwifterSockets16ReceiverProtocol", "incrementAllocationCounter"]
 - ["P14SwifterSockets16ReceiverProtocol", "init"]
@@ -434,14 +459,11 @@ depends-member:
 - ["P14SwifterSockets16ReceiverProtocol", "objectIdCount"]
 - !private ["P14SwifterSockets16ReceiverProtocol", "parameters"]
 - ["P14SwifterSockets16ReceiverProtocol", "prepare"]
-- ["P14SwifterSockets16ReceiverProtocol", "rQueue"]
 - ["P14SwifterSockets16ReceiverProtocol", "receiverClosed"]
 - ["P14SwifterSockets16ReceiverProtocol", "receiverData"]
 - ["P14SwifterSockets16ReceiverProtocol", "receiverError"]
 - ["P14SwifterSockets16ReceiverProtocol", "receiverLoop"]
-- ["P14SwifterSockets16ReceiverProtocol", "tQueue"]
 - ["P14SwifterSockets16ReceiverProtocol", "timeOfAccept"]
-- ["P14SwifterSockets16ReceiverProtocol", "transfer"]
 - ["P14SwifterSockets16ReceiverProtocol", "transmitterClosed"]
 - ["P14SwifterSockets16ReceiverProtocol", "transmitterError"]
 - ["P14SwifterSockets16ReceiverProtocol", "transmitterReady"]
@@ -454,7 +476,10 @@ depends-member:
 - !private ["P10Foundation20ReferenceConvertible", "append"]
 - !private ["P10Foundation20ReferenceConvertible", "count"]
 - ["P10Foundation20ReferenceConvertible", "init"]
+- !private ["P10Foundation20ReferenceConvertible", "javaDate"]
 - !private ["P10Foundation20ReferenceConvertible", "subdata"]
+- ["O14SwifterSockets6Result", "deinit"]
+- !private ["Ps8Sequence", "Element"]
 - !private ["Ps8Sequence", "IndexDistance"]
 - !private ["Ps8Sequence", "Iterator"]
 - !private ["Ps8Sequence", "append"]
@@ -465,9 +490,12 @@ depends-member:
 - ["SS", "init"]
 - !private ["SS", "source"]
 - !private ["C10SwifterLog10SwifterLog", "atLevelDebug"]
+- !private ["C10SwifterLog10SwifterLog", "atLevelEmergency"]
 - !private ["C10SwifterLog10SwifterLog", "atLevelError"]
 - !private ["C10SwifterLog10SwifterLog", "atLevelInfo"]
 - ["C10SwifterLog10SwifterLog", "deinit"]
+- ["C13SwiftfireCore9Telemetry", "deinit"]
+- !private ["C13SwiftfireCore9Telemetry", "nofAcceptedHttpRequests"]
 - ["Ps16TextOutputStream", "init"]
 - !private ["Ps16TextOutputStream", "source"]
 - ["Ps20TextOutputStreamable", "init"]
@@ -477,18 +505,15 @@ depends-member:
 - ["P14SwifterSockets19TransmitterProtocol", "FileManager"]
 - !private ["P14SwifterSockets19TransmitterProtocol", "HttpConnection"]
 - !private ["P14SwifterSockets19TransmitterProtocol", "HttpHeader"]
-- ["P14SwifterSockets19TransmitterProtocol", "NSDate"]
-- !private ["P14SwifterSockets19TransmitterProtocol", "Option"]
 - !private ["P14SwifterSockets19TransmitterProtocol", "Range"]
-- !private ["P14SwifterSockets19TransmitterProtocol", "SwifterSockets"]
 - ["P14SwifterSockets19TransmitterProtocol", "_allocationCount"]
 - ["P14SwifterSockets19TransmitterProtocol", "abortConnection"]
 - ["P14SwifterSockets19TransmitterProtocol", "abortProcessing"]
 - ["P14SwifterSockets19TransmitterProtocol", "allocationCount"]
-- !private ["P14SwifterSockets19TransmitterProtocol", "closeConnection"]
+- !private ["P14SwifterSockets19TransmitterProtocol", "connectionPool"]
 - ["P14SwifterSockets19TransmitterProtocol", "filemanager"]
 - ["P14SwifterSockets19TransmitterProtocol", "forwarder"]
-- !private ["P14SwifterSockets19TransmitterProtocol", "httpConnectionPool"]
+- !private ["P14SwifterSockets19TransmitterProtocol", "headerLogger"]
 - ["P14SwifterSockets19TransmitterProtocol", "httpHeader"]
 - ["P14SwifterSockets19TransmitterProtocol", "incrementAllocationCounter"]
 - ["P14SwifterSockets19TransmitterProtocol", "init"]
@@ -502,14 +527,11 @@ depends-member:
 - ["P14SwifterSockets19TransmitterProtocol", "objectIdCount"]
 - !private ["P14SwifterSockets19TransmitterProtocol", "parameters"]
 - ["P14SwifterSockets19TransmitterProtocol", "prepare"]
-- ["P14SwifterSockets19TransmitterProtocol", "rQueue"]
 - ["P14SwifterSockets19TransmitterProtocol", "receiverClosed"]
 - ["P14SwifterSockets19TransmitterProtocol", "receiverData"]
 - ["P14SwifterSockets19TransmitterProtocol", "receiverError"]
 - ["P14SwifterSockets19TransmitterProtocol", "receiverLoop"]
-- ["P14SwifterSockets19TransmitterProtocol", "tQueue"]
 - ["P14SwifterSockets19TransmitterProtocol", "timeOfAccept"]
-- ["P14SwifterSockets19TransmitterProtocol", "transfer"]
 - ["P14SwifterSockets19TransmitterProtocol", "transmitterClosed"]
 - ["P14SwifterSockets19TransmitterProtocol", "transmitterError"]
 - ["P14SwifterSockets19TransmitterProtocol", "transmitterReady"]
@@ -522,10 +544,18 @@ depends-member:
 - !private ["Vs6UInt32", "deinit"]
 - !private ["Vs6UInt64", "deinit"]
 - !private ["Vs5UInt8", "deinit"]
+- ["C13SwiftfireCore13UIntTelemetry", "deinit"]
+- !private ["C13SwiftfireCore13UIntTelemetry", "increment"]
 - !private ["Sc", "deinit"]
 - !private ["SR", "IndexDistance"]
 - !private ["SR", "count"]
 - ["SR", "deinit"]
+- !private ["P11SwifterJSON19VJsonDeserializable", "action"]
+- !private ["P11SwifterJSON17VJsonSerializable", "action"]
+- ["P11SwifterJSON17VJsonSerializable", "init"]
+- !private ["P11SwifterJSON17VJsonSerializable", "source"]
+- !private ["Ps14_ArrayProtocol", "Element"]
+- !private ["Ps24_DestructorSafeContainer", "Element"]
 - !private ["Ps35_ExpressibleByBuiltinBooleanLiteral", "_getBuiltinLogicValue"]
 - ["Ps51_ExpressibleByBuiltinExtendedGraphemeClusterLiteral", "init"]
 - !private ["Ps51_ExpressibleByBuiltinExtendedGraphemeClusterLiteral", "source"]
@@ -543,8 +573,8 @@ depends-member:
 - !private ["Ps9_Hashable", "append"]
 - !private ["Ps9_Hashable", "async"]
 - !private ["Ps9_Hashable", "count"]
-- !private ["Ps9_Hashable", "free"]
 - ["Ps9_Hashable", "init"]
+- !private ["Ps9_Hashable", "javaDate"]
 - !private ["Ps9_Hashable", "source"]
 - !private ["Ps9_Hashable", "subdata"]
 - !private ["P10Foundation18_MutablePairBoxing", "IndexDistance"]
@@ -553,34 +583,41 @@ depends-member:
 - !private ["P10Foundation18_MutablePairBoxing", "count"]
 - ["P10Foundation18_MutablePairBoxing", "init"]
 - !private ["P10Foundation18_MutablePairBoxing", "subdata"]
+- !private ["Ps21_ObjectiveCBridgeable", "Element"]
 - !private ["Ps21_ObjectiveCBridgeable", "IndexDistance"]
 - !private ["Ps21_ObjectiveCBridgeable", "Iterator"]
 - !private ["Ps21_ObjectiveCBridgeable", "_getBuiltinLogicValue"]
 - !private ["Ps21_ObjectiveCBridgeable", "append"]
 - !private ["Ps21_ObjectiveCBridgeable", "count"]
 - ["Ps21_ObjectiveCBridgeable", "init"]
+- !private ["Ps21_ObjectiveCBridgeable", "javaDate"]
 - !private ["Ps21_ObjectiveCBridgeable", "source"]
 - !private ["Ps21_ObjectiveCBridgeable", "subdata"]
 - ["Vs26_OptionalNilComparisonType", "deinit"]
 depends-nominal:
 - "Ps9AnyObject"
+- "Sa"
 - "Ps23BidirectionalCollection"
 - "Ps22BidirectionalIndexable"
+- "C13SwiftfireCore9Blacklist"
 - "Sb"
 - "Ps7CVarArg"
 - !private "Vs9Character"
 - "Ps10Collection"
 - "Ps10Comparable"
 - "C14SwifterSockets10Connection"
+- "C14SwifterSockets14ConnectionPool"
 - "Ps28CustomDebugStringConvertible"
 - "Ps29CustomPlaygroundQuickLookable"
 - "Ps17CustomReflectable"
 - "Ps23CustomStringConvertible"
 - "V10Foundation4Data"
+- "V10Foundation4Date"
 - "CSo14DispatchObject"
 - "CSo13DispatchQueue"
 - !private "Sd"
 - "Ps9Equatable"
+- !private "Ps25ExpressibleByArrayLiteral"
 - !private "Ps27ExpressibleByBooleanLiteral"
 - "Ps43ExpressibleByExtendedGraphemeClusterLiteral"
 - !private "Ps23ExpressibleByNilLiteral"
@@ -591,25 +628,25 @@ depends-nominal:
 - !private "Sf"
 - "Ps8Hashable"
 - "C9Swiftfire14HttpConnection"
-- !private "C9Swiftfire18HttpConnectionPool"
-- "C9Swiftfire10HttpHeader"
+- "C13SwiftfireCore10HttpHeader"
+- "C9Swiftfire16HttpHeaderLogger"
 - "Ps9Indexable"
 - "Ps13IndexableBase"
 - "Si"
 - "Vs5Int16"
 - "Vs5Int32"
-- !private "Vs5Int64"
+- "Vs5Int64"
 - !private "Vs4Int8"
 - "P14SwifterSockets15InterfaceAccess"
 - !private "VV10Foundation4Data8Iterator"
 - !private "Ps16IteratorProtocol"
+- !private "C13SwiftfireCore7Logfile"
 - "Ps25LosslessStringConvertible"
 - "Ps10MirrorPath"
 - "Ps17MutableCollection"
 - "Ps16MutableIndexable"
 - "PSo8NSCoding"
 - "PSo9NSCopying"
-- "CSo6NSDate"
 - "PSo16NSMutableCopying"
 - "CSo8NSObject"
 - "PSo16NSObjectProtocol"
@@ -618,9 +655,9 @@ depends-nominal:
 - "PSo14NSSecureCoding"
 - "CSo8NSString"
 - "CSo9OS_object"
-- "OC14SwifterSockets10Connection6Option"
+- !private "OC14SwifterSockets10Connection6Option"
 - "Sq"
-- "C9Swiftfire10Parameters"
+- "C13SwiftfireCore10Parameters"
 - "Ps22RandomAccessCollection"
 - "Ps21RandomAccessIndexable"
 - "Vs5Range"
@@ -628,9 +665,11 @@ depends-nominal:
 - "Ps25RangeReplaceableIndexable"
 - "P14SwifterSockets16ReceiverProtocol"
 - "P10Foundation20ReferenceConvertible"
+- "O14SwifterSockets6Result"
 - "Ps8Sequence"
 - "SS"
 - "C10SwifterLog10SwifterLog"
+- "C13SwiftfireCore9Telemetry"
 - "Ps16TextOutputStream"
 - "Ps20TextOutputStreamable"
 - "P14SwifterSockets19TransmitterProtocol"
@@ -639,8 +678,13 @@ depends-nominal:
 - !private "Vs6UInt32"
 - !private "Vs6UInt64"
 - !private "Vs5UInt8"
+- "C13SwiftfireCore13UIntTelemetry"
 - !private "Sc"
 - "SR"
+- !private "P11SwifterJSON19VJsonDeserializable"
+- "P11SwifterJSON17VJsonSerializable"
+- !private "Ps14_ArrayProtocol"
+- !private "Ps24_DestructorSafeContainer"
 - !private "Ps35_ExpressibleByBuiltinBooleanLiteral"
 - "Ps51_ExpressibleByBuiltinExtendedGraphemeClusterLiteral"
 - "Ps34_ExpressibleByBuiltinStringLiteral"
@@ -661,17 +705,16 @@ depends-external:
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/ObjectiveC.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreGraphics.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/IOKit.swiftmodule"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterJSON.framework/Modules/SwifterJSON.swiftmodule/x86_64.swiftmodule"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/Ascii.framework/Modules/Ascii.swiftmodule/x86_64.swiftmodule"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterLog.framework/Modules/SwifterLog.swiftmodule/x86_64.swiftmodule"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/CAsl-0.1.0/Sources/include/CAsl.h"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/CAsl.framework/Modules/module.modulemap"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterSockets.framework/Modules/SwifterSockets.swiftmodule/x86_64.swiftmodule"
 - "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwiftfireCore.framework/Modules/SwiftfireCore.swiftmodule/x86_64.swiftmodule"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/COpenSsl-0.1.0/module.modulemap"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/Ascii.framework/Modules/Ascii.swiftmodule/x86_64.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/AppKit.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreData.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/QuartzCore.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/XPC.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreImage.swiftmodule"
-interface-hash: "95b699a650060ed52d57bf9f744f334a"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterJSON.framework/Modules/SwifterJSON.swiftmodule/x86_64.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterLog.framework/Modules/SwifterLog.swiftmodule/x86_64.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/CAsl-0.1.0/Sources/include/CAsl.h"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/CAsl.framework/Modules/module.modulemap"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterSockets.framework/Modules/SwifterSockets.swiftmodule/x86_64.swiftmodule"
+interface-hash: "c577494a7cf85c469fc86ecdaa555c0c"

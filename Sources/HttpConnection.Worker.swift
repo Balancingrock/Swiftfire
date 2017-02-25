@@ -49,18 +49,27 @@
 //
 // History
 //
-// v0.9.15 - General update and switch to frameworks
-// v0.9.14 - Added support for HTTP 1.0
+// 0.9.15  - General update and switch to frameworks
+// 0.9.14  - Added support for HTTP 1.0
 //         - Upgraded to Xcode 8 beta 6
-// v0.9.13 - Upgraded to Xcode 8 beta 3 (Swift 3)
-// v0.9.11 - Added support for usage statistics
-// v0.9.6  - Header update
-// v0.9.3  - Added incrementing of serverTelemetry.nofHttp400Replies if the host cannot be mapped to a domain
+// 0.9.13  - Upgraded to Xcode 8 beta 3 (Swift 3)
+// 0.9.11  - Added support for usage statistics
+// 0.9.6   - Header update
+// 0.9.3   - Added incrementing of serverTelemetry.nofHttp400Replies if the host cannot be mapped to a domain
 //         - Split "domain not found" error into "domain not found" and "domain not enabled"
 //         - Removed port information from "domain not found/enabled" error
-// v0.9.2  - Made forwarding case cleaner
+// 0.9.2   - Made forwarding case cleaner
 //         - Moved the code that provides a response to the Domain class
-// v0.9.0  - Initial release
+// 0.9.0   - Initial release
+//
+// =====================================================================================================================
+// Description
+// =====================================================================================================================
+//
+// Handles the work associated with a HTTP connection object. Once a complete HTTP request is received, this operation
+// starts processing that request. After a some validation it starts the services for the domain the request is for.
+// Upon completion of the services, it will send a response to the client.
+//
 // =====================================================================================================================
 
 import Foundation
@@ -73,62 +82,86 @@ import SwiftfireCore
 extension HttpConnection {
     
     
+    /// Create an error for a missing http version
+    
+    private func send400BadRequestResponse(_ message: String) {
+        
+        
+        // Telemetry update
+        
+        telemetry.nofHttp400Replies.increment()
+        
+        
+        // Log update
+        
+        log.atLevelDebug(id: logId, source: #file.source(#function, #line), message: message)
+        
+        
+        // Reply to client
+        
+        let response = createHttpResponse(for: .code400_BadRequest, version: .http1_1, message: "<p>\(message)</p>")
+        transfer(response)
+        
+        
+        // Statistics update
+        
+        let mutation = Mutation.createAddClientRecord(from: self)
+        mutation.httpResponseCode = HttpResponseCode.code400_BadRequest.rawValue
+        mutation.responseDetails = message
+        mutation.requestCompleted = Date().javaDate
+        statistics.submit(mutation: mutation)
+
+    }
+    
+    
+    /// Create an error if http1.0 is not supported.
+    
+    private func send500InternalServerError(_ message: String) {
+        
+        
+        // Telemetry update
+        
+        telemetry.nofHttp500Replies.increment()
+        
+        
+        // Logging update
+        
+        log.atLevelDebug(id: logId, source: #file.source(#function, #line), message: message)
+        
+        
+        // Reply to client
+        
+        let response = createHttpResponse(for: .code500_InternalServerError, version: .http1_0, message: "<p>\(message)</p>")
+        transfer(response)
+        
+        
+        // Statistics update
+        
+        let mutation = Mutation.createAddClientRecord(from: self)
+        mutation.httpResponseCode = HttpResponseCode.code500_InternalServerError.rawValue
+        mutation.responseDetails = message
+        mutation.requestCompleted = Date().javaDate
+        statistics.submit(mutation: mutation)
+
+    }
+    
+    
     /// Examines the http message header for a servicable request and creates the corresponding response.
-    /// Implementation justification:  
+    /// Implementation justification:
     
     func worker(header: HttpHeader, body: Data) {
         
-        
-        // =============================================================================================================
-        // Create a new statistics record for this message
-        // =============================================================================================================
-
-        let mutation = Mutation.createAddClientRecord()
-        mutation.ipAddress = remoteAddress
-        mutation.connectionAllocationCount = allocationCount
-        mutation.connectionObjectId = objectId
-        mutation.socket = logId
-        mutation.requestReceived = Date().javaDate
-        
-        
-        // =============================================================================================================
-        // Check which protocol version is used
-        // =============================================================================================================
-        
-        // =============================================================================================================
-        // Special case for HTTP version 1.0
-        // =============================================================================================================
-        
-        // HTTP/1.0 does not contain a "Host" field. It is therefore handled seperately.
-
-        guard let httpVersion = header.httpVersion else {
-            
-            // Telemetry update
-            telemetry.nofHttp400Replies.increment()
-            
-            // Log update
-            let message = "HTTP Version not present"
-            log.atLevelDebug(id: logId, source: #file.source(#function, #line), message: message)
-            
-            // Reply to client
-            let response = HttpResponse.withCode(.code400_BadRequest, version: .http1_1, message: "<p>\(message)</p>")
-            transfer(response)
-
-            // Mutation update
-            mutation.httpResponseCode = HttpResponseCode.code400_BadRequest.rawValue
-            mutation.responseDetails = message
-            mutation.requestCompleted = Date().javaDate
-            statistics.submit(mutation: mutation)
-            
-            return
-        }
-        
 
         // =============================================================================================================
-        // Find the domain this request is for
+        // Find the domain (host) this request is for.
         // =============================================================================================================
 
-        var host: Host
+        guard let httpVersion = header.httpVersion else { send400BadRequestResponse("HTTP Version not present"); return }
+        
+        var host: HttpHost
+        
+        
+        // Find the host. For HTTP 1.1 this must be provided in the request, for HTTP 1.0 it should be defined in the parameter 'http1_0DomainName'
         
         if let _host = header.host {
             
@@ -136,90 +169,50 @@ extension HttpConnection {
         
         } else {
             
-            // No host found, if this is a HTTP1.0 request, then use the spefied domain as the 'host'.
+            
+            // No host found, and this is a HTTP1.0 request, then use the predefined http1_0DomainName as the 'host'.
             
             if httpVersion == HttpVersion.http1_0 {
                 
+                
+                // Find the domain, if none is found, then http 1.0 is not supported
+                
                 if domains.domain(forName: parameters.http1_0DomainName) != nil {
                     
-                    host = Host(address: parameters.http1_0DomainName, port: nil)
+                    host = HttpHost(address: parameters.http1_0DomainName, port: nil)
                     
                 } else {
                 
-                    // Telemetry update
-                    telemetry.nofHttp500Replies.increment()
-                    
-                    // Logging update
-                    let message = "Domain name for HTTP 1.0 requests not defined or domain not present"
-                    log.atLevelDebug(id: logId, source: #file.source(#function, #line), message: message)
-                    
-                    // Reply to client
-                    let response = HttpResponse.withCode(.code500_InternalServerError, version: httpVersion, message: "<p>\(message)</p>")
-                    transfer(response)
-                    
-                    // Mutation update
-                    mutation.httpResponseCode = HttpResponseCode.code500_InternalServerError.rawValue
-                    mutation.responseDetails = message
-                    mutation.requestCompleted = Date().javaDate
-                    statistics.submit(mutation: mutation)
+                    send500InternalServerError("HTTP 1.0 requests not supported")
                     
                     return
                 }
 
             } else {
                 
-                // Telemetry update
-                telemetry.nofHttp400Replies.increment()
-                
-                // Logging update
-                let message = "Could not extract host from Http Request Header"
-                log.atLevelDebug(id: logId, source: #file.source(#function, #line), message: message)
-                
-                // Reply to client
-                let response = HttpResponse.withCode(.code400_BadRequest, version: httpVersion, message: "<p>\(message)</p>")
-                transfer(response)
-                
-                // Mutation update
-                mutation.httpResponseCode = HttpResponseCode.code400_BadRequest.rawValue
-                mutation.responseDetails = message
-                mutation.requestCompleted = Date().javaDate
-                statistics.submit(mutation: mutation)
+                send400BadRequestResponse("Could not extract host from Http Request Header")
                 
                 return
             }
         }
         
+        
+        // Get the domain
+        
         guard let domain = domains.domain(forName: host.address), domain.enabled else {
             
-            // Telemetry update
-            telemetry.nofHttp400Replies.increment()
-            
-            // Logging update
             let message: String
             if domains.domain(forName: host.address) == nil {
                 message = "Domain not found for host: \(host.address)"
             } else {
                 message = "Domain not enabled for host: \(host.address)"
             }
-            log.atLevelNotice(id: logId, source: #file.source(#function, #line), message: message)
             
-            // Reply to client
-            let response = HttpResponse.withCode(.code400_BadRequest, version: httpVersion, message: "<p>\(message)</p>")
-            transfer(response)
-            
-            // Mutation update
-            mutation.httpResponseCode = HttpResponseCode.code400_BadRequest.rawValue
-            mutation.responseDetails = message
-            mutation.requestCompleted = Date().javaDate
-            statistics.submit(mutation: mutation)
+            send400BadRequestResponse(message)
 
             return
         }
-            
-        // Update mutation
-        
-        mutation.domain = domain.name
-        
+
         
         // =============================================================================================================
         // Evaluate forwarding
@@ -249,7 +242,9 @@ extension HttpConnection {
             
             // The forwarding connection will be closed when the forwarding target closes its connection. Until then all data received from the forwarding target will be routed to the client.
 
-            // Mutation update
+            // Statistics update
+            let mutation = Mutation.createAddClientRecord(from: self)
+            mutation.domain = domain.name
             mutation.httpResponseCode = "Unavailable"
             mutation.responseDetails = "Forwarding of domain '\(host.address)'"
             mutation.requestCompleted = Date().javaDate
@@ -260,23 +255,115 @@ extension HttpConnection {
         
         
         // =============================================================================================================
-        // The domain takes over from here
+        // Increment the access counter for the domain
         // =============================================================================================================
 
-        if let response = domain.httpWorker(header: header, body: body, connection: self, mutation: mutation) {
-            
-            transfer(response)
+        domain.telemetry.nofRequests.increment()
+
         
-            // Mutation update
-            mutation.httpResponseCode ??= HttpResponseCode.code200_OK.rawValue
-            mutation.responseDetails ??= ""
+        // =============================================================================================================
+        // Access logging
+        // =============================================================================================================
+        
+        domain.recordInAccessLog(
+            time: timeOfAccept,
+            ipAddress: remoteAddress,
+            url: header.url ?? "",
+            operation: header.operation?.rawValue ?? "",
+            version: header.httpVersion?.rawValue ?? "")
+
+        
+        // =============================================================================================================
+        // Start the service chain
+        // =============================================================================================================
+
+        var response = DomainServices.Response(httpVersion, mimeTypeDefault)
+        
+        // Note: Since the response.code is not set, it is possible to only consume a request and not transmit any response.
+        
+        var chainInfo = DomainServices.ChainInfo()
+
+        if let services = domainServices(for: domain) {
+            for service in services {
+                if service.closure(header, body, self, domain, &chainInfo, &response) == .abortChain { break }
+            }
+        }
+        
+        
+        // =============================================================================================================
+        // Send reply
+        // =============================================================================================================
+        
+        // If there is no code, nothing will be returned
+        
+        guard let code = response.code else { return }
+        
+            
+        // If there is data return that data
+            
+        if let payload = response.payload {
+            
+            
+            // Wrap the data in a HTTP resonse
+            
+            let message = createHttpResponse(for: code, version: response.httpVersion, mimeType: response.mimeType, body: payload)
+            
+            
+            // Transmit the response
+            
+            bufferedTransfer(message)
+
+            
+            // Update the statistics
+            
+            let mutation = Mutation.createAddClientRecord(from: self)
+            mutation.domain = domain.name
+            mutation.url = chainInfo[ResourcePathKey] as? String ?? "Unknown resource path"
+            mutation.httpResponseCode = code.rawValue
             mutation.requestCompleted = Date().javaDate
             statistics.submit(mutation: mutation)
-        
+
         } else {
         
-            // If no data is returned the domain does not want to serve the client, in that case the statistics are not updated and the connection should close asap.
-            mustClose = true
+            // There is no data, try to create a domain specific default response
+            
+            if let payload = domain.customErrorResponse(for: code) {
+                
+                let message = createHttpResponse(for: code, version: response.httpVersion, mimeType: response.mimeType, body: payload)
+                bufferedTransfer(message)
+
+                
+            } else {
+                
+                
+                // There is no domain default response, use the server default response
+                
+                let message = createHttpResponse(for: code, version: response.httpVersion)
+                bufferedTransfer(message)
+            }
         }
     }
 }
+    
+
+// Rebuilds the domain service cache in the domain object and returns it
+    
+private func domainServices(for domain: Domain) -> Array<DomainServices.ServiceEntry>? {
+        
+    if domain.services == nil {
+        domain.services = []
+        for (index, serviceName) in domain.serviceNames.enumerated() {
+            
+            // Add a service if it exists, if it does not exist, remove the service from the service names.
+            
+            if let entry = domainServices.availableServices[serviceName] {
+                domain.services?.append(entry)
+            } else {
+                domain.serviceNames.remove(at: index)
+            }
+        }
+    }
+    
+    return domain.services!
+}
+

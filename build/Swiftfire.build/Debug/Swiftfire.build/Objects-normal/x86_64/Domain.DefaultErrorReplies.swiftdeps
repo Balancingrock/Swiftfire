@@ -6,21 +6,16 @@ provides-member:
 - ["C13SwiftfireCore6Domain", "errorMessage"]
 provides-dynamic-lookup:
 depends-top-level:
-- !private "URL"
-- !private "StringLiteralType"
-- !private "HttpResponse"
 - "HttpResponseCode"
-- "Domain"
-- "HttpVersion"
-- "HttpConnection"
+- !private "StringLiteralType"
 - "Data"
+- "Domain"
+- !private "URL"
 depends-member:
 - !private ["Ps9AnyObject", "Data"]
-- !private ["Ps9AnyObject", "HttpResponse"]
 - !private ["Ps9AnyObject", "URL"]
 - !private ["Ps9AnyObject", "init"]
 - !private ["Ps9AnyObject", "sfresources"]
-- !private ["Ps9AnyObject", "withCode"]
 - !private ["Ps23BidirectionalCollection", "init"]
 - !private ["Ps22BidirectionalIndexable", "init"]
 - !private ["Ps7CVarArg", "init"]
@@ -34,7 +29,6 @@ depends-member:
 - !private ["Ps29CustomPlaygroundQuickLookable", "init"]
 - !private ["Ps17CustomReflectable", "init"]
 - !private ["Ps23CustomStringConvertible", "Data"]
-- !private ["Ps23CustomStringConvertible", "HttpResponse"]
 - !private ["Ps23CustomStringConvertible", "URL"]
 - !private ["Ps23CustomStringConvertible", "appendingPathComponent"]
 - !private ["Ps23CustomStringConvertible", "appendingPathExtension"]
@@ -43,16 +37,12 @@ depends-member:
 - ["V10Foundation4Data", "deinit"]
 - !private ["V10Foundation4Data", "init"]
 - ["C13SwiftfireCore6Domain", "Data"]
-- ["C13SwiftfireCore6Domain", "HttpConnection"]
-- !private ["C13SwiftfireCore6Domain", "HttpResponse"]
 - ["C13SwiftfireCore6Domain", "HttpResponseCode"]
-- ["C13SwiftfireCore6Domain", "HttpVersion"]
 - !private ["C13SwiftfireCore6Domain", "URL"]
 - ["C13SwiftfireCore6Domain", "deinit"]
 - ["C13SwiftfireCore6Domain", "errorMessage"]
 - !private ["C13SwiftfireCore6Domain", "sfresources"]
 - !private ["Ps9Equatable", "Data"]
-- !private ["Ps9Equatable", "HttpResponse"]
 - !private ["Ps9Equatable", "URL"]
 - !private ["Ps9Equatable", "appendingPathComponent"]
 - !private ["Ps9Equatable", "appendingPathExtension"]
@@ -67,10 +57,8 @@ depends-member:
 - !private ["Ps8Hashable", "appendingPathExtension"]
 - !private ["Ps8Hashable", "init"]
 - !private ["Ps8Hashable", "rawValue"]
-- !private ["C9Swiftfire12HttpResponse", "withCode"]
-- ["O9Swiftfire16HttpResponseCode", "deinit"]
-- !private ["O9Swiftfire16HttpResponseCode", "rawValue"]
-- ["O9Swiftfire11HttpVersion", "deinit"]
+- ["O13SwiftfireCore16HttpResponseCode", "deinit"]
+- !private ["O13SwiftfireCore16HttpResponseCode", "rawValue"]
 - !private ["Ps9Indexable", "init"]
 - !private ["Ps13IndexableBase", "init"]
 - !private ["Ps25LosslessStringConvertible", "init"]
@@ -86,6 +74,7 @@ depends-member:
 - !private ["PSo19NSPasteboardWriting", "init"]
 - !private ["PSo14NSSecureCoding", "init"]
 - !private ["CSo8NSString", "init"]
+- ["Sq", "deinit"]
 - !private ["Ps22RandomAccessCollection", "init"]
 - !private ["Ps21RandomAccessIndexable", "init"]
 - !private ["Ps26RangeReplaceableCollection", "init"]
@@ -95,7 +84,6 @@ depends-member:
 - !private ["P10Foundation20ReferenceConvertible", "appendingPathExtension"]
 - !private ["P10Foundation20ReferenceConvertible", "init"]
 - !private ["P10SwifterLog26ReflectedStringConvertible", "Data"]
-- !private ["P10SwifterLog26ReflectedStringConvertible", "HttpResponse"]
 - !private ["P10SwifterLog26ReflectedStringConvertible", "URL"]
 - !private ["P10SwifterLog26ReflectedStringConvertible", "sfresources"]
 - !private ["Ps8Sequence", "init"]
@@ -107,6 +95,7 @@ depends-member:
 - !private ["V10Foundation3URL", "appendingPathExtension"]
 - ["V10Foundation3URL", "deinit"]
 - !private ["V10Foundation3URL", "init"]
+- !private ["P11SwifterJSON17VJsonSerializable", "init"]
 - !private ["Ps51_ExpressibleByBuiltinExtendedGraphemeClusterLiteral", "init"]
 - !private ["Ps34_ExpressibleByBuiltinStringLiteral", "init"]
 - !private ["Ps39_ExpressibleByBuiltinUTF16StringLiteral", "init"]
@@ -142,9 +131,7 @@ depends-nominal:
 - !private "Ps26ExpressibleByStringLiteral"
 - !private "Ps33ExpressibleByUnicodeScalarLiteral"
 - !private "Ps8Hashable"
-- !private "C9Swiftfire12HttpResponse"
-- "O9Swiftfire16HttpResponseCode"
-- "O9Swiftfire11HttpVersion"
+- "O13SwiftfireCore16HttpResponseCode"
 - !private "Ps9Indexable"
 - !private "Ps13IndexableBase"
 - !private "Ps25LosslessStringConvertible"
@@ -160,6 +147,7 @@ depends-nominal:
 - !private "PSo19NSPasteboardWriting"
 - !private "PSo14NSSecureCoding"
 - !private "CSo8NSString"
+- "Sq"
 - !private "Ps22RandomAccessCollection"
 - !private "Ps21RandomAccessIndexable"
 - !private "Ps26RangeReplaceableCollection"
@@ -172,6 +160,7 @@ depends-nominal:
 - !private "Ps16TextOutputStream"
 - !private "Ps20TextOutputStreamable"
 - "V10Foundation3URL"
+- !private "P11SwifterJSON17VJsonSerializable"
 - !private "Ps51_ExpressibleByBuiltinExtendedGraphemeClusterLiteral"
 - !private "Ps34_ExpressibleByBuiltinStringLiteral"
 - !private "Ps39_ExpressibleByBuiltinUTF16StringLiteral"
@@ -198,10 +187,9 @@ depends-external:
 - "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/CAsl.framework/Modules/module.modulemap"
 - "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterSockets.framework/Modules/SwifterSockets.swiftmodule/x86_64.swiftmodule"
 - "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwiftfireCore.framework/Modules/SwiftfireCore.swiftmodule/x86_64.swiftmodule"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/COpenSsl-0.1.0/module.modulemap"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/AppKit.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreData.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/QuartzCore.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/XPC.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreImage.swiftmodule"
-interface-hash: "95af24b60c6ee622f4d8f60d5ecea6e1"
+interface-hash: "526d97061a565d72610a6ec50a5f6ab2"

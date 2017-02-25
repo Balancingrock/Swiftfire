@@ -6,48 +6,65 @@ provides-member:
 - ["C9Swiftfire14HttpConnection", "worker"]
 provides-dynamic-lookup:
 depends-top-level:
-- !private "!="
-- !private "??="
-- !private "String"
 - !private "Date"
+- "Data"
 - !private "forwardingConnectionFactory"
 - "HttpConnection"
+- !private "Array"
 - !private "StringLiteralType"
-- !private "SwifterSockets"
-- !private "HttpVersion"
-- !private "??"
-- !private "Mutation"
-- !private "log"
-- !private "HttpResponseCode"
-- "AssignmentPrecedence"
-- !private "Host"
-- !private "=="
-- "HttpHeader"
-- !private "parameters"
-- "CastingPrecedence"
-- "Data"
-- !private "HttpResponse"
 - !private "statistics"
-- !private "domains"
+- !private "domainServices"
+- "HttpHeader"
+- !private "mimeTypeDefault"
+- !private "UnicodeScalarType"
+- !private "HttpHost"
+- !private "??"
+- !private "DomainServices"
+- !private "Domain"
+- !private "!="
+- !private "Forwarder"
+- !private "String"
+- !private "log"
+- !private "createHttpResponse"
+- !private "HttpVersion"
 - !private "telemetry"
+- !private "IntegerLiteralType"
+- "AssignmentPrecedence"
+- !private "=="
+- "CastingPrecedence"
+- !private "HttpResponseCode"
+- !private "parameters"
+- !private "domains"
+- !private "ResourcePathKey"
+- !private "Mutation"
+- !private "SwifterSockets"
 depends-member:
+- !private ["Ps9AnyObject", "ChainInfo"]
 - !private ["Ps9AnyObject", "Date"]
-- !private ["Ps9AnyObject", "Host"]
-- !private ["Ps9AnyObject", "HttpResponse"]
+- !private ["Ps9AnyObject", "DomainServices"]
+- !private ["Ps9AnyObject", "HttpHost"]
 - !private ["Ps9AnyObject", "HttpResponseCode"]
 - !private ["Ps9AnyObject", "HttpVersion"]
 - !private ["Ps9AnyObject", "Mutation"]
+- !private ["Ps9AnyObject", "ResourcePathKey"]
+- !private ["Ps9AnyObject", "Response"]
+- !private ["Ps9AnyObject", "ServiceEntry"]
 - !private ["Ps9AnyObject", "SwifterSockets"]
-- !private ["Ps9AnyObject", "allocationCount"]
 - !private ["Ps9AnyObject", "asData"]
 - !private ["Ps9AnyObject", "atLevelDebug"]
-- !private ["Ps9AnyObject", "atLevelNotice"]
+- !private ["Ps9AnyObject", "atLevelError"]
+- !private ["Ps9AnyObject", "availableServices"]
+- !private ["Ps9AnyObject", "bufferedTransfer"]
 - !private ["Ps9AnyObject", "client"]
-- !private ["Ps9AnyObject", "connectionAllocationCount"]
-- !private ["Ps9AnyObject", "connectionObjectId"]
+- !private ["Ps9AnyObject", "code"]
 - !private ["Ps9AnyObject", "createAddClientRecord"]
+- !private ["Ps9AnyObject", "createHttpResponse"]
+- !private ["Ps9AnyObject", "customErrorResponse"]
 - !private ["Ps9AnyObject", "domain"]
+- !private ["Ps9AnyObject", "domainServices"]
 - !private ["Ps9AnyObject", "domains"]
+- !private ["Ps9AnyObject", "enabled"]
+- !private ["Ps9AnyObject", "forwardHost"]
 - !private ["Ps9AnyObject", "forwarder"]
 - !private ["Ps9AnyObject", "forwardingConnectionFactory"]
 - !private ["Ps9AnyObject", "host"]
@@ -56,110 +73,246 @@ depends-member:
 - !private ["Ps9AnyObject", "httpVersion"]
 - !private ["Ps9AnyObject", "increment"]
 - !private ["Ps9AnyObject", "init"]
-- !private ["Ps9AnyObject", "ipAddress"]
 - !private ["Ps9AnyObject", "log"]
 - !private ["Ps9AnyObject", "logId"]
-- !private ["Ps9AnyObject", "mustClose"]
+- !private ["Ps9AnyObject", "mimeType"]
+- !private ["Ps9AnyObject", "mimeTypeDefault"]
+- !private ["Ps9AnyObject", "name"]
 - !private ["Ps9AnyObject", "nofHttp400Replies"]
 - !private ["Ps9AnyObject", "nofHttp500Replies"]
-- !private ["Ps9AnyObject", "objectId"]
+- !private ["Ps9AnyObject", "nofRequests"]
+- !private ["Ps9AnyObject", "operation"]
 - !private ["Ps9AnyObject", "parameters"]
+- !private ["Ps9AnyObject", "payload"]
+- !private ["Ps9AnyObject", "recordInAccessLog"]
 - !private ["Ps9AnyObject", "remoteAddress"]
 - !private ["Ps9AnyObject", "requestCompleted"]
-- !private ["Ps9AnyObject", "requestReceived"]
 - !private ["Ps9AnyObject", "responseDetails"]
-- !private ["Ps9AnyObject", "socket"]
+- ["Ps9AnyObject", "send400BadRequestResponse"]
+- ["Ps9AnyObject", "send500InternalServerError"]
+- !private ["Ps9AnyObject", "serviceNames"]
+- !private ["Ps9AnyObject", "services"]
 - !private ["Ps9AnyObject", "source"]
 - !private ["Ps9AnyObject", "statistics"]
 - !private ["Ps9AnyObject", "submit"]
 - !private ["Ps9AnyObject", "telemetry"]
+- !private ["Ps9AnyObject", "timeOfAccept"]
 - !private ["Ps9AnyObject", "transfer"]
-- !private ["Ps9AnyObject", "withCode"]
+- !private ["Ps9AnyObject", "url"]
 - ["Ps9AnyObject", "worker"]
+- !private ["Sa", "Element"]
+- !private ["Sa", "Index"]
+- !private ["Sa", "Iterator"]
+- !private ["Sa", "_Element"]
+- !private ["Sa", "append"]
+- ["Sa", "deinit"]
+- !private ["Sa", "enumerated"]
+- !private ["Sa", "remove"]
+- !private ["Ps23BidirectionalCollection", "Element"]
+- !private ["Ps23BidirectionalCollection", "Index"]
+- !private ["Ps23BidirectionalCollection", "Iterator"]
+- !private ["Ps23BidirectionalCollection", "_Element"]
 - !private ["Ps23BidirectionalCollection", "append"]
+- !private ["Ps23BidirectionalCollection", "enumerated"]
+- !private ["Ps23BidirectionalCollection", "remove"]
+- !private ["Ps22BidirectionalIndexable", "Element"]
+- !private ["Ps22BidirectionalIndexable", "Index"]
+- !private ["Ps22BidirectionalIndexable", "Iterator"]
+- !private ["Ps22BidirectionalIndexable", "_Element"]
 - !private ["Ps22BidirectionalIndexable", "append"]
+- !private ["Ps22BidirectionalIndexable", "enumerated"]
+- !private ["Ps22BidirectionalIndexable", "remove"]
 - !private ["Sb", "_getBuiltinLogicValue"]
 - ["Sb", "deinit"]
+- !private ["Ps7CVarArg", "Element"]
+- !private ["Ps7CVarArg", "Index"]
+- !private ["Ps7CVarArg", "IndexDistance"]
+- !private ["Ps7CVarArg", "Iterator"]
+- !private ["Ps7CVarArg", "SubSequence"]
+- !private ["Ps7CVarArg", "_Element"]
+- !private ["Ps7CVarArg", "append"]
+- !private ["Ps7CVarArg", "enumerated"]
 - !private ["Ps7CVarArg", "increment"]
 - !private ["Ps7CVarArg", "init"]
+- !private ["Ps7CVarArg", "nofRequests"]
+- !private ["Ps7CVarArg", "remove"]
 - !private ["Ps7CVarArg", "source"]
+- !private ["Ps7CVarArg", "subscript"]
 - !private ["Vs9Character", "deinit"]
+- !private ["Ps10Collection", "Element"]
+- !private ["Ps10Collection", "Index"]
+- !private ["Ps10Collection", "IndexDistance"]
+- !private ["Ps10Collection", "Iterator"]
+- !private ["Ps10Collection", "SubSequence"]
+- !private ["Ps10Collection", "_Element"]
 - !private ["Ps10Collection", "append"]
+- !private ["Ps10Collection", "enumerated"]
+- !private ["Ps10Collection", "init"]
+- !private ["Ps10Collection", "remove"]
+- !private ["Ps10Collection", "subscript"]
 - !private ["Ps10Comparable", "init"]
 - !private ["Ps10Comparable", "javaDate"]
 - !private ["Ps10Comparable", "source"]
 - ["C14SwifterSockets10Connection", "Data"]
 - !private ["C14SwifterSockets10Connection", "Date"]
-- !private ["C14SwifterSockets10Connection", "Host"]
+- !private ["C14SwifterSockets10Connection", "DomainServices"]
+- !private ["C14SwifterSockets10Connection", "Forwarder"]
 - ["C14SwifterSockets10Connection", "HttpHeader"]
-- !private ["C14SwifterSockets10Connection", "HttpResponse"]
+- !private ["C14SwifterSockets10Connection", "HttpHost"]
 - !private ["C14SwifterSockets10Connection", "HttpResponseCode"]
 - !private ["C14SwifterSockets10Connection", "HttpVersion"]
 - !private ["C14SwifterSockets10Connection", "Mutation"]
+- !private ["C14SwifterSockets10Connection", "ResourcePathKey"]
 - !private ["C14SwifterSockets10Connection", "String"]
 - !private ["C14SwifterSockets10Connection", "SwifterSockets"]
-- !private ["C14SwifterSockets10Connection", "allocationCount"]
+- !private ["C14SwifterSockets10Connection", "bufferedTransfer"]
 - !private ["C14SwifterSockets10Connection", "client"]
-- !private ["C14SwifterSockets10Connection", "deinit"]
+- !private ["C14SwifterSockets10Connection", "createHttpResponse"]
+- ["C14SwifterSockets10Connection", "deinit"]
+- !private ["C14SwifterSockets10Connection", "domainServices"]
 - !private ["C14SwifterSockets10Connection", "domains"]
 - !private ["C14SwifterSockets10Connection", "forwarder"]
 - !private ["C14SwifterSockets10Connection", "forwardingConnectionFactory"]
 - !private ["C14SwifterSockets10Connection", "log"]
 - !private ["C14SwifterSockets10Connection", "logId"]
-- !private ["C14SwifterSockets10Connection", "mustClose"]
-- !private ["C14SwifterSockets10Connection", "objectId"]
+- !private ["C14SwifterSockets10Connection", "mimeTypeDefault"]
 - !private ["C14SwifterSockets10Connection", "parameters"]
 - !private ["C14SwifterSockets10Connection", "remoteAddress"]
+- ["C14SwifterSockets10Connection", "send400BadRequestResponse"]
+- ["C14SwifterSockets10Connection", "send500InternalServerError"]
 - !private ["C14SwifterSockets10Connection", "statistics"]
 - !private ["C14SwifterSockets10Connection", "telemetry"]
+- !private ["C14SwifterSockets10Connection", "timeOfAccept"]
 - !private ["C14SwifterSockets10Connection", "transfer"]
 - ["C14SwifterSockets10Connection", "worker"]
+- !private ["Ps28CustomDebugStringConvertible", "Element"]
+- !private ["Ps28CustomDebugStringConvertible", "Index"]
+- !private ["Ps28CustomDebugStringConvertible", "IndexDistance"]
+- !private ["Ps28CustomDebugStringConvertible", "Iterator"]
+- !private ["Ps28CustomDebugStringConvertible", "SubSequence"]
+- !private ["Ps28CustomDebugStringConvertible", "_Element"]
 - !private ["Ps28CustomDebugStringConvertible", "append"]
+- !private ["Ps28CustomDebugStringConvertible", "enumerated"]
 - !private ["Ps28CustomDebugStringConvertible", "increment"]
 - !private ["Ps28CustomDebugStringConvertible", "init"]
 - !private ["Ps28CustomDebugStringConvertible", "javaDate"]
-- !private ["Ps28CustomDebugStringConvertible", "nofHttp400Replies"]
-- !private ["Ps28CustomDebugStringConvertible", "nofHttp500Replies"]
+- !private ["Ps28CustomDebugStringConvertible", "nofRequests"]
+- !private ["Ps28CustomDebugStringConvertible", "remove"]
 - !private ["Ps28CustomDebugStringConvertible", "source"]
+- !private ["Ps28CustomDebugStringConvertible", "subscript"]
 - !private ["Ps29CustomPlaygroundQuickLookable", "_getBuiltinLogicValue"]
 - !private ["Ps29CustomPlaygroundQuickLookable", "init"]
 - !private ["Ps29CustomPlaygroundQuickLookable", "javaDate"]
 - !private ["Ps29CustomPlaygroundQuickLookable", "source"]
+- !private ["Ps17CustomReflectable", "Element"]
+- !private ["Ps17CustomReflectable", "Index"]
+- !private ["Ps17CustomReflectable", "IndexDistance"]
+- !private ["Ps17CustomReflectable", "Iterator"]
+- !private ["Ps17CustomReflectable", "SubSequence"]
+- !private ["Ps17CustomReflectable", "_Element"]
 - !private ["Ps17CustomReflectable", "_getBuiltinLogicValue"]
 - !private ["Ps17CustomReflectable", "append"]
+- !private ["Ps17CustomReflectable", "enumerated"]
 - !private ["Ps17CustomReflectable", "init"]
 - !private ["Ps17CustomReflectable", "javaDate"]
+- !private ["Ps17CustomReflectable", "remove"]
 - !private ["Ps17CustomReflectable", "source"]
+- !private ["Ps17CustomReflectable", "subscript"]
+- !private ["Ps23CustomStringConvertible", "Element"]
+- !private ["Ps23CustomStringConvertible", "Index"]
+- !private ["Ps23CustomStringConvertible", "IndexDistance"]
+- !private ["Ps23CustomStringConvertible", "Iterator"]
+- !private ["Ps23CustomStringConvertible", "SubSequence"]
+- !private ["Ps23CustomStringConvertible", "_Element"]
 - !private ["Ps23CustomStringConvertible", "_getBuiltinLogicValue"]
 - !private ["Ps23CustomStringConvertible", "append"]
+- !private ["Ps23CustomStringConvertible", "customErrorResponse"]
+- !private ["Ps23CustomStringConvertible", "enabled"]
+- !private ["Ps23CustomStringConvertible", "enumerated"]
+- !private ["Ps23CustomStringConvertible", "forwardHost"]
 - !private ["Ps23CustomStringConvertible", "increment"]
 - !private ["Ps23CustomStringConvertible", "init"]
 - !private ["Ps23CustomStringConvertible", "javaDate"]
-- !private ["Ps23CustomStringConvertible", "nofHttp400Replies"]
-- !private ["Ps23CustomStringConvertible", "nofHttp500Replies"]
+- !private ["Ps23CustomStringConvertible", "name"]
+- !private ["Ps23CustomStringConvertible", "nofRequests"]
+- !private ["Ps23CustomStringConvertible", "recordInAccessLog"]
+- !private ["Ps23CustomStringConvertible", "remove"]
+- !private ["Ps23CustomStringConvertible", "serviceNames"]
+- !private ["Ps23CustomStringConvertible", "services"]
 - !private ["Ps23CustomStringConvertible", "source"]
+- !private ["Ps23CustomStringConvertible", "subscript"]
+- !private ["Ps23CustomStringConvertible", "telemetry"]
 - !private ["V10Foundation4Data", "append"]
 - ["V10Foundation4Data", "deinit"]
 - ["V10Foundation4Date", "deinit"]
 - !private ["V10Foundation4Date", "init"]
 - !private ["V10Foundation4Date", "javaDate"]
+- !private ["Vs10Dictionary", "Index"]
+- !private ["Vs10Dictionary", "IndexDistance"]
+- !private ["Vs10Dictionary", "SubSequence"]
+- !private ["Vs10Dictionary", "_Element"]
+- ["Vs10Dictionary", "deinit"]
+- !private ["Vs10Dictionary", "init"]
+- !private ["Vs10Dictionary", "subscript"]
+- !private ["C13SwiftfireCore6Domain", "customErrorResponse"]
+- ["C13SwiftfireCore6Domain", "deinit"]
+- !private ["C13SwiftfireCore6Domain", "enabled"]
+- !private ["C13SwiftfireCore6Domain", "forwardHost"]
+- !private ["C13SwiftfireCore6Domain", "name"]
+- !private ["C13SwiftfireCore6Domain", "recordInAccessLog"]
+- !private ["C13SwiftfireCore6Domain", "serviceNames"]
+- !private ["C13SwiftfireCore6Domain", "services"]
+- !private ["C13SwiftfireCore6Domain", "telemetry"]
+- !private ["C13SwiftfireCore14DomainServices", "ChainInfo"]
+- !private ["C13SwiftfireCore14DomainServices", "Response"]
+- !private ["C13SwiftfireCore14DomainServices", "ServiceEntry"]
+- !private ["C13SwiftfireCore14DomainServices", "availableServices"]
+- !private ["C13SwiftfireCore14DomainServices", "deinit"]
+- !private ["C13SwiftfireCore15DomainTelemetry", "nofRequests"]
 - ["C13SwiftfireCore7Domains", "deinit"]
 - !private ["C13SwiftfireCore7Domains", "domain"]
 - !private ["Sd", "deinit"]
+- !private ["Vs18EnumeratedIterator", "Element"]
+- !private ["Vs18EnumeratedSequence", "Iterator"]
+- !private ["Vs18EnumeratedSequence", "deinit"]
 - !private ["Ps9Equatable", "RawValue"]
 - !private ["Ps9Equatable", "_getBuiltinLogicValue"]
+- !private ["Ps9Equatable", "abortChain"]
+- !private ["Ps9Equatable", "address"]
 - !private ["Ps9Equatable", "append"]
-- !private ["Ps9Equatable", "code200_OK"]
 - !private ["Ps9Equatable", "code400_BadRequest"]
 - !private ["Ps9Equatable", "code500_InternalServerError"]
+- !private ["Ps9Equatable", "customErrorResponse"]
+- !private ["Ps9Equatable", "enabled"]
+- !private ["Ps9Equatable", "forwardHost"]
 - !private ["Ps9Equatable", "http1_0"]
 - !private ["Ps9Equatable", "http1_1"]
 - !private ["Ps9Equatable", "increment"]
 - !private ["Ps9Equatable", "init"]
 - !private ["Ps9Equatable", "javaDate"]
+- !private ["Ps9Equatable", "name"]
+- !private ["Ps9Equatable", "nofRequests"]
+- !private ["Ps9Equatable", "port"]
 - !private ["Ps9Equatable", "rawValue"]
+- !private ["Ps9Equatable", "recordInAccessLog"]
+- !private ["Ps9Equatable", "serviceNames"]
+- !private ["Ps9Equatable", "services"]
 - !private ["Ps9Equatable", "source"]
+- !private ["Ps9Equatable", "telemetry"]
+- !private ["Ps25ExpressibleByArrayLiteral", "Element"]
+- !private ["Ps25ExpressibleByArrayLiteral", "Index"]
+- !private ["Ps25ExpressibleByArrayLiteral", "Iterator"]
+- !private ["Ps25ExpressibleByArrayLiteral", "_Element"]
+- !private ["Ps25ExpressibleByArrayLiteral", "append"]
+- !private ["Ps25ExpressibleByArrayLiteral", "enumerated"]
+- !private ["Ps25ExpressibleByArrayLiteral", "remove"]
 - !private ["Ps27ExpressibleByBooleanLiteral", "_getBuiltinLogicValue"]
+- !private ["Ps30ExpressibleByDictionaryLiteral", "Index"]
+- !private ["Ps30ExpressibleByDictionaryLiteral", "IndexDistance"]
+- !private ["Ps30ExpressibleByDictionaryLiteral", "SubSequence"]
+- !private ["Ps30ExpressibleByDictionaryLiteral", "_Element"]
+- !private ["Ps30ExpressibleByDictionaryLiteral", "init"]
+- !private ["Ps30ExpressibleByDictionaryLiteral", "subscript"]
 - !private ["Ps43ExpressibleByExtendedGraphemeClusterLiteral", "init"]
 - !private ["Ps43ExpressibleByExtendedGraphemeClusterLiteral", "source"]
 - !private ["Ps32ExpressibleByStringInterpolation", "init"]
@@ -170,12 +323,12 @@ depends-member:
 - !private ["Ps33ExpressibleByUnicodeScalarLiteral", "source"]
 - !private ["Sf", "deinit"]
 - !private ["C9Swiftfire9Forwarder", "client"]
-- !private ["C9Swiftfire9Forwarder", "deinit"]
+- ["C9Swiftfire9Forwarder", "deinit"]
 - !private ["C9Swiftfire9Forwarder", "transfer"]
 - !private ["Ps8Hashable", "RawValue"]
 - !private ["Ps8Hashable", "_getBuiltinLogicValue"]
+- !private ["Ps8Hashable", "abortChain"]
 - !private ["Ps8Hashable", "append"]
-- !private ["Ps8Hashable", "code200_OK"]
 - !private ["Ps8Hashable", "code400_BadRequest"]
 - !private ["Ps8Hashable", "code500_InternalServerError"]
 - !private ["Ps8Hashable", "http1_0"]
@@ -183,72 +336,117 @@ depends-member:
 - !private ["Ps8Hashable", "increment"]
 - !private ["Ps8Hashable", "init"]
 - !private ["Ps8Hashable", "javaDate"]
+- !private ["Ps8Hashable", "nofRequests"]
 - !private ["Ps8Hashable", "rawValue"]
 - !private ["Ps8Hashable", "source"]
 - ["C9Swiftfire14HttpConnection", "Data"]
 - !private ["C9Swiftfire14HttpConnection", "Date"]
-- !private ["C9Swiftfire14HttpConnection", "Host"]
+- !private ["C9Swiftfire14HttpConnection", "DomainServices"]
+- !private ["C9Swiftfire14HttpConnection", "Forwarder"]
 - ["C9Swiftfire14HttpConnection", "HttpHeader"]
-- !private ["C9Swiftfire14HttpConnection", "HttpResponse"]
+- !private ["C9Swiftfire14HttpConnection", "HttpHost"]
 - !private ["C9Swiftfire14HttpConnection", "HttpResponseCode"]
 - !private ["C9Swiftfire14HttpConnection", "HttpVersion"]
 - !private ["C9Swiftfire14HttpConnection", "Mutation"]
+- !private ["C9Swiftfire14HttpConnection", "ResourcePathKey"]
 - !private ["C9Swiftfire14HttpConnection", "String"]
 - !private ["C9Swiftfire14HttpConnection", "SwifterSockets"]
-- !private ["C9Swiftfire14HttpConnection", "allocationCount"]
+- !private ["C9Swiftfire14HttpConnection", "bufferedTransfer"]
+- !private ["C9Swiftfire14HttpConnection", "createHttpResponse"]
 - ["C9Swiftfire14HttpConnection", "deinit"]
+- !private ["C9Swiftfire14HttpConnection", "domainServices"]
 - !private ["C9Swiftfire14HttpConnection", "domains"]
 - !private ["C9Swiftfire14HttpConnection", "forwarder"]
 - !private ["C9Swiftfire14HttpConnection", "forwardingConnectionFactory"]
 - !private ["C9Swiftfire14HttpConnection", "log"]
 - !private ["C9Swiftfire14HttpConnection", "logId"]
-- !private ["C9Swiftfire14HttpConnection", "mustClose"]
-- !private ["C9Swiftfire14HttpConnection", "objectId"]
+- !private ["C9Swiftfire14HttpConnection", "mimeTypeDefault"]
 - !private ["C9Swiftfire14HttpConnection", "parameters"]
 - !private ["C9Swiftfire14HttpConnection", "remoteAddress"]
+- !private ["C9Swiftfire14HttpConnection", "send400BadRequestResponse"]
+- !private ["C9Swiftfire14HttpConnection", "send500InternalServerError"]
 - !private ["C9Swiftfire14HttpConnection", "statistics"]
 - !private ["C9Swiftfire14HttpConnection", "telemetry"]
+- !private ["C9Swiftfire14HttpConnection", "timeOfAccept"]
 - !private ["C9Swiftfire14HttpConnection", "transfer"]
 - ["C9Swiftfire14HttpConnection", "worker"]
-- !private ["C9Swiftfire10HttpHeader", "asData"]
-- ["C9Swiftfire10HttpHeader", "deinit"]
-- !private ["C9Swiftfire10HttpHeader", "host"]
-- !private ["C9Swiftfire10HttpHeader", "httpVersion"]
-- !private ["C9Swiftfire12HttpResponse", "withCode"]
-- !private ["O9Swiftfire16HttpResponseCode", "code200_OK"]
-- !private ["O9Swiftfire16HttpResponseCode", "code400_BadRequest"]
-- !private ["O9Swiftfire16HttpResponseCode", "code500_InternalServerError"]
-- ["O9Swiftfire16HttpResponseCode", "deinit"]
-- !private ["O9Swiftfire16HttpResponseCode", "rawValue"]
-- !private ["O9Swiftfire11HttpVersion", "RawValue"]
-- ["O9Swiftfire11HttpVersion", "deinit"]
-- !private ["O9Swiftfire11HttpVersion", "http1_0"]
-- !private ["O9Swiftfire11HttpVersion", "http1_1"]
+- !private ["C13SwiftfireCore10HttpHeader", "asData"]
+- ["C13SwiftfireCore10HttpHeader", "deinit"]
+- !private ["C13SwiftfireCore10HttpHeader", "host"]
+- !private ["C13SwiftfireCore10HttpHeader", "httpVersion"]
+- !private ["C13SwiftfireCore10HttpHeader", "operation"]
+- !private ["C13SwiftfireCore10HttpHeader", "url"]
+- !private ["V13SwiftfireCore8HttpHost", "address"]
+- ["V13SwiftfireCore8HttpHost", "deinit"]
+- !private ["V13SwiftfireCore8HttpHost", "init"]
+- !private ["V13SwiftfireCore8HttpHost", "port"]
+- !private ["O13SwiftfireCore13HttpOperation", "rawValue"]
+- !private ["O13SwiftfireCore16HttpResponseCode", "code400_BadRequest"]
+- !private ["O13SwiftfireCore16HttpResponseCode", "code500_InternalServerError"]
+- ["O13SwiftfireCore16HttpResponseCode", "deinit"]
+- !private ["O13SwiftfireCore16HttpResponseCode", "rawValue"]
+- !private ["O13SwiftfireCore11HttpVersion", "RawValue"]
+- ["O13SwiftfireCore11HttpVersion", "deinit"]
+- !private ["O13SwiftfireCore11HttpVersion", "http1_0"]
+- !private ["O13SwiftfireCore11HttpVersion", "http1_1"]
+- !private ["O13SwiftfireCore11HttpVersion", "rawValue"]
+- !private ["Ps9Indexable", "Element"]
+- !private ["Ps9Indexable", "Index"]
+- !private ["Ps9Indexable", "IndexDistance"]
+- !private ["Ps9Indexable", "Iterator"]
+- !private ["Ps9Indexable", "SubSequence"]
+- !private ["Ps9Indexable", "_Element"]
 - !private ["Ps9Indexable", "append"]
+- !private ["Ps9Indexable", "enumerated"]
+- !private ["Ps9Indexable", "init"]
+- !private ["Ps9Indexable", "remove"]
+- !private ["Ps9Indexable", "subscript"]
+- !private ["Ps13IndexableBase", "Element"]
+- !private ["Ps13IndexableBase", "Index"]
+- !private ["Ps13IndexableBase", "IndexDistance"]
+- !private ["Ps13IndexableBase", "Iterator"]
+- !private ["Ps13IndexableBase", "SubSequence"]
+- !private ["Ps13IndexableBase", "_Element"]
 - !private ["Ps13IndexableBase", "append"]
+- !private ["Ps13IndexableBase", "enumerated"]
+- !private ["Ps13IndexableBase", "init"]
+- !private ["Ps13IndexableBase", "remove"]
+- !private ["Ps13IndexableBase", "subscript"]
+- !private ["Vs16IndexingIterator", "Element"]
 - ["Si", "deinit"]
-- ["Vs5Int16", "deinit"]
+- !private ["Vs5Int16", "deinit"]
 - ["Vs5Int32", "deinit"]
 - ["Vs5Int64", "deinit"]
 - !private ["Vs4Int8", "deinit"]
+- ["CC13SwiftfireCore15DomainTelemetry4Item", "deinit"]
+- !private ["CC13SwiftfireCore15DomainTelemetry4Item", "increment"]
+- !private ["Ps16IteratorProtocol", "Element"]
 - !private ["Ps25LosslessStringConvertible", "_getBuiltinLogicValue"]
 - !private ["Ps25LosslessStringConvertible", "init"]
 - !private ["Ps25LosslessStringConvertible", "source"]
 - !private ["Ps10MirrorPath", "init"]
 - !private ["Ps10MirrorPath", "source"]
+- !private ["Ps17MutableCollection", "Element"]
+- !private ["Ps17MutableCollection", "Index"]
+- !private ["Ps17MutableCollection", "Iterator"]
+- !private ["Ps17MutableCollection", "_Element"]
 - !private ["Ps17MutableCollection", "append"]
+- !private ["Ps17MutableCollection", "enumerated"]
+- !private ["Ps17MutableCollection", "remove"]
+- !private ["Ps16MutableIndexable", "Element"]
+- !private ["Ps16MutableIndexable", "Index"]
+- !private ["Ps16MutableIndexable", "Iterator"]
+- !private ["Ps16MutableIndexable", "_Element"]
 - !private ["Ps16MutableIndexable", "append"]
-- !private ["C9Swiftfire8Mutation", "connectionAllocationCount"]
-- !private ["C9Swiftfire8Mutation", "connectionObjectId"]
-- !private ["C9Swiftfire8Mutation", "createAddClientRecord"]
-- ["C9Swiftfire8Mutation", "deinit"]
-- !private ["C9Swiftfire8Mutation", "domain"]
-- !private ["C9Swiftfire8Mutation", "httpResponseCode"]
-- !private ["C9Swiftfire8Mutation", "ipAddress"]
-- !private ["C9Swiftfire8Mutation", "requestCompleted"]
-- !private ["C9Swiftfire8Mutation", "requestReceived"]
-- !private ["C9Swiftfire8Mutation", "responseDetails"]
-- !private ["C9Swiftfire8Mutation", "socket"]
+- !private ["Ps16MutableIndexable", "enumerated"]
+- !private ["Ps16MutableIndexable", "remove"]
+- !private ["C13SwiftfireCore8Mutation", "createAddClientRecord"]
+- ["C13SwiftfireCore8Mutation", "deinit"]
+- !private ["C13SwiftfireCore8Mutation", "domain"]
+- !private ["C13SwiftfireCore8Mutation", "httpResponseCode"]
+- !private ["C13SwiftfireCore8Mutation", "requestCompleted"]
+- !private ["C13SwiftfireCore8Mutation", "responseDetails"]
+- !private ["C13SwiftfireCore8Mutation", "url"]
 - !private ["PSo8NSCoding", "init"]
 - !private ["PSo8NSCoding", "source"]
 - !private ["PSo9NSCopying", "init"]
@@ -257,9 +455,11 @@ depends-member:
 - !private ["PSo16NSMutableCopying", "source"]
 - !private ["CSo8NSObject", "increment"]
 - !private ["CSo8NSObject", "init"]
+- !private ["CSo8NSObject", "nofRequests"]
 - !private ["CSo8NSObject", "source"]
 - !private ["PSo16NSObjectProtocol", "increment"]
 - !private ["PSo16NSObjectProtocol", "init"]
+- !private ["PSo16NSObjectProtocol", "nofRequests"]
 - !private ["PSo16NSObjectProtocol", "source"]
 - !private ["PSo19NSPasteboardReading", "init"]
 - !private ["PSo19NSPasteboardReading", "source"]
@@ -270,81 +470,150 @@ depends-member:
 - !private ["CSo8NSString", "init"]
 - !private ["CSo8NSString", "source"]
 - ["Sq", "deinit"]
-- ["C9Swiftfire10Parameters", "deinit"]
-- !private ["C9Swiftfire10Parameters", "http1_0DomainName"]
+- ["C13SwiftfireCore10Parameters", "deinit"]
+- !private ["C13SwiftfireCore10Parameters", "http1_0DomainName"]
+- !private ["Ps22RandomAccessCollection", "Element"]
+- !private ["Ps22RandomAccessCollection", "Index"]
+- !private ["Ps22RandomAccessCollection", "Iterator"]
+- !private ["Ps22RandomAccessCollection", "_Element"]
 - !private ["Ps22RandomAccessCollection", "append"]
+- !private ["Ps22RandomAccessCollection", "enumerated"]
+- !private ["Ps22RandomAccessCollection", "remove"]
+- !private ["Ps21RandomAccessIndexable", "Element"]
+- !private ["Ps21RandomAccessIndexable", "Index"]
+- !private ["Ps21RandomAccessIndexable", "Iterator"]
+- !private ["Ps21RandomAccessIndexable", "_Element"]
 - !private ["Ps21RandomAccessIndexable", "append"]
+- !private ["Ps21RandomAccessIndexable", "enumerated"]
+- !private ["Ps21RandomAccessIndexable", "remove"]
+- !private ["Ps26RangeReplaceableCollection", "Element"]
+- !private ["Ps26RangeReplaceableCollection", "Index"]
+- !private ["Ps26RangeReplaceableCollection", "Iterator"]
+- !private ["Ps26RangeReplaceableCollection", "_Element"]
 - !private ["Ps26RangeReplaceableCollection", "append"]
+- !private ["Ps26RangeReplaceableCollection", "enumerated"]
+- !private ["Ps26RangeReplaceableCollection", "remove"]
+- !private ["Ps25RangeReplaceableIndexable", "Element"]
+- !private ["Ps25RangeReplaceableIndexable", "Index"]
+- !private ["Ps25RangeReplaceableIndexable", "Iterator"]
+- !private ["Ps25RangeReplaceableIndexable", "_Element"]
 - !private ["Ps25RangeReplaceableIndexable", "append"]
+- !private ["Ps25RangeReplaceableIndexable", "enumerated"]
+- !private ["Ps25RangeReplaceableIndexable", "remove"]
 - !private ["Ps16RawRepresentable", "RawValue"]
-- !private ["Ps16RawRepresentable", "code200_OK"]
 - !private ["Ps16RawRepresentable", "code400_BadRequest"]
 - !private ["Ps16RawRepresentable", "code500_InternalServerError"]
 - !private ["Ps16RawRepresentable", "http1_0"]
 - !private ["Ps16RawRepresentable", "http1_1"]
 - !private ["Ps16RawRepresentable", "rawValue"]
 - !private ["P14SwifterSockets16ReceiverProtocol", "Date"]
-- !private ["P14SwifterSockets16ReceiverProtocol", "Host"]
-- !private ["P14SwifterSockets16ReceiverProtocol", "HttpResponse"]
+- !private ["P14SwifterSockets16ReceiverProtocol", "DomainServices"]
+- !private ["P14SwifterSockets16ReceiverProtocol", "HttpHost"]
 - !private ["P14SwifterSockets16ReceiverProtocol", "HttpResponseCode"]
 - !private ["P14SwifterSockets16ReceiverProtocol", "HttpVersion"]
 - !private ["P14SwifterSockets16ReceiverProtocol", "Mutation"]
+- !private ["P14SwifterSockets16ReceiverProtocol", "ResourcePathKey"]
 - !private ["P14SwifterSockets16ReceiverProtocol", "SwifterSockets"]
-- !private ["P14SwifterSockets16ReceiverProtocol", "allocationCount"]
+- !private ["P14SwifterSockets16ReceiverProtocol", "bufferedTransfer"]
 - !private ["P14SwifterSockets16ReceiverProtocol", "client"]
+- !private ["P14SwifterSockets16ReceiverProtocol", "createHttpResponse"]
+- !private ["P14SwifterSockets16ReceiverProtocol", "domainServices"]
 - !private ["P14SwifterSockets16ReceiverProtocol", "domains"]
 - !private ["P14SwifterSockets16ReceiverProtocol", "forwarder"]
 - !private ["P14SwifterSockets16ReceiverProtocol", "forwardingConnectionFactory"]
 - !private ["P14SwifterSockets16ReceiverProtocol", "log"]
 - !private ["P14SwifterSockets16ReceiverProtocol", "logId"]
-- !private ["P14SwifterSockets16ReceiverProtocol", "mustClose"]
-- !private ["P14SwifterSockets16ReceiverProtocol", "objectId"]
+- !private ["P14SwifterSockets16ReceiverProtocol", "mimeTypeDefault"]
 - !private ["P14SwifterSockets16ReceiverProtocol", "parameters"]
 - !private ["P14SwifterSockets16ReceiverProtocol", "remoteAddress"]
+- ["P14SwifterSockets16ReceiverProtocol", "send400BadRequestResponse"]
+- ["P14SwifterSockets16ReceiverProtocol", "send500InternalServerError"]
 - !private ["P14SwifterSockets16ReceiverProtocol", "statistics"]
 - !private ["P14SwifterSockets16ReceiverProtocol", "telemetry"]
+- !private ["P14SwifterSockets16ReceiverProtocol", "timeOfAccept"]
 - !private ["P14SwifterSockets16ReceiverProtocol", "transfer"]
 - ["P14SwifterSockets16ReceiverProtocol", "worker"]
 - !private ["P10Foundation20ReferenceConvertible", "append"]
 - !private ["P10Foundation20ReferenceConvertible", "init"]
 - !private ["P10Foundation20ReferenceConvertible", "javaDate"]
+- !private ["P10SwifterLog26ReflectedStringConvertible", "customErrorResponse"]
+- !private ["P10SwifterLog26ReflectedStringConvertible", "enabled"]
+- !private ["P10SwifterLog26ReflectedStringConvertible", "forwardHost"]
+- !private ["P10SwifterLog26ReflectedStringConvertible", "name"]
+- !private ["P10SwifterLog26ReflectedStringConvertible", "recordInAccessLog"]
+- !private ["P10SwifterLog26ReflectedStringConvertible", "serviceNames"]
+- !private ["P10SwifterLog26ReflectedStringConvertible", "services"]
+- !private ["P10SwifterLog26ReflectedStringConvertible", "telemetry"]
+- !private ["CC13SwiftfireCore14DomainServices8Response", "code"]
+- ["CC13SwiftfireCore14DomainServices8Response", "deinit"]
+- !private ["CC13SwiftfireCore14DomainServices8Response", "httpVersion"]
+- !private ["CC13SwiftfireCore14DomainServices8Response", "init"]
+- !private ["CC13SwiftfireCore14DomainServices8Response", "mimeType"]
+- !private ["CC13SwiftfireCore14DomainServices8Response", "payload"]
+- ["O14SwifterSockets6Result", "deinit"]
+- ["O14SwifterSockets6Result", "error"]
+- ["O14SwifterSockets6Result", "success"]
+- !private ["Ps8Sequence", "Element"]
+- !private ["Ps8Sequence", "Index"]
+- !private ["Ps8Sequence", "IndexDistance"]
+- !private ["Ps8Sequence", "Iterator"]
+- !private ["Ps8Sequence", "SubSequence"]
+- !private ["Ps8Sequence", "_Element"]
 - !private ["Ps8Sequence", "append"]
 - !private ["Ps8Sequence", "domain"]
-- ["C9Swiftfire10Statistics", "deinit"]
-- !private ["C9Swiftfire10Statistics", "submit"]
+- !private ["Ps8Sequence", "enumerated"]
+- !private ["Ps8Sequence", "init"]
+- !private ["Ps8Sequence", "remove"]
+- !private ["Ps8Sequence", "subscript"]
+- !private ["VC13SwiftfireCore14DomainServices12ServiceEntry", "closure"]
+- ["VC13SwiftfireCore14DomainServices12ServiceEntry", "deinit"]
+- !private ["OC13SwiftfireCore14DomainServices13ServiceResult", "abortChain"]
+- ["OC13SwiftfireCore14DomainServices13ServiceResult", "deinit"]
+- !private ["Vs5Slice", "Index"]
+- !private ["Vs5Slice", "Iterator"]
+- !private ["Vs5Slice", "SubSequence"]
+- !private ["Vs5Slice", "_Element"]
+- ["C13SwiftfireCore10Statistics", "deinit"]
+- !private ["C13SwiftfireCore10Statistics", "submit"]
 - ["SS", "deinit"]
 - !private ["SS", "init"]
 - !private ["SS", "source"]
 - !private ["C10SwifterLog10SwifterLog", "atLevelDebug"]
-- !private ["C10SwifterLog10SwifterLog", "atLevelNotice"]
+- !private ["C10SwifterLog10SwifterLog", "atLevelError"]
 - ["C10SwifterLog10SwifterLog", "deinit"]
-- ["C9Swiftfire9Telemetry", "deinit"]
-- !private ["C9Swiftfire9Telemetry", "nofHttp400Replies"]
-- !private ["C9Swiftfire9Telemetry", "nofHttp500Replies"]
+- !private ["C13SwiftfireCore9Telemetry", "deinit"]
+- !private ["C13SwiftfireCore9Telemetry", "nofHttp400Replies"]
+- !private ["C13SwiftfireCore9Telemetry", "nofHttp500Replies"]
 - !private ["Ps16TextOutputStream", "init"]
 - !private ["Ps16TextOutputStream", "source"]
 - !private ["Ps20TextOutputStreamable", "init"]
 - !private ["Ps20TextOutputStreamable", "source"]
+- ["O14SwifterSockets14TransferResult", "deinit"]
 - !private ["P14SwifterSockets19TransmitterProtocol", "Date"]
-- !private ["P14SwifterSockets19TransmitterProtocol", "Host"]
-- !private ["P14SwifterSockets19TransmitterProtocol", "HttpResponse"]
+- !private ["P14SwifterSockets19TransmitterProtocol", "DomainServices"]
+- !private ["P14SwifterSockets19TransmitterProtocol", "HttpHost"]
 - !private ["P14SwifterSockets19TransmitterProtocol", "HttpResponseCode"]
 - !private ["P14SwifterSockets19TransmitterProtocol", "HttpVersion"]
 - !private ["P14SwifterSockets19TransmitterProtocol", "Mutation"]
+- !private ["P14SwifterSockets19TransmitterProtocol", "ResourcePathKey"]
 - !private ["P14SwifterSockets19TransmitterProtocol", "SwifterSockets"]
-- !private ["P14SwifterSockets19TransmitterProtocol", "allocationCount"]
+- !private ["P14SwifterSockets19TransmitterProtocol", "bufferedTransfer"]
 - !private ["P14SwifterSockets19TransmitterProtocol", "client"]
+- !private ["P14SwifterSockets19TransmitterProtocol", "createHttpResponse"]
+- !private ["P14SwifterSockets19TransmitterProtocol", "domainServices"]
 - !private ["P14SwifterSockets19TransmitterProtocol", "domains"]
 - !private ["P14SwifterSockets19TransmitterProtocol", "forwarder"]
 - !private ["P14SwifterSockets19TransmitterProtocol", "forwardingConnectionFactory"]
 - !private ["P14SwifterSockets19TransmitterProtocol", "log"]
 - !private ["P14SwifterSockets19TransmitterProtocol", "logId"]
-- !private ["P14SwifterSockets19TransmitterProtocol", "mustClose"]
-- !private ["P14SwifterSockets19TransmitterProtocol", "objectId"]
+- !private ["P14SwifterSockets19TransmitterProtocol", "mimeTypeDefault"]
 - !private ["P14SwifterSockets19TransmitterProtocol", "parameters"]
 - !private ["P14SwifterSockets19TransmitterProtocol", "remoteAddress"]
+- ["P14SwifterSockets19TransmitterProtocol", "send400BadRequestResponse"]
+- ["P14SwifterSockets19TransmitterProtocol", "send500InternalServerError"]
 - !private ["P14SwifterSockets19TransmitterProtocol", "statistics"]
 - !private ["P14SwifterSockets19TransmitterProtocol", "telemetry"]
+- !private ["P14SwifterSockets19TransmitterProtocol", "timeOfAccept"]
 - !private ["P14SwifterSockets19TransmitterProtocol", "transfer"]
 - ["P14SwifterSockets19TransmitterProtocol", "worker"]
 - !private ["Su", "deinit"]
@@ -352,10 +621,26 @@ depends-member:
 - !private ["Vs6UInt32", "deinit"]
 - !private ["Vs6UInt64", "deinit"]
 - !private ["Vs5UInt8", "deinit"]
-- ["C9Swiftfire13UIntTelemetry", "deinit"]
-- !private ["C9Swiftfire13UIntTelemetry", "increment"]
+- !private ["C13SwiftfireCore13UIntTelemetry", "deinit"]
+- !private ["C13SwiftfireCore13UIntTelemetry", "increment"]
 - !private ["Sc", "deinit"]
+- !private ["P11SwifterJSON17VJsonSerializable", "init"]
+- !private ["P11SwifterJSON17VJsonSerializable", "source"]
 - !private ["P11SwifterJSON17VJsonSerializable", "submit"]
+- !private ["Ps14_ArrayProtocol", "Element"]
+- !private ["Ps14_ArrayProtocol", "Index"]
+- !private ["Ps14_ArrayProtocol", "Iterator"]
+- !private ["Ps14_ArrayProtocol", "_Element"]
+- !private ["Ps14_ArrayProtocol", "append"]
+- !private ["Ps14_ArrayProtocol", "enumerated"]
+- !private ["Ps14_ArrayProtocol", "remove"]
+- !private ["Ps24_DestructorSafeContainer", "Element"]
+- !private ["Ps24_DestructorSafeContainer", "Index"]
+- !private ["Ps24_DestructorSafeContainer", "Iterator"]
+- !private ["Ps24_DestructorSafeContainer", "_Element"]
+- !private ["Ps24_DestructorSafeContainer", "append"]
+- !private ["Ps24_DestructorSafeContainer", "enumerated"]
+- !private ["Ps24_DestructorSafeContainer", "remove"]
 - !private ["Ps35_ExpressibleByBuiltinBooleanLiteral", "_getBuiltinLogicValue"]
 - !private ["Ps51_ExpressibleByBuiltinExtendedGraphemeClusterLiteral", "init"]
 - !private ["Ps51_ExpressibleByBuiltinExtendedGraphemeClusterLiteral", "source"]
@@ -369,8 +654,8 @@ depends-member:
 - !private ["Ps35_HasCustomAnyHashableRepresentation", "source"]
 - !private ["Ps9_Hashable", "RawValue"]
 - !private ["Ps9_Hashable", "_getBuiltinLogicValue"]
+- !private ["Ps9_Hashable", "abortChain"]
 - !private ["Ps9_Hashable", "append"]
-- !private ["Ps9_Hashable", "code200_OK"]
 - !private ["Ps9_Hashable", "code400_BadRequest"]
 - !private ["Ps9_Hashable", "code500_InternalServerError"]
 - !private ["Ps9_Hashable", "http1_0"]
@@ -378,17 +663,28 @@ depends-member:
 - !private ["Ps9_Hashable", "increment"]
 - !private ["Ps9_Hashable", "init"]
 - !private ["Ps9_Hashable", "javaDate"]
+- !private ["Ps9_Hashable", "nofRequests"]
 - !private ["Ps9_Hashable", "rawValue"]
 - !private ["Ps9_Hashable", "source"]
 - !private ["P10Foundation18_MutablePairBoxing", "append"]
+- !private ["Ps21_ObjectiveCBridgeable", "Element"]
+- !private ["Ps21_ObjectiveCBridgeable", "Index"]
+- !private ["Ps21_ObjectiveCBridgeable", "IndexDistance"]
+- !private ["Ps21_ObjectiveCBridgeable", "Iterator"]
+- !private ["Ps21_ObjectiveCBridgeable", "SubSequence"]
+- !private ["Ps21_ObjectiveCBridgeable", "_Element"]
 - !private ["Ps21_ObjectiveCBridgeable", "_getBuiltinLogicValue"]
 - !private ["Ps21_ObjectiveCBridgeable", "append"]
+- !private ["Ps21_ObjectiveCBridgeable", "enumerated"]
 - !private ["Ps21_ObjectiveCBridgeable", "init"]
 - !private ["Ps21_ObjectiveCBridgeable", "javaDate"]
+- !private ["Ps21_ObjectiveCBridgeable", "remove"]
 - !private ["Ps21_ObjectiveCBridgeable", "source"]
+- !private ["Ps21_ObjectiveCBridgeable", "subscript"]
 - ["Vs26_OptionalNilComparisonType", "deinit"]
 depends-nominal:
 - "Ps9AnyObject"
+- "Sa"
 - !private "Ps23BidirectionalCollection"
 - !private "Ps22BidirectionalIndexable"
 - "Sb"
@@ -403,34 +699,46 @@ depends-nominal:
 - !private "Ps23CustomStringConvertible"
 - "V10Foundation4Data"
 - "V10Foundation4Date"
+- "Vs10Dictionary"
+- "C13SwiftfireCore6Domain"
+- !private "C13SwiftfireCore14DomainServices"
+- !private "C13SwiftfireCore15DomainTelemetry"
 - "C13SwiftfireCore7Domains"
 - !private "Sd"
+- !private "Vs18EnumeratedIterator"
+- !private "Vs18EnumeratedSequence"
 - !private "Ps9Equatable"
+- !private "Ps25ExpressibleByArrayLiteral"
 - !private "Ps27ExpressibleByBooleanLiteral"
+- !private "Ps30ExpressibleByDictionaryLiteral"
 - !private "Ps43ExpressibleByExtendedGraphemeClusterLiteral"
 - !private "Ps32ExpressibleByStringInterpolation"
 - !private "Ps26ExpressibleByStringLiteral"
 - !private "Ps33ExpressibleByUnicodeScalarLiteral"
 - !private "Sf"
-- !private "C9Swiftfire9Forwarder"
+- "C9Swiftfire9Forwarder"
 - !private "Ps8Hashable"
 - "C9Swiftfire14HttpConnection"
-- "C9Swiftfire10HttpHeader"
-- !private "C9Swiftfire12HttpResponse"
-- "O9Swiftfire16HttpResponseCode"
-- "O9Swiftfire11HttpVersion"
+- "C13SwiftfireCore10HttpHeader"
+- "V13SwiftfireCore8HttpHost"
+- !private "O13SwiftfireCore13HttpOperation"
+- "O13SwiftfireCore16HttpResponseCode"
+- "O13SwiftfireCore11HttpVersion"
 - !private "Ps9Indexable"
 - !private "Ps13IndexableBase"
+- !private "Vs16IndexingIterator"
 - "Si"
-- "Vs5Int16"
+- !private "Vs5Int16"
 - "Vs5Int32"
 - "Vs5Int64"
 - !private "Vs4Int8"
+- "CC13SwiftfireCore15DomainTelemetry4Item"
+- !private "Ps16IteratorProtocol"
 - !private "Ps25LosslessStringConvertible"
 - !private "Ps10MirrorPath"
 - !private "Ps17MutableCollection"
 - !private "Ps16MutableIndexable"
-- "C9Swiftfire8Mutation"
+- "C13SwiftfireCore8Mutation"
 - !private "PSo8NSCoding"
 - !private "PSo9NSCopying"
 - !private "PSo16NSMutableCopying"
@@ -441,7 +749,7 @@ depends-nominal:
 - !private "PSo14NSSecureCoding"
 - !private "CSo8NSString"
 - "Sq"
-- "C9Swiftfire10Parameters"
+- "C13SwiftfireCore10Parameters"
 - !private "Ps22RandomAccessCollection"
 - !private "Ps21RandomAccessIndexable"
 - !private "Ps26RangeReplaceableCollection"
@@ -449,22 +757,31 @@ depends-nominal:
 - !private "Ps16RawRepresentable"
 - "P14SwifterSockets16ReceiverProtocol"
 - !private "P10Foundation20ReferenceConvertible"
+- !private "P10SwifterLog26ReflectedStringConvertible"
+- "CC13SwiftfireCore14DomainServices8Response"
+- "O14SwifterSockets6Result"
 - !private "Ps8Sequence"
-- "C9Swiftfire10Statistics"
+- "VC13SwiftfireCore14DomainServices12ServiceEntry"
+- "OC13SwiftfireCore14DomainServices13ServiceResult"
+- !private "Vs5Slice"
+- "C13SwiftfireCore10Statistics"
 - "SS"
 - "C10SwifterLog10SwifterLog"
-- "C9Swiftfire9Telemetry"
+- !private "C13SwiftfireCore9Telemetry"
 - !private "Ps16TextOutputStream"
 - !private "Ps20TextOutputStreamable"
+- "O14SwifterSockets14TransferResult"
 - "P14SwifterSockets19TransmitterProtocol"
 - !private "Su"
 - !private "Vs6UInt16"
 - !private "Vs6UInt32"
 - !private "Vs6UInt64"
 - !private "Vs5UInt8"
-- "C9Swiftfire13UIntTelemetry"
+- !private "C13SwiftfireCore13UIntTelemetry"
 - !private "Sc"
 - !private "P11SwifterJSON17VJsonSerializable"
+- !private "Ps14_ArrayProtocol"
+- !private "Ps24_DestructorSafeContainer"
 - !private "Ps35_ExpressibleByBuiltinBooleanLiteral"
 - !private "Ps51_ExpressibleByBuiltinExtendedGraphemeClusterLiteral"
 - !private "Ps34_ExpressibleByBuiltinStringLiteral"
@@ -485,17 +802,16 @@ depends-external:
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/ObjectiveC.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreGraphics.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/IOKit.swiftmodule"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterJSON.framework/Modules/SwifterJSON.swiftmodule/x86_64.swiftmodule"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/Ascii.framework/Modules/Ascii.swiftmodule/x86_64.swiftmodule"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterLog.framework/Modules/SwifterLog.swiftmodule/x86_64.swiftmodule"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/CAsl-0.1.0/Sources/include/CAsl.h"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/CAsl.framework/Modules/module.modulemap"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterSockets.framework/Modules/SwifterSockets.swiftmodule/x86_64.swiftmodule"
 - "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwiftfireCore.framework/Modules/SwiftfireCore.swiftmodule/x86_64.swiftmodule"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/COpenSsl-0.1.0/module.modulemap"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/Ascii.framework/Modules/Ascii.swiftmodule/x86_64.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/AppKit.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreData.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/QuartzCore.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/XPC.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreImage.swiftmodule"
-interface-hash: "e9dd55dbcf3b333b180aae72936b68fc"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterJSON.framework/Modules/SwifterJSON.swiftmodule/x86_64.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterLog.framework/Modules/SwifterLog.swiftmodule/x86_64.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/CAsl-0.1.0/Sources/include/CAsl.h"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/CAsl.framework/Modules/module.modulemap"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterSockets.framework/Modules/SwifterSockets.swiftmodule/x86_64.swiftmodule"
+interface-hash: "5f495c7a2c4b600efb61f6dc8d96f98a"

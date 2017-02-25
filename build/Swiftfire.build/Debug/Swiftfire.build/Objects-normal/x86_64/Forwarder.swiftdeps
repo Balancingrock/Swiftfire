@@ -8,27 +8,27 @@ provides-member:
 - ["C9Swiftfire9Forwarder", ""]
 provides-dynamic-lookup:
 depends-top-level:
+- "UInt8"
+- !private "StringLiteralType"
+- "UnsafeBufferPointer"
+- !private "log"
+- "Bool"
+- "String"
 - !private "Array"
 - !private "BooleanLiteralType"
-- !private "HttpResponse"
-- "UInt8"
-- "UnsafeBufferPointer"
-- "forwardingConnectionFactory"
 - "SwifterSockets"
-- !private "StringLiteralType"
-- !private "HttpVersion"
-- "Bool"
-- "AssignmentPrecedence"
-- !private "log"
 - "Forwarder"
-- "String"
+- "AssignmentPrecedence"
+- !private "createHttpResponse"
+- "forwardingConnectionFactory"
+- !private "HttpVersion"
 depends-member:
-- !private ["Ps9AnyObject", "HttpResponse"]
 - !private ["Ps9AnyObject", "HttpVersion"]
 - !private ["Ps9AnyObject", "atLevelError"]
 - ["Ps9AnyObject", "client"]
 - !private ["Ps9AnyObject", "closeConnection"]
 - ["Ps9AnyObject", "closeForwarder"]
+- !private ["Ps9AnyObject", "createHttpResponse"]
 - ["Ps9AnyObject", "error"]
 - !private ["Ps9AnyObject", "init"]
 - !private ["Ps9AnyObject", "interface"]
@@ -40,7 +40,6 @@ depends-member:
 - ["Ps9AnyObject", "receiverLoop"]
 - !private ["Ps9AnyObject", "source"]
 - !private ["Ps9AnyObject", "transfer"]
-- !private ["Ps9AnyObject", "withCode"]
 - ["Ps9AnyObject", ""]
 - !private ["Sa", "Element"]
 - ["Sa", "deinit"]
@@ -54,7 +53,6 @@ depends-member:
 - !private ["Ps10Comparable", "init"]
 - !private ["Ps10Comparable", "source"]
 - ["C14SwifterSockets10Connection", "Bool"]
-- !private ["C14SwifterSockets10Connection", "HttpResponse"]
 - !private ["C14SwifterSockets10Connection", "HttpVersion"]
 - ["C14SwifterSockets10Connection", "String"]
 - ["C14SwifterSockets10Connection", "SwifterSockets"]
@@ -63,6 +61,7 @@ depends-member:
 - ["C14SwifterSockets10Connection", "client"]
 - !private ["C14SwifterSockets10Connection", "closeConnection"]
 - ["C14SwifterSockets10Connection", "closeForwarder"]
+- !private ["C14SwifterSockets10Connection", "createHttpResponse"]
 - ["C14SwifterSockets10Connection", "deinit"]
 - ["C14SwifterSockets10Connection", "error"]
 - ["C14SwifterSockets10Connection", "init"]
@@ -101,7 +100,6 @@ depends-member:
 - !private ["Ps33ExpressibleByUnicodeScalarLiteral", "init"]
 - !private ["Ps33ExpressibleByUnicodeScalarLiteral", "source"]
 - ["C9Swiftfire9Forwarder", "Bool"]
-- !private ["C9Swiftfire9Forwarder", "HttpResponse"]
 - !private ["C9Swiftfire9Forwarder", "HttpVersion"]
 - ["C9Swiftfire9Forwarder", "String"]
 - ["C9Swiftfire9Forwarder", "SwifterSockets"]
@@ -110,6 +108,7 @@ depends-member:
 - ["C9Swiftfire9Forwarder", "client"]
 - !private ["C9Swiftfire9Forwarder", "closeConnection"]
 - ["C9Swiftfire9Forwarder", "closeForwarder"]
+- !private ["C9Swiftfire9Forwarder", "createHttpResponse"]
 - ["C9Swiftfire9Forwarder", "deinit"]
 - ["C9Swiftfire9Forwarder", "error"]
 - ["C9Swiftfire9Forwarder", "init"]
@@ -123,11 +122,10 @@ depends-member:
 - !private ["Ps8Hashable", "http1_1"]
 - !private ["Ps8Hashable", "init"]
 - !private ["Ps8Hashable", "source"]
-- !private ["C9Swiftfire12HttpResponse", "withCode"]
-- !private ["O9Swiftfire16HttpResponseCode", "code408_RequestTimeout"]
-- ["O9Swiftfire16HttpResponseCode", "deinit"]
-- ["O9Swiftfire11HttpVersion", "deinit"]
-- !private ["O9Swiftfire11HttpVersion", "http1_1"]
+- !private ["O13SwiftfireCore16HttpResponseCode", "code408_RequestTimeout"]
+- ["O13SwiftfireCore16HttpResponseCode", "deinit"]
+- ["O13SwiftfireCore11HttpVersion", "deinit"]
+- !private ["O13SwiftfireCore11HttpVersion", "http1_1"]
 - !private ["Ps9Indexable", "Element"]
 - !private ["Ps13IndexableBase", "Element"]
 - ["Si", "deinit"]
@@ -167,11 +165,11 @@ depends-member:
 - !private ["Ps25RangeReplaceableIndexable", "Element"]
 - !private ["Ps16RawRepresentable", "code408_RequestTimeout"]
 - !private ["Ps16RawRepresentable", "http1_1"]
-- !private ["P14SwifterSockets16ReceiverProtocol", "HttpResponse"]
 - !private ["P14SwifterSockets16ReceiverProtocol", "HttpVersion"]
 - ["P14SwifterSockets16ReceiverProtocol", "client"]
 - !private ["P14SwifterSockets16ReceiverProtocol", "closeConnection"]
 - ["P14SwifterSockets16ReceiverProtocol", "closeForwarder"]
+- !private ["P14SwifterSockets16ReceiverProtocol", "createHttpResponse"]
 - ["P14SwifterSockets16ReceiverProtocol", "error"]
 - !private ["P14SwifterSockets16ReceiverProtocol", "init"]
 - !private ["P14SwifterSockets16ReceiverProtocol", "interface"]
@@ -193,11 +191,12 @@ depends-member:
 - !private ["Ps16TextOutputStream", "source"]
 - !private ["Ps20TextOutputStreamable", "init"]
 - !private ["Ps20TextOutputStreamable", "source"]
-- !private ["P14SwifterSockets19TransmitterProtocol", "HttpResponse"]
+- ["O14SwifterSockets14TransferResult", "deinit"]
 - !private ["P14SwifterSockets19TransmitterProtocol", "HttpVersion"]
 - ["P14SwifterSockets19TransmitterProtocol", "client"]
 - !private ["P14SwifterSockets19TransmitterProtocol", "closeConnection"]
 - ["P14SwifterSockets19TransmitterProtocol", "closeForwarder"]
+- !private ["P14SwifterSockets19TransmitterProtocol", "createHttpResponse"]
 - ["P14SwifterSockets19TransmitterProtocol", "error"]
 - !private ["P14SwifterSockets19TransmitterProtocol", "init"]
 - !private ["P14SwifterSockets19TransmitterProtocol", "interface"]
@@ -210,6 +209,8 @@ depends-member:
 - !private ["P14SwifterSockets19TransmitterProtocol", "transfer"]
 - ["P14SwifterSockets19TransmitterProtocol", ""]
 - ["SR", "deinit"]
+- !private ["P11SwifterJSON17VJsonSerializable", "init"]
+- !private ["P11SwifterJSON17VJsonSerializable", "source"]
 - !private ["Ps14_ArrayProtocol", "Element"]
 - !private ["Ps24_DestructorSafeContainer", "Element"]
 - !private ["Ps51_ExpressibleByBuiltinExtendedGraphemeClusterLiteral", "init"]
@@ -252,9 +253,8 @@ depends-nominal:
 - !private "Ps33ExpressibleByUnicodeScalarLiteral"
 - "C9Swiftfire9Forwarder"
 - !private "Ps8Hashable"
-- !private "C9Swiftfire12HttpResponse"
-- "O9Swiftfire16HttpResponseCode"
-- "O9Swiftfire11HttpVersion"
+- "O13SwiftfireCore16HttpResponseCode"
+- "O13SwiftfireCore11HttpVersion"
 - !private "Ps9Indexable"
 - !private "Ps13IndexableBase"
 - "Si"
@@ -286,8 +286,10 @@ depends-nominal:
 - "C10SwifterLog10SwifterLog"
 - !private "Ps16TextOutputStream"
 - !private "Ps20TextOutputStreamable"
+- "O14SwifterSockets14TransferResult"
 - "P14SwifterSockets19TransmitterProtocol"
 - "SR"
+- !private "P11SwifterJSON17VJsonSerializable"
 - !private "Ps14_ArrayProtocol"
 - !private "Ps24_DestructorSafeContainer"
 - !private "Ps51_ExpressibleByBuiltinExtendedGraphemeClusterLiteral"
@@ -307,17 +309,16 @@ depends-external:
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/ObjectiveC.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreGraphics.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/IOKit.swiftmodule"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterJSON.framework/Modules/SwifterJSON.swiftmodule/x86_64.swiftmodule"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/Ascii.framework/Modules/Ascii.swiftmodule/x86_64.swiftmodule"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterLog.framework/Modules/SwifterLog.swiftmodule/x86_64.swiftmodule"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/CAsl-0.1.0/Sources/include/CAsl.h"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/CAsl.framework/Modules/module.modulemap"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterSockets.framework/Modules/SwifterSockets.swiftmodule/x86_64.swiftmodule"
 - "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwiftfireCore.framework/Modules/SwiftfireCore.swiftmodule/x86_64.swiftmodule"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/COpenSsl-0.1.0/module.modulemap"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/Ascii.framework/Modules/Ascii.swiftmodule/x86_64.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/AppKit.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreData.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/QuartzCore.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/XPC.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreImage.swiftmodule"
-interface-hash: "fcc0208ed4fe3f6804c2c1e830767be8"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterJSON.framework/Modules/SwifterJSON.swiftmodule/x86_64.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterLog.framework/Modules/SwifterLog.swiftmodule/x86_64.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/CAsl-0.1.0/Sources/include/CAsl.h"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/CAsl.framework/Modules/module.modulemap"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterSockets.framework/Modules/SwifterSockets.swiftmodule/x86_64.swiftmodule"
+interface-hash: "fb7ba82363b5312f3870eefd52d6c283"

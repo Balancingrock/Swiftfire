@@ -1,6 +1,6 @@
 version: "Apple Swift version 3.0.2 (swiftlang-800.0.63 clang-800.0.42.1)"
 options: "222414f328534733fb772c4156b08f9d"
-build_time: [539978881, 165430000]
+build_time: [541240646, 458162000]
 inputs:
-  "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/SwifterLog-0.9.18/Sources/SwifterLog.Network.swift": [539978672, 0]
-  "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/SwifterLog-0.9.18/Sources/SwifterLog.swift": [539978672, 0]
+  "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/SwifterLog-0.9.19/Sources/SwifterLog.Network.swift": [540901924, 0]
+  "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/SwifterLog-0.9.19/Sources/SwifterLog.swift": [540901924, 0]

@@ -49,26 +49,33 @@
 //
 // History
 //
-// v0.9.15 - General update and switch to frameworks
-// v0.9.14 - Upgraded to Xcode 8 beta 6
+// 0.9.15  - General update and switch to frameworks
+// 0.9.14  - Upgraded to Xcode 8 beta 6
 //         - Upgraded Command and Reply processing for Swiftfire resp SwiftfireConsole
-// v0.9.13 - Upgraded to Xcode 8 beta 3 (Swift 3)
-// v0.9.12 - Added TransferToConsole protocol compliance
-// v0.9.11 - Moved declaration of abortMacLoop and acceptQueue to here (from main.swift)
+// 0.9.13  - Upgraded to Xcode 8 beta 3 (Swift 3)
+// 0.9.12  - Added TransferToConsole protocol compliance
+// 0.9.11  - Moved declaration of abortMacLoop and acceptQueue to here (from main.swift)
 //         - Added ReadStatisticsCommand
 //         - Updated for VJson 0.9.8
-// v0.9.7  - Added HEADER_LOGGING_ENABLED, MAX_FILE_SIZE_FOR_HEADER_LOGGING, FLUSH_HEADER_LOGFILE_AFTER_EACH_WRITE
+// 0.9.7   - Added HEADER_LOGGING_ENABLED, MAX_FILE_SIZE_FOR_HEADER_LOGGING, FLUSH_HEADER_LOGFILE_AFTER_EACH_WRITE
 //         - Added missing HTTP_KEEP_ALIVE_INACTIVITY_TIMEOUT
 //         - Moved doWriteServerParameterCommand and doReadServerParameterCommand processing to Parameters
 //         - Added 1 second delay after transmitting closing-connection.
-// v0.9.6  - Header update
+// 0.9.6   - Header update
 //         - Added transmission of "ClosingMacConnection" upon timeout for the M&C connection
 //         - Added ResetDomainTelemetry
 //         - Merged Startup into Parameters
-// v0.9.5  - Fixed bug that revented domain creation
-// v0.9.4  - Changed according to new command & reply definitions
-// v0.9.3  - Removed no longer existing server telemetry
-// v0.9.0  - Initial release
+// 0.9.5   - Fixed bug that revented domain creation
+// 0.9.4   - Changed according to new command & reply definitions
+// 0.9.3   - Removed no longer existing server telemetry
+// 0.9.0   - Initial release
+//
+// =====================================================================================================================
+// Description
+// =====================================================================================================================
+//
+// The monitoring and control loop for the swiftfire webserver.
+//
 // =====================================================================================================================
 
 
@@ -76,6 +83,7 @@ import Foundation
 import SwifterSockets
 import SwifterLog
 import SwifterJSON
+import SwiftfireCore
 
 
 var mac: MonitoringAndControlConnection?
@@ -140,8 +148,10 @@ final class MonitoringAndControlConnection: SwifterSockets.Connection {
         commandFactories.append(ReadStatisticsCommand.factory)
         commandFactories.append(UpdatePathPartCommand.factory)
         commandFactories.append(UpdateClientCommand.factory)
-        commandFactories.append(ModifyBlacklistCommand.factory)
+        commandFactories.append(UpdateBlacklistCommand.factory)
+        commandFactories.append(UpdateServicesCommand.factory)
         commandFactories.append(ReadBlacklistCommand.factory)
+        commandFactories.append(ReadServicesCommand.factory)
         commandFactories.append(SaveBlacklistCommand.factory)
         commandFactories.append(RestoreBlacklistCommand.factory)
     }
@@ -184,7 +194,8 @@ final class MonitoringAndControlConnection: SwifterSockets.Connection {
         commandsBufferStartOfFreeArea = commandsBufferStartOfFreeArea.advanced(by: buffer.count)
         commandsByteCount += buffer.count
         
-        log.atLevelDebug(id: -1, source: "MacLoop receiveData (1)", message: "\(commandsBufferStartOfFreeArea), \(commandsByteCount)")
+        //log.atLevelDebug(id: -1, source: "MacLoop receiveData (1)", message: "\(commandsBufferStartOfFreeArea), \(commandsByteCount)")
+        //log.atLevelDebug(id: -1, source: "MacLoop receiveData (2)", message: "\(commandsBuffer), \(commandsByteCount)")
         
         // Execute all completely received commands
         
@@ -215,16 +226,17 @@ final class MonitoringAndControlConnection: SwifterSockets.Connection {
                 
                 // Remove the processed command from the buffer
                 
-                log.atLevelDebug(id: -1, source: "MacLoop receiveData (2)", message: "\(commandsBufferStartOfFreeArea), \(commandsByteCount)")
+                //log.atLevelDebug(id: -1, source: "MacLoop receiveData (3)", message: "\(commandsBufferStartOfFreeArea), \(commandsByteCount)")
 
                 
                 let srcPtr = UnsafeRawPointer(jsonBuffer.baseAddress!.advanced(by: jsonBuffer.count))
                 let consumedBytes = UnsafeRawPointer(commandsBuffer).distance(to: srcPtr)
                 commandsByteCount -= consumedBytes
                 commandsBufferStartOfFreeArea = commandsBufferStartOfFreeArea.advanced(by: -consumedBytes)
+                if commandsByteCount == 0 { break BUFFER_LOOP }
                 memcpy(commandsBuffer, srcPtr, commandsByteCount)
 
-                log.atLevelDebug(id: -1, source: "MacLoop receiveData (3)", message: "\(commandsBufferStartOfFreeArea), \(commandsByteCount)")
+                //log.atLevelDebug(id: -1, source: "MacLoop receiveData (4)", message: "\(commandsBufferStartOfFreeArea), \(commandsByteCount)")
 
                 
             } catch let error as VJson.Exception {
@@ -271,7 +283,7 @@ final class MonitoringAndControlConnection: SwifterSockets.Connection {
     func transfer(_ reply: MacMessage?) {
         if let reply = reply {
             let msg = reply.json.code
-            log.atLevelDebug(id: -1, source: "MacLoop.transfer", message: "Transferring MacMessage \(msg)")
+            log.atLevelDebug(id: -1, source: "MacLoop.transfer", message: "Transferring MacMessage \(msg)", targets: SwifterLog.Target.ALL_NON_RECURSIVE)
             super.transfer(msg, callback: nil)
         }
     }

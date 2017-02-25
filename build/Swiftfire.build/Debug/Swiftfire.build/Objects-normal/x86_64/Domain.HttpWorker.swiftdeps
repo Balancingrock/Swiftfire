@@ -7,75 +7,46 @@ provides-member:
 - ["C13SwiftfireCore6Domain", "resourceIsAvailable"]
 provides-dynamic-lookup:
 depends-top-level:
-- !private "NSString"
-- !private "accessLog"
-- "Data"
-- !private "HttpOperation"
-- !private "Date"
-- "Mutation"
-- !private "||"
-- !private "assert"
-- "HttpHeader"
-- !private "mimeTypeDefault"
-- !private "httpWorkerPostprocessor"
-- "AssignmentPrecedence"
-- !private "=="
-- !private "!="
-- !private "four04Log"
-- !private "??="
-- !private "httpWorkerPreprocessor"
-- !private "enableHttpPostprocessor"
-- "CastingPrecedence"
-- !private "Blacklist"
-- !private "enableHttpPreprocessor"
-- !private "log"
+- "FunctionResult"
+- !private "HttpResponseCode"
 - !private "StringLiteralType"
+- !private "log"
+- !private "mimeType"
+- !private "BooleanLiteralType"
+- "Mutation"
+- "SFConnection"
+- !private "NSString"
+- "HttpConnection"
+- !private "??="
+- !private "HttpOperation"
+- "HttpHeader"
 - !private "HttpResponse"
 - !private "ObjCBool"
-- !private "BooleanLiteralType"
-- "ResourceAvailability"
-- !private "HttpResponseCode"
-- "HttpConnection"
+- !private "||"
 - "Domain"
-- !private "mimeType"
-- !private "??"
-- "String"
 - !private "HttpVersion"
+- !private "??"
+- "Data"
+- !private "mimeTypeDefault"
+- "AssignmentPrecedence"
+- !private "=="
+- "String"
+- "CastingPrecedence"
+- !private "errorMessage"
 depends-member:
-- ["OC13SwiftfireCore9Blacklist6Action", "closeConnection"]
-- ["OC13SwiftfireCore9Blacklist6Action", "send401Unauthorized"]
-- ["OC13SwiftfireCore9Blacklist6Action", "send503ServiceUnavailable"]
-- ["Ps9AnyObject", "Action"]
-- !private ["Ps9AnyObject", "Date"]
 - !private ["Ps9AnyObject", "HttpOperation"]
 - !private ["Ps9AnyObject", "HttpResponse"]
 - !private ["Ps9AnyObject", "HttpResponseCode"]
 - !private ["Ps9AnyObject", "HttpVersion"]
-- !private ["Ps9AnyObject", "accessLog"]
-- !private ["Ps9AnyObject", "accessLogEnabled"]
-- !private ["Ps9AnyObject", "action"]
 - !private ["Ps9AnyObject", "appendingPathComponent"]
-- !private ["Ps9AnyObject", "assert"]
 - !private ["Ps9AnyObject", "atLevelDebug"]
 - !private ["Ps9AnyObject", "atLevelError"]
-- !private ["Ps9AnyObject", "atLevelNotice"]
-- !private ["Ps9AnyObject", "blacklist"]
-- !private ["Ps9AnyObject", "contents"]
 - !private ["Ps9AnyObject", "createResponse"]
-- !private ["Ps9AnyObject", "enableHttpPostprocessor"]
-- !private ["Ps9AnyObject", "enableHttpPreprocessor"]
 - !private ["Ps9AnyObject", "errorMessage"]
-- !private ["Ps9AnyObject", "fileExists"]
-- !private ["Ps9AnyObject", "filemanager"]
-- !private ["Ps9AnyObject", "four04Log"]
-- !private ["Ps9AnyObject", "four04LogEnabled"]
 - !private ["Ps9AnyObject", "httpResponseCode"]
 - !private ["Ps9AnyObject", "httpVersion"]
-- !private ["Ps9AnyObject", "httpWorkerPostprocessor"]
-- !private ["Ps9AnyObject", "httpWorkerPreprocessor"]
 - !private ["Ps9AnyObject", "increment"]
 - !private ["Ps9AnyObject", "init"]
-- !private ["Ps9AnyObject", "isReadableFile"]
 - !private ["Ps9AnyObject", "log"]
 - !private ["Ps9AnyObject", "logId"]
 - !private ["Ps9AnyObject", "mimeType"]
@@ -89,25 +60,17 @@ depends-member:
 - !private ["Ps9AnyObject", "nof505"]
 - !private ["Ps9AnyObject", "nofRequests"]
 - !private ["Ps9AnyObject", "operation"]
-- !private ["Ps9AnyObject", "remoteAddress"]
 - !private ["Ps9AnyObject", "resourceIsAvailable"]
 - !private ["Ps9AnyObject", "responseDetails"]
 - !private ["Ps9AnyObject", "root"]
 - !private ["Ps9AnyObject", "source"]
 - !private ["Ps9AnyObject", "telemetry"]
-- !private ["Ps9AnyObject", "transfer"]
 - !private ["Ps9AnyObject", "url"]
-- !private ["Ps9AnyObject", "withCode"]
-- ["C13SwiftfireCore9Blacklist", "Action"]
-- !private ["C13SwiftfireCore9Blacklist", "action"]
 - !private ["Sb", "_getBuiltinLogicValue"]
 - ["Sb", "deinit"]
 - !private ["Ps7CVarArg", "appendingPathComponent"]
-- !private ["Ps7CVarArg", "contents"]
-- !private ["Ps7CVarArg", "fileExists"]
 - !private ["Ps7CVarArg", "increment"]
 - !private ["Ps7CVarArg", "init"]
-- !private ["Ps7CVarArg", "isReadableFile"]
 - !private ["Ps7CVarArg", "nof200"]
 - !private ["Ps7CVarArg", "nof400"]
 - !private ["Ps7CVarArg", "nof403"]
@@ -120,16 +83,10 @@ depends-member:
 - !private ["Vs9Character", "deinit"]
 - !private ["Ps10Comparable", "init"]
 - !private ["Ps10Comparable", "source"]
-- !private ["C14SwifterSockets10Connection", "filemanager"]
 - !private ["C14SwifterSockets10Connection", "logId"]
-- !private ["C14SwifterSockets10Connection", "remoteAddress"]
-- !private ["C14SwifterSockets10Connection", "transfer"]
 - !private ["Ps28CustomDebugStringConvertible", "appendingPathComponent"]
-- !private ["Ps28CustomDebugStringConvertible", "contents"]
-- !private ["Ps28CustomDebugStringConvertible", "fileExists"]
 - !private ["Ps28CustomDebugStringConvertible", "increment"]
 - !private ["Ps28CustomDebugStringConvertible", "init"]
-- !private ["Ps28CustomDebugStringConvertible", "isReadableFile"]
 - !private ["Ps28CustomDebugStringConvertible", "nof200"]
 - !private ["Ps28CustomDebugStringConvertible", "nof400"]
 - !private ["Ps28CustomDebugStringConvertible", "nof403"]
@@ -147,31 +104,17 @@ depends-member:
 - !private ["Ps17CustomReflectable", "boolValue"]
 - !private ["Ps17CustomReflectable", "init"]
 - !private ["Ps17CustomReflectable", "source"]
-- !private ["Ps23CustomStringConvertible", "Date"]
 - !private ["Ps23CustomStringConvertible", "HttpOperation"]
 - !private ["Ps23CustomStringConvertible", "HttpResponse"]
 - !private ["Ps23CustomStringConvertible", "HttpResponseCode"]
 - !private ["Ps23CustomStringConvertible", "HttpVersion"]
 - !private ["Ps23CustomStringConvertible", "_getBuiltinLogicValue"]
-- !private ["Ps23CustomStringConvertible", "accessLog"]
-- !private ["Ps23CustomStringConvertible", "accessLogEnabled"]
 - !private ["Ps23CustomStringConvertible", "appendingPathComponent"]
-- !private ["Ps23CustomStringConvertible", "assert"]
-- !private ["Ps23CustomStringConvertible", "blacklist"]
 - !private ["Ps23CustomStringConvertible", "boolValue"]
-- !private ["Ps23CustomStringConvertible", "contents"]
 - !private ["Ps23CustomStringConvertible", "createResponse"]
-- !private ["Ps23CustomStringConvertible", "enableHttpPostprocessor"]
-- !private ["Ps23CustomStringConvertible", "enableHttpPreprocessor"]
 - !private ["Ps23CustomStringConvertible", "errorMessage"]
-- !private ["Ps23CustomStringConvertible", "fileExists"]
-- !private ["Ps23CustomStringConvertible", "four04Log"]
-- !private ["Ps23CustomStringConvertible", "four04LogEnabled"]
-- !private ["Ps23CustomStringConvertible", "httpWorkerPostprocessor"]
-- !private ["Ps23CustomStringConvertible", "httpWorkerPreprocessor"]
 - !private ["Ps23CustomStringConvertible", "increment"]
 - !private ["Ps23CustomStringConvertible", "init"]
-- !private ["Ps23CustomStringConvertible", "isReadableFile"]
 - !private ["Ps23CustomStringConvertible", "log"]
 - !private ["Ps23CustomStringConvertible", "mimeType"]
 - !private ["Ps23CustomStringConvertible", "mimeTypeDefault"]
@@ -187,10 +130,8 @@ depends-member:
 - !private ["Ps23CustomStringConvertible", "root"]
 - !private ["Ps23CustomStringConvertible", "source"]
 - !private ["Ps23CustomStringConvertible", "telemetry"]
-- ["V10Foundation4Data", "deinit"]
-- !private ["C13SwiftfireCore6Domain", "Blacklist"]
 - ["C13SwiftfireCore6Domain", "Data"]
-- !private ["C13SwiftfireCore6Domain", "Date"]
+- ["C13SwiftfireCore6Domain", "FunctionResult"]
 - ["C13SwiftfireCore6Domain", "HttpConnection"]
 - ["C13SwiftfireCore6Domain", "HttpHeader"]
 - !private ["C13SwiftfireCore6Domain", "HttpOperation"]
@@ -200,22 +141,12 @@ depends-member:
 - ["C13SwiftfireCore6Domain", "Mutation"]
 - !private ["C13SwiftfireCore6Domain", "NSString"]
 - !private ["C13SwiftfireCore6Domain", "ObjCBool"]
-- ["C13SwiftfireCore6Domain", "ResourceAvailability"]
+- ["C13SwiftfireCore6Domain", "SFConnection"]
 - ["C13SwiftfireCore6Domain", "String"]
-- !private ["C13SwiftfireCore6Domain", "accessLog"]
-- !private ["C13SwiftfireCore6Domain", "accessLogEnabled"]
-- !private ["C13SwiftfireCore6Domain", "assert"]
-- !private ["C13SwiftfireCore6Domain", "blacklist"]
 - !private ["C13SwiftfireCore6Domain", "createResponse"]
 - ["C13SwiftfireCore6Domain", "deinit"]
-- !private ["C13SwiftfireCore6Domain", "enableHttpPostprocessor"]
-- !private ["C13SwiftfireCore6Domain", "enableHttpPreprocessor"]
 - !private ["C13SwiftfireCore6Domain", "errorMessage"]
-- !private ["C13SwiftfireCore6Domain", "four04Log"]
-- !private ["C13SwiftfireCore6Domain", "four04LogEnabled"]
 - ["C13SwiftfireCore6Domain", "httpWorker"]
-- !private ["C13SwiftfireCore6Domain", "httpWorkerPostprocessor"]
-- !private ["C13SwiftfireCore6Domain", "httpWorkerPreprocessor"]
 - !private ["C13SwiftfireCore6Domain", "log"]
 - !private ["C13SwiftfireCore6Domain", "mimeType"]
 - !private ["C13SwiftfireCore6Domain", "mimeTypeDefault"]
@@ -231,44 +162,27 @@ depends-member:
 - !private ["C13SwiftfireCore15DomainTelemetry", "nof505"]
 - !private ["C13SwiftfireCore15DomainTelemetry", "nofRequests"]
 - !private ["Sd", "deinit"]
-- !private ["Ps9Equatable", "Date"]
 - !private ["Ps9Equatable", "HttpOperation"]
 - !private ["Ps9Equatable", "HttpResponse"]
 - !private ["Ps9Equatable", "HttpResponseCode"]
 - !private ["Ps9Equatable", "HttpVersion"]
 - !private ["Ps9Equatable", "RawValue"]
 - !private ["Ps9Equatable", "_getBuiltinLogicValue"]
-- !private ["Ps9Equatable", "accessLog"]
-- !private ["Ps9Equatable", "accessLogEnabled"]
 - !private ["Ps9Equatable", "appendingPathComponent"]
-- !private ["Ps9Equatable", "assert"]
-- !private ["Ps9Equatable", "blacklist"]
-- ["Ps9Equatable", "closeConnection"]
 - !private ["Ps9Equatable", "code200_OK"]
 - !private ["Ps9Equatable", "code400_BadRequest"]
-- !private ["Ps9Equatable", "code401_Unauthorized"]
 - !private ["Ps9Equatable", "code403_Forbidden"]
 - !private ["Ps9Equatable", "code404_NotFound"]
 - !private ["Ps9Equatable", "code500_InternalServerError"]
 - !private ["Ps9Equatable", "code501_NotImplemented"]
-- !private ["Ps9Equatable", "code503_ServiceUnavailable"]
 - !private ["Ps9Equatable", "code505_HttpVersionNotSupported"]
-- !private ["Ps9Equatable", "contents"]
 - !private ["Ps9Equatable", "createResponse"]
-- !private ["Ps9Equatable", "enableHttpPostprocessor"]
-- !private ["Ps9Equatable", "enableHttpPreprocessor"]
 - !private ["Ps9Equatable", "errorMessage"]
-- !private ["Ps9Equatable", "fileExists"]
-- !private ["Ps9Equatable", "four04Log"]
-- !private ["Ps9Equatable", "four04LogEnabled"]
 - !private ["Ps9Equatable", "get"]
 - !private ["Ps9Equatable", "http1_0"]
 - !private ["Ps9Equatable", "http1_1"]
-- !private ["Ps9Equatable", "httpWorkerPostprocessor"]
-- !private ["Ps9Equatable", "httpWorkerPreprocessor"]
 - !private ["Ps9Equatable", "increment"]
 - !private ["Ps9Equatable", "init"]
-- !private ["Ps9Equatable", "isReadableFile"]
 - !private ["Ps9Equatable", "log"]
 - !private ["Ps9Equatable", "mimeType"]
 - !private ["Ps9Equatable", "mimeTypeDefault"]
@@ -284,8 +198,6 @@ depends-member:
 - !private ["Ps9Equatable", "rawValue"]
 - !private ["Ps9Equatable", "resourceIsAvailable"]
 - !private ["Ps9Equatable", "root"]
-- ["Ps9Equatable", "send401Unauthorized"]
-- ["Ps9Equatable", "send503ServiceUnavailable"]
 - !private ["Ps9Equatable", "source"]
 - !private ["Ps9Equatable", "telemetry"]
 - !private ["Ps27ExpressibleByBooleanLiteral", "_getBuiltinLogicValue"]
@@ -293,7 +205,6 @@ depends-member:
 - !private ["Ps43ExpressibleByExtendedGraphemeClusterLiteral", "appendingPathComponent"]
 - !private ["Ps43ExpressibleByExtendedGraphemeClusterLiteral", "init"]
 - !private ["Ps43ExpressibleByExtendedGraphemeClusterLiteral", "source"]
-- !private ["Ps23ExpressibleByNilLiteral", "init"]
 - !private ["Ps32ExpressibleByStringInterpolation", "init"]
 - !private ["Ps32ExpressibleByStringInterpolation", "source"]
 - !private ["Ps26ExpressibleByStringLiteral", "appendingPathComponent"]
@@ -302,32 +213,22 @@ depends-member:
 - !private ["Ps33ExpressibleByUnicodeScalarLiteral", "appendingPathComponent"]
 - !private ["Ps33ExpressibleByUnicodeScalarLiteral", "init"]
 - !private ["Ps33ExpressibleByUnicodeScalarLiteral", "source"]
-- !private ["CSo11FileManager", "contents"]
-- !private ["CSo11FileManager", "deinit"]
-- !private ["CSo11FileManager", "fileExists"]
-- !private ["CSo11FileManager", "isReadableFile"]
 - !private ["Sf", "deinit"]
 - !private ["Ps8Hashable", "RawValue"]
 - !private ["Ps8Hashable", "_getBuiltinLogicValue"]
 - !private ["Ps8Hashable", "appendingPathComponent"]
-- ["Ps8Hashable", "closeConnection"]
 - !private ["Ps8Hashable", "code200_OK"]
 - !private ["Ps8Hashable", "code400_BadRequest"]
-- !private ["Ps8Hashable", "code401_Unauthorized"]
 - !private ["Ps8Hashable", "code403_Forbidden"]
 - !private ["Ps8Hashable", "code404_NotFound"]
 - !private ["Ps8Hashable", "code500_InternalServerError"]
 - !private ["Ps8Hashable", "code501_NotImplemented"]
-- !private ["Ps8Hashable", "code503_ServiceUnavailable"]
 - !private ["Ps8Hashable", "code505_HttpVersionNotSupported"]
-- !private ["Ps8Hashable", "contents"]
-- !private ["Ps8Hashable", "fileExists"]
 - !private ["Ps8Hashable", "get"]
 - !private ["Ps8Hashable", "http1_0"]
 - !private ["Ps8Hashable", "http1_1"]
 - !private ["Ps8Hashable", "increment"]
 - !private ["Ps8Hashable", "init"]
-- !private ["Ps8Hashable", "isReadableFile"]
 - !private ["Ps8Hashable", "nof200"]
 - !private ["Ps8Hashable", "nof400"]
 - !private ["Ps8Hashable", "nof403"]
@@ -338,40 +239,31 @@ depends-member:
 - !private ["Ps8Hashable", "nofRequests"]
 - !private ["Ps8Hashable", "post"]
 - !private ["Ps8Hashable", "rawValue"]
-- ["Ps8Hashable", "send401Unauthorized"]
-- ["Ps8Hashable", "send503ServiceUnavailable"]
 - !private ["Ps8Hashable", "source"]
 - ["C9Swiftfire14HttpConnection", "deinit"]
-- !private ["C9Swiftfire14HttpConnection", "filemanager"]
 - !private ["C9Swiftfire14HttpConnection", "logId"]
-- !private ["C9Swiftfire14HttpConnection", "remoteAddress"]
-- !private ["C9Swiftfire14HttpConnection", "transfer"]
-- ["C9Swiftfire10HttpHeader", "deinit"]
-- !private ["C9Swiftfire10HttpHeader", "httpVersion"]
-- !private ["C9Swiftfire10HttpHeader", "operation"]
-- !private ["C9Swiftfire10HttpHeader", "url"]
-- !private ["O9Swiftfire13HttpOperation", "RawValue"]
-- ["O9Swiftfire13HttpOperation", "deinit"]
-- !private ["O9Swiftfire13HttpOperation", "get"]
-- !private ["O9Swiftfire13HttpOperation", "post"]
-- !private ["O9Swiftfire13HttpOperation", "rawValue"]
-- !private ["C9Swiftfire12HttpResponse", "withCode"]
-- !private ["O9Swiftfire16HttpResponseCode", "code200_OK"]
-- !private ["O9Swiftfire16HttpResponseCode", "code400_BadRequest"]
-- !private ["O9Swiftfire16HttpResponseCode", "code401_Unauthorized"]
-- !private ["O9Swiftfire16HttpResponseCode", "code403_Forbidden"]
-- !private ["O9Swiftfire16HttpResponseCode", "code404_NotFound"]
-- !private ["O9Swiftfire16HttpResponseCode", "code500_InternalServerError"]
-- !private ["O9Swiftfire16HttpResponseCode", "code501_NotImplemented"]
-- !private ["O9Swiftfire16HttpResponseCode", "code503_ServiceUnavailable"]
-- !private ["O9Swiftfire16HttpResponseCode", "code505_HttpVersionNotSupported"]
-- ["O9Swiftfire16HttpResponseCode", "deinit"]
-- !private ["O9Swiftfire16HttpResponseCode", "rawValue"]
-- !private ["O9Swiftfire11HttpVersion", "RawValue"]
-- ["O9Swiftfire11HttpVersion", "deinit"]
-- !private ["O9Swiftfire11HttpVersion", "http1_0"]
-- !private ["O9Swiftfire11HttpVersion", "http1_1"]
-- !private ["O9Swiftfire11HttpVersion", "rawValue"]
+- ["C13SwiftfireCore10HttpHeader", "deinit"]
+- !private ["C13SwiftfireCore10HttpHeader", "httpVersion"]
+- !private ["C13SwiftfireCore10HttpHeader", "operation"]
+- !private ["C13SwiftfireCore10HttpHeader", "url"]
+- !private ["O13SwiftfireCore13HttpOperation", "RawValue"]
+- ["O13SwiftfireCore13HttpOperation", "deinit"]
+- !private ["O13SwiftfireCore13HttpOperation", "get"]
+- !private ["O13SwiftfireCore13HttpOperation", "post"]
+- !private ["O13SwiftfireCore13HttpOperation", "rawValue"]
+- !private ["O13SwiftfireCore16HttpResponseCode", "code200_OK"]
+- !private ["O13SwiftfireCore16HttpResponseCode", "code400_BadRequest"]
+- !private ["O13SwiftfireCore16HttpResponseCode", "code403_Forbidden"]
+- !private ["O13SwiftfireCore16HttpResponseCode", "code404_NotFound"]
+- !private ["O13SwiftfireCore16HttpResponseCode", "code500_InternalServerError"]
+- !private ["O13SwiftfireCore16HttpResponseCode", "code501_NotImplemented"]
+- !private ["O13SwiftfireCore16HttpResponseCode", "code505_HttpVersionNotSupported"]
+- ["O13SwiftfireCore16HttpResponseCode", "deinit"]
+- !private ["O13SwiftfireCore16HttpResponseCode", "rawValue"]
+- !private ["O13SwiftfireCore11HttpVersion", "RawValue"]
+- ["O13SwiftfireCore11HttpVersion", "deinit"]
+- !private ["O13SwiftfireCore11HttpVersion", "http1_0"]
+- !private ["O13SwiftfireCore11HttpVersion", "http1_1"]
 - ["Si", "deinit"]
 - !private ["Vs5Int16", "deinit"]
 - ["Vs5Int32", "deinit"]
@@ -384,10 +276,10 @@ depends-member:
 - !private ["Ps25LosslessStringConvertible", "source"]
 - !private ["Ps10MirrorPath", "init"]
 - !private ["Ps10MirrorPath", "source"]
-- ["C9Swiftfire8Mutation", "deinit"]
-- !private ["C9Swiftfire8Mutation", "httpResponseCode"]
-- !private ["C9Swiftfire8Mutation", "responseDetails"]
-- !private ["C9Swiftfire8Mutation", "url"]
+- ["C13SwiftfireCore8Mutation", "deinit"]
+- !private ["C13SwiftfireCore8Mutation", "httpResponseCode"]
+- !private ["C13SwiftfireCore8Mutation", "responseDetails"]
+- !private ["C13SwiftfireCore8Mutation", "url"]
 - !private ["PSo8NSCoding", "appendingPathComponent"]
 - !private ["PSo8NSCoding", "init"]
 - !private ["PSo8NSCoding", "source"]
@@ -398,11 +290,8 @@ depends-member:
 - !private ["PSo16NSMutableCopying", "init"]
 - !private ["PSo16NSMutableCopying", "source"]
 - !private ["CSo8NSObject", "appendingPathComponent"]
-- !private ["CSo8NSObject", "contents"]
-- !private ["CSo8NSObject", "fileExists"]
 - !private ["CSo8NSObject", "increment"]
 - !private ["CSo8NSObject", "init"]
-- !private ["CSo8NSObject", "isReadableFile"]
 - !private ["CSo8NSObject", "nof200"]
 - !private ["CSo8NSObject", "nof400"]
 - !private ["CSo8NSObject", "nof403"]
@@ -413,11 +302,8 @@ depends-member:
 - !private ["CSo8NSObject", "nofRequests"]
 - !private ["CSo8NSObject", "source"]
 - !private ["PSo16NSObjectProtocol", "appendingPathComponent"]
-- !private ["PSo16NSObjectProtocol", "contents"]
-- !private ["PSo16NSObjectProtocol", "fileExists"]
 - !private ["PSo16NSObjectProtocol", "increment"]
 - !private ["PSo16NSObjectProtocol", "init"]
-- !private ["PSo16NSObjectProtocol", "isReadableFile"]
 - !private ["PSo16NSObjectProtocol", "nof200"]
 - !private ["PSo16NSObjectProtocol", "nof400"]
 - !private ["PSo16NSObjectProtocol", "nof403"]
@@ -437,85 +323,57 @@ depends-member:
 - !private ["PSo14NSSecureCoding", "init"]
 - !private ["PSo14NSSecureCoding", "source"]
 - !private ["CSo8NSString", "appendingPathComponent"]
-- !private ["CSo8NSString", "deinit"]
+- ["CSo8NSString", "deinit"]
 - !private ["CSo8NSString", "init"]
 - !private ["CSo8NSString", "source"]
 - !private ["V10ObjectiveC8ObjCBool", "boolValue"]
 - ["V10ObjectiveC8ObjCBool", "deinit"]
 - ["Sq", "deinit"]
-- !private ["Sq", "init"]
 - !private ["Ps16RawRepresentable", "RawValue"]
-- ["Ps16RawRepresentable", "closeConnection"]
 - !private ["Ps16RawRepresentable", "code200_OK"]
 - !private ["Ps16RawRepresentable", "code400_BadRequest"]
-- !private ["Ps16RawRepresentable", "code401_Unauthorized"]
 - !private ["Ps16RawRepresentable", "code403_Forbidden"]
 - !private ["Ps16RawRepresentable", "code404_NotFound"]
 - !private ["Ps16RawRepresentable", "code500_InternalServerError"]
 - !private ["Ps16RawRepresentable", "code501_NotImplemented"]
-- !private ["Ps16RawRepresentable", "code503_ServiceUnavailable"]
 - !private ["Ps16RawRepresentable", "code505_HttpVersionNotSupported"]
 - !private ["Ps16RawRepresentable", "get"]
 - !private ["Ps16RawRepresentable", "http1_0"]
 - !private ["Ps16RawRepresentable", "http1_1"]
 - !private ["Ps16RawRepresentable", "post"]
 - !private ["Ps16RawRepresentable", "rawValue"]
-- ["Ps16RawRepresentable", "send401Unauthorized"]
-- ["Ps16RawRepresentable", "send503ServiceUnavailable"]
-- !private ["P14SwifterSockets16ReceiverProtocol", "filemanager"]
 - !private ["P14SwifterSockets16ReceiverProtocol", "logId"]
-- !private ["P14SwifterSockets16ReceiverProtocol", "remoteAddress"]
-- !private ["P14SwifterSockets16ReceiverProtocol", "transfer"]
-- !private ["P10SwifterLog26ReflectedStringConvertible", "Date"]
 - !private ["P10SwifterLog26ReflectedStringConvertible", "HttpOperation"]
 - !private ["P10SwifterLog26ReflectedStringConvertible", "HttpResponse"]
 - !private ["P10SwifterLog26ReflectedStringConvertible", "HttpResponseCode"]
 - !private ["P10SwifterLog26ReflectedStringConvertible", "HttpVersion"]
-- !private ["P10SwifterLog26ReflectedStringConvertible", "accessLog"]
-- !private ["P10SwifterLog26ReflectedStringConvertible", "accessLogEnabled"]
-- !private ["P10SwifterLog26ReflectedStringConvertible", "assert"]
-- !private ["P10SwifterLog26ReflectedStringConvertible", "blacklist"]
 - !private ["P10SwifterLog26ReflectedStringConvertible", "createResponse"]
-- !private ["P10SwifterLog26ReflectedStringConvertible", "enableHttpPostprocessor"]
-- !private ["P10SwifterLog26ReflectedStringConvertible", "enableHttpPreprocessor"]
 - !private ["P10SwifterLog26ReflectedStringConvertible", "errorMessage"]
-- !private ["P10SwifterLog26ReflectedStringConvertible", "four04Log"]
-- !private ["P10SwifterLog26ReflectedStringConvertible", "four04LogEnabled"]
-- !private ["P10SwifterLog26ReflectedStringConvertible", "httpWorkerPostprocessor"]
-- !private ["P10SwifterLog26ReflectedStringConvertible", "httpWorkerPreprocessor"]
 - !private ["P10SwifterLog26ReflectedStringConvertible", "log"]
 - !private ["P10SwifterLog26ReflectedStringConvertible", "mimeType"]
 - !private ["P10SwifterLog26ReflectedStringConvertible", "mimeTypeDefault"]
 - !private ["P10SwifterLog26ReflectedStringConvertible", "resourceIsAvailable"]
 - !private ["P10SwifterLog26ReflectedStringConvertible", "root"]
 - !private ["P10SwifterLog26ReflectedStringConvertible", "telemetry"]
-- ["Vs12StaticString", "deinit"]
-- !private ["Vs12StaticString", "init"]
 - ["SS", "deinit"]
 - !private ["SS", "init"]
 - !private ["SS", "source"]
 - !private ["C10SwifterLog10SwifterLog", "atLevelDebug"]
 - !private ["C10SwifterLog10SwifterLog", "atLevelError"]
-- !private ["C10SwifterLog10SwifterLog", "atLevelNotice"]
 - ["C10SwifterLog10SwifterLog", "deinit"]
 - !private ["Ps16TextOutputStream", "init"]
 - !private ["Ps16TextOutputStream", "source"]
 - !private ["Ps20TextOutputStreamable", "init"]
 - !private ["Ps20TextOutputStreamable", "source"]
-- !private ["P14SwifterSockets19TransmitterProtocol", "filemanager"]
 - !private ["P14SwifterSockets19TransmitterProtocol", "logId"]
-- !private ["P14SwifterSockets19TransmitterProtocol", "remoteAddress"]
-- !private ["P14SwifterSockets19TransmitterProtocol", "transfer"]
-- ["Su", "deinit"]
+- !private ["Su", "deinit"]
 - !private ["Vs6UInt16", "deinit"]
 - !private ["Vs6UInt32", "deinit"]
 - !private ["Vs6UInt64", "deinit"]
 - !private ["Vs5UInt8", "deinit"]
 - !private ["Sc", "deinit"]
-- ["P11SwifterJSON19VJsonDeserializable", "Action"]
-- !private ["P11SwifterJSON19VJsonDeserializable", "action"]
-- ["P11SwifterJSON17VJsonSerializable", "Action"]
-- !private ["P11SwifterJSON17VJsonSerializable", "action"]
+- !private ["P11SwifterJSON17VJsonSerializable", "init"]
+- !private ["P11SwifterJSON17VJsonSerializable", "source"]
 - !private ["Ps35_ExpressibleByBuiltinBooleanLiteral", "_getBuiltinLogicValue"]
 - !private ["Ps51_ExpressibleByBuiltinExtendedGraphemeClusterLiteral", "init"]
 - !private ["Ps51_ExpressibleByBuiltinExtendedGraphemeClusterLiteral", "source"]
@@ -531,24 +389,18 @@ depends-member:
 - !private ["Ps9_Hashable", "RawValue"]
 - !private ["Ps9_Hashable", "_getBuiltinLogicValue"]
 - !private ["Ps9_Hashable", "appendingPathComponent"]
-- ["Ps9_Hashable", "closeConnection"]
 - !private ["Ps9_Hashable", "code200_OK"]
 - !private ["Ps9_Hashable", "code400_BadRequest"]
-- !private ["Ps9_Hashable", "code401_Unauthorized"]
 - !private ["Ps9_Hashable", "code403_Forbidden"]
 - !private ["Ps9_Hashable", "code404_NotFound"]
 - !private ["Ps9_Hashable", "code500_InternalServerError"]
 - !private ["Ps9_Hashable", "code501_NotImplemented"]
-- !private ["Ps9_Hashable", "code503_ServiceUnavailable"]
 - !private ["Ps9_Hashable", "code505_HttpVersionNotSupported"]
-- !private ["Ps9_Hashable", "contents"]
-- !private ["Ps9_Hashable", "fileExists"]
 - !private ["Ps9_Hashable", "get"]
 - !private ["Ps9_Hashable", "http1_0"]
 - !private ["Ps9_Hashable", "http1_1"]
 - !private ["Ps9_Hashable", "increment"]
 - !private ["Ps9_Hashable", "init"]
-- !private ["Ps9_Hashable", "isReadableFile"]
 - !private ["Ps9_Hashable", "nof200"]
 - !private ["Ps9_Hashable", "nof400"]
 - !private ["Ps9_Hashable", "nof403"]
@@ -559,16 +411,12 @@ depends-member:
 - !private ["Ps9_Hashable", "nofRequests"]
 - !private ["Ps9_Hashable", "post"]
 - !private ["Ps9_Hashable", "rawValue"]
-- ["Ps9_Hashable", "send401Unauthorized"]
-- ["Ps9_Hashable", "send503ServiceUnavailable"]
 - !private ["Ps9_Hashable", "source"]
 - !private ["Ps21_ObjectiveCBridgeable", "_getBuiltinLogicValue"]
 - !private ["Ps21_ObjectiveCBridgeable", "init"]
 - !private ["Ps21_ObjectiveCBridgeable", "source"]
 depends-nominal:
-- "OC13SwiftfireCore9Blacklist6Action"
-- "Ps9AnyObject"
-- "C13SwiftfireCore9Blacklist"
+- !private "Ps9AnyObject"
 - "Sb"
 - !private "Ps7CVarArg"
 - !private "Vs9Character"
@@ -578,26 +426,22 @@ depends-nominal:
 - !private "Ps29CustomPlaygroundQuickLookable"
 - !private "Ps17CustomReflectable"
 - !private "Ps23CustomStringConvertible"
-- "V10Foundation4Data"
 - "C13SwiftfireCore6Domain"
 - !private "C13SwiftfireCore15DomainTelemetry"
 - !private "Sd"
-- "Ps9Equatable"
+- !private "Ps9Equatable"
 - !private "Ps27ExpressibleByBooleanLiteral"
 - !private "Ps43ExpressibleByExtendedGraphemeClusterLiteral"
-- !private "Ps23ExpressibleByNilLiteral"
 - !private "Ps32ExpressibleByStringInterpolation"
 - !private "Ps26ExpressibleByStringLiteral"
 - !private "Ps33ExpressibleByUnicodeScalarLiteral"
-- !private "CSo11FileManager"
 - !private "Sf"
-- "Ps8Hashable"
+- !private "Ps8Hashable"
 - "C9Swiftfire14HttpConnection"
-- "C9Swiftfire10HttpHeader"
-- "O9Swiftfire13HttpOperation"
-- !private "C9Swiftfire12HttpResponse"
-- "O9Swiftfire16HttpResponseCode"
-- "O9Swiftfire11HttpVersion"
+- "C13SwiftfireCore10HttpHeader"
+- "O13SwiftfireCore13HttpOperation"
+- "O13SwiftfireCore16HttpResponseCode"
+- "O13SwiftfireCore11HttpVersion"
 - "Si"
 - !private "Vs5Int16"
 - "Vs5Int32"
@@ -606,7 +450,7 @@ depends-nominal:
 - "CC13SwiftfireCore15DomainTelemetry4Item"
 - !private "Ps25LosslessStringConvertible"
 - !private "Ps10MirrorPath"
-- "C9Swiftfire8Mutation"
+- "C13SwiftfireCore8Mutation"
 - !private "PSo8NSCoding"
 - !private "PSo9NSCopying"
 - !private "PSo16NSMutableCopying"
@@ -615,33 +459,31 @@ depends-nominal:
 - !private "PSo19NSPasteboardReading"
 - !private "PSo19NSPasteboardWriting"
 - !private "PSo14NSSecureCoding"
-- !private "CSo8NSString"
+- "CSo8NSString"
 - "V10ObjectiveC8ObjCBool"
 - "Sq"
-- "Ps16RawRepresentable"
+- !private "Ps16RawRepresentable"
 - !private "P14SwifterSockets16ReceiverProtocol"
 - !private "P10SwifterLog26ReflectedStringConvertible"
-- "Vs12StaticString"
 - "SS"
 - "C10SwifterLog10SwifterLog"
 - !private "Ps16TextOutputStream"
 - !private "Ps20TextOutputStreamable"
 - !private "P14SwifterSockets19TransmitterProtocol"
-- "Su"
+- !private "Su"
 - !private "Vs6UInt16"
 - !private "Vs6UInt32"
 - !private "Vs6UInt64"
 - !private "Vs5UInt8"
 - !private "Sc"
-- "P11SwifterJSON19VJsonDeserializable"
-- "P11SwifterJSON17VJsonSerializable"
+- !private "P11SwifterJSON17VJsonSerializable"
 - !private "Ps35_ExpressibleByBuiltinBooleanLiteral"
 - !private "Ps51_ExpressibleByBuiltinExtendedGraphemeClusterLiteral"
 - !private "Ps34_ExpressibleByBuiltinStringLiteral"
 - !private "Ps39_ExpressibleByBuiltinUTF16StringLiteral"
 - !private "Ps41_ExpressibleByBuiltinUnicodeScalarLiteral"
 - !private "Ps35_HasCustomAnyHashableRepresentation"
-- "Ps9_Hashable"
+- !private "Ps9_Hashable"
 - !private "Ps21_ObjectiveCBridgeable"
 depends-dynamic-lookup:
 depends-external:
@@ -653,18 +495,17 @@ depends-external:
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/ObjectiveC.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreGraphics.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/IOKit.swiftmodule"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterJSON.framework/Modules/SwifterJSON.swiftmodule/x86_64.swiftmodule"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/Ascii.framework/Modules/Ascii.swiftmodule/x86_64.swiftmodule"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterLog.framework/Modules/SwifterLog.swiftmodule/x86_64.swiftmodule"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/CAsl-0.1.0/Sources/include/CAsl.h"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/CAsl.framework/Modules/module.modulemap"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterSockets.framework/Modules/SwifterSockets.swiftmodule/x86_64.swiftmodule"
 - "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwiftfireCore.framework/Modules/SwiftfireCore.swiftmodule/x86_64.swiftmodule"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/COpenSsl-0.1.0/module.modulemap"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/Ascii.framework/Modules/Ascii.swiftmodule/x86_64.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/AppKit.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreData.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/QuartzCore.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/XPC.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreImage.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterJSON.framework/Modules/SwifterJSON.swiftmodule/x86_64.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterLog.framework/Modules/SwifterLog.swiftmodule/x86_64.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/CAsl-0.1.0/Sources/include/CAsl.h"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/CAsl.framework/Modules/module.modulemap"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterSockets.framework/Modules/SwifterSockets.swiftmodule/x86_64.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/simd.swiftmodule"
-interface-hash: "17f48ee4b00cc72193c45a48ba635efb"
+interface-hash: "9d9fb35b8d2351387f4cce71a80f86d9"

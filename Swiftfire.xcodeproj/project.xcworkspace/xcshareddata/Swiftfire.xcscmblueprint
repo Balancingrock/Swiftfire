@@ -14,8 +14,8 @@
   },
   "DVTSourceControlWorkspaceBlueprintIdentifierKey" : "9AB59C01-0CDC-4C24-BD80-592017D2A576",
   "DVTSourceControlWorkspaceBlueprintWorkingCopyPathsKey" : {
-    "5B20DC5A3688C85EB1A5785522EE90A45D6C6FB2" : "Swiftfire\/Packages\/SwifterSockets-0.9.13\/",
-    "4112BE80E1590C6E997D243FD2B2107DD98EDD52" : "Swiftfire\/Packages\/SwifterLog-0.9.18\/",
+    "5B20DC5A3688C85EB1A5785522EE90A45D6C6FB2" : "Swiftfire\/Packages\/SwifterSockets-0.9.14\/",
+    "4112BE80E1590C6E997D243FD2B2107DD98EDD52" : "Swiftfire\/Packages\/SwifterLog-0.9.19\/",
     "022A86DEEE661F9F16A60B17A9A92D02A7AEF71B" : "Swiftfire\/",
     "14F0A7FA95A08688CE263586500388EDDF6AD709" : "Swiftfire\/Packages\/Ascii-1.0.0\/",
     "ACB900593AFBAA918E902BFC95EA466C9AFC1110" : "Swiftfire\/Packages\/SecureSockets-0.3.3\/",

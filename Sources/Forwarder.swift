@@ -50,19 +50,25 @@
 // History
 //
 // v0.9.15 - General update and switch to frameworks, Initial release
+//
 // =====================================================================================================================
-
 
 import Foundation
 import SwifterSockets
 import SwifterLog
+import SwiftfireCore
 
+
+/// Creates a new forwarding connection.
 
 func forwardingConnectionFactory(_ ctype: SwifterSockets.InterfaceAccess, _ address: String) -> Forwarder? {
     let fcon = Forwarder()
     _ = fcon.prepare(for: ctype, remoteAddress: address, options: [])
     return fcon
 }
+
+
+/// A connection that passes incoming data to the designated client.
 
 class Forwarder: SwifterSockets.Connection {
     
@@ -80,7 +86,7 @@ class Forwarder: SwifterSockets.Connection {
     }
     
     override func receiverLoop() -> Bool {
-        let msg = HttpResponse.withCode(.code408_RequestTimeout, version: HttpVersion.http1_1, message: "Forwarding target timed out.")
+        let msg = createHttpResponse(for: .code408_RequestTimeout, version: HttpVersion.http1_1, message: "Forwarding target timed out.")
         _ = client?.transfer(msg, callback: nil)
         closeForwarder()
         return false

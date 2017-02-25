@@ -1,10 +1,17 @@
 ### Swift dependencies file v0 ###
 provides-top-level:
 - "quitSwiftfire"
+- "parameters"
 - "LogForewarder"
 - "logforewarder"
 - "serverBlacklist"
+- "statistics"
+- "domainServices"
+- "headerLogger"
 - "domains"
+- "connectionPool"
+- "telemetry"
+- "httpServerErrorHandler"
 - "httpServer"
 - "macServer"
 provides-nominal:
@@ -13,56 +20,66 @@ provides-member:
 - ["C9Swiftfire13LogForewarder", ""]
 provides-dynamic-lookup:
 depends-top-level:
-- "Blacklist"
-- "parameters"
-- "Int"
-- !private "LogLineReply"
-- "logforewarder"
-- "macErrorHandler"
-- "&&"
-- "domains"
-- "ServerStartCommand"
-- "macAcceptQueue"
-- "Array"
-- "EXIT_FAILURE"
-- "HttpHeader"
-- "StringLiteralType"
 - "SwifterlogCallbackProtocol"
-- "exit"
-- "String"
-- "Domains"
-- "serverBlacklist"
-- "Bool"
-- "macConnectionFactory"
-- "BooleanLiteralType"
-- "FileManager"
-- "IntegerLiteralType"
-- "EXIT_SUCCESS"
-- "FloatLiteralType"
-- "acceptQueue"
-- !private "LogLine"
-- "DispatchQueue"
-- "!"
-- "macServer"
-- "Date"
-- "UnicodeScalarType"
-- "statistics"
-- "CastingPrecedence"
-- !private "mac"
 - "AssignmentPrecedence"
-- "httpServer"
+- "EXIT_FAILURE"
+- "Int"
+- "StringLiteralType"
+- "HttpHeaderLogger"
+- "ConnectionPool"
+- "Statistics"
+- "SwifterLog"
+- "quitSwiftfire"
+- "fatalError"
+- "BooleanLiteralType"
+- "exit"
+- "Telemetry"
+- "&&"
+- "!="
+- "DomainServices"
+- "domainServices"
+- "httpConnectionFactory"
+- "Blacklist"
+- "registerDomainServices"
+- "macConnectionFactory"
+- "connectionPool"
+- "DispatchQueue"
+- "*"
+- !private "mac"
 - "httpServerErrorHandler"
 - "UInt64"
-- "*"
-- "quitSwiftfire"
-- "SwifterSockets"
-- "SwifterLog"
-- "log"
+- "acceptQueue"
+- "macAcceptQueue"
 - "sleep"
-- "LogForewarder"
-- "!="
-- "httpConnectionFactory"
+- "telemetry"
+- "SwifterSockets"
+- "parameters"
 - "FileURLs"
+- "!"
+- "headerLogger"
+- !private "LogLineReply"
+- "UnicodeScalarType"
+- "Bool"
+- "Array"
+- "IntegerLiteralType"
+- "macServer"
+- "FloatLiteralType"
+- "String"
+- "logforewarder"
+- "serverBlacklist"
+- "Domains"
+- "ServerStartCommand"
+- "httpServer"
+- "Date"
+- "EXIT_SUCCESS"
+- !private "LogLine"
+- "macErrorHandler"
+- "CastingPrecedence"
+- "Parameters"
+- "LogForewarder"
+- "log"
+- "statistics"
+- "domains"
 depends-member:
 - ["Ps9AnyObject", "AutoreleaseFrequency"]
 - ["Ps9AnyObject", "Level"]
@@ -72,19 +89,19 @@ depends-member:
 - ["Ps9AnyObject", "applicationLogDir"]
 - ["Ps9AnyObject", "aslFacilityRecordAtAndAboveLevel"]
 - ["Ps9AnyObject", "atLevelEmergency"]
+- !private ["Ps9AnyObject", "atLevelError"]
 - ["Ps9AnyObject", "atLevelNotice"]
 - ["Ps9AnyObject", "autoStartup"]
 - ["Ps9AnyObject", "callbackAtAndAboveLevel"]
-- ["Ps9AnyObject", "closeHeaderLoggingFile"]
+- ["Ps9AnyObject", "close"]
 - ["Ps9AnyObject", "connectToNetworkTarget"]
-- ["Ps9AnyObject", "default"]
-- ["Ps9AnyObject", "domainDefaults"]
+- ["Ps9AnyObject", "domainDefaultsFile"]
 - ["Ps9AnyObject", "execute"]
 - ["Ps9AnyObject", "fileRecordAtAndAboveLevel"]
+- ["Ps9AnyObject", "headersLogDir"]
 - ["Ps9AnyObject", "httpServicePortNumber"]
 - ["Ps9AnyObject", "init"]
-- ["Ps9AnyObject", "isReadableFile"]
-- ["Ps9AnyObject", "load"]
+- ["Ps9AnyObject", "isEmpty"]
 - ["Ps9AnyObject", "logInfo"]
 - ["Ps9AnyObject", "logParameterSettings"]
 - ["Ps9AnyObject", "logfileDirectoryPath"]
@@ -98,12 +115,15 @@ depends-member:
 - ["Ps9AnyObject", "networkLogtargetIpAddress"]
 - ["Ps9AnyObject", "networkLogtargetPortNumber"]
 - ["Ps9AnyObject", "networkTransmitAtAndAboveLevel"]
+- ["Ps9AnyObject", "parameterDefaultsFile"]
 - ["Ps9AnyObject", "registerCallback"]
 - ["Ps9AnyObject", "restore"]
 - ["Ps9AnyObject", "save"]
-- ["Ps9AnyObject", "serverBlacklist"]
+- ["Ps9AnyObject", "serverBlacklistFile"]
 - ["Ps9AnyObject", "serverShutdown"]
+- !private ["Ps9AnyObject", "source"]
 - ["Ps9AnyObject", "start"]
+- ["Ps9AnyObject", "statisticsFile"]
 - ["Ps9AnyObject", "stdoutPrintAtAndAboveLevel"]
 - !private ["Ps9AnyObject", "transfer"]
 - ["Ps9AnyObject", "writeToLog"]
@@ -115,37 +135,44 @@ depends-member:
 - ["Ps17BitwiseOperations", "init"]
 - ["C13SwiftfireCore9Blacklist", "deinit"]
 - ["C13SwiftfireCore9Blacklist", "init"]
-- ["C13SwiftfireCore9Blacklist", "load"]
+- ["C13SwiftfireCore9Blacklist", "restore"]
 - ["C13SwiftfireCore9Blacklist", "save"]
-- ["C13SwiftfireCore9Blacklist", "writeToLog"]
 - ["Sb", "_getBuiltinLogicValue"]
 - ["Sb", "deinit"]
 - ["Ps7CVarArg", "AutoreleaseFrequency"]
-- ["Ps7CVarArg", "default"]
 - ["Ps7CVarArg", "init"]
-- ["Ps7CVarArg", "isReadableFile"]
+- ["Ps7CVarArg", "isEmpty"]
+- !private ["Ps7CVarArg", "source"]
 - ["Vs9Character", "deinit"]
 - ["Ps10Comparable", "init"]
+- ["Ps10Comparable", "isEmpty"]
+- !private ["Ps10Comparable", "source"]
 - !private ["C14SwifterSockets10Connection", "transfer"]
+- ["C14SwifterSockets14ConnectionPool", "deinit"]
+- ["C14SwifterSockets14ConnectionPool", "init"]
 - ["Ps28CustomDebugStringConvertible", "AutoreleaseFrequency"]
-- ["Ps28CustomDebugStringConvertible", "default"]
 - ["Ps28CustomDebugStringConvertible", "init"]
-- ["Ps28CustomDebugStringConvertible", "isReadableFile"]
+- ["Ps28CustomDebugStringConvertible", "isEmpty"]
 - ["Ps28CustomDebugStringConvertible", "path"]
+- !private ["Ps28CustomDebugStringConvertible", "source"]
 - ["Ps29CustomPlaygroundQuickLookable", "_getBuiltinLogicValue"]
 - ["Ps29CustomPlaygroundQuickLookable", "init"]
+- ["Ps29CustomPlaygroundQuickLookable", "isEmpty"]
 - ["Ps29CustomPlaygroundQuickLookable", "path"]
+- !private ["Ps29CustomPlaygroundQuickLookable", "source"]
 - ["Ps17CustomReflectable", "_getBuiltinLogicValue"]
 - ["Ps17CustomReflectable", "init"]
+- ["Ps17CustomReflectable", "isEmpty"]
+- !private ["Ps17CustomReflectable", "source"]
 - ["Ps23CustomStringConvertible", "AutoreleaseFrequency"]
 - ["Ps23CustomStringConvertible", "_getBuiltinLogicValue"]
 - ["Ps23CustomStringConvertible", "debug"]
-- ["Ps23CustomStringConvertible", "default"]
 - ["Ps23CustomStringConvertible", "init"]
-- ["Ps23CustomStringConvertible", "isReadableFile"]
+- ["Ps23CustomStringConvertible", "isEmpty"]
 - ["Ps23CustomStringConvertible", "none"]
 - ["Ps23CustomStringConvertible", "notice"]
 - ["Ps23CustomStringConvertible", "path"]
+- !private ["Ps23CustomStringConvertible", "source"]
 - ["V10Foundation4Date", "deinit"]
 - ["CSo14DispatchObject", "AutoreleaseFrequency"]
 - ["CSo14DispatchObject", "init"]
@@ -154,9 +181,12 @@ depends-member:
 - ["CSo13DispatchQueue", "AutoreleaseFrequency"]
 - ["CSo13DispatchQueue", "deinit"]
 - ["CSo13DispatchQueue", "init"]
+- ["C13SwiftfireCore14DomainServices", "deinit"]
+- ["C13SwiftfireCore14DomainServices", "init"]
 - ["C13SwiftfireCore7Domains", "deinit"]
 - ["C13SwiftfireCore7Domains", "init"]
 - ["C13SwiftfireCore7Domains", "restore"]
+- ["C13SwiftfireCore7Domains", "save"]
 - ["C13SwiftfireCore7Domains", "serverShutdown"]
 - ["C13SwiftfireCore7Domains", "writeToLog"]
 - ["Sd", "deinit"]
@@ -164,40 +194,53 @@ depends-member:
 - ["Ps9Equatable", "Element"]
 - ["Ps9Equatable", "_getBuiltinLogicValue"]
 - ["Ps9Equatable", "debug"]
-- ["Ps9Equatable", "default"]
 - ["Ps9Equatable", "inherit"]
 - ["Ps9Equatable", "init"]
-- ["Ps9Equatable", "isReadableFile"]
+- ["Ps9Equatable", "isEmpty"]
 - ["Ps9Equatable", "none"]
 - ["Ps9Equatable", "notice"]
 - ["Ps9Equatable", "path"]
+- !private ["Ps9Equatable", "source"]
 - ["Ps9Equatable", "userInteractive"]
 - ["Ps25ExpressibleByArrayLiteral", "Element"]
 - ["Ps27ExpressibleByBooleanLiteral", "_getBuiltinLogicValue"]
 - ["Ps43ExpressibleByExtendedGraphemeClusterLiteral", "init"]
+- ["Ps43ExpressibleByExtendedGraphemeClusterLiteral", "isEmpty"]
+- !private ["Ps43ExpressibleByExtendedGraphemeClusterLiteral", "source"]
 - ["Ps27ExpressibleByIntegerLiteral", "init"]
 - ["Ps23ExpressibleByNilLiteral", "init"]
 - ["Ps32ExpressibleByStringInterpolation", "init"]
+- ["Ps32ExpressibleByStringInterpolation", "isEmpty"]
+- !private ["Ps32ExpressibleByStringInterpolation", "source"]
 - ["Ps26ExpressibleByStringLiteral", "init"]
+- ["Ps26ExpressibleByStringLiteral", "isEmpty"]
+- !private ["Ps26ExpressibleByStringLiteral", "source"]
 - ["Ps33ExpressibleByUnicodeScalarLiteral", "init"]
-- ["CSo11FileManager", "default"]
-- ["CSo11FileManager", "deinit"]
-- ["CSo11FileManager", "isReadableFile"]
+- ["Ps33ExpressibleByUnicodeScalarLiteral", "isEmpty"]
+- !private ["Ps33ExpressibleByUnicodeScalarLiteral", "source"]
 - ["C9Swiftfire8FileURLs", "applicationLogDir"]
-- ["C9Swiftfire8FileURLs", "domainDefaults"]
-- ["C9Swiftfire8FileURLs", "serverBlacklist"]
+- ["C9Swiftfire8FileURLs", "domainDefaultsFile"]
+- ["C9Swiftfire8FileURLs", "headersLogDir"]
+- ["C9Swiftfire8FileURLs", "parameterDefaultsFile"]
+- ["C9Swiftfire8FileURLs", "serverBlacklistFile"]
+- ["C9Swiftfire8FileURLs", "statisticsFile"]
 - ["Sf", "deinit"]
+- ["O13SwiftfireCore14FunctionResult", "deinit"]
+- ["O13SwiftfireCore14FunctionResult", "error"]
+- ["O13SwiftfireCore14FunctionResult", "success"]
 - ["Ps8Hashable", "AutoreleaseFrequency"]
 - ["Ps8Hashable", "_getBuiltinLogicValue"]
 - ["Ps8Hashable", "debug"]
-- ["Ps8Hashable", "default"]
 - ["Ps8Hashable", "inherit"]
 - ["Ps8Hashable", "init"]
-- ["Ps8Hashable", "isReadableFile"]
+- ["Ps8Hashable", "isEmpty"]
 - ["Ps8Hashable", "none"]
 - ["Ps8Hashable", "notice"]
 - ["Ps8Hashable", "path"]
-- ["C9Swiftfire10HttpHeader", "closeHeaderLoggingFile"]
+- !private ["Ps8Hashable", "source"]
+- ["C9Swiftfire16HttpHeaderLogger", "close"]
+- ["C9Swiftfire16HttpHeaderLogger", "deinit"]
+- ["C9Swiftfire16HttpHeaderLogger", "init"]
 - ["Si", "deinit"]
 - ["Si", "init"]
 - ["Vs5Int16", "deinit"]
@@ -221,32 +264,51 @@ depends-member:
 - !private ["C9Swiftfire13LogForewarder", "mac"]
 - ["V10SwifterLog7LogLine", "deinit"]
 - !private ["V10SwifterLog7LogLine", "init"]
-- ["C9Swiftfire12LogLineReply", "deinit"]
-- !private ["C9Swiftfire12LogLineReply", "init"]
+- ["C13SwiftfireCore12LogLineReply", "deinit"]
+- !private ["C13SwiftfireCore12LogLineReply", "init"]
+- ["C13SwiftfireCore7Logfile", "close"]
 - ["Ps25LosslessStringConvertible", "_getBuiltinLogicValue"]
 - ["Ps25LosslessStringConvertible", "init"]
-- ["P9Swiftfire10MacCommand", "execute"]
-- ["P9Swiftfire10MacCommand", "init"]
-- ["P9Swiftfire10MacMessage", "execute"]
-- ["P9Swiftfire10MacMessage", "init"]
+- ["Ps25LosslessStringConvertible", "isEmpty"]
+- !private ["Ps25LosslessStringConvertible", "source"]
+- ["P13SwiftfireCore10MacCommand", "execute"]
+- ["P13SwiftfireCore10MacCommand", "init"]
+- ["P13SwiftfireCore10MacMessage", "execute"]
+- ["P13SwiftfireCore10MacMessage", "init"]
 - ["Ps10MirrorPath", "init"]
+- ["Ps10MirrorPath", "isEmpty"]
+- !private ["Ps10MirrorPath", "source"]
 - ["C9Swiftfire30MonitoringAndControlConnection", "deinit"]
 - !private ["C9Swiftfire30MonitoringAndControlConnection", "transfer"]
 - ["PSo8NSCoding", "init"]
+- ["PSo8NSCoding", "isEmpty"]
+- !private ["PSo8NSCoding", "source"]
 - ["PSo9NSCopying", "init"]
+- ["PSo9NSCopying", "isEmpty"]
+- !private ["PSo9NSCopying", "source"]
 - ["PSo16NSMutableCopying", "init"]
+- ["PSo16NSMutableCopying", "isEmpty"]
+- !private ["PSo16NSMutableCopying", "source"]
 - ["CSo8NSObject", "AutoreleaseFrequency"]
-- ["CSo8NSObject", "default"]
 - ["CSo8NSObject", "init"]
-- ["CSo8NSObject", "isReadableFile"]
+- ["CSo8NSObject", "isEmpty"]
+- !private ["CSo8NSObject", "source"]
 - ["PSo16NSObjectProtocol", "AutoreleaseFrequency"]
-- ["PSo16NSObjectProtocol", "default"]
 - ["PSo16NSObjectProtocol", "init"]
-- ["PSo16NSObjectProtocol", "isReadableFile"]
+- ["PSo16NSObjectProtocol", "isEmpty"]
+- !private ["PSo16NSObjectProtocol", "source"]
 - ["PSo19NSPasteboardReading", "init"]
+- ["PSo19NSPasteboardReading", "isEmpty"]
+- !private ["PSo19NSPasteboardReading", "source"]
 - ["PSo19NSPasteboardWriting", "init"]
+- ["PSo19NSPasteboardWriting", "isEmpty"]
+- !private ["PSo19NSPasteboardWriting", "source"]
 - ["PSo14NSSecureCoding", "init"]
+- ["PSo14NSSecureCoding", "isEmpty"]
+- !private ["PSo14NSSecureCoding", "source"]
 - ["CSo8NSString", "init"]
+- ["CSo8NSString", "isEmpty"]
+- !private ["CSo8NSString", "source"]
 - ["Os5Never", "deinit"]
 - ["CSo9OS_object", "AutoreleaseFrequency"]
 - ["CSo9OS_object", "init"]
@@ -260,22 +322,23 @@ depends-member:
 - ["Ps9OptionSet", "Element"]
 - ["Sq", "deinit"]
 - ["Sq", "init"]
-- ["C9Swiftfire10Parameters", "aslFacilityRecordAtAndAboveLevel"]
-- ["C9Swiftfire10Parameters", "autoStartup"]
-- ["C9Swiftfire10Parameters", "callbackAtAndAboveLevel"]
-- ["C9Swiftfire10Parameters", "deinit"]
-- ["C9Swiftfire10Parameters", "fileRecordAtAndAboveLevel"]
-- ["C9Swiftfire10Parameters", "httpServicePortNumber"]
-- ["C9Swiftfire10Parameters", "logParameterSettings"]
-- ["C9Swiftfire10Parameters", "logfileMaxNofFiles"]
-- ["C9Swiftfire10Parameters", "logfileMaxSize"]
-- ["C9Swiftfire10Parameters", "macPortNumber"]
-- ["C9Swiftfire10Parameters", "maxNofPendingConnections"]
-- ["C9Swiftfire10Parameters", "networkLogtargetIpAddress"]
-- ["C9Swiftfire10Parameters", "networkLogtargetPortNumber"]
-- ["C9Swiftfire10Parameters", "networkTransmitAtAndAboveLevel"]
-- ["C9Swiftfire10Parameters", "restore"]
-- ["C9Swiftfire10Parameters", "stdoutPrintAtAndAboveLevel"]
+- ["C13SwiftfireCore10Parameters", "aslFacilityRecordAtAndAboveLevel"]
+- ["C13SwiftfireCore10Parameters", "autoStartup"]
+- ["C13SwiftfireCore10Parameters", "callbackAtAndAboveLevel"]
+- ["C13SwiftfireCore10Parameters", "deinit"]
+- ["C13SwiftfireCore10Parameters", "fileRecordAtAndAboveLevel"]
+- ["C13SwiftfireCore10Parameters", "httpServicePortNumber"]
+- ["C13SwiftfireCore10Parameters", "init"]
+- ["C13SwiftfireCore10Parameters", "logParameterSettings"]
+- ["C13SwiftfireCore10Parameters", "logfileMaxNofFiles"]
+- ["C13SwiftfireCore10Parameters", "logfileMaxSize"]
+- ["C13SwiftfireCore10Parameters", "macPortNumber"]
+- ["C13SwiftfireCore10Parameters", "maxNofPendingConnections"]
+- ["C13SwiftfireCore10Parameters", "networkLogtargetIpAddress"]
+- ["C13SwiftfireCore10Parameters", "networkLogtargetPortNumber"]
+- ["C13SwiftfireCore10Parameters", "networkTransmitAtAndAboveLevel"]
+- ["C13SwiftfireCore10Parameters", "restore"]
+- ["C13SwiftfireCore10Parameters", "stdoutPrintAtAndAboveLevel"]
 - ["Ps16RawRepresentable", "Element"]
 - ["Ps16RawRepresentable", "debug"]
 - ["Ps16RawRepresentable", "none"]
@@ -287,25 +350,33 @@ depends-member:
 - ["O14SwifterSockets6Result", "success"]
 - ["Ps8Sequence", "init"]
 - ["Ps8Sequence", "restore"]
+- ["Ps8Sequence", "save"]
 - ["Ps8Sequence", "serverShutdown"]
 - ["Ps8Sequence", "writeToLog"]
 - ["P14SwifterSockets14ServerProtocol", "init"]
 - ["P14SwifterSockets14ServerProtocol", "start"]
-- ["C9Swiftfire18ServerStartCommand", "deinit"]
-- ["C9Swiftfire18ServerStartCommand", "execute"]
-- ["C9Swiftfire18ServerStartCommand", "init"]
+- ["C13SwiftfireCore18ServerStartCommand", "deinit"]
+- ["C13SwiftfireCore18ServerStartCommand", "execute"]
+- ["C13SwiftfireCore18ServerStartCommand", "init"]
 - ["Ps10SetAlgebra", "Element"]
 - ["Ps13SignedInteger", "init"]
 - ["Ps12SignedNumber", "init"]
-- ["C9Swiftfire10Statistics", "deinit"]
-- ["C9Swiftfire10Statistics", "save"]
+- ["Vs12StaticString", "deinit"]
+- ["Vs12StaticString", "init"]
+- ["C13SwiftfireCore10Statistics", "deinit"]
+- ["C13SwiftfireCore10Statistics", "init"]
+- ["C13SwiftfireCore10Statistics", "restore"]
+- ["C13SwiftfireCore10Statistics", "save"]
 - ["Ps10Strideable", "init"]
 - ["SS", "deinit"]
 - ["SS", "init"]
+- ["SS", "isEmpty"]
+- !private ["SS", "source"]
 - ["C10SwifterLog10SwifterLog", "Level"]
 - ["C10SwifterLog10SwifterLog", "NetworkTarget"]
 - ["C10SwifterLog10SwifterLog", "aslFacilityRecordAtAndAboveLevel"]
 - ["C10SwifterLog10SwifterLog", "atLevelEmergency"]
+- !private ["C10SwifterLog10SwifterLog", "atLevelError"]
 - ["C10SwifterLog10SwifterLog", "atLevelNotice"]
 - ["C10SwifterLog10SwifterLog", "callbackAtAndAboveLevel"]
 - ["C10SwifterLog10SwifterLog", "connectToNetworkTarget"]
@@ -323,8 +394,14 @@ depends-member:
 - ["P10SwifterLog26SwifterlogCallbackProtocol", "logInfo"]
 - !private ["P10SwifterLog26SwifterlogCallbackProtocol", "mac"]
 - ["P10SwifterLog26SwifterlogCallbackProtocol", ""]
+- ["C13SwiftfireCore9Telemetry", "deinit"]
+- ["C13SwiftfireCore9Telemetry", "init"]
 - ["Ps16TextOutputStream", "init"]
+- ["Ps16TextOutputStream", "isEmpty"]
+- !private ["Ps16TextOutputStream", "source"]
 - ["Ps20TextOutputStreamable", "init"]
+- ["Ps20TextOutputStreamable", "isEmpty"]
+- !private ["Ps20TextOutputStreamable", "source"]
 - ["C14SwifterSockets9TipServer", "deinit"]
 - ["C14SwifterSockets9TipServer", "init"]
 - ["C14SwifterSockets9TipServer", "start"]
@@ -341,40 +418,52 @@ depends-member:
 - ["Ps15UnsignedInteger", "init"]
 - ["P11SwifterJSON19VJsonDeserializable", "execute"]
 - ["P11SwifterJSON19VJsonDeserializable", "init"]
-- ["P11SwifterJSON19VJsonDeserializable", "load"]
+- ["P11SwifterJSON19VJsonDeserializable", "restore"]
 - ["P11SwifterJSON19VJsonDeserializable", "save"]
-- ["P11SwifterJSON19VJsonDeserializable", "writeToLog"]
 - ["P11SwifterJSON17VJsonSerializable", "execute"]
 - ["P11SwifterJSON17VJsonSerializable", "init"]
-- ["P11SwifterJSON17VJsonSerializable", "load"]
+- ["P11SwifterJSON17VJsonSerializable", "isEmpty"]
+- ["P11SwifterJSON17VJsonSerializable", "restore"]
 - ["P11SwifterJSON17VJsonSerializable", "save"]
-- ["P11SwifterJSON17VJsonSerializable", "writeToLog"]
+- !private ["P11SwifterJSON17VJsonSerializable", "source"]
 - ["Ps15_CVarArgAligned", "init"]
 - ["Ps28_DisallowMixedSignArithmetic", "init"]
 - ["Ps35_ExpressibleByBuiltinBooleanLiteral", "_getBuiltinLogicValue"]
 - ["Ps51_ExpressibleByBuiltinExtendedGraphemeClusterLiteral", "init"]
+- ["Ps51_ExpressibleByBuiltinExtendedGraphemeClusterLiteral", "isEmpty"]
+- !private ["Ps51_ExpressibleByBuiltinExtendedGraphemeClusterLiteral", "source"]
 - ["Ps35_ExpressibleByBuiltinIntegerLiteral", "init"]
 - ["Ps34_ExpressibleByBuiltinStringLiteral", "init"]
+- ["Ps34_ExpressibleByBuiltinStringLiteral", "isEmpty"]
+- !private ["Ps34_ExpressibleByBuiltinStringLiteral", "source"]
 - ["Ps39_ExpressibleByBuiltinUTF16StringLiteral", "init"]
+- ["Ps39_ExpressibleByBuiltinUTF16StringLiteral", "isEmpty"]
+- !private ["Ps39_ExpressibleByBuiltinUTF16StringLiteral", "source"]
 - ["Ps41_ExpressibleByBuiltinUnicodeScalarLiteral", "init"]
+- ["Ps41_ExpressibleByBuiltinUnicodeScalarLiteral", "isEmpty"]
+- !private ["Ps41_ExpressibleByBuiltinUnicodeScalarLiteral", "source"]
 - ["Ps34_ExpressibleByFileReferenceLiteral", "path"]
 - ["Ps35_HasCustomAnyHashableRepresentation", "init"]
+- ["Ps35_HasCustomAnyHashableRepresentation", "isEmpty"]
+- !private ["Ps35_HasCustomAnyHashableRepresentation", "source"]
 - ["Ps9_Hashable", "AutoreleaseFrequency"]
 - ["Ps9_Hashable", "_getBuiltinLogicValue"]
 - ["Ps9_Hashable", "debug"]
-- ["Ps9_Hashable", "default"]
 - ["Ps9_Hashable", "inherit"]
 - ["Ps9_Hashable", "init"]
-- ["Ps9_Hashable", "isReadableFile"]
+- ["Ps9_Hashable", "isEmpty"]
 - ["Ps9_Hashable", "none"]
 - ["Ps9_Hashable", "notice"]
 - ["Ps9_Hashable", "path"]
+- !private ["Ps9_Hashable", "source"]
 - ["Ps14_Incrementable", "init"]
 - ["Ps8_Integer", "init"]
 - ["Ps18_IntegerArithmetic", "init"]
 - ["Ps21_ObjectiveCBridgeable", "_getBuiltinLogicValue"]
 - ["Ps21_ObjectiveCBridgeable", "init"]
+- ["Ps21_ObjectiveCBridgeable", "isEmpty"]
 - ["Ps21_ObjectiveCBridgeable", "path"]
+- !private ["Ps21_ObjectiveCBridgeable", "source"]
 - ["Ps14_SignedInteger", "init"]
 - ["Ps11_Strideable", "init"]
 depends-nominal:
@@ -388,6 +477,7 @@ depends-nominal:
 - "Vs9Character"
 - "Ps10Comparable"
 - !private "C14SwifterSockets10Connection"
+- "C14SwifterSockets14ConnectionPool"
 - "Ps28CustomDebugStringConvertible"
 - "Ps29CustomPlaygroundQuickLookable"
 - "Ps17CustomReflectable"
@@ -396,6 +486,7 @@ depends-nominal:
 - "CSo14DispatchObject"
 - "V8Dispatch11DispatchQoS"
 - "CSo13DispatchQueue"
+- "C13SwiftfireCore14DomainServices"
 - "C13SwiftfireCore7Domains"
 - "Sd"
 - "Ps9Equatable"
@@ -407,11 +498,11 @@ depends-nominal:
 - "Ps32ExpressibleByStringInterpolation"
 - "Ps26ExpressibleByStringLiteral"
 - "Ps33ExpressibleByUnicodeScalarLiteral"
-- "CSo11FileManager"
 - "C9Swiftfire8FileURLs"
 - "Sf"
+- "O13SwiftfireCore14FunctionResult"
 - "Ps8Hashable"
-- "C9Swiftfire10HttpHeader"
+- "C9Swiftfire16HttpHeaderLogger"
 - "Si"
 - "Vs5Int16"
 - "Vs5Int32"
@@ -422,10 +513,11 @@ depends-nominal:
 - "OC10SwifterLog10SwifterLog5Level"
 - "C9Swiftfire13LogForewarder"
 - "V10SwifterLog7LogLine"
-- "C9Swiftfire12LogLineReply"
+- "C13SwiftfireCore12LogLineReply"
+- "C13SwiftfireCore7Logfile"
 - "Ps25LosslessStringConvertible"
-- "P9Swiftfire10MacCommand"
-- "P9Swiftfire10MacMessage"
+- "P13SwiftfireCore10MacCommand"
+- "P13SwiftfireCore10MacMessage"
 - "Ps10MirrorPath"
 - "C9Swiftfire30MonitoringAndControlConnection"
 - "PSo8NSCoding"
@@ -442,22 +534,24 @@ depends-nominal:
 - "OC14SwifterSockets9TipServer6Option"
 - "Ps9OptionSet"
 - "Sq"
-- "C9Swiftfire10Parameters"
+- "C13SwiftfireCore10Parameters"
 - "Ps16RawRepresentable"
 - !private "P14SwifterSockets16ReceiverProtocol"
 - "P10Foundation20ReferenceConvertible"
 - "O14SwifterSockets6Result"
 - "Ps8Sequence"
 - "P14SwifterSockets14ServerProtocol"
-- "C9Swiftfire18ServerStartCommand"
+- "C13SwiftfireCore18ServerStartCommand"
 - "Ps10SetAlgebra"
 - "Ps13SignedInteger"
 - "Ps12SignedNumber"
-- "C9Swiftfire10Statistics"
+- "Vs12StaticString"
+- "C13SwiftfireCore10Statistics"
 - "Ps10Strideable"
 - "SS"
 - "C10SwifterLog10SwifterLog"
 - "P10SwifterLog26SwifterlogCallbackProtocol"
+- "C13SwiftfireCore9Telemetry"
 - "Ps16TextOutputStream"
 - "Ps20TextOutputStreamable"
 - "C14SwifterSockets9TipServer"
@@ -499,17 +593,16 @@ depends-external:
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/ObjectiveC.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreGraphics.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/IOKit.swiftmodule"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterJSON.framework/Modules/SwifterJSON.swiftmodule/x86_64.swiftmodule"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/Ascii.framework/Modules/Ascii.swiftmodule/x86_64.swiftmodule"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterLog.framework/Modules/SwifterLog.swiftmodule/x86_64.swiftmodule"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/CAsl-0.1.0/Sources/include/CAsl.h"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/CAsl.framework/Modules/module.modulemap"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterSockets.framework/Modules/SwifterSockets.swiftmodule/x86_64.swiftmodule"
 - "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwiftfireCore.framework/Modules/SwiftfireCore.swiftmodule/x86_64.swiftmodule"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/COpenSsl-0.1.0/module.modulemap"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/Ascii.framework/Modules/Ascii.swiftmodule/x86_64.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/AppKit.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreData.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/QuartzCore.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/XPC.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreImage.swiftmodule"
-interface-hash: "0b7d0d10d6f52998bdabb19d3e08234b"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterJSON.framework/Modules/SwifterJSON.swiftmodule/x86_64.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterLog.framework/Modules/SwifterLog.swiftmodule/x86_64.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/CAsl-0.1.0/Sources/include/CAsl.h"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/CAsl.framework/Modules/module.modulemap"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterSockets.framework/Modules/SwifterSockets.swiftmodule/x86_64.swiftmodule"
+interface-hash: "84764db964ac071be804a7d2d939adec"

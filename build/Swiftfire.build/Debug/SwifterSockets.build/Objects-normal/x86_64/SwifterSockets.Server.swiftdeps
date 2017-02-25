@@ -1,48 +1,51 @@
 ### Swift dependencies file v0 ###
 provides-top-level:
+- "ServerProtocol"
 - "setupTipServer"
 - "TipServer"
 provides-nominal:
+- "P14SwifterSockets14ServerProtocol"
 - "C14SwifterSockets9TipServer"
 - "OC14SwifterSockets9TipServer6Option"
 provides-member:
+- ["P14SwifterSockets14ServerProtocol", ""]
 - ["C14SwifterSockets9TipServer", ""]
 - ["OC14SwifterSockets9TipServer6Option", ""]
 provides-dynamic-lookup:
 depends-top-level:
+- !private "AF_UNSPEC"
+- !private "EAI_SYSTEM"
+- "ConnectionObjectFactory"
+- !private "SO_REUSEADDR"
+- !private "socklen_t"
+- !private "AI_PASSIVE"
+- "TipServer"
+- "ServerProtocol"
+- "DispatchQueue"
+- !private "SOCK_STREAM"
+- "Result"
+- "AssignmentPrecedence"
+- !private "!"
+- !private "=="
 - "Int32"
 - "AddressHandler"
-- "Int"
-- "String"
-- "AssignmentPrecedence"
-- !private "=="
-- "ErrorHandler"
-- !private "MemoryLayout"
-- !private "closeSocket"
-- !private "TipInterface"
-- !private "Darwin"
-- !private "!"
-- "Result"
-- !private "!="
-- "DispatchQueue"
-- !private "??"
 - !private "SOL_SOCKET"
+- !private "Darwin"
 - !private "UnsafeMutablePointer"
-- "BooleanLiteralType"
-- "TipServer"
-- !private "SO_REUSEADDR"
-- "ServerProtocol"
-- "ConnectionObjectFactory"
-- "Bool"
-- !private "EAI_SYSTEM"
-- !private "AF_UNSPEC"
-- "StringLiteralType"
-- !private "AI_PASSIVE"
-- !private "socklen_t"
-- !private "tipAccept"
-- "TimeInterval"
-- !private "SOCK_STREAM"
+- "String"
 - "setupTipServer"
+- !private "TipInterface"
+- !private "tipAccept"
+- "Bool"
+- !private "!="
+- "BooleanLiteralType"
+- "TimeInterval"
+- !private "??"
+- "StringLiteralType"
+- "Int"
+- "ErrorHandler"
+- !private "closeSocket"
+- !private "MemoryLayout"
 depends-member:
 - !private ["Ps9AnyObject", "Attributes"]
 - !private ["Ps9AnyObject", "AutoreleaseFrequency"]
@@ -242,8 +245,10 @@ depends-member:
 - !private ["Ps8Sequence", "Element"]
 - !private ["Ps8Sequence", "Iterator"]
 - !private ["Ps8Sequence", "_Element"]
+- ["P14SwifterSockets14ServerProtocol", "Bool"]
 - !private ["P14SwifterSockets14ServerProtocol", "DispatchQueue"]
 - !private ["P14SwifterSockets14ServerProtocol", "Int32"]
+- ["P14SwifterSockets14ServerProtocol", "Result"]
 - !private ["P14SwifterSockets14ServerProtocol", "TipInterface"]
 - !private ["P14SwifterSockets14ServerProtocol", "_stop"]
 - !private ["P14SwifterSockets14ServerProtocol", "acceptLoopDuration"]
@@ -479,4 +484,4 @@ depends-external:
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/ObjectiveC.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreGraphics.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/IOKit.swiftmodule"
-interface-hash: "3b33306c2eb665fb08572348799c261e"
+interface-hash: "70e89b13ecee18bc451d7491de58c2fa"

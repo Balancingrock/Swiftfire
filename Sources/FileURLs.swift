@@ -49,16 +49,37 @@
 //
 // History
 //
-// v0.9.15 - General update and switch to frameworks
-// v0.9.14 - Added serverBlacklist
+// 0.9.15  - General update and switch to frameworks
+// 0.9.14  - Added serverBlacklist
 //         - Upgraded to Xcode 8 beta 6
-// v0.9.13 - Upgraded to Xcode 8 beta 3 (Swift 3)
-// v0.9.11 - Added statistics support
-// v0.9.7  - Added header logging and application log directory
+// 0.9.13  - Upgraded to Xcode 8 beta 3 (Swift 3)
+// 0.9.11  - Added statistics support
+// 0.9.7   - Added header logging and application log directory
 //         - Removed startup file
 //         - Made class final
-// v0.9.6  - Header update
-// v0.9.0  - Initial release
+// 0.9.6   - Header update
+// 0.9.0   - Initial release
+//
+// =====================================================================================================================
+// Description
+// =====================================================================================================================
+//
+// By default all files and directories are relative to the root directory (which is by default the app support directory)
+//
+// root
+// - domains
+//   - domain-defaults.json
+//   - ... subdirectories for each domain
+// - settings
+//   - parameter-defaults.json
+//   - server-blacklist.json
+// - logs
+//   - headers
+//   - application
+//     - ... logfiles from SwifterLog
+// - statistics
+//   - statistics.json
+//
 // =====================================================================================================================
 
 import Foundation
@@ -67,9 +88,41 @@ import Foundation
 final class FileURLs {
     
     
-    /// The Application Support Directory
+    /// Create a directory url and ensure that the directory exists.
+    ///
+    /// - Parameters:
+    ///   - root: The directory in/from which to create/retrieve the requested directory
+    ///   - name: The name for the directory
     
-    static var appSupportDir: URL? = {
+    private static func dirUrl(_ root: URL?, _ name: String) -> URL? {
+        
+        guard let root = root else { return nil }
+        
+        do {
+            
+            let url = root.appendingPathComponent(name)
+            try FileManager.default.createDirectory(atPath: url.path, withIntermediateDirectories: true, attributes: nil)
+            return url
+            
+        } catch { return nil }
+    }
+    
+    
+    /// Create a file url
+    ///
+    /// - Parameters:
+    ///   - root: The directory in/from which to create/retrieve the requested file
+    ///   - name: The name for the file
+    
+    private static func fileUrl(_ root: URL?, _ name: String) -> URL? {
+        guard let root = root else { return nil }
+        return root.appendingPathComponent(name)
+    }
+    
+
+    /// The root directory (Application Support Directory)
+    
+    static var rootDir: URL? = {
         
         let filemanager = FileManager.default
         
@@ -90,114 +143,59 @@ final class FileURLs {
     }()
     
     
+    // =================================================================================================================
     /// The directory containing the parameter and domain files with default values
     
-    static private var settingsDir: URL? = {
-        
-        guard let appSupportDir = appSupportDir else { return nil }
-        
-        let filemanager = FileManager.default
-        
-        do {
-            let dirpath = appSupportDir.appendingPathComponent("settings")
-            try filemanager.createDirectory(atPath: dirpath.path, withIntermediateDirectories: true, attributes: nil)
-            return dirpath
-            
-        } catch { return nil }
-    }()
+    static var settingsDir: URL? = { dirUrl(rootDir, "settings") }()
     
-    
-    /// The directory containing the logging files
-    
-    static private var loggingDir: URL? = {
-        
-        guard let appSupportDir = appSupportDir else { return nil }
-        
-        let filemanager = FileManager.default
-        
-        do {
-            let dirpath = appSupportDir.appendingPathComponent("logging")
-            try filemanager.createDirectory(atPath: dirpath.path, withIntermediateDirectories: true, attributes: nil)
-            return dirpath
-            
-        } catch { return nil }
-    }()
-
-    
-    /// The directory containing the header logging files
-    
-    static var headerLoggingDir: URL? = {
-        
-        guard let loggingDir = loggingDir else { return nil }
-        
-        let filemanager = FileManager.default
-        
-        do {
-            let dirpath = loggingDir.appendingPathComponent("headers")
-            try filemanager.createDirectory(at: dirpath, withIntermediateDirectories: true, attributes: nil)
-            return dirpath
-            
-        } catch { return nil }
-    }()
-
-    
-    /// The directory containing the application log files
-    
-    static var applicationLogDir: URL? = {
-        
-        guard let loggingDir = loggingDir else { return nil }
-        
-        let filemanager = FileManager.default
-        
-        do {
-            let dirpath = loggingDir.appendingPathComponent("application")
-            try filemanager.createDirectory(at: dirpath, withIntermediateDirectories: true, attributes: nil)
-            return dirpath
-            
-        } catch { return nil }
-    }()
-
-    
-    /// The directory for the statistics file
-    
-    static var statisticsDir: URL? = {
-        
-        guard let appSupportDir = appSupportDir else { return nil }
-
-        let filemanager = FileManager.default
-
-        do {
-            let dirpath = appSupportDir.appendingPathComponent("statistics")
-            try filemanager.createDirectory(at: dirpath, withIntermediateDirectories: true, attributes: nil)
-            return dirpath
-        
-        } catch { return nil }
-    }()
-
     
     /// The file with parameter defaults
     
-    static var parameterDefaults: URL? = {
-        guard let dirpath = settingsDir else { return nil }
-        return dirpath.appendingPathComponent("parameter-defaults.json")
-    }()
-    
-    
-    /// The file with domain defaults
-    
-    static var domainDefaults: URL? = {
-        guard let dirpath = settingsDir else { return nil }
-        return dirpath.appendingPathComponent("domain-defaults.json")
-    }()
+    static var parameterDefaultsFile: URL? = { fileUrl(settingsDir, "parameter-defaults.json") }()
     
     
     /// The file with blacklisted addresses
     
-    static var serverBlacklist: URL? = {
-        guard let dirpath = settingsDir else { return nil }
-        return dirpath.appendingPathComponent("server-blacklist.json")
-    }()
+    static var serverBlacklistFile: URL? = { fileUrl(settingsDir, "server-blacklist.json") }()
 
+    
+    // =================================================================================================================
+    /// The directory containing the logging files
+    
+    static var logsDir: URL? = { dirUrl(rootDir, "logs") }()
+
+    
+    /// The directory containing the header logging files
+    
+    static var headersLogDir: URL? = { dirUrl(logsDir, "headers") } ()
+
+    
+    /// The directory containing the application log files
+    
+    static var applicationLogDir: URL? = { dirUrl(logsDir, "application") } ()
+
+    
+    // =================================================================================================================
+    /// The directory for the statistics file
+    
+    static var statisticsDir: URL? = { dirUrl(rootDir, "statistics") }()
+
+    
+    /// The file with statistics information
+    
+    static var statisticsFile: URL? = { fileUrl(statisticsDir, "statistics.json") }()
+
+    
+    // =================================================================================================================
+    /// The directory for the domains
+    
+    static var domainsDir: URL? = { dirUrl(rootDir, "domains") }()
+    
+    
+    /// The file with domain defaults
+    
+    static var domainDefaultsFile: URL? = { fileUrl(domainsDir, "domain-defaults.json") }()
+    
     
     /// Determines if a file exists and is not a directory
     

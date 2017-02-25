@@ -1,47 +1,52 @@
 ### Swift dependencies file v0 ###
 provides-top-level:
+- "TransmitterProtocol"
+- "TransmitterProgressMonitor"
 - "TransferResult"
 - "tipTransfer"
 - "tipTransfer"
 - "tipTransfer"
 provides-nominal:
+- "P14SwifterSockets19TransmitterProtocol"
 - "O14SwifterSockets14TransferResult"
 provides-member:
+- ["P14SwifterSockets19TransmitterProtocol", ""]
 - ["O14SwifterSockets14TransferResult", ""]
 provides-dynamic-lookup:
 depends-top-level:
-- "TransferResult"
-- !private "+="
-- "UInt8"
-- "UnsafeBufferPointer"
+- !private "BooleanLiteralType"
 - "TransmitterProtocol"
-- !private "!"
+- "Int32"
+- "TransferResult"
+- "Int"
+- "String"
+- !private "errno"
+- "UnsafeBufferPointer"
+- "UInt8"
+- !private "..."
+- "Data"
+- "CustomDebugStringConvertible"
+- !private "StringLiteralType"
+- !private "UnicodeScalarType"
+- "CustomStringConvertible"
+- !private "-"
+- !private "+"
+- !private "??"
+- !private "Date"
 - !private "=="
 - "AssignmentPrecedence"
 - !private "~="
-- !private "strerror"
-- !private "UnicodeScalarType"
-- !private "UnsafePointer"
-- "Int32"
-- !private "Darwin"
-- "String"
+- !private "!"
 - !private "waitForSelect"
-- "Data"
+- "Bool"
+- !private "strerror"
 - "tipTransfer"
-- !private "BooleanLiteralType"
-- "TimeInterval"
-- !private "-"
-- !private "??"
-- !private "+"
-- "TransmitterProgressMonitor"
-- "CustomDebugStringConvertible"
-- !private "StringLiteralType"
-- !private "Date"
-- "CustomStringConvertible"
-- !private "Int"
-- !private "..."
-- !private "errno"
 - !private "<"
+- !private "Darwin"
+- !private "+="
+- "TransmitterProgressMonitor"
+- "TimeInterval"
+- !private "UnsafePointer"
 depends-member:
 - !private ["Ps9AnyObject", "Encoding"]
 - !private ["Ps9AnyObject", "data"]
@@ -57,6 +62,7 @@ depends-member:
 - !private ["Ps22BidirectionalIndexable", "init"]
 - !private ["Ps22BidirectionalIndexable", "withUnsafeBytes"]
 - !private ["Ps17BitwiseOperations", "Stride"]
+- !private ["Ps17BitwiseOperations", "init"]
 - !private ["Ps17BitwiseOperations", "max"]
 - !private ["Ps17BitwiseOperations", "min"]
 - !private ["Sb", "_getBuiltinLogicValue"]
@@ -95,6 +101,7 @@ depends-member:
 - ["Ps28CustomDebugStringConvertible", "description"]
 - ["Ps28CustomDebugStringConvertible", "error"]
 - !private ["Ps28CustomDebugStringConvertible", "init"]
+- ["Ps28CustomDebugStringConvertible", "queued"]
 - ["Ps28CustomDebugStringConvertible", "ready"]
 - ["Ps28CustomDebugStringConvertible", "timeout"]
 - !private ["Ps28CustomDebugStringConvertible", "withUnsafeBytes"]
@@ -132,6 +139,7 @@ depends-member:
 - !private ["Ps23CustomStringConvertible", "init"]
 - !private ["Ps23CustomStringConvertible", "max"]
 - !private ["Ps23CustomStringConvertible", "min"]
+- ["Ps23CustomStringConvertible", "queued"]
 - ["Ps23CustomStringConvertible", "ready"]
 - ["Ps23CustomStringConvertible", "timeout"]
 - !private ["Ps23CustomStringConvertible", "utf8"]
@@ -164,6 +172,7 @@ depends-member:
 - !private ["Ps43ExpressibleByExtendedGraphemeClusterLiteral", "data"]
 - !private ["Ps43ExpressibleByExtendedGraphemeClusterLiteral", "init"]
 - !private ["Ps27ExpressibleByIntegerLiteral", "Stride"]
+- !private ["Ps27ExpressibleByIntegerLiteral", "init"]
 - !private ["Ps27ExpressibleByIntegerLiteral", "max"]
 - !private ["Ps27ExpressibleByIntegerLiteral", "min"]
 - !private ["Ps32ExpressibleByStringInterpolation", "Encoding"]
@@ -201,6 +210,7 @@ depends-member:
 - !private ["Ps13IndexableBase", "withUnsafeBytes"]
 - !private ["Si", "Stride"]
 - ["Si", "deinit"]
+- !private ["Si", "init"]
 - !private ["Si", "max"]
 - !private ["Si", "min"]
 - !private ["Vs5Int16", "deinit"]
@@ -208,9 +218,11 @@ depends-member:
 - !private ["Vs5Int64", "deinit"]
 - !private ["Vs4Int8", "deinit"]
 - !private ["Ps7Integer", "Stride"]
+- !private ["Ps7Integer", "init"]
 - !private ["Ps7Integer", "max"]
 - !private ["Ps7Integer", "min"]
 - !private ["Ps17IntegerArithmetic", "Stride"]
+- !private ["Ps17IntegerArithmetic", "init"]
 - !private ["Ps17IntegerArithmetic", "max"]
 - !private ["Ps17IntegerArithmetic", "min"]
 - !private ["Ps25LosslessStringConvertible", "Encoding"]
@@ -285,12 +297,15 @@ depends-member:
 - !private ["Ps8Sequence", "init"]
 - !private ["Ps8Sequence", "withUnsafeBytes"]
 - !private ["Ps13SignedInteger", "Stride"]
+- !private ["Ps13SignedInteger", "init"]
 - !private ["Ps13SignedInteger", "max"]
 - !private ["Ps13SignedInteger", "min"]
 - !private ["Ps12SignedNumber", "Stride"]
+- !private ["Ps12SignedNumber", "init"]
 - !private ["Ps12SignedNumber", "max"]
 - !private ["Ps12SignedNumber", "min"]
 - !private ["Ps10Strideable", "Stride"]
+- !private ["Ps10Strideable", "init"]
 - !private ["Ps10Strideable", "max"]
 - !private ["Ps10Strideable", "min"]
 - !private ["SS", "Encoding"]
@@ -303,19 +318,23 @@ depends-member:
 - !private ["Ps20TextOutputStreamable", "Encoding"]
 - !private ["Ps20TextOutputStreamable", "data"]
 - !private ["Ps20TextOutputStreamable", "init"]
+- ["O14SwifterSockets14TransferResult", "Int"]
 - ["O14SwifterSockets14TransferResult", "String"]
 - ["O14SwifterSockets14TransferResult", "closed"]
 - ["O14SwifterSockets14TransferResult", "debugDescription"]
 - ["O14SwifterSockets14TransferResult", "deinit"]
 - ["O14SwifterSockets14TransferResult", "description"]
 - ["O14SwifterSockets14TransferResult", "error"]
+- ["O14SwifterSockets14TransferResult", "queued"]
 - ["O14SwifterSockets14TransferResult", "ready"]
 - ["O14SwifterSockets14TransferResult", "timeout"]
+- ["P14SwifterSockets19TransmitterProtocol", "Int"]
+- ["P14SwifterSockets19TransmitterProtocol", "String"]
 - ["P14SwifterSockets19TransmitterProtocol", "deinit"]
-- !private ["P14SwifterSockets19TransmitterProtocol", "transmitterClosed"]
-- !private ["P14SwifterSockets19TransmitterProtocol", "transmitterError"]
-- !private ["P14SwifterSockets19TransmitterProtocol", "transmitterReady"]
-- !private ["P14SwifterSockets19TransmitterProtocol", "transmitterTimeout"]
+- ["P14SwifterSockets19TransmitterProtocol", "transmitterClosed"]
+- ["P14SwifterSockets19TransmitterProtocol", "transmitterError"]
+- ["P14SwifterSockets19TransmitterProtocol", "transmitterReady"]
+- ["P14SwifterSockets19TransmitterProtocol", "transmitterTimeout"]
 - !private ["Su", "deinit"]
 - !private ["Vs6UInt16", "deinit"]
 - !private ["Vs6UInt32", "deinit"]
@@ -334,6 +353,7 @@ depends-member:
 - !private ["Ps51_ExpressibleByBuiltinExtendedGraphemeClusterLiteral", "data"]
 - !private ["Ps51_ExpressibleByBuiltinExtendedGraphemeClusterLiteral", "init"]
 - !private ["Ps35_ExpressibleByBuiltinIntegerLiteral", "Stride"]
+- !private ["Ps35_ExpressibleByBuiltinIntegerLiteral", "init"]
 - !private ["Ps35_ExpressibleByBuiltinIntegerLiteral", "max"]
 - !private ["Ps35_ExpressibleByBuiltinIntegerLiteral", "min"]
 - !private ["Ps34_ExpressibleByBuiltinStringLiteral", "Encoding"]
@@ -361,12 +381,15 @@ depends-member:
 - !private ["Ps9_Hashable", "utf8"]
 - !private ["Ps9_Hashable", "withUnsafeBytes"]
 - !private ["Ps14_Incrementable", "Stride"]
+- !private ["Ps14_Incrementable", "init"]
 - !private ["Ps14_Incrementable", "max"]
 - !private ["Ps14_Incrementable", "min"]
 - !private ["Ps8_Integer", "Stride"]
+- !private ["Ps8_Integer", "init"]
 - !private ["Ps8_Integer", "max"]
 - !private ["Ps8_Integer", "min"]
 - !private ["Ps18_IntegerArithmetic", "Stride"]
+- !private ["Ps18_IntegerArithmetic", "init"]
 - !private ["Ps18_IntegerArithmetic", "max"]
 - !private ["Ps18_IntegerArithmetic", "min"]
 - !private ["P10Foundation18_MutablePairBoxing", "IndexDistance"]
@@ -386,9 +409,11 @@ depends-member:
 - !private ["Vs26_OptionalNilComparisonType", "deinit"]
 - !private ["Ps8_Pointer", "Stride"]
 - !private ["Ps14_SignedInteger", "Stride"]
+- !private ["Ps14_SignedInteger", "init"]
 - !private ["Ps14_SignedInteger", "max"]
 - !private ["Ps14_SignedInteger", "min"]
 - !private ["Ps11_Strideable", "Stride"]
+- !private ["Ps11_Strideable", "init"]
 - !private ["Ps11_Strideable", "max"]
 - !private ["Ps11_Strideable", "min"]
 depends-nominal:
@@ -495,4 +520,4 @@ depends-external:
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/ObjectiveC.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreGraphics.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/IOKit.swiftmodule"
-interface-hash: "bdc2e0b71c6a528a8ca91499b7ae2f81"
+interface-hash: "038f94329ea3399c28ea47e939cc69d9"

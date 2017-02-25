@@ -1,34 +1,38 @@
 ### Swift dependencies file v0 ###
 provides-top-level:
+- "ReceiverProtocol"
 - "tipReceiverLoop"
 provides-nominal:
+- "P14SwifterSockets16ReceiverProtocol"
 provides-member:
+- ["P14SwifterSockets16ReceiverProtocol", ""]
 provides-dynamic-lookup:
 depends-top-level:
-- !private "Darwin"
-- !private "..."
 - !private "assert"
-- !private "FloatLiteralType"
-- !private "Date"
-- !private "UInt8"
+- !private "errno"
 - "tipReceiverLoop"
+- "Int"
+- !private "BooleanLiteralType"
+- "UInt8"
 - !private ">"
-- !private "IntegerLiteralType"
-- !private "UnsafeMutableRawPointer"
-- !private "UnsafeBufferPointer"
+- "UnsafeBufferPointer"
+- !private "..."
+- "String"
+- !private "??"
+- "ReceiverProtocol"
+- "Int32"
+- !private "StringLiteralType"
 - !private "~="
-- !private "waitForSelect"
 - "AssignmentPrecedence"
+- !private "Date"
+- "Bool"
+- !private "UnsafeMutableRawPointer"
+- !private "IntegerLiteralType"
+- !private "Darwin"
 - !private "strerror"
 - "TimeInterval"
-- "Int32"
-- !private "errno"
-- "ReceiverProtocol"
-- !private "StringLiteralType"
-- "Int"
-- !private "??"
-- !private "String"
-- !private "BooleanLiteralType"
+- !private "FloatLiteralType"
+- !private "waitForSelect"
 depends-member:
 - !private ["Ps9AnyObject", "init"]
 - !private ["Ps23BidirectionalCollection", "init"]
@@ -144,11 +148,15 @@ depends-member:
 - !private ["Ps22RandomAccessCollection", "init"]
 - !private ["Ps21RandomAccessIndexable", "init"]
 - !private ["Vs5Range", "deinit"]
+- ["P14SwifterSockets16ReceiverProtocol", "Bool"]
+- ["P14SwifterSockets16ReceiverProtocol", "String"]
+- ["P14SwifterSockets16ReceiverProtocol", "UInt8"]
+- ["P14SwifterSockets16ReceiverProtocol", "UnsafeBufferPointer"]
 - ["P14SwifterSockets16ReceiverProtocol", "deinit"]
-- !private ["P14SwifterSockets16ReceiverProtocol", "receiverClosed"]
-- !private ["P14SwifterSockets16ReceiverProtocol", "receiverData"]
-- !private ["P14SwifterSockets16ReceiverProtocol", "receiverError"]
-- !private ["P14SwifterSockets16ReceiverProtocol", "receiverLoop"]
+- ["P14SwifterSockets16ReceiverProtocol", "receiverClosed"]
+- ["P14SwifterSockets16ReceiverProtocol", "receiverData"]
+- ["P14SwifterSockets16ReceiverProtocol", "receiverError"]
+- ["P14SwifterSockets16ReceiverProtocol", "receiverLoop"]
 - !private ["P10Foundation20ReferenceConvertible", "addingTimeInterval"]
 - !private ["P10Foundation20ReferenceConvertible", "init"]
 - ["O14SwifterSockets12SelectResult", "closed"]
@@ -316,4 +324,4 @@ depends-external:
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/ObjectiveC.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreGraphics.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/IOKit.swiftmodule"
-interface-hash: "acdfe13c7c93cf10d9d60a88dfc5a93f"
+interface-hash: "b490e31ee2c94696f2b74b5f9908b0a2"

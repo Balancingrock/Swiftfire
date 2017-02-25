@@ -7,29 +7,34 @@ provides-member:
 - ["C9Swiftfire8FileURLs", ""]
 provides-dynamic-lookup:
 depends-top-level:
-- !private "=="
-- "BooleanLiteralType"
 - "URL"
-- "ProcessInfo"
-- "FileManager"
-- "Bool"
-- "StringLiteralType"
 - "FileURLs"
+- "ProcessInfo"
+- !private "=="
+- "StringLiteralType"
+- "FileManager"
+- !private "String"
 - !private "ObjCBool"
+- "Bool"
+- "BooleanLiteralType"
 depends-member:
 - ["Ps9AnyObject", "FileManager"]
 - ["Ps9AnyObject", "ProcessInfo"]
 - ["Ps9AnyObject", "SearchPathDirectory"]
 - ["Ps9AnyObject", "SearchPathDomainMask"]
-- ["Ps9AnyObject", "appSupportDir"]
 - ["Ps9AnyObject", "createDirectory"]
 - ["Ps9AnyObject", "default"]
+- ["Ps9AnyObject", "dirUrl"]
+- ["Ps9AnyObject", "domainsDir"]
 - !private ["Ps9AnyObject", "fileExists"]
+- ["Ps9AnyObject", "fileUrl"]
 - ["Ps9AnyObject", "init"]
-- ["Ps9AnyObject", "loggingDir"]
+- ["Ps9AnyObject", "logsDir"]
 - ["Ps9AnyObject", "processInfo"]
 - ["Ps9AnyObject", "processName"]
+- ["Ps9AnyObject", "rootDir"]
 - ["Ps9AnyObject", "settingsDir"]
+- ["Ps9AnyObject", "statisticsDir"]
 - ["Ps9AnyObject", "url"]
 - ["Ps9AnyObject", ""]
 - !private ["Sb", "_getBuiltinLogicValue"]
@@ -107,19 +112,24 @@ depends-member:
 - ["C9Swiftfire8FileURLs", "FileManager"]
 - !private ["C9Swiftfire8FileURLs", "ObjCBool"]
 - ["C9Swiftfire8FileURLs", "ProcessInfo"]
+- !private ["C9Swiftfire8FileURLs", "String"]
 - ["C9Swiftfire8FileURLs", "URL"]
-- ["C9Swiftfire8FileURLs", "appSupportDir"]
 - ["C9Swiftfire8FileURLs", "applicationLogDir"]
 - ["C9Swiftfire8FileURLs", "deinit"]
-- ["C9Swiftfire8FileURLs", "domainDefaults"]
+- ["C9Swiftfire8FileURLs", "dirUrl"]
+- ["C9Swiftfire8FileURLs", "domainDefaultsFile"]
+- ["C9Swiftfire8FileURLs", "domainsDir"]
 - ["C9Swiftfire8FileURLs", "exists"]
-- ["C9Swiftfire8FileURLs", "headerLoggingDir"]
+- ["C9Swiftfire8FileURLs", "fileUrl"]
+- ["C9Swiftfire8FileURLs", "headersLogDir"]
 - ["C9Swiftfire8FileURLs", "init"]
-- ["C9Swiftfire8FileURLs", "loggingDir"]
-- ["C9Swiftfire8FileURLs", "parameterDefaults"]
-- ["C9Swiftfire8FileURLs", "serverBlacklist"]
+- ["C9Swiftfire8FileURLs", "logsDir"]
+- ["C9Swiftfire8FileURLs", "parameterDefaultsFile"]
+- ["C9Swiftfire8FileURLs", "rootDir"]
+- ["C9Swiftfire8FileURLs", "serverBlacklistFile"]
 - ["C9Swiftfire8FileURLs", "settingsDir"]
 - ["C9Swiftfire8FileURLs", "statisticsDir"]
+- ["C9Swiftfire8FileURLs", "statisticsFile"]
 - ["Ps8Hashable", "SearchPathDirectory"]
 - ["Ps8Hashable", "SearchPathDomainMask"]
 - !private ["Ps8Hashable", "_getBuiltinLogicValue"]
@@ -184,6 +194,7 @@ depends-member:
 - ["V10Foundation3URL", "appendingPathComponent"]
 - ["V10Foundation3URL", "deinit"]
 - ["V10Foundation3URL", "path"]
+- ["P11SwifterJSON17VJsonSerializable", "init"]
 - !private ["Ps35_ExpressibleByBuiltinBooleanLiteral", "_getBuiltinLogicValue"]
 - ["Ps51_ExpressibleByBuiltinExtendedGraphemeClusterLiteral", "init"]
 - ["Ps34_ExpressibleByBuiltinStringLiteral", "init"]
@@ -253,6 +264,7 @@ depends-nominal:
 - "Ps16TextOutputStream"
 - "Ps20TextOutputStreamable"
 - "V10Foundation3URL"
+- "P11SwifterJSON17VJsonSerializable"
 - !private "Ps35_ExpressibleByBuiltinBooleanLiteral"
 - "Ps51_ExpressibleByBuiltinExtendedGraphemeClusterLiteral"
 - "Ps34_ExpressibleByBuiltinStringLiteral"
@@ -273,17 +285,16 @@ depends-external:
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/ObjectiveC.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreGraphics.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/IOKit.swiftmodule"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterJSON.framework/Modules/SwifterJSON.swiftmodule/x86_64.swiftmodule"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/Ascii.framework/Modules/Ascii.swiftmodule/x86_64.swiftmodule"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterLog.framework/Modules/SwifterLog.swiftmodule/x86_64.swiftmodule"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/CAsl-0.1.0/Sources/include/CAsl.h"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/CAsl.framework/Modules/module.modulemap"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterSockets.framework/Modules/SwifterSockets.swiftmodule/x86_64.swiftmodule"
 - "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwiftfireCore.framework/Modules/SwiftfireCore.swiftmodule/x86_64.swiftmodule"
-- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/COpenSsl-0.1.0/module.modulemap"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/Ascii.framework/Modules/Ascii.swiftmodule/x86_64.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/AppKit.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreData.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/QuartzCore.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/XPC.swiftmodule"
 - "/Applications/Xcode.app/Contents/Developer/Toolchains/XcodeDefault.xctoolchain/usr/lib/swift/macosx/x86_64/CoreImage.swiftmodule"
-interface-hash: "a02b1f7c5121fe61168c6b5851a0c793"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterJSON.framework/Modules/SwifterJSON.swiftmodule/x86_64.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterLog.framework/Modules/SwifterLog.swiftmodule/x86_64.swiftmodule"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/Packages/CAsl-0.1.0/Sources/include/CAsl.h"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/CAsl.framework/Modules/module.modulemap"
+- "/Volumes/Home/Users/Rien/Documents/Projects/Swiftfire/build/Debug/SwifterSockets.framework/Modules/SwifterSockets.swiftmodule/x86_64.swiftmodule"
+interface-hash: "5abdf38985a13084451c2ca293d72d8b"

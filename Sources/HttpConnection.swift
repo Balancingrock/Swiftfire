@@ -49,22 +49,29 @@
 //
 // History
 //
-// v0.9.15 - General update and switch to frameworks
-// v0.9.14 - Changed return of http version number to fit the request header http version
+// 0.9.15  - General update and switch to frameworks
+// 0.9.14  - Changed return of http version number to fit the request header http version
 //         - Upgraded to Xcode 8 beta 6
-// v0.9.13 - Upgraded to Xcode 8 beta 3 (Swift 3)
-// v0.9.11 - Added "allocationCount", "objectId" and "objectIdCount"
-// v0.9.6  - Header update
+// 0.9.13  - Upgraded to Xcode 8 beta 3 (Swift 3)
+// 0.9.11  - Added "allocationCount", "objectId" and "objectIdCount"
+// 0.9.6   - Header update
 //         - Merged MAX_NOF_PENDING_CLIENT_MESSAGES with MAX_CLIENT_MESSAGE_SIZE into CLIENT_MESSAGE_BUFFER_SIZE
-// v0.9.5  - Added support for different MIME types of response
-// v0.9.2  - Replaced sendXXXX functions with httpErrorResponseWithCode and httpResponseWithCode
-// v0.9.0  - Initial release
+// 0.9.5   - Added support for different MIME types of response
+// 0.9.2   - Replaced sendXXXX functions with httpErrorResponseWithCode and httpResponseWithCode
+// 0.9.0   - Initial release
+//
 // =====================================================================================================================
-
+// Description
+// =====================================================================================================================
+//
+// Defines the support structure for a HTTP connection based on a SwifterSockets.Connection.
+//
+// =====================================================================================================================
 
 import Foundation
 import SwifterSockets
 import SwifterLog
+import SwiftfireCore
 
 
 /// Holds all data that is associated with an HTTP Connection.
@@ -83,7 +90,6 @@ final class HttpConnection: SwifterSockets.Connection {
     override init() {
         objectId = HttpConnection.objectIdCount
         HttpConnection.objectIdCount += 1
-
         super.init()
     }
     
@@ -96,16 +102,7 @@ final class HttpConnection: SwifterSockets.Connection {
     
     public override func prepare(for type: SwifterSockets.InterfaceAccess, remoteAddress address: String, options: Option...) -> Bool {
         
-        if !super.prepare(
-            for: type,
-            remoteAddress: address,
-            options:
-                SwifterSockets.Connection.Option.receiverQueue(rQueue),
-                SwifterSockets.Connection.Option.transmitterQueue(tQueue)
-            ) {
-            
-            return false
-        }
+        guard super.prepare(for: type, remoteAddress: address, options: options) else { return false }
     
         
         // Reinitialize internal data
@@ -144,22 +141,12 @@ final class HttpConnection: SwifterSockets.Connection {
     
     /// The time when this connection was accepted
     
-    var timeOfAccept: NSDate = NSDate()
-    
-    
-    // The receiver queue
-    
-    private let rQueue = DispatchQueue(label: "Receiver queue for HttpConnection object")
-    
-    
-    // The transmitter queue
-    
-    private let tQueue = DispatchQueue(label: "Transmitter queue for HttpConnection object")
+    var timeOfAccept: Int64 = 0
 
     
     /// The dispatch queue on which connections process the data from the client
     
-    let workerQueue = DispatchQueue(label: "Worker queue for HttpConnection object")
+    let workerQueue = DispatchQueue(label: "Worker queue for SFConnection object")
     
     
     /// The file manager to be used for this connection object
@@ -192,18 +179,8 @@ final class HttpConnection: SwifterSockets.Connection {
     var mustClose = false
     
     
-    // MARK: - Conveniance functions to transfer data
-    
-    func transfer(_ data: Data) { transfer(data, callback: self) }
-    
-    func transfer(_ string: String) { transfer(string, callback: self) }
-    
-    func transfer(_ buffer: UnsafeBufferPointer<UInt8>) { transfer(buffer, callback: self) }
-    
-    
-    // MARK: - Overriding SwifterSocketsConnectedClient protocol
-    
     override func abortConnection() {
+    
         
         // Record the closing
         
@@ -226,25 +203,26 @@ final class HttpConnection: SwifterSockets.Connection {
         super.abortConnection()
 
         // Free this connection object
-        httpConnectionPool.free(connection: self)
+        connectionPool.free(connection: self)
     }
     
-    override func transmitterReady() {
+    override func transmitterReady(_ id: Int) {
         log.atLevelDebug(id: logId, source: #file.source(#function, #line))
     }
     
-    override func transmitterTimeout() {
+    override func transmitterTimeout(_ id: Int) {
         log.atLevelDebug(id: logId, source: #file.source(#function, #line))
+        super.transmitterTimeout(id)
     }
     
-    override func transmitterError(_ message: String) {
+    override func transmitterError(_ id: Int, _ message: String) {
         log.atLevelError(id: logId, source: #file.source(#function, #line), message: message)
-        closeConnection()
+        super.transmitterError(id, message)
     }
     
-    override func transmitterClosed() {
+    override func transmitterClosed(_ id: Int) {
         log.atLevelDebug(id: logId, source: #file.source(#function, #line))
-        closeConnection()
+        super.transmitterClosed(id)
     }
     
     
@@ -306,7 +284,7 @@ final class HttpConnection: SwifterSockets.Connection {
                     // Write the header to the log if so required
                     // Note: This is done now because there might be errors this request that would be missed if the log is not done at the earliest possible moment..
                     
-                    if parameters.headerLoggingEnabled { header.record(connection: self) }
+                    if parameters.headerLoggingEnabled { headerLogger?.record(connection: self, header: httpHeader!) }
                 }
             }
             
@@ -361,4 +339,60 @@ final class HttpConnection: SwifterSockets.Connection {
         
         return true
     }
+}
+
+
+/// A connection factory for HTTP connections.
+///
+/// This factory recycles the connections that are available in the global connection pool.
+///
+/// - Parameters:
+///   - cType: The interface to be used for this connection object.
+///   - remoreAddress: The remote IP address of the client.
+///
+/// - Returns: A HttpConnection object if there is a free object available. Nil if all connection object are in use.
+
+func httpConnectionFactory(_ cType: SwifterSockets.InterfaceAccess, _ remoteAddress: String) -> SwifterSockets.Connection? {
+    
+    
+    // Exclude access for blacklisted clients (Server level blacklisting rejects the connection request before data is received, hence no HTML message will be sent as the client is -quite likely- not ready for it)
+    
+    if serverBlacklist.action(forAddress: remoteAddress) != nil { return nil }
+    
+    
+    // Find a free SFConnection object
+    
+    guard let connection = connectionPool.allocateOrTimeout(parameters.maxWaitForPendingConnections) as? HttpConnection else {
+        log.atLevelEmergency(id: -1, source: #file.source(#function, #line), message: "SF Connection could not be allocated, client at \(remoteAddress) will be rejected")
+        return nil
+    }
+    
+    
+    // Increase the allocation counter
+    
+    connection.incrementAllocationCounter()
+    
+    
+    // Create log entry that can be used to associate this place in the logfile with data from the statistics.
+    
+    log.atLevelDebug(id: cType.logId, source: #file.source(#function, #line), message: "Allocating connection object \(connection.objectId) to client from address \(remoteAddress) on socket \(cType.logId) with allocation count \(connection.allocationCount)")
+    
+    
+    // Configure the connection
+    
+    if !connection.prepare(for: cType, remoteAddress: remoteAddress, options: []) {
+        log.atLevelEmergency(id: -1, source: #file.source(#function, #line), message: "Cannot prepare SF connection \(connection.objectId) for reuse")
+        connectionPool.free(connection: connection)
+        return nil
+    }
+    
+    connection.timeOfAccept = Date().javaDate
+    
+    
+    // Telemetry update
+    
+    telemetry.nofAcceptedHttpRequests.increment()
+    
+    
+    return connection
 }

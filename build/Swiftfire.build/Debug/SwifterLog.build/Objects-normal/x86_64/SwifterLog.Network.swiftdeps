@@ -11,24 +11,24 @@ provides-member:
 - ["C10SwifterLog10SwifterLog", "logToNetwork"]
 provides-dynamic-lookup:
 depends-top-level:
-- "CustomStringConvertible"
+- !private "SwifterSockets"
 - "SwifterLog"
 - !private "&="
-- "LogLine"
-- !private "close"
-- !private "StringLiteralType"
-- !private "+"
-- !private "Array"
-- !private "SwifterSockets"
-- !private "!="
-- "VJson"
-- !private "ProcessInfo"
 - !private "|"
-- "AssignmentPrecedence"
 - "Date"
-- !private "DispatchQueue"
-- !private "=="
+- !private "close"
+- !private "+"
 - "String"
+- !private "StringLiteralType"
+- !private "ProcessInfo"
+- "CustomStringConvertible"
+- "VJson"
+- !private "!="
+- "AssignmentPrecedence"
+- !private "=="
+- "LogLine"
+- !private "DispatchQueue"
+- !private "Array"
 depends-member:
 - !private ["Ps9AnyObject", "DispatchQueue"]
 - ["Ps9AnyObject", "Level"]
@@ -74,6 +74,7 @@ depends-member:
 - !private ["Ps28CustomDebugStringConvertible", "init"]
 - !private ["Ps28CustomDebugStringConvertible", "processInfo"]
 - !private ["Ps28CustomDebugStringConvertible", "processName"]
+- ["Ps28CustomDebugStringConvertible", "queued"]
 - ["Ps28CustomDebugStringConvertible", "ready"]
 - !private ["Ps28CustomDebugStringConvertible", "string"]
 - ["Ps28CustomDebugStringConvertible", "timeout"]
@@ -98,6 +99,7 @@ depends-member:
 - !private ["Ps23CustomStringConvertible", "message"]
 - !private ["Ps23CustomStringConvertible", "processInfo"]
 - !private ["Ps23CustomStringConvertible", "processName"]
+- ["Ps23CustomStringConvertible", "queued"]
 - !private ["Ps23CustomStringConvertible", "rawValue"]
 - ["Ps23CustomStringConvertible", "ready"]
 - !private ["Ps23CustomStringConvertible", "source"]
@@ -256,6 +258,7 @@ depends-member:
 - ["O14SwifterSockets14TransferResult", "closed"]
 - ["O14SwifterSockets14TransferResult", "deinit"]
 - ["O14SwifterSockets14TransferResult", "error"]
+- ["O14SwifterSockets14TransferResult", "queued"]
 - ["O14SwifterSockets14TransferResult", "ready"]
 - ["O14SwifterSockets14TransferResult", "timeout"]
 - !private ["Su", "deinit"]
