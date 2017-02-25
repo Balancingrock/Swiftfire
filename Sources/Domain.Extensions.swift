@@ -50,6 +50,7 @@
 // History
 //
 // 0.9.15  - General update and switch to frameworks
+//         - Added removeUnknownServices
 // 0.9.14  - Initial release
 //
 // =====================================================================================================================
@@ -81,5 +82,17 @@ extension Domain {
         } catch {
             return nil
         }        
+    }
+    
+    
+    /// Removes service names that are not in the available domain services
+    
+    func removeUnknownServices() {
+        
+        for (index, serviceName) in serviceNames.enumerated().reversed() {
+            if domainServices.availableServices[serviceName] == nil {
+                serviceNames.remove(at: index)
+            }
+        }
     }
 }

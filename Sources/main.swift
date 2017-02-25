@@ -267,6 +267,7 @@ case let .success(message):
     log.atLevelNotice(id: -1, source: "Main", message: message)
 }
 
+for domain in domains { domain.removeUnknownServices() }
 domains.writeToLog(atLevel: .notice)
 
 

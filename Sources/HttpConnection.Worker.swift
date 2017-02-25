@@ -50,6 +50,7 @@
 // History
 //
 // 0.9.15  - General update and switch to frameworks
+//         - Updated domainServices
 // 0.9.14  - Added support for HTTP 1.0
 //         - Upgraded to Xcode 8 beta 6
 // 0.9.13  - Upgraded to Xcode 8 beta 3 (Swift 3)
@@ -349,18 +350,23 @@ extension HttpConnection {
 // Rebuilds the domain service cache in the domain object and returns it
     
 private func domainServices(for domain: Domain) -> Array<DomainServices.ServiceEntry>? {
+    
+    
+    // Remove non existing services
+    
+    domain.removeUnknownServices()
+    
+    
+    // Build the service chain
+    
+    domain.services = []
+    for serviceName in domain.serviceNames {
         
-    if domain.services == nil {
-        domain.services = []
-        for (index, serviceName) in domain.serviceNames.enumerated() {
+        
+        // Add a service if it exists, if it does not exist, remove the service from the service names.
             
-            // Add a service if it exists, if it does not exist, remove the service from the service names.
-            
-            if let entry = domainServices.availableServices[serviceName] {
-                domain.services?.append(entry)
-            } else {
-                domain.serviceNames.remove(at: index)
-            }
+        if let entry = domainServices.availableServices[serviceName] {
+            domain.services?.append(entry)
         }
     }
     
