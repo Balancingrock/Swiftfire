@@ -1,3 +1,0 @@
-framework module SecureSockets {
-    header "SecureSockets-Swift.h"
-}

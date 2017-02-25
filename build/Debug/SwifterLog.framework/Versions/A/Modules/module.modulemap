@@ -1,3 +1,0 @@
-framework module SwifterLog {
-    header "SwifterLog-Swift.h"
-}
