@@ -78,7 +78,9 @@ extension ServerStartCommand: MacCommand {
             
         connectionPool.create(num: parameters.maxNofAcceptedConnections, generator: { return HttpConnection() })
 
+        log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Initialized the connection pool with \(parameters.maxNofAcceptedConnections) http connections")
 
+        
         // Start the server
         
         let result = httpServer.start()
