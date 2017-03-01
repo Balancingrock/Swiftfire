@@ -166,6 +166,13 @@ final class MonitoringAndControlConnection: SwifterSockets.Connection {
 
     private var commandFactories: Array<MacCommandFactory> = []
     
+    
+    override func prepare(for interface: InterfaceAccess, remoteAddress address: String, options: [Connection.Option]) -> Bool {
+        var localOptions = options
+        localOptions.append(.inactivityDetectionThreshold(parameters.macInactivityTimeout))
+        localOptions.append(.inactivityAction({ (c: Connection) in mac?.transfer(ClosingMacConnection())}))
+        return super.prepare(for: interface, remoteAddress: address, options: localOptions)
+    }
 
     /// Used internally, calling this operation may lead to aborted transfers and error messages. In order to close the connection use "closeConnection()" instead.
     
@@ -194,8 +201,6 @@ final class MonitoringAndControlConnection: SwifterSockets.Connection {
         commandsBufferStartOfFreeArea = commandsBufferStartOfFreeArea.advanced(by: buffer.count)
         commandsByteCount += buffer.count
         
-        //log.atLevelDebug(id: -1, source: "MacLoop receiveData (1)", message: "\(commandsBufferStartOfFreeArea), \(commandsByteCount)")
-        //log.atLevelDebug(id: -1, source: "MacLoop receiveData (2)", message: "\(commandsBuffer), \(commandsByteCount)")
         
         // Execute all completely received commands
         
@@ -226,17 +231,12 @@ final class MonitoringAndControlConnection: SwifterSockets.Connection {
                 
                 // Remove the processed command from the buffer
                 
-                //log.atLevelDebug(id: -1, source: "MacLoop receiveData (3)", message: "\(commandsBufferStartOfFreeArea), \(commandsByteCount)")
-
-                
                 let srcPtr = UnsafeRawPointer(jsonBuffer.baseAddress!.advanced(by: jsonBuffer.count))
                 let consumedBytes = UnsafeRawPointer(commandsBuffer).distance(to: srcPtr)
                 commandsByteCount -= consumedBytes
                 commandsBufferStartOfFreeArea = commandsBufferStartOfFreeArea.advanced(by: -consumedBytes)
                 if commandsByteCount == 0 { break BUFFER_LOOP }
                 memcpy(commandsBuffer, srcPtr, commandsByteCount)
-
-                //log.atLevelDebug(id: -1, source: "MacLoop receiveData (4)", message: "\(commandsBufferStartOfFreeArea), \(commandsByteCount)")
 
                 
             } catch let error as VJson.Exception {
@@ -277,6 +277,8 @@ final class MonitoringAndControlConnection: SwifterSockets.Connection {
             }
         }
         
+        inactivityDetectionRestart()
+        
         return true
     }
 
@@ -287,5 +289,7 @@ final class MonitoringAndControlConnection: SwifterSockets.Connection {
             super.transfer(msg, callback: nil)
         }
     }
+    
+    
 }
 

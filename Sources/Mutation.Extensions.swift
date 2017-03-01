@@ -78,7 +78,6 @@ extension Mutation {
         mutation.connectionAllocationCount = connection.allocationCount
         mutation.connectionObjectId = connection.objectId
         mutation.socket = connection.logId
-        mutation.requestReceived = connection.timeOfAccept
         return mutation
     }
 }

@@ -150,6 +150,7 @@ func ds_getFileAtResourcePath(_ header: HttpHeader, _ body: Data?, _ connection:
         let mutation = Mutation.createAddClientRecord(from: connection)
         mutation.httpResponseCode = HttpResponseCode.code500_InternalServerError.rawValue
         mutation.responseDetails = "No resource path present"
+        mutation.requestReceived = chainInfo[ResponseStartedKey] as? Int64 ?? 0
         statistics.submit(mutation: mutation)
         
         
@@ -213,6 +214,7 @@ func ds_getFileAtResourcePath(_ header: HttpHeader, _ body: Data?, _ connection:
         mutation.url = resourcePath
         mutation.httpResponseCode = HttpResponseCode.code500_InternalServerError.rawValue
         mutation.responseDetails = message
+        mutation.requestReceived = chainInfo[ResponseStartedKey] as? Int64 ?? 0
         statistics.submit(mutation: mutation)
 
         

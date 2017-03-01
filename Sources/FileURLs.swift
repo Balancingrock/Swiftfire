@@ -64,7 +64,7 @@
 // Description
 // =====================================================================================================================
 //
-// By default all files and directories are relative to the root directory (which is by default the app support directory)
+// By default all files and directories are relative to the root directory (which is by default the app support directory) in "~/Library/Application Support/Swiftfire".
 //
 // root
 // - domains

@@ -96,13 +96,21 @@ final class HttpConnection: SwifterSockets.Connection {
     
     /// Prepares the object for (re)use.
     ///
-    /// - Parameter forType: The connection type.
-    /// - Parameter remoteAddress: The address of the remote computer.
-    /// - Parameter options: The options to be set for the connection.
+    /// - Parameters:
+    ///   - for: The connection type.
+    ///   - remoteAddress: The address of the remote computer.
+    ///   - options: The options to be set for the connection. The options inactivityDetectionThreshold and inactivityAction are used by this operation and should not be set externally.
     
-    public override func prepare(for type: SwifterSockets.InterfaceAccess, remoteAddress address: String, options: Option...) -> Bool {
+    override func prepare(for type: SwifterSockets.InterfaceAccess, remoteAddress address: String, options: [Option]) -> Bool {
         
-        guard super.prepare(for: type, remoteAddress: address, options: options) else { return false }
+        // In case of inactivity, close the connection.
+        var localOptions = options
+        localOptions.append(.receiverBufferSize(parameters.clientMessageBufferSize))
+        localOptions.append(.transmitterTimeout(parameters.httpResponseClientTimeout))
+        localOptions.append(.inactivityDetectionThreshold(Double(parameters.httpKeepAliveInactivityTimeout)/1000.0))
+        localOptions.append(.inactivityAction({ (c: Connection) in c.closeConnection()}))
+        
+        guard super.prepare(for: type, remoteAddress: address, options: localOptions) else { return false }
     
         
         // Reinitialize internal data
@@ -336,6 +344,8 @@ final class HttpConnection: SwifterSockets.Connection {
             
             httpHeader = nil
         }
+        
+        inactivityDetectionRestart()
         
         return true
     }

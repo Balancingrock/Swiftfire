@@ -149,6 +149,7 @@ func ds_onlyGetOrPost(_ header: HttpHeader, _ body: Data?, _ connection: Connect
         let mutation = Mutation.createAddClientRecord(from: connection)
         mutation.httpResponseCode = HttpResponseCode.code400_BadRequest.rawValue
         mutation.responseDetails = message
+        mutation.requestReceived = chainInfo[ResponseStartedKey] as? Int64 ?? 0
         statistics.submit(mutation: mutation)
         
         
@@ -188,6 +189,7 @@ func ds_onlyGetOrPost(_ header: HttpHeader, _ body: Data?, _ connection: Connect
         let mutation = Mutation.createAddClientRecord(from: connection)
         mutation.httpResponseCode = HttpResponseCode.code501_NotImplemented.rawValue
         mutation.responseDetails = message
+        mutation.requestReceived = chainInfo[ResponseStartedKey] as? Int64 ?? 0
         statistics.submit(mutation: mutation)
         
         

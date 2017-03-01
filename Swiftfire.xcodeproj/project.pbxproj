@@ -7,252 +7,252 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
-		OBJ_151 /* CAsl.m in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_9 /* CAsl.m */; };
-		OBJ_158 /* Ascii.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_14 /* Ascii.swift */; };
-		OBJ_165 /* VJson.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_16 /* VJson.swift */; };
-		OBJ_167 /* Ascii.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_139 /* Ascii.framework */; };
-		OBJ_174 /* SwifterSockets.Accept.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_18 /* SwifterSockets.Accept.swift */; };
-		OBJ_175 /* SwifterSockets.Client.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_19 /* SwifterSockets.Client.swift */; };
-		OBJ_176 /* SwifterSockets.Connection.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_20 /* SwifterSockets.Connection.swift */; };
-		OBJ_177 /* SwifterSockets.ConnectionPool.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_21 /* SwifterSockets.ConnectionPool.swift */; };
-		OBJ_178 /* SwifterSockets.Receive.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_22 /* SwifterSockets.Receive.swift */; };
-		OBJ_179 /* SwifterSockets.Server.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_23 /* SwifterSockets.Server.swift */; };
-		OBJ_180 /* SwifterSockets.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_24 /* SwifterSockets.swift */; };
-		OBJ_181 /* SwifterSockets.Transmit.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_25 /* SwifterSockets.Transmit.swift */; };
-		OBJ_188 /* SwifterLog.Network.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_27 /* SwifterLog.Network.swift */; };
-		OBJ_189 /* SwifterLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_28 /* SwifterLog.swift */; };
-		OBJ_191 /* CAsl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_138 /* CAsl.framework */; };
-		OBJ_192 /* Ascii.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_139 /* Ascii.framework */; };
-		OBJ_193 /* SwifterJSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_140 /* SwifterJSON.framework */; };
-		OBJ_194 /* SwifterSockets.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_141 /* SwifterSockets.framework */; };
-		OBJ_204 /* Blacklist.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_30 /* Blacklist.swift */; };
-		OBJ_205 /* Command.CreateDomain.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_31 /* Command.CreateDomain.swift */; };
-		OBJ_206 /* Command.Delta.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_32 /* Command.Delta.swift */; };
-		OBJ_207 /* Command.ReadBlacklist.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_33 /* Command.ReadBlacklist.swift */; };
-		OBJ_208 /* Command.ReadDomains.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_34 /* Command.ReadDomains.swift */; };
-		OBJ_209 /* Command.ReadServerParameter.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_35 /* Command.ReadServerParameter.swift */; };
-		OBJ_210 /* Command.ReadServerTelemetry.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_36 /* Command.ReadServerTelemetry.swift */; };
-		OBJ_211 /* Command.ReadServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_37 /* Command.ReadServices.swift */; };
-		OBJ_212 /* Command.ReadStatistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_38 /* Command.ReadStatistics.swift */; };
-		OBJ_213 /* Command.RemoveDomain.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_39 /* Command.RemoveDomain.swift */; };
-		OBJ_214 /* Command.ResetDomainTelemetry.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_40 /* Command.ResetDomainTelemetry.swift */; };
-		OBJ_215 /* Command.RestoreBlacklist.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_41 /* Command.RestoreBlacklist.swift */; };
-		OBJ_216 /* Command.RestoreDomains.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_42 /* Command.RestoreDomains.swift */; };
-		OBJ_217 /* Command.RestoreServerParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_43 /* Command.RestoreServerParameters.swift */; };
-		OBJ_218 /* Command.SaveBlacklist.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_44 /* Command.SaveBlacklist.swift */; };
-		OBJ_219 /* Command.SaveDomains.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_45 /* Command.SaveDomains.swift */; };
-		OBJ_220 /* Command.SaveServerParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_46 /* Command.SaveServerParameters.swift */; };
-		OBJ_221 /* Command.ServerQuit.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_47 /* Command.ServerQuit.swift */; };
-		OBJ_222 /* Command.ServerStart.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_48 /* Command.ServerStart.swift */; };
-		OBJ_223 /* Command.ServerStop.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_49 /* Command.ServerStop.swift */; };
-		OBJ_224 /* Command.UpdateBlacklist.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_50 /* Command.UpdateBlacklist.swift */; };
-		OBJ_225 /* Command.UpdateClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_51 /* Command.UpdateClient.swift */; };
-		OBJ_226 /* Command.UpdateDomain.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_52 /* Command.UpdateDomain.swift */; };
-		OBJ_227 /* Command.UpdatePathPart.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_53 /* Command.UpdatePathPart.swift */; };
-		OBJ_228 /* Command.UpdateServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_54 /* Command.UpdateServices.swift */; };
-		OBJ_229 /* Command.WriteServerParameter.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_55 /* Command.WriteServerParameter.swift */; };
-		OBJ_230 /* Domain.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_56 /* Domain.swift */; };
-		OBJ_231 /* Domains.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_57 /* Domains.swift */; };
-		OBJ_232 /* DomainServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_58 /* DomainServices.swift */; };
-		OBJ_233 /* DomainTelemetry.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_59 /* DomainTelemetry.swift */; };
-		OBJ_234 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_60 /* Extensions.swift */; };
-		OBJ_235 /* GenericHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_61 /* GenericHelpers.swift */; };
-		OBJ_236 /* HttpHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_62 /* HttpHeader.swift */; };
-		OBJ_237 /* HttpHost.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_63 /* HttpHost.swift */; };
-		OBJ_238 /* HttpResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_64 /* HttpResponse.swift */; };
-		OBJ_239 /* HttpResponseCodes.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_65 /* HttpResponseCodes.swift */; };
-		OBJ_240 /* Logfile.404Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_66 /* Logfile.404Log.swift */; };
-		OBJ_241 /* Logfile.AccessLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_67 /* Logfile.AccessLog.swift */; };
-		OBJ_242 /* Logfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_68 /* Logfile.swift */; };
-		OBJ_243 /* MacMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_69 /* MacMessage.swift */; };
-		OBJ_244 /* MimeType.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_70 /* MimeType.swift */; };
-		OBJ_245 /* Mutation.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_71 /* Mutation.swift */; };
-		OBJ_246 /* Parameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_72 /* Parameters.swift */; };
-		OBJ_247 /* Reply.ClosingMacConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_73 /* Reply.ClosingMacConnection.swift */; };
-		OBJ_248 /* Reply.LogLine.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_74 /* Reply.LogLine.swift */; };
-		OBJ_249 /* Reply.ReadBlacklist.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_75 /* Reply.ReadBlacklist.swift */; };
-		OBJ_250 /* Reply.ReadDomains.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_76 /* Reply.ReadDomains.swift */; };
-		OBJ_251 /* Reply.ReadServerParameter.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_77 /* Reply.ReadServerParameter.swift */; };
-		OBJ_252 /* Reply.ReadServerTelemetry.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_78 /* Reply.ReadServerTelemetry.swift */; };
-		OBJ_253 /* Reply.ReadServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_79 /* Reply.ReadServices.swift */; };
-		OBJ_254 /* Reply.ReadStatistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_80 /* Reply.ReadStatistics.swift */; };
-		OBJ_255 /* ServerParameterNames.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_81 /* ServerParameterNames.swift */; };
-		OBJ_256 /* ServerTelemetryNames.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_82 /* ServerTelemetryNames.swift */; };
-		OBJ_257 /* Statistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_83 /* Statistics.swift */; };
-		OBJ_258 /* StClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_84 /* StClient.swift */; };
-		OBJ_259 /* StClientRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_85 /* StClientRecord.swift */; };
-		OBJ_260 /* StClients.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_86 /* StClients.swift */; };
-		OBJ_261 /* StCounter.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_87 /* StCounter.swift */; };
-		OBJ_262 /* StDomains.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_88 /* StDomains.swift */; };
-		OBJ_263 /* StPathPart.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_89 /* StPathPart.swift */; };
-		OBJ_264 /* Telemetry.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_90 /* Telemetry.swift */; };
-		OBJ_265 /* TimedClosure.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_91 /* TimedClosure.swift */; };
-		OBJ_266 /* UIntTelemetry.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_92 /* UIntTelemetry.swift */; };
-		OBJ_267 /* WallclockTime.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_93 /* WallclockTime.swift */; };
-		OBJ_269 /* CAsl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_138 /* CAsl.framework */; };
-		OBJ_270 /* Ascii.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_139 /* Ascii.framework */; };
-		OBJ_271 /* SwifterJSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_140 /* SwifterJSON.framework */; };
-		OBJ_272 /* SwifterSockets.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_141 /* SwifterSockets.framework */; };
-		OBJ_273 /* SwifterLog.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_142 /* SwifterLog.framework */; };
-		OBJ_284 /* Domain.Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_95 /* Domain.Extensions.swift */; };
-		OBJ_285 /* DomainService.Blacklist.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_96 /* DomainService.Blacklist.swift */; };
-		OBJ_286 /* DomainService.GetFileAtResourcePath.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_97 /* DomainService.GetFileAtResourcePath.swift */; };
-		OBJ_287 /* DomainService.GetResourcePathFromUrl.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_98 /* DomainService.GetResourcePathFromUrl.swift */; };
-		OBJ_288 /* DomainService.OnlyGetOrPost.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_99 /* DomainService.OnlyGetOrPost.swift */; };
-		OBJ_289 /* DomainService.OnlyHttp10or11.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_100 /* DomainService.OnlyHttp10or11.swift */; };
-		OBJ_290 /* DomainServices.Registration.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_101 /* DomainServices.Registration.swift */; };
-		OBJ_291 /* FileURLs.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_102 /* FileURLs.swift */; };
-		OBJ_292 /* Forwarder.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_103 /* Forwarder.swift */; };
-		OBJ_293 /* HttpConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_104 /* HttpConnection.swift */; };
-		OBJ_294 /* HttpConnection.Worker.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_105 /* HttpConnection.Worker.swift */; };
-		OBJ_295 /* HttpHeaderLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_106 /* HttpHeaderLogger.swift */; };
-		OBJ_296 /* MacCommand.CreateDomain.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_107 /* MacCommand.CreateDomain.swift */; };
-		OBJ_297 /* MacCommand.Delta.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_108 /* MacCommand.Delta.swift */; };
-		OBJ_298 /* MacCommand.ReadBlacklist.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_109 /* MacCommand.ReadBlacklist.swift */; };
-		OBJ_299 /* MacCommand.ReadDomains.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_110 /* MacCommand.ReadDomains.swift */; };
-		OBJ_300 /* MacCommand.ReadServerParameter.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_111 /* MacCommand.ReadServerParameter.swift */; };
-		OBJ_301 /* MacCommand.ReadServerTelemetry.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_112 /* MacCommand.ReadServerTelemetry.swift */; };
-		OBJ_302 /* MacCommand.ReadServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_113 /* MacCommand.ReadServices.swift */; };
-		OBJ_303 /* MacCommand.ReadStatistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_114 /* MacCommand.ReadStatistics.swift */; };
-		OBJ_304 /* MacCommand.RemoveDomain.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_115 /* MacCommand.RemoveDomain.swift */; };
-		OBJ_305 /* MacCommand.ResetDomainTelemetry.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_116 /* MacCommand.ResetDomainTelemetry.swift */; };
-		OBJ_306 /* MacCommand.RestoreBlacklist.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_117 /* MacCommand.RestoreBlacklist.swift */; };
-		OBJ_307 /* MacCommand.RestoreDomains.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_118 /* MacCommand.RestoreDomains.swift */; };
-		OBJ_308 /* MacCommand.RestoreServerParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_119 /* MacCommand.RestoreServerParameters.swift */; };
-		OBJ_309 /* MacCommand.SaveBlacklist.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_120 /* MacCommand.SaveBlacklist.swift */; };
-		OBJ_310 /* MacCommand.SaveDomains.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_121 /* MacCommand.SaveDomains.swift */; };
-		OBJ_311 /* MacCommand.SaveServerParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_122 /* MacCommand.SaveServerParameters.swift */; };
-		OBJ_312 /* MacCommand.ServerQuit.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_123 /* MacCommand.ServerQuit.swift */; };
-		OBJ_313 /* MacCommand.ServerStart.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_124 /* MacCommand.ServerStart.swift */; };
-		OBJ_314 /* MacCommand.ServerStop.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_125 /* MacCommand.ServerStop.swift */; };
-		OBJ_315 /* MacCommand.UpdateBlacklist.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_126 /* MacCommand.UpdateBlacklist.swift */; };
-		OBJ_316 /* MacCommand.UpdateClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_127 /* MacCommand.UpdateClient.swift */; };
-		OBJ_317 /* MacCommand.UpdateDomain.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_128 /* MacCommand.UpdateDomain.swift */; };
-		OBJ_318 /* MacCommand.UpdatePathPart.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_129 /* MacCommand.UpdatePathPart.swift */; };
-		OBJ_319 /* MacCommand.UpdateServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_130 /* MacCommand.UpdateServices.swift */; };
-		OBJ_320 /* MacCommand.WriteServerParameter.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_131 /* MacCommand.WriteServerParameter.swift */; };
-		OBJ_321 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_132 /* main.swift */; };
-		OBJ_322 /* MonitoringAndControlConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_133 /* MonitoringAndControlConnection.swift */; };
-		OBJ_323 /* Mutation.Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_134 /* Mutation.Extensions.swift */; };
-		OBJ_325 /* CAsl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_138 /* CAsl.framework */; };
-		OBJ_326 /* Ascii.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_139 /* Ascii.framework */; };
-		OBJ_327 /* SwifterJSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_140 /* SwifterJSON.framework */; };
-		OBJ_328 /* SwifterSockets.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_141 /* SwifterSockets.framework */; };
-		OBJ_329 /* SwifterLog.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_142 /* SwifterLog.framework */; };
-		OBJ_330 /* SwiftfireCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_143 /* SwiftfireCore.framework */; };
+		OBJ_152 /* CAsl.m in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_9 /* CAsl.m */; };
+		OBJ_159 /* Ascii.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_14 /* Ascii.swift */; };
+		OBJ_166 /* VJson.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_16 /* VJson.swift */; };
+		OBJ_168 /* Ascii.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_140 /* Ascii.framework */; };
+		OBJ_175 /* SwifterSockets.Accept.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_18 /* SwifterSockets.Accept.swift */; };
+		OBJ_176 /* SwifterSockets.Client.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_19 /* SwifterSockets.Client.swift */; };
+		OBJ_177 /* SwifterSockets.Connection.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_20 /* SwifterSockets.Connection.swift */; };
+		OBJ_178 /* SwifterSockets.ConnectionPool.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_21 /* SwifterSockets.ConnectionPool.swift */; };
+		OBJ_179 /* SwifterSockets.Receive.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_22 /* SwifterSockets.Receive.swift */; };
+		OBJ_180 /* SwifterSockets.Server.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_23 /* SwifterSockets.Server.swift */; };
+		OBJ_181 /* SwifterSockets.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_24 /* SwifterSockets.swift */; };
+		OBJ_182 /* SwifterSockets.Transmit.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_25 /* SwifterSockets.Transmit.swift */; };
+		OBJ_189 /* SwifterLog.Network.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_27 /* SwifterLog.Network.swift */; };
+		OBJ_190 /* SwifterLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_28 /* SwifterLog.swift */; };
+		OBJ_192 /* CAsl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_139 /* CAsl.framework */; };
+		OBJ_193 /* Ascii.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_140 /* Ascii.framework */; };
+		OBJ_194 /* SwifterJSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_141 /* SwifterJSON.framework */; };
+		OBJ_195 /* SwifterSockets.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_142 /* SwifterSockets.framework */; };
+		OBJ_205 /* Blacklist.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_30 /* Blacklist.swift */; };
+		OBJ_206 /* Command.CreateDomain.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_31 /* Command.CreateDomain.swift */; };
+		OBJ_207 /* Command.Delta.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_32 /* Command.Delta.swift */; };
+		OBJ_208 /* Command.ReadBlacklist.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_33 /* Command.ReadBlacklist.swift */; };
+		OBJ_209 /* Command.ReadDomains.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_34 /* Command.ReadDomains.swift */; };
+		OBJ_210 /* Command.ReadServerParameter.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_35 /* Command.ReadServerParameter.swift */; };
+		OBJ_211 /* Command.ReadServerTelemetry.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_36 /* Command.ReadServerTelemetry.swift */; };
+		OBJ_212 /* Command.ReadServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_37 /* Command.ReadServices.swift */; };
+		OBJ_213 /* Command.ReadStatistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_38 /* Command.ReadStatistics.swift */; };
+		OBJ_214 /* Command.RemoveDomain.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_39 /* Command.RemoveDomain.swift */; };
+		OBJ_215 /* Command.ResetDomainTelemetry.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_40 /* Command.ResetDomainTelemetry.swift */; };
+		OBJ_216 /* Command.RestoreBlacklist.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_41 /* Command.RestoreBlacklist.swift */; };
+		OBJ_217 /* Command.RestoreDomains.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_42 /* Command.RestoreDomains.swift */; };
+		OBJ_218 /* Command.RestoreServerParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_43 /* Command.RestoreServerParameters.swift */; };
+		OBJ_219 /* Command.SaveBlacklist.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_44 /* Command.SaveBlacklist.swift */; };
+		OBJ_220 /* Command.SaveDomains.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_45 /* Command.SaveDomains.swift */; };
+		OBJ_221 /* Command.SaveServerParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_46 /* Command.SaveServerParameters.swift */; };
+		OBJ_222 /* Command.ServerQuit.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_47 /* Command.ServerQuit.swift */; };
+		OBJ_223 /* Command.ServerStart.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_48 /* Command.ServerStart.swift */; };
+		OBJ_224 /* Command.ServerStop.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_49 /* Command.ServerStop.swift */; };
+		OBJ_225 /* Command.UpdateBlacklist.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_50 /* Command.UpdateBlacklist.swift */; };
+		OBJ_226 /* Command.UpdateClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_51 /* Command.UpdateClient.swift */; };
+		OBJ_227 /* Command.UpdateDomain.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_52 /* Command.UpdateDomain.swift */; };
+		OBJ_228 /* Command.UpdatePathPart.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_53 /* Command.UpdatePathPart.swift */; };
+		OBJ_229 /* Command.UpdateServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_54 /* Command.UpdateServices.swift */; };
+		OBJ_230 /* Command.WriteServerParameter.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_55 /* Command.WriteServerParameter.swift */; };
+		OBJ_231 /* Domain.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_56 /* Domain.swift */; };
+		OBJ_232 /* Domains.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_57 /* Domains.swift */; };
+		OBJ_233 /* DomainServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_58 /* DomainServices.swift */; };
+		OBJ_234 /* DomainTelemetry.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_59 /* DomainTelemetry.swift */; };
+		OBJ_235 /* Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_60 /* Extensions.swift */; };
+		OBJ_236 /* GenericHelpers.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_61 /* GenericHelpers.swift */; };
+		OBJ_237 /* HttpHeader.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_62 /* HttpHeader.swift */; };
+		OBJ_238 /* HttpHost.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_63 /* HttpHost.swift */; };
+		OBJ_239 /* HttpResponse.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_64 /* HttpResponse.swift */; };
+		OBJ_240 /* HttpResponseCodes.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_65 /* HttpResponseCodes.swift */; };
+		OBJ_241 /* Logfile.404Log.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_66 /* Logfile.404Log.swift */; };
+		OBJ_242 /* Logfile.AccessLog.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_67 /* Logfile.AccessLog.swift */; };
+		OBJ_243 /* Logfile.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_68 /* Logfile.swift */; };
+		OBJ_244 /* MacMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_69 /* MacMessage.swift */; };
+		OBJ_245 /* MimeType.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_70 /* MimeType.swift */; };
+		OBJ_246 /* Mutation.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_71 /* Mutation.swift */; };
+		OBJ_247 /* Parameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_72 /* Parameters.swift */; };
+		OBJ_248 /* Reply.ClosingMacConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_73 /* Reply.ClosingMacConnection.swift */; };
+		OBJ_249 /* Reply.LogLine.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_74 /* Reply.LogLine.swift */; };
+		OBJ_250 /* Reply.ReadBlacklist.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_75 /* Reply.ReadBlacklist.swift */; };
+		OBJ_251 /* Reply.ReadDomains.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_76 /* Reply.ReadDomains.swift */; };
+		OBJ_252 /* Reply.ReadServerParameter.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_77 /* Reply.ReadServerParameter.swift */; };
+		OBJ_253 /* Reply.ReadServerTelemetry.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_78 /* Reply.ReadServerTelemetry.swift */; };
+		OBJ_254 /* Reply.ReadServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_79 /* Reply.ReadServices.swift */; };
+		OBJ_255 /* Reply.ReadStatistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_80 /* Reply.ReadStatistics.swift */; };
+		OBJ_256 /* ServerParameterNames.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_81 /* ServerParameterNames.swift */; };
+		OBJ_257 /* ServerTelemetryNames.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_82 /* ServerTelemetryNames.swift */; };
+		OBJ_258 /* Statistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_83 /* Statistics.swift */; };
+		OBJ_259 /* StClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_84 /* StClient.swift */; };
+		OBJ_260 /* StClientRecord.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_85 /* StClientRecord.swift */; };
+		OBJ_261 /* StClients.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_86 /* StClients.swift */; };
+		OBJ_262 /* StCounter.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_87 /* StCounter.swift */; };
+		OBJ_263 /* StDomains.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_88 /* StDomains.swift */; };
+		OBJ_264 /* StPathPart.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_89 /* StPathPart.swift */; };
+		OBJ_265 /* Telemetry.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_90 /* Telemetry.swift */; };
+		OBJ_266 /* TimedClosure.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_91 /* TimedClosure.swift */; };
+		OBJ_267 /* UIntTelemetry.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_92 /* UIntTelemetry.swift */; };
+		OBJ_268 /* WallclockTime.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_93 /* WallclockTime.swift */; };
+		OBJ_270 /* CAsl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_139 /* CAsl.framework */; };
+		OBJ_271 /* Ascii.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_140 /* Ascii.framework */; };
+		OBJ_272 /* SwifterJSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_141 /* SwifterJSON.framework */; };
+		OBJ_273 /* SwifterSockets.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_142 /* SwifterSockets.framework */; };
+		OBJ_274 /* SwifterLog.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_143 /* SwifterLog.framework */; };
+		OBJ_285 /* Domain.Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_95 /* Domain.Extensions.swift */; };
+		OBJ_286 /* DomainService.Blacklist.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_96 /* DomainService.Blacklist.swift */; };
+		OBJ_287 /* DomainService.GetFileAtResourcePath.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_97 /* DomainService.GetFileAtResourcePath.swift */; };
+		OBJ_288 /* DomainService.GetResourcePathFromUrl.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_98 /* DomainService.GetResourcePathFromUrl.swift */; };
+		OBJ_289 /* DomainService.OnlyGetOrPost.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_99 /* DomainService.OnlyGetOrPost.swift */; };
+		OBJ_290 /* DomainService.OnlyHttp10or11.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_100 /* DomainService.OnlyHttp10or11.swift */; };
+		OBJ_291 /* DomainServices.Registration.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_101 /* DomainServices.Registration.swift */; };
+		OBJ_292 /* FileURLs.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_102 /* FileURLs.swift */; };
+		OBJ_293 /* Forwarder.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_103 /* Forwarder.swift */; };
+		OBJ_294 /* HttpConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_104 /* HttpConnection.swift */; };
+		OBJ_295 /* HttpConnection.Worker.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_105 /* HttpConnection.Worker.swift */; };
+		OBJ_296 /* HttpHeaderLogger.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_106 /* HttpHeaderLogger.swift */; };
+		OBJ_297 /* MacCommand.CreateDomain.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_107 /* MacCommand.CreateDomain.swift */; };
+		OBJ_298 /* MacCommand.Delta.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_108 /* MacCommand.Delta.swift */; };
+		OBJ_299 /* MacCommand.ReadBlacklist.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_109 /* MacCommand.ReadBlacklist.swift */; };
+		OBJ_300 /* MacCommand.ReadDomains.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_110 /* MacCommand.ReadDomains.swift */; };
+		OBJ_301 /* MacCommand.ReadServerParameter.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_111 /* MacCommand.ReadServerParameter.swift */; };
+		OBJ_302 /* MacCommand.ReadServerTelemetry.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_112 /* MacCommand.ReadServerTelemetry.swift */; };
+		OBJ_303 /* MacCommand.ReadServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_113 /* MacCommand.ReadServices.swift */; };
+		OBJ_304 /* MacCommand.ReadStatistics.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_114 /* MacCommand.ReadStatistics.swift */; };
+		OBJ_305 /* MacCommand.RemoveDomain.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_115 /* MacCommand.RemoveDomain.swift */; };
+		OBJ_306 /* MacCommand.ResetDomainTelemetry.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_116 /* MacCommand.ResetDomainTelemetry.swift */; };
+		OBJ_307 /* MacCommand.RestoreBlacklist.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_117 /* MacCommand.RestoreBlacklist.swift */; };
+		OBJ_308 /* MacCommand.RestoreDomains.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_118 /* MacCommand.RestoreDomains.swift */; };
+		OBJ_309 /* MacCommand.RestoreServerParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_119 /* MacCommand.RestoreServerParameters.swift */; };
+		OBJ_310 /* MacCommand.SaveBlacklist.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_120 /* MacCommand.SaveBlacklist.swift */; };
+		OBJ_311 /* MacCommand.SaveDomains.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_121 /* MacCommand.SaveDomains.swift */; };
+		OBJ_312 /* MacCommand.SaveServerParameters.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_122 /* MacCommand.SaveServerParameters.swift */; };
+		OBJ_313 /* MacCommand.ServerQuit.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_123 /* MacCommand.ServerQuit.swift */; };
+		OBJ_314 /* MacCommand.ServerStart.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_124 /* MacCommand.ServerStart.swift */; };
+		OBJ_315 /* MacCommand.ServerStop.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_125 /* MacCommand.ServerStop.swift */; };
+		OBJ_316 /* MacCommand.UpdateBlacklist.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_126 /* MacCommand.UpdateBlacklist.swift */; };
+		OBJ_317 /* MacCommand.UpdateClient.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_127 /* MacCommand.UpdateClient.swift */; };
+		OBJ_318 /* MacCommand.UpdateDomain.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_128 /* MacCommand.UpdateDomain.swift */; };
+		OBJ_319 /* MacCommand.UpdatePathPart.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_129 /* MacCommand.UpdatePathPart.swift */; };
+		OBJ_320 /* MacCommand.UpdateServices.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_130 /* MacCommand.UpdateServices.swift */; };
+		OBJ_321 /* MacCommand.WriteServerParameter.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_131 /* MacCommand.WriteServerParameter.swift */; };
+		OBJ_322 /* main.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_132 /* main.swift */; };
+		OBJ_323 /* MonitoringAndControlConnection.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_133 /* MonitoringAndControlConnection.swift */; };
+		OBJ_324 /* Mutation.Extensions.swift in Sources */ = {isa = PBXBuildFile; fileRef = OBJ_134 /* Mutation.Extensions.swift */; };
+		OBJ_326 /* CAsl.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_139 /* CAsl.framework */; };
+		OBJ_327 /* Ascii.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_140 /* Ascii.framework */; };
+		OBJ_328 /* SwifterJSON.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_141 /* SwifterJSON.framework */; };
+		OBJ_329 /* SwifterSockets.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_142 /* SwifterSockets.framework */; };
+		OBJ_330 /* SwifterLog.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_143 /* SwifterLog.framework */; };
+		OBJ_331 /* SwiftfireCore.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = OBJ_144 /* SwiftfireCore.framework */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
-		86F0ABF81E62CFFF0024B8BD /* PBXContainerItemProxy */ = {
+		86FD70691E656F63007D8F70 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = OBJ_1 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = OBJ_153;
+			remoteGlobalIDString = OBJ_154;
 			remoteInfo = Ascii;
 		};
-		86F0ABF91E62CFFF0024B8BD /* PBXContainerItemProxy */ = {
+		86FD706A1E656F63007D8F70 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = OBJ_1 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = OBJ_145;
+			remoteGlobalIDString = OBJ_146;
 			remoteInfo = CAsl;
 		};
-		86F0ABFA1E62CFFF0024B8BD /* PBXContainerItemProxy */ = {
+		86FD706B1E656F63007D8F70 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = OBJ_1 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = OBJ_153;
+			remoteGlobalIDString = OBJ_154;
 			remoteInfo = Ascii;
 		};
-		86F0ABFB1E62CFFF0024B8BD /* PBXContainerItemProxy */ = {
+		86FD706C1E656F63007D8F70 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = OBJ_1 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = OBJ_160;
+			remoteGlobalIDString = OBJ_161;
 			remoteInfo = SwifterJSON;
 		};
-		86F0ABFC1E62CFFF0024B8BD /* PBXContainerItemProxy */ = {
+		86FD706D1E656F63007D8F70 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = OBJ_1 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = OBJ_169;
+			remoteGlobalIDString = OBJ_170;
 			remoteInfo = SwifterSockets;
 		};
-		86F0ABFD1E62CFFF0024B8BD /* PBXContainerItemProxy */ = {
+		86FD706E1E656F63007D8F70 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = OBJ_1 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = OBJ_145;
+			remoteGlobalIDString = OBJ_146;
 			remoteInfo = CAsl;
 		};
-		86F0ABFE1E62CFFF0024B8BD /* PBXContainerItemProxy */ = {
+		86FD706F1E656F63007D8F70 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = OBJ_1 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = OBJ_153;
+			remoteGlobalIDString = OBJ_154;
 			remoteInfo = Ascii;
 		};
-		86F0ABFF1E62CFFF0024B8BD /* PBXContainerItemProxy */ = {
+		86FD70701E656F63007D8F70 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = OBJ_1 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = OBJ_160;
+			remoteGlobalIDString = OBJ_161;
 			remoteInfo = SwifterJSON;
 		};
-		86F0AC001E62CFFF0024B8BD /* PBXContainerItemProxy */ = {
+		86FD70711E656F63007D8F70 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = OBJ_1 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = OBJ_169;
+			remoteGlobalIDString = OBJ_170;
 			remoteInfo = SwifterSockets;
 		};
-		86F0AC011E62CFFF0024B8BD /* PBXContainerItemProxy */ = {
+		86FD70721E656F63007D8F70 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = OBJ_1 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = OBJ_183;
+			remoteGlobalIDString = OBJ_184;
 			remoteInfo = SwifterLog;
 		};
-		86F0AC021E62CFFF0024B8BD /* PBXContainerItemProxy */ = {
+		86FD70731E656F63007D8F70 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = OBJ_1 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = OBJ_145;
+			remoteGlobalIDString = OBJ_146;
 			remoteInfo = CAsl;
 		};
-		86F0AC031E62CFFF0024B8BD /* PBXContainerItemProxy */ = {
+		86FD70741E656F63007D8F70 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = OBJ_1 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = OBJ_153;
+			remoteGlobalIDString = OBJ_154;
 			remoteInfo = Ascii;
 		};
-		86F0AC041E62CFFF0024B8BD /* PBXContainerItemProxy */ = {
+		86FD70751E656F63007D8F70 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = OBJ_1 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = OBJ_160;
+			remoteGlobalIDString = OBJ_161;
 			remoteInfo = SwifterJSON;
 		};
-		86F0AC051E62CFFF0024B8BD /* PBXContainerItemProxy */ = {
+		86FD70761E656F63007D8F70 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = OBJ_1 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = OBJ_169;
+			remoteGlobalIDString = OBJ_170;
 			remoteInfo = SwifterSockets;
 		};
-		86F0AC061E62CFFF0024B8BD /* PBXContainerItemProxy */ = {
+		86FD70771E656F63007D8F70 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = OBJ_1 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = OBJ_183;
+			remoteGlobalIDString = OBJ_184;
 			remoteInfo = SwifterLog;
 		};
-		86F0AC071E62CFFF0024B8BD /* PBXContainerItemProxy */ = {
+		86FD70781E656F63007D8F70 /* PBXContainerItemProxy */ = {
 			isa = PBXContainerItemProxy;
 			containerPortal = OBJ_1 /* Project object */;
 			proxyType = 1;
-			remoteGlobalIDString = OBJ_199;
+			remoteGlobalIDString = OBJ_200;
 			remoteInfo = SwiftfireCore;
 		};
 /* End PBXContainerItemProxy section */
@@ -296,14 +296,15 @@
 		OBJ_133 /* MonitoringAndControlConnection.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MonitoringAndControlConnection.swift; sourceTree = "<group>"; };
 		OBJ_134 /* Mutation.Extensions.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Mutation.Extensions.swift; sourceTree = "<group>"; };
 		OBJ_136 /* build */ = {isa = PBXFileReference; lastKnownFileType = folder; path = build; sourceTree = SOURCE_ROOT; };
-		OBJ_138 /* CAsl.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = CAsl.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		OBJ_139 /* Ascii.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Ascii.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		OBJ_137 /* doc */ = {isa = PBXFileReference; lastKnownFileType = folder; path = doc; sourceTree = SOURCE_ROOT; };
+		OBJ_139 /* CAsl.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = CAsl.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		OBJ_14 /* Ascii.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Ascii.swift; sourceTree = "<group>"; };
-		OBJ_140 /* SwifterJSON.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SwifterJSON.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		OBJ_141 /* SwifterSockets.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SwifterSockets.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		OBJ_142 /* SwifterLog.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SwifterLog.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		OBJ_143 /* SwiftfireCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SwiftfireCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
-		OBJ_144 /* Swiftfire */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = Swiftfire; sourceTree = BUILT_PRODUCTS_DIR; };
+		OBJ_140 /* Ascii.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = Ascii.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		OBJ_141 /* SwifterJSON.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SwifterJSON.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		OBJ_142 /* SwifterSockets.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SwifterSockets.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		OBJ_143 /* SwifterLog.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SwifterLog.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		OBJ_144 /* SwiftfireCore.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; path = SwiftfireCore.framework; sourceTree = BUILT_PRODUCTS_DIR; };
+		OBJ_145 /* Swiftfire */ = {isa = PBXFileReference; lastKnownFileType = "compiled.mach-o.executable"; path = Swiftfire; sourceTree = BUILT_PRODUCTS_DIR; };
 		OBJ_16 /* VJson.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = VJson.swift; sourceTree = "<group>"; };
 		OBJ_18 /* SwifterSockets.Accept.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwifterSockets.Accept.swift; sourceTree = "<group>"; };
 		OBJ_19 /* SwifterSockets.Client.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SwifterSockets.Client.swift; sourceTree = "<group>"; };
@@ -389,68 +390,68 @@
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
-		OBJ_152 /* Frameworks */ = {
+		OBJ_153 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 0;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		OBJ_159 /* Frameworks */ = {
+		OBJ_160 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 0;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		OBJ_166 /* Frameworks */ = {
+		OBJ_167 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 0;
 			files = (
-				OBJ_167 /* Ascii.framework in Frameworks */,
+				OBJ_168 /* Ascii.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		OBJ_182 /* Frameworks */ = {
+		OBJ_183 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 0;
 			files = (
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		OBJ_190 /* Frameworks */ = {
+		OBJ_191 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 0;
 			files = (
-				OBJ_191 /* CAsl.framework in Frameworks */,
-				OBJ_192 /* Ascii.framework in Frameworks */,
-				OBJ_193 /* SwifterJSON.framework in Frameworks */,
-				OBJ_194 /* SwifterSockets.framework in Frameworks */,
+				OBJ_192 /* CAsl.framework in Frameworks */,
+				OBJ_193 /* Ascii.framework in Frameworks */,
+				OBJ_194 /* SwifterJSON.framework in Frameworks */,
+				OBJ_195 /* SwifterSockets.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		OBJ_268 /* Frameworks */ = {
+		OBJ_269 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 0;
 			files = (
-				OBJ_269 /* CAsl.framework in Frameworks */,
-				OBJ_270 /* Ascii.framework in Frameworks */,
-				OBJ_271 /* SwifterJSON.framework in Frameworks */,
-				OBJ_272 /* SwifterSockets.framework in Frameworks */,
-				OBJ_273 /* SwifterLog.framework in Frameworks */,
+				OBJ_270 /* CAsl.framework in Frameworks */,
+				OBJ_271 /* Ascii.framework in Frameworks */,
+				OBJ_272 /* SwifterJSON.framework in Frameworks */,
+				OBJ_273 /* SwifterSockets.framework in Frameworks */,
+				OBJ_274 /* SwifterLog.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		OBJ_324 /* Frameworks */ = {
+		OBJ_325 /* Frameworks */ = {
 			isa = PBXFrameworksBuildPhase;
 			buildActionMask = 0;
 			files = (
-				OBJ_325 /* CAsl.framework in Frameworks */,
-				OBJ_326 /* Ascii.framework in Frameworks */,
-				OBJ_327 /* SwifterJSON.framework in Frameworks */,
-				OBJ_328 /* SwifterSockets.framework in Frameworks */,
-				OBJ_329 /* SwifterLog.framework in Frameworks */,
-				OBJ_330 /* SwiftfireCore.framework in Frameworks */,
+				OBJ_326 /* CAsl.framework in Frameworks */,
+				OBJ_327 /* Ascii.framework in Frameworks */,
+				OBJ_328 /* SwifterJSON.framework in Frameworks */,
+				OBJ_329 /* SwifterSockets.framework in Frameworks */,
+				OBJ_330 /* SwifterLog.framework in Frameworks */,
+				OBJ_331 /* SwiftfireCore.framework in Frameworks */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -482,16 +483,16 @@
 			path = Tests;
 			sourceTree = "<group>";
 		};
-		OBJ_137 /* Products */ = {
+		OBJ_138 /* Products */ = {
 			isa = PBXGroup;
 			children = (
-				OBJ_138 /* CAsl.framework */,
-				OBJ_139 /* Ascii.framework */,
-				OBJ_140 /* SwifterJSON.framework */,
-				OBJ_141 /* SwifterSockets.framework */,
-				OBJ_142 /* SwifterLog.framework */,
-				OBJ_143 /* SwiftfireCore.framework */,
-				OBJ_144 /* Swiftfire */,
+				OBJ_139 /* CAsl.framework */,
+				OBJ_140 /* Ascii.framework */,
+				OBJ_141 /* SwifterJSON.framework */,
+				OBJ_142 /* SwifterSockets.framework */,
+				OBJ_143 /* SwifterLog.framework */,
+				OBJ_144 /* SwiftfireCore.framework */,
+				OBJ_145 /* Swiftfire */,
 			);
 			name = Products;
 			sourceTree = BUILT_PRODUCTS_DIR;
@@ -518,7 +519,7 @@
 				OBJ_25 /* SwifterSockets.Transmit.swift */,
 			);
 			name = SwifterSockets;
-			path = "Packages/SwifterSockets-0.9.14/Sources";
+			path = "Packages/SwifterSockets-0.9.15/Sources";
 			sourceTree = SOURCE_ROOT;
 		};
 		OBJ_26 /* SwifterLog */ = {
@@ -610,7 +611,8 @@
 				OBJ_7 /* Sources */,
 				OBJ_135 /* Tests */,
 				OBJ_136 /* build */,
-				OBJ_137 /* Products */,
+				OBJ_137 /* doc */,
+				OBJ_138 /* Products */,
 			);
 			name = "";
 			sourceTree = "<group>";
@@ -690,13 +692,13 @@
 /* End PBXGroup section */
 
 /* Begin PBXNativeTarget section */
-		OBJ_145 /* CAsl */ = {
+		OBJ_146 /* CAsl */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = OBJ_146 /* Build configuration list for PBXNativeTarget "CAsl" */;
+			buildConfigurationList = OBJ_147 /* Build configuration list for PBXNativeTarget "CAsl" */;
 			buildPhases = (
-				OBJ_149 /* ShellScript */,
-				OBJ_150 /* Sources */,
-				OBJ_152 /* Frameworks */,
+				OBJ_150 /* ShellScript */,
+				OBJ_151 /* Sources */,
+				OBJ_153 /* Frameworks */,
 			);
 			buildRules = (
 			);
@@ -704,15 +706,15 @@
 			);
 			name = CAsl;
 			productName = CAsl;
-			productReference = OBJ_138 /* CAsl.framework */;
+			productReference = OBJ_139 /* CAsl.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		OBJ_153 /* Ascii */ = {
+		OBJ_154 /* Ascii */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = OBJ_154 /* Build configuration list for PBXNativeTarget "Ascii" */;
+			buildConfigurationList = OBJ_155 /* Build configuration list for PBXNativeTarget "Ascii" */;
 			buildPhases = (
-				OBJ_157 /* Sources */,
-				OBJ_159 /* Frameworks */,
+				OBJ_158 /* Sources */,
+				OBJ_160 /* Frameworks */,
 			);
 			buildRules = (
 			);
@@ -720,32 +722,32 @@
 			);
 			name = Ascii;
 			productName = Ascii;
-			productReference = OBJ_139 /* Ascii.framework */;
+			productReference = OBJ_140 /* Ascii.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		OBJ_160 /* SwifterJSON */ = {
+		OBJ_161 /* SwifterJSON */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = OBJ_161 /* Build configuration list for PBXNativeTarget "SwifterJSON" */;
+			buildConfigurationList = OBJ_162 /* Build configuration list for PBXNativeTarget "SwifterJSON" */;
 			buildPhases = (
-				OBJ_164 /* Sources */,
-				OBJ_166 /* Frameworks */,
+				OBJ_165 /* Sources */,
+				OBJ_167 /* Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				OBJ_168 /* PBXTargetDependency */,
+				OBJ_169 /* PBXTargetDependency */,
 			);
 			name = SwifterJSON;
 			productName = SwifterJSON;
-			productReference = OBJ_140 /* SwifterJSON.framework */;
+			productReference = OBJ_141 /* SwifterJSON.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		OBJ_169 /* SwifterSockets */ = {
+		OBJ_170 /* SwifterSockets */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = OBJ_170 /* Build configuration list for PBXNativeTarget "SwifterSockets" */;
+			buildConfigurationList = OBJ_171 /* Build configuration list for PBXNativeTarget "SwifterSockets" */;
 			buildPhases = (
-				OBJ_173 /* Sources */,
-				OBJ_182 /* Frameworks */,
+				OBJ_174 /* Sources */,
+				OBJ_183 /* Frameworks */,
 			);
 			buildRules = (
 			);
@@ -753,70 +755,70 @@
 			);
 			name = SwifterSockets;
 			productName = SwifterSockets;
-			productReference = OBJ_141 /* SwifterSockets.framework */;
+			productReference = OBJ_142 /* SwifterSockets.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		OBJ_183 /* SwifterLog */ = {
+		OBJ_184 /* SwifterLog */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = OBJ_184 /* Build configuration list for PBXNativeTarget "SwifterLog" */;
+			buildConfigurationList = OBJ_185 /* Build configuration list for PBXNativeTarget "SwifterLog" */;
 			buildPhases = (
-				OBJ_187 /* Sources */,
-				OBJ_190 /* Frameworks */,
+				OBJ_188 /* Sources */,
+				OBJ_191 /* Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				OBJ_195 /* PBXTargetDependency */,
 				OBJ_196 /* PBXTargetDependency */,
 				OBJ_197 /* PBXTargetDependency */,
 				OBJ_198 /* PBXTargetDependency */,
+				OBJ_199 /* PBXTargetDependency */,
 			);
 			name = SwifterLog;
 			productName = SwifterLog;
-			productReference = OBJ_142 /* SwifterLog.framework */;
+			productReference = OBJ_143 /* SwifterLog.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		OBJ_199 /* SwiftfireCore */ = {
+		OBJ_200 /* SwiftfireCore */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = OBJ_200 /* Build configuration list for PBXNativeTarget "SwiftfireCore" */;
+			buildConfigurationList = OBJ_201 /* Build configuration list for PBXNativeTarget "SwiftfireCore" */;
 			buildPhases = (
-				OBJ_203 /* Sources */,
-				OBJ_268 /* Frameworks */,
+				OBJ_204 /* Sources */,
+				OBJ_269 /* Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				OBJ_274 /* PBXTargetDependency */,
 				OBJ_275 /* PBXTargetDependency */,
 				OBJ_276 /* PBXTargetDependency */,
 				OBJ_277 /* PBXTargetDependency */,
 				OBJ_278 /* PBXTargetDependency */,
+				OBJ_279 /* PBXTargetDependency */,
 			);
 			name = SwiftfireCore;
 			productName = SwiftfireCore;
-			productReference = OBJ_143 /* SwiftfireCore.framework */;
+			productReference = OBJ_144 /* SwiftfireCore.framework */;
 			productType = "com.apple.product-type.framework";
 		};
-		OBJ_279 /* Swiftfire */ = {
+		OBJ_280 /* Swiftfire */ = {
 			isa = PBXNativeTarget;
-			buildConfigurationList = OBJ_280 /* Build configuration list for PBXNativeTarget "Swiftfire" */;
+			buildConfigurationList = OBJ_281 /* Build configuration list for PBXNativeTarget "Swiftfire" */;
 			buildPhases = (
-				OBJ_283 /* Sources */,
-				OBJ_324 /* Frameworks */,
+				OBJ_284 /* Sources */,
+				OBJ_325 /* Frameworks */,
 			);
 			buildRules = (
 			);
 			dependencies = (
-				OBJ_331 /* PBXTargetDependency */,
 				OBJ_332 /* PBXTargetDependency */,
 				OBJ_333 /* PBXTargetDependency */,
 				OBJ_334 /* PBXTargetDependency */,
 				OBJ_335 /* PBXTargetDependency */,
 				OBJ_336 /* PBXTargetDependency */,
+				OBJ_337 /* PBXTargetDependency */,
 			);
 			name = Swiftfire;
 			productName = Swiftfire;
-			productReference = OBJ_144 /* Swiftfire */;
+			productReference = OBJ_145 /* Swiftfire */;
 			productType = "com.apple.product-type.tool";
 		};
 /* End PBXNativeTarget section */
@@ -835,23 +837,23 @@
 				en,
 			);
 			mainGroup = OBJ_5 /*  */;
-			productRefGroup = OBJ_137 /* Products */;
+			productRefGroup = OBJ_138 /* Products */;
 			projectDirPath = "";
 			projectRoot = "";
 			targets = (
-				OBJ_145 /* CAsl */,
-				OBJ_153 /* Ascii */,
-				OBJ_160 /* SwifterJSON */,
-				OBJ_169 /* SwifterSockets */,
-				OBJ_183 /* SwifterLog */,
-				OBJ_199 /* SwiftfireCore */,
-				OBJ_279 /* Swiftfire */,
+				OBJ_146 /* CAsl */,
+				OBJ_154 /* Ascii */,
+				OBJ_161 /* SwifterJSON */,
+				OBJ_170 /* SwifterSockets */,
+				OBJ_184 /* SwifterLog */,
+				OBJ_200 /* SwiftfireCore */,
+				OBJ_280 /* Swiftfire */,
 			);
 		};
 /* End PBXProject section */
 
 /* Begin PBXShellScriptBuildPhase section */
-		OBJ_149 /* ShellScript */ = {
+		OBJ_150 /* ShellScript */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 0;
 			files = (
@@ -863,259 +865,259 @@
 /* End PBXShellScriptBuildPhase section */
 
 /* Begin PBXSourcesBuildPhase section */
-		OBJ_150 /* Sources */ = {
+		OBJ_151 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
-				OBJ_151 /* CAsl.m in Sources */,
+				OBJ_152 /* CAsl.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		OBJ_157 /* Sources */ = {
+		OBJ_158 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
-				OBJ_158 /* Ascii.swift in Sources */,
+				OBJ_159 /* Ascii.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		OBJ_164 /* Sources */ = {
+		OBJ_165 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
-				OBJ_165 /* VJson.swift in Sources */,
+				OBJ_166 /* VJson.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		OBJ_173 /* Sources */ = {
+		OBJ_174 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
-				OBJ_174 /* SwifterSockets.Accept.swift in Sources */,
-				OBJ_175 /* SwifterSockets.Client.swift in Sources */,
-				OBJ_176 /* SwifterSockets.Connection.swift in Sources */,
-				OBJ_177 /* SwifterSockets.ConnectionPool.swift in Sources */,
-				OBJ_178 /* SwifterSockets.Receive.swift in Sources */,
-				OBJ_179 /* SwifterSockets.Server.swift in Sources */,
-				OBJ_180 /* SwifterSockets.swift in Sources */,
-				OBJ_181 /* SwifterSockets.Transmit.swift in Sources */,
+				OBJ_175 /* SwifterSockets.Accept.swift in Sources */,
+				OBJ_176 /* SwifterSockets.Client.swift in Sources */,
+				OBJ_177 /* SwifterSockets.Connection.swift in Sources */,
+				OBJ_178 /* SwifterSockets.ConnectionPool.swift in Sources */,
+				OBJ_179 /* SwifterSockets.Receive.swift in Sources */,
+				OBJ_180 /* SwifterSockets.Server.swift in Sources */,
+				OBJ_181 /* SwifterSockets.swift in Sources */,
+				OBJ_182 /* SwifterSockets.Transmit.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		OBJ_187 /* Sources */ = {
+		OBJ_188 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
-				OBJ_188 /* SwifterLog.Network.swift in Sources */,
-				OBJ_189 /* SwifterLog.swift in Sources */,
+				OBJ_189 /* SwifterLog.Network.swift in Sources */,
+				OBJ_190 /* SwifterLog.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		OBJ_203 /* Sources */ = {
+		OBJ_204 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
-				OBJ_204 /* Blacklist.swift in Sources */,
-				OBJ_205 /* Command.CreateDomain.swift in Sources */,
-				OBJ_206 /* Command.Delta.swift in Sources */,
-				OBJ_207 /* Command.ReadBlacklist.swift in Sources */,
-				OBJ_208 /* Command.ReadDomains.swift in Sources */,
-				OBJ_209 /* Command.ReadServerParameter.swift in Sources */,
-				OBJ_210 /* Command.ReadServerTelemetry.swift in Sources */,
-				OBJ_211 /* Command.ReadServices.swift in Sources */,
-				OBJ_212 /* Command.ReadStatistics.swift in Sources */,
-				OBJ_213 /* Command.RemoveDomain.swift in Sources */,
-				OBJ_214 /* Command.ResetDomainTelemetry.swift in Sources */,
-				OBJ_215 /* Command.RestoreBlacklist.swift in Sources */,
-				OBJ_216 /* Command.RestoreDomains.swift in Sources */,
-				OBJ_217 /* Command.RestoreServerParameters.swift in Sources */,
-				OBJ_218 /* Command.SaveBlacklist.swift in Sources */,
-				OBJ_219 /* Command.SaveDomains.swift in Sources */,
-				OBJ_220 /* Command.SaveServerParameters.swift in Sources */,
-				OBJ_221 /* Command.ServerQuit.swift in Sources */,
-				OBJ_222 /* Command.ServerStart.swift in Sources */,
-				OBJ_223 /* Command.ServerStop.swift in Sources */,
-				OBJ_224 /* Command.UpdateBlacklist.swift in Sources */,
-				OBJ_225 /* Command.UpdateClient.swift in Sources */,
-				OBJ_226 /* Command.UpdateDomain.swift in Sources */,
-				OBJ_227 /* Command.UpdatePathPart.swift in Sources */,
-				OBJ_228 /* Command.UpdateServices.swift in Sources */,
-				OBJ_229 /* Command.WriteServerParameter.swift in Sources */,
-				OBJ_230 /* Domain.swift in Sources */,
-				OBJ_231 /* Domains.swift in Sources */,
-				OBJ_232 /* DomainServices.swift in Sources */,
-				OBJ_233 /* DomainTelemetry.swift in Sources */,
-				OBJ_234 /* Extensions.swift in Sources */,
-				OBJ_235 /* GenericHelpers.swift in Sources */,
-				OBJ_236 /* HttpHeader.swift in Sources */,
-				OBJ_237 /* HttpHost.swift in Sources */,
-				OBJ_238 /* HttpResponse.swift in Sources */,
-				OBJ_239 /* HttpResponseCodes.swift in Sources */,
-				OBJ_240 /* Logfile.404Log.swift in Sources */,
-				OBJ_241 /* Logfile.AccessLog.swift in Sources */,
-				OBJ_242 /* Logfile.swift in Sources */,
-				OBJ_243 /* MacMessage.swift in Sources */,
-				OBJ_244 /* MimeType.swift in Sources */,
-				OBJ_245 /* Mutation.swift in Sources */,
-				OBJ_246 /* Parameters.swift in Sources */,
-				OBJ_247 /* Reply.ClosingMacConnection.swift in Sources */,
-				OBJ_248 /* Reply.LogLine.swift in Sources */,
-				OBJ_249 /* Reply.ReadBlacklist.swift in Sources */,
-				OBJ_250 /* Reply.ReadDomains.swift in Sources */,
-				OBJ_251 /* Reply.ReadServerParameter.swift in Sources */,
-				OBJ_252 /* Reply.ReadServerTelemetry.swift in Sources */,
-				OBJ_253 /* Reply.ReadServices.swift in Sources */,
-				OBJ_254 /* Reply.ReadStatistics.swift in Sources */,
-				OBJ_255 /* ServerParameterNames.swift in Sources */,
-				OBJ_256 /* ServerTelemetryNames.swift in Sources */,
-				OBJ_257 /* Statistics.swift in Sources */,
-				OBJ_258 /* StClient.swift in Sources */,
-				OBJ_259 /* StClientRecord.swift in Sources */,
-				OBJ_260 /* StClients.swift in Sources */,
-				OBJ_261 /* StCounter.swift in Sources */,
-				OBJ_262 /* StDomains.swift in Sources */,
-				OBJ_263 /* StPathPart.swift in Sources */,
-				OBJ_264 /* Telemetry.swift in Sources */,
-				OBJ_265 /* TimedClosure.swift in Sources */,
-				OBJ_266 /* UIntTelemetry.swift in Sources */,
-				OBJ_267 /* WallclockTime.swift in Sources */,
+				OBJ_205 /* Blacklist.swift in Sources */,
+				OBJ_206 /* Command.CreateDomain.swift in Sources */,
+				OBJ_207 /* Command.Delta.swift in Sources */,
+				OBJ_208 /* Command.ReadBlacklist.swift in Sources */,
+				OBJ_209 /* Command.ReadDomains.swift in Sources */,
+				OBJ_210 /* Command.ReadServerParameter.swift in Sources */,
+				OBJ_211 /* Command.ReadServerTelemetry.swift in Sources */,
+				OBJ_212 /* Command.ReadServices.swift in Sources */,
+				OBJ_213 /* Command.ReadStatistics.swift in Sources */,
+				OBJ_214 /* Command.RemoveDomain.swift in Sources */,
+				OBJ_215 /* Command.ResetDomainTelemetry.swift in Sources */,
+				OBJ_216 /* Command.RestoreBlacklist.swift in Sources */,
+				OBJ_217 /* Command.RestoreDomains.swift in Sources */,
+				OBJ_218 /* Command.RestoreServerParameters.swift in Sources */,
+				OBJ_219 /* Command.SaveBlacklist.swift in Sources */,
+				OBJ_220 /* Command.SaveDomains.swift in Sources */,
+				OBJ_221 /* Command.SaveServerParameters.swift in Sources */,
+				OBJ_222 /* Command.ServerQuit.swift in Sources */,
+				OBJ_223 /* Command.ServerStart.swift in Sources */,
+				OBJ_224 /* Command.ServerStop.swift in Sources */,
+				OBJ_225 /* Command.UpdateBlacklist.swift in Sources */,
+				OBJ_226 /* Command.UpdateClient.swift in Sources */,
+				OBJ_227 /* Command.UpdateDomain.swift in Sources */,
+				OBJ_228 /* Command.UpdatePathPart.swift in Sources */,
+				OBJ_229 /* Command.UpdateServices.swift in Sources */,
+				OBJ_230 /* Command.WriteServerParameter.swift in Sources */,
+				OBJ_231 /* Domain.swift in Sources */,
+				OBJ_232 /* Domains.swift in Sources */,
+				OBJ_233 /* DomainServices.swift in Sources */,
+				OBJ_234 /* DomainTelemetry.swift in Sources */,
+				OBJ_235 /* Extensions.swift in Sources */,
+				OBJ_236 /* GenericHelpers.swift in Sources */,
+				OBJ_237 /* HttpHeader.swift in Sources */,
+				OBJ_238 /* HttpHost.swift in Sources */,
+				OBJ_239 /* HttpResponse.swift in Sources */,
+				OBJ_240 /* HttpResponseCodes.swift in Sources */,
+				OBJ_241 /* Logfile.404Log.swift in Sources */,
+				OBJ_242 /* Logfile.AccessLog.swift in Sources */,
+				OBJ_243 /* Logfile.swift in Sources */,
+				OBJ_244 /* MacMessage.swift in Sources */,
+				OBJ_245 /* MimeType.swift in Sources */,
+				OBJ_246 /* Mutation.swift in Sources */,
+				OBJ_247 /* Parameters.swift in Sources */,
+				OBJ_248 /* Reply.ClosingMacConnection.swift in Sources */,
+				OBJ_249 /* Reply.LogLine.swift in Sources */,
+				OBJ_250 /* Reply.ReadBlacklist.swift in Sources */,
+				OBJ_251 /* Reply.ReadDomains.swift in Sources */,
+				OBJ_252 /* Reply.ReadServerParameter.swift in Sources */,
+				OBJ_253 /* Reply.ReadServerTelemetry.swift in Sources */,
+				OBJ_254 /* Reply.ReadServices.swift in Sources */,
+				OBJ_255 /* Reply.ReadStatistics.swift in Sources */,
+				OBJ_256 /* ServerParameterNames.swift in Sources */,
+				OBJ_257 /* ServerTelemetryNames.swift in Sources */,
+				OBJ_258 /* Statistics.swift in Sources */,
+				OBJ_259 /* StClient.swift in Sources */,
+				OBJ_260 /* StClientRecord.swift in Sources */,
+				OBJ_261 /* StClients.swift in Sources */,
+				OBJ_262 /* StCounter.swift in Sources */,
+				OBJ_263 /* StDomains.swift in Sources */,
+				OBJ_264 /* StPathPart.swift in Sources */,
+				OBJ_265 /* Telemetry.swift in Sources */,
+				OBJ_266 /* TimedClosure.swift in Sources */,
+				OBJ_267 /* UIntTelemetry.swift in Sources */,
+				OBJ_268 /* WallclockTime.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
-		OBJ_283 /* Sources */ = {
+		OBJ_284 /* Sources */ = {
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 0;
 			files = (
-				OBJ_284 /* Domain.Extensions.swift in Sources */,
-				OBJ_285 /* DomainService.Blacklist.swift in Sources */,
-				OBJ_286 /* DomainService.GetFileAtResourcePath.swift in Sources */,
-				OBJ_287 /* DomainService.GetResourcePathFromUrl.swift in Sources */,
-				OBJ_288 /* DomainService.OnlyGetOrPost.swift in Sources */,
-				OBJ_289 /* DomainService.OnlyHttp10or11.swift in Sources */,
-				OBJ_290 /* DomainServices.Registration.swift in Sources */,
-				OBJ_291 /* FileURLs.swift in Sources */,
-				OBJ_292 /* Forwarder.swift in Sources */,
-				OBJ_293 /* HttpConnection.swift in Sources */,
-				OBJ_294 /* HttpConnection.Worker.swift in Sources */,
-				OBJ_295 /* HttpHeaderLogger.swift in Sources */,
-				OBJ_296 /* MacCommand.CreateDomain.swift in Sources */,
-				OBJ_297 /* MacCommand.Delta.swift in Sources */,
-				OBJ_298 /* MacCommand.ReadBlacklist.swift in Sources */,
-				OBJ_299 /* MacCommand.ReadDomains.swift in Sources */,
-				OBJ_300 /* MacCommand.ReadServerParameter.swift in Sources */,
-				OBJ_301 /* MacCommand.ReadServerTelemetry.swift in Sources */,
-				OBJ_302 /* MacCommand.ReadServices.swift in Sources */,
-				OBJ_303 /* MacCommand.ReadStatistics.swift in Sources */,
-				OBJ_304 /* MacCommand.RemoveDomain.swift in Sources */,
-				OBJ_305 /* MacCommand.ResetDomainTelemetry.swift in Sources */,
-				OBJ_306 /* MacCommand.RestoreBlacklist.swift in Sources */,
-				OBJ_307 /* MacCommand.RestoreDomains.swift in Sources */,
-				OBJ_308 /* MacCommand.RestoreServerParameters.swift in Sources */,
-				OBJ_309 /* MacCommand.SaveBlacklist.swift in Sources */,
-				OBJ_310 /* MacCommand.SaveDomains.swift in Sources */,
-				OBJ_311 /* MacCommand.SaveServerParameters.swift in Sources */,
-				OBJ_312 /* MacCommand.ServerQuit.swift in Sources */,
-				OBJ_313 /* MacCommand.ServerStart.swift in Sources */,
-				OBJ_314 /* MacCommand.ServerStop.swift in Sources */,
-				OBJ_315 /* MacCommand.UpdateBlacklist.swift in Sources */,
-				OBJ_316 /* MacCommand.UpdateClient.swift in Sources */,
-				OBJ_317 /* MacCommand.UpdateDomain.swift in Sources */,
-				OBJ_318 /* MacCommand.UpdatePathPart.swift in Sources */,
-				OBJ_319 /* MacCommand.UpdateServices.swift in Sources */,
-				OBJ_320 /* MacCommand.WriteServerParameter.swift in Sources */,
-				OBJ_321 /* main.swift in Sources */,
-				OBJ_322 /* MonitoringAndControlConnection.swift in Sources */,
-				OBJ_323 /* Mutation.Extensions.swift in Sources */,
+				OBJ_285 /* Domain.Extensions.swift in Sources */,
+				OBJ_286 /* DomainService.Blacklist.swift in Sources */,
+				OBJ_287 /* DomainService.GetFileAtResourcePath.swift in Sources */,
+				OBJ_288 /* DomainService.GetResourcePathFromUrl.swift in Sources */,
+				OBJ_289 /* DomainService.OnlyGetOrPost.swift in Sources */,
+				OBJ_290 /* DomainService.OnlyHttp10or11.swift in Sources */,
+				OBJ_291 /* DomainServices.Registration.swift in Sources */,
+				OBJ_292 /* FileURLs.swift in Sources */,
+				OBJ_293 /* Forwarder.swift in Sources */,
+				OBJ_294 /* HttpConnection.swift in Sources */,
+				OBJ_295 /* HttpConnection.Worker.swift in Sources */,
+				OBJ_296 /* HttpHeaderLogger.swift in Sources */,
+				OBJ_297 /* MacCommand.CreateDomain.swift in Sources */,
+				OBJ_298 /* MacCommand.Delta.swift in Sources */,
+				OBJ_299 /* MacCommand.ReadBlacklist.swift in Sources */,
+				OBJ_300 /* MacCommand.ReadDomains.swift in Sources */,
+				OBJ_301 /* MacCommand.ReadServerParameter.swift in Sources */,
+				OBJ_302 /* MacCommand.ReadServerTelemetry.swift in Sources */,
+				OBJ_303 /* MacCommand.ReadServices.swift in Sources */,
+				OBJ_304 /* MacCommand.ReadStatistics.swift in Sources */,
+				OBJ_305 /* MacCommand.RemoveDomain.swift in Sources */,
+				OBJ_306 /* MacCommand.ResetDomainTelemetry.swift in Sources */,
+				OBJ_307 /* MacCommand.RestoreBlacklist.swift in Sources */,
+				OBJ_308 /* MacCommand.RestoreDomains.swift in Sources */,
+				OBJ_309 /* MacCommand.RestoreServerParameters.swift in Sources */,
+				OBJ_310 /* MacCommand.SaveBlacklist.swift in Sources */,
+				OBJ_311 /* MacCommand.SaveDomains.swift in Sources */,
+				OBJ_312 /* MacCommand.SaveServerParameters.swift in Sources */,
+				OBJ_313 /* MacCommand.ServerQuit.swift in Sources */,
+				OBJ_314 /* MacCommand.ServerStart.swift in Sources */,
+				OBJ_315 /* MacCommand.ServerStop.swift in Sources */,
+				OBJ_316 /* MacCommand.UpdateBlacklist.swift in Sources */,
+				OBJ_317 /* MacCommand.UpdateClient.swift in Sources */,
+				OBJ_318 /* MacCommand.UpdateDomain.swift in Sources */,
+				OBJ_319 /* MacCommand.UpdatePathPart.swift in Sources */,
+				OBJ_320 /* MacCommand.UpdateServices.swift in Sources */,
+				OBJ_321 /* MacCommand.WriteServerParameter.swift in Sources */,
+				OBJ_322 /* main.swift in Sources */,
+				OBJ_323 /* MonitoringAndControlConnection.swift in Sources */,
+				OBJ_324 /* Mutation.Extensions.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
 /* End PBXSourcesBuildPhase section */
 
 /* Begin PBXTargetDependency section */
-		OBJ_168 /* PBXTargetDependency */ = {
+		OBJ_169 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = OBJ_153 /* Ascii */;
-			targetProxy = 86F0ABF81E62CFFF0024B8BD /* PBXContainerItemProxy */;
-		};
-		OBJ_195 /* PBXTargetDependency */ = {
-			isa = PBXTargetDependency;
-			target = OBJ_145 /* CAsl */;
-			targetProxy = 86F0ABF91E62CFFF0024B8BD /* PBXContainerItemProxy */;
+			target = OBJ_154 /* Ascii */;
+			targetProxy = 86FD70691E656F63007D8F70 /* PBXContainerItemProxy */;
 		};
 		OBJ_196 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = OBJ_153 /* Ascii */;
-			targetProxy = 86F0ABFA1E62CFFF0024B8BD /* PBXContainerItemProxy */;
+			target = OBJ_146 /* CAsl */;
+			targetProxy = 86FD706A1E656F63007D8F70 /* PBXContainerItemProxy */;
 		};
 		OBJ_197 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = OBJ_160 /* SwifterJSON */;
-			targetProxy = 86F0ABFB1E62CFFF0024B8BD /* PBXContainerItemProxy */;
+			target = OBJ_154 /* Ascii */;
+			targetProxy = 86FD706B1E656F63007D8F70 /* PBXContainerItemProxy */;
 		};
 		OBJ_198 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = OBJ_169 /* SwifterSockets */;
-			targetProxy = 86F0ABFC1E62CFFF0024B8BD /* PBXContainerItemProxy */;
+			target = OBJ_161 /* SwifterJSON */;
+			targetProxy = 86FD706C1E656F63007D8F70 /* PBXContainerItemProxy */;
 		};
-		OBJ_274 /* PBXTargetDependency */ = {
+		OBJ_199 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = OBJ_145 /* CAsl */;
-			targetProxy = 86F0ABFD1E62CFFF0024B8BD /* PBXContainerItemProxy */;
+			target = OBJ_170 /* SwifterSockets */;
+			targetProxy = 86FD706D1E656F63007D8F70 /* PBXContainerItemProxy */;
 		};
 		OBJ_275 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = OBJ_153 /* Ascii */;
-			targetProxy = 86F0ABFE1E62CFFF0024B8BD /* PBXContainerItemProxy */;
+			target = OBJ_146 /* CAsl */;
+			targetProxy = 86FD706E1E656F63007D8F70 /* PBXContainerItemProxy */;
 		};
 		OBJ_276 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = OBJ_160 /* SwifterJSON */;
-			targetProxy = 86F0ABFF1E62CFFF0024B8BD /* PBXContainerItemProxy */;
+			target = OBJ_154 /* Ascii */;
+			targetProxy = 86FD706F1E656F63007D8F70 /* PBXContainerItemProxy */;
 		};
 		OBJ_277 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = OBJ_169 /* SwifterSockets */;
-			targetProxy = 86F0AC001E62CFFF0024B8BD /* PBXContainerItemProxy */;
+			target = OBJ_161 /* SwifterJSON */;
+			targetProxy = 86FD70701E656F63007D8F70 /* PBXContainerItemProxy */;
 		};
 		OBJ_278 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = OBJ_183 /* SwifterLog */;
-			targetProxy = 86F0AC011E62CFFF0024B8BD /* PBXContainerItemProxy */;
+			target = OBJ_170 /* SwifterSockets */;
+			targetProxy = 86FD70711E656F63007D8F70 /* PBXContainerItemProxy */;
 		};
-		OBJ_331 /* PBXTargetDependency */ = {
+		OBJ_279 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = OBJ_145 /* CAsl */;
-			targetProxy = 86F0AC021E62CFFF0024B8BD /* PBXContainerItemProxy */;
+			target = OBJ_184 /* SwifterLog */;
+			targetProxy = 86FD70721E656F63007D8F70 /* PBXContainerItemProxy */;
 		};
 		OBJ_332 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = OBJ_153 /* Ascii */;
-			targetProxy = 86F0AC031E62CFFF0024B8BD /* PBXContainerItemProxy */;
+			target = OBJ_146 /* CAsl */;
+			targetProxy = 86FD70731E656F63007D8F70 /* PBXContainerItemProxy */;
 		};
 		OBJ_333 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = OBJ_160 /* SwifterJSON */;
-			targetProxy = 86F0AC041E62CFFF0024B8BD /* PBXContainerItemProxy */;
+			target = OBJ_154 /* Ascii */;
+			targetProxy = 86FD70741E656F63007D8F70 /* PBXContainerItemProxy */;
 		};
 		OBJ_334 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = OBJ_169 /* SwifterSockets */;
-			targetProxy = 86F0AC051E62CFFF0024B8BD /* PBXContainerItemProxy */;
+			target = OBJ_161 /* SwifterJSON */;
+			targetProxy = 86FD70751E656F63007D8F70 /* PBXContainerItemProxy */;
 		};
 		OBJ_335 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = OBJ_183 /* SwifterLog */;
-			targetProxy = 86F0AC061E62CFFF0024B8BD /* PBXContainerItemProxy */;
+			target = OBJ_170 /* SwifterSockets */;
+			targetProxy = 86FD70761E656F63007D8F70 /* PBXContainerItemProxy */;
 		};
 		OBJ_336 /* PBXTargetDependency */ = {
 			isa = PBXTargetDependency;
-			target = OBJ_199 /* SwiftfireCore */;
-			targetProxy = 86F0AC071E62CFFF0024B8BD /* PBXContainerItemProxy */;
+			target = OBJ_184 /* SwifterLog */;
+			targetProxy = 86FD70771E656F63007D8F70 /* PBXContainerItemProxy */;
+		};
+		OBJ_337 /* PBXTargetDependency */ = {
+			isa = PBXTargetDependency;
+			target = OBJ_200 /* SwiftfireCore */;
+			targetProxy = 86FD70781E656F63007D8F70 /* PBXContainerItemProxy */;
 		};
 /* End PBXTargetDependency section */
 
 /* Begin XCBuildConfiguration section */
-		OBJ_147 /* Debug */ = {
+		OBJ_148 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				DEFINES_MODULE = YES;
@@ -1140,7 +1142,7 @@
 			};
 			name = Debug;
 		};
-		OBJ_148 /* Release */ = {
+		OBJ_149 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				DEFINES_MODULE = YES;
@@ -1165,7 +1167,7 @@
 			};
 			name = Release;
 		};
-		OBJ_155 /* Debug */ = {
+		OBJ_156 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ENABLE_TESTABILITY = YES;
@@ -1185,7 +1187,7 @@
 			};
 			name = Debug;
 		};
-		OBJ_156 /* Release */ = {
+		OBJ_157 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ENABLE_TESTABILITY = YES;
@@ -1205,7 +1207,7 @@
 			};
 			name = Release;
 		};
-		OBJ_162 /* Debug */ = {
+		OBJ_163 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ENABLE_TESTABILITY = YES;
@@ -1225,7 +1227,7 @@
 			};
 			name = Debug;
 		};
-		OBJ_163 /* Release */ = {
+		OBJ_164 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ENABLE_TESTABILITY = YES;
@@ -1245,7 +1247,7 @@
 			};
 			name = Release;
 		};
-		OBJ_171 /* Debug */ = {
+		OBJ_172 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ENABLE_TESTABILITY = YES;
@@ -1265,7 +1267,7 @@
 			};
 			name = Debug;
 		};
-		OBJ_172 /* Release */ = {
+		OBJ_173 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ENABLE_TESTABILITY = YES;
@@ -1285,7 +1287,7 @@
 			};
 			name = Release;
 		};
-		OBJ_185 /* Debug */ = {
+		OBJ_186 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ENABLE_TESTABILITY = YES;
@@ -1309,7 +1311,7 @@
 			};
 			name = Debug;
 		};
-		OBJ_186 /* Release */ = {
+		OBJ_187 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ENABLE_TESTABILITY = YES;
@@ -1333,7 +1335,7 @@
 			};
 			name = Release;
 		};
-		OBJ_201 /* Debug */ = {
+		OBJ_202 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ENABLE_TESTABILITY = YES;
@@ -1357,7 +1359,7 @@
 			};
 			name = Debug;
 		};
-		OBJ_202 /* Release */ = {
+		OBJ_203 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ENABLE_TESTABILITY = YES;
@@ -1381,7 +1383,7 @@
 			};
 			name = Release;
 		};
-		OBJ_281 /* Debug */ = {
+		OBJ_282 /* Debug */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = (
@@ -1403,7 +1405,7 @@
 			};
 			name = Debug;
 		};
-		OBJ_282 /* Release */ = {
+		OBJ_283 /* Release */ = {
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				FRAMEWORK_SEARCH_PATHS = (
@@ -1470,47 +1472,47 @@
 /* End XCBuildConfiguration section */
 
 /* Begin XCConfigurationList section */
-		OBJ_146 /* Build configuration list for PBXNativeTarget "CAsl" */ = {
+		OBJ_147 /* Build configuration list for PBXNativeTarget "CAsl" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				OBJ_147 /* Debug */,
-				OBJ_148 /* Release */,
+				OBJ_148 /* Debug */,
+				OBJ_149 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		OBJ_154 /* Build configuration list for PBXNativeTarget "Ascii" */ = {
+		OBJ_155 /* Build configuration list for PBXNativeTarget "Ascii" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				OBJ_155 /* Debug */,
-				OBJ_156 /* Release */,
+				OBJ_156 /* Debug */,
+				OBJ_157 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		OBJ_161 /* Build configuration list for PBXNativeTarget "SwifterJSON" */ = {
+		OBJ_162 /* Build configuration list for PBXNativeTarget "SwifterJSON" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				OBJ_162 /* Debug */,
-				OBJ_163 /* Release */,
+				OBJ_163 /* Debug */,
+				OBJ_164 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		OBJ_170 /* Build configuration list for PBXNativeTarget "SwifterSockets" */ = {
+		OBJ_171 /* Build configuration list for PBXNativeTarget "SwifterSockets" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				OBJ_171 /* Debug */,
-				OBJ_172 /* Release */,
+				OBJ_172 /* Debug */,
+				OBJ_173 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		OBJ_184 /* Build configuration list for PBXNativeTarget "SwifterLog" */ = {
+		OBJ_185 /* Build configuration list for PBXNativeTarget "SwifterLog" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				OBJ_185 /* Debug */,
-				OBJ_186 /* Release */,
+				OBJ_186 /* Debug */,
+				OBJ_187 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
@@ -1524,20 +1526,20 @@
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		OBJ_200 /* Build configuration list for PBXNativeTarget "SwiftfireCore" */ = {
+		OBJ_201 /* Build configuration list for PBXNativeTarget "SwiftfireCore" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				OBJ_201 /* Debug */,
-				OBJ_202 /* Release */,
+				OBJ_202 /* Debug */,
+				OBJ_203 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;
 		};
-		OBJ_280 /* Build configuration list for PBXNativeTarget "Swiftfire" */ = {
+		OBJ_281 /* Build configuration list for PBXNativeTarget "Swiftfire" */ = {
 			isa = XCConfigurationList;
 			buildConfigurations = (
-				OBJ_281 /* Debug */,
-				OBJ_282 /* Release */,
+				OBJ_282 /* Debug */,
+				OBJ_283 /* Release */,
 			);
 			defaultConfigurationIsVisible = 0;
 			defaultConfigurationName = Debug;

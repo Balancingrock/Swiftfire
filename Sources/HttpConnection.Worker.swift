@@ -85,7 +85,7 @@ extension HttpConnection {
     
     /// Create an error for a missing http version
     
-    private func send400BadRequestResponse(_ message: String) {
+    private func send400BadRequestResponse(_ message: String, processingStartedAt: Int64) {
         
         
         // Telemetry update
@@ -109,7 +109,7 @@ extension HttpConnection {
         let mutation = Mutation.createAddClientRecord(from: self)
         mutation.httpResponseCode = HttpResponseCode.code400_BadRequest.rawValue
         mutation.responseDetails = message
-        mutation.requestCompleted = Date().javaDate
+        mutation.requestReceived = processingStartedAt
         statistics.submit(mutation: mutation)
 
     }
@@ -117,7 +117,7 @@ extension HttpConnection {
     
     /// Create an error if http1.0 is not supported.
     
-    private func send500InternalServerError(_ message: String) {
+    private func send500InternalServerError(_ message: String, processingStartedAt: Int64) {
         
         
         // Telemetry update
@@ -141,7 +141,7 @@ extension HttpConnection {
         let mutation = Mutation.createAddClientRecord(from: self)
         mutation.httpResponseCode = HttpResponseCode.code500_InternalServerError.rawValue
         mutation.responseDetails = message
-        mutation.requestCompleted = Date().javaDate
+        mutation.requestReceived = processingStartedAt
         statistics.submit(mutation: mutation)
 
     }
@@ -152,12 +152,21 @@ extension HttpConnection {
     
     func worker(header: HttpHeader, body: Data) {
         
+        
+        // To determine how long it takes to create a response message
+        
+        let timestampResponseStart = Date().javaDate
+        
+        
 
         // =============================================================================================================
         // Find the domain (host) this request is for.
         // =============================================================================================================
 
-        guard let httpVersion = header.httpVersion else { send400BadRequestResponse("HTTP Version not present"); return }
+        guard let httpVersion = header.httpVersion else {
+            send400BadRequestResponse("HTTP Version not present", processingStartedAt: timestampResponseStart)
+            return
+        }
         
         var host: HttpHost
         
@@ -184,14 +193,14 @@ extension HttpConnection {
                     
                 } else {
                 
-                    send500InternalServerError("HTTP 1.0 requests not supported")
+                    send500InternalServerError("HTTP 1.0 requests not supported", processingStartedAt: timestampResponseStart)
                     
                     return
                 }
 
             } else {
                 
-                send400BadRequestResponse("Could not extract host from Http Request Header")
+                send400BadRequestResponse("Could not extract host from Http Request Header", processingStartedAt: timestampResponseStart)
                 
                 return
             }
@@ -209,7 +218,7 @@ extension HttpConnection {
                 message = "Domain not enabled for host: \(host.address)"
             }
             
-            send400BadRequestResponse(message)
+            send400BadRequestResponse(message, processingStartedAt: timestampResponseStart)
 
             return
         }
@@ -248,7 +257,7 @@ extension HttpConnection {
             mutation.domain = domain.name
             mutation.httpResponseCode = "Unavailable"
             mutation.responseDetails = "Forwarding of domain '\(host.address)'"
-            mutation.requestCompleted = Date().javaDate
+            mutation.requestReceived = timestampResponseStart
             statistics.submit(mutation: mutation)
 
             return
@@ -283,6 +292,7 @@ extension HttpConnection {
         // Note: Since the response.code is not set, it is possible to only consume a request and not transmit any response.
         
         var chainInfo = DomainServices.ChainInfo()
+        chainInfo[ResponseStartedKey] = timestampResponseStart
 
         if let services = domainServices(for: domain) {
             for service in services {
@@ -321,9 +331,12 @@ extension HttpConnection {
             mutation.domain = domain.name
             mutation.url = chainInfo[ResourcePathKey] as? String ?? "Unknown resource path"
             mutation.httpResponseCode = code.rawValue
-            mutation.requestCompleted = Date().javaDate
+            mutation.responseDetails = ""
+            mutation.requestReceived = timestampResponseStart
             statistics.submit(mutation: mutation)
 
+            log.atLevelInfo(id: logId, source: #file.source(#function, #line), message: "Response took \(Date().javaDate - timestampResponseStart) milli seconds")
+            
         } else {
         
             // There is no data, try to create a domain specific default response

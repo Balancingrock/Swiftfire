@@ -150,6 +150,7 @@ func ds_onlyHttp10or11(_ header: HttpHeader, _ body: Data?, _ connection: Connec
         let mutation = Mutation.createAddClientRecord(from: connection)
         mutation.httpResponseCode = HttpResponseCode.code400_BadRequest.rawValue
         mutation.responseDetails = message
+        mutation.requestReceived = chainInfo[ResponseStartedKey] as? Int64 ?? 0
         statistics.submit(mutation: mutation)
         
         
@@ -189,6 +190,7 @@ func ds_onlyHttp10or11(_ header: HttpHeader, _ body: Data?, _ connection: Connec
         let mutation = Mutation.createAddClientRecord(from: connection)
         mutation.httpResponseCode = HttpResponseCode.code505_HttpVersionNotSupported.rawValue
         mutation.responseDetails = message
+        mutation.requestReceived = chainInfo[ResponseStartedKey] as? Int64 ?? 0
         statistics.submit(mutation: mutation)
         
         

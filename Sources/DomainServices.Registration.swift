@@ -75,10 +75,24 @@ private let getResourcePathFromUrl = "Get resource path from request URL"
 private let getFileAtResourcePath = "Get file at resource path"
 
 
+// ===============
 // ChainInfo key's
+// ===============
+
+/// String, initialy set by DomainService.GetResourcePathFromUrl
 
 let ResourcePathKey = "ResourcePath"
 
+
+ // Int64, set by HttpConnection.Worker before first domain service call
+
+let ResponseStartedKey = "ResponseStarted"
+
+
+// =================================================
+// Add to the next function to register new services
+// =================================================
+// Notice that the sequence itself is not important
 
 /// Register the domain services
 
@@ -91,6 +105,11 @@ func registerDomainServices() {
     domainServices.register(name: getFileAtResourcePath, closure: ds_getFileAtResourcePath)
 }
 
+
+// ========================================================================
+// Add to the next array to provide a default service chain for NEW domains
+// ========================================================================
+// Notice that the sequence is very important
 
 /// Default services for newly created domains (implements a static webserver)
 

@@ -148,6 +148,7 @@ func ds_getResourcePathFromUrl(_ header: HttpHeader, _ body: Data?, _ connection
         let mutation = Mutation.createAddClientRecord(from: connection)
         mutation.httpResponseCode = HttpResponseCode.code400_BadRequest.rawValue
         mutation.responseDetails = message
+        mutation.requestReceived = chainInfo[ResponseStartedKey] as? Int64 ?? 0
         statistics.submit(mutation: mutation)
         
         
@@ -180,6 +181,7 @@ func ds_getResourcePathFromUrl(_ header: HttpHeader, _ body: Data?, _ connection
         let mutation = Mutation.createAddClientRecord(from: connection)
         mutation.httpResponseCode = HttpResponseCode.code404_NotFound.rawValue
         mutation.responseDetails = "Resource for url '\(path)' not found"
+        mutation.requestReceived = chainInfo[ResponseStartedKey] as? Int64 ?? 0
         statistics.submit(mutation: mutation)
         
         
@@ -207,6 +209,7 @@ func ds_getResourcePathFromUrl(_ header: HttpHeader, _ body: Data?, _ connection
         let mutation = Mutation.createAddClientRecord(from: connection)
         mutation.httpResponseCode = HttpResponseCode.code403_Forbidden.rawValue
         mutation.responseDetails = "Access for url '\(path)' not allowed"
+        mutation.requestReceived = chainInfo[ResponseStartedKey] as? Int64 ?? 0
         statistics.submit(mutation: mutation)
         
         

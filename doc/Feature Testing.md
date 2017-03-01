@@ -15,15 +15,15 @@ There are three different test methods: Test, Implicit and Code Inspection.
 | ID | Description | How | In  
 | -: | :- | :-: | :-:
 | SP 1 | Ensure that the number of the monitoring and control port can be changed. | Implicit | -
-| SP 2 | Ensure that the M&C interface is closed when the inactivity timeout expires | Test | -
+| SP 2 | Ensure that the M&C interface is closed when the inactivity timeout expires | Test | 0.9.15
 | SP 3 | Ensure that the HTTP service port number can be changed | Implicit | -
-| SP 4 | Ensure that the maximum number of parallel connection is configurable | Code Inspection | -
-| SP 5 | Ensure that the maximum number of pending connections is configurable | Code Inspection | -
-| SP 6 | Ensure that the maximum wait for pending connections is configurable | Code Inspection | -
-| SP 7 | Ensure that the Client Message Buffer size is configurable | Code Inspection | -
-| SP 8 | Ensure that the inactivity duration for keep alive is configurable | Code Inspection | -
-| SP 9 | Ensure that the timeout for a transfer to a client is configurable | Code Inspection | -
-| SP 10 | Ensure that the auto-start feature is configurable | Test | -
+| SP 4 | Ensure that the maximum number of parallel connection is configurable | Test | 0.9.15
+| SP 5 | Ensure that the maximum number of pending connections is configurable | Code Inspection | 0.9.15
+| SP 6 | Ensure that the maximum wait for pending connections is configurable | Code Inspection | 0.9.15
+| SP 7 | Ensure that the Client Message Buffer size is configurable | Code Inspection | 0.9.15
+| SP 8 | Ensure that the inactivity duration for keep alive is configurable | Test | 0.9.15
+| SP 9 | Ensure that the timeout for a transfer to a client is configurable | Code Inspection | 0.9.15
+| SP 10 | Ensure that the auto-start feature is configurable | Test | 0.9.15
 | SP 11 | Ensure that the ASL loglevel is configurable | Test | -
 | SP 12 | Ensure that the Stdout loglevel is configurable | Implicit | -
 | SP 13 | Ensure that the file loglevel is configurable | Test | -
@@ -33,7 +33,7 @@ There are three different test methods: Test, Implicit and Code Inspection.
 | SP 17 | Ensure that the network loglevel is configurable | Code Inspection | -
 | SP 18 | Ensure that the network target address can be set | Code Inspection | -
 | SP 19 | Ensure that the port of the network target can be set | Code Inspection | -
-| SP 20 | Ensure that logging of the full request header at server level can be performed | Test | -
+| SP 20 | Ensure that logging of the full request header at server level can be performed | Test | 0.9.15
 | SP 21 | Ensure that the maximum size of the full header logfile can be configured | Code Inspection | -
 | SP 22 | Ensure that the full header logfile can be flushed after each recording | Code Inspection | -
 | SP 23 | Check that HTTP 1.0 access is supported | Test | -
