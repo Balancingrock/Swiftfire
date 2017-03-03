@@ -151,7 +151,10 @@ func ds_getFileAtResourcePath(_ header: HttpHeader, _ body: Data?, _ connection:
         mutation.httpResponseCode = HttpResponseCode.code500_InternalServerError.rawValue
         mutation.responseDetails = "No resource path present"
         mutation.requestReceived = chainInfo[ResponseStartedKey] as? Int64 ?? 0
-        statistics.submit(mutation: mutation)
+        statistics.submit(mutation: mutation, onError: {
+            (message: String) in
+            log.atLevelError(id: connection.logId, source: #file.source(#function, #line), message: "Error during statistics submission:\(message)")
+        })
         
         
         // Response
@@ -215,7 +218,10 @@ func ds_getFileAtResourcePath(_ header: HttpHeader, _ body: Data?, _ connection:
         mutation.httpResponseCode = HttpResponseCode.code500_InternalServerError.rawValue
         mutation.responseDetails = message
         mutation.requestReceived = chainInfo[ResponseStartedKey] as? Int64 ?? 0
-        statistics.submit(mutation: mutation)
+        statistics.submit(mutation: mutation, onError: {
+            (message: String) in
+            log.atLevelError(id: connection.logId, source: #file.source(#function, #line), message: "Error during statistics submission:\(message)")
+        })
 
         
         // Response

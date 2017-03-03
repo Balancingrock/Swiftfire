@@ -84,7 +84,10 @@ extension RestoreBlacklistCommand: MacCommand {
         }
         else {
             if let domain = domains.domain(forName: source) {
-                domain.restoreBlacklist()
+                switch domain.restoreBlacklist() {
+                case .error(let message): log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Failed to restore blacklist for \(source), error = \(message)")
+                case .success: break
+                }
                 let reply = ReadBlacklistReply(source: source, list: domain.blacklist)
                 mac?.transfer(reply)
             }

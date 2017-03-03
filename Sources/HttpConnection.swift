@@ -372,7 +372,11 @@ func httpConnectionFactory(_ cType: SwifterSockets.InterfaceAccess, _ remoteAddr
     
     // Find a free SFConnection object
     
-    guard let connection = connectionPool.allocateOrTimeout(parameters.maxWaitForPendingConnections) as? HttpConnection else {
+    let (count, availableConnection) = connectionPool.allocateOrTimeout(parameters.maxWaitForPendingConnections)
+    
+    if count > 0 { telemetry.nofAcceptWaitsForConnectionObject.increment() }
+    
+    guard let connection = availableConnection as? HttpConnection else {
         log.atLevelEmergency(id: -1, source: #file.source(#function, #line), message: "SF Connection could not be allocated, client at \(remoteAddress) will be rejected")
         return nil
     }

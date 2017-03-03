@@ -34,8 +34,8 @@ There are three different test methods: Test, Implicit and Code Inspection.
 | SP 18 | Ensure that the network target address can be set | Code Inspection | -
 | SP 19 | Ensure that the port of the network target can be set | Code Inspection | -
 | SP 20 | Ensure that logging of the full request header at server level can be performed | Test | 0.9.15
-| SP 21 | Ensure that the maximum size of the full header logfile can be configured | Code Inspection | -
-| SP 22 | Ensure that the full header logfile can be flushed after each recording | Code Inspection | -
+| SP 21 | Ensure that the maximum size of the full header logfile can be configured | Code Inspection | 0.9.15
+| SP 22 | Ensure that the full header logfile can be flushed after each recording | Code Inspection | 0.9.15
 | SP 23 | Check that HTTP 1.0 access is supported | Test | -
 
 # Swiftfire Server Telemetry
@@ -44,34 +44,33 @@ There are three different test methods: Test, Implicit and Code Inspection.
 | -: | :- | :-: | :-:
 | ST 1 | Verify that the service version number is correctly reported | Implicit | -
 | ST 2 | Verify that the swiftfire status is correctly reported | Implicit | -
-| ST 3 | Verify that the number of accept calls that had to wait is correctly reported | Code Inspection | -
-| ST 4 | Verify that the total number of accepted HTTP requests is incremented correctly | Test | -
-| ST 5 | Verify that the number of HTTP 400 (bad request) is incremented correctly | Test | -
-| ST 6 | Verify that the number of HTTP 500 (server error) is incremented correctly | Code Inspection | -
-| ST 7 | Verify that the number of HTTP 502 (bad gateway) is incremented correctly | Code Inspection | -
+| ST 3 | Verify that the number of accept calls that had to wait is correctly reported | Code Inspection | 0.9.15
+| ST 4 | Verify that the total number of accepted HTTP requests is incremented correctly | Test | 0.9.15
+| ST 5 | Verify that the number of HTTP 400 (bad request) is incremented correctly | Code Inspection | 0.9.15
+| ST 6 | Verify that the number of HTTP 500 (server error) is incremented correctly | Code Inspection | 0.9.15
 
 # Domain Parameters
 
 | ID | Description | How | In |
 | -: | :- | :-: | :-:
 | DP 1 | Verify that the 'map www prefix' works as expected | Test | -
-| DP 2 | Verify that the root folder can be changed | Test | -
-| DP 3 | Verify that the resources folder can be configured | Test | -
+| DP 2 | Verify that the root folder can be changed | Test | 0.9.15
+| DP 3 | Verify that the resources folder can be configured | Test | 0.9.15
 | DP 4 | Test that domain forwarding works | Test | -
-| DP 5 | Verify that 'enable domain' works as expected | Test | -
-| DP 6 | Verify that access logging works for a domain | Test | -
-| DP 7 | Verify that the 404 logging works for a domain | Test | -
+| DP 5 | Verify that 'enable domain' works as expected | Test | 0.9.15
+| DP 6 | Verify that access logging works for a domain | Test | 0.9.15
+| DP 7 | Verify that the 404 logging works for a domain | Test | 0.9.15
 
 # Domain Telemetry
 
 | ID | Description | How | In |
 | -: | :- | :-: | :-:
-| DT 1 | Verify that the nof Requests is updated correctly | Test | -
+| DT 1 | Verify that the nof Requests is updated correctly | Test | 0.9.15
 | DT 2 | Verify that the nof blacklisted access is updated correctly | Test | -
-| DT 3 | Verify that the nof HTTP 200 (OK) is incremented correctly | Test | -
+| DT 3 | Verify that the nof HTTP 200 (OK) is incremented correctly | Test | 0.9.15
 | DT 4 | Verify that the nof HTTP 400 (Bad requests) is incremented correctly | Test | -
 | DT 5 | Verify that the nof HTTP 403 (Forbidden) is incremented correctly | Test | -
-| DT 6 | Verify that the nof HTTP 404 (Not found) is incremented correctly | Test | -
+| DT 6 | Verify that the nof HTTP 404 (Not found) is incremented correctly | Test | 0.9.15
 | DT 7 | Verify that the nof HTTP 500 (Server error) is incremented correctly | Test | -
 | DT 8 | Verify that the nof HTTP 501 (Not implemented) is incremented correctly | Test | -
 | DT 9 | Verify that the nof HTTP 505 (Http version not supported) is incremented correctly | Test | -

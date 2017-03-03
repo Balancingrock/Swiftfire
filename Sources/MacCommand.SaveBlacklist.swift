@@ -77,7 +77,10 @@ extension SaveBlacklistCommand: MacCommand {
         }
         else {
             if let domain = domains.domain(forName: source) {
-                domain.saveBlacklist()
+                switch domain.saveBlacklist() {
+                case .error(let message): log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Failed to save blacklist for \(source), error = \(message)")
+                case .success: break
+                }
                 let reply = ReadBlacklistReply(source: source, list: domain.blacklist)
                 mac?.transfer(reply)
             }

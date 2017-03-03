@@ -151,7 +151,10 @@ func ds_onlyHttp10or11(_ header: HttpHeader, _ body: Data?, _ connection: Connec
         mutation.httpResponseCode = HttpResponseCode.code400_BadRequest.rawValue
         mutation.responseDetails = message
         mutation.requestReceived = chainInfo[ResponseStartedKey] as? Int64 ?? 0
-        statistics.submit(mutation: mutation)
+        statistics.submit(mutation: mutation, onError: {
+            (message: String) in
+            log.atLevelError(id: connection.logId, source: #file.source(#function, #line), message: "Error during statistics submission:\(message)")
+        })
         
         
         // Response
@@ -191,7 +194,10 @@ func ds_onlyHttp10or11(_ header: HttpHeader, _ body: Data?, _ connection: Connec
         mutation.httpResponseCode = HttpResponseCode.code505_HttpVersionNotSupported.rawValue
         mutation.responseDetails = message
         mutation.requestReceived = chainInfo[ResponseStartedKey] as? Int64 ?? 0
-        statistics.submit(mutation: mutation)
+        statistics.submit(mutation: mutation, onError: {
+            (message: String) in
+            log.atLevelError(id: connection.logId, source: #file.source(#function, #line), message: "Error during statistics submission:\(message)")
+        })
         
         
         // Response

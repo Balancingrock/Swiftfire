@@ -81,6 +81,11 @@ extension ServerStartCommand: MacCommand {
         log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Initialized the connection pool with \(parameters.maxNofAcceptedConnections) http connections")
 
         
+        // Rebuild the available services for the domains
+        
+        domains.forEach(){ $0.rebuildServices() }
+        
+        
         // Start the server
         
         let result = httpServer.start()

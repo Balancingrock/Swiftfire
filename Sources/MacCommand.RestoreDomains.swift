@@ -70,7 +70,7 @@ extension RestoreDomainsCommand: MacCommand {
         log.atLevelNotice(id: -1, source: #file.source(#function, #line))
         if let url = FileURLs.domainDefaultsFile {
             domains.restore(fromFile: url)
-            domains.writeToLog(atLevel: SwifterLog.Level.notice)
+            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Restored the domains:\n\(domains)")
         } else {
             log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Missing file url")
         }

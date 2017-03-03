@@ -50,7 +50,7 @@
 // History
 //
 // 0.9.15  - General update and switch to frameworks
-//         - Added removeUnknownServices
+//         - Added removeUnknownServices & rebuildServices
 // 0.9.14  - Initial release
 //
 // =====================================================================================================================
@@ -60,7 +60,6 @@
 // Add functionality to the Mutation (defined in SwiftfireCore)
 //
 // =====================================================================================================================
-
 
 import Foundation
 import SwiftfireCore
@@ -76,7 +75,7 @@ extension Domain {
     func customErrorResponse(for code: HttpResponseCode) -> Data? {
         
         do {
-            let url = URL(fileURLWithPath: sfresources).appendingPathComponent(code.rawValue).appendingPathExtension("html")
+            let url = URL(fileURLWithPath: sfresources).appendingPathComponent(code.rawValue.replacingOccurrences(of: " ", with: "_")).appendingPathExtension("html")
             let reply = try Data(contentsOf: url)
             return reply
         } catch {
@@ -92,6 +91,19 @@ extension Domain {
         for (index, serviceName) in serviceNames.enumerated().reversed() {
             if domainServices.availableServices[serviceName] == nil {
                 serviceNames.remove(at: index)
+            }
+        }
+    }
+    
+    
+    /// Rebuild the services member from the serviceNames and the available services (the later is a member of domainServices)
+    
+    func rebuildServices() {
+        
+        services = []
+        for serviceName in serviceNames {
+            if let service = domainServices.availableServices[serviceName] {
+                services.append(service)
             }
         }
     }

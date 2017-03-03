@@ -77,14 +77,24 @@ import SwifterSockets
 import SwiftfireCore
 
 
+// Make the optional loglevel loggers easier accessable
+
+typealias Log = SwifterLog
+
+
 // Every thread that runs for more than a few milliseconds should poll this variable and terminate itself when it finds that this flag is 'true'.
 
 var quitSwiftfire: Bool = false
 
 
-// Purpose: Set default logging levels to gain some output if anything goes wrong before the log levels are set to the application values
+// Create the logger
 
-log.aslFacilityRecordAtAndAboveLevel = SwifterLog.Level.notice
+let log = SwifterLog.theLogger
+
+
+// Set default logging levels to gain some output if anything goes wrong before the log levels are set to the application values
+
+log.aslFacilityRecordAtAndAboveLevel = SwifterLog.Level.none
 log.fileRecordAtAndAboveLevel = SwifterLog.Level.none
 log.stdoutPrintAtAndAboveLevel = SwifterLog.Level.debug
 log.callbackAtAndAboveLevel = SwifterLog.Level.none
@@ -117,7 +127,7 @@ case let .success(message):
     }
 }
 
-log.atLevelNotice(id: -1, source: "Main", message: "Configuration parameters initialized")
+log.atLevelNotice(id: -1, source: "Main", message: "Configuration parameters values:\n\(parameters)")
 
 
 // =================
@@ -172,14 +182,6 @@ let logforewarder = LogForewarder()
 log.registerCallback(logforewarder)
 
 log.atLevelNotice(id: -1, source: "Main", message: "Remote console logging set up (not started)")
-
-
-// ==============================================================
-// Provide an audit trail of the configuration parameter settings
-// ==============================================================
-
-log.atLevelNotice(id: -1, source: "Main", message: "Configuration parameters initialized to:")
-parameters.logParameterSettings(atLevel: .notice)
 
 
 // ===============================================
@@ -250,6 +252,9 @@ let headerLogger = HttpHeaderLogger(inDirectory: FileURLs.headersLogDir)
 
 let domains = Domains()
 
+
+// Restore the domains from file
+
 guard let defaultDomainsFile = FileURLs.domainDefaultsFile else {
     log.atLevelEmergency(id: -1, source: "Main", message: "Default domains file could not be constructed, aborting...")
     sleep(1)
@@ -267,8 +272,15 @@ case let .success(message):
     log.atLevelNotice(id: -1, source: "Main", message: message)
 }
 
-for domain in domains { domain.removeUnknownServices() }
-domains.writeToLog(atLevel: .notice)
+
+// Remove unknown services from the domains
+
+domains.forEach() { $0.removeUnknownServices() }
+
+
+// log the domain settings
+
+log.atLevelNotice(id: -1, source: "Main", message: "Domain settings:\n\(domains)")
 
 
 // ==============================
@@ -375,9 +387,15 @@ case .success:
         log.atLevelNotice(id: -1, source: "Main", message: "Saved server blacklist")
     }
     
-    domains.serverShutdown()
-    domains.save(toFile: FileURLs.domainDefaultsFile!)
-    log.atLevelNotice(id: -1, source: "Main", message: "Saved domains")
+    switch domains.serverShutdown() {
+    case .error(let message): log.atLevelError(id: -1, source: "Main", message: "Error while shutting down the domains:\n\(message)")
+    case .success: break;
+    }
+    
+    switch domains.save(toFile: FileURLs.domainDefaultsFile!) {
+    case .error(let message): log.atLevelError(id: -1, source: "Main", message: "Error while saving the domains:\n\(message)")
+    case .success: log.atLevelNotice(id: -1, source: "Main", message: "Saved domains")
+    }
     
     log.atLevelNotice(id: -1, source: "Main", message: "Swiftfire terminated normally")
     

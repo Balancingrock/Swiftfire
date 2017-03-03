@@ -95,7 +95,7 @@ extension HttpConnection {
         
         // Log update
         
-        log.atLevelDebug(id: logId, source: #file.source(#function, #line), message: message)
+        Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: message)
         
         
         // Reply to client
@@ -110,7 +110,10 @@ extension HttpConnection {
         mutation.httpResponseCode = HttpResponseCode.code400_BadRequest.rawValue
         mutation.responseDetails = message
         mutation.requestReceived = processingStartedAt
-        statistics.submit(mutation: mutation)
+        statistics.submit(mutation: mutation, onError: {
+            [unowned self] (message: String) in
+            log.atLevelError(id: self.logId, source: #file.source(#function, #line), message: message)
+        })
 
     }
     
@@ -127,7 +130,7 @@ extension HttpConnection {
         
         // Logging update
         
-        log.atLevelDebug(id: logId, source: #file.source(#function, #line), message: message)
+        Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: message)
         
         
         // Reply to client
@@ -142,7 +145,10 @@ extension HttpConnection {
         mutation.httpResponseCode = HttpResponseCode.code500_InternalServerError.rawValue
         mutation.responseDetails = message
         mutation.requestReceived = processingStartedAt
-        statistics.submit(mutation: mutation)
+        statistics.submit(mutation: mutation, onError: {
+            [unowned self] (message: String) in
+            log.atLevelError(id: self.logId, source: #file.source(#function, #line), message: message)
+        })
 
     }
     
@@ -258,7 +264,10 @@ extension HttpConnection {
             mutation.httpResponseCode = "Unavailable"
             mutation.responseDetails = "Forwarding of domain '\(host.address)'"
             mutation.requestReceived = timestampResponseStart
-            statistics.submit(mutation: mutation)
+            statistics.submit(mutation: mutation) {
+                [unowned self] (message: String) in
+                log.atLevelError(id: self.logId, source: #file.source(#function, #line), message: message)
+            }
 
             return
         }
@@ -294,10 +303,8 @@ extension HttpConnection {
         var chainInfo = DomainServices.ChainInfo()
         chainInfo[ResponseStartedKey] = timestampResponseStart
 
-        if let services = domainServices(for: domain) {
-            for service in services {
-                if service.closure(header, body, self, domain, &chainInfo, &response) == .abortChain { break }
-            }
+        for service in domain.services {
+            if service.closure(header, body, self, domain, &chainInfo, &response) == .abortChain { break }
         }
         
         
@@ -333,7 +340,10 @@ extension HttpConnection {
             mutation.httpResponseCode = code.rawValue
             mutation.responseDetails = ""
             mutation.requestReceived = timestampResponseStart
-            statistics.submit(mutation: mutation)
+            statistics.submit(mutation: mutation, onError: {
+                [unowned self] (message: String) in
+                log.atLevelError(id: self.logId, source: #file.source(#function, #line), message: message)
+            })
 
             log.atLevelInfo(id: logId, source: #file.source(#function, #line), message: "Response took \(Date().javaDate - timestampResponseStart) milli seconds")
             
@@ -343,7 +353,7 @@ extension HttpConnection {
             
             if let payload = domain.customErrorResponse(for: code) {
                 
-                let message = createHttpResponse(for: code, version: response.httpVersion, mimeType: response.mimeType, body: payload)
+                let message = createHttpResponse(for: code, version: response.httpVersion, mimeType: mimeTypeHtml, body: payload)
                 bufferedTransfer(message)
 
                 
@@ -358,31 +368,3 @@ extension HttpConnection {
         }
     }
 }
-    
-
-// Rebuilds the domain service cache in the domain object and returns it
-    
-private func domainServices(for domain: Domain) -> Array<DomainServices.ServiceEntry>? {
-    
-    
-    // Remove non existing services
-    
-    domain.removeUnknownServices()
-    
-    
-    // Build the service chain
-    
-    domain.services = []
-    for serviceName in domain.serviceNames {
-        
-        
-        // Add a service if it exists, if it does not exist, remove the service from the service names.
-            
-        if let entry = domainServices.availableServices[serviceName] {
-            domain.services?.append(entry)
-        }
-    }
-    
-    return domain.services!
-}
-

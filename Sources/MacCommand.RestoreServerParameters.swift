@@ -91,7 +91,7 @@ extension RestoreServerParametersCommand: MacCommand {
         
         // Provide audit trail
         
-        parameters.logParameterSettings(atLevel: SwifterLog.Level.notice)
+        log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Parameter settings restored to:\n\(parameters)")
 
         
         // Send the new values to the console

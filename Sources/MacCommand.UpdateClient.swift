@@ -71,11 +71,19 @@ extension UpdateClientCommand: MacCommand {
         let mutation = Mutation.createUpdateClient()
         mutation.ipAddress = client
         mutation.doNotTrace = newValue
-        statistics.submit(mutation: mutation, onSuccess: {
-        
-            // Try to signal the console (if any) that the path part is updated
-            let message = ReadStatisticsReply(statistics: statistics.json)
-            mac?.transfer(message)
-        })
+        statistics.submit(
+            
+            mutation: mutation,
+            
+            onSuccess: {
+                // Try to signal the console (if any) that the path part is updated
+                let message = ReadStatisticsReply(statistics: statistics.json)
+                mac?.transfer(message)},
+            
+            onError: {
+                (message: String) in
+                log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Error updating the statistics, message = \(message)")
+            }
+        )
     }
 }

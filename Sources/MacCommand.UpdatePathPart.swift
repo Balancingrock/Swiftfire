@@ -76,6 +76,9 @@ extension UpdatePathPartCommand: MacCommand {
             // Try to signal the console (if any) that the path part is updated
             let message = ReadStatisticsReply(statistics: statistics.json)
             mac?.transfer(message)
+        }, onError: {
+            (message: String) in
+            log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Error during executing: \(message)")
         })
     }
 }

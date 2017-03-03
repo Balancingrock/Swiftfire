@@ -98,13 +98,6 @@ extension ReadServerTelemetryCommand: MacCommand {
             mac?.transfer(reply)
             
             
-        case .nofHttp502Replies:
-            
-            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Reading, telemetry.nofHttp502Replies = \(telemetry.nofHttp502Replies.intValue)")
-            let reply = ReadServerTelemetryReply(item: telemetryName, value: telemetry.nofHttp502Replies.intValue)
-            mac?.transfer(reply)
-            
-            
         case .serverStatus:
             
             let rs = httpServer.isRunning

@@ -149,7 +149,10 @@ func ds_getResourcePathFromUrl(_ header: HttpHeader, _ body: Data?, _ connection
         mutation.httpResponseCode = HttpResponseCode.code400_BadRequest.rawValue
         mutation.responseDetails = message
         mutation.requestReceived = chainInfo[ResponseStartedKey] as? Int64 ?? 0
-        statistics.submit(mutation: mutation)
+        statistics.submit(mutation: mutation, onError: {
+            (message: String) in
+            log.atLevelError(id: connection.logId, source: #file.source(#function, #line), message: "Error during statistics submission:\(message)")
+        })
         
         
         // Response
@@ -182,7 +185,10 @@ func ds_getResourcePathFromUrl(_ header: HttpHeader, _ body: Data?, _ connection
         mutation.httpResponseCode = HttpResponseCode.code404_NotFound.rawValue
         mutation.responseDetails = "Resource for url '\(path)' not found"
         mutation.requestReceived = chainInfo[ResponseStartedKey] as? Int64 ?? 0
-        statistics.submit(mutation: mutation)
+        statistics.submit(mutation: mutation, onError: {
+            (message: String) in
+            log.atLevelError(id: connection.logId, source: #file.source(#function, #line), message: "Error during statistics submission:\(message)")
+        })
         
         
         // Response
@@ -210,7 +216,10 @@ func ds_getResourcePathFromUrl(_ header: HttpHeader, _ body: Data?, _ connection
         mutation.httpResponseCode = HttpResponseCode.code403_Forbidden.rawValue
         mutation.responseDetails = "Access for url '\(path)' not allowed"
         mutation.requestReceived = chainInfo[ResponseStartedKey] as? Int64 ?? 0
-        statistics.submit(mutation: mutation)
+        statistics.submit(mutation: mutation, onError: {
+            (message: String) in
+            log.atLevelError(id: connection.logId, source: #file.source(#function, #line), message: "Error during statistics submission:\(message)")
+        })
         
         
         // Response
