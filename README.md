@@ -1,23 +1,13 @@
 # Swiftfire
 The next generation personal webserver written in Swift.
 
-Visit the [Swiftfire](http://swiftfire.nl) homepage at [http://swiftfire.nl](http://swiftfire.nl).
+Visit the Swiftfire homepage at [http://swiftfire.nl](http://swiftfire.nl).
 
 #Note
-
-__Due to the move to a package/framework based distribution the current version of Swiftfire is not compatible with the most up-to-date versions of the other subprojects.__
 
 This is an early public release and I do not consider this code ready for prime time. It is experimental in nature and subject to severe rewrites as development continues.
 
 However: It does work! :-)
-
-__Special note__: The current version 0.9.14 compiles under Xcode 8 beta 6 only. It has not been deployed and only tested on a development machine. It is intended as an interim build for developpers only.
-
-#Usage
-
-Swiftfire needs the files from SwifterLog, SwifterSockets and SwifterJSON as source files.
-To this end I created a workspace with 4 projects (5 actually), all of the above mentioned packages.
-Then I drag & drop the group with the source files from (for example) SwifterLog and drop them in Swiftfire. In the dialogue I make sure that the files are not copied, only referenced. That is it, compile & run...
 
 #Features
 
@@ -30,32 +20,61 @@ Then I drag & drop the group with the source files from (for example) SwifterLog
 - Custom pages for errors (for example the infamous 404 page not found)
 - Logging of received headers possible
 - Logging of missing pages (404)
-- Includes a console application
-- Compiles with Xcode 8 beta 6 (Swift 3)
+- Console application available
+
+#Installation
+
+Installation is best done with the SPM (SwiftPM, Swift Package Manager)
+
+~~~~
+$ git clone https://github.com/Balancingrock/Swiftfire
+$ cd Swiftfire
+$ swift build
+~~~~
+
+Note that this will also pull-in a few other necessary packages.
+
+Then start the application with:
+
+~~~~
+$ .build/debug/Swiftfire
+~~~~
+
+To actually use Swiftfire you will need to configure it. See [Swiftfire.nl](http://swiftfire.nl) for more details on that.
+
+Refer to [SwiftfireConsole](https://github.com/Balancingrock/SwiftfireConsole) for a GUI application to monitor and control Swiftfire.
 
 #Version history
 
 Note: Planned releases are for information only and subject to change without notice.
 
-####V2.0.0 (Planned)
+####V2.0.0 (Thought about)
 
 - Adding support for dynamic content
 - Session support
-- HTTPS support
+- Add URL redirection list
 
 ####V1.0.0 (Planned)
 
-- 1-3 Months after v0.9.14
+- 1-3 months after v0.10.0
 - Bugfixes
 - Small feature improvements (if necessary)
 - Code improvements
-- Build with final version of Swift 3
 
-####v0.9.15 (Planned)
+####v0.10.0 (Planned)
 
-- Add URL redirection list
+- HTTPS support
 
-####v0.9.14 (Current)
+####v0.9.16 (Planned)
+
+- Use SSL for the interface to the SwiftfireCosole
+
+####v0.9.15 (Current)
+
+- Switched to SwiftPM distribution
+- Updated for new approach in SwifterSockets
+
+####v0.9.14
 
 - Added IP Address block list (blacklists)
 - Added custom error pages (for example the 404 error) support
