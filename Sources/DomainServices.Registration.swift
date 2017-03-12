@@ -64,8 +64,35 @@ import SwiftfireCore
 import SwifterSockets
 
 
+// ===============
+// ChainInfo key's
+// ===============
+
+/// String, set by the service that determines the URL of the resource to be fetched. (DomainService.GetResourcePathFromUrl)
+///
+/// This path is relative to the root of the file system. It is used to fetch the requested resource.
+
+let AbsoluteResourcePathKey = "AbsoluteResourcePath"
+
+
+/// String, set by the service that determines the URL of the resource to be fetched. (DomainService.GetResourcePathFromUrl)
+///
+/// This path is relative to the root of the domain. It is used for statistics purposes.
+
+let RelativeResourcePathKey = "RelativeResourcePath"
+
+
+/// Int64, set by HttpConnection.Worker before first domain service call.
+///
+/// It is the time stamp at the start of the HTTP request processing. It is used for statistics purposes.
+
+let ResponseStartedKey = "ResponseStarted"
+
+
+// ==============================================
 // Descriptions for the available domain services
-//
+// ==============================================
+
 // Note: If any of these texts are changed it will be necessary to re-assign new services for existing domains.
 
 private let blacklist = "Abort if client IP is in blacklist"
@@ -73,20 +100,6 @@ private let onlyHttp10OrHttp11 = "Only HTTP 1.0 / 1.1 requests"
 private let onlyGetOrPost = "Only GET / POST requests"
 private let getResourcePathFromUrl = "Get resource path from request URL"
 private let getFileAtResourcePath = "Get file at resource path"
-
-
-// ===============
-// ChainInfo key's
-// ===============
-
-/// String, initialy set by DomainService.GetResourcePathFromUrl
-
-let ResourcePathKey = "ResourcePath"
-
-
- // Int64, set by HttpConnection.Worker before first domain service call
-
-let ResponseStartedKey = "ResponseStarted"
 
 
 // =================================================
@@ -122,3 +135,4 @@ var defaultDomainServices: Array<String> {
         getFileAtResourcePath
     ]
 }
+

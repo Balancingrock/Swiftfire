@@ -121,7 +121,7 @@ import SwifterSockets
 ///
 /// - Returns: On error .abortChain, on success .continueChain.
 
-func ds_getResourcePathFromUrl(_ header: HttpHeader, _ body: Data?, _ connection: Connection, _ domain: Domain, _ chainInfo: inout DomainServices.ChainInfo, _ response: inout DomainServices.Response) -> DomainServices.ServiceResult {
+func ds_getResourcePathFromUrl(_ header: HttpHeader, _ body: Data?, _ connection: Connection, _ domain: Domain, _ chainInfo: inout DomainServices.ChainInfo, _ response: inout DomainServices.Response) -> DomainServices.Result {
     
     
     func handle400_BadRequestError(message: String) {
@@ -275,7 +275,8 @@ func ds_getResourcePathFromUrl(_ header: HttpHeader, _ body: Data?, _ connection
             
             if connection.filemanager.isReadableFile(atPath: tpath) {
                 
-                chainInfo[ResourcePathKey] = tpath as String
+                chainInfo[AbsoluteResourcePathKey] = tpath as String
+                chainInfo[RelativeResourcePathKey] = (partialPath as NSString).appendingPathComponent("index.html")
              
                 return .continueChain
             }
@@ -287,7 +288,8 @@ func ds_getResourcePathFromUrl(_ header: HttpHeader, _ body: Data?, _ connection
             
             if connection.filemanager.isReadableFile(atPath: t2path) {
                 
-                chainInfo[ResourcePathKey] = t2path as String
+                chainInfo[AbsoluteResourcePathKey] = t2path as String
+                chainInfo[RelativeResourcePathKey] = (partialPath as NSString).appendingPathComponent("index.html")
             
                 return .continueChain
             }
@@ -306,7 +308,8 @@ func ds_getResourcePathFromUrl(_ header: HttpHeader, _ body: Data?, _ connection
             
             if connection.filemanager.isReadableFile(atPath: fullPath) {
                 
-                chainInfo[ResourcePathKey] = fullPath
+                chainInfo[AbsoluteResourcePathKey] = fullPath
+                chainInfo[RelativeResourcePathKey] = partialPath
                 
                 return .continueChain
             

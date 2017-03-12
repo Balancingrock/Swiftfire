@@ -114,7 +114,7 @@ import SwifterSockets
 ///
 /// - Returns: On error .abortChain, on success .continueChain.
 
-func ds_getFileAtResourcePath(_ header: HttpHeader, _ body: Data?, _ connection: Connection, _ domain: Domain, _ chainInfo: inout DomainServices.ChainInfo, _ response: inout DomainServices.Response) -> DomainServices.ServiceResult {
+func ds_getFileAtResourcePath(_ header: HttpHeader, _ body: Data?, _ connection: Connection, _ domain: Domain, _ chainInfo: inout DomainServices.ChainInfo, _ response: inout DomainServices.Response) -> DomainServices.Result {
     
     
     // Abort immediately if there is already a response code
@@ -132,7 +132,7 @@ func ds_getFileAtResourcePath(_ header: HttpHeader, _ body: Data?, _ connection:
     // Make sure a resource path string is present in the chainInfo
     // =================================================================================================================
     
-    guard let resourcePath = chainInfo[ResourcePathKey] as? String else {
+    guard let resourcePath = chainInfo[AbsoluteResourcePathKey] as? String else {
         
         
         // Telemetry update

@@ -303,8 +303,8 @@ extension HttpConnection {
         var chainInfo = DomainServices.ChainInfo()
         chainInfo[ResponseStartedKey] = timestampResponseStart
 
-        for service in domain.services {
-            if service.closure(header, body, self, domain, &chainInfo, &response) == .abortChain { break }
+        for item in domain.services {
+            if item.service(header, body, self, domain, &chainInfo, &response) == .abortChain { break }
         }
         
         
@@ -336,7 +336,7 @@ extension HttpConnection {
             
             let mutation = Mutation.createAddClientRecord(from: self)
             mutation.domain = domain.name
-            mutation.url = chainInfo[ResourcePathKey] as? String ?? "Unknown resource path"
+            mutation.url = chainInfo[RelativeResourcePathKey] as? String ?? "Unknown resource path"
             mutation.httpResponseCode = code.rawValue
             mutation.responseDetails = ""
             mutation.requestReceived = timestampResponseStart
