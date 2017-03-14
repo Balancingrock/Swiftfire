@@ -3,13 +3,13 @@ The next generation personal webserver written in Swift.
 
 Visit the Swiftfire homepage at [http://swiftfire.nl](http://swiftfire.nl).
 
-#Note
+# Note
 
 This is an early public release and I do not consider this code ready for prime time. It is experimental in nature and subject to severe rewrites as development continues.
 
 However: It does work! :-)
 
-#Features
+# Features
 
 - Webserver for static websites
 - Handles multiple domains
@@ -23,7 +23,7 @@ However: It does work! :-)
 - Console application available
 - Easy to extend for new domain services
 
-#Installation
+# Installation
 
 Installation with the SPM (SwiftPM, Swift Package Manager)
 
@@ -51,78 +51,78 @@ To use Xcode, generate the xcode project with:
 $ swift package generate-xcodeproj
 ~~~~
 
-#Version history
+# Version history
 
-Note: Planned releases are for information only and subject to change without notice.
+Note: Planned releases are for information only and almost always change.
 
-####V2.0.0 (Thought about)
+#### 2.0.0 (Thought about)
 
 - Adding support for dynamic content
 - Session support
 - Add URL redirection list
 
-####V1.0.0 (Planned)
+#### 1.0.0 (Planned)
 
 - 1-3 months after v0.10.0
 - Bugfixes
 - Small feature improvements (if necessary)
 - Code improvements
 
-####v0.10.0 (Planned)
+#### 0.10.0 (Planned)
 
 - HTTPS support
 
-####v0.9.17 (Planned)
+#### 0.9.17 (Planned)
 
 - Use SSL for the interface to the SwiftfireCosole
 
-#### v0.9.16 (Current)
+#### 0.9.16 (Current)
 
 - Infrastructure update (no code changes).
 
-####v0.9.15
+#### 0.9.15
 
 - Switched to SwiftPM distribution
 - Updated for new approach in SwifterSockets
 
-####v0.9.14
+#### 0.9.14
 
 - Added IP Address block list (blacklists)
 - Added custom error pages (for example the 404 error) support
 - Upgrade to Xcode 8 beta 6 (Swift 3)
 - Major improvements of the GUI console
 
-####V0.9.13
+#### 0.9.13
 
 - Updated for Xcode 8 beta 3 (Swift 3)
 
-####v0.9.12
+#### 0.9.12
 
 - Added usage charts that track the number of page visits over time
 - Added enabling/disabling of visit counting for specific resources
 
-####v0.9.11
+#### 0.9.11
 
 - Merged SwiftfireConsole into this project as an extra target
 - Added usage statistics for client & domain usage.
 - Updated for VJson 0.9.8
 
-####v0.9.10
+#### 0.9.10
 
 - Added domain statistics
 
-####v0.9.9
+#### 0.9.9
 
 - Fixed a bug in SwifterSockets that would not log correct IPv6 addresses.
 - Fixed a number of bugs that messed up logging of access and 404
 - Renamed FileLog to Logfile
 - Replaced header logging code with usage of Logfile
 
-####v0.9.8
+#### 0.9.8
 
 - Quick fix for bug that would prevent creation of AccessLog and Four04Log.
 
-####v0.9.7
+#### 0.9.7
 
 - Cleaned up parameter definition setting and usage
 - Added option to log all HTTP request headers
@@ -130,7 +130,7 @@ Note: Planned releases are for information only and subject to change without no
 - Added option to log all URLs that result in a 404 reply
 - Few minor bug fixes (minor = will probably never occur and does not impact functionaly)
 
-####v0.9.6
+#### 0.9.6
 
 - Header update to include new website: [swiftfire.nl](http://swiftfire.nl)
 - Removed Startup, folded into Parameters
@@ -139,30 +139,30 @@ Note: Planned releases are for information only and subject to change without no
 - Added transmission of "ClosingMacConnection" info upon timeout for the M&C connection
 - Added ResetDomainTelemetry command
 
-####v0.9.5
+#### 0.9.5
 
 - Fixed bug that prevented domain creation
 - Added MIME type support based on the file extension
 
-####v0.9.4
+#### 0.9.4
 
 - Switched to VJSON pipe operators
 - Simplified the SwifterConsole M&C interface
 
-####v0.9.3
+#### 0.9.3
 
 - Added domain telemetry
 
-####v0.9.2
+#### 0.9.2
 
 - Minor changes to accomodate changes in other packages
 
-####v0.9.1
+#### 0.9.1
 
 - Minor changes to accomodate changes in SwifterSockets/SwifterLog/SwifterJSON
 - Added 'descriptionWithSeparator' to Extensions.swift
 - Added release tags
 
-####v0.9.0
+#### 0.9.0
 
 - Initial public release
