@@ -21,10 +21,11 @@ However: It does work! :-)
 - Logging of received headers possible
 - Logging of missing pages (404)
 - Console application available
+- Easy to extend for new domain services
 
 #Installation
 
-Installation is best done with the SPM (SwiftPM, Swift Package Manager)
+Installation with the SPM (SwiftPM, Swift Package Manager)
 
 ~~~~
 $ git clone https://github.com/Balancingrock/Swiftfire
@@ -43,6 +44,12 @@ $ .build/debug/Swiftfire
 To actually use Swiftfire you will need to configure it. See [Swiftfire.nl](http://swiftfire.nl) for more details on that.
 
 Refer to [SwiftfireConsole](https://github.com/Balancingrock/SwiftfireConsole) for a GUI application to monitor and control Swiftfire.
+
+To use Xcode, generate the xcode project with:
+
+~~~~
+$ swift package generate-xcodeproj
+~~~~
 
 #Version history
 
@@ -65,11 +72,15 @@ Note: Planned releases are for information only and subject to change without no
 
 - HTTPS support
 
-####v0.9.16 (Planned)
+####v0.9.17 (Planned)
 
 - Use SSL for the interface to the SwiftfireCosole
 
-####v0.9.15 (Current)
+#### v0.9.16 (Current)
+
+- Infrastructure update (no code changes).
+
+####v0.9.15
 
 - Switched to SwiftPM distribution
 - Updated for new approach in SwifterSockets
