@@ -74,6 +74,7 @@
 import Foundation
 import SwifterLog
 import SwiftfireCore
+import SecureSockets
 import SwifterSockets
 
 
@@ -364,13 +365,24 @@ private let macAcceptQueue = DispatchQueue(
     autoreleaseFrequency: DispatchQueue.AutoreleaseFrequency.inherit,
     target: nil)
 
-let macServer = SwifterSockets.TipServer(
+let certAndKey = CertificateAndPrivateKeyFiles(pemCertificateFile: FileURLs.sslConsoleCertificateFile!.path, pemPrivateKeyFile: FileURLs.sslConsolePrivateKeyFile!.path) {
+    message in
+    Log.atError?.log(id: -1, source: "Main", message: message)
+    sleep(2)
+    fatalError(message)
+}
+
+let macServer = SslServer()
+_ = macServer.setOptions(
     .port(parameters.macPortNumber),
     .maxPendingConnectionRequests(1),
     .acceptQueue(macAcceptQueue),
     .connectionObjectFactory(macConnectionFactory),
     .acceptLoopDuration(10),
-    .errorHandler(macErrorHandler))
+    .errorHandler(macErrorHandler),
+    .trustedClientCertificates([FileURLs.sslTrustedConsoleCertificatesDir!.path]),
+    .certificateAndPrivateKeyFiles(certAndKey)
+)
 
 
 // =====================================
