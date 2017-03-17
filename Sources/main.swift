@@ -73,8 +73,8 @@
 
 import Foundation
 import SwifterLog
-import SwifterSockets
 import SwiftfireCore
+import SwifterSockets
 
 
 // Make the optional loglevel loggers easier accessable
@@ -269,7 +269,7 @@ case let .error(message):
     fatalError(message)
     
 case let .success(message):
-    log.atLevelNotice(id: -1, source: "Main", message: message)
+    Log.atNotice?.log(id: -1, source: "Main", message: message)
 }
 
 
@@ -280,7 +280,7 @@ domains.forEach() { $0.removeUnknownServices() }
 
 // log the domain settings
 
-log.atLevelNotice(id: -1, source: "Main", message: "Domain settings:\n\(domains)")
+Log.atNotice?.log(id: -1, source: "Main", message: "Domain settings:\n\(domains)")
 
 
 // ==============================
@@ -309,7 +309,7 @@ private let acceptQueue = DispatchQueue(
     target: nil)
 
 func httpServerErrorHandler(message: String) {
-    log.atLevelError(id: -1, source: #file.source(#function, #line), message: message)
+    Log.atError?.log(id: -1, source: "Main", message: message)
 }
 
 let httpServer = SwifterSockets.TipServer(
@@ -322,10 +322,40 @@ let httpServer = SwifterSockets.TipServer(
 
 
 // =========================================================
-// Initialize the port for the Command and Control interface
+// Make sure certificates are present for the M&C connection
 // =========================================================
 
-log.atLevelNotice(id: -1, source: "Main", message: "Initializing M&C loop on port \(parameters.macPortNumber)")
+if !FileURLs.exists(url: FileURLs.sslConsoleCertificateFile) {
+    if case .error(let message) = generateKeyAndCertificate(privateKeyLocation: FileURLs.sslConsolePrivateKeyFile, certificateLocation: FileURLs.sslConsoleCertificateFile) {
+        Log.atError?.log(id: -1, source: "Main", message: message)
+    } else {
+        Log.atNotice?.log(id: -1, source: "Main", message: "Console certificate and private key generated")
+    }
+} else {
+    Log.atNotice?.log(id: -1, source: "Main", message: "Console certificate present")
+}
+
+var consoleCertificateFound = false
+if let certs = try? FileManager.default.contentsOfDirectory(at: FileURLs.sslTrustedConsoleCertificatesDir!, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles, .skipsSubdirectoryDescendants]) {
+    for cand in certs {
+        if cand.pathExtension.compare("pem", options: String.CompareOptions.caseInsensitive, range: nil, locale: nil) == ComparisonResult.orderedSame {
+            consoleCertificateFound = true
+            break
+        }
+    }
+}
+if consoleCertificateFound {
+    Log.atNotice?.log(id: -1, source: "Main", message: "Trusted Console Certificate(s) present")
+} else {
+    Log.atError?.log(id: -1, source: "Main", message: "No Trusted Console Certificate found")
+}
+
+
+// ============================================================
+// Initialize the port for the Monitoring and Control interface
+// ============================================================
+
+Log.atNotice?.log(id: -1, source: "Main", message: "Initializing M&C loop on port \(parameters.macPortNumber)")
 
 private let macAcceptQueue = DispatchQueue(
     label: "M&C Accept queue",
