@@ -168,17 +168,17 @@ final class FileURLs {
     
     /// The directory with the certificate and private key certificates
     
-    static var sslConsoleServer: URL? = { dirUrl(sslConsoleDir, "server") }()
+    static var sslConsoleServerDir: URL? = { dirUrl(sslConsoleDir, "server") }()
     
     
     /// The certificate to be used for the console connection
     
-    static var sslConsoleServerCertificateFile: URL? = { fileUrl(sslConsoleDir, "certificate.pem") }()
+    static var sslConsoleServerCertificateFile: URL? = { fileUrl(sslConsoleServerDir, "certificate.pem") }()
 
     
     /// The private key to be used for the console connection
     
-    static var sslConsoleServerPrivateKeyFile: URL? = { fileUrl(sslConsoleDir, "private-key.pem") }()
+    static var sslConsoleServerPrivateKeyFile: URL? = { fileUrl(sslConsoleServerDir, "private-key.pem") }()
     
     
     // =================================================================================================================
