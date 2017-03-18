@@ -68,8 +68,10 @@
 //
 // root
 // - ssl
-//   - trusted-console-certificates
 //   - console
+//     - trusted-client-certificates
+//       (must run "c_rehash ." command when something changes in this directory)
+//   - server
 //     - certificate.pem
 //     - private-key.pem
 // - domains
@@ -154,24 +156,29 @@ final class FileURLs {
     static var sslDir: URL? = { dirUrl(rootDir, "ssl") }()
     
     
-    /// The directory with trusted console certificates
-    
-    static var sslTrustedConsoleCertificatesDir: URL? = { dirUrl(sslDir, "trusted-console-certificates") }()
-    
-    
     /// The directory with certificate and key for the console connection
     
     static var sslConsoleDir: URL? = { dirUrl(sslDir, "console") }()
+
+    
+    /// The directory with trusted console certificates
+    
+    static var sslConsoleTrustedClientsDir: URL? = { dirUrl(sslConsoleDir, "trusted-client-certificates") }()
+    
+    
+    /// The directory with the certificate and private key certificates
+    
+    static var sslConsoleServer: URL? = { dirUrl(sslConsoleDir, "server") }()
     
     
     /// The certificate to be used for the console connection
     
-    static var sslConsoleCertificateFile: URL? = { fileUrl(sslConsoleDir, "certificate.pem") }()
+    static var sslConsoleServerCertificateFile: URL? = { fileUrl(sslConsoleDir, "certificate.pem") }()
 
     
     /// The private key to be used for the console connection
     
-    static var sslConsolePrivateKeyFile: URL? = { fileUrl(sslConsoleDir, "privateKey.pem") }()
+    static var sslConsoleServerPrivateKeyFile: URL? = { fileUrl(sslConsoleDir, "private-key.pem") }()
     
     
     // =================================================================================================================

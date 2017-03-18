@@ -326,8 +326,8 @@ let httpServer = SwifterSockets.TipServer(
 // Make sure certificates are present for the M&C connection
 // =========================================================
 
-if !FileURLs.exists(url: FileURLs.sslConsoleCertificateFile) {
-    if case .error(let message) = generateKeyAndCertificate(privateKeyLocation: FileURLs.sslConsolePrivateKeyFile, certificateLocation: FileURLs.sslConsoleCertificateFile) {
+if !FileURLs.exists(url: FileURLs.sslConsoleServerCertificateFile) {
+    if case .error(let message) = generateKeyAndCertificate(privateKeyLocation: FileURLs.sslConsoleServerPrivateKeyFile, certificateLocation: FileURLs.sslConsoleServerCertificateFile) {
         Log.atError?.log(id: -1, source: "Main", message: message)
     } else {
         Log.atNotice?.log(id: -1, source: "Main", message: "Console certificate and private key generated")
@@ -336,16 +336,16 @@ if !FileURLs.exists(url: FileURLs.sslConsoleCertificateFile) {
     Log.atNotice?.log(id: -1, source: "Main", message: "Console certificate present")
 }
 
-var consoleCertificateFound = false
-if let certs = try? FileManager.default.contentsOfDirectory(at: FileURLs.sslTrustedConsoleCertificatesDir!, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles, .skipsSubdirectoryDescendants]) {
+var consoleServerCertificateFound = false
+if let certs = try? FileManager.default.contentsOfDirectory(at: FileURLs.sslConsoleTrustedClientsDir!, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles, .skipsSubdirectoryDescendants]) {
     for cand in certs {
         if cand.pathExtension.compare("pem", options: String.CompareOptions.caseInsensitive, range: nil, locale: nil) == ComparisonResult.orderedSame {
-            consoleCertificateFound = true
+            consoleServerCertificateFound = true
             break
         }
     }
 }
-if consoleCertificateFound {
+if consoleServerCertificateFound {
     Log.atNotice?.log(id: -1, source: "Main", message: "Trusted Console Certificate(s) present")
 } else {
     Log.atError?.log(id: -1, source: "Main", message: "No Trusted Console Certificate found")
@@ -365,7 +365,7 @@ private let macAcceptQueue = DispatchQueue(
     autoreleaseFrequency: DispatchQueue.AutoreleaseFrequency.inherit,
     target: nil)
 
-let certAndKey = CertificateAndPrivateKeyFiles(pemCertificateFile: FileURLs.sslConsoleCertificateFile!.path, pemPrivateKeyFile: FileURLs.sslConsolePrivateKeyFile!.path) {
+let certAndKey = CertificateAndPrivateKeyFiles(pemCertificateFile: FileURLs.sslConsoleServerCertificateFile!.path, pemPrivateKeyFile: FileURLs.sslConsoleServerPrivateKeyFile!.path) {
     message in
     Log.atError?.log(id: -1, source: "Main", message: message)
     sleep(2)
@@ -380,7 +380,7 @@ _ = macServer.setOptions(
     .connectionObjectFactory(macConnectionFactory),
     .acceptLoopDuration(10),
     .errorHandler(macErrorHandler),
-    .trustedClientCertificates([FileURLs.sslTrustedConsoleCertificatesDir!.path]),
+    .trustedClientCertificates([FileURLs.sslConsoleTrustedClientsDir!.path]),
     .certificateAndPrivateKeyFiles(certAndKey)
 )
 
