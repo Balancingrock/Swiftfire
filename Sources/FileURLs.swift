@@ -71,9 +71,9 @@
 //   - console
 //     - trusted-client-certificates
 //       (must run "c_rehash ." command when something changes in this directory)
-//   - server
-//     - certificate.pem
-//     - private-key.pem
+//     - server
+//       - certificate.pem
+//       - private-key.pem
 // - domains
 //   - domain-defaults.json
 //   - ... subdirectories for each domain
