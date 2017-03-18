@@ -72,11 +72,11 @@ Note: Planned releases are for information only and almost always change.
 
 - HTTPS support
 
-#### 0.9.17 (Planned)
+#### 0.9.17 (Current)
 
-- Use SSL for the interface to the SwiftfireCosole
+- Use SSL for the interface to SwiftfireConsole
 
-#### 0.9.16 (Current)
+#### 0.9.16
 
 - Infrastructure update (no code changes).
 
