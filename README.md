@@ -24,32 +24,7 @@ However: It does work! :-)
 - Easy to extend for new domain services
 
 # Installation
-
-Installation with the SPM (SwiftPM, Swift Package Manager)
-
-~~~~
-$ git clone https://github.com/Balancingrock/Swiftfire
-$ cd Swiftfire
-$ swift build
-~~~~
-
-Note that this will also pull-in a few other necessary packages.
-
-Then start the application with:
-
-~~~~
-$ .build/debug/Swiftfire
-~~~~
-
-To actually use Swiftfire you will need to configure it. See [Swiftfire.nl](http://swiftfire.nl) for more details on that.
-
-Refer to [SwiftfireConsole](https://github.com/Balancingrock/SwiftfireConsole) for a GUI application to monitor and control Swiftfire.
-
-To use Xcode, generate the xcode project with:
-
-~~~~
-$ swift package generate-xcodeproj
-~~~~
+Please refer to the [installation instructions](http://swiftfire.nl/pages/manual/02_installation.html) on the [Swiftfire](http://swiftfire.nl) website.
 
 # Version history
 
