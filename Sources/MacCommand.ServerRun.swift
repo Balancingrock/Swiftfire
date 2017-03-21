@@ -1,9 +1,9 @@
 // =====================================================================================================================
 //
-//  File:       MacCommand.ServerStart.swift
+//  File:       MacCommand.ServerRun.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.15
+//  Version:    0.9.18
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,6 +49,7 @@
 //
 // History
 //
+// 0.9.18 - Renamed from Start to Run
 // 0.9.15 - General update and switch to frameworks
 // 0.9.14 - Initial release
 //
@@ -60,10 +61,10 @@ import SwifterLog
 import SwiftfireCore
 
 
-extension ServerStartCommand: MacCommand {
+extension ServerRunCommand: MacCommand {
         
     public static func factory(json: VJson?) -> MacCommand? {
-        return ServerStartCommand(json: json)
+        return ServerRunCommand(json: json)
     }
         
     public func execute() {

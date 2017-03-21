@@ -3,7 +3,7 @@
 //  File:       MonitoringAndControl.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.15
+//  Version:    0.9.18
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,6 +49,7 @@
 //
 // History
 //
+// 0.9.18  - Renamed server Start to Run (Bugfix 4)
 // 0.9.15  - General update and switch to frameworks
 // 0.9.14  - Upgraded to Xcode 8 beta 6
 //         - Upgraded Command and Reply processing for Swiftfire resp SwiftfireConsole
@@ -141,7 +142,7 @@ final class MonitoringAndControlConnection: SwifterSockets.Connection {
         commandFactories.append(SaveDomainsCommand.factory)
         commandFactories.append(RestoreDomainsCommand.factory)
         commandFactories.append(ServerQuitCommand.factory)
-        commandFactories.append(ServerStartCommand.factory)
+        commandFactories.append(ServerRunCommand.factory)
         commandFactories.append(ServerStopCommand.factory)
         commandFactories.append(DeltaCommand.factory)
         commandFactories.append(ResetDomainTelemetryCommand.factory)

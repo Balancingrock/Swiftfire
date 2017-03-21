@@ -3,7 +3,7 @@
 //  File:       main.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.15
+//  Version:    0.9.18
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,6 +49,7 @@
 //
 // History
 //
+// 0.9.18  - Renames Start command to Run
 // 0.9.15  - General update and switch to frameworks
 // 0.9.14  - Added loading of server level blacklisted clients
 //         - Upgraded to Xcode 8 beta 6
@@ -408,7 +409,7 @@ case .success:
     // Autostart http server if necessary
     // ==================================
     
-    if parameters.autoStartup { ServerStartCommand().execute() }
+    if parameters.autoStartup { ServerRunCommand().execute() }
     
     
     // Wait for the 'quit' command
