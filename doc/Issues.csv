@@ -1,0 +1,29 @@
+Number;Found;Fixed;Project;Problem
+1;0.9.15;0.9.18;Swiftfire;Name of domain directory not updated when the domain nam itself is updated
+2;0.9.15;0.9.18;Console;Domains window: ‘enable’ does not update when using “1” instead of “true”
+3;0.9.15;0.9.18;Console;Blacklist window: remove ‘stat’ button & column
+4;0.9.15;0.9.18;Console;Rename the start button to ‘run’ (Also rename the start command to run) Also in the “Services” window.
+5;0.9.15;0.9.18;Swiftfire;Rename ‘closure’ to ‘service’ in the register services function.
+;;;;
+;;;;
+;;;;
+;;;;
+;;;;
+;;;;
+;;;;
+;;;;
+;;;;
+;;;;
+;;;;
+;;;;
+;;;;
+;;;;
+;;;;
+;;;;
+;;;;
+;;;;
+;;;;
+;;;;
+;;;;
+;;;;
+;;;;
