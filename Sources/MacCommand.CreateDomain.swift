@@ -3,7 +3,7 @@
 //  File:       MacCommand.CreateDomain.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.15
+//  Version:    0.9.18
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -22,9 +22,8 @@
 //
 //  I also ask you to please leave this header with the source code.
 //
-//  I strongly believe that the Non Agression Principle is the way for societies to function optimally. I thus reject
-//  the implicit use of force to extract payment. Since I cannot negotiate with you about the price of this code, I
-//  have choosen to leave it up to you to determine its price. You pay me whatever you think this code is worth to you.
+//  I strongly believe that voluntarism is the way for societies to function optimally. Thus I have choosen to leave it
+//  up to you to determine the price for this code. You pay me whatever you think this code is worth to you.
 //
 //   - You can send payment via paypal to: sales@balancingrock.nl
 //   - Or wire bitcoins to: 1GacSREBxPy1yskLMc9de2nofNv2SNdwqH
@@ -49,6 +48,7 @@
 //
 // History
 //
+// 0.9.18 - Header update
 // 0.9.15 - General update and switch to frameworks
 // 0.9.14 - Initial release
 //

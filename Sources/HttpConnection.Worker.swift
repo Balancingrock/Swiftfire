@@ -3,7 +3,7 @@
 //  File:       HttpConnection.HttpWorker.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.15
+//  Version:    0.9.18
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -22,9 +22,8 @@
 //
 //  I also ask you to please leave this header with the source code.
 //
-//  I strongly believe that the Non Agression Principle is the way for societies to function optimally. I thus reject
-//  the implicit use of force to extract payment. Since I cannot negotiate with you about the price of this code, I
-//  have choosen to leave it up to you to determine its price. You pay me whatever you think this code is worth to you.
+//  I strongly believe that voluntarism is the way for societies to function optimally. Thus I have choosen to leave it
+//  up to you to determine the price for this code. You pay me whatever you think this code is worth to you.
 //
 //   - You can send payment via paypal to: sales@balancingrock.nl
 //   - Or wire bitcoins to: 1GacSREBxPy1yskLMc9de2nofNv2SNdwqH
@@ -49,19 +48,20 @@
 //
 // History
 //
-// 0.9.15  - General update and switch to frameworks
-//         - Updated domainServices
-// 0.9.14  - Added support for HTTP 1.0
-//         - Upgraded to Xcode 8 beta 6
-// 0.9.13  - Upgraded to Xcode 8 beta 3 (Swift 3)
-// 0.9.11  - Added support for usage statistics
-// 0.9.6   - Header update
-// 0.9.3   - Added incrementing of serverTelemetry.nofHttp400Replies if the host cannot be mapped to a domain
-//         - Split "domain not found" error into "domain not found" and "domain not enabled"
-//         - Removed port information from "domain not found/enabled" error
-// 0.9.2   - Made forwarding case cleaner
-//         - Moved the code that provides a response to the Domain class
-// 0.9.0   - Initial release
+// 0.9.18 - Header update
+// 0.9.15 - General update and switch to frameworks
+//        - Updated domainServices
+// 0.9.14 - Added support for HTTP 1.0
+//        - Upgraded to Xcode 8 beta 6
+// 0.9.13 - Upgraded to Xcode 8 beta 3 (Swift 3)
+// 0.9.11 - Added support for usage statistics
+// 0.9.6  - Header update
+// 0.9.3  - Added incrementing of serverTelemetry.nofHttp400Replies if the host cannot be mapped to a domain
+//        - Split "domain not found" error into "domain not found" and "domain not enabled"
+//        - Removed port information from "domain not found/enabled" error
+// 0.9.2  - Made forwarding case cleaner
+//        - Moved the code that provides a response to the Domain class
+// 0.9.0  - Initial release
 //
 // =====================================================================================================================
 // Description
