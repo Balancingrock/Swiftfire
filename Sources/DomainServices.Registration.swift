@@ -3,7 +3,7 @@
 //  File:       DomainServices.Registration.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.15
+//  Version:    0.9.18
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,6 +49,7 @@
 //
 // History
 //
+// 0.9.18 - Renamed closure to service in register call
 // 0.9.15 - Initial release
 //
 // =====================================================================================================================
@@ -111,11 +112,11 @@ private let getFileAtResourcePath = "Get file at resource path"
 
 func registerDomainServices() {
     
-    domainServices.register(name: blacklist, closure: ds_blacklist)
-    domainServices.register(name: onlyHttp10OrHttp11, closure: ds_onlyHttp10or11)
-    domainServices.register(name: onlyGetOrPost, closure: ds_onlyGetOrPost)
-    domainServices.register(name: getResourcePathFromUrl, closure: ds_getResourcePathFromUrl)
-    domainServices.register(name: getFileAtResourcePath, closure: ds_getFileAtResourcePath)
+    domainServices.register(name: blacklist, service: ds_blacklist)
+    domainServices.register(name: onlyHttp10OrHttp11, service: ds_onlyHttp10or11)
+    domainServices.register(name: onlyGetOrPost, service: ds_onlyGetOrPost)
+    domainServices.register(name: getResourcePathFromUrl, service: ds_getResourcePathFromUrl)
+    domainServices.register(name: getFileAtResourcePath, service: ds_getFileAtResourcePath)
 }
 
 
