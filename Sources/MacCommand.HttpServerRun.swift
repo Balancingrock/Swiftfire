@@ -1,6 +1,6 @@
 // =====================================================================================================================
 //
-//  File:       MacCommand.ServerStop.swift
+//  File:       MacCommand.HttpServerRun.swift
 //  Project:    Swiftfire
 //
 //  Version:    0.9.18
@@ -48,31 +48,84 @@
 //
 // History
 //
-// 0.9.18 - Header update
+// 0.9.18 - Renamed from Start to Run
+//        - Header update
 // 0.9.15 - General update and switch to frameworks
 // 0.9.14 - Initial release
 //
 // =====================================================================================================================
 
 import Foundation
-import SwifterJSON
 import SwifterLog
+import SwifterJSON
 import SwiftfireCore
+import SecureSockets
+import SwifterSockets
 
 
-extension ServerStopCommand: MacCommand {
-    
+extension HttpServerRunCommand: MacCommand {
+        
     public static func factory(json: VJson?) -> MacCommand? {
-        return ServerStopCommand(json: json)
+        return HttpServerRunCommand(json: json)
     }
-    
+        
     public func execute() {
         
-        if httpServer.isRunning {
-            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Stopping HTTP server")
-            httpServer.stop()
+        
+        // If the server is running, don't do anything
+        
+        if httpServer?.isRunning ?? false { telemetry.httpServerStatus = "Running"; return }
+        
+        
+        // If the https server is not running either, then reinit the available connections and domain services
+        
+        if !(httpsServer?.isRunning ?? false) {
+            
+            
+            // Reset available connections
+        
+            connectionPool.create(num: parameters.maxNofAcceptedConnections, generator: { return HttpConnection() })
+        
+            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Initialized the connection pool with \(parameters.maxNofAcceptedConnections) http connections")
+            
+            
+            // Rebuild the available services for the domains
+            
+            domains.forEach(){ $0.rebuildServices() }
+        }
+
+
+        // Restart the HTTP server
+        
+        httpServer = SwifterSockets.TipServer(
+            .port(parameters.httpServicePortNumber),
+            .maxPendingConnectionRequests(Int(parameters.maxNofPendingConnections)),
+            .acceptQueue(httpServerAcceptQueue),
+            .connectionObjectFactory(httpConnectionFactory),
+            .acceptLoopDuration(2),
+            .errorHandler(serverErrorHandler))
+        
+        switch httpServer?.start() {
+            
+        case nil:
+                
+            log.atLevelCritical(id: -1, source: #file.source(#function, #line), message: "No HTTP server created")
+            telemetry.httpServerStatus = "Cannot"
+            
+            
+        case let .error(message)?:
+                
+            log.atLevelError(id: -1, source: #file.source(#function, #line), message: message)
+            telemetry.httpServerStatus = "Error"
+            
+            
+        case .success?:
+            
+            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "HTTP Server started on port \(parameters.httpServicePortNumber)")
+            telemetry.httpServerStatus = "Running"
         }
         
-        log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "HTTP server stopped")
+
+        log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Completed")
     }
 }

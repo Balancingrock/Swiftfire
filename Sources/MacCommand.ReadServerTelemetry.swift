@@ -49,6 +49,7 @@
 // History
 //
 // 0.9.18 - Header update
+//        - Renamed serverStatus to httpServerStatus and added httpsServerStatus
 // 0.9.15 - General update and switch to frameworks
 // 0.9.14 - Initial release
 //
@@ -98,17 +99,23 @@ extension ReadServerTelemetryCommand: MacCommand {
             mac?.transfer(reply)
             
             
-        case .serverStatus:
+        case .httpServerStatus:
             
-            let rs = httpServer.isRunning
-            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Reading, at_RunningStatus = \(rs)")
-            let reply = ReadServerTelemetryReply(item: telemetryName, value: (rs ? "Running" : "Not Running"))
+            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Reading, httpServerStatus = \(telemetry.httpServerStatus)")
+            let reply = ReadServerTelemetryReply(item: telemetryName, value: telemetry.httpServerStatus)
+            mac?.transfer(reply)
+            
+            
+        case .httpsServerStatus:
+            
+            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Reading, httpsServerStatus = \(telemetry.httpsServerStatus)")
+            let reply = ReadServerTelemetryReply(item: telemetryName, value: telemetry.httpsServerStatus)
             mac?.transfer(reply)
             
             
         case .serverVersion:
             
-            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Reading, ap_Version = \(SWIFTFIRE_VERSION)")
+            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Reading, Version = \(SWIFTFIRE_VERSION)")
             let reply = ReadServerTelemetryReply(item: telemetryName, value: SWIFTFIRE_VERSION)
             mac?.transfer(reply)
         }

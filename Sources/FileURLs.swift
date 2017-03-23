@@ -181,6 +181,11 @@ final class FileURLs {
     static var sslConsoleServerPrivateKeyFile: URL? = { fileUrl(sslConsoleServerDir, "private-key.pem") }()
     
     
+    /// The directory for the server certificate & private key
+    
+    static var sslServerDir: URL? = { dirUrl(sslDir, "server") }()
+    
+    
     // =================================================================================================================
     /// The directory containing the parameter and domain files with default values
     

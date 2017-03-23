@@ -1,6 +1,6 @@
 // =====================================================================================================================
 //
-//  File:       MacCommand.ServerRun.swift
+//  File:       MacCommand.HttpsServerStop.swift
 //  Project:    Swiftfire
 //
 //  Version:    0.9.18
@@ -11,7 +11,7 @@
 //  Blog:       http://swiftrien.blogspot.com
 //  Git:        https://github.com/Balancingrock/Swiftfire
 //
-//  Copyright:  (c) 2016-2017 Marinus van der Lugt, All rights reserved.
+//  Copyright:  (c) 2017 Marinus van der Lugt, All rights reserved.
 //
 //  License:    Use or redistribute this code any way you like with the following two provision:
 //
@@ -48,57 +48,36 @@
 //
 // History
 //
-// 0.9.18 - Renamed from Start to Run
-//        - Header update
-// 0.9.15 - General update and switch to frameworks
-// 0.9.14 - Initial release
+// 0.9.18 - Initial release
 //
 // =====================================================================================================================
 
 import Foundation
 import SwifterJSON
-import SwifterLog
 import SwiftfireCore
+import SwifterLog
 
 
-extension ServerRunCommand: MacCommand {
-        
+extension HttpsServerStopCommand: MacCommand {
+    
     public static func factory(json: VJson?) -> MacCommand? {
-        return ServerRunCommand(json: json)
+        return HttpsServerStopCommand(json: json)
     }
-        
+    
     public func execute() {
         
-        
-        // If the server is running, don't do anything
-        
-        if httpServer.isRunning { return }
-        
-        
-        // Reset available connections
-            
-        connectionPool.create(num: parameters.maxNofAcceptedConnections, generator: { return HttpConnection() })
-
-        log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Initialized the connection pool with \(parameters.maxNofAcceptedConnections) http connections")
-
-        
-        // Rebuild the available services for the domains
-        
-        domains.forEach(){ $0.rebuildServices() }
-        
-        
-        // Start the server
-        
-        let result = httpServer.start()
-        
-        switch result {
-        case let .error(message):
-            log.atLevelError(id: -1, source: #file.source(#function, #line), message: message)
-        
-        case .success:
-            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "HTTP Server started")
+        if httpsServer?.isRunning ?? false {
+            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Stopping HTTPS server")
+            httpsServer?.stop()
+            telemetry.httpsServerStatus = "Stopping"
+        } else {
+            if httpsServer == nil {
+                telemetry.httpsServerStatus = "Cannot"
+            } else {
+                telemetry.httpsServerStatus = "Not Running"
+            }
         }
         
-        log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Completed")
+        Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Command completed")
     }
 }

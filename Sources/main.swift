@@ -303,24 +303,26 @@ let telemetry = Telemetry()
 // Prepare the HTTP server
 // =======================
 
-private let acceptQueue = DispatchQueue(
+let httpServerAcceptQueue = DispatchQueue(
     label: "Http Server Accept queue",
     qos: .userInteractive,
     attributes: [],
     autoreleaseFrequency: DispatchQueue.AutoreleaseFrequency.inherit,
     target: nil)
 
-func httpServerErrorHandler(message: String) {
+let httpsServerAcceptQueue = DispatchQueue(
+    label: "Https Server Accept queue",
+    qos: .userInteractive,
+    attributes: [],
+    autoreleaseFrequency: DispatchQueue.AutoreleaseFrequency.inherit,
+    target: nil)
+
+func serverErrorHandler(message: String) {
     Log.atError?.log(id: -1, source: "Main", message: message)
 }
 
-let httpServer = SwifterSockets.TipServer(
-    .port(parameters.httpServicePortNumber),
-    .maxPendingConnectionRequests(Int(parameters.maxNofPendingConnections)),
-    .acceptQueue(acceptQueue),
-    .connectionObjectFactory(httpConnectionFactory),
-    .acceptLoopDuration(2),
-    .errorHandler(httpServerErrorHandler))
+var httpServer: SwifterSockets.TipServer?
+var httpsServer: SecureSockets.SslServer?
 
 
 // =========================================================
@@ -406,10 +408,10 @@ case .success:
     log.atLevelNotice(id: -1, source: "Main", message: "Listening for M&C connections")
     
     // ==================================
-    // Autostart http server if necessary
+    // Autostart servers if necessary
     // ==================================
     
-    if parameters.autoStartup { ServerRunCommand().execute() }
+    if parameters.autoStartup { HttpServerRunCommand().execute(); HttpsServerRunCommand().execute() }
     
     
     // Wait for the 'quit' command

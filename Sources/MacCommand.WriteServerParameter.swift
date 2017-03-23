@@ -142,7 +142,8 @@ extension WriteServerParameterCommand: MacCommand {
         case .callbackAtAndAboveLevel: updateLevel(name: parameter.rawValue, value: value, setter: { parameters.callbackAtAndAboveLevel = $0; log.callbackAtAndAboveLevel = $0 }, getter: { log.callbackAtAndAboveLevel })
         case .networkTransmitAtAndAboveLevel: updateLevel(name: parameter.rawValue, value: value, setter: { parameters.networkTransmitAtAndAboveLevel = $0; log.networkTransmitAtAndAboveLevel = $0 }, getter: { log.networkTransmitAtAndAboveLevel })
         case .stdoutPrintAtAndAboveLevel: updateLevel(name: parameter.rawValue, value: value, setter: { parameters.stdoutPrintAtAndAboveLevel = $0; log.stdoutPrintAtAndAboveLevel = $0 }, getter: { log.stdoutPrintAtAndAboveLevel })
-        case .servicePortNumber: keepOrUpdate(name: parameter.rawValue, value: value, setter: { parameters.httpServicePortNumber = $0 }, getter: { parameters.httpServicePortNumber })
+        case .httpServicePortNumber: keepOrUpdate(name: parameter.rawValue, value: value, setter: { parameters.httpServicePortNumber = $0 }, getter: { parameters.httpServicePortNumber })
+        case .httpsServicePortNumber: keepOrUpdate(name: parameter.rawValue, value: value, setter: { parameters.httpsServicePortNumber = $0 }, getter: { parameters.httpsServicePortNumber })
         case .macPortNumber: keepOrUpdate(name: parameter.rawValue, value: value, setter: { parameters.macPortNumber = $0 }, getter: { parameters.macPortNumber })
             
         case .networkLogtargetIpAddress:
@@ -180,14 +181,11 @@ extension WriteServerParameterCommand: MacCommand {
     }
     
     
-    // The network target for the logger
-    
-//    private static var networkLogTarget = SwifterLog.NetworkTarget("","")
-    
-    
     /// Checks if the networkLogTarget contains two non-empty fields, and if so, tries to connect the logger to the target. After a connection attempt it will empty the fields.
-    /// - Returns: True if the connection attempt was made, false otherwise.
+    ///
     /// - Note: It does not report the sucess/failure of the connection attempt.
+    ///
+    /// - Returns: True if the connection attempt was made, false otherwise.
     
     @discardableResult
     private static func conditionallySetNetworkLogTarget() -> Bool {

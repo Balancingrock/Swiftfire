@@ -1,6 +1,6 @@
 // =====================================================================================================================
 //
-//  File:       MacCommand.ServerQuit.swift
+//  File:       MacCommand.HttpServerStop.swift
 //  Project:    Swiftfire
 //
 //  Version:    0.9.18
@@ -49,6 +49,7 @@
 // History
 //
 // 0.9.18 - Header update
+//        - Renmed to HttpServerStop
 // 0.9.15 - General update and switch to frameworks
 // 0.9.14 - Initial release
 //
@@ -60,37 +61,26 @@ import SwifterLog
 import SwiftfireCore
 
 
-private let COMMAND_NAME = "ServerQuitCommand"
-
-
-extension ServerQuitCommand: MacCommand {
+extension HttpServerStopCommand: MacCommand {
     
     public static func factory(json: VJson?) -> MacCommand? {
-        return ServerQuitCommand(json: json)
+        return HttpServerStopCommand(json: json)
     }
     
     public func execute() {
         
-        // Stop the http server if it is running
-        
-        if httpServer.isRunning {
-            
-            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Stopping HTTP Server")
-            
-            httpServer.stop()
+        if httpServer?.isRunning ?? false {
+            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Stopping HTTP server")
+            httpServer?.stop()
+            telemetry.httpServerStatus = "Stopping"
+        } else {
+            if httpServer == nil {
+                telemetry.httpServerStatus = "Cannot"
+            } else {
+                telemetry.httpServerStatus = "Not Running"
+            }
         }
         
-        
-        // Wait a little to give the stop command time to run through the system
-        
-        sleep(5)
-        
-        
-        log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Quitting Swiftfire")
-        
-        
-        // Now quit the server
-        
-        quitSwiftfire = true
+        Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Command completed")
     }
 }
