@@ -60,6 +60,9 @@ import SecureSockets
 import SwifterSockets
 
 
+fileprivate func serverErrorHandler(message: String) { Log.atError?.log(id: -1, source: "HTTPS Server", message: message) }
+
+
 extension HttpsServerRunCommand: MacCommand {
     
     public static func factory(json: VJson?) -> MacCommand? {
@@ -92,15 +95,16 @@ extension HttpsServerRunCommand: MacCommand {
         }
         
         
-        // Create new domain CTXs
-        
-        var domainCtxs = domains.ctxs
-        
-        
         // Get a server certificate and private key reference
         
-        var serverCtx = getServerCertAndKey()
+        var serverCtx = buildServerCtx()
+
         
+        // Create new domain CTXs
+        
+        var domainCtxs = checkDomainCtxs()
+        
+
         if serverCtx == nil && domainCtxs.count == 0 {
             
             Log.atCritical?.log(id: -1, source: #file.source(#function, #line), message: "No certificate or private key (or combo) found, cannot start the HTTPS server")
@@ -156,7 +160,7 @@ extension HttpsServerRunCommand: MacCommand {
     }
 }
 
-fileprivate func getServerCertAndKey() -> ServerCtx? {
+fileprivate func buildServerCtx() -> ServerCtx? {
     
     guard let sslServerDir = FileURLs.sslServerDir else {
         Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "No sll server directory found")
@@ -214,27 +218,96 @@ fileprivate func getServerCertAndKey() -> ServerCtx? {
     // Create the server CTX
     
     guard let ctx = ServerCtx() else {
-        Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Context creation failed")
+        Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Server context creation failed")
         return nil
     }
-    
+
     
     // Add the certificate and (private) key
     
-    switch ctx.useCertificate(file: EncodedFile(path: certFiles[0].path, encoding: .pem)) {
-    case .error(let message): Log.atWarning?.log(id: -1, source: #file.source(#function, #line), message: message)
-    case .success: break
+    if case let .error(message) = ctx.useCertificate(file: EncodedFile(path: certFiles[0].path, encoding: .pem)) {
+        Log.atWarning?.log(id: -1, source: #file.source(#function, #line), message: message)
+        return nil
     }
     
-    switch ctx.usePrivateKey(file: EncodedFile(path: keyFiles[0].path, encoding: .pem)) {
-    case .error(let message): Log.atWarning?.log(id: -1, source: #file.source(#function, #line), message: message)
-    case .success: break
+    if case let .error(message) = ctx.usePrivateKey(file: EncodedFile(path: keyFiles[0].path, encoding: .pem)) {
+        Log.atWarning?.log(id: -1, source: #file.source(#function, #line), message: message)
+        return nil
     }
     
-    switch ctx.checkPrivateKey() {
-    case .error(let message): Log.atWarning?.log(id: -1, source: #file.source(#function, #line), message: message)
-    case .success: break
+    if case let .error(message) = ctx.checkPrivateKey() {
+        Log.atWarning?.log(id: -1, source: #file.source(#function, #line), message: message)
+        return nil
     }
+
+    
+    // Check validity period
+    
+    guard let cert = X509(ctx: ctx) else {
+        Log.atWarning?.log(id: -1, source: #file.source(#function, #line), message: "Failure retrieving certificate store from context")
+        return nil
+    }
+    
+    let today = Date().javaDate
+    
+    if today < cert.validNotBefore {
+        Log.atWarning?.log(id: -1, source: #file.source(#function, #line), message: "Certificate at \(certFiles[0].path) is not yet valid")
+        return nil
+    }
+
+    if today > cert.validNotAfter {
+        Log.atWarning?.log(id: -1, source: #file.source(#function, #line), message: "Certificate at \(certFiles[0].path) is no longer valid")
+        return nil
+    }
+    
+    let validForDays = (cert.validNotAfter - today)/(24 * 60 * 60 * 1000)
+    
+    Log.atInfo?.log(id: -1, source: "Main", message: "Server certificate is valid for \(validForDays) more days")
     
     return ctx
+}
+
+fileprivate func checkDomainCtxs() -> [ServerCtx] {
+    
+    let today = Date().javaDate
+
+    var domainCtxs = domains.ctxs
+    
+    for domain in domains {
+        
+        switch domain.ctx {
+        
+        case let .error(message): Log.atWarning?.log(id: -1, source: #file.source(#function, #line), message: message)
+        
+        case let .success(ctx):
+            
+            let cert = X509(ctx: ctx)
+            
+            if cert != nil {
+
+                if today < cert!.validNotBefore {
+                    
+                    Log.atWarning?.log(id: -1, source: #file.source(#function, #line), message: "Certificate for domain \(domain.name) is not yet valid")
+                
+                } else if today > cert!.validNotAfter {
+                    
+                    Log.atWarning?.log(id: -1, source: #file.source(#function, #line), message: "Certificate for domain \(domain.name) is no longer valid")
+                
+                } else {
+        
+                    let validForDays = (cert!.validNotAfter - today)/(24 * 60 * 60 * 1000)
+        
+                    Log.atInfo?.log(id: -1, source: #file.source(#function, #line), message: "Server certificate is valid for \(validForDays) more days")
+                    
+                    domainCtxs.append(ctx)
+                }
+                
+            } else {
+                
+                Log.atInfo?.log(id: -1, source: #file.source(#function, #line), message: "Cannot extract certificate of domain \(domain.name)")
+            }
+        }
+    }
+    
+    return domainCtxs
 }

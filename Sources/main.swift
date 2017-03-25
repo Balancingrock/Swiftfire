@@ -84,6 +84,15 @@ import SwifterSockets
 typealias Log = SwifterLog
 
 
+/// Stops the startup process.
+
+fileprivate func emergencyExit(_ message: String) -> Never {
+    Log.atEmergency?.log(id: -1, source: "Main", message: message)
+    sleep(2) // Give the logger some time to do its work
+    fatalError(message)
+}
+
+
 // Every thread that runs for more than a few milliseconds should poll this variable and terminate itself when it finds that this flag is 'true'.
 
 var quitSwiftfire: Bool = false
@@ -109,24 +118,11 @@ log.networkTransmitAtAndAboveLevel = SwifterLog.Level.none
 
 let parameters = Parameters()
 
-guard let parameterDefaultFile = FileURLs.parameterDefaultsFile else {
-    /// If the FileURLs module could not create the filename, something is seriously wrong.
-    log.atLevelEmergency(id: -1, source: "Main", message: "Could not construct parameter defaults filename, aborting...")
-    sleep(1) // Allow the error messages to percolate through the system
-    fatalError("Could not construct parameter defaults filename, aborting...")
-}
+guard let parameterDefaultFile = FileURLs.parameterDefaultsFile else { emergencyExit("Could not construct parameter defaults filename") }
 
 switch parameters.restore(fromFile: parameterDefaultFile) {
-    
-case let .error(message):
-    log.atLevelEmergency(id: -1, source: "Main", message: message)
-    sleep(1) // Allow the error messages to percolate through the system
-    fatalError(message)
-
-case let .success(message):
-    if !message.isEmpty {
-        log.atLevelNotice(id: -1, source: "Main", message: message)
-    }
+case let .error(message):   emergencyExit(message)
+case let .success(message): log.atLevelNotice(id: -1, source: "Main", message: message)
 }
 
 log.atLevelNotice(id: -1, source: "Main", message: "Configuration parameters values:\n\(parameters)")
@@ -136,12 +132,7 @@ log.atLevelNotice(id: -1, source: "Main", message: "Configuration parameters val
 // Configure logging
 // =================
 
-guard let applicationLoggingDirectory = FileURLs.applicationLogDir?.path else {
-    /// If the FileURLs module could not create the filename, something is seriously wrong.
-    log.atLevelEmergency(id: -1, source: "main", message: "Could not construct application log directory (name), aborting...")
-    sleep(1) // Allow the error messages to percolate through the system
-    fatalError("Could not construct application log directory (name), aborting...")
-}
+guard let applicationLoggingDirectory = FileURLs.applicationLogDir?.path else { emergencyExit("Could not construct application log directory") }
 
 log.logfileDirectoryPath = applicationLoggingDirectory
 
@@ -192,21 +183,11 @@ log.atLevelNotice(id: -1, source: "Main", message: "Remote console logging set u
 
 let serverBlacklist = Blacklist()
 
-guard let serverBlacklistFile = FileURLs.serverBlacklistFile else {
-    log.atLevelEmergency(id: -1, source: "Main", message: "Could not construct server blacklist file, aborting...")
-    sleep(1) // Allow the error messages to percolate through the system
-    fatalError("Could not construct server blacklist file, aborting...")
-}
+guard let serverBlacklistFile = FileURLs.serverBlacklistFile else { emergencyExit("Could not construct server blacklist file") }
 
 switch serverBlacklist.restore(fromFile: serverBlacklistFile) {
-
-case let .error(message):
-    log.atLevelEmergency(id: -1, source: "Main", message: message)
-    sleep(1) // Allow the error messages to percolate through the system
-    fatalError(message)
-
-case let .success(message):
-    log.atLevelNotice(id: -1, source: "Main", message: message)
+case let .error(message):   emergencyExit(message)
+case let .success(message): log.atLevelNotice(id: -1, source: "Main", message: message)
 }
 
 
@@ -216,15 +197,10 @@ case let .success(message):
 
 let statistics = Statistics()
 
-guard let statisticsFile = FileURLs.statisticsFile else {
-    log.atLevelEmergency(id: -1, source: "Main", message: "Statistics file could not be constructed, aborting...")
-    sleep(1) // Allow the error messages to percolate through the system
-    fatalError("Statistics file could not be constructed, aborting...")
-}
+guard let statisticsFile = FileURLs.statisticsFile else { emergencyExit("Statistics file could not be constructed") }
 
 switch statistics.restore(fromFile: statisticsFile) {
-case let .error(message):
-    log.atLevelEmergency(id: -1, source: "Main", message: message)
+case let .error(message): emergencyExit(message)
 case .success: break
 }
 
@@ -254,24 +230,11 @@ let headerLogger = HttpHeaderLogger(inDirectory: FileURLs.headersLogDir)
 
 let domains = Domains()
 
-
-// Restore the domains from file
-
-guard let defaultDomainsFile = FileURLs.domainDefaultsFile else {
-    log.atLevelEmergency(id: -1, source: "Main", message: "Default domains file could not be constructed, aborting...")
-    sleep(1)
-    fatalError("Default domains file could not be constructed, aborting...")
-}
+guard let defaultDomainsFile = FileURLs.domainDefaultsFile else { emergencyExit("Default domains file could not be constructed") }
 
 switch domains.restore(fromFile: defaultDomainsFile) {
-
-case let .error(message):
-    log.atLevelEmergency(id: -1, source: "Main", message: message)
-    sleep(1)
-    fatalError(message)
-    
-case let .success(message):
-    Log.atNotice?.log(id: -1, source: "Main", message: message)
+case let .error(message): emergencyExit(message)
+case let .success(message): Log.atNotice?.log(id: -1, source: "Main", message: message)
 }
 
 
@@ -299,27 +262,23 @@ let connectionPool = ConnectionPool()
 let telemetry = Telemetry()
 
 
-// =======================
-// Prepare the HTTP server
-// =======================
+// ===================================
+// Prepare for the HTTP & HTTPS server
+// ===================================
 
 let httpServerAcceptQueue = DispatchQueue(
-    label: "Http Server Accept queue",
+    label: "HTTP Server Accept queue",
     qos: .userInteractive,
     attributes: [],
     autoreleaseFrequency: DispatchQueue.AutoreleaseFrequency.inherit,
     target: nil)
 
 let httpsServerAcceptQueue = DispatchQueue(
-    label: "Https Server Accept queue",
+    label: "HTTPS Server Accept queue",
     qos: .userInteractive,
     attributes: [],
     autoreleaseFrequency: DispatchQueue.AutoreleaseFrequency.inherit,
     target: nil)
-
-func serverErrorHandler(message: String) {
-    Log.atError?.log(id: -1, source: "Main", message: message)
-}
 
 var httpServer: SwifterSockets.TipServer?
 var httpsServer: SecureSockets.SslServer?
@@ -329,25 +288,74 @@ var httpsServer: SecureSockets.SslServer?
 // Make sure certificates are present for the M&C connection
 // =========================================================
 
-if !FileURLs.exists(url: FileURLs.sslConsoleServerCertificateFile) {
-    if case .error(let message) = generateKeyAndCertificate(privateKeyLocation: FileURLs.sslConsoleServerPrivateKeyFile, certificateLocation: FileURLs.sslConsoleServerCertificateFile) {
-        Log.atError?.log(id: -1, source: "Main", message: message)
-    } else {
-        Log.atNotice?.log(id: -1, source: "Main", message: "Console certificate and private key generated")
+if (!FileURLs.exists(url: FileURLs.sslConsoleServerCertificateFile) || !FileURLs.exists(url: FileURLs.sslConsoleServerPrivateKeyFile)) {
+    switch generateKeyAndCertificate(privateKeyLocation: FileURLs.sslConsoleServerPrivateKeyFile, certificateLocation: FileURLs.sslConsoleServerCertificateFile) {
+    case .error(let message): emergencyExit(message)
+    case .success: Log.atNotice?.log(id: -1, source: "Main", message: "Certificate and private key for console connection generated")
     }
 } else {
-    Log.atNotice?.log(id: -1, source: "Main", message: "Console certificate present")
+    Log.atNotice?.log(id: -1, source: "Main", message: "Certificate and private key files for console connection present")
 }
 
+
+// Create the CTX that will be used
+
+guard let macCtx = ServerCtx() else { emergencyExit("Cannot create server context for console connection") }
+
+
+// Set the certificate & private key
+
+if case let .error(message) = macCtx.usePrivateKey(file: EncodedFile(path: FileURLs.sslConsoleServerPrivateKeyFile!.path, encoding: .pem)) {
+    emergencyExit(message)
+}
+
+if case let .error(message) = macCtx.useCertificate(file: EncodedFile(path: FileURLs.sslConsoleServerCertificateFile!.path, encoding: .pem)) {
+    emergencyExit(message)
+}
+
+
+// Verify the validity duration of the certificate
+
+guard let macCert: X509 = X509(ctx: macCtx) else { emergencyExit("Could not extract certificate store from console context") }
+
+fileprivate let today = Date().javaDate
+
+if today < macCert.validNotBefore { emergencyExit("Console certificate in \(FileURLs.sslConsoleServerCertificateFile!.path) is not yet valid") }
+if today > macCert.validNotAfter  { emergencyExit("Console certificate in \(FileURLs.sslConsoleServerCertificateFile!.path) is no longer valid") }
+
+fileprivate let validForDays = (macCert.validNotAfter - today)/(24 * 60 * 60 * 1000)
+
+Log.atInfo?.log(id: -1, source: "Main", message: "Server certificate for console interface is valid for \(validForDays) more days")
+
+
+// Check that there is a trusted console certificate
+
 var consoleServerCertificateFound = false
-if let certs = try? FileManager.default.contentsOfDirectory(at: FileURLs.sslConsoleTrustedClientsDir!, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles, .skipsSubdirectoryDescendants]) {
-    for cand in certs {
-        if cand.pathExtension.compare("pem", options: String.CompareOptions.caseInsensitive, range: nil, locale: nil) == ComparisonResult.orderedSame {
-            consoleServerCertificateFound = true
-            break
+if let urls = try? FileManager.default.contentsOfDirectory(at: FileURLs.sslConsoleTrustedClientsDir!, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles, .skipsSubdirectoryDescendants]) {
+    for url in urls {
+        // If a certificate file format is found, then load it and check its validity period
+        if url.pathExtension.compare("pem", options: String.CompareOptions.caseInsensitive, range: nil, locale: nil) == ComparisonResult.orderedSame {
+            // Load the file into a certificate store
+            guard let ctx = ServerCtx() else { emergencyExit("Failed to create context for trusted console certificates check") }
+            if case let .error(message) = ctx.useCertificate(file: EncodedFile(path: url.path, encoding: .pem)) {
+                Log.atWarning?.log(id: -1, source: "Main", message: "Failed to load trusted console certificate at \(url.path)")
+            } else {
+                if let cert = X509(ctx: ctx) {
+                    if today < cert.validNotBefore {
+                        Log.atWarning?.log(id: -1, source: "Main", message: "Trusted console certificate in \(url.path) is not yet valid")
+                    } else if today > cert.validNotAfter {
+                        Log.atWarning?.log(id: -1, source: "Main", message: "Trusted console certificate in \(url.path) is no longer valid")
+                    } else {
+                        let validForDays = (macCert.validNotAfter - today)/(24 * 60 * 60 * 1000)
+                        Log.atInfo?.log(id: -1, source: "Main", message: "Trusted console certificate in \(url.path) is valid for \(validForDays) more days")
+                        consoleServerCertificateFound = true
+                    }
+                }
+            }
         }
     }
 }
+
 if consoleServerCertificateFound {
     Log.atNotice?.log(id: -1, source: "Main", message: "Trusted Console Certificate(s) present")
 } else {
@@ -361,6 +369,9 @@ if consoleServerCertificateFound {
 
 Log.atNotice?.log(id: -1, source: "Main", message: "Initializing M&C loop on port \(parameters.macPortNumber)")
 
+
+// The thread for the process that communicates with the console (mac).
+
 private let macAcceptQueue = DispatchQueue(
     label: "M&C Accept queue",
     qos: .userInteractive,
@@ -368,12 +379,13 @@ private let macAcceptQueue = DispatchQueue(
     autoreleaseFrequency: DispatchQueue.AutoreleaseFrequency.inherit,
     target: nil)
 
-let certAndKey = CertificateAndPrivateKeyFiles(pemCertificateFile: FileURLs.sslConsoleServerCertificateFile!.path, pemPrivateKeyFile: FileURLs.sslConsoleServerPrivateKeyFile!.path) {
-    message in
-    Log.atError?.log(id: -1, source: "Main", message: message)
-    sleep(2)
-    fatalError(message)
-}
+
+// Create a container for the certificate and private key
+
+guard let macCertKeyContainer = CertificateAndPrivateKeyFiles(pemCertificateFile: FileURLs.sslConsoleServerCertificateFile!.path, pemPrivateKeyFile: FileURLs.sslConsoleServerPrivateKeyFile!.path) else { emergencyExit("Could not create console server certificate & private key container") }
+
+
+// Create the server
 
 let macServer = SslServer()
 _ = macServer.setOptions(
@@ -384,7 +396,7 @@ _ = macServer.setOptions(
     .acceptLoopDuration(10),
     .errorHandler(macErrorHandler),
     .trustedClientCertificates([FileURLs.sslConsoleTrustedClientsDir!.path]),
-    .certificateAndPrivateKeyFiles(certAndKey)
+    .serverCtx(macCtx)
 )
 
 
@@ -411,7 +423,10 @@ case .success:
     // Autostart servers if necessary
     // ==================================
     
-    if parameters.autoStartup { HttpServerRunCommand().execute(); HttpsServerRunCommand().execute() }
+    if parameters.autoStartup {
+        HttpServerRunCommand().execute()
+        HttpsServerRunCommand().execute()
+    }
     
     
     // Wait for the 'quit' command

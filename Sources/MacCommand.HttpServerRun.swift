@@ -50,6 +50,7 @@
 //
 // 0.9.18 - Renamed from Start to Run
 //        - Header update
+//        - Added serverErrorHandler
 // 0.9.15 - General update and switch to frameworks
 // 0.9.14 - Initial release
 //
@@ -61,6 +62,9 @@ import SwifterJSON
 import SwiftfireCore
 import SecureSockets
 import SwifterSockets
+
+
+fileprivate func serverErrorHandler(message: String) { Log.atError?.log(id: -1, source: "HTTP Server", message: message) }
 
 
 extension HttpServerRunCommand: MacCommand {
