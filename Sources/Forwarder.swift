@@ -49,6 +49,7 @@
 // History
 //
 // 0.9.18 - Header update
+//        - Replaced log with Log?
 // 0.9.15 - General update and switch to frameworks, Initial release
 //
 // =====================================================================================================================
@@ -93,7 +94,7 @@ class Forwarder: SwifterSockets.Connection {
     }
     
     override func receiverError(_ message: String) {
-        log.atLevelError(id: client!.interface!.logId, source: #file.source(#function, #line), message: message)
+        Log.atError?.log(id: client!.interface!.logId, source: #file.source(#function, #line), message: message)
         closeForwarder()
     }
     

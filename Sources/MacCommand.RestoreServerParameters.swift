@@ -49,6 +49,7 @@
 // History
 //
 // 0.9.18 - Header update
+//        - Replaced log by Log?
 // 0.9.15 - General update and switch to frameworks
 // 0.9.14 - Initial release (replaces part of MacDef.swift)
 //
@@ -70,7 +71,7 @@ extension RestoreServerParametersCommand: MacCommand {
     
     public func execute() {
         
-        log.atLevelNotice(id: -1, source: #file.source(#function, #line))
+        Log.atNotice?.log(id: -1, source: #file.source(#function, #line))
         
         
         // Restore
@@ -78,20 +79,20 @@ extension RestoreServerParametersCommand: MacCommand {
         if let url = FileURLs.parameterDefaultsFile {
             switch parameters.restore(fromFile: url) {
             case let .error(message):
-                log.atLevelError(id: -1, source: #file.source(#function, #line), message: message)
+                Log.atError?.log(id: -1, source: #file.source(#function, #line), message: message)
             case let .success(message):
                 if !message.isEmpty {
-                    log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: message)
+                    Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: message)
                 }
             }
         } else {
-            log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Could not construct default parameters filename")
+            Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Could not construct default parameters filename")
         }
         
         
         // Provide audit trail
         
-        log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Parameter settings restored to:\n\(parameters)")
+        Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Parameter settings restored to:\n\(parameters)")
 
         
         // Send the new values to the console

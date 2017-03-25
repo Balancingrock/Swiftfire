@@ -49,6 +49,7 @@
 // History
 //
 // 0.9.18 - Header update
+//        - Replaced log with Log?
 // 0.9.15 - General update and switch to frameworks
 // 0.9.14 - Changed return of http version number to fit the request header http version
 //        - Upgraded to Xcode 8 beta 6
@@ -192,7 +193,7 @@ final class HttpConnection: SwifterSockets.Connection {
         
         // Record the closing
         
-        log.atLevelInfo(id: self.logId, source: #file.source(#function, #line), message: "Closing connection")
+        Log.atInfo?.log(id: self.logId, source: #file.source(#function, #line), message: "Closing connection")
         
         
         // Close a potential forwarding socket
@@ -215,21 +216,21 @@ final class HttpConnection: SwifterSockets.Connection {
     }
     
     override func transmitterReady(_ id: Int) {
-        log.atLevelDebug(id: logId, source: #file.source(#function, #line))
+        Log.atDebug?.log(id: logId, source: #file.source(#function, #line))
     }
     
     override func transmitterTimeout(_ id: Int) {
-        log.atLevelDebug(id: logId, source: #file.source(#function, #line))
+        Log.atDebug?.log(id: logId, source: #file.source(#function, #line))
         super.transmitterTimeout(id)
     }
     
     override func transmitterError(_ id: Int, _ message: String) {
-        log.atLevelError(id: logId, source: #file.source(#function, #line), message: message)
+        Log.atError?.log(id: logId, source: #file.source(#function, #line), message: message)
         super.transmitterError(id, message)
     }
     
     override func transmitterClosed(_ id: Int) {
-        log.atLevelDebug(id: logId, source: #file.source(#function, #line))
+        Log.atDebug?.log(id: logId, source: #file.source(#function, #line))
         super.transmitterClosed(id)
     }
     
@@ -239,7 +240,7 @@ final class HttpConnection: SwifterSockets.Connection {
     override func receiverClosed() {}
     
     override func receiverError(_ message: String) {
-        log.atLevelError(id: logId, source: #file.source(#function, #line), message: "Error event: \(message)")
+        Log.atError?.log(id: logId, source: #file.source(#function, #line), message: "Error event: \(message)")
     }
     
     override func receiverLoop() -> Bool {
@@ -252,7 +253,7 @@ final class HttpConnection: SwifterSockets.Connection {
     override func receiverData(_ buffer: UnsafeBufferPointer<UInt8>) -> Bool {
         
         
-        log.atLevelDebug(id: logId, source: #file.source(#function, #line), message: "Received \(buffer.count) bytes")
+        Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: "Received \(buffer.count) bytes")
         
         
         // Add the new data
@@ -282,7 +283,7 @@ final class HttpConnection: SwifterSockets.Connection {
                     
                     // Yes, the header is complete
                     
-                    log.atLevelDebug(id: logId, source: #file.source(#function, #line), message: "HTTP Message Header complete")
+                    Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: "HTTP Message Header complete")
                     
                     
                     // =======================
@@ -324,7 +325,7 @@ final class HttpConnection: SwifterSockets.Connection {
             let bodyRange = Range(uncheckedBounds: (lower: httpHeader!.headerLength, upper: messageSize))
             let body = messageBuffer.subdata(in: bodyRange)
             
-            log.atLevelDebug(id: logId, source: #file.source(#function, #line), message: "HTTP Message Body complete, dispatching worker")
+            Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: "HTTP Message Body complete, dispatching worker")
             
             
             // =====================
@@ -377,7 +378,7 @@ func httpConnectionFactory(_ cType: SwifterSockets.InterfaceAccess, _ remoteAddr
     if count > 0 { telemetry.nofAcceptWaitsForConnectionObject.increment() }
     
     guard let connection = availableConnection as? HttpConnection else {
-        log.atLevelEmergency(id: -1, source: #file.source(#function, #line), message: "SF Connection could not be allocated, client at \(remoteAddress) will be rejected")
+        Log.atEmergency?.log(id: -1, source: #file.source(#function, #line), message: "SF Connection could not be allocated, client at \(remoteAddress) will be rejected")
         return nil
     }
     
@@ -389,13 +390,13 @@ func httpConnectionFactory(_ cType: SwifterSockets.InterfaceAccess, _ remoteAddr
     
     // Create log entry that can be used to associate this place in the logfile with data from the statistics.
     
-    log.atLevelDebug(id: cType.logId, source: #file.source(#function, #line), message: "Allocating connection object \(connection.objectId) to client from address \(remoteAddress) on socket \(cType.logId) with allocation count \(connection.allocationCount)")
+    Log.atDebug?.log(id: cType.logId, source: #file.source(#function, #line), message: "Allocating connection object \(connection.objectId) to client from address \(remoteAddress) on socket \(cType.logId) with allocation count \(connection.allocationCount)")
     
     
     // Configure the connection
     
     if !connection.prepare(for: cType, remoteAddress: remoteAddress, options: []) {
-        log.atLevelEmergency(id: -1, source: #file.source(#function, #line), message: "Cannot prepare SF connection \(connection.objectId) for reuse")
+        Log.atEmergency?.log(id: -1, source: #file.source(#function, #line), message: "Cannot prepare SF connection \(connection.objectId) for reuse")
         connectionPool.free(connection: connection)
         return nil
     }

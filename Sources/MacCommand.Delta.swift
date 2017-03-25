@@ -49,6 +49,7 @@
 // History
 //
 // 0.9.18 - Header update
+//        - Replaced log by Log?
 // 0.9.15 - General update and switch to frameworks
 // 0.9.14 - Initial release
 //
@@ -67,10 +68,10 @@ extension DeltaCommand: MacCommand {
     }
     
     public func execute() {
-        log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Start")
+        Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Start")
         if delay > 0 {
             sleep(UInt32(min(delay, 10))) // Never more than 10 seconds
         }
-        log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Completed")
+        Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Completed")
     }
 }

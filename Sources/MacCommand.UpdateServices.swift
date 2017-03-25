@@ -49,6 +49,7 @@
 // History
 //
 // 0.9.18 - Header update
+//        - Replaced log by Log?
 // 0.9.15 - Initial release
 //
 // =====================================================================================================================
@@ -67,7 +68,7 @@ extension UpdateServicesCommand: MacCommand {
     
     public func execute() {
         
-        log.atLevelNotice(id: -1, source: #file.source(#function, #line))
+        Log.atNotice?.log(id: -1, source: #file.source(#function, #line))
 
         if let domain = domains.domain(forName: domainName) {
             
@@ -75,7 +76,7 @@ extension UpdateServicesCommand: MacCommand {
             
         } else {
             
-            log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Failed to update services for \(domainName), domain not found.")
+            Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Failed to update services for \(domainName), domain not found.")
         }
     }
 }

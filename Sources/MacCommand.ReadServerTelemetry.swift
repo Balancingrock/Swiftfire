@@ -50,6 +50,7 @@
 //
 // 0.9.18 - Header update
 //        - Renamed serverStatus to httpServerStatus and added httpsServerStatus
+//        - Replaced log by Log?
 // 0.9.15 - General update and switch to frameworks
 // 0.9.14 - Initial release
 //
@@ -73,49 +74,49 @@ extension ReadServerTelemetryCommand: MacCommand {
             
         case .nofAcceptedHttpRequests:
             
-            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Reading, telemetry.nofAcceptedHttpRequests = \(telemetry.nofAcceptedHttpRequests.intValue)")
+            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Reading, telemetry.nofAcceptedHttpRequests = \(telemetry.nofAcceptedHttpRequests.intValue)")
             let reply = ReadServerTelemetryReply(item: telemetryName, value: telemetry.nofAcceptedHttpRequests.intValue)
             mac?.transfer(reply)
             
             
         case .nofAcceptWaitsForConnectionObject:
             
-            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Reading, telemetry.nofAcceptWaitsForConnectionObject = \(telemetry.nofAcceptWaitsForConnectionObject.intValue)")
+            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Reading, telemetry.nofAcceptWaitsForConnectionObject = \(telemetry.nofAcceptWaitsForConnectionObject.intValue)")
             let reply = ReadServerTelemetryReply(item: telemetryName, value: telemetry.nofAcceptWaitsForConnectionObject.intValue)
             mac?.transfer(reply)
             
             
         case .nofHttp400Replies:
             
-            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Reading, telemetry.nofHttp400Replies = \(telemetry.nofHttp400Replies.intValue)")
+            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Reading, telemetry.nofHttp400Replies = \(telemetry.nofHttp400Replies.intValue)")
             let reply = ReadServerTelemetryReply(item: telemetryName, value: telemetry.nofHttp400Replies.intValue)
             mac?.transfer(reply)
             
             
         case .nofHttp500Replies:
             
-            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Reading, telemetry.nofHttp500Replies = \(telemetry.nofHttp500Replies.intValue)")
+            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Reading, telemetry.nofHttp500Replies = \(telemetry.nofHttp500Replies.intValue)")
             let reply = ReadServerTelemetryReply(item: telemetryName, value: telemetry.nofHttp500Replies.intValue)
             mac?.transfer(reply)
             
             
         case .httpServerStatus:
             
-            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Reading, httpServerStatus = \(telemetry.httpServerStatus)")
+            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Reading, httpServerStatus = \(telemetry.httpServerStatus)")
             let reply = ReadServerTelemetryReply(item: telemetryName, value: telemetry.httpServerStatus)
             mac?.transfer(reply)
             
             
         case .httpsServerStatus:
             
-            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Reading, httpsServerStatus = \(telemetry.httpsServerStatus)")
+            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Reading, httpsServerStatus = \(telemetry.httpsServerStatus)")
             let reply = ReadServerTelemetryReply(item: telemetryName, value: telemetry.httpsServerStatus)
             mac?.transfer(reply)
             
             
         case .serverVersion:
             
-            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Reading, Version = \(SWIFTFIRE_VERSION)")
+            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Reading, Version = \(SWIFTFIRE_VERSION)")
             let reply = ReadServerTelemetryReply(item: telemetryName, value: SWIFTFIRE_VERSION)
             mac?.transfer(reply)
         }

@@ -50,6 +50,7 @@
 //
 // 0.9.18  - Renames Start command to Run
 //         - Header update
+//         - Replaced log with Log?
 // 0.9.15  - General update and switch to frameworks
 // 0.9.14  - Added loading of server level blacklisted clients
 //         - Upgraded to Xcode 8 beta 6
@@ -98,18 +99,13 @@ fileprivate func emergencyExit(_ message: String) -> Never {
 var quitSwiftfire: Bool = false
 
 
-// Create the logger
-
-let log = SwifterLog.theLogger
-
-
 // Set default logging levels to gain some output if anything goes wrong before the log levels are set to the application values
 
-log.aslFacilityRecordAtAndAboveLevel = SwifterLog.Level.none
-log.fileRecordAtAndAboveLevel = SwifterLog.Level.none
-log.stdoutPrintAtAndAboveLevel = SwifterLog.Level.debug
-log.callbackAtAndAboveLevel = SwifterLog.Level.none
-log.networkTransmitAtAndAboveLevel = SwifterLog.Level.none
+Log.theLogger.aslFacilityRecordAtAndAboveLevel = SwifterLog.Level.none
+Log.theLogger.fileRecordAtAndAboveLevel = SwifterLog.Level.none
+Log.theLogger.stdoutPrintAtAndAboveLevel = SwifterLog.Level.debug
+Log.theLogger.callbackAtAndAboveLevel = SwifterLog.Level.none
+Log.theLogger.networkTransmitAtAndAboveLevel = SwifterLog.Level.none
 
 
 // =======================================
@@ -122,10 +118,10 @@ guard let parameterDefaultFile = FileURLs.parameterDefaultsFile else { emergency
 
 switch parameters.restore(fromFile: parameterDefaultFile) {
 case let .error(message):   emergencyExit(message)
-case let .success(message): log.atLevelNotice(id: -1, source: "Main", message: message)
+case let .success(message): Log.atNotice?.log(id: -1, source: "Main", message: message)
 }
 
-log.atLevelNotice(id: -1, source: "Main", message: "Configuration parameters values:\n\(parameters)")
+Log.atNotice?.log(id: -1, source: "Main", message: "Configuration parameters values:\n\(parameters)")
 
 
 // =================
@@ -134,24 +130,24 @@ log.atLevelNotice(id: -1, source: "Main", message: "Configuration parameters val
 
 guard let applicationLoggingDirectory = FileURLs.applicationLogDir?.path else { emergencyExit("Could not construct application log directory") }
 
-log.logfileDirectoryPath = applicationLoggingDirectory
+Log.theLogger.logfileDirectoryPath = applicationLoggingDirectory
 
-log.fileRecordAtAndAboveLevel = parameters.fileRecordAtAndAboveLevel
-log.logfileDirectoryPath = FileURLs.applicationLogDir!.path
-log.logfileMaxNumberOfFiles = parameters.logfileMaxNofFiles
-log.logfileMaxSizeInBytes = UInt64(parameters.logfileMaxSize) * 1024
+Log.theLogger.fileRecordAtAndAboveLevel = parameters.fileRecordAtAndAboveLevel
+Log.theLogger.logfileDirectoryPath = FileURLs.applicationLogDir!.path
+Log.theLogger.logfileMaxNumberOfFiles = parameters.logfileMaxNofFiles
+Log.theLogger.logfileMaxSizeInBytes = UInt64(parameters.logfileMaxSize) * 1024
 
-log.aslFacilityRecordAtAndAboveLevel = parameters.aslFacilityRecordAtAndAboveLevel
-log.stdoutPrintAtAndAboveLevel = parameters.stdoutPrintAtAndAboveLevel
-log.callbackAtAndAboveLevel = parameters.callbackAtAndAboveLevel
+Log.theLogger.aslFacilityRecordAtAndAboveLevel = parameters.aslFacilityRecordAtAndAboveLevel
+Log.theLogger.stdoutPrintAtAndAboveLevel = parameters.stdoutPrintAtAndAboveLevel
+Log.theLogger.callbackAtAndAboveLevel = parameters.callbackAtAndAboveLevel
 
-log.networkTransmitAtAndAboveLevel = parameters.networkTransmitAtAndAboveLevel
+Log.theLogger.networkTransmitAtAndAboveLevel = parameters.networkTransmitAtAndAboveLevel
 if (parameters.networkLogtargetIpAddress != "") && (parameters.networkLogtargetPortNumber != "") {
     let nettar = SwifterLog.NetworkTarget(address: parameters.networkLogtargetIpAddress, port: parameters.networkLogtargetPortNumber)
-    log.connectToNetworkTarget(nettar)
+    Log.theLogger.connectToNetworkTarget(nettar)
 }
 
-log.atLevelNotice(id: -1, source: "Main", message: "Logging configured")
+Log.atNotice?.log(id: -1, source: "Main", message: "Logging configured")
 
 
 // ======================================
@@ -172,9 +168,9 @@ class LogForewarder: SwifterlogCallbackProtocol {
 
 let logforewarder = LogForewarder()
 
-log.registerCallback(logforewarder)
+Log.theLogger.registerCallback(logforewarder)
 
-log.atLevelNotice(id: -1, source: "Main", message: "Remote console logging set up (not started)")
+Log.atNotice?.log(id: -1, source: "Main", message: "Remote console logging set up (not started)")
 
 
 // ===============================================
@@ -187,7 +183,7 @@ guard let serverBlacklistFile = FileURLs.serverBlacklistFile else { emergencyExi
 
 switch serverBlacklist.restore(fromFile: serverBlacklistFile) {
 case let .error(message):   emergencyExit(message)
-case let .success(message): log.atLevelNotice(id: -1, source: "Main", message: message)
+case let .success(message): Log.atNotice?.log(id: -1, source: "Main", message: message)
 }
 
 
@@ -204,7 +200,7 @@ case let .error(message): emergencyExit(message)
 case .success: break
 }
 
-log.atLevelNotice(id: -1, source: "Main", message: "Server statistics loaded.")
+Log.atNotice?.log(id: -1, source: "Main", message: "Server statistics loaded.")
 
 
 // ========================
@@ -408,7 +404,7 @@ switch macServer.start() {
     
 case let .error(message):
     
-    log.atLevelEmergency(id: -1, source: "Main", message: "Swiftfire terminated with error '\(message)'")
+    Log.atEmergency?.log(id: -1, source: "Main", message: "Swiftfire terminated with error '\(message)'")
     
     sleep(10)
     
@@ -417,7 +413,7 @@ case let .error(message):
     
 case .success:
     
-    log.atLevelNotice(id: -1, source: "Main", message: "Listening for M&C connections")
+    Log.atNotice?.log(id: -1, source: "Main", message: "Listening for M&C connections")
     
     // ==================================
     // Autostart servers if necessary
@@ -437,27 +433,27 @@ case .success:
     // Cleanup
     
     statistics.save(toFile: FileURLs.statisticsFile!)
-    log.atLevelNotice(id: -1, source: "Main", message: "Saved server statistics")
+    Log.atNotice?.log(id: -1, source: "Main", message: "Saved server statistics")
     
     headerLogger?.close()
-    log.atLevelNotice(id: -1, source: "Main", message: "Closed header logging file")
+    Log.atNotice?.log(id: -1, source: "Main", message: "Closed header logging file")
     
     if let url = FileURLs.serverBlacklistFile {
         serverBlacklist.save(toFile: url)
-        log.atLevelNotice(id: -1, source: "Main", message: "Saved server blacklist")
+        Log.atNotice?.log(id: -1, source: "Main", message: "Saved server blacklist")
     }
     
     switch domains.serverShutdown() {
-    case .error(let message): log.atLevelError(id: -1, source: "Main", message: "Error while shutting down the domains:\n\(message)")
+    case .error(let message): Log.atError?.log(id: -1, source: "Main", message: "Error while shutting down the domains:\n\(message)")
     case .success: break;
     }
     
     switch domains.save(toFile: FileURLs.domainDefaultsFile!) {
-    case .error(let message): log.atLevelError(id: -1, source: "Main", message: "Error while saving the domains:\n\(message)")
-    case .success: log.atLevelNotice(id: -1, source: "Main", message: "Saved domains")
+    case .error(let message): Log.atError?.log(id: -1, source: "Main", message: "Error while saving the domains:\n\(message)")
+    case .success: Log.atNotice?.log(id: -1, source: "Main", message: "Saved domains")
     }
     
-    log.atLevelNotice(id: -1, source: "Main", message: "Swiftfire terminated normally")
+    Log.atNotice?.log(id: -1, source: "Main", message: "Swiftfire terminated normally")
     
     
     // Give other tasks time to complete

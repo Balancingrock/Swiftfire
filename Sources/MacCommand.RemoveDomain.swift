@@ -49,6 +49,7 @@
 // History
 //
 // 0.9.18 - Header update
+//        - Replaced log by Log?
 // 0.9.15 - General update and switch to frameworks
 // 0.9.14 - Initial release
 //
@@ -69,9 +70,9 @@ extension RemoveDomainCommand: MacCommand {
     public func execute() {
         
         if domains.remove(domainWithName: domainName) {
-            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Removed domain: '\(domainName)')")
+            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Removed domain: '\(domainName)')")
         } else {
-            log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Domain does not exist: (\(domainName))")
+            Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Domain does not exist: (\(domainName))")
         }
     }
 }

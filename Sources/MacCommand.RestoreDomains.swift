@@ -49,6 +49,7 @@
 // History
 //
 // 0.9.18 - Header update
+//        - Replaced log by Log?
 // 0.9.15 - General update and switch to frameworks
 // 0.9.14 - Initial release
 //
@@ -67,12 +68,12 @@ extension RestoreDomainsCommand: MacCommand {
     }
     
     public func execute() {
-        log.atLevelNotice(id: -1, source: #file.source(#function, #line))
+        Log.atNotice?.log(id: -1, source: #file.source(#function, #line))
         if let url = FileURLs.domainDefaultsFile {
             domains.restore(fromFile: url)
-            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Restored the domains:\n\(domains)")
+            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Restored the domains:\n\(domains)")
         } else {
-            log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Missing file url")
+            Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Missing file url")
         }
     }
 }

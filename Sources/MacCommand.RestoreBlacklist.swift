@@ -49,6 +49,7 @@
 // History
 //
 // 0.9.18 - Header update
+//        - Replaced log by Log?
 // 0.9.15 - General update and switch to frameworks
 // 0.9.14 - Initial release
 //
@@ -68,15 +69,15 @@ extension RestoreBlacklistCommand: MacCommand {
     
     public func execute() {
         
-        log.atLevelNotice(id: -1, source: #file.source(#function, #line))
+        Log.atNotice?.log(id: -1, source: #file.source(#function, #line))
         
         if source == "Server" {
             if let url = FileURLs.serverBlacklistFile {
                 switch serverBlacklist.restore(fromFile: url) {
                 case let .error(message):
-                    log.atLevelError(id: -1, source: #file.source(#function, #line), message: message)
+                    Log.atError?.log(id: -1, source: #file.source(#function, #line), message: message)
                 case let .success(message):
-                    log.atLevelError(id: -1, source: #file.source(#function, #line), message: message)
+                    Log.atError?.log(id: -1, source: #file.source(#function, #line), message: message)
                 }
             }
             let reply = ReadBlacklistReply(source: "Server", list: serverBlacklist)
@@ -85,7 +86,8 @@ extension RestoreBlacklistCommand: MacCommand {
         else {
             if let domain = domains.domain(forName: source) {
                 switch domain.restoreBlacklist() {
-                case .error(let message): log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Failed to restore blacklist for \(source), error = \(message)")
+                case .error(let message):
+                    Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Failed to restore blacklist for \(source), error = \(message)")
                 case .success: break
                 }
                 let reply = ReadBlacklistReply(source: source, list: domain.blacklist)

@@ -49,6 +49,7 @@
 // History
 //
 // 0.9.18 - Header update
+//        - Replaced log by Log?
 // 0.9.15 - General update and switch to frameworks
 // 0.9.14 - Initial release
 //
@@ -69,7 +70,7 @@ extension ResetDomainTelemetryCommand: MacCommand {
     public func execute() {
         
         guard let domain = domains.domain(forName: domainName) else {
-            log.atLevelError(id: -1, source: #file.source(#function, #line), message: "No domain available with name = \(domainName)")
+            Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "No domain available with name = \(domainName)")
             return
         }
         

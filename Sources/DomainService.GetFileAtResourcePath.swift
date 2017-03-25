@@ -49,6 +49,7 @@
 // History
 //
 // 0.9.18 - Header update
+//        - Replaced log with Log?
 // 0.9.15 - Initial release
 //
 // =====================================================================================================================
@@ -142,7 +143,7 @@ func ds_getFileAtResourcePath(_ header: HttpHeader, _ body: Data?, _ connection:
         
         // Log update
         
-        log.atLevelCritical(id: logId, source: #file.source(#function, #line), message: "No resource path present")
+        Log.atCritical?.log(id: logId, source: #file.source(#function, #line), message: "No resource path present")
         
         
         // Mutation update
@@ -153,7 +154,7 @@ func ds_getFileAtResourcePath(_ header: HttpHeader, _ body: Data?, _ connection:
         mutation.requestReceived = chainInfo[ResponseStartedKey] as? Int64 ?? 0
         statistics.submit(mutation: mutation, onError: {
             (message: String) in
-            log.atLevelError(id: connection.logId, source: #file.source(#function, #line), message: "Error during statistics submission:\(message)")
+            Log.atError?.log(id: connection.logId, source: #file.source(#function, #line), message: "Error during statistics submission:\(message)")
         })
         
         
@@ -208,7 +209,7 @@ func ds_getFileAtResourcePath(_ header: HttpHeader, _ body: Data?, _ connection:
         
         // Log update
         
-        log.atLevelError(id: logId, source: #file.source(#function, #line), message: message)
+        Log.atError?.log(id: logId, source: #file.source(#function, #line), message: message)
         
         
         // Mutation update
@@ -220,7 +221,7 @@ func ds_getFileAtResourcePath(_ header: HttpHeader, _ body: Data?, _ connection:
         mutation.requestReceived = chainInfo[ResponseStartedKey] as? Int64 ?? 0
         statistics.submit(mutation: mutation, onError: {
             (message: String) in
-            log.atLevelError(id: connection.logId, source: #file.source(#function, #line), message: "Error during statistics submission:\(message)")
+            Log.atError?.log(id: connection.logId, source: #file.source(#function, #line), message: "Error during statistics submission:\(message)")
         })
 
         

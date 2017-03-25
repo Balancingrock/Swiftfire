@@ -49,6 +49,7 @@
 // History
 //
 // 0.9.18 - Header update
+//        - Replaced log by Log?
 // 0.9.15 - General update and switch to frameworks
 // 0.9.14 - Initial release
 //
@@ -67,7 +68,7 @@ extension UpdateClientCommand: MacCommand {
     }
     
     public func execute() {
-        log.atLevelDebug(id: -1, source: #file.source(#function, #line))
+        Log.atDebug?.log(id: -1, source: #file.source(#function, #line))
         let mutation = Mutation.createUpdateClient()
         mutation.ipAddress = client
         mutation.doNotTrace = newValue
@@ -82,7 +83,7 @@ extension UpdateClientCommand: MacCommand {
             
             onError: {
                 (message: String) in
-                log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Error updating the statistics, message = \(message)")
+                Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Error updating the statistics, message = \(message)")
             }
         )
     }

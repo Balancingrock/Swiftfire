@@ -49,6 +49,7 @@
 // History
 //
 // 0.9.18 - Header update
+//        - Replaced log by Log?
 // 0.9.15 - General update and switch to frameworks
 // 0.9.14 - Initial release
 //
@@ -70,7 +71,7 @@ extension CreateDomainCommand: MacCommand {
         
         // Error if this domain already exists
         guard domains.domain(forName: domainName) == nil else {
-            log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Domain name already exists (\(domainName as String))")
+            Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Domain name already exists (\(domainName as String))")
             return
         }
         
@@ -82,13 +83,13 @@ extension CreateDomainCommand: MacCommand {
         
             domains.add(domain: domain)
         
-            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Added new domain with \(domain))")
+            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Added new domain with \(domain))")
 
         } else {
             
-            log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Failed to retrieve domains directory)")
+            Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Failed to retrieve domains directory)")
         }
         
-        log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Number of domains: \(domains.count)")
+        Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Number of domains: \(domains.count)")
     }
 }

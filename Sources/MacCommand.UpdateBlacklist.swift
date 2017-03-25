@@ -49,6 +49,7 @@
 // History
 //
 // 0.9.18 - Header update
+//        - Replaced log by Log?
 // 0.9.15 - General update and switch to frameworks
 //        - Renamed from Modify... to Update...
 // 0.9.14 - Initial release
@@ -69,10 +70,10 @@ extension UpdateBlacklistCommand: MacCommand {
     
     public func execute() {
         
-        log.atLevelNotice(id: -1, source: #file.source(#function, #line))
+        Log.atNotice?.log(id: -1, source: #file.source(#function, #line))
         
         guard let bAction = Blacklist.Action(rawValue: action) else {
-            log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Cannot create Action type from '\(action)'")
+            Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Cannot create Action type from '\(action)'")
             return
         }
         

@@ -49,6 +49,7 @@
 // History
 //
 // 0.9.18 - Header update
+//        - Replaced log by Log?
 // 0.9.15 - General update and switch to frameworks
 // 0.9.14 - Initial release
 //
@@ -68,7 +69,7 @@ extension ReadBlacklistCommand: MacCommand {
     
     public func execute() {
         
-        log.atLevelNotice(id: -1, source: #file.source(#function, #line))
+        Log.atNotice?.log(id: -1, source: #file.source(#function, #line))
         
         if source == "Server" {
             let reply = ReadBlacklistReply(source: "Server", list: serverBlacklist)

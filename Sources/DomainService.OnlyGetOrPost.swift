@@ -49,6 +49,7 @@
 // History
 //
 // 0.9.18 - Header update
+//        - Replaced log with Log?
 // 0.9.15 - Initial release
 //
 // =====================================================================================================================
@@ -141,7 +142,7 @@ func ds_onlyGetOrPost(_ header: HttpHeader, _ body: Data?, _ connection: Connect
         // Log update
         
         let message = "Could not extract operation"
-        log.atLevelDebug(id: logId, source: #file.source(#function, #line), message: message)
+        Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: message)
         
         
         // Mutation update
@@ -152,7 +153,7 @@ func ds_onlyGetOrPost(_ header: HttpHeader, _ body: Data?, _ connection: Connect
         mutation.requestReceived = chainInfo[ResponseStartedKey] as? Int64 ?? 0
         statistics.submit(mutation: mutation, onError: {
             (message: String) in
-            log.atLevelError(id: connection.logId, source: #file.source(#function, #line), message: "Error during statistics submission:\(message)")
+            Log.atError?.log(id: connection.logId, source: #file.source(#function, #line), message: "Error during statistics submission:\(message)")
         })
         
         
@@ -184,7 +185,7 @@ func ds_onlyGetOrPost(_ header: HttpHeader, _ body: Data?, _ connection: Connect
         // Log update
         
         let message = "Operation '\(operation.rawValue)' not supported)"
-        log.atLevelDebug(id: logId, source: #file.source(#function, #line), message: message)
+        Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: message)
         
         
         // Mutation update
@@ -195,7 +196,7 @@ func ds_onlyGetOrPost(_ header: HttpHeader, _ body: Data?, _ connection: Connect
         mutation.requestReceived = chainInfo[ResponseStartedKey] as? Int64 ?? 0
         statistics.submit(mutation: mutation, onError: {
             (message: String) in
-            log.atLevelError(id: connection.logId, source: #file.source(#function, #line), message: "Error during statistics submission:\(message)")
+            Log.atError?.log(id: connection.logId, source: #file.source(#function, #line), message: "Error during statistics submission:\(message)")
         })
         
         

@@ -49,6 +49,7 @@
 // History
 //
 // 0.9.18 - Header update
+//        - Replaced log by Log?
 // 0.9.15 - Initial release
 //
 // =====================================================================================================================
@@ -67,7 +68,7 @@ extension ReadServicesCommand: MacCommand {
     
     public func execute() {
         
-        log.atLevelNotice(id: -1, source: #file.source(#function, #line))
+        Log.atNotice?.log(id: -1, source: #file.source(#function, #line))
         
         if let domain = domains.domain(forName: source) {
             let reply = ReadServicesReply(domainName: source, serviceNames: domain.serviceNames)

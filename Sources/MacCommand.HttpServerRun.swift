@@ -51,6 +51,7 @@
 // 0.9.18 - Renamed from Start to Run
 //        - Header update
 //        - Added serverErrorHandler
+//        - Replaced log by Log?
 // 0.9.15 - General update and switch to frameworks
 // 0.9.14 - Initial release
 //
@@ -90,7 +91,7 @@ extension HttpServerRunCommand: MacCommand {
         
             connectionPool.create(num: parameters.maxNofAcceptedConnections, generator: { return HttpConnection() })
         
-            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Initialized the connection pool with \(parameters.maxNofAcceptedConnections) http connections")
+            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Initialized the connection pool with \(parameters.maxNofAcceptedConnections) http connections")
             
             
             // Rebuild the available services for the domains
@@ -113,13 +114,13 @@ extension HttpServerRunCommand: MacCommand {
             
         case nil:
                 
-            log.atLevelCritical(id: -1, source: #file.source(#function, #line), message: "No HTTP server created")
+            Log.atCritical?.log(id: -1, source: #file.source(#function, #line), message: "No HTTP server created")
             telemetry.httpServerStatus = "Cannot"
             
             
         case let .error(message)?:
                 
-            log.atLevelError(id: -1, source: #file.source(#function, #line), message: message)
+            Log.atError?.log(id: -1, source: #file.source(#function, #line), message: message)
             telemetry.httpServerStatus = "Error"
             
             
@@ -130,6 +131,6 @@ extension HttpServerRunCommand: MacCommand {
         }
         
 
-        log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Completed")
+        Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Completed")
     }
 }

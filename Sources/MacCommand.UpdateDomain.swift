@@ -49,6 +49,7 @@
 // History
 //
 // 0.9.18 - Header update
+//        - Replaced log by Log?
 // 0.9.15 - General update and switch to frameworks
 // 0.9.14 - Initial release
 //
@@ -69,14 +70,14 @@ extension UpdateDomainCommand: MacCommand {
     public func execute() {
         
         guard domains.contains(domainWithName: oldDomainName) else {
-            log.atLevelError(id: -1, source: #file.source(#function, #line), message: "No domain present with name \(oldDomainName)")
+            Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "No domain present with name \(oldDomainName)")
             return
         }
         
         if domains.update(domainWithName: oldDomainName, withDomain: newDomain) {
-            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Updated domain \(oldDomainName) to \(newDomain))")
+            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Updated domain \(oldDomainName) to \(newDomain))")
         } else {
-            log.atLevelError(id: -1, source: #file.source(#function, #line), message: "Failed")
+            Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Failed")
         }
         
         mac?.transfer(ReadDomainsReply(domains: domains))

@@ -50,6 +50,7 @@
 //
 // 0.9.18  - Renamed server Start to Run (Issue 4)
 //         - Header update
+//         - Replaced log with Log?
 // 0.9.15  - General update and switch to frameworks
 // 0.9.14  - Upgraded to Xcode 8 beta 6
 //         - Upgraded Command and Reply processing for Swiftfire resp SwiftfireConsole
@@ -91,13 +92,13 @@ var mac: MonitoringAndControlConnection?
 
 
 func macErrorHandler(message: String) {
-    log.atLevelError(id: -1, source: "Monitoring and Control Error Handler", message: message)
+    Log.atError?.log(id: -1, source: "Monitoring and Control Error Handler", message: message)
 }
 
 
 func macConnectionFactory(_ cType: SwifterSockets.InterfaceAccess, _ remoteAddress: String) -> MonitoringAndControlConnection? {
     mac = MonitoringAndControlConnection(for: cType, remoteAddress: remoteAddress)
-    log.atLevelNotice(id: -1, source: "Monitoring and Control", message: "MAC object created")
+    Log.atNotice?.log(id: -1, source: "Monitoring and Control", message: "MAC object created")
     return mac
 }
 
@@ -182,7 +183,7 @@ final class MonitoringAndControlConnection: SwifterSockets.Connection {
     override func abortConnection() {
         super.abortConnection()
         mac = nil
-        log.atLevelNotice(id: -1, source: "Monitoring And Control", message: "MAC removed")
+        Log.atNotice?.log(id: -1, source: "Monitoring And Control", message: "MAC removed")
     }
     
     
@@ -195,7 +196,7 @@ final class MonitoringAndControlConnection: SwifterSockets.Connection {
     
     override func receiverData(_ buffer: UnsafeBufferPointer<UInt8>) -> Bool {
         
-        log.atLevelDebug(id: -1, source: "Monitoring And Control", message: "ReceiveData called, \(buffer.count) bytes received")
+        Log.atDebug?.log(id: -1, source: "Monitoring And Control", message: "ReceiveData called, \(buffer.count) bytes received")
         
         
         // Add the new data to the command buffer
@@ -209,13 +210,13 @@ final class MonitoringAndControlConnection: SwifterSockets.Connection {
         
         BUFFER_LOOP: while let jsonBuffer = VJson.findPossibleJsonCode(start: commandsBuffer, count: commandsByteCount) {
             
-            log.atLevelDebug(id: -1, source: "MacLoop receiveData", message: "Found command with \(jsonBuffer.count) bytes")
+            Log.atDebug?.log(id: -1, source: "MacLoop receiveData", message: "Found command with \(jsonBuffer.count) bytes")
             
             do {
                 
                 let json = try VJson.parse(buffer: jsonBuffer)
                 
-                log.atLevelDebug(id: -1, source: "MacLoop receiveData", message: "JSON message found: \(json)")
+                Log.atDebug?.log(id: -1, source: "MacLoop receiveData", message: "JSON message found: \(json)")
                 
                 var commandExecuted = false
                 
@@ -228,7 +229,7 @@ final class MonitoringAndControlConnection: SwifterSockets.Connection {
                 }
                 
                 if !commandExecuted {
-                    log.atLevelError(id: -1, source: "MacLoop receiveData", message: "Could not create command from JSON code: \(json)")
+                    Log.atError?.log(id: -1, source: "MacLoop receiveData", message: "Could not create command from JSON code: \(json)")
                 }
                 
                 
@@ -252,11 +253,11 @@ final class MonitoringAndControlConnection: SwifterSockets.Connection {
                         
                     } else {
                         
-                        log.atLevelError(id: -1, source: "MacLoop receiveData", message: error.description)
+                        Log.atError?.log(id: -1, source: "MacLoop receiveData", message: error.description)
                     }
                     
                 } else {
-                    log.atLevelError(id: -1, source: "MacLoop receiveData", message: "Logic error 1")
+                    Log.atError?.log(id: -1, source: "MacLoop receiveData", message: "Logic error 1")
                 }
                 
                 
@@ -269,7 +270,7 @@ final class MonitoringAndControlConnection: SwifterSockets.Connection {
 
             } catch {
                 
-                log.atLevelError(id: -1, source: "MacLoop consoleReceieveHandler", message: "Logic error 2")
+                Log.atError?.log(id: -1, source: "MacLoop consoleReceieveHandler", message: "Logic error 2")
                 
                 // Try to recover by emptying the buffer
                 
@@ -288,7 +289,7 @@ final class MonitoringAndControlConnection: SwifterSockets.Connection {
     func transfer(_ reply: MacMessage?) {
         if let reply = reply {
             let msg = reply.json.code
-            log.atLevelDebug(id: -1, source: "MacLoop.transfer", message: "Transferring MacMessage \(msg)", targets: SwifterLog.Target.ALL_NON_RECURSIVE)
+            Log.atDebug?.log(id: -1, source: "MacLoop.transfer", message: "Transferring MacMessage \(msg)", targets: SwifterLog.Target.ALL_NON_RECURSIVE)
             super.transfer(msg, callback: nil)
         }
     }

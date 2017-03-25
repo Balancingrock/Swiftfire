@@ -49,6 +49,7 @@
 // History
 //
 // 0.9.18 - Header update
+//        - Replaced log with Log?
 // 0.9.15 - General update and switch to frameworks
 // 0.9.14 - Initial release
 //
@@ -137,7 +138,7 @@ func ds_blacklist(_ header: HttpHeader, _ body: Data?, _ connection: Connection,
         
         domain.telemetry.nofBlacklistedAccesses.increment()
         
-        log.atLevelNotice(id: logId, source: #file.source(#function, #line), message: "Domain rejected blacklisted client \(connection.remoteAddress) by closing the connection")
+        Log.atNotice?.log(id: logId, source: #file.source(#function, #line), message: "Domain rejected blacklisted client \(connection.remoteAddress) by closing the connection")
         
         return .abortChain
         
@@ -146,7 +147,7 @@ func ds_blacklist(_ header: HttpHeader, _ body: Data?, _ connection: Connection,
         
         domain.telemetry.nofBlacklistedAccesses.increment()
 
-        log.atLevelNotice(id: logId, source: #file.source(#function, #line), message: "Domain rejected blacklisted client \(connection.remoteAddress) with 401 reply")
+        Log.atNotice?.log(id: logId, source: #file.source(#function, #line), message: "Domain rejected blacklisted client \(connection.remoteAddress) with 401 reply")
         
         response.code = HttpResponseCode.code401_Unauthorized
         
@@ -157,7 +158,7 @@ func ds_blacklist(_ header: HttpHeader, _ body: Data?, _ connection: Connection,
         
         domain.telemetry.nofBlacklistedAccesses.increment()
 
-        log.atLevelNotice(id: logId, source: #file.source(#function, #line), message: "Domain rejected blacklisted client \(connection.remoteAddress) with 503 reply")
+        Log.atNotice?.log(id: logId, source: #file.source(#function, #line), message: "Domain rejected blacklisted client \(connection.remoteAddress) with 503 reply")
         
         response.code = HttpResponseCode.code503_ServiceUnavailable
 

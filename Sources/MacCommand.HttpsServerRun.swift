@@ -86,7 +86,7 @@ extension HttpsServerRunCommand: MacCommand {
             
             connectionPool.create(num: parameters.maxNofAcceptedConnections, generator: { return HttpConnection() })
             
-            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Initialized the connection pool with \(parameters.maxNofAcceptedConnections) http connections")
+            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Initialized the connection pool with \(parameters.maxNofAcceptedConnections) http connections")
             
             
             // Rebuild the available services for the domains
@@ -139,24 +139,24 @@ extension HttpsServerRunCommand: MacCommand {
             
             case nil:
                 
-                log.atLevelCritical(id: -1, source: #file.source(#function, #line), message: "No HTTPS server created")
+                Log.atCritical?.log(id: -1, source: #file.source(#function, #line), message: "No HTTPS server created")
                 telemetry.httpsServerStatus = "Cannot"
             
                 
             case let .error(message)?:
                 
-                log.atLevelError(id: -1, source: #file.source(#function, #line), message: message)
+                Log.atError?.log(id: -1, source: #file.source(#function, #line), message: message)
                 telemetry.httpsServerStatus = "Error"
                 
             
             case .success?:
                 
-                log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "HTTPS Server started on port \(parameters.httpsServicePortNumber)")
+                Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "HTTPS Server started on port \(parameters.httpsServicePortNumber)")
                 telemetry.httpsServerStatus = "Running"
             }
         }
         
-        log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Completed")
+        Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Completed")
     }
 }
 

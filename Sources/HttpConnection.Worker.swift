@@ -49,6 +49,7 @@
 // History
 //
 // 0.9.18 - Header update
+//        - Replaced log by Log?
 // 0.9.15 - General update and switch to frameworks
 //        - Updated domainServices
 // 0.9.14 - Added support for HTTP 1.0
@@ -112,7 +113,7 @@ extension HttpConnection {
         mutation.requestReceived = processingStartedAt
         statistics.submit(mutation: mutation, onError: {
             [unowned self] (message: String) in
-            log.atLevelError(id: self.logId, source: #file.source(#function, #line), message: message)
+            Log.atError?.log(id: self.logId, source: #file.source(#function, #line), message: message)
         })
 
     }
@@ -147,7 +148,7 @@ extension HttpConnection {
         mutation.requestReceived = processingStartedAt
         statistics.submit(mutation: mutation, onError: {
             [unowned self] (message: String) in
-            log.atLevelError(id: self.logId, source: #file.source(#function, #line), message: message)
+            Log.atError?.log(id: self.logId, source: #file.source(#function, #line), message: message)
         })
 
     }
@@ -242,7 +243,7 @@ extension HttpConnection {
                 let result = SwifterSockets.connectToTipServer(atAddress: domain.forwardHost!.address, atPort: (domain.forwardHost!.port ?? "80"), connectionObjectFactory: forwardingConnectionFactory)
                 
                 if case let .error(message) = result {
-                    log.atLevelError(id: logId, source: #file.source(#function, #line), message: message)
+                    Log.atError?.log(id: logId, source: #file.source(#function, #line), message: message)
                 }
                 if case let .success(conn) = result {
                     forwarder = conn as? Forwarder
@@ -266,7 +267,7 @@ extension HttpConnection {
             mutation.requestReceived = timestampResponseStart
             statistics.submit(mutation: mutation) {
                 [unowned self] (message: String) in
-                log.atLevelError(id: self.logId, source: #file.source(#function, #line), message: message)
+                Log.atError?.log(id: self.logId, source: #file.source(#function, #line), message: message)
             }
 
             return
@@ -342,10 +343,10 @@ extension HttpConnection {
             mutation.requestReceived = timestampResponseStart
             statistics.submit(mutation: mutation, onError: {
                 [unowned self] (message: String) in
-                log.atLevelError(id: self.logId, source: #file.source(#function, #line), message: message)
+                Log.atError?.log(id: self.logId, source: #file.source(#function, #line), message: message)
             })
 
-            log.atLevelInfo(id: logId, source: #file.source(#function, #line), message: "Response took \(Date().javaDate - timestampResponseStart) milli seconds")
+            Log.atInfo?.log(id: logId, source: #file.source(#function, #line), message: "Response took \(Date().javaDate - timestampResponseStart) milli seconds")
             
         } else {
         

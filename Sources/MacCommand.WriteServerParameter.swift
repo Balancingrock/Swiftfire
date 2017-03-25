@@ -49,6 +49,7 @@
 // History
 //
 // 0.9.18 - Header update
+//        - Replaced log by Log?
 // 0.9.15 - General update and switch to frameworks
 // 0.9.14 - Initial release
 //
@@ -73,10 +74,10 @@ extension WriteServerParameterCommand: MacCommand {
         
         func keepOrUpdate<T: Equatable>(name: String, value: T, setter: (T)->(), getter: () -> T) {
             if value != getter() {
-                log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "\(name) updating from \(getter()) to \(value)")
+                Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "\(name) updating from \(getter()) to \(value)")
                 setter(value)
             } else {
-                log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "\(name) new value same as old value: \(value)")
+                Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "\(name) new value same as old value: \(value)")
             }
         }
         
@@ -84,7 +85,7 @@ extension WriteServerParameterCommand: MacCommand {
             if let val = Bool(value) {
                 keepOrUpdate(name: name, value: val, setter: setter, getter: getter)
             } else {
-                log.atLevelWarning(id: -1, source: #file.source(#function, #line), message: "\(name) should contain a Bool value")
+                Log.atWarning?.log(id: -1, source: #file.source(#function, #line), message: "\(name) should contain a Bool value")
             }
         }
         
@@ -92,7 +93,7 @@ extension WriteServerParameterCommand: MacCommand {
             if let val = Int(value) {
                 keepOrUpdate(name: name, value: val, setter: setter, getter: getter)
             } else {
-                log.atLevelWarning(id: -1, source: #file.source(#function, #line), message: "\(name) should contain an Int value")
+                Log.atWarning?.log(id: -1, source: #file.source(#function, #line), message: "\(name) should contain an Int value")
             }
         }
         
@@ -100,7 +101,7 @@ extension WriteServerParameterCommand: MacCommand {
             if let val = Int32(value) {
                 keepOrUpdate(name: name, value: val, setter: setter, getter: getter)
             } else {
-                log.atLevelWarning(id: -1, source: #file.source(#function, #line), message: "\(name) should contain an Int32 value")
+                Log.atWarning?.log(id: -1, source: #file.source(#function, #line), message: "\(name) should contain an Int32 value")
             }
         }
         
@@ -108,7 +109,7 @@ extension WriteServerParameterCommand: MacCommand {
             if let val = Double(value) {
                 keepOrUpdate(name: name, value: val, setter: setter, getter: getter)
             } else {
-                log.atLevelWarning(id: -1, source: #file.source(#function, #line), message: "\(name) should contain a Double value")
+                Log.atWarning?.log(id: -1, source: #file.source(#function, #line), message: "\(name) should contain a Double value")
             }
         }
         
@@ -116,7 +117,7 @@ extension WriteServerParameterCommand: MacCommand {
             if let intVal = Int(value), let val = SwifterLog.Level(rawValue: intVal) {
                 keepOrUpdate(name: name, value: val, setter: setter, getter: getter)
             } else {
-                log.atLevelWarning(id: -1, source: #file.source(#function, #line), message: "\(name) should contain an Int value convertible to SwifterLog.Level")
+                Log.atWarning?.log(id: -1, source: #file.source(#function, #line), message: "\(name) should contain an Int value convertible to SwifterLog.Level")
             }
         }
         
@@ -133,15 +134,15 @@ extension WriteServerParameterCommand: MacCommand {
         case .maxNumberOfAcceptedConnections: updateInt(name: parameter.rawValue, value: value, setter: { parameters.maxNofAcceptedConnections = $0 }, getter: { parameters.maxNofAcceptedConnections })
         case .maxNumberOfPendingConnections: updateInt32(name: parameter.rawValue, value: value, setter: { parameters.maxNofPendingConnections = $0 }, getter: { parameters.maxNofPendingConnections })
         case .maxWaitForPendingConnections: updateInt(name: parameter.rawValue, value: value, setter: { parameters.maxWaitForPendingConnections = $0 }, getter: { parameters.maxWaitForPendingConnections })
-        case .logfileMaxSize: updateInt(name: parameter.rawValue, value: value, setter: { parameters.logfileMaxSize = $0; log.logfileMaxSizeInBytes = UInt64($0 * 1024) }, getter: { Int(log.logfileMaxSizeInBytes) * 1024 })
-        case .logfileMaxNofFiles: updateInt(name: parameter.rawValue, value: value, setter: { parameters.logfileMaxNofFiles = $0; log.logfileMaxNumberOfFiles = $0 }, getter: { log.logfileMaxNumberOfFiles })
+        case .logfileMaxSize: updateInt(name: parameter.rawValue, value: value, setter: { parameters.logfileMaxSize = $0; Log.theLogger.logfileMaxSizeInBytes = UInt64($0 * 1024) }, getter: { Int(Log.theLogger.logfileMaxSizeInBytes) * 1024 })
+        case .logfileMaxNofFiles: updateInt(name: parameter.rawValue, value: value, setter: { parameters.logfileMaxNofFiles = $0; Log.theLogger.logfileMaxNumberOfFiles = $0 }, getter: { Log.theLogger.logfileMaxNumberOfFiles })
         case .maxFileSizeForHeaderLogging: updateInt(name: parameter.rawValue, value: value, setter: { parameters.maxFileSizeForHeaderLogging = $0 }, getter: { parameters.maxFileSizeForHeaderLogging })
         case .httpResponseClientTimeout: updateDouble(name: parameter.rawValue, value: value, setter: { parameters.httpResponseClientTimeout = $0 }, getter: { parameters.httpResponseClientTimeout })
-        case .aslFacilityRecordAtAndAboveLevel: updateLevel(name: parameter.rawValue, value: value, setter: { parameters.aslFacilityRecordAtAndAboveLevel = $0; log.aslFacilityRecordAtAndAboveLevel = $0 }, getter: { log.aslFacilityRecordAtAndAboveLevel })
-        case .fileRecordAtAndAboveLevel: updateLevel(name: parameter.rawValue, value: value, setter: { parameters.fileRecordAtAndAboveLevel = $0; log.fileRecordAtAndAboveLevel = $0 }, getter: { log.fileRecordAtAndAboveLevel })
-        case .callbackAtAndAboveLevel: updateLevel(name: parameter.rawValue, value: value, setter: { parameters.callbackAtAndAboveLevel = $0; log.callbackAtAndAboveLevel = $0 }, getter: { log.callbackAtAndAboveLevel })
-        case .networkTransmitAtAndAboveLevel: updateLevel(name: parameter.rawValue, value: value, setter: { parameters.networkTransmitAtAndAboveLevel = $0; log.networkTransmitAtAndAboveLevel = $0 }, getter: { log.networkTransmitAtAndAboveLevel })
-        case .stdoutPrintAtAndAboveLevel: updateLevel(name: parameter.rawValue, value: value, setter: { parameters.stdoutPrintAtAndAboveLevel = $0; log.stdoutPrintAtAndAboveLevel = $0 }, getter: { log.stdoutPrintAtAndAboveLevel })
+        case .aslFacilityRecordAtAndAboveLevel: updateLevel(name: parameter.rawValue, value: value, setter: { parameters.aslFacilityRecordAtAndAboveLevel = $0; Log.theLogger.aslFacilityRecordAtAndAboveLevel = $0 }, getter: { Log.theLogger.aslFacilityRecordAtAndAboveLevel })
+        case .fileRecordAtAndAboveLevel: updateLevel(name: parameter.rawValue, value: value, setter: { parameters.fileRecordAtAndAboveLevel = $0; Log.theLogger.fileRecordAtAndAboveLevel = $0 }, getter: { Log.theLogger.fileRecordAtAndAboveLevel })
+        case .callbackAtAndAboveLevel: updateLevel(name: parameter.rawValue, value: value, setter: { parameters.callbackAtAndAboveLevel = $0; Log.theLogger.callbackAtAndAboveLevel = $0 }, getter: { Log.theLogger.callbackAtAndAboveLevel })
+        case .networkTransmitAtAndAboveLevel: updateLevel(name: parameter.rawValue, value: value, setter: { parameters.networkTransmitAtAndAboveLevel = $0; Log.theLogger.networkTransmitAtAndAboveLevel = $0 }, getter: { Log.theLogger.networkTransmitAtAndAboveLevel })
+        case .stdoutPrintAtAndAboveLevel: updateLevel(name: parameter.rawValue, value: value, setter: { parameters.stdoutPrintAtAndAboveLevel = $0; Log.theLogger.stdoutPrintAtAndAboveLevel = $0 }, getter: { Log.theLogger.stdoutPrintAtAndAboveLevel })
         case .httpServicePortNumber: keepOrUpdate(name: parameter.rawValue, value: value, setter: { parameters.httpServicePortNumber = $0 }, getter: { parameters.httpServicePortNumber })
         case .httpsServicePortNumber: keepOrUpdate(name: parameter.rawValue, value: value, setter: { parameters.httpsServicePortNumber = $0 }, getter: { parameters.httpsServicePortNumber })
         case .macPortNumber: keepOrUpdate(name: parameter.rawValue, value: value, setter: { parameters.macPortNumber = $0 }, getter: { parameters.macPortNumber })
@@ -156,7 +157,7 @@ extension WriteServerParameterCommand: MacCommand {
                     WriteServerParameterCommand.conditionallySetNetworkLogTarget()
                 },
                 getter: {
-                    log.networkTarget?.address ?? ""
+                    Log.theLogger.networkTarget?.address ?? ""
                 }
             )
             
@@ -170,7 +171,7 @@ extension WriteServerParameterCommand: MacCommand {
                     WriteServerParameterCommand.conditionallySetNetworkLogTarget()
                 },
                 getter: {
-                    log.networkTarget?.port ?? ""
+                    Log.theLogger.networkTarget?.port ?? ""
                 }
             )
             
@@ -191,8 +192,8 @@ extension WriteServerParameterCommand: MacCommand {
     private static func conditionallySetNetworkLogTarget() -> Bool {
         if networkLogTarget.address.isEmpty { return false }
         if networkLogTarget.port.isEmpty { return false }
-        log.connectToNetworkTarget(networkLogTarget)
-        log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Setting the network logtarget to: \(networkLogTarget.address):\(networkLogTarget.port)")
+        Log.theLogger.connectToNetworkTarget(networkLogTarget)
+        Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Setting the network logtarget to: \(networkLogTarget.address):\(networkLogTarget.port)")
         networkLogTarget.address = ""
         networkLogTarget.port = ""
         return true

@@ -50,6 +50,7 @@
 //
 // 0.9.18 - Header update
 //        - Renamed to SwiftfireQuit
+//        - Replaced log by Log?
 // 0.9.15 - General update and switch to frameworks
 // 0.9.14 - Initial release
 //
@@ -75,12 +76,12 @@ extension SwiftfireQuitCommand: MacCommand {
         // Stop the servers if they are running
         
         if httpServer?.isRunning ?? false {
-            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Stopping HTTP Server")
+            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Stopping HTTP Server")
             httpServer?.stop()
         }
         
         if httpsServer?.isRunning ?? false {
-            log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Stopping HTTPS Server")
+            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Stopping HTTPS Server")
             httpsServer?.stop()
         }
         
@@ -90,7 +91,7 @@ extension SwiftfireQuitCommand: MacCommand {
         sleep(5)
         
         
-        log.atLevelNotice(id: -1, source: #file.source(#function, #line), message: "Quitting Swiftfire")
+        Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Quitting Swiftfire")
         
         
         // Now quit the server
