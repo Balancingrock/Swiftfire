@@ -17,6 +17,7 @@ However: It does work! :-)
 - Integrated usage statistics (page visits)
 - Blacklisting (refusal of service) on IP basis for Server and per domain
 - Supports HTTP1.0 and HTTP1.1
+- Supports HTTPS
 - Custom pages for errors (for example the infamous 404 page not found)
 - Logging of received headers possible
 - Logging of missing pages (404)
@@ -45,9 +46,14 @@ Note: Planned releases are for information only and almost always change.
 
 #### 0.10.0 (Planned)
 
-- HTTPS support
+- Merge HTML code with result of Swift callouts
 
-#### 0.9.17 (Current)
+#### 0.9.18 (Current)
+
+- Added HTTPS support
+- General update of headers
+
+#### 0.9.17
 
 - Use SSL for the interface to SwiftfireConsole
 
