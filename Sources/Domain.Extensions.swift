@@ -89,7 +89,7 @@ extension Domain {
     func removeUnknownServices() {
         
         for (index, serviceName) in serviceNames.enumerated().reversed() {
-            if domainServices.availableServices[serviceName] == nil {
+            if Swiftfire.services.registered[serviceName] == nil {
                 serviceNames.remove(at: index)
             }
         }
@@ -102,7 +102,7 @@ extension Domain {
         
         services = []
         for serviceName in serviceNames {
-            if let service = domainServices.availableServices[serviceName] {
+            if let service = Swiftfire.services.registered[serviceName] {
                 services.append(service)
             }
         }

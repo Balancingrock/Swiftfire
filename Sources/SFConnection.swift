@@ -1,9 +1,9 @@
 // =====================================================================================================================
 //
-//  File:       HttpConnection.swift
+//  File:       SFConnection.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.18
+//  Version:    0.10.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.0 - Renamed to SFConnection because the connection can also be a HTTPS connection
 // 0.9.18 - Header update
 //        - Replaced log with Log?
 // 0.9.15 - General update and switch to frameworks
@@ -77,7 +78,7 @@ import SwiftfireCore
 
 /// Holds all data that is associated with an HTTP Connection.
 
-final class HttpConnection: SwifterSockets.Connection {
+final class SFConnection: SwifterSockets.Connection {
     
     
     // A unique object id allows a correlation between statistics and the logfile (debug level)
@@ -89,8 +90,8 @@ final class HttpConnection: SwifterSockets.Connection {
     // Designated initializer
     
     override init() {
-        objectId = HttpConnection.objectIdCount
-        HttpConnection.objectIdCount += 1
+        objectId = SFConnection.objectIdCount
+        SFConnection.objectIdCount += 1
         super.init()
     }
     
@@ -377,7 +378,7 @@ func httpConnectionFactory(_ cType: SwifterSockets.InterfaceAccess, _ remoteAddr
     
     if count > 0 { telemetry.nofAcceptWaitsForConnectionObject.increment() }
     
-    guard let connection = availableConnection as? HttpConnection else {
+    guard let connection = availableConnection as? SFConnection else {
         Log.atEmergency?.log(id: -1, source: #file.source(#function, #line), message: "SF Connection could not be allocated, client at \(remoteAddress) will be rejected")
         return nil
     }

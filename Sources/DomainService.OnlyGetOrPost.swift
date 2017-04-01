@@ -3,7 +3,7 @@
 //  File:       DomainService.OnlyGetOrPost.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.18
+//  Version:    0.10.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.0 - Renamed HttpConnection to SFConnection
 // 0.9.18 - Header update
 //        - Replaced log with Log?
 // 0.9.15 - Initial release
@@ -113,7 +114,7 @@ import SwifterSockets
 ///
 /// - Returns: On error .abortChain, on success .continueChain.
 
-func ds_onlyGetOrPost(_ header: HttpHeader, _ body: Data?, _ connection: Connection, _ domain: Domain, _ chainInfo: inout DomainServices.ChainInfo, _ response: inout DomainServices.Response) -> DomainServices.Result {
+func ds_onlyGetOrPost(_ header: HttpHeader, _ body: Data?, _ connection: Connection, _ domain: Domain, _ chainInfo: inout Service.ChainInfo, _ response: inout Service.Response) -> Service.Result {
     
     
     // Abort immediately if there is already a response code
@@ -135,7 +136,7 @@ func ds_onlyGetOrPost(_ header: HttpHeader, _ body: Data?, _ connection: Connect
         
         // Aliases
         
-        let connection = (connection as! HttpConnection)
+        let connection = (connection as! SFConnection)
         let logId = connection.interface?.logId ?? -2
 
         
@@ -150,7 +151,7 @@ func ds_onlyGetOrPost(_ header: HttpHeader, _ body: Data?, _ connection: Connect
         let mutation = Mutation.createAddClientRecord(from: connection)
         mutation.httpResponseCode = HttpResponseCode.code400_BadRequest.rawValue
         mutation.responseDetails = message
-        mutation.requestReceived = chainInfo[ResponseStartedKey] as? Int64 ?? 0
+        mutation.requestReceived = chainInfo[Service.ChainInfoKey.responseStartedKey] as? Int64 ?? 0
         statistics.submit(mutation: mutation, onError: {
             (message: String) in
             Log.atError?.log(id: connection.logId, source: #file.source(#function, #line), message: "Error during statistics submission:\(message)")
@@ -178,7 +179,7 @@ func ds_onlyGetOrPost(_ header: HttpHeader, _ body: Data?, _ connection: Connect
         
         // Aliases
         
-        let connection = (connection as! HttpConnection)
+        let connection = (connection as! SFConnection)
         let logId = connection.interface?.logId ?? -2
 
         
@@ -193,7 +194,7 @@ func ds_onlyGetOrPost(_ header: HttpHeader, _ body: Data?, _ connection: Connect
         let mutation = Mutation.createAddClientRecord(from: connection)
         mutation.httpResponseCode = HttpResponseCode.code501_NotImplemented.rawValue
         mutation.responseDetails = message
-        mutation.requestReceived = chainInfo[ResponseStartedKey] as? Int64 ?? 0
+        mutation.requestReceived = chainInfo[Service.ChainInfoKey.responseStartedKey] as? Int64 ?? 0
         statistics.submit(mutation: mutation, onError: {
             (message: String) in
             Log.atError?.log(id: connection.logId, source: #file.source(#function, #line), message: "Error during statistics submission:\(message)")

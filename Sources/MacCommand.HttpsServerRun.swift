@@ -3,7 +3,7 @@
 //  File:       MacCommand.HttpsServerRun.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.18
+//  Version:    0.10.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,8 @@
 //
 // History
 //
+// 0.10.0 - Renamed HttpConnection to SFConnection
+//        - Added logging of setup after start
 // 0.9.18 - Initial release
 //
 // =====================================================================================================================
@@ -84,7 +86,7 @@ extension HttpsServerRunCommand: MacCommand {
             
             // Reset available connections
             
-            connectionPool.create(num: parameters.maxNofAcceptedConnections, generator: { return HttpConnection() })
+            connectionPool.create(num: parameters.maxNofAcceptedConnections, generator: { return SFConnection() })
             
             Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Initialized the connection pool with \(parameters.maxNofAcceptedConnections) http connections")
             
@@ -152,6 +154,11 @@ extension HttpsServerRunCommand: MacCommand {
             case .success?:
                 
                 Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "HTTPS Server started on port \(parameters.httpsServicePortNumber)")
+                
+                // Log the conditions the server is running under
+                
+                logServerSetup(logger: SwifterLog.atNotice)
+
                 telemetry.httpsServerStatus = "Running"
             }
         }

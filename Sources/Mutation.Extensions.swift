@@ -3,7 +3,7 @@
 //  File:       Mutation.Extensions.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.18
+//  Version:    0.10.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.0 - Renamed HttpConnection to SFConnection
 // 0.9.18 - Header update
 // 0.9.15 - Initial release
 //
@@ -72,7 +73,7 @@ extension Mutation {
     ///
     /// - Returns: A partly initialized client mutation.
     
-    static func createAddClientRecord(from connection: HttpConnection) -> Mutation {
+    static func createAddClientRecord(from connection: SFConnection) -> Mutation {
         let mutation = Mutation.createAddClientRecord()
         mutation.ipAddress = connection.remoteAddress
         mutation.connectionAllocationCount = connection.allocationCount

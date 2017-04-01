@@ -3,7 +3,7 @@
 //  File:       main.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.18
+//  Version:    0.10.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.0  - Included support for function calls
 // 0.9.18  - Renames Start command to Run
 //         - Header update
 //         - Replaced log with Log?
@@ -118,10 +119,11 @@ guard let parameterDefaultFile = FileURLs.parameterDefaultsFile else { emergency
 
 switch parameters.restore(fromFile: parameterDefaultFile) {
 case let .error(message):   emergencyExit(message)
-case let .success(message): Log.atNotice?.log(id: -1, source: "Main", message: message)
+case let .success(message):
+    if !message.isEmpty { Log.atNotice?.log(id: -1, source: "Main", message: message) }
 }
 
-Log.atNotice?.log(id: -1, source: "Main", message: "Configuration parameters values:\n\(parameters)")
+Log.atDebug?.log(id: -1, source: "Main", message: "Configuration parameters:\n\n\(parameters)\n")
 
 
 // =================
@@ -183,8 +185,9 @@ guard let serverBlacklistFile = FileURLs.serverBlacklistFile else { emergencyExi
 
 switch serverBlacklist.restore(fromFile: serverBlacklistFile) {
 case let .error(message):   emergencyExit(message)
-case let .success(message): Log.atNotice?.log(id: -1, source: "Main", message: message)
+case .success: break
 }
+Log.atDebug?.log(id: -1, source: "Main", message: "Server Blacklist:\n\n\(serverBlacklist)\n")
 
 
 // =========================
@@ -207,15 +210,23 @@ Log.atNotice?.log(id: -1, source: "Main", message: "Server statistics loaded.")
 // Load the domain services
 // ========================
 
-let domainServices = DomainServices()
-registerDomainServices()
+let services = Service()
+registerServices()
+Log.atDebug?.log(id: -1, source: "Main", message: "Registered services:\n\n\(services)\n")
+
+
+// ================================
+// Load the "Insert Here" functions
+// ================================
+
+let functions = Function()
+registerFunctions()
+Log.atDebug?.log(id: -1, source: "Main", message: "Registered functions:\n\n\(functions)\n")
 
 
 // ============================
 // Setup the Http Header Logger
 // ============================
-
-// Note that actuall logging depends on the configuration and may be changed during operation.
 
 let headerLogger = HttpHeaderLogger(inDirectory: FileURLs.headersLogDir)
 
@@ -241,7 +252,7 @@ domains.forEach() { $0.removeUnknownServices() }
 
 // log the domain settings
 
-Log.atNotice?.log(id: -1, source: "Main", message: "Domain settings:\n\(domains)")
+Log.atNotice?.log(id: -1, source: "Main", message: "Domain settings:\n\n\(domains)\n")
 
 
 // ==============================

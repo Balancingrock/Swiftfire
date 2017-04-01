@@ -3,7 +3,7 @@
 //  File:       HttpHeaderLogger.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.18
+//  Version:    0.10.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.0 - Renamed HttpConnection to SFConnection
 // 0.9.18 - Header update
 // 0.9.15 - Initial release
 //
@@ -82,10 +83,10 @@ final class HttpHeaderLogger: Logfile {
     /// Append a log entry for the given header.
     ///
     /// - Parameters:
-    ///   - connection: The HTTP connection on which the client is connected.
+    ///   - connection: The connection through which the client is connected.
     ///   - header: The header to be added.
     
-    func record(connection: HttpConnection, header: HttpHeader) {
+    func record(connection: SFConnection, header: HttpHeader) {
   
         
         // Create the message

@@ -3,6 +3,6 @@ import PackageDescription
 let package = Package(
     name: "Swiftfire",
     dependencies: [
-        .Package(url: "https://github.com/Balancingrock/SwiftfireCore", Version(0,  9,  18))
+        .Package(url: "../SwiftfireCore", Version(0,  10,  0))
     ]
 )

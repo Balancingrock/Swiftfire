@@ -75,7 +75,7 @@ extension ReadServicesCommand: MacCommand {
             mac?.transfer(reply)
         } else {
             var names: Array<String> = []
-            for entry in domainServices.availableServices { names.append(entry.key) }
+            for entry in services.registered { names.append(entry.key) }
             let reply = ReadServicesReply(domainName: nil, serviceNames: names)
             mac?.transfer(reply)
         }

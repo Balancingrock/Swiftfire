@@ -3,7 +3,7 @@
 //  File:       DomainService.GetFileAtResourcePath.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.18
+//  Version:    0.10.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,8 @@
 //
 // History
 //
+// 0.10.0 - Renamed HttpConnection to SFConnection
+//        - Added support for .sf. files (i.e. function call's from source text)
 // 0.9.18 - Header update
 //        - Replaced log with Log?
 // 0.9.15 - Initial release
@@ -115,7 +117,40 @@ import SwifterSockets
 ///
 /// - Returns: On error .abortChain, on success .continueChain.
 
-func ds_getFileAtResourcePath(_ header: HttpHeader, _ body: Data?, _ connection: Connection, _ domain: Domain, _ chainInfo: inout DomainServices.ChainInfo, _ response: inout DomainServices.Response) -> DomainServices.Result {
+func ds_getFileAtResourcePath(_ header: HttpHeader, _ body: Data?, _ connection: Connection, _ domain: Domain, _ chainInfo: inout Service.ChainInfo, _ response: inout Service.Response) -> Service.Result {
+    
+    
+
+    func handle500_ServerError(connection: SFConnection, resourcePath: String?, message: String, line: Int) {
+        
+        
+        // Telemetry update
+        
+        domain.telemetry.nof500.increment()
+        
+        
+        // Log update
+        
+        Log.atCritical?.log(id: connection.logId, source: #file.source(#function, #line), message: message)
+        
+        
+        // Mutation update
+        
+        let mutation = Mutation.createAddClientRecord(from: connection)
+        mutation.httpResponseCode = HttpResponseCode.code500_InternalServerError.rawValue
+        mutation.url = resourcePath
+        mutation.responseDetails = message
+        mutation.requestReceived = chainInfo[Service.ChainInfoKey.responseStartedKey] as? Int64 ?? 0
+        statistics.submit(mutation: mutation, onError: {
+            (message: String) in
+            Log.atError?.log(id: connection.logId, source: #file.source(#function, line), message: "Error during statistics submission:\(message)")
+        })
+        
+        
+        // Response
+        
+        response.code = HttpResponseCode.code500_InternalServerError
+    }
     
     
     // Abort immediately if there is already a response code
@@ -125,42 +160,15 @@ func ds_getFileAtResourcePath(_ header: HttpHeader, _ body: Data?, _ connection:
     
     // Aliases
     
-    let connection = (connection as! HttpConnection)
-    let logId = connection.interface?.logId ?? -2
+    let connection = (connection as! SFConnection)
     
     
     // =================================================================================================================
     // Make sure a resource path string is present in the chainInfo
     // =================================================================================================================
     
-    guard let resourcePath = chainInfo[AbsoluteResourcePathKey] as? String else {
-        
-        
-        // Telemetry update
-        
-        domain.telemetry.nof500.increment()
-        
-        
-        // Log update
-        
-        Log.atCritical?.log(id: logId, source: #file.source(#function, #line), message: "No resource path present")
-        
-        
-        // Mutation update
-        
-        let mutation = Mutation.createAddClientRecord(from: connection)
-        mutation.httpResponseCode = HttpResponseCode.code500_InternalServerError.rawValue
-        mutation.responseDetails = "No resource path present"
-        mutation.requestReceived = chainInfo[ResponseStartedKey] as? Int64 ?? 0
-        statistics.submit(mutation: mutation, onError: {
-            (message: String) in
-            Log.atError?.log(id: connection.logId, source: #file.source(#function, #line), message: "Error during statistics submission:\(message)")
-        })
-        
-        
-        // Response
-        
-        response.code = HttpResponseCode.code500_InternalServerError
+    guard let resourcePath = chainInfo[Service.ChainInfoKey.absoluteResourcePathKey] as? String else {
+        handle500_ServerError(connection: connection, resourcePath: nil, message: "No resource path present", line: #line)
         return .continueChain
     }
 
@@ -169,67 +177,56 @@ func ds_getFileAtResourcePath(_ header: HttpHeader, _ body: Data?, _ connection:
     // Fetch the requested resource
     // =================================================================================================================
     
-    if let payload = connection.filemanager.contents(atPath: resourcePath) {
-        
+    let payload: Data
+    
+    // If the file can contain function calls, then process it. Otherwise return the file as read.
+    
+    if (resourcePath as NSString).lastPathComponent.contains(".sf.") {
+    
+        switch SFDocument.factory(path: resourcePath, filemanager: connection.filemanager) {
+            
+        case .error(let message):
+            
+            handle500_ServerError(connection: connection, resourcePath: resourcePath, message: message, line: #line)
+            return .continueChain
+            
+            
+        case .success(let doc):
 
-        // =============================================================================================================
-        // Create the http response
-        // =============================================================================================================
+            let environment = Function.Environment(header: header, body: body, connection: connection, domain: domain, response: &response, chainInfo: &chainInfo)
+            
+            payload = doc.getContent(with: environment)
+        }
         
-        
-        // Telemetry update
-        
-        domain.telemetry.nof200.increment()
-
-        
-        // Response
-        
-        response.code = HttpResponseCode.code200_OK
-        response.mimeType = mimeType(forPath: resourcePath) ?? mimeTypeDefault
-        response.payload = payload
-        
-        return .continueChain
         
         
     } else {
         
+        guard let data = connection.filemanager.contents(atPath: resourcePath) else {
+            handle500_ServerError(connection: connection, resourcePath: resourcePath, message: "Reading contents of file failed (but file is reported readable), resource: \(resourcePath)", line: #line)
+            return .continueChain
+        }
         
-        // =============================================================================================================
-        // Create a server error
-        // =============================================================================================================
-
-        
-        let message = "Reading contents of file failed (but file is reported readable), resource: \(resourcePath)"
-        
-    
-        // Telemetry update
-        
-        domain.telemetry.nof500.increment()
-        
-        
-        // Log update
-        
-        Log.atError?.log(id: logId, source: #file.source(#function, #line), message: message)
-        
-        
-        // Mutation update
-        
-        let mutation = Mutation.createAddClientRecord(from: connection)
-        mutation.url = resourcePath
-        mutation.httpResponseCode = HttpResponseCode.code500_InternalServerError.rawValue
-        mutation.responseDetails = message
-        mutation.requestReceived = chainInfo[ResponseStartedKey] as? Int64 ?? 0
-        statistics.submit(mutation: mutation, onError: {
-            (message: String) in
-            Log.atError?.log(id: connection.logId, source: #file.source(#function, #line), message: "Error during statistics submission:\(message)")
-        })
-
-        
-        // Response
-        
-        response.code = HttpResponseCode.code500_InternalServerError
-        
-        return .continueChain
+        payload = data
     }
+    
+    
+    // =============================================================================================================
+    // Create the http response
+    // =============================================================================================================
+        
+        
+    // Telemetry update
+        
+    domain.telemetry.nof200.increment()
+
+        
+    // Response
+        
+    response.code = HttpResponseCode.code200_OK
+    response.mimeType = mimeType(forPath: resourcePath) ?? mimeTypeDefault
+    response.payload = payload
+        
+    return .continueChain
 }
 

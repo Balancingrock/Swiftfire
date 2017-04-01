@@ -3,7 +3,7 @@
 //  File:       HttpConnection.HttpWorker.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.18
+//  Version:    0.10.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.0 - Renamed HttpConnection to SFConnection
 // 0.9.18 - Header update
 //        - Replaced log by Log?
 // 0.9.15 - General update and switch to frameworks
@@ -81,7 +82,7 @@ import SwifterSockets
 import SwiftfireCore
 
 
-extension HttpConnection {
+extension SFConnection {
     
     
     /// Create an error for a missing http version
@@ -297,12 +298,12 @@ extension HttpConnection {
         // Start the service chain
         // =============================================================================================================
 
-        var response = DomainServices.Response(httpVersion, mimeTypeDefault)
+        var response = Service.Response(httpVersion, mimeTypeDefault)
         
         // Note: Since the response.code is not set, it is possible to only consume a request and not transmit any response.
         
-        var chainInfo = DomainServices.ChainInfo()
-        chainInfo[ResponseStartedKey] = timestampResponseStart
+        var chainInfo = Service.ChainInfo()
+        chainInfo[Service.ChainInfoKey.responseStartedKey] = timestampResponseStart
 
         for item in domain.services {
             if item.service(header, body, self, domain, &chainInfo, &response) == .abortChain { break }
@@ -337,7 +338,7 @@ extension HttpConnection {
             
             let mutation = Mutation.createAddClientRecord(from: self)
             mutation.domain = domain.name
-            mutation.url = chainInfo[RelativeResourcePathKey] as? String ?? "Unknown resource path"
+            mutation.url = chainInfo[Service.ChainInfoKey.relativeResourcePathKey] as? String ?? "Unknown resource path"
             mutation.httpResponseCode = code.rawValue
             mutation.responseDetails = ""
             mutation.requestReceived = timestampResponseStart

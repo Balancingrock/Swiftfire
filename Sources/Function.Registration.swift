@@ -1,9 +1,9 @@
 // =====================================================================================================================
 //
-//  File:       MacCommand.CreateDomain.swift
+//  File:       Functions.Registration.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.18
+//  Version:    0.10.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -11,7 +11,7 @@
 //  Blog:       http://swiftrien.blogspot.com
 //  Git:        https://github.com/Balancingrock/Swiftfire
 //
-//  Copyright:  (c) 2016-2017 Marinus van der Lugt, All rights reserved.
+//  Copyright:  (c) 2017 Marinus van der Lugt, All rights reserved.
 //
 //  License:    Use or redistribute this code any way you like with the following two provision:
 //
@@ -48,48 +48,37 @@
 //
 // History
 //
-// 0.9.18 - Header update
-//        - Replaced log by Log?
-// 0.9.15 - General update and switch to frameworks
-// 0.9.14 - Initial release
+// 0.10.0 - Initial release
 //
 // =====================================================================================================================
 
 import Foundation
-import SwifterJSON
-import SwifterLog
 import SwiftfireCore
 
 
-extension CreateDomainCommand: MacCommand {
-    
-    public static func factory(json: VJson?) -> MacCommand? {
-        return CreateDomainCommand(json: json)
-    }
-    
-    public func execute() {
-        
-        // Error if this domain already exists
-        guard domains.domain(forName: domainName) == nil else {
-            Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Domain name already exists (\(domainName as String))")
-            return
-        }
-        
-        if let url = FileURLs.domainsDir {
-            let domainUrl = url.appendingPathComponent(domainName, isDirectory: true)
-            let domain = Domain(supportDirectory: domainUrl)
-            domain.name = domainName
-            domain.serviceNames = defaultServices
-        
-            domains.add(domain: domain)
-        
-            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Added new domain with \(domain))")
+// =================================
+// Names for the available functions
+// =================================
 
-        } else {
-            
-            Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Failed to retrieve domains directory)")
-        }
-        
-        Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Number of domains: \(domains.count)")
-    }
+
+/// Returns the number of hits for the requested resource (path).
+///
+/// Necessary arguments: None.
+///
+/// Optional argument: A string with the path of a resource for which the hitcount must be returned.
+///
+/// Example: .nofPageHits()
+
+let NOF_PAGE_HITS = "nofPageHits"
+
+
+// ==================================================
+// Add to the next function to register new functions
+// ==================================================
+// Notice that the sequence itself is not important
+
+/// Register the functions
+
+func registerFunctions() {
+    functions.register(name: NOF_PAGE_HITS, function: sf_nofPageHits)
 }

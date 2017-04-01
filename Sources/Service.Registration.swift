@@ -3,7 +3,7 @@
 //  File:       DomainServices.Registration.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.18
+//  Version:    0.10.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,8 @@
 //
 // History
 //
+// 0.10.0 - Removed import of SwifterSockets
+//        - Moved ChainInfo key's to SwifterCore.DomainServices
 // 0.9.18 - Renamed closure to service in register call
 //        - Header update
 // 0.9.15 - Initial release
@@ -62,32 +64,6 @@
 
 import Foundation
 import SwiftfireCore
-import SwifterSockets
-
-
-// ===============
-// ChainInfo key's
-// ===============
-
-/// String, set by the service that determines the URL of the resource to be fetched. (DomainService.GetResourcePathFromUrl)
-///
-/// This path is relative to the root of the file system. It is used to fetch the requested resource.
-
-let AbsoluteResourcePathKey = "AbsoluteResourcePath"
-
-
-/// String, set by the service that determines the URL of the resource to be fetched. (DomainService.GetResourcePathFromUrl)
-///
-/// This path is relative to the root of the domain. It is used for statistics purposes.
-
-let RelativeResourcePathKey = "RelativeResourcePath"
-
-
-/// Int64, set by HttpConnection.Worker before first domain service call.
-///
-/// It is the time stamp at the start of the HTTP request processing. It is used for statistics purposes.
-
-let ResponseStartedKey = "ResponseStarted"
 
 
 // ==============================================
@@ -110,13 +86,13 @@ private let getFileAtResourcePath = "Get file at resource path"
 
 /// Register the domain services
 
-func registerDomainServices() {
+func registerServices() {
     
-    domainServices.register(name: blacklist, service: ds_blacklist)
-    domainServices.register(name: onlyHttp10OrHttp11, service: ds_onlyHttp10or11)
-    domainServices.register(name: onlyGetOrPost, service: ds_onlyGetOrPost)
-    domainServices.register(name: getResourcePathFromUrl, service: ds_getResourcePathFromUrl)
-    domainServices.register(name: getFileAtResourcePath, service: ds_getFileAtResourcePath)
+    services.register(name: blacklist, service: ds_blacklist)
+    services.register(name: onlyHttp10OrHttp11, service: ds_onlyHttp10or11)
+    services.register(name: onlyGetOrPost, service: ds_onlyGetOrPost)
+    services.register(name: getResourcePathFromUrl, service: ds_getResourcePathFromUrl)
+    services.register(name: getFileAtResourcePath, service: ds_getFileAtResourcePath)
 }
 
 
@@ -127,7 +103,7 @@ func registerDomainServices() {
 
 /// Default services for newly created domains (implements a static webserver)
 
-var defaultDomainServices: Array<String> {
+var defaultServices: Array<String> {
     return [
         blacklist,
         onlyHttp10OrHttp11,
