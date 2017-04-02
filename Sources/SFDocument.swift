@@ -81,12 +81,20 @@ import SwiftfireCore
 final class SFDocument: EstimatedMemoryConsumption {
 
     
-    static var cache = MemoryCache<String, SFDocument>(limitStrategy: .bySize(10*1024*1024), purgeStrategy: .leastUsed)
+    /// This cache contains SFDocuments that have already been processed.
+    
+    private static var cache = MemoryCache<String, SFDocument>(limitStrategy: .bySize(10*1024*1024), purgeStrategy: .leastUsed)
+    
+    
+    /// Protect the cache processing functions
+    
+    private static let queue = DispatchQueue(label: "SFDocument cache processing", qos: DispatchQoS.default, attributes: DispatchQueue.Attributes(), autoreleaseFrequency: DispatchQueue.AutoreleaseFrequency.inherit, target: nil)
     
     
     /// A block of characters that does not contain a function.
     
-    class CharacterBlock {
+    final class CharacterBlock {
+        
         
         /// The data in the block
         
@@ -103,8 +111,8 @@ final class SFDocument: EstimatedMemoryConsumption {
     
     /// A block of characters that contains a function, with the details of the function completely parsed.
     
-    class FunctionBlock {
-
+    final class FunctionBlock {
+        
         
         /// References the function closure
         
@@ -121,9 +129,19 @@ final class SFDocument: EstimatedMemoryConsumption {
         var arguments: Function.Arguments
         
 
-        /// Data returned by the function
+        // The index of this function block in the document's blocks list
         
-        var data: Data?
+        fileprivate var blocksIndex: Int?
+        
+        
+        /// The index to the prioritized function table where this functionblock resides
+        
+        fileprivate var prioritizedIndex: Int?
+        
+        
+        /// The data returned by the function
+        
+        fileprivate var data: Data?
         
         
         /// Create a new instance
@@ -138,7 +156,7 @@ final class SFDocument: EstimatedMemoryConsumption {
     
     /// The blocks that are contained in a document
     
-    enum DocumentBlock {
+    public enum DocumentBlock {
         case characterBlock(CharacterBlock)
         case functionBlock(FunctionBlock)
     }
@@ -146,32 +164,32 @@ final class SFDocument: EstimatedMemoryConsumption {
     
     /// The path on disk of the file
     
-    let path: String
+    public let path: String
     
     
     /// The buffer with all characters (UTF8) in the file
     
-    let filedata: Data
+    public let filedata: Data
     
     
     /// The time the file was last modified
     
-    let fileModificationDate: Int64
+    public let fileModificationDate: Int64
     
     
     /// The results of the parser
     
-    var blocks: Array<DocumentBlock> = []
+    public var blocks: Array<DocumentBlock> = []
     
     
     /// All function call in prioritized order (lowest index = first to execute)
     
-    var prioritizedFunctions: Array<FunctionBlock> = []
+    private var prioritizedFunctions: Array<FunctionBlock> = []
     
     
     /// The side of the data contained in this document
     
-    var estimatedMemoryConsumption: Int
+    public var estimatedMemoryConsumption: Int
     
     
     /// Create a new SFDocument
@@ -221,14 +239,19 @@ final class SFDocument: EstimatedMemoryConsumption {
     
     func getContent(with environment: Function.Environment) -> Data {
         
+        // Thread safety: All data that is updated and/or returned must reside in local (stack) storage.
+        
         
         // First execute the functions in the prioritized order
+        // Make a local copy of the prioritized function blocks.
+        
+        var fblocks = prioritizedFunctions
         
         var info = Function.Info()
         
-        prioritizedFunctions.forEach({
-            $0.data = $0.function?($0.arguments, &info, environment)
-        })
+        for (index, fb) in fblocks.enumerated() {
+            fblocks[index].data = fb.function?(fb.arguments, &info, environment)
+        }
         
         
         // Merge the data
@@ -239,7 +262,12 @@ final class SFDocument: EstimatedMemoryConsumption {
             
             switch $0 {
             case .characterBlock(let cb): data.append(cb.data)
-            case .functionBlock(let fb): if let fbData = fb.data { data.append(fbData) }
+            case .functionBlock(let fb):
+                if let index = fb.prioritizedIndex {
+                    if let fbData = fblocks[index].data {
+                        data.append(fbData)
+                    }
+                }
             }
         })
         
@@ -250,7 +278,9 @@ final class SFDocument: EstimatedMemoryConsumption {
     }
 
     
-    /// Create a new Swiftfire Document
+    /// Create a new Swiftfire Document.
+    ///
+    /// - Note: Threadsafe
     ///
     /// - Parameters:
     ///   - path: The path of the file.
@@ -260,39 +290,41 @@ final class SFDocument: EstimatedMemoryConsumption {
     
     static func factory(path: String, filemanager: FileManager) -> Result<SFDocument> {
         
-        
-        // Try to retrieve the document from cache
-        
-        if let doc = SFDocument.cache[path] {
-            if let fileattributes = try? filemanager.attributesOfItem(atPath: path) {
-                if let modificationDate = fileattributes[FileAttributeKey.modificationDate] as? Date  {
-                    if modificationDate.javaDate <= doc.fileModificationDate {
-                         return .success(doc)
+        return queue.sync(execute: {
+            
+            // Try to retrieve the document from cache
+            
+            if let doc = SFDocument.cache[path] {
+                if let fileattributes = try? filemanager.attributesOfItem(atPath: path) {
+                    if let modificationDate = fileattributes[FileAttributeKey.modificationDate] as? Date  {
+                        if modificationDate.javaDate <= doc.fileModificationDate {
+                            return .success(doc)
+                        }
                     }
                 }
             }
-        }
-        
-        
-        // Try to create a new document
-        
-        guard let doc = SFDocument(path: path, filemanager: filemanager) else {
             
-            // Try to find reason for error
             
-            guard filemanager.isReadableFile(atPath: path) else { return .error(message: "File not readable at \(path)") }
-            guard let fileattributes = try? filemanager.attributesOfItem(atPath: path) else { return .error(message: "Cannot read file attributes at \(path)") }
-            guard let _ = fileattributes[FileAttributeKey.modificationDate] as? Date else { return .error(message: "Cannot extract modification date from file attributes at \(path)") }
+            // Try to create a new document
             
-            return .error(message: "Cannot read file content at \(path)")
-        }
-        
-        
-        // Add the new document to the cache
-        
-        SFDocument.cache[path] = doc
-        
-        return .success(doc)
+            guard let doc = SFDocument(path: path, filemanager: filemanager) else {
+                
+                // Try to find reason for error
+                
+                guard filemanager.isReadableFile(atPath: path) else { return .error(message: "File not readable at \(path)") }
+                guard let fileattributes = try? filemanager.attributesOfItem(atPath: path) else { return .error(message: "Cannot read file attributes at \(path)") }
+                guard let _ = fileattributes[FileAttributeKey.modificationDate] as? Date else { return .error(message: "Cannot extract modification date from file attributes at \(path)") }
+                
+                return .error(message: "Cannot read file content at \(path)")
+            }
+            
+            
+            // Add the new document to the cache
+            
+            SFDocument.cache[path] = doc
+            
+            return .success(doc)
+        })
     }
     
     
@@ -301,15 +333,36 @@ final class SFDocument: EstimatedMemoryConsumption {
     
     fileprivate func prioritize() {
         
-        let functions = blocks.flatMap({
-            block -> FunctionBlock? in
-            if case let .functionBlock(fb) = block {
-                return fb
-            } else {
-                return nil
-            }
-        })
         
-        prioritizedFunctions = functions.sorted(by: { $0.priority > $1.priority })
+        
+        // Make a list of only the function blocks in the document blocks
+
+        var fblocks: Array<FunctionBlock> = []
+        
+        for index in 0 ..< blocks.count {
+            switch blocks[index] {
+            case .characterBlock: break
+            case .functionBlock(let fb):
+                fb.blocksIndex = index
+                fblocks.append(fb)
+            }
+        }
+        
+        
+        // Sorth the function blocks according to their priority
+        
+        prioritizedFunctions = fblocks.sorted(by: { $0.priority > $1.priority })
+        
+        
+        // (Re)associate the function blocks in the document blocks and prioritizedFunctions
+        
+        for (index, fb) in prioritizedFunctions.enumerated() {
+            if let blocksIndex = fb.blocksIndex {
+                switch blocks[blocksIndex] {
+                case .functionBlock(let block): block.prioritizedIndex = index
+                case .characterBlock: break
+                }
+            }
+        }
     }
 }
