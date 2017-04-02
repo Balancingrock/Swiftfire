@@ -177,7 +177,8 @@ extension WriteServerParameterCommand: MacCommand {
             
         case .macInactivityTimeout: updateDouble(name: parameter.rawValue, value: value, setter: { parameters.macInactivityTimeout = $0 }, getter: { parameters.macInactivityTimeout })
         case .http1_0DomainName: keepOrUpdate(name: parameter.rawValue, value: value, setter: { parameters.http1_0DomainName = $0 }, getter: { parameters.http1_0DomainName })
-            
+        case .sfdocumentCacheSize: updateInt(name: parameter.rawValue, value: value, setter: { parameters.sfDocumentCacheSize = $0 }, getter: { parameters.sfDocumentCacheSize })
+
         }
     }
     

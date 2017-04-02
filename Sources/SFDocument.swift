@@ -74,6 +74,7 @@
 import Foundation
 import BRUtils
 import SwiftfireCore
+import KeyedCache
 
 
 /// This encapsulates a swiftfire document in its parsed form.
@@ -83,12 +84,15 @@ final class SFDocument: EstimatedMemoryConsumption {
     
     /// This cache contains SFDocuments that have already been processed.
     
-    private static var cache = MemoryCache<String, SFDocument>(limitStrategy: .bySize(10*1024*1024), purgeStrategy: .leastUsed)
+    private static var cache: MemoryCache<String, SFDocument> = {
+        let cacheSize = parameters.sfDocumentCacheSize * 1024 * 1024
+        return MemoryCache<String, SFDocument>(limitStrategy: .bySize(cacheSize), purgeStrategy: .leastUsed)
+    }()
     
     
     /// Protect the cache processing functions
     
-    private static let queue = DispatchQueue(label: "SFDocument cache processing", qos: DispatchQoS.default, attributes: DispatchQueue.Attributes(), autoreleaseFrequency: DispatchQueue.AutoreleaseFrequency.inherit, target: nil)
+    private static let queue = DispatchQueue(label: "SFDocument cache", qos: DispatchQoS.default, attributes: DispatchQueue.Attributes(), autoreleaseFrequency: DispatchQueue.AutoreleaseFrequency.inherit, target: nil)
     
     
     /// A block of characters that does not contain a function.
