@@ -1,6 +1,6 @@
 // =====================================================================================================================
 //
-//  File:       DomainService.GetFileAtResourcePath.swift
+//  File:       Service.GetFileAtResourcePath.swift
 //  Project:    Swiftfire
 //
 //  Version:    0.10.0
@@ -50,6 +50,7 @@
 //
 // 0.10.0 - Renamed HttpConnection to SFConnection
 //        - Added support for .sf. files (i.e. function call's from source text)
+//        - Renamed from DomainService to Service
 // 0.9.18 - Header update
 //        - Replaced log with Log?
 // 0.9.15 - Initial release

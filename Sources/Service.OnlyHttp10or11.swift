@@ -1,6 +1,6 @@
 // =====================================================================================================================
 //
-//  File:       DomainService.OnlyHttp10or11.swift
+//  File:       Service.OnlyHttp10or11.swift
 //  Project:    Swiftfire
 //
 //  Version:    0.10.0
@@ -49,6 +49,7 @@
 // History
 //
 // 0.10.0 - Renamed HttpConnection to SFConnection
+//        - Renamed from DomainService to Service
 // 0.9.18 - Header update
 //        - Replaced log with Log?
 // 0.9.15 - Initial release
