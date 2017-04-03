@@ -1,6 +1,6 @@
 // =====================================================================================================================
 //
-//  File:       MacCommand.HttpsServerRun.swift
+//  File:       Command.HttpsServerRun.swift
 //  Project:    Swiftfire
 //
 //  Version:    0.10.0
@@ -50,6 +50,7 @@
 //
 // 0.10.0 - Renamed HttpConnection to SFConnection
 //        - Added logging of setup after start
+//        - Renamed file from MacCommand to Command
 // 0.9.18 - Initial release
 //
 // =====================================================================================================================

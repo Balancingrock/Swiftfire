@@ -1,9 +1,9 @@
 // =====================================================================================================================
 //
-//  File:       MacCommand.ReadServerTelemetry.swift
+//  File:       Command.HttpServerRun.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.18
+//  Version:    0.10.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,8 +48,12 @@
 //
 // History
 //
-// 0.9.18 - Header update
-//        - Renamed serverStatus to httpServerStatus and added httpsServerStatus
+// 0.10.0 - Renamed HttpConnection to SFConnection
+//        - Added logging of setup after start
+//        - Renamed file from MacCommand to Command
+// 0.9.18 - Renamed from Start to Run
+//        - Header update
+//        - Added serverErrorHandler
 //        - Replaced log by Log?
 // 0.9.15 - General update and switch to frameworks
 // 0.9.14 - Initial release
@@ -57,68 +61,84 @@
 // =====================================================================================================================
 
 import Foundation
-import SwifterJSON
 import SwifterLog
+import SwifterJSON
 import SwiftfireCore
+import SecureSockets
+import SwifterSockets
 
 
-extension ReadServerTelemetryCommand: MacCommand {
-    
+fileprivate func serverErrorHandler(message: String) { Log.atError?.log(id: -1, source: "HTTP Server", message: message) }
+
+
+extension HttpServerRunCommand: MacCommand {
+        
     public static func factory(json: VJson?) -> MacCommand? {
-        return ReadServerTelemetryCommand(json: json)
+        return HttpServerRunCommand(json: json)
     }
-    
+        
     public func execute() {
         
-        switch telemetryName {
-            
-        case .nofAcceptedHttpRequests:
-            
-            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Reading, telemetry.nofAcceptedHttpRequests = \(telemetry.nofAcceptedHttpRequests.intValue)")
-            let reply = ReadServerTelemetryReply(item: telemetryName, value: telemetry.nofAcceptedHttpRequests.intValue)
-            mac?.transfer(reply)
-            
-            
-        case .nofAcceptWaitsForConnectionObject:
-            
-            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Reading, telemetry.nofAcceptWaitsForConnectionObject = \(telemetry.nofAcceptWaitsForConnectionObject.intValue)")
-            let reply = ReadServerTelemetryReply(item: telemetryName, value: telemetry.nofAcceptWaitsForConnectionObject.intValue)
-            mac?.transfer(reply)
+        
+        // If the server is running, don't do anything
+        
+        if httpServer?.isRunning ?? false { telemetry.httpServerStatus = "Running"; return }
+        
+        
+        // If the https server is not running either, then reinit the available connections and domain services
+        
+        if !(httpsServer?.isRunning ?? false) {
             
             
-        case .nofHttp400Replies:
-            
-            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Reading, telemetry.nofHttp400Replies = \(telemetry.nofHttp400Replies.intValue)")
-            let reply = ReadServerTelemetryReply(item: telemetryName, value: telemetry.nofHttp400Replies.intValue)
-            mac?.transfer(reply)
-            
-            
-        case .nofHttp500Replies:
-            
-            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Reading, telemetry.nofHttp500Replies = \(telemetry.nofHttp500Replies.intValue)")
-            let reply = ReadServerTelemetryReply(item: telemetryName, value: telemetry.nofHttp500Replies.intValue)
-            mac?.transfer(reply)
+            // Reset available connections
+        
+            connectionPool.create(num: parameters.maxNofAcceptedConnections, generator: { return SFConnection() })
+        
+            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Initialized the connection pool with \(parameters.maxNofAcceptedConnections) http connections")
             
             
-        case .httpServerStatus:
+            // Rebuild the available services for the domains
             
-            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Reading, httpServerStatus = \(telemetry.httpServerStatus)")
-            let reply = ReadServerTelemetryReply(item: telemetryName, value: telemetry.httpServerStatus)
-            mac?.transfer(reply)
-            
-            
-        case .httpsServerStatus:
-            
-            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Reading, httpsServerStatus = \(telemetry.httpsServerStatus)")
-            let reply = ReadServerTelemetryReply(item: telemetryName, value: telemetry.httpsServerStatus)
-            mac?.transfer(reply)
-            
-            
-        case .serverVersion:
-            
-            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Reading, Version = \(SWIFTFIRE_VERSION)")
-            let reply = ReadServerTelemetryReply(item: telemetryName, value: SWIFTFIRE_VERSION)
-            mac?.transfer(reply)
+            domains.forEach(){ $0.rebuildServices() }
         }
+
+
+        // Restart the HTTP server
+        
+        httpServer = SwifterSockets.TipServer(
+            .port(parameters.httpServicePortNumber),
+            .maxPendingConnectionRequests(Int(parameters.maxNofPendingConnections)),
+            .acceptQueue(httpServerAcceptQueue),
+            .connectionObjectFactory(httpConnectionFactory),
+            .acceptLoopDuration(2),
+            .errorHandler(serverErrorHandler))
+        
+        switch httpServer?.start() {
+            
+        case nil:
+                
+            Log.atCritical?.log(id: -1, source: #file.source(#function, #line), message: "No HTTP server created")
+            telemetry.httpServerStatus = "Cannot"
+            
+            
+        case let .error(message)?:
+                
+            Log.atError?.log(id: -1, source: #file.source(#function, #line), message: message)
+            telemetry.httpServerStatus = "Error"
+            
+            
+        case .success?:
+            
+            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "HTTP Server started on port \(parameters.httpServicePortNumber)")
+            
+            // Log the conditions the server is running under
+            
+            logServerSetup(logger: SwifterLog.atNotice)
+            
+            telemetry.httpServerStatus = "Running"
+        }
+        
+
+        Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Completed")
     }
 }

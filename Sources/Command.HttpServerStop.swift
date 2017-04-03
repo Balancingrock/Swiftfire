@@ -1,9 +1,9 @@
 // =====================================================================================================================
 //
-//  File:       MacCommand.SwiftfireQuit.swift
+//  File:       Command.HttpServerStop.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.18
+//  Version:    0.10.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,9 +48,9 @@
 //
 // History
 //
+// 0.10.0 - Renamed file from MacCommand to Command
 // 0.9.18 - Header update
-//        - Renamed to SwiftfireQuit
-//        - Replaced log by Log?
+//        - Renmed to HttpServerStop
 // 0.9.15 - General update and switch to frameworks
 // 0.9.14 - Initial release
 //
@@ -62,40 +62,26 @@ import SwifterLog
 import SwiftfireCore
 
 
-private let COMMAND_NAME = "SwiftfireQuitCommand"
-
-
-extension SwiftfireQuitCommand: MacCommand {
+extension HttpServerStopCommand: MacCommand {
     
     public static func factory(json: VJson?) -> MacCommand? {
-        return SwiftfireQuitCommand(json: json)
+        return HttpServerStopCommand(json: json)
     }
     
     public func execute() {
         
-        // Stop the servers if they are running
-        
         if httpServer?.isRunning ?? false {
-            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Stopping HTTP Server")
+            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Stopping HTTP server")
             httpServer?.stop()
+            telemetry.httpServerStatus = "Stopping"
+        } else {
+            if httpServer == nil {
+                telemetry.httpServerStatus = "Cannot"
+            } else {
+                telemetry.httpServerStatus = "Not Running"
+            }
         }
         
-        if httpsServer?.isRunning ?? false {
-            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Stopping HTTPS Server")
-            httpsServer?.stop()
-        }
-        
-        
-        // Wait a little to give the stop command time to run through the system
-        
-        sleep(5)
-        
-        
-        Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Quitting Swiftfire")
-        
-        
-        // Now quit the server
-        
-        quitSwiftfire = true
+        Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Command completed")
     }
 }

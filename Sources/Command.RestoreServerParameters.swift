@@ -1,9 +1,9 @@
 // =====================================================================================================================
 //
-//  File:       MacCommand.UpdateServices.swift
+//  File:       Command.RestoreServerParameters.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.18
+//  Version:    0.10.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -11,7 +11,7 @@
 //  Blog:       http://swiftrien.blogspot.com
 //  Git:        https://github.com/Balancingrock/Swiftfire
 //
-//  Copyright:  (c) 2017 Marinus van der Lugt, All rights reserved.
+//  Copyright:  (c) 2016-2017 Marinus van der Lugt, All rights reserved.
 //
 //  License:    Use or redistribute this code any way you like with the following two provision:
 //
@@ -48,11 +48,14 @@
 //
 // History
 //
+// 0.10.0 - Renamed file from MacCommand to Command
 // 0.9.18 - Header update
 //        - Replaced log by Log?
-// 0.9.15 - Initial release
+// 0.9.15 - General update and switch to frameworks
+// 0.9.14 - Initial release (replaces part of MacDef.swift)
 //
 // =====================================================================================================================
+
 
 import Foundation
 import SwifterJSON
@@ -60,23 +63,43 @@ import SwifterLog
 import SwiftfireCore
 
 
-extension UpdateServicesCommand: MacCommand {
+extension RestoreServerParametersCommand: MacCommand {
+    
     
     public static func factory(json: VJson?) -> MacCommand? {
-        return UpdateServicesCommand(json: json)
+        return RestoreServerParametersCommand(json: json)
     }
     
     public func execute() {
         
         Log.atNotice?.log(id: -1, source: #file.source(#function, #line))
-
-        if let domain = domains.domain(forName: domainName) {
-            
-            domain.serviceNames = services
-            
+        
+        
+        // Restore
+        
+        if let url = FileURLs.parameterDefaultsFile {
+            switch parameters.restore(fromFile: url) {
+            case let .error(message):
+                Log.atError?.log(id: -1, source: #file.source(#function, #line), message: message)
+            case let .success(message):
+                if !message.isEmpty {
+                    Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: message)
+                }
+            }
         } else {
-            
-            Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Failed to update services for \(domainName), domain not found.")
+            Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Could not construct default parameters filename")
+        }
+        
+        
+        // Provide audit trail
+        
+        Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Parameter settings restored to:\n\(parameters)")
+
+        
+        // Send the new values to the console
+        
+        for parm in ServerParameterName.all {
+            mac?.transfer(ReadServerParameterReply(parameter: parm, value: parameters.stringValue(for: parm)))
         }
     }
 }

@@ -1,9 +1,9 @@
 // =====================================================================================================================
 //
-//  File:       MacCommand.SaveBlacklist.swift
+//  File:       Command.ResetDomainTelemetry.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.18
+//  Version:    0.10.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.0 - Renamed file from MacCommand to Command
 // 0.9.18 - Header update
 //        - Replaced log by Log?
 // 0.9.15 - General update and switch to frameworks
@@ -61,30 +62,21 @@ import SwifterLog
 import SwiftfireCore
 
 
-extension SaveBlacklistCommand: MacCommand {
+extension ResetDomainTelemetryCommand: MacCommand {
     
     public static func factory(json: VJson?) -> MacCommand? {
-        return SaveBlacklistCommand(json: json)
+        return ResetDomainTelemetryCommand(json: json)
     }
     
     public func execute() {
         
-        Log.atNotice?.log(id: -1, source: #file.source(#function, #line))
+        guard let domain = domains.domain(forName: domainName) else {
+            Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "No domain available with name = \(domainName)")
+            return
+        }
         
-        if source == "Server" {
-            if let url = FileURLs.serverBlacklistFile { serverBlacklist.save(toFile: url) }
-            let reply = ReadBlacklistReply(source: "Server", list: serverBlacklist)
-            mac?.transfer(reply)
-        }
-        else {
-            if let domain = domains.domain(forName: source) {
-                switch domain.saveBlacklist() {
-                case .error(let message): Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Failed to save blacklist for \(source), error = \(message)")
-                case .success: break
-                }
-                let reply = ReadBlacklistReply(source: source, list: domain.blacklist)
-                mac?.transfer(reply)
-            }
-        }
-    }
+        domain.telemetry.reset()
+        
+        mac?.transfer(ReadDomainsReply(domains: domains))
+    }    
 }

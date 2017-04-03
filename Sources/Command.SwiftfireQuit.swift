@@ -1,9 +1,9 @@
 // =====================================================================================================================
 //
-//  File:       MacCommand.UpdatePathPart.swift
+//  File:       Command.SwiftfireQuit.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.18
+//  Version:    0.10.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,7 +48,9 @@
 //
 // History
 //
+// 0.10.0 - Renamed file from MacCommand to Command
 // 0.9.18 - Header update
+//        - Renamed to SwiftfireQuit
 //        - Replaced log by Log?
 // 0.9.15 - General update and switch to frameworks
 // 0.9.14 - Initial release
@@ -61,25 +63,40 @@ import SwifterLog
 import SwiftfireCore
 
 
-extension UpdatePathPartCommand: MacCommand {
-        
+private let COMMAND_NAME = "SwiftfireQuitCommand"
+
+
+extension SwiftfireQuitCommand: MacCommand {
+    
     public static func factory(json: VJson?) -> MacCommand? {
-        return UpdatePathPartCommand(json: json)
+        return SwiftfireQuitCommand(json: json)
     }
     
     public func execute() {
-        Log.atDebug?.log(id: -1, source: #file.source(#function, #line))
-        let mutation = Mutation.createUpdatePathPart()
-        mutation.url = url
-        mutation.doNotTrace = newValue
-        statistics.submit(mutation: mutation, onSuccess: {
         
-            // Try to signal the console (if any) that the path part is updated
-            let message = ReadStatisticsReply(statistics: statistics.json)
-            mac?.transfer(message)
-        }, onError: {
-            (message: String) in
-            Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Error during executing: \(message)")
-        })
+        // Stop the servers if they are running
+        
+        if httpServer?.isRunning ?? false {
+            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Stopping HTTP Server")
+            httpServer?.stop()
+        }
+        
+        if httpsServer?.isRunning ?? false {
+            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Stopping HTTPS Server")
+            httpsServer?.stop()
+        }
+        
+        
+        // Wait a little to give the stop command time to run through the system
+        
+        sleep(5)
+        
+        
+        Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Quitting Swiftfire")
+        
+        
+        // Now quit the server
+        
+        quitSwiftfire = true
     }
 }

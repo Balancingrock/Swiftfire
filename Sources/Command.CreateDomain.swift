@@ -1,9 +1,9 @@
 // =====================================================================================================================
 //
-//  File:       MacCommand.ReadDomains.swift
+//  File:       Command.CreateDomain.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.18
+//  Version:    0.10.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.0 - Renamed file from MacCommand to Command
 // 0.9.18 - Header update
 //        - Replaced log by Log?
 // 0.9.15 - General update and switch to frameworks
@@ -61,14 +62,35 @@ import SwifterLog
 import SwiftfireCore
 
 
-extension ReadDomainsCommand: MacCommand {
+extension CreateDomainCommand: MacCommand {
     
     public static func factory(json: VJson?) -> MacCommand? {
-        return ReadDomainsCommand(json: json)
+        return CreateDomainCommand(json: json)
     }
     
     public func execute() {
-        Log.atNotice?.log(id: -1, source: #file.source(#function, #line))
-        mac?.transfer(ReadDomainsReply(domains: domains))
+        
+        // Error if this domain already exists
+        guard domains.domain(forName: domainName) == nil else {
+            Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Domain name already exists (\(domainName as String))")
+            return
+        }
+        
+        if let url = FileURLs.domainsDir {
+            let domainUrl = url.appendingPathComponent(domainName, isDirectory: true)
+            let domain = Domain(supportDirectory: domainUrl)
+            domain.name = domainName
+            domain.serviceNames = defaultServices
+        
+            domains.add(domain: domain)
+        
+            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Added new domain with \(domain))")
+
+        } else {
+            
+            Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Failed to retrieve domains directory)")
+        }
+        
+        Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Number of domains: \(domains.count)")
     }
 }

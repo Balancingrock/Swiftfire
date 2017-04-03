@@ -1,9 +1,9 @@
 // =====================================================================================================================
 //
-//  File:       MacCommand.Delta.swift
+//  File:       Command.RestoreDomains.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.18
+//  Version:    0.10.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.0 - Renamed file from MacCommand to Command
 // 0.9.18 - Header update
 //        - Replaced log by Log?
 // 0.9.15 - General update and switch to frameworks
@@ -61,17 +62,19 @@ import SwifterLog
 import SwiftfireCore
 
 
-extension DeltaCommand: MacCommand {
-    
+extension RestoreDomainsCommand: MacCommand {
+        
     public static func factory(json: VJson?) -> MacCommand? {
-        return DeltaCommand(json: json)
+        return RestoreDomainsCommand(json: json)
     }
     
     public func execute() {
-        Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Start")
-        if delay > 0 {
-            sleep(UInt32(min(delay, 10))) // Never more than 10 seconds
+        Log.atNotice?.log(id: -1, source: #file.source(#function, #line))
+        if let url = FileURLs.domainDefaultsFile {
+            domains.restore(fromFile: url)
+            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Restored the domains:\n\(domains)")
+        } else {
+            Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Missing file url")
         }
-        Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Completed")
     }
 }

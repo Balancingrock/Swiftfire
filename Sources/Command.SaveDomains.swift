@@ -1,9 +1,9 @@
 // =====================================================================================================================
 //
-//  File:       MacCommand.ReadStatistics.swift
+//  File:       Command.SaveDomains.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.18
+//  Version:    0.10.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.0 - Renamed file from MacCommand to Command
 // 0.9.18 - Header update
 //        - Replaced log by Log?
 // 0.9.15 - General update and switch to frameworks
@@ -56,19 +57,23 @@
 // =====================================================================================================================
 
 import Foundation
-import SwifterLog
 import SwifterJSON
+import SwifterLog
 import SwiftfireCore
 
 
-extension ReadStatisticsCommand: MacCommand {
+extension SaveDomainsCommand: MacCommand {
     
     public static func factory(json: VJson?) -> MacCommand? {
-        return ReadStatisticsCommand(json: json)
+        return SaveDomainsCommand(json: json)
     }
     
     public func execute() {
-        Log.atDebug?.log(id: -1, source: #file.source(#function, #line))
-        mac?.transfer(ReadStatisticsReply(statistics: statistics.json))
+        Log.atNotice?.log(id: -1, source: #file.source(#function, #line))
+        if let url = FileURLs.domainDefaultsFile {
+            domains.save(toFile: url)
+        } else {
+            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Missing file url")
+        }
     }
 }

@@ -1,9 +1,9 @@
 // =====================================================================================================================
 //
-//  File:       MacCommand.UpdateBlacklist.swift
+//  File:       Command.ReadServices.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.18
+//  Version:    0.10.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -11,7 +11,7 @@
 //  Blog:       http://swiftrien.blogspot.com
 //  Git:        https://github.com/Balancingrock/Swiftfire
 //
-//  Copyright:  (c) 2016-2017 Marinus van der Lugt, All rights reserved.
+//  Copyright:  (c) 2017 Marinus van der Lugt, All rights reserved.
 //
 //  License:    Use or redistribute this code any way you like with the following two provision:
 //
@@ -48,11 +48,10 @@
 //
 // History
 //
+// 0.10.0 - Renamed file from MacCommand to Command
 // 0.9.18 - Header update
 //        - Replaced log by Log?
-// 0.9.15 - General update and switch to frameworks
-//        - Renamed from Modify... to Update...
-// 0.9.14 - Initial release
+// 0.9.15 - Initial release
 //
 // =====================================================================================================================
 
@@ -62,42 +61,24 @@ import SwifterLog
 import SwiftfireCore
 
 
-extension UpdateBlacklistCommand: MacCommand {
+extension ReadServicesCommand: MacCommand {
     
     public static func factory(json: VJson?) -> MacCommand? {
-        return UpdateBlacklistCommand(json: json)
+        return ReadServicesCommand(json: json)
     }
     
     public func execute() {
         
         Log.atNotice?.log(id: -1, source: #file.source(#function, #line))
         
-        guard let bAction = Blacklist.Action(rawValue: action) else {
-            Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Cannot create Action type from '\(action)'")
-            return
-        }
-        
-        if source == "Server" {
-            if remove {
-                serverBlacklist.remove(ipAddress: address)
-            }
-            else {
-                serverBlacklist.add(ipAddress: address, action: bAction)
-            }
-            let reply = ReadBlacklistReply(source: "Server", list: serverBlacklist)
+        if let domain = domains.domain(forName: source) {
+            let reply = ReadServicesReply(domainName: source, serviceNames: domain.serviceNames)
             mac?.transfer(reply)
-        }
-        else {
-            if let domain = domains.domain(forName: source) {
-                if remove {
-                    domain.blacklist.remove(ipAddress: address)
-                }
-                else {
-                    domain.blacklist.add(ipAddress: address, action: bAction)
-                }
-                let reply = ReadBlacklistReply(source: source, list: domain.blacklist)
-                mac?.transfer(reply)
-            }
+        } else {
+            var names: Array<String> = []
+            for entry in services.registered { names.append(entry.key) }
+            let reply = ReadServicesReply(domainName: nil, serviceNames: names)
+            mac?.transfer(reply)
         }
     }
 }

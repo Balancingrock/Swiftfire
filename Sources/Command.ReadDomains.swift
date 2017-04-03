@@ -1,9 +1,9 @@
 // =====================================================================================================================
 //
-//  File:       MacCommand.SaveDomains.swift
+//  File:       Command.ReadDomains.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.18
+//  Version:    0.10.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.0 - Renamed file from MacCommand to Command
 // 0.9.18 - Header update
 //        - Replaced log by Log?
 // 0.9.15 - General update and switch to frameworks
@@ -61,18 +62,14 @@ import SwifterLog
 import SwiftfireCore
 
 
-extension SaveDomainsCommand: MacCommand {
+extension ReadDomainsCommand: MacCommand {
     
     public static func factory(json: VJson?) -> MacCommand? {
-        return SaveDomainsCommand(json: json)
+        return ReadDomainsCommand(json: json)
     }
     
     public func execute() {
         Log.atNotice?.log(id: -1, source: #file.source(#function, #line))
-        if let url = FileURLs.domainDefaultsFile {
-            domains.save(toFile: url)
-        } else {
-            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Missing file url")
-        }
+        mac?.transfer(ReadDomainsReply(domains: domains))
     }
 }

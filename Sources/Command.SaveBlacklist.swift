@@ -1,9 +1,9 @@
 // =====================================================================================================================
 //
-//  File:       MacCommand.SaveServerParameters.swift
+//  File:       Command.SaveBlacklist.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.18
+//  Version:    0.10.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.0 - Renamed file from MacCommand to Command
 // 0.9.18 - Header update
 //        - Replaced log by Log?
 // 0.9.15 - General update and switch to frameworks
@@ -61,18 +62,30 @@ import SwifterLog
 import SwiftfireCore
 
 
-extension SaveServerParametersCommand: MacCommand {
+extension SaveBlacklistCommand: MacCommand {
     
     public static func factory(json: VJson?) -> MacCommand? {
-        return SaveServerParametersCommand(json: json)
+        return SaveBlacklistCommand(json: json)
     }
     
     public func execute() {
+        
         Log.atNotice?.log(id: -1, source: #file.source(#function, #line))
-        if let url = FileURLs.parameterDefaultsFile {
-            parameters.save(toFile: url)
-        } else {
-            Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Could not construct default parameters filename")
+        
+        if source == "Server" {
+            if let url = FileURLs.serverBlacklistFile { serverBlacklist.save(toFile: url) }
+            let reply = ReadBlacklistReply(source: "Server", list: serverBlacklist)
+            mac?.transfer(reply)
+        }
+        else {
+            if let domain = domains.domain(forName: source) {
+                switch domain.saveBlacklist() {
+                case .error(let message): Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Failed to save blacklist for \(source), error = \(message)")
+                case .success: break
+                }
+                let reply = ReadBlacklistReply(source: source, list: domain.blacklist)
+                mac?.transfer(reply)
+            }
         }
     }
 }

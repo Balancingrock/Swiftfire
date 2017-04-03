@@ -1,9 +1,9 @@
 // =====================================================================================================================
 //
-//  File:       MacCommand.ReadServices.swift
+//  File:       Command.UpdateServices.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.18
+//  Version:    0.10.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.0 - Renamed file from MacCommand to Command
 // 0.9.18 - Header update
 //        - Replaced log by Log?
 // 0.9.15 - Initial release
@@ -60,24 +61,23 @@ import SwifterLog
 import SwiftfireCore
 
 
-extension ReadServicesCommand: MacCommand {
+extension UpdateServicesCommand: MacCommand {
     
     public static func factory(json: VJson?) -> MacCommand? {
-        return ReadServicesCommand(json: json)
+        return UpdateServicesCommand(json: json)
     }
     
     public func execute() {
         
         Log.atNotice?.log(id: -1, source: #file.source(#function, #line))
-        
-        if let domain = domains.domain(forName: source) {
-            let reply = ReadServicesReply(domainName: source, serviceNames: domain.serviceNames)
-            mac?.transfer(reply)
+
+        if let domain = domains.domain(forName: domainName) {
+            
+            domain.serviceNames = services
+            
         } else {
-            var names: Array<String> = []
-            for entry in services.registered { names.append(entry.key) }
-            let reply = ReadServicesReply(domainName: nil, serviceNames: names)
-            mac?.transfer(reply)
+            
+            Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Failed to update services for \(domainName), domain not found.")
         }
     }
 }

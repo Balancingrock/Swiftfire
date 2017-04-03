@@ -1,9 +1,9 @@
 // =====================================================================================================================
 //
-//  File:       MacCommand.RestoreDomains.swift
+//  File:       Command.UpdatePathPart.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.18
+//  Version:    0.10.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.0 - Renamed file from MacCommand to Command
 // 0.9.18 - Header update
 //        - Replaced log by Log?
 // 0.9.15 - General update and switch to frameworks
@@ -61,19 +62,25 @@ import SwifterLog
 import SwiftfireCore
 
 
-extension RestoreDomainsCommand: MacCommand {
+extension UpdatePathPartCommand: MacCommand {
         
     public static func factory(json: VJson?) -> MacCommand? {
-        return RestoreDomainsCommand(json: json)
+        return UpdatePathPartCommand(json: json)
     }
     
     public func execute() {
-        Log.atNotice?.log(id: -1, source: #file.source(#function, #line))
-        if let url = FileURLs.domainDefaultsFile {
-            domains.restore(fromFile: url)
-            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Restored the domains:\n\(domains)")
-        } else {
-            Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Missing file url")
-        }
+        Log.atDebug?.log(id: -1, source: #file.source(#function, #line))
+        let mutation = Mutation.createUpdatePathPart()
+        mutation.url = url
+        mutation.doNotTrace = newValue
+        statistics.submit(mutation: mutation, onSuccess: {
+        
+            // Try to signal the console (if any) that the path part is updated
+            let message = ReadStatisticsReply(statistics: statistics.json)
+            mac?.transfer(message)
+        }, onError: {
+            (message: String) in
+            Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Error during executing: \(message)")
+        })
     }
 }

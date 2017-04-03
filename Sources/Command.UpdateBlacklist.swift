@@ -1,9 +1,9 @@
 // =====================================================================================================================
 //
-//  File:       MacCommand.UpdateDomain.swift
+//  File:       Command.UpdateBlacklist.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.18
+//  Version:    0.10.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,9 +48,11 @@
 //
 // History
 //
+// 0.10.0 - Renamed file from MacCommand to Command
 // 0.9.18 - Header update
 //        - Replaced log by Log?
 // 0.9.15 - General update and switch to frameworks
+//        - Renamed from Modify... to Update...
 // 0.9.14 - Initial release
 //
 // =====================================================================================================================
@@ -61,25 +63,42 @@ import SwifterLog
 import SwiftfireCore
 
 
-extension UpdateDomainCommand: MacCommand {
+extension UpdateBlacklistCommand: MacCommand {
     
     public static func factory(json: VJson?) -> MacCommand? {
-        return UpdateDomainCommand(json: json)
+        return UpdateBlacklistCommand(json: json)
     }
     
     public func execute() {
         
-        guard domains.contains(domainWithName: oldDomainName) else {
-            Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "No domain present with name \(oldDomainName)")
+        Log.atNotice?.log(id: -1, source: #file.source(#function, #line))
+        
+        guard let bAction = Blacklist.Action(rawValue: action) else {
+            Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Cannot create Action type from '\(action)'")
             return
         }
         
-        if domains.update(domainWithName: oldDomainName, withDomain: newDomain) {
-            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Updated domain \(oldDomainName) to \(newDomain))")
-        } else {
-            Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Failed")
+        if source == "Server" {
+            if remove {
+                serverBlacklist.remove(ipAddress: address)
+            }
+            else {
+                serverBlacklist.add(ipAddress: address, action: bAction)
+            }
+            let reply = ReadBlacklistReply(source: "Server", list: serverBlacklist)
+            mac?.transfer(reply)
         }
-        
-        mac?.transfer(ReadDomainsReply(domains: domains))
+        else {
+            if let domain = domains.domain(forName: source) {
+                if remove {
+                    domain.blacklist.remove(ipAddress: address)
+                }
+                else {
+                    domain.blacklist.add(ipAddress: address, action: bAction)
+                }
+                let reply = ReadBlacklistReply(source: source, list: domain.blacklist)
+                mac?.transfer(reply)
+            }
+        }
     }
 }

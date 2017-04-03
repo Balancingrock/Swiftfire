@@ -70,4 +70,6 @@ func customSetup() {
     // Registering functions can be done here, but is probably done better in the file Function.Registration.swift
 
     // As soon as this function returns the monitoring & control loop will be started and the auto-start feature may start the HTTP and HTTPS server.
+    
+    // If it is necessary to abort the start, use "fatalError" or "exit(EXIT_FAILURE)", but put a "sleep(1)" in front of it to enable the logging process to catch up with all log messages.
 }

@@ -1,9 +1,9 @@
 // =====================================================================================================================
 //
-//  File:       MacCommand.RestoreServerParameters.swift
+//  File:       Command.UpdateDomain.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.18
+//  Version:    0.10.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,13 +48,13 @@
 //
 // History
 //
+// 0.10.0 - Renamed file from MacCommand to Command
 // 0.9.18 - Header update
 //        - Replaced log by Log?
 // 0.9.15 - General update and switch to frameworks
-// 0.9.14 - Initial release (replaces part of MacDef.swift)
+// 0.9.14 - Initial release
 //
 // =====================================================================================================================
-
 
 import Foundation
 import SwifterJSON
@@ -62,43 +62,25 @@ import SwifterLog
 import SwiftfireCore
 
 
-extension RestoreServerParametersCommand: MacCommand {
-    
+extension UpdateDomainCommand: MacCommand {
     
     public static func factory(json: VJson?) -> MacCommand? {
-        return RestoreServerParametersCommand(json: json)
+        return UpdateDomainCommand(json: json)
     }
     
     public func execute() {
         
-        Log.atNotice?.log(id: -1, source: #file.source(#function, #line))
+        guard domains.contains(domainWithName: oldDomainName) else {
+            Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "No domain present with name \(oldDomainName)")
+            return
+        }
         
-        
-        // Restore
-        
-        if let url = FileURLs.parameterDefaultsFile {
-            switch parameters.restore(fromFile: url) {
-            case let .error(message):
-                Log.atError?.log(id: -1, source: #file.source(#function, #line), message: message)
-            case let .success(message):
-                if !message.isEmpty {
-                    Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: message)
-                }
-            }
+        if domains.update(domainWithName: oldDomainName, withDomain: newDomain) {
+            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Updated domain \(oldDomainName) to \(newDomain))")
         } else {
-            Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Could not construct default parameters filename")
+            Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Failed")
         }
         
-        
-        // Provide audit trail
-        
-        Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Parameter settings restored to:\n\(parameters)")
-
-        
-        // Send the new values to the console
-        
-        for parm in ServerParameterName.all {
-            mac?.transfer(ReadServerParameterReply(parameter: parm, value: parameters.stringValue(for: parm)))
-        }
+        mac?.transfer(ReadDomainsReply(domains: domains))
     }
 }

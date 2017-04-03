@@ -1,9 +1,9 @@
 // =====================================================================================================================
 //
-//  File:       MacCommand.HttpServerStop.swift
+//  File:       Command.RemoveDomain.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.18
+//  Version:    0.10.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,8 +48,9 @@
 //
 // History
 //
+// 0.10.0 - Renamed file from MacCommand to Command
 // 0.9.18 - Header update
-//        - Renmed to HttpServerStop
+//        - Replaced log by Log?
 // 0.9.15 - General update and switch to frameworks
 // 0.9.14 - Initial release
 //
@@ -61,26 +62,18 @@ import SwifterLog
 import SwiftfireCore
 
 
-extension HttpServerStopCommand: MacCommand {
+extension RemoveDomainCommand: MacCommand {
     
     public static func factory(json: VJson?) -> MacCommand? {
-        return HttpServerStopCommand(json: json)
+        return RemoveDomainCommand(json: json)
     }
     
     public func execute() {
         
-        if httpServer?.isRunning ?? false {
-            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Stopping HTTP server")
-            httpServer?.stop()
-            telemetry.httpServerStatus = "Stopping"
+        if domains.remove(domainWithName: domainName) {
+            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Removed domain: '\(domainName)')")
         } else {
-            if httpServer == nil {
-                telemetry.httpServerStatus = "Cannot"
-            } else {
-                telemetry.httpServerStatus = "Not Running"
-            }
+            Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Domain does not exist: (\(domainName))")
         }
-        
-        Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Command completed")
     }
 }

@@ -1,9 +1,9 @@
 // =====================================================================================================================
 //
-//  File:       MacCommand.HttpsServerStop.swift
+//  File:       Command.SaveServerParameters.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.18
+//  Version:    0.10.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -11,7 +11,7 @@
 //  Blog:       http://swiftrien.blogspot.com
 //  Git:        https://github.com/Balancingrock/Swiftfire
 //
-//  Copyright:  (c) 2017 Marinus van der Lugt, All rights reserved.
+//  Copyright:  (c) 2016-2017 Marinus van der Lugt, All rights reserved.
 //
 //  License:    Use or redistribute this code any way you like with the following two provision:
 //
@@ -48,36 +48,32 @@
 //
 // History
 //
-// 0.9.18 - Initial release
+// 0.10.0 - Renamed file from MacCommand to Command
+// 0.9.18 - Header update
+//        - Replaced log by Log?
+// 0.9.15 - General update and switch to frameworks
+// 0.9.14 - Initial release
 //
 // =====================================================================================================================
 
 import Foundation
 import SwifterJSON
-import SwiftfireCore
 import SwifterLog
+import SwiftfireCore
 
 
-extension HttpsServerStopCommand: MacCommand {
+extension SaveServerParametersCommand: MacCommand {
     
     public static func factory(json: VJson?) -> MacCommand? {
-        return HttpsServerStopCommand(json: json)
+        return SaveServerParametersCommand(json: json)
     }
     
     public func execute() {
-        
-        if httpsServer?.isRunning ?? false {
-            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Stopping HTTPS server")
-            httpsServer?.stop()
-            telemetry.httpsServerStatus = "Stopping"
+        Log.atNotice?.log(id: -1, source: #file.source(#function, #line))
+        if let url = FileURLs.parameterDefaultsFile {
+            parameters.save(toFile: url)
         } else {
-            if httpsServer == nil {
-                telemetry.httpsServerStatus = "Cannot"
-            } else {
-                telemetry.httpsServerStatus = "Not Running"
-            }
+            Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Could not construct default parameters filename")
         }
-        
-        Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Command completed")
     }
 }

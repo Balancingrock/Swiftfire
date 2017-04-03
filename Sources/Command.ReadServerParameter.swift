@@ -1,9 +1,9 @@
 // =====================================================================================================================
 //
-//  File:       MacCommand.ReadBlacklist.swift
+//  File:       Command.ReadServerParameter.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.18
+//  Version:    0.10.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -29,7 +29,7 @@
 //   - Or wire bitcoins to: 1GacSREBxPy1yskLMc9de2nofNv2SNdwqH
 //
 //  I prefer the above two, but if these options don't suit you, you can also send me a gift from my amazon.co.uk
-//  wishlist: http://www.amazon.co.uk/gp/registry/wishlist/34GNMPZKAQ0OO/ref=cm_sw_em_r_wsl_cE3Tub013CKN6_wb
+//  whishlist: http://www.amazon.co.uk/gp/registry/wishlist/34GNMPZKAQ0OO/ref=cm_sw_em_r_wsl_cE3Tub013CKN6_wb
 //
 //  If you like to pay in another way, please contact me at rien@balancingrock.nl
 //
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.0 - Renamed file from MacCommand to Command
 // 0.9.18 - Header update
 //        - Replaced log by Log?
 // 0.9.15 - General update and switch to frameworks
@@ -61,25 +62,18 @@ import SwifterLog
 import SwiftfireCore
 
 
-extension ReadBlacklistCommand: MacCommand {
+extension ReadServerParameterCommand: MacCommand {
     
     public static func factory(json: VJson?) -> MacCommand? {
-        return ReadBlacklistCommand(json: json)
+        return ReadServerParameterCommand(json: json)
     }
     
     public func execute() {
+                
+        let value = parameters.stringValue(for: parameter)
         
-        Log.atNotice?.log(id: -1, source: #file.source(#function, #line))
-        
-        if source == "Server" {
-            let reply = ReadBlacklistReply(source: "Server", list: serverBlacklist)
-            mac?.transfer(reply)
-        }
-        else {
-            if let domain = domains.domain(forName: source) {
-                let reply = ReadBlacklistReply(source: source, list: domain.blacklist)
-                mac?.transfer(reply)
-            }
-        }
+        Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Reading, \(parameter.rawValue) = \(value)")
+
+        mac?.transfer(ReadServerParameterReply(parameter: parameter, value: value))
     }
 }

@@ -1,9 +1,9 @@
 // =====================================================================================================================
 //
-//  File:       MacCommand.UpdateClient.swift
+//  File:       Command.ReadBlacklist.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.18
+//  Version:    0.10.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.0 - Renamed file from MacCommand to Command
 // 0.9.18 - Header update
 //        - Replaced log by Log?
 // 0.9.15 - General update and switch to frameworks
@@ -61,30 +62,25 @@ import SwifterLog
 import SwiftfireCore
 
 
-extension UpdateClientCommand: MacCommand {
+extension ReadBlacklistCommand: MacCommand {
     
     public static func factory(json: VJson?) -> MacCommand? {
-        return UpdateClientCommand(json: json)
+        return ReadBlacklistCommand(json: json)
     }
     
     public func execute() {
-        Log.atDebug?.log(id: -1, source: #file.source(#function, #line))
-        let mutation = Mutation.createUpdateClient()
-        mutation.ipAddress = client
-        mutation.doNotTrace = newValue
-        statistics.submit(
-            
-            mutation: mutation,
-            
-            onSuccess: {
-                // Try to signal the console (if any) that the path part is updated
-                let message = ReadStatisticsReply(statistics: statistics.json)
-                mac?.transfer(message)},
-            
-            onError: {
-                (message: String) in
-                Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Error updating the statistics, message = \(message)")
+        
+        Log.atNotice?.log(id: -1, source: #file.source(#function, #line))
+        
+        if source == "Server" {
+            let reply = ReadBlacklistReply(source: "Server", list: serverBlacklist)
+            mac?.transfer(reply)
+        }
+        else {
+            if let domain = domains.domain(forName: source) {
+                let reply = ReadBlacklistReply(source: source, list: domain.blacklist)
+                mac?.transfer(reply)
             }
-        )
+        }
     }
 }
