@@ -407,6 +407,17 @@ _ = macServer.setOptions(
 )
 
 
+// ====================================
+// Caal out to the custom setup routine
+// ====================================
+
+Log.atNotice?.log(id: -1, source: "Main", message: "Calling out to custom setup")
+
+customSetup()
+
+Log.atNotice?.log(id: -1, source: "Main", message: "Finished custom setup")
+
+
 // =====================================
 // Start the monitoring and control loop
 // =====================================

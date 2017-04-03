@@ -1,6 +1,6 @@
 // =====================================================================================================================
 //
-//  File:       Function.nofPageHits.swift
+//  File:       Custom.swift
 //  Project:    Swiftfire
 //
 //  Version:    0.10.0
@@ -51,38 +51,23 @@
 // 0.10.0 - Initial release
 //
 // =====================================================================================================================
+// Description
+// =====================================================================================================================
+//
+// Use this file to call out to project specific setup code that must be run before the servers become active.
+//
+// =====================================================================================================================
 
 import Foundation
-import SwiftfireCore
 
-
-/// Returns the number of hits for a resource.
-///
-/// If the arguments contain a String, then the string will be intepreted as a resource path (relative to the domain) and the count for that resource will be returned.
-///
-/// If the argument does not contain any arguments, it will return the count for the currently requested resource.
-
-func sf_nofPageHits(_ args: Function.Arguments, _ info: inout Function.Info, _ environment: Function.Environment) -> Data? {
+func customSetup() {
     
-    var count: Int64 = -1
+    // Do any setup/initialization necessary at startup from here.
+    // All global data is already initialized.
     
-    var path: String?
+    // Registering services can be done here, but is probably done better in the file Service.Registration.swift
     
-    if case .array(let arr) = args {
-        if arr.count > 0 {
-            path = arr[0]
-        }
-    }
-    
-    if path == nil {
-        path = environment.chainInfo[Service.ChainInfoKey.relativeResourcePathKey] as? String
-    }
+    // Registering functions can be done here, but is probably done better in the file Function.Registration.swift
 
-    if let path = path {
-        count = statistics.foreverCount(domain: environment.domain.name, path: path)
-    }
-
-    Log.atDebug?.log(id: (environment.connection as! SFConnection).logId, source: #file.source(#function, #line), message: "ForeverCount for \(path) = \(count)")
-
-    return count.description.data(using: String.Encoding.utf8)
+    // As soon as this function returns the monitoring & control loop will be started and the auto-start feature may start the HTTP and HTTPS server.
 }
