@@ -24,9 +24,7 @@ func sf_nofPageHits(_ args: Function.Arguments, _ info: inout Function.Info, _ e
     
     if case .array(let arr) = args {
         if arr.count > 0 {
-            if let p = arr[0] as? String {
-                path = p
-            }
+            path = arr[0]
         }
     }
     

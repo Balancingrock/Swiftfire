@@ -68,17 +68,14 @@
 //
 // <arguments>             ::= "("[<argument>[{<argument-separator><argument>}]]")"|<json-object>
 // <json-object>           ::= "{"<json-code>"}"
-// <argument>              ::= <name>|<quoted-string>|<number>|<bool>
+// <argument>              ::= <string>|<quoted-string>
 // <arguments-separator>   ::= ","
 // <string>                ::= {" "}<name>{" "}
 // <quoted-string>         ::= {" "}"""{<printable>}"""{" "}
-// <number>                ::= {" "}<json-number>{" "}
-// <json-number>           ::= double as specified by the JSON spec
-// <bool>                  ::= {" "}"true"|"false"|"yes"|"no"|"0"|"1"{" "}
 //
 // Examples:
 // .numberOfHits()
-// .customSeparator(twentyOne, fourtyTwo)
+// .customSeparator(1, fourtyTwo)
 // .numberOfBoxes:2{"first":"jumping", "second":["throw", "catch"]}
 //
 // Note: Only a function that does have a corresponding entry in the registered function table will be recognized as
@@ -220,7 +217,7 @@ extension SFDocument {
         
         var jsonArgument: VJson?
         
-        var arrayArguments: Array<Any> = []
+        var arrayArguments: Function.ArrayArguments = []
         
         var offset: Int = 0
         
@@ -266,26 +263,10 @@ extension SFDocument {
             string.append(Character(UnicodeScalar(char)))
         }
         
-        func addArrayArgument(doubleQuotes: Bool = false) {
+        func addArrayArgument() {
             if string == "" { return }
-            if doubleQuotes == false {
-                if let bool = Bool(special: string) {
-                    arrayArguments.append(bool)
-                    return
-                }
-                if let num = Int(string) {
-                    arrayArguments.append(num)
-                    return
-                }
-                if let num = Double(string) {
-                    arrayArguments.append(num)
-                    return
-                }
-            }
             arrayArguments.append(string)
         }
-        
-        
         
         func markFunctionBlockOffset() {
             functionBlockOffset = offset
@@ -586,7 +567,7 @@ extension SFDocument {
             
         } else if char == Ascii._DOUBLE_QUOTES {
             
-            block.addArrayArgument(doubleQuotes: true)
+            block.addArrayArgument()
             return .readArrayArgument
             
             
