@@ -1,6 +1,6 @@
 # Build websites in Swift.
 
-The Swiftfire webserver can be extended with functions and services written in Swift. Making it possible to create entire websites written in nothing else but HTML, CSS and Swift. No other languages, frameworks or external serivices necessary.
+The Swiftfire webserver can be extended with functions and services written in Swift. Making it possible to create entire websites written in nothing else but HTML, CSS and Swift. No other languages, frameworks or external services necessary.
 
 Since the website and server-software are merged into one, you will need access to your own server-hardware. This can be any old computer as long as it is able to run MacOS 10.11 (El Capitan).
 
