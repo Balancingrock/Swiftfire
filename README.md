@@ -1,17 +1,63 @@
-# Swiftfire
-The next generation personal webserver written in Swift.
+# Build websites in Swift.
+
+The Swiftfire webserver can be extended with functions and services written in Swift. Making it possible to create entire websites written in nothing else but HTML, CSS and Swift. No other languages, frameworks or external serivices necessary.
+
+Since the website and server-software are merged into one, you will need access to your own server-hardware. This can be any old computer as long as it is able to run MacOS 10.11 (El Capitan).
+
+Linux compatibility is envisaged, but not yet actively supported.
 
 Visit the Swiftfire homepage at [http://swiftfire.nl](http://swiftfire.nl).
 
-# Note
+## How it works
 
-This is an early public release and I do not consider this code ready for prime time. It is experimental in nature and subject to severe rewrites as development continues.
+This is a very high level overview of how Swiftfire can use Swift code to create websites.
+
+Every domain that is hosted under Swiftfire implements a stack of services. By default that stack implements a static website.
+
+For each (valid and accepted) request that arrives at the server, Swiftfire finds the stack of services to execute and does so one by one.
+
+You can add your own services to modify or extend de default behaviour. However adding services is probabely not done too often. It is nice to know that it is possible, but it is not anticipated that many users will want to do so.
+
+It is in the custom "functions" that the real power of Swiftfire rests.
+
+One service in the stack of services retrieves the requested resource from disk and verifies if it must be parsed.
+If it must be parsed it scans the file for "functions". Any function that is found is executed, and the result of the execution is injected into the resource at the exact spot of the function. The function itself is removed.
+
+In an example:
+
+    <p>This page has been accessed .nofPageHits() times</p>
+
+is translated to:
+
+    <p>This page has been accessed 59440 times</p>
+
+or any other number of course.
+
+The best part is, you can define and write the functions yourself. And after registration Swiftfire takes care of the rest.
+
+It is up to you to determine how much you want to do in Swift. For example, you could decide to have the entire landing page to be created by a function if index.html exists only of: `.buildLandingPage()`. (And of course you have implemented the function that is registered under the name `createLandingPage`)
+
+## No GUI?
+
+No, Swiftfire is a faceless webserver application. It does not have a GUI.
+
+However there is anther project called [SwiftfireConsole](https://github.com/Balancingrock/SwiftfireConsole) that does have a GUI and can connect to a Swiftfire webserver.
+
+Thus for setup or monitoring a GUI is available.
+
+The GUI even implements a rudimentary tracking of the number of visitors to your site without needing third parties.
+  
+## Note
+
+This is an early public beta release. 
 
 However: It does work! :-)
 
-# Features
+## Features
 
-- Webserver for static websites
+- Allows HTML and CSS code injection from functions written in Swift
+- Allows website services to be implemented in Swift 
+- Out of the box support for static websites
 - Handles multiple domains
 - Client forwarding (to other hosts or a different port on the same host)
 - Integrated usage statistics (page visits)
@@ -22,33 +68,31 @@ However: It does work! :-)
 - Logging of received headers possible
 - Logging of missing pages (404)
 - Console application available
-- Easy to extend for new domain services
 
-# Installation
+## Installation
 Please refer to the [installation instructions](http://swiftfire.nl/pages/manual/02_installation.html) on the [Swiftfire](http://swiftfire.nl) website.
 
-# Version history
+## Version history
 
 Note: Planned releases are for information only and almost always change.
 
 #### 2.0.0 (Thought about)
 
-- Adding support for dynamic content
 - Session support
 - Add URL redirection list
 
 #### 1.0.0 (Planned)
 
-- 1-3 months after v0.10.0
+- A few (1-6) months after v0.10.0 (Confidence building period)##
 - Bugfixes
 - Small feature improvements (if necessary)
 - Code improvements
 
-#### 0.10.0 (Planned)
+#### 0.10.0 (Current)
 
-- Merge HTML code with result of Swift callouts
+- Added support for functions (HTML & CSS code injections)
 
-#### 0.9.18 (Current)
+#### 0.9.18
 
 - Added HTTPS support
 - General update of headers
