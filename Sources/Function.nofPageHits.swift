@@ -3,7 +3,7 @@
 //  File:       Function.nofPageHits.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.0
+//  Version:    0.10.1
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.1 - Fixed warnings in xcode 8.3
 // 0.10.0 - Initial release
 //
 // =====================================================================================================================
@@ -82,7 +83,7 @@ func sf_nofPageHits(_ args: Function.Arguments, _ info: inout Function.Info, _ e
         count = statistics.foreverCount(domain: environment.domain.name, path: path)
     }
 
-    Log.atDebug?.log(id: (environment.connection as! SFConnection).logId, source: #file.source(#function, #line), message: "ForeverCount for \(path) = \(count)")
+    Log.atDebug?.log(id: (environment.connection as! SFConnection).logId, source: #file.source(#function, #line), message: "ForeverCount for \(path ?? "Unknown") = \(count)")
 
     return count.description.data(using: String.Encoding.utf8)
 }

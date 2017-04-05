@@ -3,7 +3,7 @@
 //  File:       Command.HttpsServerRun.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.0
+//  Version:    0.10.1
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.1 - Fixed warnings under Xcode 8.3
 // 0.10.0 - Renamed HttpConnection to SFConnection
 //        - Added logging of setup after start
 //        - Renamed file from MacCommand to Command
@@ -268,7 +269,7 @@ fileprivate func buildServerCtx() -> ServerCtx? {
         return nil
     }
     
-    let validForDays = (cert.validNotAfter - today)/(24 * 60 * 60 * 1000)
+    let validForDays = (cert.validNotAfter - today)/Int64(24 * 60 * 60 * 1000)
     
     Log.atInfo?.log(id: -1, source: "Main", message: "Server certificate is valid for \(validForDays) more days")
     
@@ -303,7 +304,7 @@ fileprivate func checkDomainCtxs() -> [ServerCtx] {
                 
                 } else {
         
-                    let validForDays = (cert!.validNotAfter - today)/(24 * 60 * 60 * 1000)
+                    let validForDays = (cert!.validNotAfter - today)/Int64(24 * 60 * 60 * 1000)
         
                     Log.atInfo?.log(id: -1, source: #file.source(#function, #line), message: "Server certificate is valid for \(validForDays) more days")
                     

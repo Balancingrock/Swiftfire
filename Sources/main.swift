@@ -3,7 +3,7 @@
 //  File:       main.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.0
+//  Version:    0.10.1
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.1  - Fixed new warnings from xcode 8.3
 // 0.10.0  - Included support for function calls
 // 0.9.18  - Renames Start command to Run
 //         - Header update
@@ -330,7 +331,7 @@ fileprivate let today = Date().javaDate
 if today < macCert.validNotBefore { emergencyExit("Console certificate in \(FileURLs.sslConsoleServerCertificateFile!.path) is not yet valid") }
 if today > macCert.validNotAfter  { emergencyExit("Console certificate in \(FileURLs.sslConsoleServerCertificateFile!.path) is no longer valid") }
 
-fileprivate let validForDays = (macCert.validNotAfter - today)/(24 * 60 * 60 * 1000)
+fileprivate let validForDays = (macCert.validNotAfter - today)/Int64(24 * 60 * 60 * 1000)
 
 Log.atInfo?.log(id: -1, source: "Main", message: "Server certificate for console interface is valid for \(validForDays) more days")
 
@@ -353,7 +354,7 @@ if let urls = try? FileManager.default.contentsOfDirectory(at: FileURLs.sslConso
                     } else if today > cert.validNotAfter {
                         Log.atWarning?.log(id: -1, source: "Main", message: "Trusted console certificate in \(url.path) is no longer valid")
                     } else {
-                        let validForDays = (macCert.validNotAfter - today)/(24 * 60 * 60 * 1000)
+                        let validForDays = (macCert.validNotAfter - today)/Int64(24 * 60 * 60 * 1000)
                         Log.atInfo?.log(id: -1, source: "Main", message: "Trusted console certificate in \(url.path) is valid for \(validForDays) more days")
                         consoleServerCertificateFound = true
                     }
