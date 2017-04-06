@@ -88,7 +88,11 @@ Note: Planned releases are for information only and almost always change.
 - Small feature improvements (if necessary)
 - Code improvements
 
-#### 0.10.0 (Current)
+#### 0.10.1 (Current)
+
+- Removed warnings due to Xcode 8.3
+
+#### 0.10.0
 
 - Added support for functions (HTML & CSS code injections)
 
