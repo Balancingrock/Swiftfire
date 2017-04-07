@@ -88,7 +88,11 @@ Note: Planned releases are for information only and almost always change.
 - Small feature improvements (if necessary)
 - Code improvements
 
-#### 0.10.1 (Current)
+#### 0.10.2 (Current)
+
+- Changes in SwiftfireConsole for xcode 8.3
+
+#### 0.10.1
 
 - Removed warnings due to Xcode 8.3
 
