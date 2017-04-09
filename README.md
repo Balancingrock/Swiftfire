@@ -88,7 +88,11 @@ Note: Planned releases are for information only and almost always change.
 - Small feature improvements (if necessary)
 - Code improvements
 
-#### 0.10.2 (Current)
+#### 0.10.3 (Current)
+
+- Bugfixes in SwifterSockets and SwiftfireCore
+
+#### 0.10.2
 
 - Changes in SwiftfireConsole for xcode 8.3
 
