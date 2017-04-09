@@ -88,7 +88,11 @@ Note: Planned releases are for information only and almost always change.
 - Small feature improvements (if necessary)
 - Code improvements
 
-#### 0.10.3 (Current)
+#### 0.10.4 (Current)
+
+- Bugfix: inactivity on m&c interface no longer causes a crash.
+
+#### 0.10.3
 
 - Bugfixes in SwifterSockets and SwiftfireCore
 

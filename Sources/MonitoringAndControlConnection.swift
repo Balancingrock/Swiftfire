@@ -3,7 +3,7 @@
 //  File:       MonitoringAndControl.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.18
+//  Version:    0.10.4
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.4  - Fixed problem where the inactivity timeout would crash the MAC connection.
 // 0.9.18  - Renamed server Start to Run (Issue 4)
 //         - Header update
 //         - Replaced log with Log?
@@ -174,7 +175,10 @@ final class MonitoringAndControlConnection: SwifterSockets.Connection {
     override func prepare(for interface: InterfaceAccess, remoteAddress address: String, options: [Connection.Option]) -> Bool {
         var localOptions = options
         localOptions.append(.inactivityDetectionThreshold(parameters.macInactivityTimeout))
-        localOptions.append(.inactivityAction({ (c: Connection) in mac?.transfer(ClosingMacConnection())}))
+        localOptions.append(.inactivityAction({
+            (c: Connection) in
+            c.bufferedTransfer(ClosingMacConnection().json.code, affectInactivityDetection: false)
+        }))
         return super.prepare(for: interface, remoteAddress: address, options: localOptions)
     }
 
@@ -290,10 +294,8 @@ final class MonitoringAndControlConnection: SwifterSockets.Connection {
         if let reply = reply {
             let msg = reply.json.code
             Log.atDebug?.log(id: -1, source: "MacLoop.transfer", message: "Transferring MacMessage \(msg)", targets: SwifterLog.Target.ALL_NON_RECURSIVE)
-            super.transfer(msg, callback: nil)
+            super.bufferedTransfer(msg, callback: nil)
         }
     }
-    
-    
 }
 
