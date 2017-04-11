@@ -3,7 +3,7 @@
 //  File:       HttpConnection.HttpWorker.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.0
+//  Version:    0.10.5
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.5 - Added more debug output
 // 0.10.0 - Renamed HttpConnection to SFConnection
 // 0.9.18 - Header update
 //        - Replaced log by Log?
@@ -231,6 +232,8 @@ extension SFConnection {
             return
         }
 
+        Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: "Request for domain: \(domain.name)")
+        
         
         // =============================================================================================================
         // Evaluate forwarding
@@ -298,6 +301,8 @@ extension SFConnection {
         // Start the service chain
         // =============================================================================================================
 
+        Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: "Starting domain services")
+
         var response = Service.Response(httpVersion, mimeTypeDefault)
         
         // Note: Since the response.code is not set, it is possible to only consume a request and not transmit any response.
@@ -306,8 +311,13 @@ extension SFConnection {
         chainInfo[Service.ChainInfoKey.responseStartedKey] = timestampResponseStart
 
         for item in domain.services {
+            
+            Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: "Starting services: \(item.name)")
+            
             if item.service(header, body, self, domain, &chainInfo, &response) == .abortChain { break }
         }
+        
+        Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: "Domain services completed with code = \(response.code?.rawValue ?? "None")")
         
         
         // =============================================================================================================
