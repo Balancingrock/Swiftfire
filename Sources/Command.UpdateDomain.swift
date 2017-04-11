@@ -3,7 +3,7 @@
 //  File:       Command.UpdateDomain.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.0
+//  Version:    0.10.5
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.5 - Fixed typo (additional ')' at end of log entry)
 // 0.10.0 - Renamed file from MacCommand to Command
 // 0.9.18 - Header update
 //        - Replaced log by Log?
@@ -76,7 +77,7 @@ extension UpdateDomainCommand: MacCommand {
         }
         
         if domains.update(domainWithName: oldDomainName, withDomain: newDomain) {
-            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Updated domain \(oldDomainName) to \(newDomain))")
+            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Updated domain \(oldDomainName) to \(newDomain)")
         } else {
             Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Failed")
         }
