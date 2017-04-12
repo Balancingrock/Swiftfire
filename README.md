@@ -88,7 +88,13 @@ Note: Planned releases are for information only and almost always change.
 - Small feature improvements (if necessary)
 - Code improvements
 
-#### 0.10.4 (Current)
+#### 0.10.5 (Current)
+
+- Fixed typo of blacklist in log
+- Added debug output to service invokation
+- Fixed memory leak from SwifterJSON
+
+#### 0.10.4
 
 - Bugfix: inactivity on m&c interface no longer causes a crash.
 
