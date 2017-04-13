@@ -3,7 +3,7 @@
 //  File:       Function.nofPageHits.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.1
+//  Version:    0.10.6
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.6 - Renamed chain... to service...
 // 0.10.1 - Fixed warnings in xcode 8.3
 // 0.10.0 - Initial release
 //
@@ -76,7 +77,7 @@ func sf_nofPageHits(_ args: Function.Arguments, _ info: inout Function.Info, _ e
     }
     
     if path == nil {
-        path = environment.chainInfo[Service.ChainInfoKey.relativeResourcePathKey] as? String
+        path = environment.serviceInfo[.relativeResourcePathKey] as? String
     }
 
     if let path = path {

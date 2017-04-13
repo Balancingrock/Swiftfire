@@ -49,6 +49,7 @@
 // History
 //
 // 0.10.6 - Interface update
+//        - Renamed chain... to service...
 // 0.10.0 - Renamed from DomainService to Service
 // 0.9.18 - Header update
 //        - Replaced log with Log?
@@ -75,7 +76,7 @@
 //
 // response.code: nil
 //
-// return: .continueChain
+// return: .next
 //
 //
 // On error (IP address is contained in the blacklist)
@@ -89,8 +90,8 @@
 // domain.telemetry.nofBlacklistedAccesses: Incremented.
 //
 // return:
-// - .abortChain: If the IP address is blacklisted and the connection must be terminated immediately
-// - .continueChain: If a 401 or 503 is required.
+// - .abort: If the IP address is blacklisted and the connection must be terminated immediately
+// - .next: If a 401 or 503 is required.
 //
 // =====================================================================================================================
 
@@ -109,17 +110,17 @@ import SwifterSockets
 ///   - body: The data that accompanied the HTTP request (if any).
 ///   - connection: The HttpConnection object that is used for this connection.
 ///   - domain: The domain that is serviced for this request.
-///   - chainInfo: A dictionary for communication between services.
+///   - serviceInfo: A dictionary for communication between services.
 ///   - response: An object that can receive information to be returned in response to the request.
 ///
-/// - Returns: On error .abortChain, on success .continueChain.
+/// - Returns: On error .abort, on success .next.
 
-func ds_blacklist(_ header: HttpHeader, _ body: Data?, _ connection: Connection, _ domain: Domain, _ chainInfo: inout Service.ChainInfo, _ response: inout HttpResponse) -> Service.Result {
+func ds_blacklist(_ header: HttpHeader, _ body: Data?, _ connection: Connection, _ domain: Domain, _ serviceInfo: inout Service.Info, _ response: inout HttpResponse) -> Service.Result {
     
     
     // Abort immediately if there is already a response code
     
-    if response.code != nil { return .continueChain }
+    if response.code != nil { return .next }
     
     
     // Aliases
@@ -133,7 +134,7 @@ func ds_blacklist(_ header: HttpHeader, _ body: Data?, _ connection: Connection,
 
     case nil: // No blacklisting action required
         
-        return .continueChain
+        return .next
         
         
     case Blacklist.Action.closeConnection?:
@@ -142,7 +143,7 @@ func ds_blacklist(_ header: HttpHeader, _ body: Data?, _ connection: Connection,
         
         Log.atNotice?.log(id: logId, source: #file.source(#function, #line), message: "Domain rejected blacklisted client \(connection.remoteAddress) by closing the connection")
         
-        return .abortChain
+        return .abort
         
         
     case Blacklist.Action.send401Unauthorized?:
@@ -153,7 +154,7 @@ func ds_blacklist(_ header: HttpHeader, _ body: Data?, _ connection: Connection,
         
         response.code = HttpResponseCode.code401_Unauthorized
         
-        return .continueChain
+        return .next
         
         
     case Blacklist.Action.send503ServiceUnavailable?:
@@ -164,7 +165,7 @@ func ds_blacklist(_ header: HttpHeader, _ body: Data?, _ connection: Connection,
         
         response.code = HttpResponseCode.code503_ServiceUnavailable
 
-        return .continueChain
+        return .next
     }
 }
 

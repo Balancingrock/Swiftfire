@@ -49,6 +49,7 @@
 // History
 //
 // 0.10.6 - Interface update
+//        - Renamed chain... to service...
 // 0.10.0 - Renamed HttpConnection to SFConnection
 //        - Renamed from DomainService to Service
 // 0.9.18 - Header update
@@ -61,20 +62,20 @@
 //
 // Examines the request header and create an error code if the header is neither a HTTP 1.0 or HTTP 1.1 verion.
 //
-// If a response.code is set, this operation exists immediately with .continueChain.
+// If a response.code is set, this operation exists immediately with .next.
 //
 //
 // Input:
 // ------
 //
 // header.httpVersion: The version of the http request header.
-// response.code: If set, this service will exit immediately with .continueChain'.
+// response.code: If set, this service will exit immediately with .next'.
 //
 //
 // On success:
 // -----------
 //
-// return: .continueChain
+// return: .next
 //
 //
 // On error: Missing http version
@@ -83,7 +84,7 @@
 // domain.telemetry.nof400: incremented
 // statistics: Updated with a ClientRecord.
 //
-// return: .continueChain
+// return: .next
 //
 //
 // On error: Wrong http version
@@ -93,7 +94,7 @@
 // domain.telemetry.nof505: incremented
 // statistics: Updated with a ClientRecord.
 //
-// return: .continueChain
+// return: .next
 //
 // =====================================================================================================================
 
@@ -112,17 +113,17 @@ import SwifterSockets
 ///   - body: The data that accompanied the HTTP request (if any).
 ///   - connection: The HttpConnection object that is used for this connection.
 ///   - domain: The domain that is serviced for this request.
-///   - chainInfo: A dictionary for communication between services.
+///   - serviceInfo: A dictionary for communication between services.
 ///   - response: An object that can receive information to be returned in response to the request.
 ///
-/// - Returns: On error .abortChain, on success .continueChain.
+/// - Returns: On error .abort, on success .next.
 
-func ds_onlyHttp10or11(_ header: HttpHeader, _ body: Data?, _ connection: Connection, _ domain: Domain, _ chainInfo: inout Service.ChainInfo, _ response: inout HttpResponse) -> Service.Result {
+func ds_onlyHttp10or11(_ header: HttpHeader, _ body: Data?, _ connection: Connection, _ domain: Domain, _ serviceInfo: inout Service.Info, _ response: inout HttpResponse) -> Service.Result {
     
     
     // Abort immediately if there is already a response code
     
-    if response.code != nil { return .continueChain }
+    if response.code != nil { return .next }
 
     
     // =============================================================================================================
@@ -154,7 +155,7 @@ func ds_onlyHttp10or11(_ header: HttpHeader, _ body: Data?, _ connection: Connec
         let mutation = Mutation.createAddClientRecord(from: connection)
         mutation.httpResponseCode = HttpResponseCode.code400_BadRequest.rawValue
         mutation.responseDetails = message
-        mutation.requestReceived = chainInfo[Service.ChainInfoKey.responseStartedKey] as? Int64 ?? 0
+        mutation.requestReceived = serviceInfo[.responseStartedKey] as? Int64 ?? 0
         statistics.submit(mutation: mutation, onError: {
             (message: String) in
             Log.atError?.log(id: connection.logId, source: #file.source(#function, #line), message: "Error during statistics submission:\(message)")
@@ -164,7 +165,7 @@ func ds_onlyHttp10or11(_ header: HttpHeader, _ body: Data?, _ connection: Connec
         // Response
         
         response.code = HttpResponseCode.code400_BadRequest
-        return .continueChain
+        return .next
     }
     
     
@@ -197,7 +198,7 @@ func ds_onlyHttp10or11(_ header: HttpHeader, _ body: Data?, _ connection: Connec
         let mutation = Mutation.createAddClientRecord(from: connection)
         mutation.httpResponseCode = HttpResponseCode.code505_HttpVersionNotSupported.rawValue
         mutation.responseDetails = message
-        mutation.requestReceived = chainInfo[Service.ChainInfoKey.responseStartedKey] as? Int64 ?? 0
+        mutation.requestReceived = serviceInfo[.responseStartedKey] as? Int64 ?? 0
         statistics.submit(mutation: mutation, onError: {
             (message: String) in
             Log.atError?.log(id: connection.logId, source: #file.source(#function, #line), message: "Error during statistics submission:\(message)")
@@ -207,8 +208,8 @@ func ds_onlyHttp10or11(_ header: HttpHeader, _ body: Data?, _ connection: Connec
         // Response
         
         response.code = HttpResponseCode.code505_HttpVersionNotSupported
-        return .continueChain
+        return .next
     }
     
-    return .continueChain
+    return .next
 }

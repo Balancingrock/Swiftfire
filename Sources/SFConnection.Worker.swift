@@ -49,6 +49,7 @@
 // History
 //
 // 0.10.6 - Updated parameters to services & transmission of response
+//        - Renamed chain... to service...
 // 0.10.5 - Added more debug output
 // 0.10.0 - Renamed HttpConnection to SFConnection
 // 0.9.18 - Header update
@@ -324,14 +325,14 @@ extension SFConnection {
         response.contentType = mimeTypeDefault
         
         
-        var chainInfo = Service.ChainInfo()
-        chainInfo[Service.ChainInfoKey.responseStartedKey] = timestampResponseStart
+        var serviceInfo = Service.Info()
+        serviceInfo[.responseStartedKey] = timestampResponseStart
 
         for item in domain.services {
             
             Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: "Starting services: \(item.name)")
             
-            if item.service(header, body, self, domain, &chainInfo, &response) == .abortChain { break }
+            if item.service(header, body, self, domain, &serviceInfo, &response) == .abort { break }
         }
         
         Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: "Domain services completed with code = \(response.code?.rawValue ?? "None")")
@@ -382,7 +383,7 @@ extension SFConnection {
             
         let mutation = Mutation.createAddClientRecord(from: self)
         mutation.domain = domain.name
-        mutation.url = chainInfo[Service.ChainInfoKey.relativeResourcePathKey] as? String ?? "Unknown resource path"
+        mutation.url = serviceInfo[.relativeResourcePathKey] as? String ?? "Unknown resource path"
         mutation.httpResponseCode = code.rawValue
         mutation.responseDetails = ""
         mutation.requestReceived = timestampResponseStart

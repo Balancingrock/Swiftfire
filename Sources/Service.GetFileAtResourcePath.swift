@@ -49,6 +49,7 @@
 // History
 //
 // 0.10.6 - Interface update
+//        - Renamed chain... to service...
 // 0.10.0 - Renamed HttpConnection to SFConnection
 //        - Added support for .sf. files (i.e. function call's from source text)
 //        - Renamed from DomainService to Service
@@ -67,7 +68,7 @@
 // ------
 //
 // chainInfo[ResourcePathKey]: A string with the full path for the file to be read.
-// response.code: If set, this service will exit immediately with .continueChain'.
+// response.code: If set, this service will exit immediately with .next'.
 //
 //
 // On success:
@@ -79,7 +80,7 @@
 //
 // domain.telemetry.nof200: Incremented
 //
-// return: .continueChain
+// return: .next
 //
 //
 // On error:
@@ -91,11 +92,11 @@
 //
 // statistics: Updated with new ClientRecord
 //
-// return: .abortChain
+// return: .abort
 //
 // Possible error causes:
 // - No resource path found in chainInfo
-// - Resource path in chainInfo points to a resource that cannot be retrieved
+// - Resource path in serviceInfo points to a resource that cannot be retrieved
 //
 // =====================================================================================================================
 
@@ -114,12 +115,12 @@ import SwifterSockets
 ///   - body: The data that accompanied the HTTP request (if any).
 ///   - connection: The HttpConnection object that is used for this connection.
 ///   - domain: The domain that is serviced for this request.
-///   - chainInfo: A dictionary for communication between services.
+///   - serviceInfo: A dictionary for communication between services.
 ///   - response: An object that can receive information to be returned in response to the request.
 ///
-/// - Returns: On error .abortChain, on success .continueChain.
+/// - Returns: On error .abort, on success .next.
 
-func ds_getFileAtResourcePath(_ header: HttpHeader, _ body: Data?, _ connection: Connection, _ domain: Domain, _ chainInfo: inout Service.ChainInfo, _ response: inout HttpResponse) -> Service.Result {
+func ds_getFileAtResourcePath(_ header: HttpHeader, _ body: Data?, _ connection: Connection, _ domain: Domain, _ serviceInfo: inout Service.Info, _ response: inout HttpResponse) -> Service.Result {
     
     
 
@@ -142,7 +143,7 @@ func ds_getFileAtResourcePath(_ header: HttpHeader, _ body: Data?, _ connection:
         mutation.httpResponseCode = HttpResponseCode.code500_InternalServerError.rawValue
         mutation.url = resourcePath
         mutation.responseDetails = message
-        mutation.requestReceived = chainInfo[Service.ChainInfoKey.responseStartedKey] as? Int64 ?? 0
+        mutation.requestReceived = serviceInfo[.responseStartedKey] as? Int64 ?? 0
         statistics.submit(mutation: mutation, onError: {
             (message: String) in
             Log.atError?.log(id: connection.logId, source: #file.source(#function, line), message: "Error during statistics submission:\(message)")
@@ -157,7 +158,7 @@ func ds_getFileAtResourcePath(_ header: HttpHeader, _ body: Data?, _ connection:
     
     // Abort immediately if there is already a response code
     
-    if response.code != nil { return .continueChain }
+    if response.code != nil { return .next }
 
     
     // Aliases
@@ -169,9 +170,9 @@ func ds_getFileAtResourcePath(_ header: HttpHeader, _ body: Data?, _ connection:
     // Make sure a resource path string is present in the chainInfo
     // =================================================================================================================
     
-    guard let resourcePath = chainInfo[Service.ChainInfoKey.absoluteResourcePathKey] as? String else {
+    guard let resourcePath = serviceInfo[.absoluteResourcePathKey] as? String else {
         handle500_ServerError(connection: connection, resourcePath: nil, message: "No resource path present", line: #line)
-        return .continueChain
+        return .next
     }
 
     
@@ -190,12 +191,12 @@ func ds_getFileAtResourcePath(_ header: HttpHeader, _ body: Data?, _ connection:
         case .error(let message):
             
             handle500_ServerError(connection: connection, resourcePath: resourcePath, message: message, line: #line)
-            return .continueChain
+            return .next
             
             
         case .success(let doc):
 
-            let environment = Function.Environment(header: header, body: body, connection: connection, domain: domain, response: &response, chainInfo: &chainInfo)
+            let environment = Function.Environment(header: header, body: body, connection: connection, domain: domain, response: &response, serviceInfo: &serviceInfo)
             
             payload = doc.getContent(with: environment)
         }
@@ -206,7 +207,7 @@ func ds_getFileAtResourcePath(_ header: HttpHeader, _ body: Data?, _ connection:
         
         guard let data = connection.filemanager.contents(atPath: resourcePath) else {
             handle500_ServerError(connection: connection, resourcePath: resourcePath, message: "Reading contents of file failed (but file is reported readable), resource: \(resourcePath)", line: #line)
-            return .continueChain
+            return .next
         }
         
         payload = data
@@ -229,6 +230,6 @@ func ds_getFileAtResourcePath(_ header: HttpHeader, _ body: Data?, _ connection:
     response.contentType = mimeType(forPath: resourcePath) ?? mimeTypeDefault
     response.payload = payload
         
-    return .continueChain
+    return .next
 }
 

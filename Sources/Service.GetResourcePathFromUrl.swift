@@ -49,6 +49,7 @@
 // History
 //
 // 0.10.6 - Interface update
+//        - Renamed chain... to service...
 // 0.10.0 - Renamed HttpConnection to SFConnection
 //        - Renamed from DomainService to Service
 // 0.9.18 - Header update
@@ -120,12 +121,12 @@ import SwifterSockets
 ///   - body: The data that accompanied the HTTP request (if any).
 ///   - connection: The HttpConnection object that is used for this connection.
 ///   - domain: The domain that is serviced for this request.
-///   - chainInfo: A dictionary for communication between services.
+///   - serviceInfo: A dictionary for communication between services.
 ///   - response: An object that can receive information to be returned in response to the request.
 ///
-/// - Returns: On error .abortChain, on success .continueChain.
+/// - Returns: On error .abort, on success .next.
 
-func ds_getResourcePathFromUrl(_ header: HttpHeader, _ body: Data?, _ connection: Connection, _ domain: Domain, _ chainInfo: inout Service.ChainInfo, _ response: inout HttpResponse) -> Service.Result {
+func ds_getResourcePathFromUrl(_ header: HttpHeader, _ body: Data?, _ connection: Connection, _ domain: Domain, _ serviceInfo: inout Service.Info, _ response: inout HttpResponse) -> Service.Result {
     
     
     func handle400_BadRequestError(message: String) {
@@ -152,7 +153,7 @@ func ds_getResourcePathFromUrl(_ header: HttpHeader, _ body: Data?, _ connection
         let mutation = Mutation.createAddClientRecord(from: connection)
         mutation.httpResponseCode = HttpResponseCode.code400_BadRequest.rawValue
         mutation.responseDetails = message
-        mutation.requestReceived = chainInfo[Service.ChainInfoKey.responseStartedKey] as? Int64 ?? 0
+        mutation.requestReceived = serviceInfo[.responseStartedKey] as? Int64 ?? 0
         statistics.submit(mutation: mutation, onError: {
             (message: String) in
             Log.atError?.log(id: connection.logId, source: #file.source(#function, #line), message: "Error during statistics submission:\(message)")
@@ -188,7 +189,7 @@ func ds_getResourcePathFromUrl(_ header: HttpHeader, _ body: Data?, _ connection
         let mutation = Mutation.createAddClientRecord(from: connection)
         mutation.httpResponseCode = HttpResponseCode.code404_NotFound.rawValue
         mutation.responseDetails = "Resource for url '\(path)' not found"
-        mutation.requestReceived = chainInfo[Service.ChainInfoKey.responseStartedKey] as? Int64 ?? 0
+        mutation.requestReceived = serviceInfo[.responseStartedKey] as? Int64 ?? 0
         statistics.submit(mutation: mutation, onError: {
             (message: String) in
             Log.atError?.log(id: connection.logId, source: #file.source(#function, #line), message: "Error during statistics submission:\(message)")
@@ -219,7 +220,7 @@ func ds_getResourcePathFromUrl(_ header: HttpHeader, _ body: Data?, _ connection
         let mutation = Mutation.createAddClientRecord(from: connection)
         mutation.httpResponseCode = HttpResponseCode.code403_Forbidden.rawValue
         mutation.responseDetails = "Access for url '\(path)' not allowed"
-        mutation.requestReceived = chainInfo[Service.ChainInfoKey.responseStartedKey] as? Int64 ?? 0
+        mutation.requestReceived = serviceInfo[.responseStartedKey] as? Int64 ?? 0
         statistics.submit(mutation: mutation, onError: {
             (message: String) in
             Log.atError?.log(id: connection.logId, source: #file.source(#function, #line), message: "Error during statistics submission:\(message)")
@@ -234,7 +235,7 @@ func ds_getResourcePathFromUrl(_ header: HttpHeader, _ body: Data?, _ connection
     
     // Abort immediately if there is already a response code
     
-    if response.code != nil { return .continueChain }
+    if response.code != nil { return .next }
 
     
     // Aliases
@@ -248,7 +249,7 @@ func ds_getResourcePathFromUrl(_ header: HttpHeader, _ body: Data?, _ connection
     
     guard let partialPath = header.url else {
         handle400_BadRequestError(message: "No URL in request")
-        return .continueChain
+        return .next
     }
     
     
@@ -286,10 +287,10 @@ func ds_getResourcePathFromUrl(_ header: HttpHeader, _ body: Data?, _ connection
                 
                 if connection.filemanager.isReadableFile(atPath: tpath) {
                     
-                    chainInfo[Service.ChainInfoKey.absoluteResourcePathKey] = tpath as String
-                    chainInfo[Service.ChainInfoKey.relativeResourcePathKey] = (partialPath as NSString).appendingPathComponent(name)
+                    serviceInfo[.absoluteResourcePathKey] = tpath as String
+                    serviceInfo[.relativeResourcePathKey] = (partialPath as NSString).appendingPathComponent(name)
                     
-                    return .continueChain
+                    return .next
                 }
             }
             
@@ -298,7 +299,7 @@ func ds_getResourcePathFromUrl(_ header: HttpHeader, _ body: Data?, _ connection
             
             handle404_NotFoundError(path: partialPath)
             
-            return .continueChain
+            return .next
             
             
         } else {
@@ -307,16 +308,16 @@ func ds_getResourcePathFromUrl(_ header: HttpHeader, _ body: Data?, _ connection
             
             if connection.filemanager.isReadableFile(atPath: fullPath) {
                 
-                chainInfo[Service.ChainInfoKey.absoluteResourcePathKey] = fullPath
-                chainInfo[Service.ChainInfoKey.relativeResourcePathKey] = partialPath
+                serviceInfo[.absoluteResourcePathKey] = fullPath
+                serviceInfo[.relativeResourcePathKey] = partialPath
                 
-                return .continueChain
+                return .next
             
             } else {
             
                 handle403_ForbiddenError(path: partialPath)
 
-                return .continueChain
+                return .next
             }
         }
         
@@ -340,20 +341,20 @@ func ds_getResourcePathFromUrl(_ header: HttpHeader, _ body: Data?, _ connection
                     
                     if connection.filemanager.isReadableFile(atPath: sfFullPath) {
                         
-                        chainInfo[Service.ChainInfoKey.absoluteResourcePathKey] = sfFullPath
+                        serviceInfo[.absoluteResourcePathKey] = sfFullPath
                         
                         let sfPartialPath = addSf(toPath: partialPath) ?? partialPath // Default should never be used
 
-                        chainInfo[Service.ChainInfoKey.relativeResourcePathKey] = sfPartialPath
+                        serviceInfo[.relativeResourcePathKey] = sfPartialPath
                         
-                        return .continueChain
+                        return .next
                         
                         
                     } else {
                         
                         handle403_ForbiddenError(path: partialPath)
                         
-                        return .continueChain
+                        return .next
                     }
                 }
             }
@@ -364,7 +365,7 @@ func ds_getResourcePathFromUrl(_ header: HttpHeader, _ body: Data?, _ connection
         
         handle404_NotFoundError(path: partialPath)
         
-        return .continueChain
+        return .next
     }
 }
 
