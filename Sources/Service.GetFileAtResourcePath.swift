@@ -3,7 +3,7 @@
 //  File:       Service.GetFileAtResourcePath.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.0
+//  Version:    0.10.6
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.6 - Interface update
 // 0.10.0 - Renamed HttpConnection to SFConnection
 //        - Added support for .sf. files (i.e. function call's from source text)
 //        - Renamed from DomainService to Service
@@ -73,7 +74,7 @@
 // -----------
 //
 // response.payload: Set with contents of file at chainInfo[ResourcePathKey]
-// response.mimeType: Set to the mime type for the file extension
+// response.contentType: Set to the mime type for the file extension
 // response.code: Set to code 200 (OK)
 //
 // domain.telemetry.nof200: Incremented
@@ -118,7 +119,7 @@ import SwifterSockets
 ///
 /// - Returns: On error .abortChain, on success .continueChain.
 
-func ds_getFileAtResourcePath(_ header: HttpHeader, _ body: Data?, _ connection: Connection, _ domain: Domain, _ chainInfo: inout Service.ChainInfo, _ response: inout Service.Response) -> Service.Result {
+func ds_getFileAtResourcePath(_ header: HttpHeader, _ body: Data?, _ connection: Connection, _ domain: Domain, _ chainInfo: inout Service.ChainInfo, _ response: inout HttpResponse) -> Service.Result {
     
     
 
@@ -225,7 +226,7 @@ func ds_getFileAtResourcePath(_ header: HttpHeader, _ body: Data?, _ connection:
     // Response
         
     response.code = HttpResponseCode.code200_OK
-    response.mimeType = mimeType(forPath: resourcePath) ?? mimeTypeDefault
+    response.contentType = mimeType(forPath: resourcePath) ?? mimeTypeDefault
     response.payload = payload
         
     return .continueChain

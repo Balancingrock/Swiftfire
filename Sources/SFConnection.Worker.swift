@@ -3,7 +3,7 @@
 //  File:       HttpConnection.HttpWorker.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.5
+//  Version:    0.10.6
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.6 - Updated parameters to services & transmission of response
 // 0.10.5 - Added more debug output
 // 0.10.0 - Renamed HttpConnection to SFConnection
 // 0.9.18 - Header update
@@ -103,8 +104,15 @@ extension SFConnection {
         
         // Reply to client
         
-        let response = createHttpResponse(for: .code400_BadRequest, version: .http1_1, message: "<p>\(message)</p>")
-        transfer(response)
+        let response = HttpResponse()
+        response.code = .code400_BadRequest
+        response.version = .http1_1
+        response.createErrorPayload(message: "<p>\(message)</p>")
+        if let data = response.data {
+            transfer(data)
+        } else {
+            Log.atError?.log(id: logId, source: #file.source(#function, #line), message: "Failed to create HTTP reply with message = '\(message)'")
+        }
         
         
         // Statistics update
@@ -138,10 +146,18 @@ extension SFConnection {
         
         // Reply to client
         
-        let response = createHttpResponse(for: .code500_InternalServerError, version: .http1_0, message: "<p>\(message)</p>")
-        transfer(response)
-        
-        
+        let response = HttpResponse()
+        response.code = .code500_InternalServerError
+        response.version = .http1_1
+        response.createErrorPayload(message: "<p>\(message)</p>")
+        if let data = response.data {
+            transfer(data)
+        } else {
+            Log.atError?.log(id: logId, source: #file.source(#function, #line), message: "Failed to create HTTP reply with message = '\(message)'")
+        }
+
+    
+    
         // Statistics update
         
         let mutation = Mutation.createAddClientRecord(from: self)
@@ -303,9 +319,10 @@ extension SFConnection {
 
         Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: "Starting domain services")
 
-        var response = Service.Response(httpVersion, mimeTypeDefault)
+        var response = HttpResponse()
+        response.version = httpVersion
+        response.contentType = mimeTypeDefault
         
-        // Note: Since the response.code is not set, it is possible to only consume a request and not transmit any response.
         
         var chainInfo = Service.ChainInfo()
         chainInfo[Service.ChainInfoKey.responseStartedKey] = timestampResponseStart
@@ -328,55 +345,52 @@ extension SFConnection {
         
         guard let code = response.code else { return }
         
+        
+        // If there is no playload try to create the default domain reply
+        
+        if response.payload == nil {
+            response.payload = domain.customErrorResponse(for: code)
+        }
+        
+        
+        // If there is stil no payload, try the server default
+        
+        response.createErrorPayload()
+        
+        
+        // If there is still nothing, create an empty payload
+        
+        if response.payload == nil { response.payload = Data() }
+        
             
-        // If there is data return that data
+        // Send the response
             
-        if let payload = response.payload {
-            
-            
-            // Wrap the data in a HTTP resonse
-            
-            let message = createHttpResponse(for: code, version: response.httpVersion, mimeType: response.mimeType, body: payload)
+        if let reply = response.data {
             
             
             // Transmit the response
             
-            bufferedTransfer(message)
-
-            
-            // Update the statistics
-            
-            let mutation = Mutation.createAddClientRecord(from: self)
-            mutation.domain = domain.name
-            mutation.url = chainInfo[Service.ChainInfoKey.relativeResourcePathKey] as? String ?? "Unknown resource path"
-            mutation.httpResponseCode = code.rawValue
-            mutation.responseDetails = ""
-            mutation.requestReceived = timestampResponseStart
-            statistics.submit(mutation: mutation, onError: {
-                [unowned self] (message: String) in
-                Log.atError?.log(id: self.logId, source: #file.source(#function, #line), message: message)
-            })
-
-            Log.atInfo?.log(id: logId, source: #file.source(#function, #line), message: "Response took \(Date().javaDate - timestampResponseStart) milli seconds")
+            bufferedTransfer(reply)
             
         } else {
-        
-            // There is no data, try to create a domain specific default response
             
-            if let payload = domain.customErrorResponse(for: code) {
-                
-                let message = createHttpResponse(for: code, version: response.httpVersion, mimeType: mimeTypeHtml, body: payload)
-                bufferedTransfer(message)
-
-                
-            } else {
-                
-                
-                // There is no domain default response, use the server default response
-                
-                let message = createHttpResponse(for: code, version: response.httpVersion)
-                bufferedTransfer(message)
-            }
+            Log.atError?.log(id: logId, source: #file.source(#function, #line), message: "Failed to create response data")
         }
+
+            
+        // Update the statistics
+            
+        let mutation = Mutation.createAddClientRecord(from: self)
+        mutation.domain = domain.name
+        mutation.url = chainInfo[Service.ChainInfoKey.relativeResourcePathKey] as? String ?? "Unknown resource path"
+        mutation.httpResponseCode = code.rawValue
+        mutation.responseDetails = ""
+        mutation.requestReceived = timestampResponseStart
+        statistics.submit(mutation: mutation, onError: {
+            [unowned self] (message: String) in
+            Log.atError?.log(id: self.logId, source: #file.source(#function, #line), message: message)
+        })
+
+        Log.atInfo?.log(id: logId, source: #file.source(#function, #line), message: "Response took \(Date().javaDate - timestampResponseStart) milli seconds")            
     }
 }
