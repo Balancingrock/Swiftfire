@@ -3,7 +3,7 @@
 //  File:       HttpHeaderLogger.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.0
+//  Version:    0.10.6
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.6 - Renamed HttpHeader to HttpRequest
 // 0.10.0 - Renamed HttpConnection to SFConnection
 // 0.9.18 - Header update
 // 0.9.15 - Initial release
@@ -84,9 +85,9 @@ final class HttpHeaderLogger: Logfile {
     ///
     /// - Parameters:
     ///   - connection: The connection through which the client is connected.
-    ///   - header: The header to be added.
+    ///   - request: The request to be added.
     
-    func record(connection: SFConnection, header: HttpHeader) {
+    func record(connection: SFConnection, request: HttpRequest) {
   
         
         // Create the message
@@ -95,7 +96,7 @@ final class HttpHeaderLogger: Logfile {
         message += "Time      : \(Logfile.dateFormatter.string(from: Date.fromJavaDate(connection.timeOfAccept)))\n"
         message += "IP Address: \(connection.remoteAddress)\n"
         message += "Log Id    : \(connection.logId)\n\n"
-        message = header.lines.reduce(message) { $0 + $1 + "\n" }
+        message = request.lines.reduce(message) { $0 + $1 + "\n" }
         message += "\n"
         
         

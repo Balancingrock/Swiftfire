@@ -50,6 +50,7 @@
 //
 // 0.10.6 - Interface update
 //        - Renamed chain... to service...
+//        - Renamed HttpHeader to HttpRequest
 // 0.10.0 - Renamed HttpConnection to SFConnection
 //        - Added support for .sf. files (i.e. function call's from source text)
 //        - Renamed from DomainService to Service
@@ -112,15 +113,14 @@ import SwifterSockets
 ///
 /// - Parameters:
 ///   - header: The header of the HTTP request.
-///   - body: The data that accompanied the HTTP request (if any).
 ///   - connection: The HttpConnection object that is used for this connection.
 ///   - domain: The domain that is serviced for this request.
-///   - serviceInfo: A dictionary for communication between services.
+///   - info: A dictionary for communication between services.
 ///   - response: An object that can receive information to be returned in response to the request.
 ///
 /// - Returns: On error .abort, on success .next.
 
-func ds_getFileAtResourcePath(_ header: HttpHeader, _ body: Data?, _ connection: Connection, _ domain: Domain, _ serviceInfo: inout Service.Info, _ response: inout HttpResponse) -> Service.Result {
+func ds_getFileAtResourcePath(_ request: HttpRequest, _ connection: Connection, _ domain: Domain, _ info: inout Service.Info, _ response: inout HttpResponse) -> Service.Result {
     
     
 
@@ -143,7 +143,7 @@ func ds_getFileAtResourcePath(_ header: HttpHeader, _ body: Data?, _ connection:
         mutation.httpResponseCode = HttpResponseCode.code500_InternalServerError.rawValue
         mutation.url = resourcePath
         mutation.responseDetails = message
-        mutation.requestReceived = serviceInfo[.responseStartedKey] as? Int64 ?? 0
+        mutation.requestReceived = info[.responseStartedKey] as? Int64 ?? 0
         statistics.submit(mutation: mutation, onError: {
             (message: String) in
             Log.atError?.log(id: connection.logId, source: #file.source(#function, line), message: "Error during statistics submission:\(message)")
@@ -170,7 +170,7 @@ func ds_getFileAtResourcePath(_ header: HttpHeader, _ body: Data?, _ connection:
     // Make sure a resource path string is present in the chainInfo
     // =================================================================================================================
     
-    guard let resourcePath = serviceInfo[.absoluteResourcePathKey] as? String else {
+    guard let resourcePath = info[.absoluteResourcePathKey] as? String else {
         handle500_ServerError(connection: connection, resourcePath: nil, message: "No resource path present", line: #line)
         return .next
     }
@@ -196,7 +196,7 @@ func ds_getFileAtResourcePath(_ header: HttpHeader, _ body: Data?, _ connection:
             
         case .success(let doc):
 
-            let environment = Function.Environment(header: header, body: body, connection: connection, domain: domain, response: &response, serviceInfo: &serviceInfo)
+            let environment = Function.Environment(request: request, connection: connection, domain: domain, response: &response, serviceInfo: &info)
             
             payload = doc.getContent(with: environment)
         }

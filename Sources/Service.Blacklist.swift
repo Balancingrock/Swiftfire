@@ -50,6 +50,7 @@
 //
 // 0.10.6 - Interface update
 //        - Renamed chain... to service...
+//        - Renamed HttpHeader to HttpRequest
 // 0.10.0 - Renamed from DomainService to Service
 // 0.9.18 - Header update
 //        - Replaced log with Log?
@@ -106,16 +107,15 @@ import SwifterSockets
 /// - Note: For a full description of all effects of this operation see the file: DomainService.GetFileAtResourcePath.swift
 ///
 /// - Parameters:
-///   - header: The header of the HTTP request.
-///   - body: The data that accompanied the HTTP request (if any).
+///   - request: The HTTP request.
 ///   - connection: The HttpConnection object that is used for this connection.
 ///   - domain: The domain that is serviced for this request.
-///   - serviceInfo: A dictionary for communication between services.
+///   - info: A dictionary for communication between services.
 ///   - response: An object that can receive information to be returned in response to the request.
 ///
 /// - Returns: On error .abort, on success .next.
 
-func ds_blacklist(_ header: HttpHeader, _ body: Data?, _ connection: Connection, _ domain: Domain, _ serviceInfo: inout Service.Info, _ response: inout HttpResponse) -> Service.Result {
+func ds_blacklist(_ request: HttpRequest, _ connection: Connection, _ domain: Domain, _ info: inout Service.Info, _ response: inout HttpResponse) -> Service.Result {
     
     
     // Abort immediately if there is already a response code

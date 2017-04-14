@@ -50,6 +50,7 @@
 //
 // 0.10.6 - Interface update
 //        - Renamed chain... to service...
+//        - Renamed HttpHeader to HttpRequest
 // 0.10.0 - Renamed HttpConnection to SFConnection
 //        - Renamed from DomainService to Service
 // 0.9.18 - Header update
@@ -109,16 +110,15 @@ import SwifterSockets
 /// - Note: For a full description of all effects of this operation see the file: DomainService.GetResourcePathFromUrl.swift
 ///
 /// - Parameters:
-///   - header: The header of the HTTP request.
-///   - body: The data that accompanied the HTTP request (if any).
+///   - request: The HTTP request.
 ///   - connection: The HttpConnection object that is used for this connection.
 ///   - domain: The domain that is serviced for this request.
-///   - serviceInfo: A dictionary for communication between services.
+///   - info: A dictionary for communication between services.
 ///   - response: An object that can receive information to be returned in response to the request.
 ///
 /// - Returns: On error .abort, on success .next.
 
-func ds_onlyHttp10or11(_ header: HttpHeader, _ body: Data?, _ connection: Connection, _ domain: Domain, _ serviceInfo: inout Service.Info, _ response: inout HttpResponse) -> Service.Result {
+func ds_onlyHttp10or11(_ request: HttpRequest, _ connection: Connection, _ domain: Domain, _ info: inout Service.Info, _ response: inout HttpResponse) -> Service.Result {
     
     
     // Abort immediately if there is already a response code
@@ -130,7 +130,7 @@ func ds_onlyHttp10or11(_ header: HttpHeader, _ body: Data?, _ connection: Connec
     // The version must be present
     // =============================================================================================================
     
-    guard let httpVersion = header.httpVersion else {
+    guard let httpVersion = request.httpVersion else {
         
         
         // Telemetry update
@@ -155,7 +155,7 @@ func ds_onlyHttp10or11(_ header: HttpHeader, _ body: Data?, _ connection: Connec
         let mutation = Mutation.createAddClientRecord(from: connection)
         mutation.httpResponseCode = HttpResponseCode.code400_BadRequest.rawValue
         mutation.responseDetails = message
-        mutation.requestReceived = serviceInfo[.responseStartedKey] as? Int64 ?? 0
+        mutation.requestReceived = info[.responseStartedKey] as? Int64 ?? 0
         statistics.submit(mutation: mutation, onError: {
             (message: String) in
             Log.atError?.log(id: connection.logId, source: #file.source(#function, #line), message: "Error during statistics submission:\(message)")
@@ -198,7 +198,7 @@ func ds_onlyHttp10or11(_ header: HttpHeader, _ body: Data?, _ connection: Connec
         let mutation = Mutation.createAddClientRecord(from: connection)
         mutation.httpResponseCode = HttpResponseCode.code505_HttpVersionNotSupported.rawValue
         mutation.responseDetails = message
-        mutation.requestReceived = serviceInfo[.responseStartedKey] as? Int64 ?? 0
+        mutation.requestReceived = info[.responseStartedKey] as? Int64 ?? 0
         statistics.submit(mutation: mutation, onError: {
             (message: String) in
             Log.atError?.log(id: connection.logId, source: #file.source(#function, #line), message: "Error during statistics submission:\(message)")

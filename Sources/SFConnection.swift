@@ -3,7 +3,7 @@
 //  File:       SFConnection.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.0
+//  Version:    0.10.6
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.6 - Renamed HttpHeader to HttpRequest
 // 0.10.0 - Renamed to SFConnection because the connection can also be a HTTPS connection
 // 0.9.18 - Header update
 //        - Replaced log with Log?
@@ -119,7 +120,7 @@ final class SFConnection: SwifterSockets.Connection {
         
         self.forwarder = nil
         self.messageBuffer = Data()
-        self.httpHeader = nil
+        self.httpRequest = nil
         self.maxSendBufferSize = nil
         self.abortProcessing = false
         self.mustClose = false
@@ -169,9 +170,9 @@ final class SFConnection: SwifterSockets.Connection {
     var maxSendBufferSize: Int?
     
     
-    /// The decoded HTTP request header
+    /// The received HTTP request
     
-    var httpHeader: HttpHeader?
+    var httpRequest: HttpRequest?
     
 
     /// The data received from a client.
@@ -205,7 +206,7 @@ final class SFConnection: SwifterSockets.Connection {
         // Clean out old stuff so a new client can use this object
         
         self.messageBuffer = Data()
-        self.httpHeader = nil
+        self.httpRequest = nil
         self.maxSendBufferSize = nil
         self.abortProcessing = false
         self.mustClose = false
@@ -267,24 +268,24 @@ final class SFConnection: SwifterSockets.Connection {
         SCAN_FOR_COMPLETE_MESSAGES: while true {
             
             
-            // If there is no header, try to read a header
+            // If there is no request, try to read a header
             
-            if httpHeader == nil {
+            if httpRequest == nil {
                 
                 
                 // See if the header is complete
                 
-                if let header = HttpHeader(data: messageBuffer) {
+                if let request = HttpRequest(data: messageBuffer) {
                     
                     
                     // Store the header for future reference
                     
-                    httpHeader = header
+                    httpRequest = request
                     
                     
-                    // Yes, the header is complete
+                    // The header is complete
                     
-                    Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: "HTTP Message Header complete")
+                    Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: "HTTP Request Header complete")
                     
                     
                     // =======================
@@ -294,7 +295,7 @@ final class SFConnection: SwifterSockets.Connection {
                     // Write the header to the log if so required
                     // Note: This is done now because there might be errors this request that would be missed if the log is not done at the earliest possible moment..
                     
-                    if parameters.headerLoggingEnabled { headerLogger?.record(connection: self, header: httpHeader!) }
+                    if parameters.headerLoggingEnabled { headerLogger?.record(connection: self, request: httpRequest!) }
                 }
             }
             
@@ -303,15 +304,15 @@ final class SFConnection: SwifterSockets.Connection {
             // If there is no header break the scan
             // ====================================
             
-            if httpHeader == nil { break SCAN_FOR_COMPLETE_MESSAGES }
+            if httpRequest == nil { break SCAN_FOR_COMPLETE_MESSAGES }
             
             
             // =========================
             // Check for a complete body
             // =========================
             
-            let bodyLength = httpHeader!.contentLength
-            let messageSize = bodyLength + httpHeader!.headerLength
+            let bodyLength = httpRequest!.contentLength
+            let messageSize = bodyLength + httpRequest!.headerLength
             
             if messageSize > messageBuffer.count { break SCAN_FOR_COMPLETE_MESSAGES }
             
@@ -323,8 +324,8 @@ final class SFConnection: SwifterSockets.Connection {
             
             // Create duplicates of the header and body and pass these to the worker. This way the worker has sole access to the data it works on. Note that the header is a class and can thus be copied as is if the local header is set to nil afterwards.
             
-            let bodyRange = Range(uncheckedBounds: (lower: httpHeader!.headerLength, upper: messageSize))
-            let body = messageBuffer.subdata(in: bodyRange)
+            let bodyRange = Range(uncheckedBounds: (lower: httpRequest!.headerLength, upper: messageSize))
+            httpRequest!.payload = messageBuffer.subdata(in: bodyRange)
             
             Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: "HTTP Message Body complete, dispatching worker")
             
@@ -333,8 +334,7 @@ final class SFConnection: SwifterSockets.Connection {
             // Start the Http Worker
             // =====================
             
-            let header = httpHeader!
-            workerQueue.async() { [unowned self] in self.worker(header: header, body: body) }
+            workerQueue.async() { [unowned self] in self.worker(self.httpRequest!) }
             
             
             // ===========================================================
@@ -344,7 +344,7 @@ final class SFConnection: SwifterSockets.Connection {
             let unprocessedRange = Range(uncheckedBounds: (lower: messageSize, upper: messageBuffer.count))
             messageBuffer = messageBuffer.subdata(in: unprocessedRange)
             
-            httpHeader = nil
+            httpRequest = nil
         }
         
         inactivityDetectionRestart()

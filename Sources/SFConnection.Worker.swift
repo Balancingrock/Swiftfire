@@ -50,6 +50,7 @@
 //
 // 0.10.6 - Updated parameters to services & transmission of response
 //        - Renamed chain... to service...
+// 0.10.6 - Renamed HttpHeader to HttpRequest
 // 0.10.5 - Added more debug output
 // 0.10.0 - Renamed HttpConnection to SFConnection
 // 0.9.18 - Header update
@@ -176,7 +177,7 @@ extension SFConnection {
     /// Examines the http message header for a servicable request and creates the corresponding response.
     /// Implementation justification:
     
-    func worker(header: HttpHeader, body: Data) {
+    func worker(_ request: HttpRequest) {
         
         
         // To determine how long it takes to create a response message
@@ -189,7 +190,7 @@ extension SFConnection {
         // Find the domain (host) this request is for.
         // =============================================================================================================
 
-        guard let httpVersion = header.httpVersion else {
+        guard let httpVersion = request.httpVersion else {
             send400BadRequestResponse("HTTP Version not present", processingStartedAt: timestampResponseStart)
             return
         }
@@ -199,7 +200,7 @@ extension SFConnection {
         
         // Find the host. For HTTP 1.1 this must be provided in the request, for HTTP 1.0 it should be defined in the parameter 'http1_0DomainName'
         
-        if let _host = header.host {
+        if let _host = request.host {
             
             host = _host
         
@@ -272,8 +273,8 @@ extension SFConnection {
                 }
             
                 if forwarder != nil {
-                    var data: Data = header.asData()!
-                    data.append(body)
+                    var data: Data = request.asData()!
+                    if let payload = request.payload { data.append(payload) }
                     _ = forwarder?.transfer(data, callback: nil)
                 }
             }
@@ -309,9 +310,9 @@ extension SFConnection {
         domain.recordInAccessLog(
             time: timeOfAccept,
             ipAddress: remoteAddress,
-            url: header.url ?? "",
-            operation: header.operation?.rawValue ?? "",
-            version: header.httpVersion?.rawValue ?? "")
+            url: request.url ?? "",
+            operation: request.operation?.rawValue ?? "",
+            version: request.httpVersion?.rawValue ?? "")
 
         
         // =============================================================================================================
@@ -332,7 +333,7 @@ extension SFConnection {
             
             Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: "Starting services: \(item.name)")
             
-            if item.service(header, body, self, domain, &serviceInfo, &response) == .abort { break }
+            if item.service(request, self, domain, &serviceInfo, &response) == .abort { break }
         }
         
         Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: "Domain services completed with code = \(response.code?.rawValue ?? "None")")
