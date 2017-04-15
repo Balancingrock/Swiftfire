@@ -126,7 +126,7 @@ import SwifterSockets
 ///
 /// - Returns: On error .abort, on success .next.
 
-func ds_getResourcePathFromUrl(_ request: HttpRequest, _ connection: Connection, _ domain: Domain, _ info: inout Service.Info, _ response: inout HttpResponse) -> Service.Result {
+func service_getResourcePathFromUrl(_ request: HttpRequest, _ connection: Connection, _ domain: Domain, _ info: inout Service.Info, _ response: inout HttpResponse) -> Service.Result {
     
     
     func handle400_BadRequestError(message: String) {

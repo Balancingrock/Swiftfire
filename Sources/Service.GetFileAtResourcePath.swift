@@ -120,7 +120,7 @@ import SwifterSockets
 ///
 /// - Returns: On error .abort, on success .next.
 
-func ds_getFileAtResourcePath(_ request: HttpRequest, _ connection: Connection, _ domain: Domain, _ info: inout Service.Info, _ response: inout HttpResponse) -> Service.Result {
+func service_getFileAtResourcePath(_ request: HttpRequest, _ connection: Connection, _ domain: Domain, _ info: inout Service.Info, _ response: inout HttpResponse) -> Service.Result {
     
     
 

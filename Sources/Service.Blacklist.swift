@@ -115,7 +115,7 @@ import SwifterSockets
 ///
 /// - Returns: On error .abort, on success .next.
 
-func ds_blacklist(_ request: HttpRequest, _ connection: Connection, _ domain: Domain, _ info: inout Service.Info, _ response: inout HttpResponse) -> Service.Result {
+func service_blacklist(_ request: HttpRequest, _ connection: Connection, _ domain: Domain, _ info: inout Service.Info, _ response: inout HttpResponse) -> Service.Result {
     
     
     // Abort immediately if there is already a response code

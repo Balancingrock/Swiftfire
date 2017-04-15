@@ -3,7 +3,7 @@
 //  File:       Functions.Registration.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.0
+//  Version:    0.10.6
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.6 - Renaming nofPageHits
 // 0.10.0 - Initial release
 //
 // =====================================================================================================================
@@ -80,5 +81,5 @@ let NOF_PAGE_HITS = "nofPageHits"
 /// Register the functions
 
 func registerFunctions() {
-    functions.register(name: NOF_PAGE_HITS, function: sf_nofPageHits)
+    functions.register(name: NOF_PAGE_HITS, function: function_nofPageHits)
 }

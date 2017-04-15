@@ -64,7 +64,7 @@ import SwiftfireCore
 ///
 /// If the argument does not contain any arguments, it will return the count for the currently requested resource.
 
-func sf_nofPageHits(_ args: Function.Arguments, _ info: inout Function.Info, _ environment: Function.Environment) -> Data? {
+func function_nofPageHits(_ args: Function.Arguments, _ info: inout Function.Info, _ environment: Function.Environment) -> Data? {
     
     var count: Int64 = -1
     

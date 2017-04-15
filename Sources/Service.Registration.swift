@@ -3,7 +3,7 @@
 //  File:       DomainServices.Registration.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.0
+//  Version:    0.10.6
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,8 @@
 //
 // History
 //
+// 0.10.6 - Renamed services
+//        - Added getSession
 // 0.10.0 - Removed import of SwifterSockets
 //        - Moved ChainInfo key's to SwifterCore.DomainServices
 // 0.9.18 - Renamed closure to service in register call
@@ -77,6 +79,7 @@ private let onlyHttp10OrHttp11 = "Only HTTP 1.0 / 1.1 requests"
 private let onlyGetOrPost = "Only GET / POST requests"
 private let getResourcePathFromUrl = "Get resource path from request URL"
 private let getFileAtResourcePath = "Get file at resource path"
+private let getSession = "Get Active Session"
 
 
 // =================================================
@@ -88,11 +91,12 @@ private let getFileAtResourcePath = "Get file at resource path"
 
 func registerServices() {
     
-    services.register(name: blacklist, service: ds_blacklist)
-    services.register(name: onlyHttp10OrHttp11, service: ds_onlyHttp10or11)
-    services.register(name: onlyGetOrPost, service: ds_onlyGetOrPost)
-    services.register(name: getResourcePathFromUrl, service: ds_getResourcePathFromUrl)
-    services.register(name: getFileAtResourcePath, service: ds_getFileAtResourcePath)
+    services.register(name: blacklist, service: service_blacklist)
+    services.register(name: onlyHttp10OrHttp11, service: service_onlyHttp10or11)
+    services.register(name: onlyGetOrPost, service: service_onlyGetOrPost)
+    services.register(name: getResourcePathFromUrl, service: service_getResourcePathFromUrl)
+    services.register(name: getFileAtResourcePath, service: service_getFileAtResourcePath)
+    services.register(name: getSession, service: service_getSession)
 }
 
 

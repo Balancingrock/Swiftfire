@@ -1,6 +1,6 @@
 // =====================================================================================================================
 //
-//  File:       Service.GetOrStartSession.swift
+//  File:       Service.GetSession.swift
 //  Project:    Swiftfire
 //
 //  Version:    0.10.6
@@ -54,24 +54,22 @@
 // Description
 // =====================================================================================================================
 //
-// Retrieves the session ID from the HTTP request if it has any. If no session ID is available a new session ID is
-// created. It also writes the session ID to the HTTP response.
-//
-// As a side effect, all cookies will be read from the request. And when the response is created it will contain a
-// set-cookie with the session ID. The timeout value will be set to Parameter.CookieTimeout.
-//
+// Retrieves the session ID from the HTTP request (cookie) if it has any and if the session is still active.
+// If an active session is present in the request, it will add the session-id cookie to the reponse with a timeout
+// as specified for the domain.
 //
 // Input:
 // ------
 //
 // request: The HTTP request.
+// Session: The active session list.
 //
 //
 // Output:
 // -------
 //
-// info[sessionKey] = Existing session or new session.
-// response: Will contain a cookie with the session ID and a timeout.
+// info[sessionKey] = Active session.
+// response: Will contain a set-cookie with the session ID and a timeout.
 //
 //
 // Return:
@@ -100,12 +98,7 @@ import SwifterSockets
 ///
 /// - Returns: On error .abort, on success .next.
 
-func ds_getOrStartSession(_ request: HttpRequest, _ connection: Connection, _ domain: Domain, _ info: inout Service.Info, _ response: inout HttpResponse) -> Service.Result {
-
-    
-    // This will become the active session.
-    
-    var session: Session!
+func service_getSession(_ request: HttpRequest, _ connection: Connection, _ domain: Domain, _ info: inout Service.Info, _ response: inout HttpResponse) -> Service.Result {
 
     
     // Find all session cookies (there should be only 1)
@@ -117,29 +110,25 @@ func ds_getOrStartSession(_ request: HttpRequest, _ connection: Connection, _ do
     
     for sessionCookie in sessionCookies {
         if let id = UUID(uuidString: sessionCookie.value) {
-            if let s = Session.activeSession(for: id) {
-                session = s
+            if let session = Session.activeSession(for: id) {
+                
+                
+                // Store the session in the info object
+                
+                info[.sessionKey] = session
+                
+                
+                // Add the cookie to the response
+                
+                let timeout = HttpCookie.Timeout.maxAge(domain.sessionTimeout)
+                let cookie = HttpCookie(name: Session.cookieId, value: session.id.uuidString, timeout: timeout)
+                response.cookies.append(cookie)
+                
+                
+                break
             }
         }
     }
-    
-    
-    // If no active session was found, create a new session
-    
-    if session == nil {
-        session = Session.newSession(for: connection.remoteAddress)
-    }
-    
-    
-    // Store the session in the info object
-    
-    info[sessionKey] = session
-    
-    
-    // Add the cookie to the response
-    
-    let timeout = HttpCookie.Timeout.maxAge(parameters.sessionTimeout)
-    response.cookies?.append(HttpCookie(name: Session.cookieId, value: session.id, timeout: timeout))
     
     return .next
 }
