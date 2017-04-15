@@ -54,15 +54,17 @@
 // Description
 // =====================================================================================================================
 //
-// Retrieves the session ID from the HTTP request (cookie) if it has any and if the session is still active.
+// Retrieves the session for the HTTP request (via a cookie) if it has any and if the session is still active.
 // If an active session is present in the request, it will add the session-id cookie to the reponse with a timeout
 // as specified for the domain.
 //
 // Input:
 // ------
 //
-// request: The HTTP request.
-// Session: The active session list.
+// request: The HTTP request. Will be tested for the existence of a cookie with a session ID.
+// Session: The active session list. If a session ID cookie was found, it will be tested for an active session.
+// domain.sessionTimeout: If < 1, then session support is disabled. On > 0 the max-age for the cookie with the session
+//    ID will be set to this value.
 //
 //
 // Output:
@@ -101,16 +103,36 @@ import SwifterSockets
 func service_getSession(_ request: HttpRequest, _ connection: Connection, _ domain: Domain, _ info: inout Service.Info, _ response: inout HttpResponse) -> Service.Result {
 
     
+    // For logging purposes
+    
+    let logId = (connection as? SFConnection)?.logId ?? -1
+    
+    
+    // Is the session timeot valid?
+    
+    if domain.sessionTimeout < 1 { return .next }
+    
+    
     // Find all session cookies (there should be only 1)
     
     let sessionCookies = request.cookies.filter({ $0.name == Session.cookieId })
     
+    Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: "Found: \(sessionCookies.count) session cookie(s)")
+
     
     // If there is more than 1, pick the first active cookie.
     
     for sessionCookie in sessionCookies {
         if let id = UUID(uuidString: sessionCookie.value) {
             if let session = Session.activeSession(for: id) {
+                
+                
+                Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: "Found active session \(session)")
+                
+                
+                // Add the address of the client to the session
+                
+                session.addClientIp(connection.remoteAddress)
                 
                 
                 // Store the session in the info object
@@ -125,10 +147,12 @@ func service_getSession(_ request: HttpRequest, _ connection: Connection, _ doma
                 response.cookies.append(cookie)
                 
                 
-                break
+                return .next
             }
         }
     }
     
+    Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: "No active session found")
+
     return .next
 }
