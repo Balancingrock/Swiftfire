@@ -103,12 +103,16 @@ import SwifterSockets
 func service_getSession(_ request: HttpRequest, _ connection: Connection, _ domain: Domain, _ info: inout Service.Info, _ response: inout HttpResponse) -> Service.Result {
 
     
-    // For logging purposes
+    // The connection is a SFConnection
     
-    let logId = (connection as? SFConnection)?.logId ?? -1
+    guard let connection = connection as? SFConnection else {
+        Log.atCritical?.log(id: -1, source: #file.source(#function, #line), message: "Failed to cast Connection as SFConnection")
+        response.code = HttpResponseCode.code500_InternalServerError
+        return .abort
+    }
+
     
-    
-    // Is the session timeot valid?
+    // Is the session timeout valid?
     
     if domain.sessionTimeout < 1 { return .next }
     
@@ -117,42 +121,75 @@ func service_getSession(_ request: HttpRequest, _ connection: Connection, _ doma
     
     let sessionCookies = request.cookies.filter({ $0.name == Session.cookieId })
     
-    Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: "Found: \(sessionCookies.count) session cookie(s)")
+    Log.atDebug?.log(id: connection.logId, source: #file.source(#function, #line), message: "Found: \(sessionCookies.count) session cookie(s)")
 
     
     // If there is more than 1, pick the first active cookie.
     
     for sessionCookie in sessionCookies {
+        
         if let id = UUID(uuidString: sessionCookie.value) {
-            if let session = Session.activeSession(for: id) {
+            
+            var blockedCounter = 0
+            
+            WAIT_FOR_SESSION: while true {
+
+                switch domain.sessions.getActiveSession(for: id, logId: connection.logId) {
+            
+                case .none:
+                    
+                    break WAIT_FOR_SESSION
+            
+                    
+                case .blocked:
+                    
+                    // When this occurs, the user has send off too many requests at once.
+                    // While this could happen in some scenario's, its not normal if this causes a big lag in user feedback.
+                    // Hence a fixed timeout of 60 seconds is applied here to try and recover at least the server side of things.
+                    
+                    blockedCounter += 1
+                    if blockedCounter > 60 {
+                        
+                        Log.atCritical?.log(id: connection.logId, source: #file.source(#function, #line), message: "Timeout while waiting for session (with id = \(id.uuidString)) to become free.")
+                        response.code = HttpResponseCode.code500_InternalServerError
+                        return .abort
+                        
+                    } else {
+                        sleep(1)
+                    }
+
+                    
+                case .success(let session):
+                
+                    Log.atDebug?.log(id: connection.logId, source: #file.source(#function, #line), message: "Received active session \(session)")
+
+                    if parameters.debugMode {
+                
+                        // Add this event to the session debug information
+                
+                        session.addDebugInfo(address: connection.remoteAddress, domainName: domain.name, connectionId: Int(connection.objectId), allocationCount: Int64(connection.allocationCount))
+                    }
+                    
+                
+                    // Store the session in the info object
+                
+                    info[.sessionKey] = session
                 
                 
-                Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: "Found active session \(session)")
+                    // Add the cookie to the response
+                
+                    let timeout = HttpCookie.Timeout.maxAge(domain.sessionTimeout)
+                    let cookie = HttpCookie(name: Session.cookieId, value: session.id.uuidString, timeout: timeout)
+                    response.cookies.append(cookie)
                 
                 
-                // Add the address of the client to the session
-                
-                session.addClientIp(connection.remoteAddress)
-                
-                
-                // Store the session in the info object
-                
-                info[.sessionKey] = session
-                
-                
-                // Add the cookie to the response
-                
-                let timeout = HttpCookie.Timeout.maxAge(domain.sessionTimeout)
-                let cookie = HttpCookie(name: Session.cookieId, value: session.id.uuidString, timeout: timeout)
-                response.cookies.append(cookie)
-                
-                
-                return .next
+                    return .next
+                }
             }
         }
     }
     
-    Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: "No active session found")
+    Log.atDebug?.log(id: connection.logId, source: #file.source(#function, #line), message: "No active session found")
 
     return .next
 }

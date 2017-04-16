@@ -50,6 +50,7 @@
 //
 // 0.10.6 - Updated parameters to services & transmission of response
 //        - Renamed chain... to service...
+//        - Added freeing of session.
 // 0.10.6 - Renamed HttpHeader to HttpRequest
 // 0.10.5 - Added more debug output
 // 0.10.0 - Renamed HttpConnection to SFConnection
@@ -331,12 +332,26 @@ extension SFConnection {
 
         for item in domain.services {
             
-            Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: "Starting services: \(item.name)")
-            
             if item.service(request, self, domain, &serviceInfo, &response) == .abort { break }
+            
+            if parameters.debugMode {
+                Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: "Completed service: \(item.name)")
+                if let session = serviceInfo[.sessionKey] as? Session {
+                    Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: "Session content:\n\n\(session)\n\n")
+                }
+            }
         }
         
         Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: "Domain services completed with code = \(response.code?.rawValue ?? "None")")
+        
+        
+        // =============================================================================================================
+        // Free session (if used)
+        // =============================================================================================================
+
+        if let session = serviceInfo[.sessionKey] as? Session {
+            domain.sessions.free(session: session)
+        }
         
         
         // =============================================================================================================

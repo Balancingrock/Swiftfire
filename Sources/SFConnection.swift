@@ -49,6 +49,8 @@
 // History
 //
 // 0.10.6 - Renamed HttpHeader to HttpRequest
+//        - Type of objectId changed from Int16 to Int
+//        - Type of allocationCount changed from Int32 to Int
 // 0.10.0 - Renamed to SFConnection because the connection can also be a HTTPS connection
 // 0.9.18 - Header update
 //        - Replaced log with Log?
@@ -84,8 +86,8 @@ final class SFConnection: SwifterSockets.Connection {
     
     // A unique object id allows a correlation between statistics and the logfile (debug level)
     
-    static var objectIdCount: Int16 = 0
-    let objectId: Int16
+    static var objectIdCount: Int = 0
+    let objectId: Int
     
     
     // Designated initializer
@@ -145,8 +147,8 @@ final class SFConnection: SwifterSockets.Connection {
     
     /// The number of times this connection object was allocated
     
-    var allocationCount: Int32 { return _allocationCount }
-    private var _allocationCount: Int32 = 0
+    var allocationCount: Int { return _allocationCount }
+    private var _allocationCount: Int = 0
     func incrementAllocationCounter() { _allocationCount += 1 }
     
     
