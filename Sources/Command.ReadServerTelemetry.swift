@@ -3,7 +3,7 @@
 //  File:       Command.ReadServerTelemetry.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.0
+//  Version:    0.10.6
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.6 - Update of server telemetry type
 // 0.10.0 - Renamed file from MacCommand to Command
 // 0.9.18 - Header update
 //        - Renamed serverStatus to httpServerStatus and added httpsServerStatus
@@ -71,55 +72,13 @@ extension ReadServerTelemetryCommand: MacCommand {
     
     public func execute() {
         
-        switch telemetryName {
-            
-        case .nofAcceptedHttpRequests:
-            
-            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Reading, telemetry.nofAcceptedHttpRequests = \(telemetry.nofAcceptedHttpRequests.intValue)")
-            let reply = ReadServerTelemetryReply(item: telemetryName, value: telemetry.nofAcceptedHttpRequests.intValue)
-            mac?.transfer(reply)
-            
-            
-        case .nofAcceptWaitsForConnectionObject:
-            
-            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Reading, telemetry.nofAcceptWaitsForConnectionObject = \(telemetry.nofAcceptWaitsForConnectionObject.intValue)")
-            let reply = ReadServerTelemetryReply(item: telemetryName, value: telemetry.nofAcceptWaitsForConnectionObject.intValue)
-            mac?.transfer(reply)
-            
-            
-        case .nofHttp400Replies:
-            
-            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Reading, telemetry.nofHttp400Replies = \(telemetry.nofHttp400Replies.intValue)")
-            let reply = ReadServerTelemetryReply(item: telemetryName, value: telemetry.nofHttp400Replies.intValue)
-            mac?.transfer(reply)
-            
-            
-        case .nofHttp500Replies:
-            
-            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Reading, telemetry.nofHttp500Replies = \(telemetry.nofHttp500Replies.intValue)")
-            let reply = ReadServerTelemetryReply(item: telemetryName, value: telemetry.nofHttp500Replies.intValue)
-            mac?.transfer(reply)
-            
-            
-        case .httpServerStatus:
-            
-            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Reading, httpServerStatus = \(telemetry.httpServerStatus)")
-            let reply = ReadServerTelemetryReply(item: telemetryName, value: telemetry.httpServerStatus)
-            mac?.transfer(reply)
-            
-            
-        case .httpsServerStatus:
-            
-            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Reading, httpsServerStatus = \(telemetry.httpsServerStatus)")
-            let reply = ReadServerTelemetryReply(item: telemetryName, value: telemetry.httpsServerStatus)
-            mac?.transfer(reply)
-            
-            
-        case .serverVersion:
-            
-            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Reading, Version = \(SWIFTFIRE_VERSION)")
-            let reply = ReadServerTelemetryReply(item: telemetryName, value: SWIFTFIRE_VERSION)
-            mac?.transfer(reply)
-        }
+        for t in telemetry.all {
+            if t.name == name {
+                Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Reading, telemetry.\(t.name) = \(t.stringValue)")
+                let reply = ReadServerTelemetryReply(item: t)
+                mac?.transfer(reply)
+                break
+            }
+        }        
     }
 }

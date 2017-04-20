@@ -215,9 +215,9 @@ extension SFConnection {
                 
                 // Find the domain, if none is found, then http 1.0 is not supported
                 
-                if domains.domain(forName: parameters.http1_0DomainName) != nil {
+                if domains.domain(forName: parameters.http1_0DomainName.value) != nil {
                     
-                    host = HttpHost(address: parameters.http1_0DomainName, port: nil)
+                    host = HttpHost(address: parameters.http1_0DomainName.value, port: nil)
                     
                 } else {
                 
@@ -334,7 +334,7 @@ extension SFConnection {
             
             if item.service(request, self, domain, &serviceInfo, &response) == .abort { break }
             
-            if parameters.debugMode {
+            if parameters.debugMode.value {
                 Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: "Completed service: \(item.name)")
                 if let session = serviceInfo[.sessionKey] as? Session {
                     Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: "Session content:\n\n\(session)\n\n")

@@ -69,11 +69,23 @@ extension ReadServerParameterCommand: MacCommand {
     }
     
     public func execute() {
-                
-        let value = parameters.stringValue(for: parameter)
         
-        Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Reading, \(parameter.rawValue) = \(value)")
-
-        mac?.transfer(ReadServerParameterReply(parameter: parameter, value: value))
+        var failed = true
+        
+        for p in parameters.all {
+            
+            if p.name == name {
+                
+                Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Reading, \(p)")
+                
+                mac?.transfer(ReadServerParameterReply(parameter: p))
+                
+                failed = false
+            }
+        }
+        
+        if failed {
+            Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Unknown server parameter \(name)")
+        }
     }
 }

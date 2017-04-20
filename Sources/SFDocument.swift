@@ -3,7 +3,7 @@
 //  File:       SFDocument.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.0
+//  Version:    0.10.6
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.6 - Change in parameter type
 // 0.10.0 - Initial release
 //
 // =====================================================================================================================
@@ -85,7 +86,7 @@ final class SFDocument: EstimatedMemoryConsumption {
     /// This cache contains SFDocuments that have already been processed.
     
     private static var cache: MemoryCache<String, SFDocument> = {
-        let cacheSize = parameters.sfDocumentCacheSize * 1024 * 1024
+        let cacheSize = parameters.sfDocumentCacheSize.value * 1024 * 1024
         return MemoryCache<String, SFDocument>(limitStrategy: .bySize(cacheSize), purgeStrategy: .leastUsed)
     }()
     

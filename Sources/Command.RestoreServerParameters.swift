@@ -3,7 +3,7 @@
 //  File:       Command.RestoreServerParameters.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.0
+//  Version:    0.10.6
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.6 - Update of server parameter type
 // 0.10.0 - Renamed file from MacCommand to Command
 // 0.9.18 - Header update
 //        - Replaced log by Log?
@@ -98,8 +99,8 @@ extension RestoreServerParametersCommand: MacCommand {
         
         // Send the new values to the console
         
-        for parm in ServerParameterName.all {
-            mac?.transfer(ReadServerParameterReply(parameter: parm, value: parameters.stringValue(for: parm)))
+        for parm in parameters.all {
+            mac?.transfer(ReadServerParameterReply(parameter: parm))
         }
     }
 }

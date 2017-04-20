@@ -163,7 +163,7 @@ func service_getSession(_ request: HttpRequest, _ connection: Connection, _ doma
                 
                     Log.atDebug?.log(id: connection.logId, source: #file.source(#function, #line), message: "Received active session \(session)")
 
-                    if parameters.debugMode {
+                    if parameters.debugMode.value {
                 
                         // Add this event to the session debug information
                 

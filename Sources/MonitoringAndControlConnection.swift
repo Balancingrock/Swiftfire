@@ -174,7 +174,7 @@ final class MonitoringAndControlConnection: SwifterSockets.Connection {
     
     override func prepare(for interface: InterfaceAccess, remoteAddress address: String, options: [Connection.Option]) -> Bool {
         var localOptions = options
-        localOptions.append(.inactivityDetectionThreshold(parameters.macInactivityTimeout))
+        localOptions.append(.inactivityDetectionThreshold(TimeInterval(parameters.macInactivityTimeout.value)))
         localOptions.append(.inactivityAction({
             (c: Connection) in
             c.bufferedTransfer(ClosingMacConnection().json.code, affectInactivityDetection: false)

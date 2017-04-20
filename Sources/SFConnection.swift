@@ -110,9 +110,9 @@ final class SFConnection: SwifterSockets.Connection {
         
         // In case of inactivity, close the connection.
         var localOptions = options
-        localOptions.append(.receiverBufferSize(parameters.clientMessageBufferSize))
-        localOptions.append(.transmitterTimeout(parameters.httpResponseClientTimeout))
-        localOptions.append(.inactivityDetectionThreshold(Double(parameters.httpKeepAliveInactivityTimeout)/1000.0))
+        localOptions.append(.receiverBufferSize(parameters.clientMessageBufferSize.value))
+        localOptions.append(.transmitterTimeout(TimeInterval(parameters.httpResponseClientTimeout.value)))
+        localOptions.append(.inactivityDetectionThreshold(Double(parameters.httpKeepAliveInactivityTimeout.value)/1000.0))
         localOptions.append(.inactivityAction({ (c: Connection) in c.closeConnection()}))
         
         guard super.prepare(for: type, remoteAddress: address, options: localOptions) else { return false }
@@ -297,7 +297,7 @@ final class SFConnection: SwifterSockets.Connection {
                     // Write the header to the log if so required
                     // Note: This is done now because there might be errors this request that would be missed if the log is not done at the earliest possible moment..
                     
-                    if parameters.headerLoggingEnabled { headerLogger?.record(connection: self, request: httpRequest!) }
+                    if parameters.headerLoggingEnabled.value { headerLogger?.record(connection: self, request: httpRequest!) }
                 }
             }
             
@@ -376,7 +376,7 @@ func httpConnectionFactory(_ cType: SwifterSockets.InterfaceAccess, _ remoteAddr
     
     // Find a free SFConnection object
     
-    let (count, availableConnection) = connectionPool.allocateOrTimeout(parameters.maxWaitForPendingConnections)
+    let (count, availableConnection) = connectionPool.allocateOrTimeout(parameters.maxWaitForPendingConnections.value)
     
     if count > 0 { telemetry.nofAcceptWaitsForConnectionObject.increment() }
     

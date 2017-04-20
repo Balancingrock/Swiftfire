@@ -3,7 +3,7 @@
 //  File:       Command.HttpServerStop.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.0
+//  Version:    0.10.6
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.6 - Update of server telemetry type
 // 0.10.0 - Renamed file from MacCommand to Command
 // 0.9.18 - Header update
 //        - Renmed to HttpServerStop
@@ -73,12 +74,12 @@ extension HttpServerStopCommand: MacCommand {
         if httpServer?.isRunning ?? false {
             Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Stopping HTTP server")
             httpServer?.stop()
-            telemetry.httpServerStatus = "Stopping"
+            telemetry.httpServerStatus.value = "Stopping"
         } else {
             if httpServer == nil {
-                telemetry.httpServerStatus = "Cannot"
+                telemetry.httpServerStatus.value = "Cannot"
             } else {
-                telemetry.httpServerStatus = "Not Running"
+                telemetry.httpServerStatus.value = "Not Running"
             }
         }
         

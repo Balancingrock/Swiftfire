@@ -3,7 +3,7 @@
 //  File:       Command.HttpServerRun.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.0
+//  Version:    0.10.6
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.6 - Update of server telemetry type
 // 0.10.0 - Renamed HttpConnection to SFConnection
 //        - Added logging of setup after start
 //        - Renamed file from MacCommand to Command
@@ -82,7 +83,7 @@ extension HttpServerRunCommand: MacCommand {
         
         // If the server is running, don't do anything
         
-        if httpServer?.isRunning ?? false { telemetry.httpServerStatus = "Running"; return }
+        if httpServer?.isRunning ?? false { telemetry.httpServerStatus.value = "Running"; return }
         
         
         // If the https server is not running either, then reinit the available connections and domain services
@@ -92,7 +93,7 @@ extension HttpServerRunCommand: MacCommand {
             
             // Reset available connections
         
-            connectionPool.create(num: parameters.maxNofAcceptedConnections, generator: { return SFConnection() })
+            connectionPool.create(num: parameters.maxNofAcceptedConnections.value, generator: { return SFConnection() })
         
             Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Initialized the connection pool with \(parameters.maxNofAcceptedConnections) http connections")
             
@@ -106,8 +107,8 @@ extension HttpServerRunCommand: MacCommand {
         // Restart the HTTP server
         
         httpServer = SwifterSockets.TipServer(
-            .port(parameters.httpServicePortNumber),
-            .maxPendingConnectionRequests(Int(parameters.maxNofPendingConnections)),
+            .port(parameters.httpServicePortNumber.value),
+            .maxPendingConnectionRequests(Int(parameters.maxNofPendingConnections.value)),
             .acceptQueue(httpServerAcceptQueue),
             .connectionObjectFactory(httpConnectionFactory),
             .acceptLoopDuration(2),
@@ -118,13 +119,13 @@ extension HttpServerRunCommand: MacCommand {
         case nil:
                 
             Log.atCritical?.log(id: -1, source: #file.source(#function, #line), message: "No HTTP server created")
-            telemetry.httpServerStatus = "Cannot"
+            telemetry.httpServerStatus.value = "Cannot"
             
             
         case let .error(message)?:
                 
             Log.atError?.log(id: -1, source: #file.source(#function, #line), message: message)
-            telemetry.httpServerStatus = "Error"
+            telemetry.httpServerStatus.value = "Error"
             
             
         case .success?:
@@ -135,7 +136,7 @@ extension HttpServerRunCommand: MacCommand {
             
             logServerSetup(logger: SwifterLog.atNotice)
             
-            telemetry.httpServerStatus = "Running"
+            telemetry.httpServerStatus.value = "Running"
         }
         
 

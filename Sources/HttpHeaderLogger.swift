@@ -77,7 +77,7 @@ final class HttpHeaderLogger: Logfile {
     
     init?(inDirectory url: URL?) {
         guard let url = url else { return nil }
-        super.init(name: "HeaderLog", ext: "txt", dir: url, options: .newFileDailyAt(WallclockTime(hour: 0, minute: 0, second: 0)), .maxFileSize(parameters.maxFileSizeForHeaderLogging))
+        super.init(name: "HeaderLog", ext: "txt", dir: url, options: .newFileDailyAt(WallclockTime(hour: 0, minute: 0, second: 0)), .maxFileSize(parameters.maxFileSizeForHeaderLogging.value))
     }
 
     
@@ -102,6 +102,6 @@ final class HttpHeaderLogger: Logfile {
         
         record(message: message)
         
-        if parameters.flushHeaderLogfileAfterEachWrite { flush() }
+        if parameters.flushHeaderLogfileAfterEachWrite.value { flush() }
     }
 }

@@ -3,7 +3,7 @@
 //  File:       Command.HttpsServerRun.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.1
+//  Version:    0.10.6
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.6 - Update of server telemetry type
 // 0.10.1 - Fixed warnings under Xcode 8.3
 // 0.10.0 - Renamed HttpConnection to SFConnection
 //        - Added logging of setup after start
@@ -78,7 +79,7 @@ extension HttpsServerRunCommand: MacCommand {
         
         // If the server is running, don't do anything
         
-        if httpsServer?.isRunning ?? false { telemetry.httpsServerStatus = "Running"; return }
+        if httpsServer?.isRunning ?? false { telemetry.httpsServerStatus.value = "Running"; return }
         
         
         // If the http server is not running either, then reinit the available connections and domain services
@@ -88,7 +89,7 @@ extension HttpsServerRunCommand: MacCommand {
             
             // Reset available connections
             
-            connectionPool.create(num: parameters.maxNofAcceptedConnections, generator: { return SFConnection() })
+            connectionPool.create(num: parameters.maxNofAcceptedConnections.value, generator: { return SFConnection() })
             
             Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Initialized the connection pool with \(parameters.maxNofAcceptedConnections) http connections")
             
@@ -113,7 +114,7 @@ extension HttpsServerRunCommand: MacCommand {
             
             Log.atCritical?.log(id: -1, source: #file.source(#function, #line), message: "No certificate or private key (or combo) found, cannot start the HTTPS server")
             
-            telemetry.httpsServerStatus = "No Cert|Key"
+            telemetry.httpsServerStatus.value = "No Cert|Key"
         
         } else {
         
@@ -129,8 +130,8 @@ extension HttpsServerRunCommand: MacCommand {
             // Restart the HTTPS server
             
             httpsServer = SecureSockets.SslServer(
-                .port(parameters.httpsServicePortNumber),
-                .maxPendingConnectionRequests(Int(parameters.maxNofPendingConnections)),
+                .port(parameters.httpsServicePortNumber.value),
+                .maxPendingConnectionRequests(Int(parameters.maxNofPendingConnections.value)),
                 .acceptQueue(httpsServerAcceptQueue),
                 .connectionObjectFactory(httpConnectionFactory),
                 .acceptLoopDuration(2),
@@ -144,13 +145,13 @@ extension HttpsServerRunCommand: MacCommand {
             case nil:
                 
                 Log.atCritical?.log(id: -1, source: #file.source(#function, #line), message: "No HTTPS server created")
-                telemetry.httpsServerStatus = "Cannot"
+                telemetry.httpsServerStatus.value = "Cannot"
             
                 
             case let .error(message)?:
                 
                 Log.atError?.log(id: -1, source: #file.source(#function, #line), message: message)
-                telemetry.httpsServerStatus = "Error"
+                telemetry.httpsServerStatus.value = "Error"
                 
             
             case .success?:
@@ -161,7 +162,7 @@ extension HttpsServerRunCommand: MacCommand {
                 
                 logServerSetup(logger: SwifterLog.atNotice)
 
-                telemetry.httpsServerStatus = "Running"
+                telemetry.httpsServerStatus.value = "Running"
             }
         }
         

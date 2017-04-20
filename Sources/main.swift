@@ -3,7 +3,7 @@
 //  File:       main.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.1
+//  Version:    0.10.6
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.6  - Renamed parameters and telemetry type
 // 0.10.1  - Fixed new warnings from xcode 8.3
 // 0.10.0  - Included support for function calls
 // 0.9.18  - Renames Start command to Run
@@ -114,7 +115,7 @@ Log.theLogger.networkTransmitAtAndAboveLevel = SwifterLog.Level.none
 // Initialize the configuration parameters
 // =======================================
 
-let parameters = Parameters()
+let parameters = ServerParameters()
 
 guard let parameterDefaultFile = FileURLs.parameterDefaultsFile else { emergencyExit("Could not construct parameter defaults filename") }
 
@@ -135,18 +136,18 @@ guard let applicationLoggingDirectory = FileURLs.applicationLogDir?.path else { 
 
 Log.theLogger.logfileDirectoryPath = applicationLoggingDirectory
 
-Log.theLogger.fileRecordAtAndAboveLevel = parameters.fileRecordAtAndAboveLevel
+Log.theLogger.fileRecordAtAndAboveLevel = Log.Level(rawValue: parameters.fileRecordAtAndAboveLevel.value) ?? Log.Level.none
 Log.theLogger.logfileDirectoryPath = FileURLs.applicationLogDir!.path
-Log.theLogger.logfileMaxNumberOfFiles = parameters.logfileMaxNofFiles
-Log.theLogger.logfileMaxSizeInBytes = UInt64(parameters.logfileMaxSize) * 1024
+Log.theLogger.logfileMaxNumberOfFiles = parameters.logfileMaxNofFiles.value
+Log.theLogger.logfileMaxSizeInBytes = UInt64(parameters.logfileMaxSize.value) * 1024
 
-Log.theLogger.aslFacilityRecordAtAndAboveLevel = parameters.aslFacilityRecordAtAndAboveLevel
-Log.theLogger.stdoutPrintAtAndAboveLevel = parameters.stdoutPrintAtAndAboveLevel
-Log.theLogger.callbackAtAndAboveLevel = parameters.callbackAtAndAboveLevel
+Log.theLogger.aslFacilityRecordAtAndAboveLevel = Log.Level(rawValue: parameters.aslFacilityRecordAtAndAboveLevel.value) ?? Log.Level.notice
+Log.theLogger.stdoutPrintAtAndAboveLevel = Log.Level(rawValue: parameters.stdoutPrintAtAndAboveLevel.value) ?? Log.Level.none
+Log.theLogger.callbackAtAndAboveLevel = Log.Level(rawValue: parameters.callbackAtAndAboveLevel.value) ?? Log.Level.none
 
-Log.theLogger.networkTransmitAtAndAboveLevel = parameters.networkTransmitAtAndAboveLevel
-if (parameters.networkLogtargetIpAddress != "") && (parameters.networkLogtargetPortNumber != "") {
-    let nettar = SwifterLog.NetworkTarget(address: parameters.networkLogtargetIpAddress, port: parameters.networkLogtargetPortNumber)
+Log.theLogger.networkTransmitAtAndAboveLevel = Log.Level(rawValue: parameters.networkTransmitAtAndAboveLevel.value) ?? Log.Level.none
+if (parameters.networkLogtargetIpAddress.value != "") && (parameters.networkLogtargetPortNumber.value != "") {
+    let nettar = SwifterLog.NetworkTarget(address: parameters.networkLogtargetIpAddress.value, port: parameters.networkLogtargetPortNumber.value)
     Log.theLogger.connectToNetworkTarget(nettar)
 }
 
@@ -267,7 +268,7 @@ let connectionPool = ConnectionPool()
 // Initialize the serverTelemetry
 // ==============================
 
-let telemetry = Telemetry()
+let telemetry = ServerTelemetry()
 
 
 // ===================================
@@ -397,7 +398,7 @@ guard let macCertKeyContainer = CertificateAndPrivateKeyFiles(pemCertificateFile
 
 let macServer = SslServer()
 _ = macServer.setOptions(
-    .port(parameters.macPortNumber),
+    .port(parameters.macPortNumber.value),
     .maxPendingConnectionRequests(1),
     .acceptQueue(macAcceptQueue),
     .connectionObjectFactory(macConnectionFactory),
@@ -442,7 +443,7 @@ case .success:
     // Autostart servers if necessary
     // ==================================
     
-    if parameters.autoStartup {
+    if parameters.autoStartup.value {
         HttpServerRunCommand().execute()
         HttpsServerRunCommand().execute()
     }
