@@ -71,16 +71,12 @@ extension ReadServerParameterCommand: MacCommand {
     public func execute() {
         
         var failed = true
-        
         for p in parameters.all {
-            
             if p.name == name {
-                
                 Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Reading, \(p)")
-                
                 mac?.transfer(ReadServerParameterReply(parameter: p))
-                
                 failed = false
+                break
             }
         }
         

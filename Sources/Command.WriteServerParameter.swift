@@ -73,23 +73,34 @@ extension WriteServerParameterCommand: MacCommand {
     
     public func execute() {
         
-        // Update parameter
+        guard let name = (payload|"Name")?.stringValue else {
+            Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Could not read name from item")
+            return
+        }
+        
+        guard let value = (payload|"Value")?.asString else {
+            Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Could not read value from item")
+            return
+        }
+        
+        Log.atDebug?.log(id: -1, source: #file.source(#function, #line), message: "Name: \(name), Value: \(value)")
         
         var success = false
         for p in parameters.all {
-            if p.name == parameter.name {
+            if p.name == name {
                 let old = p.stringValue
-                if p.setValue(json: parameter.json) {
-                    Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "\(p.name) updating from \(old) to \(p.stringValue)")
+                if p.setValue(value) {
+                    Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "\(p.name) updating from \(old) to \(value)")
                     success = true
                 } else {
-                    Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Failed to update \(p.name) with json code = \(parameter.json)")
+                    Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Failed to update \(p.name) to \(value), cannot convert to necessary type")
                 }
+                break
             }
         }
 
         if !success {
-            Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Failed to write parameter with json code = \(parameter)")
+            Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Failed to write parameter with json code = \(payload)")
         }
         
     }

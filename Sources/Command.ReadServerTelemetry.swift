@@ -72,13 +72,18 @@ extension ReadServerTelemetryCommand: MacCommand {
     
     public func execute() {
         
+        var failed = true
         for t in telemetry.all {
             if t.name == name {
                 Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Reading, telemetry.\(t.name) = \(t.stringValue)")
-                let reply = ReadServerTelemetryReply(item: t)
-                mac?.transfer(reply)
+                mac?.transfer(ReadServerTelemetryReply(item: t))
+                failed = false
                 break
             }
-        }        
+        }
+        
+        if failed {
+            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Failed telemetry.\(name) not available.")
+        }
     }
 }
