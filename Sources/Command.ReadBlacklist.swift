@@ -3,7 +3,7 @@
 //  File:       Command.ReadBlacklist.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.0
+//  Version:    0.10.6
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.6 - Added possibleSources
 // 0.10.0 - Renamed file from MacCommand to Command
 // 0.9.18 - Header update
 //        - Replaced log by Log?
@@ -72,14 +73,19 @@ extension ReadBlacklistCommand: MacCommand {
         
         Log.atNotice?.log(id: -1, source: #file.source(#function, #line))
         
+        var possibleSources: Array<String> = ["Server"]
+        domains.forEach({ possibleSources.append($0.name) })
+        
         if source == "Server" {
-            let reply = ReadBlacklistReply(source: "Server", list: serverBlacklist)
+            let reply = ReadBlacklistReply(source: "Server", blacklist: serverBlacklist)
             mac?.transfer(reply)
         }
         else {
             if let domain = domains.domain(forName: source) {
-                let reply = ReadBlacklistReply(source: source, list: domain.blacklist)
+                let reply = ReadBlacklistReply(source: source, blacklist: domain.blacklist)
                 mac?.transfer(reply)
+            } else {
+                Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "No domain found for: \(source)")
             }
         }
     }

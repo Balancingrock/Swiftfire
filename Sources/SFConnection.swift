@@ -51,6 +51,7 @@
 // 0.10.6 - Renamed HttpHeader to HttpRequest
 //        - Type of objectId changed from Int16 to Int
 //        - Type of allocationCount changed from Int32 to Int
+//        - Changed logid from just socket to objectId + socket
 // 0.10.0 - Renamed to SFConnection because the connection can also be a HTTPS connection
 // 0.9.18 - Header update
 //        - Replaced log with Log?
@@ -142,7 +143,7 @@ final class SFConnection: SwifterSockets.Connection {
     
     /// The ID to be used when logging.
     
-    var logId: Int32 { return interface?.logId ?? -1 }
+    var logId: Int32 { return Int32(objectId << 16) + Int32(Int16(interface?.logId ?? -1)) }
     
     
     /// The number of times this connection object was allocated
@@ -192,7 +193,7 @@ final class SFConnection: SwifterSockets.Connection {
     var mustClose = false
     
     
-    override func abortConnection() {
+    override func connectionWasClosed() {
     
         
         // Record the closing
@@ -213,7 +214,6 @@ final class SFConnection: SwifterSockets.Connection {
         self.abortProcessing = false
         self.mustClose = false
         
-        super.abortConnection()
 
         // Free this connection object
         connectionPool.free(connection: self)
@@ -336,7 +336,10 @@ final class SFConnection: SwifterSockets.Connection {
             // Start the Http Worker
             // =====================
             
-            workerQueue.async() { [unowned self] in self.worker(self.httpRequest!) }
+            workerQueue.async() {
+                [httpRequest, unowned self] in
+                self.worker(httpRequest!)
+            }
             
             
             // ===========================================================
@@ -345,6 +348,9 @@ final class SFConnection: SwifterSockets.Connection {
             
             let unprocessedRange = Range(uncheckedBounds: (lower: messageSize, upper: messageBuffer.count))
             messageBuffer = messageBuffer.subdata(in: unprocessedRange)
+            
+            
+            // For the next go-around
             
             httpRequest = nil
         }

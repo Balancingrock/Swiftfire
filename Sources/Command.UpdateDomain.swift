@@ -71,17 +71,11 @@ extension UpdateDomainCommand: MacCommand {
     
     public func execute() {
         
-        guard domains.contains(domainWithName: oldDomainName) else {
-            Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "No domain present with name \(oldDomainName)")
+        guard let domain = domains.domain(forName: domainName) else {
+            Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "No domain present with name \(domainName)")
             return
         }
         
-        if domains.update(domainWithName: oldDomainName, withDomain: newDomain) {
-            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Updated domain \(oldDomainName) to \(newDomain)")
-        } else {
-            Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Failed")
-        }
-        
-        mac?.transfer(ReadDomainsReply(domains: domains))
+        domain.update(item: itemName, to: value)
     }
 }

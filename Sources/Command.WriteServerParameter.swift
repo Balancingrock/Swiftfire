@@ -103,6 +103,17 @@ extension WriteServerParameterCommand: MacCommand {
             Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Failed to write parameter with json code = \(payload)")
         }
         
+        
+        // Special case: network destination target settings
+        
+        if name.caseInsensitiveCompare(parameters.networkLogtargetIpAddress.name) == ComparisonResult.orderedSame {
+            WriteServerParameterCommand.networkLogTarget.address = value
+            WriteServerParameterCommand.conditionallySetNetworkLogTarget()
+
+        } else if name.caseInsensitiveCompare(parameters.networkLogtargetPortNumber.name) == ComparisonResult.orderedSame {
+            WriteServerParameterCommand.networkLogTarget.port = value
+            WriteServerParameterCommand.conditionallySetNetworkLogTarget()
+        }
     }
     
     

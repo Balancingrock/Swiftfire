@@ -317,7 +317,7 @@ extension SFConnection {
 
         
         // =============================================================================================================
-        // Start the service chain
+        // Execute the service chain
         // =============================================================================================================
 
         Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: "Starting domain services")
@@ -332,13 +332,29 @@ extension SFConnection {
 
         for item in domain.services {
             
-            if item.service(request, self, domain, &serviceInfo, &response) == .abort { break }
-            
             if parameters.debugMode.value {
-                Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: "Completed service: \(item.name)")
-                if let session = serviceInfo[.sessionKey] as? Session {
-                    Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: "Session content:\n\n\(session)\n\n")
+
+                Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: "Service: \(item.name)")
+
+                // ******************** SERVICE CALL
+                if item.service(request, self, domain, &serviceInfo, &response) == .abort { break }
+                // ********************
+            
+                if serviceInfo.dict.count == 0 {
+                    Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: "\n\nService info is empty")
+                } else {
+                    var str = ""
+                    str += serviceInfo.dict.map({ key, value in "Key: \(key), Value: \(value)" }).joined(separator: "\n")
+                    Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: "\n\nService info:\n\(str)\n")
                 }
+                
+                Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: "\(response)")
+                
+            } else {
+                
+                // ******************** SERVICE CALL
+                if item.service(request, self, domain, &serviceInfo, &response) == .abort { break }
+                // ********************
             }
         }
         
@@ -372,7 +388,9 @@ extension SFConnection {
         
         // If there is stil no payload, try the server default
         
-        response.createErrorPayload()
+        if response.payload == nil {
+            response.createErrorPayload()
+        }
         
         
         // If there is still nothing, create an empty payload

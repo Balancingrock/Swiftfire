@@ -112,11 +112,6 @@ func service_getSession(_ request: HttpRequest, _ connection: Connection, _ doma
     }
 
     
-    // Is the session timeout valid?
-    
-    if domain.sessionTimeout < 1 { return .next }
-    
-    
     // Find all session cookies (there should be only 1)
     
     let sessionCookies = request.cookies.filter({ $0.name == Session.cookieId })
@@ -138,6 +133,8 @@ func service_getSession(_ request: HttpRequest, _ connection: Connection, _ doma
             
                 case .none:
                     
+                    Log.atDebug?.log(id: connection.logId, source: #file.source(#function, #line), message: "Session with id: \(id) is expired")
+
                     break WAIT_FOR_SESSION
             
                     
@@ -146,6 +143,10 @@ func service_getSession(_ request: HttpRequest, _ connection: Connection, _ doma
                     // When this occurs, the user has send off too many requests at once.
                     // While this could happen in some scenario's, its not normal if this causes a big lag in user feedback.
                     // Hence a fixed timeout of 60 seconds is applied here to try and recover at least the server side of things.
+                    
+                    if blockedCounter == 0 {
+                        Log.atDebug?.log(id: connection.logId, source: #file.source(#function, #line), message: "Session with id: \(id) is blocked, waiting...")
+                    }
                     
                     blockedCounter += 1
                     if blockedCounter > 60 {
@@ -167,7 +168,7 @@ func service_getSession(_ request: HttpRequest, _ connection: Connection, _ doma
                 
                         // Add this event to the session debug information
                 
-                        session.addDebugInfo(address: connection.remoteAddress, domainName: domain.name, connectionId: Int(connection.objectId), allocationCount: Int64(connection.allocationCount))
+                        session.addDebugInfo(address: connection.remoteAddress, domainName: domain.name, connectionId: Int(connection.objectId), allocationCount: connection.allocationCount)
                     }
                     
                 

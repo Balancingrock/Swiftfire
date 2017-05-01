@@ -1,9 +1,9 @@
 // =====================================================================================================================
 //
-//  File:       Command.UpdateBlacklist.swift
+//  File:       Function.EnsureSession.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.0
+//  Version:    0.10.6
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -11,7 +11,7 @@
 //  Blog:       http://swiftrien.blogspot.com
 //  Git:        https://github.com/Balancingrock/Swiftfire
 //
-//  Copyright:  (c) 2016-2017 Marinus van der Lugt, All rights reserved.
+//  Copyright:  (c) 2017 Marinus van der Lugt, All rights reserved.
 //
 //  License:    Use or redistribute this code any way you like with the following two provision:
 //
@@ -48,65 +48,56 @@
 //
 // History
 //
-// 0.10.0 - Renamed file from MacCommand to Command
-// 0.9.18 - Header update
-//        - Replaced log by Log?
-// 0.9.15 - General update and switch to frameworks
-//        - Renamed from Modify... to Update...
-// 0.9.14 - Initial release
+// 0.10.6 - Initial release
 //
 // =====================================================================================================================
 
 import Foundation
-import SwifterJSON
-import SwifterLog
 import SwiftfireCore
 
 
-extension UpdateBlacklistCommand: MacCommand {
+/// Ensures that a session exists and adds the session cookie to the response (in the environment).
+///
+/// If no session is found a new session will be created.
+///
+/// - Returns: Always nil.
+
+func function_ensureSession(_ args: Function.Arguments, _ info: inout Function.Info, _ environment: inout Function.Environment) -> Data? {
+
     
-    public static func factory(json: VJson?) -> MacCommand? {
-        return UpdateBlacklistCommand(json: json)
+    // Get or create session
+    
+    var session: Session
+    if let oldSession = environment.serviceInfo[.sessionKey] as? Session {
+        session = oldSession
+        Log.atDebug?.log(id: (environment.connection as! SFConnection).logId, source: #file.source(#function, #line), message: "Existing session found:\n\n\(session)\n")
+    } else {
+        session = environment.newSession()
+        Log.atDebug?.log(id: (environment.connection as! SFConnection).logId, source: #file.source(#function, #line), message: "New session created:\n\n\(session)\n")
     }
     
-    public func execute() {
-        
-        Log.atNotice?.log(id: -1, source: #file.source(#function, #line))
-        
-        if source == "Server" {
-            
-            if remove {
-                
-                serverBlacklist.remove(ipAddress: address)
-                
-            } else {
+    
+    // Add session to the service info
+    
+    environment.serviceInfo[.sessionKey] = session
+    
+    
+    // Create cookie
+    
+    let cookie = HttpCookie(
+        name: Session.cookieId,
+        value: session.id.uuidString,
+        timeout: HttpCookie.Timeout.maxAge(environment.domain.sessionTimeout),
+        path: "/",
+        httpOnly: true)
 
-                guard let bAction = Blacklist.Action(rawValue: action) else {
-                    Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Cannot create Action type from '\(action)'")
-                    return
-                }
 
-                serverBlacklist.add(ipAddress: address, action: bAction)
-            }
-        
-        } else {
-            
-            if let domain = domains.domain(forName: source) {
-                
-                if remove {
-                    
-                    domain.blacklist.remove(ipAddress: address)
-                    
-                } else {
-                    
-                    guard let bAction = Blacklist.Action(rawValue: action) else {
-                        Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Cannot create Action type from '\(action)'")
-                        return
-                    }
-
-                    domain.blacklist.add(ipAddress: address, action: bAction)
-                }
-            }
-        }
-    }
+    // Adds cookie to the response
+    
+    environment.response.cookies.append(cookie)
+    
+    
+    // No data returned
+    
+    return nil
 }

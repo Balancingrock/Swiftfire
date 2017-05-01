@@ -146,7 +146,7 @@ func service_getFileAtResourcePath(_ request: HttpRequest, _ connection: Connect
         mutation.requestReceived = info[.responseStartedKey] as? Int64 ?? 0
         statistics.submit(mutation: mutation, onError: {
             (message: String) in
-            Log.atError?.log(id: connection.logId, source: #file.source(#function, line), message: "Error during statistics submission:\(message)")
+            Log.atError?.log(id: connection.logId, source: #file.source(#function, #line), message: "Error during statistics submission:\(message)")
         })
         
         
@@ -175,6 +175,8 @@ func service_getFileAtResourcePath(_ request: HttpRequest, _ connection: Connect
         return .next
     }
 
+    Log.atDebug?.log(id: connection.logId, source: #file.source(#function, #line), message: "Resource path = \(resourcePath)")
+    
     
     // =================================================================================================================
     // Fetch the requested resource
@@ -196,9 +198,9 @@ func service_getFileAtResourcePath(_ request: HttpRequest, _ connection: Connect
             
         case .success(let doc):
 
-            let environment = Function.Environment(request: request, connection: connection, domain: domain, response: &response, serviceInfo: &info)
+            var environment = Function.Environment(request: request, connection: connection, domain: domain, response: &response, serviceInfo: &info)
             
-            payload = doc.getContent(with: environment)
+            payload = doc.getContent(with: &environment)
         }
         
         

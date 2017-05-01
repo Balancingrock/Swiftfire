@@ -71,6 +71,7 @@ import SwiftfireCore
 /// Example: .nofPageHits()
 
 let NOF_PAGE_HITS = "nofPageHits"
+let ENSURE_SESSION = "ensureSession"
 
 
 // ==================================================
@@ -82,4 +83,5 @@ let NOF_PAGE_HITS = "nofPageHits"
 
 func registerFunctions() {
     functions.register(name: NOF_PAGE_HITS, function: function_nofPageHits)
+    functions.register(name: ENSURE_SESSION, function: function_ensureSession)
 }

@@ -242,7 +242,7 @@ final class SFDocument: EstimatedMemoryConsumption {
     
     /// Processes the function calls and merges the original document data with the results.
     
-    func getContent(with environment: Function.Environment) -> Data {
+    func getContent(with environment: inout Function.Environment) -> Data {
         
         // Thread safety: All data that is updated and/or returned must reside in local (stack) storage.
         
@@ -255,7 +255,7 @@ final class SFDocument: EstimatedMemoryConsumption {
         var info = Function.Info()
         
         for (index, fb) in fblocks.enumerated() {
-            fblocks[index].data = fb.function?(fb.arguments, &info, environment)
+            fblocks[index].data = fb.function?(fb.arguments, &info, &environment)
         }
         
         

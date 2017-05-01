@@ -125,6 +125,8 @@ case let .success(message):
     if !message.isEmpty { Log.atNotice?.log(id: -1, source: "Main", message: message) }
 }
 
+setupParametersDidSetActions()
+
 Log.atDebug?.log(id: -1, source: "Main", message: "Configuration parameters:\n\n\(parameters)\n")
 
 
@@ -165,7 +167,8 @@ class LogForewarder: SwifterlogCallbackProtocol {
     func logInfo(_ time: Date, level: SwifterLog.Level, source: String, message: String) {
         if let mac = mac {
             let logline = LogLine(time: time as Date, level: level, source: source, message: message)
-            mac.transfer(LogLineReply(logline))
+            // Use the buffered transfer itself to repevent duplicate STDout logging.
+            mac.bufferedTransfer(LogLineReply(logline).json.code)
         }
     }
 }
@@ -262,6 +265,12 @@ Log.atNotice?.log(id: -1, source: "Main", message: "Domain settings:\n\n\(domain
 // ==============================
 
 let connectionPool = ConnectionPool()
+connectionPool.sorter = { // Sorting makes debugging easier
+    (_ lhs: Connection, _ rhs: Connection) -> Bool in
+    let lhs = lhs as! SFConnection
+    let rhs = rhs as! SFConnection
+    return lhs.objectId < rhs.objectId
+}
 
 
 // ==============================

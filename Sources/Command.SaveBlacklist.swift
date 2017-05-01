@@ -74,8 +74,6 @@ extension SaveBlacklistCommand: MacCommand {
         
         if source == "Server" {
             if let url = FileURLs.serverBlacklistFile { serverBlacklist.save(toFile: url) }
-            let reply = ReadBlacklistReply(source: "Server", list: serverBlacklist)
-            mac?.transfer(reply)
         }
         else {
             if let domain = domains.domain(forName: source) {
@@ -83,8 +81,6 @@ extension SaveBlacklistCommand: MacCommand {
                 case .error(let message): Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Failed to save blacklist for \(source), error = \(message)")
                 case .success: break
                 }
-                let reply = ReadBlacklistReply(source: source, list: domain.blacklist)
-                mac?.transfer(reply)
             }
         }
     }

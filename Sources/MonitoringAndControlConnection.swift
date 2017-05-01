@@ -159,6 +159,7 @@ final class MonitoringAndControlConnection: SwifterSockets.Connection {
         commandFactories.append(ReadServicesCommand.factory)
         commandFactories.append(SaveBlacklistCommand.factory)
         commandFactories.append(RestoreBlacklistCommand.factory)
+        commandFactories.append(ReadDomainNamesCommand.factory)
     }
     
     
@@ -182,10 +183,10 @@ final class MonitoringAndControlConnection: SwifterSockets.Connection {
         return super.prepare(for: interface, remoteAddress: address, options: localOptions)
     }
 
-    /// Used internally, calling this operation may lead to aborted transfers and error messages. In order to close the connection use "closeConnection()" instead.
     
-    override func abortConnection() {
-        super.abortConnection()
+    /// Cleanup when the connection is closed.
+    
+    override func connectionWasClosed() {
         mac = nil
         Log.atNotice?.log(id: -1, source: "Monitoring And Control", message: "MAC removed")
     }
@@ -293,7 +294,7 @@ final class MonitoringAndControlConnection: SwifterSockets.Connection {
     func transfer(_ reply: MacMessage?) {
         if let reply = reply {
             let msg = reply.json.code
-            Log.atDebug?.log(id: -1, source: "MacLoop.transfer", message: "Transferring MacMessage \(msg)", targets: SwifterLog.Target.ALL_NON_RECURSIVE)
+            Log.atDebug?.log(id: -1, source: "MacLoop.transfer", message: "Transferring MacMessage \(msg)")
             super.bufferedTransfer(msg, callback: nil)
         }
     }

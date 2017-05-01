@@ -69,16 +69,13 @@ extension ReadServicesCommand: MacCommand {
     
     public func execute() {
         
-        Log.atNotice?.log(id: -1, source: #file.source(#function, #line))
+        let domain = domains.domain(forName: source)
         
-        if let domain = domains.domain(forName: source) {
-            let reply = ReadServicesReply(domainName: source, serviceNames: domain.serviceNames)
-            mac?.transfer(reply)
-        } else {
-            var names: Array<String> = []
-            for entry in services.registered { names.append(entry.key) }
-            let reply = ReadServicesReply(domainName: nil, serviceNames: names)
-            mac?.transfer(reply)
-        }
+        var serverServices: Array<String> = []
+        services.registered.forEach({ serverServices.append($0.key) })
+        
+        let reply = ReadServicesReply(domainName: source, domainServices: domain?.serviceNames ?? [], serverServices: serverServices)
+        
+        mac?.transfer(reply)
     }
 }
