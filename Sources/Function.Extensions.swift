@@ -13,15 +13,17 @@ extension Function.Environment {
     
     /// Creates a new session with the data contained in the environment
     
-    public func newSession() -> Session {
+    public func newSession() -> Session? {
+        
+        guard let connection = (connection as? SFConnection) else { return nil }
         
         return domain.sessions.newSession(
             address: connection.remoteAddress,
             domainName: domain.name,
-            logId: (connection as? SFConnection)?.logId ?? -1,
-            connectionId: (connection as? SFConnection)?.objectId ?? -1,
-            allocationCount: (connection as? SFConnection)?.allocationCount ?? -1
+            logId: connection.logId,
+            connectionId: connection.objectId,
+            allocationCount: connection.allocationCount,
+            timeout: domain.sessionTimeout
         )
-        
     }
 }

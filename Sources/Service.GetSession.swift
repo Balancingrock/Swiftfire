@@ -125,67 +125,27 @@ func service_getSession(_ request: HttpRequest, _ connection: Connection, _ doma
         
         if let id = UUID(uuidString: sessionCookie.value) {
             
-            var blockedCounter = 0
-            
-            WAIT_FOR_SESSION: while true {
-
-                switch domain.sessions.getActiveSession(for: id, logId: connection.logId) {
-            
-                case .none:
+            if let session = domain.sessions.getActiveSession(for: id, logId: connection.logId) {
+                
+                Log.atDebug?.log(id: connection.logId, source: #file.source(#function, #line), message: "Received active session with id: \(id)")
+                
+                if parameters.debugMode.value {
                     
-                    Log.atDebug?.log(id: connection.logId, source: #file.source(#function, #line), message: "Session with id: \(id) is expired")
-
-                    break WAIT_FOR_SESSION
-            
+                    // Add this event to the session debug information
                     
-                case .blocked:
-                    
-                    // When this occurs, the user has send off too many requests at once.
-                    // While this could happen in some scenario's, its not normal if this causes a big lag in user feedback.
-                    // Hence a fixed timeout of 60 seconds is applied here to try and recover at least the server side of things.
-                    
-                    if blockedCounter == 0 {
-                        Log.atDebug?.log(id: connection.logId, source: #file.source(#function, #line), message: "Session with id: \(id) is blocked, waiting...")
-                    }
-                    
-                    blockedCounter += 1
-                    if blockedCounter > 60 {
-                        
-                        Log.atCritical?.log(id: connection.logId, source: #file.source(#function, #line), message: "Timeout while waiting for session (with id = \(id.uuidString)) to become free.")
-                        response.code = HttpResponseCode.code500_InternalServerError
-                        return .abort
-                        
-                    } else {
-                        sleep(1)
-                    }
-
-                    
-                case .success(let session):
-                
-                    Log.atDebug?.log(id: connection.logId, source: #file.source(#function, #line), message: "Received active session \(session)")
-
-                    if parameters.debugMode.value {
-                
-                        // Add this event to the session debug information
-                
-                        session.addDebugInfo(address: connection.remoteAddress, domainName: domain.name, connectionId: Int(connection.objectId), allocationCount: connection.allocationCount)
-                    }
-                    
-                
-                    // Store the session in the info object
-                
-                    info[.sessionKey] = session
-                
-                
-                    // Add the cookie to the response
-                
-                    let timeout = HttpCookie.Timeout.maxAge(domain.sessionTimeout)
-                    let cookie = HttpCookie(name: Session.cookieId, value: session.id.uuidString, timeout: timeout)
-                    response.cookies.append(cookie)
-                
-                
-                    return .next
+                    session.markActivity(address: connection.remoteAddress, domainName: domain.name, connectionId: Int(connection.objectId), allocationCount: connection.allocationCount)
                 }
+                
+                
+                // Store the session in the info object
+                
+                info[.sessionKey] = session
+                
+                return .next
+                
+            } else {
+                
+                Log.atDebug?.log(id: connection.logId, source: #file.source(#function, #line), message: "Session with id: \(id) has expired")
             }
         }
     }

@@ -348,7 +348,7 @@ extension SFConnection {
                     Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: "\n\nService info:\n\(str)\n")
                 }
                 
-                Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: "\(response)")
+                Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: "\n\n\(response)\n")
                 
             } else {
                 
@@ -362,11 +362,16 @@ extension SFConnection {
         
         
         // =============================================================================================================
-        // Free session (if used)
+        // Session maintenance
         // =============================================================================================================
 
+        // If a session is present, set the cookie request in the response to restart the session timeout
+        
         if let session = serviceInfo[.sessionKey] as? Session {
-            domain.sessions.free(session: session)
+            if session.isActive {
+                response.cookies.append(session.cookie)
+                Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: "Session cookie added to response with id = \(session.id.uuidString)")
+            }
         }
         
         

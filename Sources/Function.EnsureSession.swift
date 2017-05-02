@@ -67,34 +67,25 @@ func function_ensureSession(_ args: Function.Arguments, _ info: inout Function.I
     
     // Get or create session
     
-    var session: Session
-    if let oldSession = environment.serviceInfo[.sessionKey] as? Session {
-        session = oldSession
+    if let session = environment.serviceInfo[.sessionKey] as? Session {
+    
         Log.atDebug?.log(id: (environment.connection as! SFConnection).logId, source: #file.source(#function, #line), message: "Existing session found:\n\n\(session)\n")
+    
     } else {
-        session = environment.newSession()
-        Log.atDebug?.log(id: (environment.connection as! SFConnection).logId, source: #file.source(#function, #line), message: "New session created:\n\n\(session)\n")
+        
+        if let session = environment.newSession() {
+            
+            // Add session to the service info
+            
+            environment.serviceInfo[.sessionKey] = session
+
+            Log.atDebug?.log(id: (environment.connection as! SFConnection).logId, source: #file.source(#function, #line), message: "New session created:\n\n\(session)\n")
+
+        } else {
+        
+            Log.atCritical?.log(id: (environment.connection as! SFConnection).logId, source: #file.source(#function, #line), message: "Could not create session")
+        }
     }
-    
-    
-    // Add session to the service info
-    
-    environment.serviceInfo[.sessionKey] = session
-    
-    
-    // Create cookie
-    
-    let cookie = HttpCookie(
-        name: Session.cookieId,
-        value: session.id.uuidString,
-        timeout: HttpCookie.Timeout.maxAge(environment.domain.sessionTimeout),
-        path: "/",
-        httpOnly: true)
-
-
-    // Adds cookie to the response
-    
-    environment.response.cookies.append(cookie)
     
     
     // No data returned
