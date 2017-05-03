@@ -59,6 +59,7 @@ However: It does work! :-)
 - Allows website services to be implemented in Swift 
 - Out of the box support for static websites
 - Handles multiple domains
+- Sessions are supported
 - Client forwarding (to other hosts or a different port on the same host)
 - Integrated usage statistics (page visits)
 - Blacklisting (refusal of service) on IP basis for Server and per domain
@@ -88,7 +89,13 @@ Note: Planned releases are for information only and almost always change.
 - Small feature improvements (if necessary)
 - Code improvements
 
-#### 0.10.5 (Current)
+#### 0.10.6 (Current)
+
+- Added session support
+- Code improvements
+- Minor bugfixes
+
+#### 0.10.5
 
 - Fixed typo of blacklist in log
 - Added debug output to service invokation
