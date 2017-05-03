@@ -48,7 +48,7 @@
 //
 // History
 //
-// 0.10.6 - Renaming nofPageHits
+// 0.10.6 - Added getSession
 // 0.10.0 - Initial release
 //
 // =====================================================================================================================
@@ -71,7 +71,7 @@ import SwiftfireCore
 /// Example: .nofPageHits()
 
 let NOF_PAGE_HITS = "nofPageHits"
-let ENSURE_SESSION = "ensureSession"
+let GET_SESSION = "getSession"
 
 
 // ==================================================
@@ -83,5 +83,5 @@ let ENSURE_SESSION = "ensureSession"
 
 func registerFunctions() {
     functions.register(name: NOF_PAGE_HITS, function: function_nofPageHits)
-    functions.register(name: ENSURE_SESSION, function: function_ensureSession)
+    functions.register(name: GET_SESSION, function: function_getSession)
 }

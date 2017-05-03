@@ -368,7 +368,7 @@ extension SFConnection {
         // If a session is present, set the cookie request in the response to restart the session timeout
         
         if let session = serviceInfo[.sessionKey] as? Session {
-            if session.isActive {
+            if session.isActiveKeepActive {
                 response.cookies.append(session.cookie)
                 Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: "Session cookie added to response with id = \(session.id.uuidString)")
             }

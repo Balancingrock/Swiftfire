@@ -53,14 +53,52 @@
 // 0.10.0 - Initial release
 //
 // =====================================================================================================================
+// Description
+// =====================================================================================================================
+//
+/// Returns the number of hits for a resource.
+//
+//
+// Signature:
+// ----------
+//
+// .nofPageHits(path: String)
+//
+//
+// Parameters:
+// -----------
+//
+// path: An optional string representing the path for which to retrieve the page hits. This string should be a relative
+// path from the root of the domain. If no path is present the path at '.relativeResourcePathKey' from the
+// 'environment.serviceInfo' will be used.
+//
+//
+// Other Input:
+// ------------
+//
+// None.
+//
+//
+// Returns:
+// --------
+//
+// The number of page hits.
+//
+//
+// Other Output:
+// -------------
+//
+// None.
+//
+// =====================================================================================================================
 
 import Foundation
 import SwiftfireCore
 
 
-/// Returns the number of hits for a resource.
+/// Returns the number of hits for a relative resource path. The path should be relative to the root directory of the domain.
 ///
-/// If the arguments contain a String, then the string will be intepreted as a resource path (relative to the domain) and the count for that resource will be returned.
+/// If the arguments contains a String, then the string will be used as the relative resource path and the count for that resource will be returned.
 ///
 /// If the argument does not contain any arguments, it will return the count for the currently requested resource.
 

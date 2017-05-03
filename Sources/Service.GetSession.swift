@@ -54,24 +54,22 @@
 // Description
 // =====================================================================================================================
 //
-// Retrieves the session for the HTTP request (via a cookie) if it has any and if the session is still active.
-// If an active session is present in the request, it will add the session-id cookie to the reponse with a timeout
-// as specified for the domain.
+// Retrieves the session for the HTTP request (via a cookie) if it has any and if the session is still active. If no
+// active session is found, it will create a new session.
+//
 //
 // Input:
 // ------
 //
-// request: The HTTP request. Will be tested for the existence of a cookie with a session ID.
-// Session: The active session list. If a session ID cookie was found, it will be tested for an active session.
-// domain.sessionTimeout: If < 1, then session support is disabled. On > 0 the max-age for the cookie with the session
-//    ID will be set to this value.
+// request: The HTTP request. Will be tested for the existence of a cookie with the session ID.
+// domain.sessions: The active session list. If a session ID cookie was found, it will be tested for an active session.
+// domain.sessionTimeout: If < 1, then session support is disabled.
 //
 //
 // Output:
 // -------
 //
-// info[sessionKey] = Active session.
-// response: Will contain a set-cookie with the session ID and a timeout.
+// info[.sessionKey] = Active session.
 //
 //
 // Return:
@@ -87,9 +85,9 @@ import SwiftfireCore
 import SwifterSockets
 
 
-/// Checks if the client IP address is in the domain.blacklist.
+/// Ensures that a session exists if the sessionTimeout for the given domain is > 0.
 ///
-/// - Note: For a full description of all effects of this operation see the file: DomainService.GetFileAtResourcePath.swift
+/// - Note: For a full description of all effects of this operation see the file: Service.GetSession.swift
 ///
 /// - Parameters:
 ///   - request: The HTTP request.
@@ -112,12 +110,18 @@ func service_getSession(_ request: HttpRequest, _ connection: Connection, _ doma
     }
 
     
+    // Check if session support is enabled
+    
+    if domain.sessionTimeout < 1 { return .next }
+    
+    
     // Find all session cookies (there should be only 1)
     
     let sessionCookies = request.cookies.filter({ $0.name == Session.cookieId })
     
     Log.atDebug?.log(id: connection.logId, source: #file.source(#function, #line), message: "Found: \(sessionCookies.count) session cookie(s)")
 
+    
     
     // If there is more than 1, pick the first active cookie.
     
@@ -133,7 +137,7 @@ func service_getSession(_ request: HttpRequest, _ connection: Connection, _ doma
                     
                     // Add this event to the session debug information
                     
-                    session.markActivity(address: connection.remoteAddress, domainName: domain.name, connectionId: Int(connection.objectId), allocationCount: connection.allocationCount)
+                    session.addActivity(address: connection.remoteAddress, domainName: domain.name, connectionId: Int(connection.objectId), allocationCount: connection.allocationCount)
                 }
                 
                 
@@ -150,7 +154,31 @@ func service_getSession(_ request: HttpRequest, _ connection: Connection, _ doma
         }
     }
     
-    Log.atDebug?.log(id: connection.logId, source: #file.source(#function, #line), message: "No active session found")
+    
+    // No cookie with an active session found, create a new session
+    
+    if let session = domain.sessions.newSession(
+        address: connection.remoteAddress,
+        domainName: domain.name,
+        logId: connection.logId,
+        connectionId: connection.objectId,
+        allocationCount: connection.allocationCount,
+        timeout: domain.sessionTimeout
+        ) {
+    
+    
+        // Store the session in the info object
+    
+        info[.sessionKey] = session
 
+        Log.atDebug?.log(id: connection.logId, source: #file.source(#function, #line), message: "No active session found, created new session with id: \(session.id.uuidString)")
+
+    } else {
+        
+        // Error
+        
+        Log.atCritical?.log(id: connection.logId, source: #file.source(#function, #line), message: "No active session found, failed to create new session")
+    }
+    
     return .next
 }

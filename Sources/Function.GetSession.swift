@@ -1,6 +1,6 @@
 // =====================================================================================================================
 //
-//  File:       Function.EnsureSession.swift
+//  File:       Function.GetSession.swift
 //  Project:    Swiftfire
 //
 //  Version:    0.10.6
@@ -51,41 +51,63 @@
 // 0.10.6 - Initial release
 //
 // =====================================================================================================================
+// Description
+// =====================================================================================================================
+//
+// Retrieves the session for the HTTP request (via a cookie) if it has any and if the session is still active. If no
+// active session is found, it will create a new session.
+//
+//
+// Signature:
+// ----------
+//
+// .getSession()
+//
+//
+// Parameters:
+// -----------
+//
+// None.
+//
+//
+// Other Input:
+// ------------
+//
+// environment.request: The HTTP request. Will be tested for the existence of a cookie with the session ID.
+// environment.domain.sessions: The active session list. If a session ID cookie was found, it will be tested for an active session.
+// environment.domain.sessionTimeout: If < 1, then session support is disabled.
+//
+//
+// Returns:
+// --------
+//
+// nil
+//
+//
+// Other Output:
+// -------------
+//
+// environment.info[.sessionKey] = Session // => Active session.
+//
+//
+// =====================================================================================================================
 
 import Foundation
 import SwiftfireCore
 
 
-/// Ensures that a session exists and adds the session cookie to the response (in the environment).
+/// Ensures that a session exists.
 ///
 /// If no session is found a new session will be created.
 ///
 /// - Returns: Always nil.
 
-func function_ensureSession(_ args: Function.Arguments, _ info: inout Function.Info, _ environment: inout Function.Environment) -> Data? {
+func function_getSession(_ args: Function.Arguments, _ info: inout Function.Info, _ environment: inout Function.Environment) -> Data? {
 
     
-    // Get or create session
+    // Find or create the session
     
-    if let session = environment.serviceInfo[.sessionKey] as? Session {
-    
-        Log.atDebug?.log(id: (environment.connection as! SFConnection).logId, source: #file.source(#function, #line), message: "Existing session found:\n\n\(session)\n")
-    
-    } else {
-        
-        if let session = environment.newSession() {
-            
-            // Add session to the service info
-            
-            environment.serviceInfo[.sessionKey] = session
-
-            Log.atDebug?.log(id: (environment.connection as! SFConnection).logId, source: #file.source(#function, #line), message: "New session created:\n\n\(session)\n")
-
-        } else {
-        
-            Log.atCritical?.log(id: (environment.connection as! SFConnection).logId, source: #file.source(#function, #line), message: "Could not create session")
-        }
-    }
+    _ = service_getSession(environment.request, environment.connection, environment.domain, &environment.serviceInfo, &environment.response)
     
     
     // No data returned
