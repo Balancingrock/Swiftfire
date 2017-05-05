@@ -53,11 +53,13 @@
 // =====================================================================================================================
 
 import Foundation
-import SwifterJSON
 import SwifterLog
+import SwifterJSON
+import SwiftfireCore
+import KeyedCache
 
 
-public class Account {
+public class Account: EstimatedMemoryConsumption {
     
     
     /// Create an account directory url from the given account ID relative to the given root url
@@ -117,7 +119,7 @@ public class Account {
     
     /// The hash value of the user password.
     
-    public var passwordHash: Int
+    fileprivate var passwordHash: Int
     
     
     /// The information associated with the user.
@@ -125,9 +127,16 @@ public class Account {
     public var info = VJson()
     
     
-    /// The path for the folder associated with this account
+    /// The path for the directory associated with this account
     
-    public private(set) var folder: URL
+    public private(set) var dirUrl: URL
+    
+    
+    /// The path for the file containing this account
+    
+    public var fileUrl: URL {
+        return dirUrl.appendingPathComponent("Account").appendingPathExtension("json")
+    }
     
     
     /// Create a new instance
@@ -141,7 +150,7 @@ public class Account {
         self.names[0] = name
         self.passwordHash = passwordHash
         self.id = id
-        self.folder = Account.dirUrl(root: rootDir, accountId: id)
+        self.dirUrl = Account.dirUrl(root: rootDir, accountId: id)
     }
     
     
@@ -159,9 +168,14 @@ public class Account {
     }
     
     
-    /// Recreate from VJson
+    /// Recreate from a JSON file
     
-    fileprivate init?(json: VJson, rootDir: URL) {
+    fileprivate convenience init?(root: URL, id: Int) {
+        
+        // Initialize with dummy's
+        self.init(id: id, name: "", passwordHash: 0, rootDir: root)
+        
+        guard let json = VJson.parse(file: fileUrl, onError: { _,_,_ in } ) else { return nil }
         
         guard let jjnames = (json|"Names")?.arrayValue else { return nil }
         guard jjnames.count > 0 else { return nil }
@@ -179,15 +193,14 @@ public class Account {
         self.id = jid
         self.passwordHash = jpasswordhash
         self.info = jinfo
-        
-        self.folder = Account.dirUrl(root: rootDir, accountId: jid)
     }
     
     
-    /// Save the user data to file
+    /// Save the user data to file.
+    ///
+    /// - Returns: On success nil, on failure a description of the error that occured.
     
     public func save() -> String? {
-        let fileUrl = folder.appendingPathComponent("Account").appendingPathExtension("json")
         return self.json.save(to: fileUrl)
     }
 }
@@ -217,21 +230,19 @@ public class Accounts {
     private var lookupTable: Dictionary<String, Int> = [:]
     
     
-    /// The path for the user/id lookup table
-    
-    private unowned var domain: Domain
-    
-    
     /// The id of the last account created
     
     private var lastAccountId: Int = 0
     
     
+    /// The account cache
+    
+    private var accountCache: MemoryCache = MemoryCache<String, Account>(limitStrategy: .byItems(100), purgeStrategy: .leastRecentUsed)
+    
+    
     /// Initialize from file
     
-    public init(domain: Domain, root: URL?) {
-        self.domain = domain
-        guard let root = root else { return }
+    public init(root: URL) {
         self.root = root
         var isDir: ObjCBool = false
         if FileManager.default.fileExists(atPath: lookupTableFile.path, isDirectory: &isDir) && !isDir.boolValue {
@@ -261,11 +272,134 @@ public class Accounts {
     }
     
     
-    /// Returns the account for the given name. If an account with the given name is in the lookup table, it will try to find it in the cache. If the cache does not contain the account, it will read the account from disk and add it to the cache.
+    /// Change the root directory url.
+    ///
+    /// - Note: This will only change the URL, not the disk contents.
     
-    public func account(for name: String) -> Account? {
-        
+    public func changeRoot(to url: URL) {
+        Accounts.queue.async {
+            self.root = url
+        }
     }
+    
+    
+    /// Returns the account for the given name and password. First it will try to read the account from the cache. If the cache does not contain the account it will try to find it in the lookup table and if found, load it from file. The password hash must matches the account hash.
+    ///
+    /// - Parameters:
+    ///   - for: The name of the account to find. May not be empty.
+    ///   - using: The password over which to calculate the hash and compare it with the stored hash. May not be empty.
+    ///
+    /// - Returns: On success the account, otherwise nil.
+    
+    public func getAccount(for name: String, using password: String) -> Account? {
+        
+        return Accounts.queue.sync {
+        
+            // Only valid parameters
+            
+            if password.isEmpty { return nil }
+            if name.isEmpty { return nil }
+            
+            
+            // Up the password to 20 characters or more, that makes the hash unpredictable even for minor changes
+            
+            var pwd = ""
+            while pwd.characters.count < 20 { pwd += password }
+            
+            
+            // Check the cache
+            
+            if let account = accountCache[name] {
+                if pwd.hash == account.passwordHash {
+                    return account
+                }
+            }
+            
+            
+            // Check the lookup table
+            
+            if let id = lookupTable[name] {
+                if let account = Account(root: root, id: id) {
+                    accountCache[name] = account
+                    if pwd.hash == account.passwordHash {
+                        return account
+                    }
+                }
+            }
+            
+            
+            // No account matches the criteria
+            
+            return nil
+        }
+    }
+    
+    
+    /// Create a new account and adds it to the cache.
+    ///
+    /// - Parameters:
+    ///   - name: The name for the account, cannot be empty.
+    ///   - password: The password over which to determine the password hash, may not be empty.
+    ///
+    /// - Returns: Nil if the input parameters are invalid or if the account already exists. The new account if it was created.
+    
+    public func newAccount(name: String, password: String) -> Account? {
+        
+        return Accounts.queue.sync {
+
+            // Only valid parameters
+            
+            if password.isEmpty { return nil }
+            if name.isEmpty { return nil }
+            
+            
+            // Check if the account already exists
+            
+            if lookupTable[name] != nil { return nil }
+            
+            
+            // Up the password to 20 characters or more, that makes the hash unpredictable even for minor changes
+            
+            var pwd = ""
+            while pwd.characters.count < 20 { pwd += password }
+            
+            
+            // Create the new account
+            
+            lastAccountId += 1
+            let account = Account(id: lastAccountId, name: name, passwordHash: pwd.hash, rootDir: root)
+            
+            
+            // Add it to the lookup and the cache
+            
+            lookupTable[name] = lastAccountId
+            accountCache[name] = account
+            
+            return account
+        }
+    }
+    
+    
+    /// Checks if an account name is available.
+    ///
+    /// - Returns: True if the given name is available as an account name.
+    
+    public func available(name: String) -> Bool {
+        
+        return Accounts.queue.sync {
+
+            return lookupTable[name] == nil
+        }
+    }
+    
+    
+    /// Regenerates the lookup table from the contents on disk
+    
+    public func regenerateLookupTable(root: URL?) -> Bool {
+        fatalError("Not implemented")
+    }
+    
+    
 }
 
 
