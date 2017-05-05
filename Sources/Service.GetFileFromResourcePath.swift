@@ -3,7 +3,7 @@
 //  File:       Service.GetFileAtResourcePath.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.6
+//  Version:    0.10.7
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.7 - Typo in comments
 // 0.10.6 - Interface update
 //        - Renamed chain... to service...
 //        - Renamed HttpHeader to HttpRequest
@@ -68,14 +69,13 @@
 // Input:
 // ------
 //
-// chainInfo[ResourcePathKey]: A string with the full path for the file to be read.
-// response.code: If set, this service will exit immediately with .next'.
+// info[.absoluteResourcePathKey]: A string with the full path for the file to be read.
 //
 //
 // On success:
 // -----------
 //
-// response.payload: Set with contents of file at chainInfo[ResourcePathKey]
+// response.payload: Set with contents of file at chainInfo[.absoluteResourcePathKey]
 // response.contentType: Set to the mime type for the file extension
 // response.code: Set to code 200 (OK)
 //

@@ -3,7 +3,7 @@
 //  File:       Service.GetResourcePathFromUrl.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.6
+//  Version:    0.10.7
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.7 - Typo in comments
 // 0.10.6 - Interface update
 //        - Renamed chain... to service...
 //        - Renamed HttpHeader to HttpRequest
@@ -66,13 +67,13 @@
 // If the root/url points at a directory, that directory will be tested for the presence of an index.htm or index.html
 // file. If found, the resource path will be set to that file.
 //
-// If a response.code is set, this operation exists immediately with .continueChain.
+// If a response.code is set, this operation exists immediately with '.next'.
 //
 //
 // Input:
 // ------
 //
-// response.code: If set, this service will exit immediately with .continueChain'.
+// response.code: If set, this service will exit immediately with '.next'.
 // header.url: The string representing the URL of the resource to be found.
 // domain.root: The string for the root directory of the domain.
 // connection.filemanager: used.
@@ -81,9 +82,10 @@
 // On success:
 // -----------
 //
-// chainInfo[ResponsePathKey]: A string with the full path to an existing resource.
+// info[.absoluteResourcePathKey] = A String value with the full path to the requested resource
+// info[.relativeResourcePathKey] = A String value
 //
-// return: .continueChain
+// return: .next
 //
 //
 // On error:
@@ -103,7 +105,7 @@
 //   & domain.telemetry.nof403: incremented
 //   & statistics: Updated with a ClientRecord.
 //
-// return: .continueChain
+// return: .next
 //
 // =====================================================================================================================
 

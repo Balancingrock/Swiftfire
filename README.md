@@ -89,6 +89,10 @@ Note: Planned releases are for information only and almost always change.
 - Small feature improvements (if necessary)
 - Code improvements
 
+#### 0.10.7 (Planned)
+
+- Add support for "Users"
+
 #### 0.10.6 (Current)
 
 - Added session support
