@@ -235,6 +235,58 @@ func service_getResourcePathFromUrl(_ request: HttpRequest, _ connection: Connec
     }
 
     
+    // Extracts the name value pairs if they are present and removes all characters starting from the first question mark encountered.
+    
+    func extractAndRemoveNameValuePairs(path: String) -> String {
+        
+        
+        // Only for get operations
+        
+        if request.operation != .get { return path }
+        
+        
+        // There must be a questionmark in the path
+        
+        if !path.contains("?") { return path }
+        
+        
+        // Split the path into two parts, before and after the questionmark
+        
+        let parts = path.components(separatedBy: "?")
+        
+        if parts.count != 2 { return path } // Some kind of error or a special case by the website designer?
+        
+        
+        // The second part contains the name/value pairs
+        
+        var getDict: Dictionary<String, String> = [:]
+        
+        var nameValuePairs = parts[1].components(separatedBy: "&")
+        
+        while nameValuePairs.count > 0 {
+            var nameValue = nameValuePairs[0].components(separatedBy: "=")
+            switch nameValue.count {
+            case 0: break // error, don't do anything
+            case 1: getDict[nameValue[0]] = ""
+            case 2: getDict[nameValue[0]] = nameValue[1]
+            default:
+                let name = nameValue.removeFirst()
+                getDict[name] = nameValue.joined(separator: "=")
+            }
+        }
+        
+        
+        // Add the get dictionary to the service info
+        
+        if getDict.count > 0 { info[.getInfo] = getDict }
+        
+        
+        // Return the "before questionmark' part of the original path
+        
+        return parts[0]
+    }
+    
+    
     // Abort immediately if there is already a response code
     
     if response.code != nil { return .next }
@@ -249,10 +301,17 @@ func service_getResourcePathFromUrl(_ request: HttpRequest, _ connection: Connec
     // Determine the resource path
     // =============================================================================================================
     
-    guard let partialPath = request.url else {
+    guard let originalPartialPath = request.url else {
         handle400_BadRequestError(message: "No URL in request")
         return .next
     }
+    
+    
+    // =============================================================================================================
+    // Extract possible name/value pairs from the partial path
+    // =============================================================================================================
+    
+    let partialPath = extractAndRemoveNameValuePairs(path: originalPartialPath)
     
     
     // =============================================================================================================
