@@ -49,6 +49,7 @@
 // History
 //
 // 0.10.7 - Typo in comments
+//        - Skips if the resource path keys are already present in info.
 // 0.10.6 - Interface update
 //        - Renamed chain... to service...
 //        - Renamed HttpHeader to HttpRequest
@@ -278,7 +279,7 @@ func service_getResourcePathFromUrl(_ request: HttpRequest, _ connection: Connec
         
         // Add the get dictionary to the service info
         
-        if getDict.count > 0 { info[.getInfo] = getDict }
+        if getDict.count > 0 { info[.getInfoKey] = getDict }
         
         
         // Return the "before questionmark' part of the original path
@@ -292,9 +293,18 @@ func service_getResourcePathFromUrl(_ request: HttpRequest, _ connection: Connec
     if response.code != nil { return .next }
 
     
+    // If there is a path already, skip (This allows o.a. serveradmin domain access)
+    
+    if info[.absoluteResourcePathKey] != nil { return .next }
+    if info[.relativeResourcePathKey] != nil { return .next }
+        
+    
     // Aliases
     
-    let connection = (connection as! SFConnection)
+    guard let connection = (connection as? SFConnection) else {
+        Log.atCritical?.log(id: -1, source: #file.source(#function, #line), message: "Type conflict: should be an SFConnection")
+        return .next
+    }
 
     
     // =============================================================================================================

@@ -3,7 +3,7 @@
 //  File:       DomainServices.Registration.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.6
+//  Version:    0.10.7
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.7 - Added getSession to the default list of services
 // 0.10.6 - Renamed services
 //        - Added getSession
 // 0.10.0 - Removed import of SwifterSockets
@@ -112,6 +113,7 @@ var defaultServices: Array<String> {
         blacklist,
         onlyHttp10OrHttp11,
         onlyGetOrPost,
+        getSession,
         getResourcePathFromUrl,
         getFileAtResourcePath
     ]

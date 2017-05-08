@@ -3,7 +3,7 @@
 //  File:       FileURLs.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.17
+//  Version:    0.10.7
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,8 @@
 //
 // History
 //
+// 0.10.7  - Added adminAccountsDir
+//         - Added adminSessionsDir
 // 0.9.17  - Added paths for secure console connections
 // 0.9.15  - General update and switch to frameworks
 // 0.9.14  - Added serverBlacklist
@@ -84,6 +86,9 @@
 //   - headers
 //   - application
 //     - ... logfiles from SwifterLog
+//   - admin
+//     - accounts
+//     - sessions
 // - statistics
 //   - statistics.json
 //
@@ -200,7 +205,7 @@ final class FileURLs {
     /// The file with blacklisted addresses
     
     static var serverBlacklistFile: URL? = { fileUrl(settingsDir, "server-blacklist.json") }()
-
+    
     
     // =================================================================================================================
     /// The directory containing the logging files
@@ -210,13 +215,28 @@ final class FileURLs {
     
     /// The directory containing the header logging files
     
-    static var headersLogDir: URL? = { dirUrl(logsDir, "headers") } ()
+    static var headersLogDir: URL? = { dirUrl(logsDir, "headers") }()
 
     
     /// The directory containing the application log files
     
-    static var applicationLogDir: URL? = { dirUrl(logsDir, "application") } ()
+    static var applicationLogDir: URL? = { dirUrl(logsDir, "application") }()
 
+    
+    /// The directory for server admin logging
+    
+    static var serverAdminDir: URL? = { dirUrl(logsDir, "admin") }()
+    
+    
+    /// The directory for server admin accounts
+    
+    static var adminAccountsDir: URL? = { dirUrl(serverAdminDir, "accounts") }()
+
+    
+    /// The directory for server admin session logging
+    
+    static var adminSessionsDir: URL? = { dirUrl(serverAdminDir, "sessions")}()
+    
     
     // =================================================================================================================
     /// The directory for the statistics file

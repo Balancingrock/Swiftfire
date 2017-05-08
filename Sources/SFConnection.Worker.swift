@@ -239,6 +239,12 @@ extension SFConnection {
         
         guard let domain = domains.domain(forName: host.address), domain.enabled else {
             
+            if domains.count == 0 {
+                setupServerAdmin(request)
+                return
+            }
+            
+            
             let message: String
             if domains.domain(forName: host.address) == nil {
                 message = "Domain not found for host: \(host.address)"
@@ -433,4 +439,187 @@ extension SFConnection {
 
         Log.atInfo?.log(id: logId, source: #file.source(#function, #line), message: "Response took \(Date().javaDate - timestampResponseStart) milli seconds")            
     }
+    
+    
+    // Find the proper step to perform.
+    
+    private func setupServerAdmin(_ request: HttpRequest) {
+        
+        // Is there a session?
+        
+        let cookies = request.cookies
+        
+        if cookies.count != 0 {
+            
+            for cookie in cookies {
+                if cookie.name == "ServerAdmin" {
+                    setupServerAdminStep2(request)
+                }
+            }
+        }
+        
+        setupServerAdminStep1(name: "Name", nameColor: "black", pwdColor: "black", rootColor: "black")
+    }
+    
+    
+    // For the first step transfer a page requesting the input of the server admin name, password (twice) and the root directory for the serveradmin account.
+    
+    private func setupServerAdminStep1(name: String, nameColor: String, pwdColor: String, rootColor: String) {
+        
+        let html = "<!DOCTYPE html>"
+        + "<html>"
+        +    "<head>"
+        +       "<title>Server Admin Setup</title>"
+        +    "</head>"
+        +    "<body>"
+        +       "<div>"
+        +          "<form action=\"/serveradmin/setup.html\" method=\"post\">"
+        +             "<div>"
+        +                "<h3>Server Admin Setup</h3>"
+        +                "<p style=\"margin-bottom:0px;color:\(nameColor);\">\(name):</p>"
+        +                "<input type=\"text\" name=\"name\" value=\"Server Admin\"><br>"
+        +                "<p style=\"margin-bottom:0px;color:\(pwdColor);\">Password:</p>"
+        +                "<input type=\"password\" name=\"pwd1\" value=\"\"><br>"
+        +                "<p style=\"margin-bottom:0px;color:\(pwdColor);\">Repeat:</p>"
+        +                "<input type=\"password\" name=\"pwd2\" value=\"\"><br>"
+        +                "<p style=\"margin-bottom:0px;color:\(rootColor);\">Root directory for the server admin site:</p>"
+        +                "<input type=\"text\" name=\"root\" value=\"\" style=\"min-width:300px;\"><br><br>"
+        +                "<input type=\"submit\" value=\"Submit\">"
+        +              "</div>"
+        +           "</form>"
+        +       "</div>"
+        +    "</body>"
+        + "</html>"
+        
+        let serverCookie = HttpCookie(name: "ServerAdmin", value: "ServerAdmin", timeout: HttpCookie.Timeout.maxAge(30))
+        
+        let response = HttpResponse()
+        response.code = HttpResponseCode.code200_OK
+        response.version = HttpVersion.http1_1
+        response.contentType = mimeTypeDefault
+        response.cookies.append(serverCookie)
+        response.payload = html.data(using: String.Encoding.utf8)
+        
+        if let reply = response.data {
+            bufferedTransfer(reply)
+        } else {
+            Log.atEmergency?.log(id: -1, source: #file.source(#function, #line), message: "Cannot transfer first step of server admin setup.")
+        }
+    }
+    
+    private func setupServerAdminStep2(_ request: HttpRequest) {
+        
+        
+        // Retrieve the form data
+        
+        guard let operation = request.operation, operation == HttpOperation.post else {
+            setupServerAdminStep1(name: "Name", nameColor: "blue", pwdColor: "black", rootColor: "black")
+            return
+        }
+        
+        guard let data = request.payload else {
+            setupServerAdminStep1(name: "Name", nameColor: "black", pwdColor: "blue", rootColor: "black")
+            return
+        }
+        
+        guard let contentType = request.contentType else {
+            setupServerAdminStep1(name: "Name", nameColor: "black", pwdColor: "black", rootColor: "blue")
+            return
+        }
+        
+        guard contentType.caseInsensitiveCompare("application/x-www-form-urlencoded") == ComparisonResult.orderedSame else {
+            setupServerAdminStep1(name: "Name", nameColor: "green", pwdColor: "black", rootColor: "black")
+            return
+        }
+        
+        guard let str = String.init(data: data, encoding: String.Encoding.utf8) else {
+            setupServerAdminStep1(name: "Name", nameColor: "black", pwdColor: "green", rootColor: "black")
+            return
+        }
+        
+        guard let formData = HttpRequest.decodeUrlEncodedFormData(str) else {
+            setupServerAdminStep1(name: "Name", nameColor: "black", pwdColor: "black", rootColor: "green")
+            return
+        }
+        
+        
+        // From here on checking of the content of the form data
+        
+        guard let name = formData["name"], !name.isEmpty else {
+            setupServerAdminStep1(name: "Name", nameColor: "red", pwdColor: "black", rootColor: "black")
+            return
+        }
+        
+        guard let pwd1 = formData["pwd1"], !pwd1.isEmpty else {
+            setupServerAdminStep1(name: name, nameColor: "black", pwdColor: "red", rootColor: "black")
+            return
+        }
+        
+        guard let pwd2 = formData["pwd2"], !pwd2.isEmpty else {
+            setupServerAdminStep1(name: name, nameColor: "black", pwdColor: "red", rootColor: "black")
+            return
+        }
+
+        guard pwd1 == pwd2 else {
+            setupServerAdminStep1(name: name, nameColor: "black", pwdColor: "red", rootColor: "black")
+            return
+        }
+        
+        guard let root = formData["root"], !root.isEmpty else {
+            setupServerAdminStep1(name: name, nameColor: "black", pwdColor: "black", rootColor: "red")
+            return
+        }
+        
+        
+        // Check that there is an index file
+        
+        let rootUrl = URL(fileURLWithPath: root, isDirectory: true)
+        let indexUrl = rootUrl.appendingPathComponent("index").appendingPathExtension("sf").appendingPathExtension("html")
+        
+        var isDir: ObjCBool = false
+        guard FileManager.default.fileExists(atPath: indexUrl.path, isDirectory: &isDir), isDir.boolValue == false else {
+            setupServerAdminStep1(name: name, nameColor: "black", pwdColor: "black", rootColor: "red")
+            return
+        }
+        
+        
+        // Form data is OK
+        
+        _ = adminAccounts.newAccount(name: name, password: pwd1)
+        
+        parameters.adminSiteRoot.setValue(indexUrl.path)
+        
+        
+        // Send accepted message
+        
+        let html = "<!DOCTYPE html>"
+            + "<html>"
+            +    "<head>"
+            +       "<title>Server Admin Setup</title>"
+            +    "</head>"
+            +    "<body>"
+            +       "<div>"
+            +          "<h2>Server Admin Created</h2>"
+            +          "<p>The server admin account has been created, please login at: <a href=\"localhost:\(parameters.httpServicePortNumber)/serveradmin/index.sf.html\">localhost:\(parameters.httpServicePortNumber)/serveradmin/index.sf.html</a></p>"
+            +       "</div>"
+            +    "</body>"
+            + "</html>"
+        
+        let response = HttpResponse()
+        response.code = HttpResponseCode.code200_OK
+        response.version = HttpVersion.http1_1
+        response.contentType = mimeTypeDefault
+        response.payload = html.data(using: String.Encoding.utf8)
+        
+        if let reply = response.data {
+            bufferedTransfer(reply)
+        } else {
+            Log.atEmergency?.log(id: -1, source: #file.source(#function, #line), message: "Cannot transfer second step of server admin setup.")
+        }
+    }
 }
+
+
+
+
+

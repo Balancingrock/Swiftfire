@@ -265,6 +265,7 @@ Log.atNotice?.log(id: -1, source: "Main", message: "Domain settings:\n\n\(domain
 // ==============================
 
 let connectionPool = ConnectionPool()
+
 connectionPool.sorter = { // Sorting makes debugging easier
     (_ lhs: Connection, _ rhs: Connection) -> Bool in
     let lhs = lhs as! SFConnection
@@ -278,6 +279,32 @@ connectionPool.sorter = { // Sorting makes debugging easier
 // ==============================
 
 let telemetry = ServerTelemetry()
+
+
+// ==============================
+// Load the server admin accounts
+// ==============================
+
+let adminAccounts: Accounts
+if let adminAccountsDir = FileURLs.adminAccountsDir {
+    adminAccounts = Accounts(root: adminAccountsDir)
+} else {
+    emergencyExit("Admin accounts directory could not be constructed")
+}
+Log.atNotice?.log(id: -1, source: "Main", message: "Admin accounts created or loaded.")
+
+
+// ====================
+// Allow admin sessions
+// ====================
+
+let adminSessions: Sessions
+if let adminSessionsDir = FileURLs.adminSessionsDir {
+    adminSessions = Sessions(logDirUrl: adminSessionsDir)
+} else {
+    emergencyExit("Admin sessions directory could not be constructed")
+}
+Log.atNotice?.log(id: -1, source: "Main", message: "Admin sessions setup completed.")
 
 
 // ===================================
@@ -465,6 +492,7 @@ case .success:
     
     // Cleanup
     
+    adminAccounts.save()
     statistics.save(toFile: FileURLs.statisticsFile!)
     Log.atNotice?.log(id: -1, source: "Main", message: "Saved server statistics")
     
