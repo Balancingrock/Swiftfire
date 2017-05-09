@@ -68,6 +68,48 @@ import SwiftfireCore
 import SecureSockets
 import SwifterSockets
 
+private let COMMAND_NAME = "HttpServerRunCommand"
+
+
+/// Start http server operations.
+
+public final class HttpServerRunCommand: MacMessage {
+    
+    
+    /// Serialize this object.
+    
+    public var json: VJson {
+        let j = VJson()
+        j[COMMAND_NAME].nullValue = true
+        return j
+    }
+    
+    
+    /// Deserialize an object.
+    ///
+    /// - Parameter json: The VJson hierarchy to be deserialized.
+    
+    public init?(json: VJson?) {
+        guard let json = json else { return nil }
+        guard (json|COMMAND_NAME)?.nullValue == true else { return nil }
+    }
+    
+    
+    /// The queue on which the server will accept client connection requests
+    
+    private static let acceptQueue: DispatchQueue = DispatchQueue(
+        label: "Http Accept queue",
+        qos: .userInteractive,
+        attributes: DispatchQueue.Attributes(),
+        autoreleaseFrequency: DispatchQueue.AutoreleaseFrequency.inherit,
+        target: nil)
+    
+    
+    /// Creates a new command.
+    
+    public init() {}
+}
+
 
 fileprivate func serverErrorHandler(message: String) { Log.atError?.log(id: -1, source: "HTTP Server", message: message) }
 

@@ -66,6 +66,36 @@ import SwiftfireCore
 private let COMMAND_NAME = "SwiftfireQuitCommand"
 
 
+/// Causes the server to quit.
+
+public final class SwiftfireQuitCommand: MacMessage {
+    
+    
+    /// Serialize this object.
+    
+    public var json: VJson {
+        let j = VJson()
+        j[COMMAND_NAME].nullValue = true
+        return j
+    }
+    
+    
+    /// Deserialize an object.
+    ///
+    /// - Parameter json: The VJson hierarchy to be deserialized.
+    
+    public init?(json: VJson?) {
+        guard let json = json else { return nil }
+        guard (json|COMMAND_NAME)?.nullValue == true else { return nil }
+    }
+    
+    
+    /// Creates a new command.
+    
+    public init() {}
+}
+
+
 extension SwiftfireQuitCommand: MacCommand {
     
     public static func factory(json: VJson?) -> MacCommand? {

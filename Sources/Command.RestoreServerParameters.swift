@@ -63,6 +63,37 @@ import SwifterJSON
 import SwifterLog
 import SwiftfireCore
 
+private let COMMAND_NAME = "RestoreServerParametersCommand"
+
+
+/// Loads the server parameters from the defaults file.
+
+public final class RestoreServerParametersCommand: MacMessage {
+    
+    
+    /// Serialize this object.
+    
+    public var json: VJson {
+        let j = VJson()
+        j[COMMAND_NAME].nullValue = true
+        return j
+    }
+    
+    
+    /// Deserialize an object.
+    ///
+    /// - Parameter json: The VJson hierarchy to be deserialized.
+    
+    public init?(json: VJson?) {
+        guard let json = json else { return nil }
+        guard (json|COMMAND_NAME)?.nullValue == true else { return nil }
+    }
+    
+    
+    /// Creates a new command.
+    
+    public init() {}
+}
 
 extension RestoreServerParametersCommand: MacCommand {
     

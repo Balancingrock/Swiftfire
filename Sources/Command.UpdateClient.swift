@@ -61,6 +61,60 @@ import SwifterJSON
 import SwifterLog
 import SwiftfireCore
 
+private let CLIENT = "Client"
+private let NEW_VALUE = "NewValue"
+private let COMMAND_NAME = "UpdateClientCommand"
+
+
+/// Updates the DoNotTrace parameter for a client in the statistics object.
+
+public final class UpdateClientCommand: MacMessage {
+    
+    
+    /// Serialize this object.
+    
+    public var json: VJson {
+        let j = VJson()
+        j[COMMAND_NAME][CLIENT] &= client
+        j[COMMAND_NAME][NEW_VALUE] &= newValue
+        return j
+    }
+    
+    
+    /// Deserialize an object.
+    ///
+    /// - Parameter json: The VJson hierarchy to be deserialized.
+    
+    public init?(json: VJson?) {
+        guard let json = json else { return nil }
+        guard let jclient = (json|COMMAND_NAME|CLIENT)?.stringValue else { return nil }
+        guard let jnewvalue = (json|COMMAND_NAME|NEW_VALUE)?.boolValue else { return nil }
+        client = jclient
+        newValue = jnewvalue
+    }
+    
+    
+    /// The IP Address of the client to be updated.
+    
+    public var client: String
+    
+    
+    /// The new value for the "DoNotTrace" parameter.
+    
+    public var newValue: Bool
+    
+    
+    /// Creates a new command.
+    ///
+    /// - Parameters:
+    ///   - client: The IP Address of the client to be updated.
+    ///   - newValue: The new value for the "DoNotTrace" parameter.
+    
+    public init(client: String, newValue: Bool) {
+        self.client = client
+        self.newValue = newValue
+    }
+}
 
 extension UpdateClientCommand: MacCommand {
     

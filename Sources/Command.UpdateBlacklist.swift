@@ -62,6 +62,85 @@ import SwifterJSON
 import SwifterLog
 import SwiftfireCore
 
+fileprivate let COMMAND_NAME = "UpdateBlacklistCommand"
+fileprivate let SOURCE = "Source"
+fileprivate let ADDRESS = "Address"
+fileprivate let ACTION = "Action"
+fileprivate let REMOVE = "Remove"
+
+
+/// This command is used to modify the contens of a blacklist
+
+public final class UpdateBlacklistCommand: MacMessage {
+    
+    
+    /// Serialize this object.
+    
+    public var json: VJson {
+        let j = VJson()
+        j[COMMAND_NAME][SOURCE] &= source
+        j[COMMAND_NAME][ADDRESS] &= address
+        j[COMMAND_NAME][ACTION] &= action
+        j[COMMAND_NAME][REMOVE] &= remove
+        return j
+    }
+    
+    
+    /// Deserialize an object.
+    ///
+    /// - Parameter json: The VJson hierarchy to be deserialized.
+    
+    public init?(json: VJson?) {
+        
+        guard let json = json else { return nil }
+        
+        guard let jsource = (json|COMMAND_NAME|SOURCE)?.stringValue else { return nil }
+        guard let jaddress = (json|COMMAND_NAME|ADDRESS)?.stringValue else { return nil }
+        guard let jaction = (json|COMMAND_NAME|ACTION)?.stringValue else { return nil }
+        guard let jremove = (json|COMMAND_NAME|REMOVE)?.boolValue else { return nil }
+        
+        self.source = jsource
+        self.address = jaddress
+        self.action = jaction
+        self.remove = jremove
+    }
+    
+    
+    /// Either "server" or a domain name.
+    
+    public private(set) var source: String
+    
+    
+    /// The address to be updated, added or removed.
+    
+    public private(set) var address: String
+    
+    
+    /// The (new) action for the address.
+    
+    public private(set) var action: String
+    
+    
+    /// If true, the address must be removed.
+    
+    public private(set) var remove: Bool
+    
+    
+    /// Creates a new command.
+    ///
+    /// - Parameters:
+    ///   - source: Either "server" or a domain name.
+    ///   - address: The address to be updated, added or removed.
+    ///   - action: The (new) action for the address.
+    ///   - remove: If true, the address must be removed.
+    
+    public init(source: String, address: String, action: String, remove: Bool) {
+        self.source = source
+        self.address = address
+        self.action = action
+        self.remove = remove
+    }
+}
 
 extension UpdateBlacklistCommand: MacCommand {
     

@@ -63,6 +63,63 @@ import SwifterLog
 import SwiftfireCore
 
 
+private let COMMAND_NAME = "UpdateDomainCommand"
+private let DOMAIN_NAME = "DomainName"
+private let ITEM_NAME = "ItemName"
+private let VALUE = "Value"
+
+
+/// Update the settings of a specific domain.
+
+public final class UpdateDomainCommand: MacMessage {
+    
+    
+    /// Serialize this object.
+    
+    public var json: VJson {
+        let json = VJson()
+        json[COMMAND_NAME][DOMAIN_NAME] &= domainName
+        json[COMMAND_NAME][ITEM_NAME] &= itemName
+        json[COMMAND_NAME][VALUE] &= value
+        return json
+    }
+    
+    
+    /// Deserialize an object.
+    ///
+    /// - Parameter json: The VJson hierarchy to be deserialized.
+    
+    public init?(json: VJson?) {
+        guard let json = json else { return nil }
+        guard let jdomainname = (json|COMMAND_NAME|DOMAIN_NAME)?.stringValue else { return nil }
+        guard let jitemname = (json|COMMAND_NAME|ITEM_NAME)?.stringValue else { return nil }
+        guard let jvalue = (json|COMMAND_NAME|VALUE)?.stringValue else { return nil }
+        domainName = jdomainname
+        itemName = jitemname
+        value = jvalue
+    }
+    
+    
+    /// The name of the domain to update.
+    
+    public let domainName: String
+    public let itemName: String
+    public let value: String
+    
+    
+    /// Creates a new command.
+    ///
+    /// - Parameters:
+    ///   - oldDomainName: The name of the domain to update.
+    ///   - newDomain: The new settings for the domain.
+    
+    public init?(domainName: String, itemName: String, value: String) {
+        self.domainName = domainName
+        self.itemName = itemName
+        self.value = value
+    }
+}
+
 extension UpdateDomainCommand: MacCommand {
     
     public static func factory(json: VJson?) -> MacCommand? {

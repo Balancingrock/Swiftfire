@@ -185,17 +185,20 @@ extension SFConnection {
         
         let timestampResponseStart = Date().javaDate
         
+
+        // The Http version is necessary to be able to prepare a response
         
-
-        // =============================================================================================================
-        // Find the domain (host) this request is for.
-        // =============================================================================================================
-
         guard let httpVersion = request.httpVersion else {
             send400BadRequestResponse("HTTP Version not present", processingStartedAt: timestampResponseStart)
             return
         }
+
         
+        // =============================================================================================================
+        // Find the domain (host) this request is for.
+        // =============================================================================================================
+
+        var domain: Domain!
         var host: HttpHost
         
         
@@ -233,28 +236,39 @@ extension SFConnection {
                 return
             }
         }
+
         
+        // A special case is made for the server admin pseudo domain
         
-        // Get the domain
+        if let urlStr = request.url, urlStr.hasPrefix("/serveradmin") {
+            domain = serverAdminPseudoDomain
+        }
         
-        guard let domain = domains.domain(forName: host.address), domain.enabled else {
+        if domains.count == 0 || serverAdminPseudoDomain.accounts.count == 0 {
+            domain = serverAdminPseudoDomain
+        }
+        
+        if domain == nil {
             
-            if domains.count == 0 {
-                setupServerAdmin(request)
+            // Get the domain from the host
+            
+            if let hostDomain = domains.domain(forName: host.address), hostDomain.enabled {
+                
+                domain = hostDomain
+            
+            } else {
+                
+                let message: String
+                if domains.domain(forName: host.address) == nil {
+                    message = "Domain not found for host: \(host.address)"
+                } else {
+                    message = "Domain not enabled for host: \(host.address)"
+                }
+                
+                send400BadRequestResponse(message, processingStartedAt: timestampResponseStart)
+                
                 return
             }
-            
-            
-            let message: String
-            if domains.domain(forName: host.address) == nil {
-                message = "Domain not found for host: \(host.address)"
-            } else {
-                message = "Domain not enabled for host: \(host.address)"
-            }
-            
-            send400BadRequestResponse(message, processingStartedAt: timestampResponseStart)
-
-            return
         }
 
         Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: "Request for domain: \(domain.name)")

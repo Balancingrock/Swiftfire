@@ -119,3 +119,13 @@ var defaultServices: Array<String> {
     ]
 }
 
+var serverAdminServices: Array<String> {
+    return [
+        blacklist,
+        onlyHttp10OrHttp11,
+        onlyGetOrPost,
+        getSession,
+        getResourcePathFromUrl,
+        getFileAtResourcePath
+    ]
+}

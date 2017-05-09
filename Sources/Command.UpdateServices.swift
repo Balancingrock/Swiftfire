@@ -60,6 +60,66 @@ import SwifterJSON
 import SwifterLog
 import SwiftfireCore
 
+fileprivate let COMMAND_NAME = "UpdateServicesCommand"
+fileprivate let DOMAIN_NAME = "DomainName"
+fileprivate let SERVICES = "Services"
+
+
+/// This command is used to modify the contens of a blacklist
+
+public final class UpdateServicesCommand: MacMessage {
+    
+    
+    /// Serialize this object.
+    
+    public var json: VJson {
+        let j = VJson()
+        j[COMMAND_NAME][DOMAIN_NAME] &= domainName
+        j[COMMAND_NAME][SERVICES] &= VJson(services)
+        return j
+    }
+    
+    
+    /// Deserialize an object.
+    ///
+    /// - Parameter json: The VJson hierarchy to be deserialized.
+    
+    public init?(json: VJson?) {
+        
+        guard let json = json else { return nil }
+        
+        guard let jdomainName = (json|COMMAND_NAME|DOMAIN_NAME)?.stringValue else { return nil }
+        guard let jservices = json|COMMAND_NAME|SERVICES else { return nil }
+        
+        self.domainName = jdomainName
+        for jservice in jservices {
+            guard let service = jservice.stringValue else { return nil }
+            self.services.append(service)
+        }
+    }
+    
+    
+    /// The domain to affect.
+    
+    public private(set) var domainName: String
+    
+    
+    /// The new services.
+    
+    public private(set) var services: Array<String> = []
+    
+    
+    /// Creates a new command.
+    ///
+    /// - Parameters:
+    ///   - domainName: Either nil or a domain name.
+    ///   - services: If true, the address must be removed.
+    
+    public init(domainName: String, services: Array<String>) {
+        self.domainName = domainName
+        self.services = services
+    }
+}
 
 extension UpdateServicesCommand: MacCommand {
     

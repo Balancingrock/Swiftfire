@@ -61,6 +61,49 @@ import SwifterJSON
 import SwifterLog
 import SwiftfireCore
 
+private let COMMAND_NAME = "DeltaCommand"
+
+
+/// A introduce a delay in the command stream.
+
+public final class DeltaCommand: MacMessage{
+    
+    
+    /// Serialize this object.
+    
+    public var json: VJson {
+        let j = VJson()
+        j[COMMAND_NAME] &= delay
+        return j
+    }
+    
+    
+    /// Deserialize an object.
+    ///
+    /// - Parameter json: The VJson hierarchy to be deserialized.
+    
+    public init?(json: VJson?) {
+        guard let json = json else { return nil }
+        guard let jdelay = (json|COMMAND_NAME)?.intValue else { return nil }
+        delay = jdelay
+    }
+    
+    
+    /// The delay.
+    
+    public let delay: Int
+    
+    
+    /// Creates a new command.
+    ///
+    /// - Parameters:
+    ///   - source: The delay.
+    
+    public init?(delay: Int?) {
+        guard let delay = delay else { return nil }
+        self.delay = delay
+    }
+}
 
 extension DeltaCommand: MacCommand {
     

@@ -57,7 +57,7 @@
 // Intercepts access to the URL path: /serveradmin and redirects them to the adminSiteRoot. In effect making the server
 // admin website available under any domain that has this service installed.
 //
-// To install this service, insert it after GetPostFormUrlEncoded and before GetResourcePathFromUrl.
+// To install this service, insert it after DecodePostFormUrlEncoded and before GetResourcePathFromUrl.
 //
 //
 // Input:
@@ -102,17 +102,6 @@ import SwifterSockets
 
 func service_serverAdmin(_ request: HttpRequest, _ connection: Connection, _ domain: Domain, _ info: inout Service.Info, _ response: inout HttpResponse) -> Service.Result {
     
-    // If the 'serveradmin' keyword is present as the first part of the URL then this is a request for the admin site.
-    // In order to serve an admin page, an admin must be owner of this session. If there is a request for an admin site
-    // resource and there is no admin logged in, then present the admin login page and remember the page that was requested
-    // to be served immediately after the login.
-    //
-    // There are thus 4 starting conditions for this routine:
-    //
-    // 0) No server admin access.
-    // 1) Initial: No admin logged in, access may either be the login page or any other page.
-    // 2) Admin logged in, previous access from (1) is pending.
-    // 3) Admin logged in, no previous access is pending.
     
     // Exit if there is a code already
     
@@ -128,12 +117,68 @@ func service_serverAdmin(_ request: HttpRequest, _ connection: Connection, _ dom
     }
     
     
-    // Retrieve the url
+    // =================================================================================================================
+    // First priority is to make sure an admin account exists
+    // =================================================================================================================
+
+    if adminAccounts.count == 0 {
+        
+        // If there are no admin setup credentials, then request them.
+        // If there are credentials, then validate them.
+        // If the credentials are valid, create the account
+        
+        guard let postInfo = info[.postInfoKey] as? Dictionary<String, String> else {
+            adminCreateAccountPage(response: &response, name: "", nameColor: "black", pwdColor: "black", rootColor: "black")
+            return .next
+        }
+        
+        guard let name = postInfo["CreateAdminAccountName"], !name.isEmpty, name.characters.count < 30 else {
+            adminCreateAccountPage(response: &response, name: "", nameColor: "red", pwdColor: "black", rootColor: "black")
+            return .next
+        }
+        
+        guard let pwd1 = postInfo["CreateAdminAccountPwd1"], !pwd1.isEmpty else {
+            adminCreateAccountPage(response: &response, name: "", nameColor: "black", pwdColor: "red", rootColor: "black")
+            return .next
+        }
+        
+        guard let pwd2 = postInfo["CreateAdminAccountPwd2"], pwd2 == pwd1 else {
+            adminCreateAccountPage(response: &response, name: "", nameColor: "black", pwdColor: "red", rootColor: "black")
+            return .next
+        }
+        
+        guard let root = postInfo["CreateAdminAccountRoot"], !root.isEmpty else {
+            adminCreateAccountPage(response: &response, name: "", nameColor: "black", pwdColor: "black", rootColor: "red")
+            return .next
+        }
+        
+        // There must be an index file in the server admin root directory
+        
+        let rootUrl = URL(fileURLWithPath: root, isDirectory: true)
+        let indexUrl = rootUrl.appendingPathComponent("index.sf.html")
+                            
+        var isDir: ObjCBool = false
+        guard FileManager.default.fileExists(atPath: indexUrl.path, isDirectory: &isDir), isDir.boolValue == false else {
+            adminCreateAccountPage(response: &response, name: "", nameColor: "black", pwdColor: "black", rootColor: "red")
+            return .next
+        }
+        
+        // Credentials are valid, create account
+    }
+    
+    
+    
+    // Only service the serverAdminPseudoDomain
+    
+    guard domain === serverAdminPseudoDomain else { return .next }
+    
+    
+    // Prepare the url
     
     guard let urlstr = request.url else { return .next }
     
     
-    // Check if it starts with 'serveradmin'.
+    // Remove the first path component if it is 'serveradmin'.
     
     var url = URL(fileURLWithPath: urlstr)
     var pathComponents = url.pathComponents
@@ -155,73 +200,89 @@ func service_serverAdmin(_ request: HttpRequest, _ connection: Connection, _ dom
     
     
     // =================================================================================================================
-    // Check if the admin is logged in
+    // Determine the action to be taken
     // =================================================================================================================
     
-    if let session = info[.sessionKey] as? Session {
+    
+    let session = info[.sessionKey] as? Session
+    
+    
+    // Initially there is no session
+    // -----------------------------
+    
+    if session == nil {
         
-        // Session found
-        // Is it from an admin?
-        
-        if let account = session.info[.accountKey] as? Account {
-            
-            if adminAccounts.contains(account.uuid) {
-                
-                // The session contains an admin account
-                // -------------------------------------
-                // Check if there is a preLoginUrl, if so, return that resource.
-                // If not, return the requested page from this request.
-                
-            } else {
-                
-                // Not an admin account
-                // --------------------
-                // Store the requested URL in a preLoginUrlKey.
-                // Return the admin login page.
-            }
-            
-        } else {
-            
-            // No account found
-            // ----------------
-            // Check if login credentials are available.
-            // If so, check the credentials.
-            // If not, request the credentials.
-            
-            if  let postInfo = info[.postInfoKey] as? Dictionary<String, String>,
-                let name = postInfo["UserName"],
-                let password = postInfo["Password"] {
-                
-                if let account = adminAccounts.getAccount(for: name, using: password) {
-                    
-                    // Store the account in the session
-                    
-                    session.info[.accountKey] = account
-                    
-                } else {
-                    
-                    // Invalid credentials
-                    // Request new credentials after a short sleep
-                    
-                    sleep(5)
-                    
-                    
-                }
-                
-            } else {
-                
-            }
-        }
-        
-    } else {
-        
-        // No session found
-        // ----------------
         // Create session
         // Store the requested url in a preLoginUrlKey.
         // Request the server admin credentials.
         
+        let newSession = adminSessions.newSession(address: connection.remoteAddress, domainName: "SwiftfireServer", logId: connection.logId, connectionId: connection.objectId, allocationCount: connection.allocationCount, timeout: 600)
         
+        info[.sessionKey] = newSession
+        
+        if pathComponents.count > 0 { session?.info[.preLoginUrlKey] = fullPath }
+        
+        fullPath = URL(fileURLWithPath: parameters.adminSiteRoot.value).appendingPathComponent("login.sf.html").path
+
+    } else {
+    
+        
+        // Then there is a session and there are a login credentials but the credentials are not yet checked.
+        // --------------------------------------------------------------------------------------------------
+        
+        let account = session?.info[.accountKey] as? Account
+        
+        if account == nil {
+            
+            
+            // Check the credentials and find the used account
+            
+            if  let postInfo = info[.postInfoKey] as? Dictionary<String, String>,
+                let name = postInfo["UserName"],
+                let password = postInfo["Password"],
+                let account = adminAccounts.getAccount(for: name, using: password) {
+                
+                
+                // Save the account
+                
+                session?.info[.accountKey] = account
+                
+                
+                // There should be a preLoginUrl path, use that and remove it.
+                
+                if let preLoginUrlPath = session?.info[.preLoginUrlKey] as? String {
+                    
+                    session?.info[.preLoginUrlKey] = nil
+                    fullPath = preLoginUrlPath
+                    
+                } else {
+                    
+                    // If there was no preLoginUrl then go to the index page
+                    
+                    fullPath = parameters.adminSiteRoot.value
+                }
+                
+            } else {
+                
+                // Something is missing/wrong, try again
+                
+                fullPath = URL(fileURLWithPath: parameters.adminSiteRoot.value).appendingPathComponent("login.sf.html").path
+            }
+            
+        } else {
+            
+            // This is the normal case: an admin is logged in and requests pages
+            // -----------------------------------------------------------------
+            
+            // Be sure it is an admin, if not dump the account and try a login again
+            
+            if !adminAccounts.contains(account?.uuid ?? "") {
+                
+                session?.info[.accountKey] = nil
+                
+                fullPath = URL(fileURLWithPath: parameters.adminSiteRoot.value).appendingPathComponent("login.sf.html").path
+            }
+        }
     }
     
     
@@ -297,10 +358,99 @@ func service_serverAdmin(_ request: HttpRequest, _ connection: Connection, _ dom
     
     
     // =================================================================================================================
-    // Read, process and return the resource
+    // Fetch the requested resource
     // =================================================================================================================
+    
+    let payload: Data
+    
+    // If the file can contain function calls, then process it. Otherwise return the file as read.
+    
+    if (fullPath as NSString).lastPathComponent.contains(".sf.") {
+        
+        switch SFDocument.factory(path: fullPath, filemanager: connection.filemanager) {
+            
+        case .error(let message):
+            
+            handle500_ServerError(connection: connection, resourcePath: fullPath, message: message, line: #line)
+            return .next
+            
+            
+        case .success(let doc):
+            
+            var environment = Function.Environment(request: request, connection: connection, domain: domain, response: &response, serviceInfo: &info)
+            
+            payload = doc.getContent(with: &environment)
+        }
+        
+        
+        
+    } else {
+        
+        guard let data = connection.filemanager.contents(atPath: fullPath) else {
+            handle500_ServerError(connection: connection, resourcePath: fullPath, message: "Reading contents of file failed (but file is reported readable), resource: \(resourcePath)", line: #line)
+            return .next
+        }
+        
+        payload = data
+    }
+    
+    
+    // =============================================================================================================
+    // Create the http response
+    // =============================================================================================================
+    
+    
+    // Telemetry update
+    
+    domain.telemetry.nof200.increment()
+    
+    
+    // Response
+    
+    response.code = HttpResponseCode.code200_OK
+    response.contentType = mimeType(forPath: resourcePath) ?? mimeTypeDefault
+    response.payload = payload
+    
+    return .next
+    
     
     Log.atDebug?.log(id: -1, source: #file.source(#function, #line), message: "")
     
     return .next
+}
+
+
+fileprivate func adminCreateAccountPage(response: inout HttpResponse, name: String, nameColor: String, pwdColor: String, rootColor: String) {
+    
+    let html = "<!DOCTYPE html>"
+        + "<html>"
+        +    "<head>"
+        +       "<title>Server Admin Setup</title>"
+        +    "</head>"
+        +    "<body>"
+        +       "<div>"
+        +          "<form action=\"/serveradmin/setup.html\" method=\"post\">"
+        +             "<div>"
+        +                "<h3>Server Admin Setup</h3>"
+        +                "<p style=\"margin-bottom:0px;color:\(nameColor);\">\(name):</p>"
+        +                "<input type=\"text\" name=\"CreateAdminAccountName\" value=\"Server Admin\"><br>"
+        +                "<p style=\"margin-bottom:0px;color:\(pwdColor);\">Password:</p>"
+        +                "<input type=\"password\" name=\"CreateAdminAccountPwd1\" value=\"\"><br>"
+        +                "<p style=\"margin-bottom:0px;color:\(pwdColor);\">Repeat:</p>"
+        +                "<input type=\"password\" name=\"CreateAdminAccountPwd2\" value=\"\"><br>"
+        +                "<p style=\"margin-bottom:0px;color:\(rootColor);\">Root directory for the server admin site:</p>"
+        +                "<input type=\"text\" name=\"CreateAdminAccountRoot\" value=\"\" style=\"min-width:300px;\"><br><br>"
+        +                "<input type=\"submit\" value=\"Submit\">"
+        +              "</div>"
+        +           "</form>"
+        +       "</div>"
+        +    "</body>"
+        + "</html>"
+    
+    
+    let response = HttpResponse()
+    response.code = HttpResponseCode.code200_OK
+    response.version = HttpVersion.http1_1
+    response.contentType = mimeTypeDefault
+    response.payload = html.data(using: String.Encoding.utf8)
 }

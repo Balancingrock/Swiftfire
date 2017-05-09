@@ -61,6 +61,54 @@ import SwifterJSON
 import SwifterLog
 import SwiftfireCore
 
+private let COMMAND_NAME = "WriteServerParameterCommand"
+
+
+/// Updates a server parameter.
+
+public final class WriteServerParameterCommand: MacMessage {
+    
+    
+    /// Serialize this object.
+    
+    public var json: VJson {
+        let j = VJson()
+        j[COMMAND_NAME] &= payload
+        return j
+    }
+    
+    
+    /// Deserialize an object.
+    ///
+    /// - Parameter json: The VJson hierarchy to be deserialized.
+    
+    public init?(json: VJson?) {
+        guard let json = json else { return nil }
+        guard let jpayload = json|COMMAND_NAME else { return nil }
+        payload = jpayload    }
+    
+    
+    /// The parameter to be updated.
+    
+    public let payload: VJson
+    
+    
+    /// Creates a new command.
+    ///
+    /// - Parameters:
+    ///   - parameter: The name of the parameter to be updated.
+    
+    public init?(parameter: NamedValueProtocol) {
+        payload = VJson()
+        payload["Name"] &= parameter.name
+        payload["Value"] &= parameter.stringValue
+    }
+    
+    
+    // The network target for the logger
+    
+    public static var networkLogTarget = SwifterLog.NetworkTarget("","")
+}
 
 extension WriteServerParameterCommand: MacCommand {
     

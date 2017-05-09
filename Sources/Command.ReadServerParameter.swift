@@ -61,6 +61,45 @@ import SwifterJSON
 import SwifterLog
 import SwiftfireCore
 
+private let COMMAND_NAME = "ReadServerParameterCommand"
+
+
+/// Requests a server parameter readout.
+
+public final class ReadServerParameterCommand: MacMessage {
+    
+    
+    /// Serialize this object.
+    
+    public var json: VJson {
+        let j = VJson()
+        j[COMMAND_NAME]["Name"] &= name
+        return j
+    }
+    
+    
+    /// Deserialize an object.
+    ///
+    /// - Parameter json: The VJson hierarchy to be deserialized.
+    
+    public init?(json: VJson?) {
+        guard let json = json else { return nil }
+        guard let jname = (json|COMMAND_NAME|"Name")?.stringValue else { return nil }
+        name = jname
+    }
+    
+    
+    /// The parameter
+    
+    public let name: String
+    
+    
+    /// Create a new command
+    
+    public init(name: String) {
+        self.name = name
+    }
+}
 
 extension ReadServerParameterCommand: MacCommand {
     

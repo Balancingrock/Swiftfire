@@ -61,6 +61,49 @@ import SwifterJSON
 import SwifterLog
 import SwiftfireCore
 
+private let COMMAND_NAME = "RestoreBlacklistCommand"
+private let SOURCE = "Source"
+
+
+/// Reloads a blacklist from file.
+
+public final class RestoreBlacklistCommand: MacMessage {
+    
+    
+    /// Serialize this object.
+    
+    public var json: VJson {
+        let j = VJson()
+        j[COMMAND_NAME][SOURCE] &= source
+        return j
+    }
+    
+    
+    /// Deserialize an object.
+    ///
+    /// - Parameter json: The VJson hierarchy to be deserialized.
+    
+    public init?(json: VJson?) {
+        guard let json = json else { return nil }
+        guard let jsource = (json|COMMAND_NAME|SOURCE)?.stringValue else { return nil }
+        self.source = jsource
+    }
+    
+    
+    /// Either "server" or a domain name
+    
+    public var source: String
+    
+    
+    /// Creates a new command.
+    ///
+    /// - Parameters:
+    ///   - source: Either "server" or a domain name.
+    
+    public init(source: String) {
+        self.source = source
+    }
+}
 
 extension RestoreBlacklistCommand: MacCommand {
     

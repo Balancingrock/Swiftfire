@@ -1,0 +1,395 @@
+// =====================================================================================================================
+//
+//  File:       Logfile.swift
+//  Project:    SwiftfireCore
+//
+//  Version:    0.10.6
+//
+//  Author:     Marinus van der Lugt
+//  Company:    http://balancingrock.nl
+//  Website:    http://swiftfire.nl/
+//  Blog:       http://swiftrien.blogspot.com
+//  Git:        https://github.com/Balancingrock/Swiftfire
+//
+//  Copyright:  (c) 2016-2017 Marinus van der Lugt, All rights reserved.
+//
+//  License:    Use or redistribute this code any way you like with the following two provision:
+//
+//  1) You ACCEPT this source code AS IS without any guarantees that it will work as intended. Any liability from its
+//  use is YOURS.
+//
+//  2) You WILL NOT seek damages from the author or balancingrock.nl.
+//
+//  I also ask you to please leave this header with the source code.
+//
+//  I strongly believe that voluntarism is the way for societies to function optimally. Thus I have choosen to leave it
+//  up to you to determine the price for this code. You pay me whatever you think this code is worth to you.
+//
+//   - You can send payment via paypal to: sales@balancingrock.nl
+//   - Or wire bitcoins to: 1GacSREBxPy1yskLMc9de2nofNv2SNdwqH
+//
+//  I prefer the above two, but if these options don't suit you, you might also send me a gift from my amazon.co.uk
+//  wishlist: http://www.amazon.co.uk/gp/registry/wishlist/34GNMPZKAQ0OO/ref=cm_sw_em_r_wsl_cE3Tub013CKN6_wb
+//
+//  If you like to pay in another way, please contact me at rien@balancingrock.nl
+//
+//  (It is always a good idea to visit the website/blog/google to ensure that you actually pay me and not some imposter)
+//
+//  For private and non-profit use the suggested price is the price of 1 good cup of coffee, say $4.
+//  For commercial use the suggested price is the price of 1 good meal, say $20.
+//
+//  You are however encouraged to pay more ;-)
+//
+//  Prices/Quotes for support, modifications or enhancements can be obtained from: rien@balancingrock.nl
+//
+// =====================================================================================================================
+// PLEASE let me know about bugs, improvements and feature requests. (rien@balancingrock.nl)
+// =====================================================================================================================
+//
+// History
+//
+// 0.10.6 - Code improvement: create strong self in closures
+// 0.9.17 - Header update
+// 0.9.15 - General update and switch to frameworks, SwiftfireCore split.
+// 0.9.14 - Upgraded to Xcode 8 beta 6
+//        - Changed LogQueue to DispatchQueue()
+// 0.9.13 - Upgraded to Xcode 8 beta 3 (Swift 3)
+// 0.9.10 - Fixed newFileDailyAt and newFileAfterDelay to accept setting to nil after creation.
+// 0.9.9  - Renamed FileLog to Logfile and general overhaul for publication on Swiftrien.
+//        - Fixed several bugs that messed up file creation (sorry!).
+//        - Changed the way in which the oldest file is determined, files are now filtered for containing the 'filename' string.
+//        - Added flush operations
+// 0.9.7  - Initial release
+// =====================================================================================================================
+
+import Foundation
+
+
+/// A base class to be used for logging purposes.
+
+open class Logfile {
+
+    
+    /// Options for the Logfile initializer
+    
+    public enum InitOption {
+        
+        
+        /// When a logfile has become larger than this number (in KBytes), a new logfile will be started.
+        
+        case maxFileSize(Int)
+        
+        
+        /// When a new logfile is created and there are more files in the logfile directory than this number (exclusing hidden files), the oldest file will be deleted.
+        /// - Note: This assumes that the filename is a unique string among the other filenames in the logfile directory. The oldest file is determined through sorting of the files containing the 'filename' string.
+        
+        case maxNofFiles(Int)
+        
+        
+        /// A new logfile will be started -when necessary- every time this time elapses. Notice that when no log entries are made, no file will be created. There will be no creep in the starttime. The wallclock time uses the current calendar.
+        
+        case newFileAfterDelay(WallclockTime)
+        
+        
+        /// Starts a new logfile daily at the specified wallclock time.
+        
+        case newFileDailyAt(WallclockTime)
+    }
+
+    
+    /// The queue on which all file logging activity will take place
+    
+    private static let queue = DispatchQueue(label: "Logfile Sync Queue", qos: .background, attributes: DispatchQueue.Attributes(), autoreleaseFrequency: DispatchQueue.AutoreleaseFrequency.inherit, target: nil)
+    
+    
+    /// The date formatter used to generate filenames
+    
+    public static var dateFormatter: DateFormatter = {
+        let ltf = DateFormatter()
+        ltf.dateFormat = "yyyy-MM-dd'T'HH.mm.ss.SSSZ"
+        return ltf
+    }()
+
+    
+    /// Returns the current file handle if there is one, or creates a new one if necessary.
+    
+    private var fileHandle: FileHandle? {
+        
+        if _fileHandle == nil {
+            
+            // Create the file
+            
+            if let fileUrl = fileUrl {
+                
+                if FileManager.default.createFile(atPath: fileUrl.path, contents: nil, attributes: [FileAttributeKey.posixPermissions.rawValue : NSNumber(value: 0o640)]) {
+                    _fileHandle = FileHandle(forUpdatingAtPath: fileUrl.path)
+                    if let startData = createFileStart()?.data(using: String.Encoding.utf8, allowLossyConversion: true) { _fileHandle?.write(startData) }
+                    _filepathForNotice = fileUrl.path
+                } else {
+                    _fileHandle = nil
+                }
+                
+                
+                // Check if there are more than MaxNofFiles in the logfile directory, if so, remove the oldest
+                
+                if maxNofFiles != nil {
+                    
+                    // Get all files that are not hidden
+                        
+                    if let files = try? FileManager.default.contentsOfDirectory(at: directory as URL, includingPropertiesForKeys: nil, options: FileManager.DirectoryEnumerationOptions()) {
+                        
+                        
+                        // Remove all files that do not contain the choosen filename
+                        
+                        let onlyLogfiles = files.flatMap({$0.path.contains(filename) ? $0 : nil})
+                        
+                        if onlyLogfiles.count > maxNofFiles! {
+                            let sortedLogfiles = onlyLogfiles.sorted(by: { $0.lastPathComponent < $1.lastPathComponent })
+                            try? FileManager.default.removeItem(at: sortedLogfiles.first!)
+                        }
+                    }
+                }
+                
+            } else {
+                _fileHandle = nil
+            }
+        }
+        return _fileHandle
+    }
+    
+    
+    /// The actual file handle, note that this parameter will be set to nil when a file is closed.
+    ///
+    /// The recording function has to evaluate the presence of a filehandle without the side effect of creating one.
+    /// Hence the split implementation of this member.
+    
+    private var _fileHandle: FileHandle?
+    
+    
+    /// The first part of the name of the logfiles
+    
+    public private(set) var filename: String
+    
+    
+    /// The file extension of the logfiles
+    
+    public private(set) var fileExtension: String
+    
+    
+    /// The URL of the directory the logfiles are located
+    
+    public private(set) var directory: URL
+    
+    
+    /// The maximum filesize of a logfile (in bytes)
+    
+    public private(set) var maxFileSize: Int?
+    
+    
+    /// The maximum number of logfiles
+    
+    public private(set) var maxNofFiles: Int?
+    
+    
+    /// The time at which a new logfile is started every day
+    
+    public private(set) var newFileDailyAt: WallclockTime? {
+        didSet {
+            self.nextDailyFileAt = (newFileDailyAt == nil) ? nil : Date.firstFutureDate(with: newFileDailyAt!)
+        }
+    }
+    
+    
+    /// The next daily logfile creation
+    
+    public private(set) var nextDailyFileAt: Date?
+    
+    
+    /// The delay between new logfiles
+    
+    public private(set) var newFileAfterDelay: WallclockTime? {
+        didSet {
+            self.nextDelayedFileAt = (newFileAfterDelay == nil) ? nil : Date() + newFileAfterDelay!
+        }
+    }
+    
+    
+    /// The time when the next logfile must be created
+    
+    public private(set) var nextDelayedFileAt: Date?
+    
+    
+    /// Creates a new logfile(s) object with the given name, extension and location. The filenames of the logfiles will follow the pattern: <filename>_<date>T<time><zone>.<extension>. Where date will be "yyyy-MM-dd" such that the files will appear sorted in directory listings.
+    ///
+    /// - Parameters:
+    ///   - name: The first name part of the logfiles. Default is 'logfile'.
+    ///   - ext: The file extension of the logfiles. default is 'txt'.
+    ///   - dir: The URL of the directory in which the logfiles will be created.
+    ///   - options: A series of option enums that will be processed in order, hence last-come overrides earlier same-option settings.
+    
+    public init?(name: String = "logfile", ext: String = "txt", dir: URL?, options: InitOption ...) {
+        
+        guard let dir = dir else { return nil }
+        
+        self.filename = name
+        self.fileExtension = ext
+        self.directory = dir
+        
+        for option in options {
+            
+            switch option {
+                
+            case let .maxFileSize(size):
+                self.maxFileSize = size * 1024
+                
+            case let .maxNofFiles(num):
+                self.maxNofFiles = num
+                
+            case let .newFileAfterDelay(delay):
+                self.newFileAfterDelay = delay
+                self.nextDelayedFileAt = Date() + delay
+                
+            case let .newFileDailyAt(time):
+                self.newFileDailyAt = time
+                self.nextDailyFileAt = Date.firstFutureDate(with: time)
+            }
+        }
+    }
+
+    
+    /// Create a new filename based on the current time.
+    
+    private var fullFilename: String {
+        return filename + "_" + Logfile.dateFormatter.string(from: Date()) +  "." + fileExtension
+    }
+    
+    
+    // Create a new file URL
+    
+    private var fileUrl: URL? {
+        return directory.appendingPathComponent(fullFilename)
+    }
+    
+    
+    // Keep track of the most recent created file
+    
+    public private(set) var _filepathForNotice: String?
+    
+    
+    /// Close the logfile.
+    ///
+    /// - Note: This method will block until the file has been closed (it is safe to 'nil' a logger object afterwards)
+    /// - Note: If a new 'record' call is made after this operation was called then a new logfile will be created.
+    ///
+    /// - Parameter cleanup: A closure that will be executed immediately before the file is closed. This closure is intended to clean up or reinitialize members when the file is closed. If close, flush or record is called from within the closure, a deadlock will occur.
+    
+    public func close(cleanup: (() -> ())? = nil) {
+        Logfile.queue.sync() { [weak self] in self?._close(cleanup: cleanup) }
+    }
+    
+    
+    /// Close the current logfile immediately (if any)
+    ///
+    /// - Parameter optional: A closure that will be executed immediately before the file is closed. This closure is intended to clean up or reinitialize members when the file is closed. If close, flush or record is called from within the closure, a deadlock will occur.
+    
+    private func _close(cleanup: (() -> ())? = nil) {
+        
+        cleanup?()
+        
+        if let file = self._fileHandle {
+            file.seekToEndOfFile()
+            if let endData = createFileEnd()?.data(using: String.Encoding.utf8, allowLossyConversion: true) { file.write(endData) }
+            file.closeFile()
+            self._fileHandle = nil
+            self._filepathForNotice = nil
+        }
+    }
+    
+    
+    /// Force possible buffer content to permanent storage
+    
+    public func flush() {
+        
+        Logfile.queue.sync() { [weak self] in self?._fileHandle?.synchronizeFile() }
+    }
+    
+    
+    /// Records the given string in the current logfile. Will create a new logfile if neccesary.
+    
+    public func record(message: String) {
+        
+        Logfile.queue.sync(execute: {
+            
+            [weak self] in
+            
+            guard let `self` = self else { return }
+            
+            // Implementation detail: Almost everything is done in this operation, from file creation to recording to closing and deleting. And since all invokations are placed on the queue, this guarantees thread safety. An alternative solution would be to use timers for the timed-renewal of the files, that would be slightly more efficient.
+            
+            // If the file exists, check if a new file must be created based on the present options for file renewal
+            
+            if let file = self._fileHandle { // Don't want side effect of creating a new fileHandle
+                
+                let now = Date() // Caching current time
+                
+                
+                // Close the current file if it is bigger than a maxFileSize assuming that maxFileSize is set.
+                
+                let fileSize = file.seekToEndOfFile()
+                if let maxSize = self.maxFileSize, fileSize > UInt64(maxSize) { self._close() }
+                
+                
+                // If the daily time has been set, and is in the past, then close the current file.
+                
+                if let newFileDailyAt = self.newFileDailyAt {
+                    
+                    if self.nextDailyFileAt!.compare(now) == ComparisonResult.orderedAscending {
+                        
+                        self._close()
+                        
+                        self.nextDailyFileAt = Date.firstFutureDate(with: newFileDailyAt)
+                    }
+                }
+                
+                
+                // If the delay was set, and is in the past, then close the current file.
+                
+                if let newFileAfterDelay = self.newFileAfterDelay {
+                    
+                    if self.nextDelayedFileAt!.compare(now) == ComparisonResult.orderedAscending {
+                        
+                        self._close()
+                        
+                        // Increase the time for the next new file, and make sure it is after the current time.
+                        
+                        while self.nextDelayedFileAt!.compare(now as Date) == ComparisonResult.orderedAscending {
+                            self.nextDelayedFileAt! = self.nextDelayedFileAt! + newFileAfterDelay
+                        }
+                    }
+                }
+            }
+            
+            if let file = self.fileHandle { // Want the side effect of creating a new fileHandle (if necessary or possible)
+                
+                if let data = message.data(using: String.Encoding.utf8, allowLossyConversion: true) {
+                    file.write(data)
+                }
+            }
+            
+        })
+    }
+    
+    
+    /// Use this function to create the first bit of data that will be prepended to any file that is opened.
+    ///
+    /// Override this function to create a header when a new logfile is openend.
+    
+    open func createFileStart() -> String? { return nil }
+    
+    
+    /// Use this function to create the last bit of data that will be appened to any file that is closed.
+    ///
+    /// Override this function to add a footer when a logfile is closed.
+    
+    open func createFileEnd() -> String? { return nil }
+}

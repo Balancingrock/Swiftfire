@@ -61,6 +61,48 @@ import SwifterJSON
 import SwifterLog
 import SwiftfireCore
 
+private let COMMAND_NAME = "ResetDomainTelemetryCommand"
+
+
+/// Resets the telemetry for a specific domain.
+
+public final class ResetDomainTelemetryCommand: MacMessage {
+    
+    
+    /// Serialize this object.
+    
+    public var json: VJson {
+        let j = VJson()
+        j[COMMAND_NAME].stringValue = domainName
+        return j
+    }
+    
+    
+    /// Deserialize an object.
+    ///
+    /// - Parameter json: The VJson hierarchy to be deserialized.
+    
+    public init?(json: VJson?) {
+        guard let json = json else { return nil }
+        guard let jdomainName = (json|COMMAND_NAME)?.stringValue else { return nil }
+        domainName = jdomainName
+    }
+    
+    
+    /// The name of the domain that must be reset.
+    
+    public let domainName: String
+    
+    
+    /// Creates a new command.
+    ///
+    /// - Parameters:
+    ///   - domainName: The name of the domain that must be reset.
+    
+    public init(domainName: String) {
+        self.domainName = domainName
+    }
+}
 
 extension ResetDomainTelemetryCommand: MacCommand {
     

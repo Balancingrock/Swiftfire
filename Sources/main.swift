@@ -260,6 +260,14 @@ domains.forEach() { $0.removeUnknownServices() }
 Log.atNotice?.log(id: -1, source: "Main", message: "Domain settings:\n\n\(domains)\n")
 
 
+// Create the server admin pseudo domain
+
+let serverAdminPseudoDomain = Domain(supportDirectory: FileURLs.serverAdminDir)
+serverAdminPseudoDomain.name = "serveradmin"
+serverAdminPseudoDomain.serviceNames = serverAdminServices // Defined in: Services.Registration.swift
+serverAdminPseudoDomain.sessionTimeout = 600 // Seconds
+
+
 // ==============================
 // Setup the http connection pool
 // ==============================
@@ -279,32 +287,6 @@ connectionPool.sorter = { // Sorting makes debugging easier
 // ==============================
 
 let telemetry = ServerTelemetry()
-
-
-// ==============================
-// Load the server admin accounts
-// ==============================
-
-let adminAccounts: Accounts
-if let adminAccountsDir = FileURLs.adminAccountsDir {
-    adminAccounts = Accounts(root: adminAccountsDir)
-} else {
-    emergencyExit("Admin accounts directory could not be constructed")
-}
-Log.atNotice?.log(id: -1, source: "Main", message: "Admin accounts created or loaded.")
-
-
-// ====================
-// Allow admin sessions
-// ====================
-
-let adminSessions: Sessions
-if let adminSessionsDir = FileURLs.adminSessionsDir {
-    adminSessions = Sessions(logDirUrl: adminSessionsDir)
-} else {
-    emergencyExit("Admin sessions directory could not be constructed")
-}
-Log.atNotice?.log(id: -1, source: "Main", message: "Admin sessions setup completed.")
 
 
 // ===================================
@@ -492,7 +474,7 @@ case .success:
     
     // Cleanup
     
-    adminAccounts.save()
+    serverAdminPseudoDomain.serverShutdown()
     statistics.save(toFile: FileURLs.statisticsFile!)
     Log.atNotice?.log(id: -1, source: "Main", message: "Saved server statistics")
     

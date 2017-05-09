@@ -59,6 +59,37 @@ import SwifterJSON
 import SwiftfireCore
 import SwifterLog
 
+private let COMMAND_NAME = "HttpsServerStopCommand"
+
+
+/// Stop the http server from accepting new requests.
+
+public final class HttpsServerStopCommand: MacMessage {
+    
+    
+    /// Serialize this object.
+    
+    public var json: VJson {
+        let j = VJson()
+        j[COMMAND_NAME].nullValue = true
+        return j
+    }
+    
+    
+    /// Deserialize an object.
+    ///
+    /// - Parameter json: The VJson hierarchy to be deserialized.
+    
+    public init?(json: VJson?) {
+        guard let json = json else { return nil }
+        guard (json|COMMAND_NAME)?.nullValue == true else { return nil }
+    }
+    
+    
+    /// Creates a new command.
+    
+    public init() {}
+}
 
 extension HttpsServerStopCommand: MacCommand {
     

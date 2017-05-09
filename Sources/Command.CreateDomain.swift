@@ -61,6 +61,49 @@ import SwifterJSON
 import SwifterLog
 import SwiftfireCore
 
+private let COMMAND_NAME = "CreateDomainCommand"
+
+
+/// Creates a new domain.
+
+public final class CreateDomainCommand: MacMessage {
+    
+    
+    /// Serialize this object.
+    
+    public var json: VJson {
+        let j = VJson()
+        j[COMMAND_NAME].stringValue = domainName
+        return j
+    }
+    
+    
+    /// Deserialize an object.
+    ///
+    /// - Parameter json: The VJson hierarchy to be deserialized.
+    
+    public init?(json: VJson?) {
+        guard let json = json else { return nil }
+        guard let jdomainName = (json|COMMAND_NAME)?.stringValue else { return nil }
+        domainName = jdomainName
+    }
+    
+    
+    /// The name of the domain to be created.
+    
+    public let domainName: String
+    
+    
+    /// Creates a new command.
+    ///
+    /// - Parameters:
+    ///   - domainName: The name of the new domain.
+    
+    public init?(domainName: String?) {
+        guard let domainName = domainName else { return nil }
+        self.domainName = domainName
+    }
+}
 
 extension CreateDomainCommand: MacCommand {
     

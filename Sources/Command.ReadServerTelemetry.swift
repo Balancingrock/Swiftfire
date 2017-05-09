@@ -63,6 +63,47 @@ import SwifterJSON
 import SwifterLog
 import SwiftfireCore
 
+private let COMMAND_NAME = "ReadServerTelemetryCommand"
+
+
+/// A request for a server telemetry item.
+
+public final class ReadServerTelemetryCommand: MacMessage {
+    
+    
+    /// Serialize this object.
+    
+    public var json: VJson {
+        let j = VJson()
+        j[COMMAND_NAME]["Name"] &= name
+        return j
+    }
+    
+    
+    /// Deserialize an object.
+    ///
+    /// - Parameter json: The VJson hierarchy to be deserialized.
+    
+    public init?(json: VJson?) {
+        guard let json = json else { return nil }
+        guard let jname = (json|COMMAND_NAME|"Name")?.stringValue else { return nil }
+        name = jname
+    }
+    
+    
+    /// The name of the requested item
+    
+    public let name: String
+    
+    
+    /// Creates a new command
+    ///
+    /// - Parameter name: The name of the requested item.
+    
+    public init(name: String) {
+        self.name = name
+    }
+}
 
 extension ReadServerTelemetryCommand: MacCommand {
     

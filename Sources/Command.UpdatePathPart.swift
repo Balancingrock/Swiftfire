@@ -61,6 +61,60 @@ import SwifterJSON
 import SwifterLog
 import SwiftfireCore
 
+private let URLSTR = "Url"
+private let NEW_VALUE = "NewValue"
+private let COMMAND_NAME = "UpdatePathPartCommand"
+
+
+/// Updates the DoNotTrace value of a path part (in the statistics)
+
+public final class UpdatePathPartCommand: MacMessage {
+    
+    
+    /// Serialize this object.
+    
+    public var json: VJson {
+        let j = VJson()
+        j[COMMAND_NAME][URLSTR] &= url
+        j[COMMAND_NAME][NEW_VALUE] &= newValue
+        return j
+    }
+    
+    
+    /// Deserialize an object.
+    ///
+    /// - Parameter json: The VJson hierarchy to be deserialized.
+    
+    public init?(json: VJson?) {
+        guard let json = json else { return nil }
+        guard let jurl = (json|COMMAND_NAME|URLSTR)?.stringValue else { return nil }
+        guard let jnewvalue = (json|COMMAND_NAME|NEW_VALUE)?.boolValue else { return nil }
+        url = jurl
+        newValue = jnewvalue
+    }
+    
+    
+    /// The URL ending with the path part to be updated.
+    
+    public let url: String
+    
+    
+    /// The new value for the DoNotTrace parameter.
+    
+    public let newValue: Bool
+    
+    
+    /// Creates a new command.
+    ///
+    /// - Parameters:
+    ///   - url: The URL ending with the path part to be updated.
+    ///   - newValue: The new value for the DoNotTrace parameter.
+    
+    public init(url: String, newValue: Bool) {
+        self.url = url
+        self.newValue = newValue
+    }
+}
 
 extension UpdatePathPartCommand: MacCommand {
         

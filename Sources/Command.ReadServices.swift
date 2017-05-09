@@ -60,6 +60,51 @@ import SwifterJSON
 import SwifterLog
 import SwiftfireCore
 
+fileprivate let COMMAND_NAME = "ReadServicesCommand"
+fileprivate let SOURCE = "Source"
+
+
+/// Request a list of services to be returned
+
+public final class ReadServicesCommand: MacMessage {
+    
+    
+    /// Serialize this object.
+    
+    public var json: VJson {
+        let j = VJson()
+        j[COMMAND_NAME][SOURCE] &= source
+        return j
+    }
+    
+    
+    /// Deserialize an object.
+    ///
+    /// - Parameter json: The VJson hierarchy to be deserialized.
+    
+    public init?(json: VJson?) {
+        
+        guard let json = json else { return nil }
+        guard let jsource = (json|COMMAND_NAME|SOURCE)?.stringValue else { return nil }
+        
+        self.source = jsource
+    }
+    
+    
+    /// A domain name.
+    
+    public var source: String
+    
+    
+    /// Creates a new command.
+    ///
+    /// - Parameters:
+    ///   - source: A domain name.
+    
+    public init(source: String) {
+        self.source = source
+    }
+}
 
 extension ReadServicesCommand: MacCommand {
     

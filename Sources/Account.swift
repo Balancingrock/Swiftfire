@@ -55,7 +55,6 @@
 import Foundation
 import SwifterLog
 import SwifterJSON
-import SwiftfireCore
 import KeyedCache
 import COpenSsl
 
@@ -81,7 +80,7 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
             if names.count > 0 {
                 return names[0]
             } else {
-                Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Array with names is empty")
+                SwifterLog.atError?.log(id: -1, source: #file.source(#function, #line), message: "Array with names is empty")
                 return ""
             }
         }
@@ -107,7 +106,7 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
             // Save the new values, if the save fails, then undo the change.
             
             if let error = save() {
-                Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Cannot save account \(self), error message = \(error)")
+                SwifterLog.atError?.log(id: -1, source: #file.source(#function, #line), message: "Cannot save account \(self), error message = \(error)")
                 
             } else {
                 
@@ -216,7 +215,7 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
         self.digest = digest
         
         if let error = save() {
-            Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Cannot save account \(self), error message = \(error)")
+            SwifterLog.atError?.log(id: -1, source: #file.source(#function, #line), message: "Cannot save account \(self), error message = \(error)")
             return nil
         }
     }
@@ -250,7 +249,7 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
         // Save the new values, if the save fails, then restore the old values.
         
         if let error = save() {
-            Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Cannot save account \(self), error message = \(error)")
+            SwifterLog.atError?.log(id: -1, source: #file.source(#function, #line), message: "Cannot save account \(self), error message = \(error)")
             self.salt = oldSalt
             self.digest = oldDigest
             return false
@@ -272,7 +271,7 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
     public func hasSameDigest(as pwd: String) -> Bool {
         
         guard let testDigest = createDigest(pwd, salt: salt) else {
-            Log.atCritical?.log(id: -1, source: #file.source(#function, #line), message: "Cannot create digest")
+            SwifterLog.atCritical?.log(id: -1, source: #file.source(#function, #line), message: "Cannot create digest")
             return false
         }
         
@@ -391,7 +390,7 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
         // Create the digest generator
         
         guard let digester = EVP_MD_CTX_new() else {
-            Log.atEmergency?.log(id: -1, source: #file.source(#function, #line), message: "Cannot allocate digest generator")
+            SwifterLog.atEmergency?.log(id: -1, source: #file.source(#function, #line), message: "Cannot allocate digest generator")
             return nil
         }
         defer { EVP_MD_CTX_free(digester) }
@@ -400,7 +399,7 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
         // Initialize the digester
         
         if EVP_DigestInit(digester, EVP_sha384()) == 0 {
-            Log.atEmergency?.log(id: -1, source: #file.source(#function, #line), message: "Cannot initialize digest generator")
+            SwifterLog.atEmergency?.log(id: -1, source: #file.source(#function, #line), message: "Cannot initialize digest generator")
             return nil
         }
         
@@ -411,7 +410,7 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
             if saltData.withUnsafeBytes({ (ptr) -> Bool in
                 return EVP_DigestUpdate(digester, UnsafeRawPointer(ptr), saltData.count) == 0
             }) {
-                Log.atEmergency?.log(id: -1, source: #file.source(#function, #line), message: "Cannot update digest generator with salt")
+                SwifterLog.atEmergency?.log(id: -1, source: #file.source(#function, #line), message: "Cannot update digest generator with salt")
                 return nil
             }
         }
@@ -423,7 +422,7 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
             if strData.withUnsafeBytes({ (ptr) -> Bool in
                 return EVP_DigestUpdate(digester, UnsafeRawPointer(ptr), strData.count) == 0
             }) {
-                Log.atEmergency?.log(id: -1, source: #file.source(#function, #line), message: "Cannot update digest generator with string")
+                SwifterLog.atEmergency?.log(id: -1, source: #file.source(#function, #line), message: "Cannot update digest generator with string")
                 return nil
             }
         }
@@ -434,7 +433,7 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
         let outputBuffer = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(EVP_MAX_MD_SIZE))
         var outputLength: UInt32 = 0
         if EVP_DigestFinal(digester, outputBuffer, &outputLength) == 0 {
-            Log.atEmergency?.log(id: -1, source: #file.source(#function, #line), message: "Cannot extract digest generator result")
+            SwifterLog.atEmergency?.log(id: -1, source: #file.source(#function, #line), message: "Cannot extract digest generator result")
             return nil
         }
         
@@ -710,7 +709,7 @@ public class Accounts {
                 
             } else {
                 
-                Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "")
+                SwifterLog.atError?.log(id: -1, source: #file.source(#function, #line), message: "")
                 return nil
             }
         }
