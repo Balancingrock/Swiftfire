@@ -169,7 +169,6 @@ public final class Function: CustomStringConvertible {
     @discardableResult
     public func register(name: String, function: @escaping Function.Signature) -> Bool {
         if registered[name] == nil {
-            SwifterLog.atDebug?.log(id: -1, source: #file.source(#function, #line), message: "Registering function: \(name)")
             registered[name] = Entry(name, function)
             return true
         } else {

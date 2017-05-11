@@ -155,7 +155,7 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
     public var description: String {
         var str = "Account\n"
         str += " Id: \(id)\n"
-        str += " Uuid: \(uuid)"
+        str += " Uuid: \(uuid)\n"
         str += " Name: \(name)\n"
         str += " fileUrl: \(fileUrl.path)\n"
         str += " Digest: \(digest)"
@@ -205,7 +205,7 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
         
         self.id = id
         self.uuid = UUID().uuidString
-        self.names[0] = name
+        self.names.insert(name, at: 0)
         self.dirUrl = createDirUrl(root: rootDir)
 
         let salt = createSalt()
@@ -215,7 +215,7 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
         self.digest = digest
         
         if let error = save() {
-            SwifterLog.atError?.log(id: -1, source: #file.source(#function, #line), message: "Cannot save account \(self), error message = \(error)")
+            SwifterLog.atError?.log(id: -1, source: #file.source(#function, #line), message: "Cannot save account\n\n\(self),\n\n Error message = \(error)\n")
             return nil
         }
     }
@@ -491,6 +491,8 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
         centiFractionsStr.forEach({ url.appendPathComponent($0) })
         url.appendPathComponent("_Account")
         
+        try? FileManager.default.createDirectory(atPath: url.path, withIntermediateDirectories: true, attributes: nil)
+        
         return url
     }
 }
@@ -534,6 +536,13 @@ public class Accounts {
     
     public var count: Int {
         return nameLut.count
+    }
+    
+    
+    /// Returns 'true' if there are no accounts yet
+    
+    public var isEmpty: Bool {
+        return nameLut.isEmpty
     }
     
     

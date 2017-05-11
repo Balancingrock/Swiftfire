@@ -59,7 +59,6 @@
 import Foundation
 import SwifterJSON
 import SwifterLog
-import SwiftfireCore
 
 private let COMMAND_NAME = "RestoreDomainsCommand"
 
@@ -101,7 +100,7 @@ extension RestoreDomainsCommand: MacCommand {
     
     public func execute() {
         Log.atNotice?.log(id: -1, source: #file.source(#function, #line))
-        if let url = FileURLs.domainDefaultsFile {
+        if let url = StorageUrls.domainDefaultsFile {
             domains.restore(fromFile: url)
             Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Restored the domains:\n\(domains)")
         } else {

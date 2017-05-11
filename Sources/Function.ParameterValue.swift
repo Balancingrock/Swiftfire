@@ -1,9 +1,9 @@
 // =====================================================================================================================
 //
-//  File:       Command.HttpServerStop.swift
+//  File:       Function.ParameterValue.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.6
+//  Version:    0.10.7
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -11,7 +11,7 @@
 //  Blog:       http://swiftrien.blogspot.com
 //  Git:        https://github.com/Balancingrock/Swiftfire
 //
-//  Copyright:  (c) 2016-2017 Marinus van der Lugt, All rights reserved.
+//  Copyright:  (c) 2017 Marinus van der Lugt, All rights reserved.
 //
 //  License:    Use or redistribute this code any way you like with the following two provision:
 //
@@ -48,71 +48,107 @@
 //
 // History
 //
-// 0.10.6 - Update of server telemetry type
-// 0.10.0 - Renamed file from MacCommand to Command
-// 0.9.18 - Header update
-//        - Renmed to HttpServerStop
-// 0.9.15 - General update and switch to frameworks
-// 0.9.14 - Initial release
+// 0.10.7 - Initial release
+//
+// =====================================================================================================================
+// Description
+// =====================================================================================================================
+//
+// Returns the value of the requested parameter item.
+//
+//
+// Signature:
+// ----------
+//
+// .parameterValue("name")
+//
+//
+// Parameters:
+// -----------
+//
+// - name: The name of the parameter item.
+//
+//
+// Other Input:
+// ------------
+//
+// session = environment.serviceInfo[.sessionKey] // Must be a non-expired session.
+// session[.accountKey] must contain an admin account
+//
+//
+// Returns:
+// --------
+//
+// The value of the requested parameter or one of the error messages:
+// - "<name> is unknown"
+// - "Illegal access"
+// - "Argument type error"
+// - "Nof arguments error"
+// - "Session error"
+// - "Account error"
+//
+//
+// Other Output:
+// -------------
+//
+// None.
+//
 //
 // =====================================================================================================================
 
 import Foundation
-import SwifterJSON
-import SwifterLog
-
-private let COMMAND_NAME = "HttpServerStopCommand"
 
 
-/// Stop the http server from accepting new requests.
+/// Returns the value of the requested parameter item.
+///
+/// - Returns: The value of the requested parameter or "No access rights".
 
-public final class HttpServerStopCommand: MacMessage {
+func function_parameterValue(_ args: Function.Arguments, _ info: inout Function.Info, _ environment: inout Function.Environment) -> Data? {
     
     
-    /// Serialize this object.
+    // Check access rights
     
-    public var json: VJson {
-        let j = VJson()
-        j[COMMAND_NAME].nullValue = true
-        return j
+    guard let session = environment.serviceInfo[.sessionKey] as? Session else {
+        return "Session error".data(using: String.Encoding.utf8)
+    }
+    
+    guard let account = session.info[.accountKey] as? Account else {
+        return "Account error".data(using: String.Encoding.utf8)
+    }
+    
+    guard serverAdminDomain.accounts.contains(account.uuid) else {
+        return "Illegal access".data(using: String.Encoding.utf8)
     }
     
     
-    /// Deserialize an object.
-    ///
-    /// - Parameter json: The VJson hierarchy to be deserialized.
+    // Check parameter name
     
-    public init?(json: VJson?) {
-        guard let json = json else { return nil }
-        guard (json|COMMAND_NAME)?.nullValue == true else { return nil }
+    guard case .array(let arr) = args else {
+        return "Argument type error".data(using: String.Encoding.utf8)
     }
     
-    
-    /// Creates a new command.
-    
-    public init() {}
-}
-
-extension HttpServerStopCommand: MacCommand {
-    
-    public static func factory(json: VJson?) -> MacCommand? {
-        return HttpServerStopCommand(json: json)
+    guard arr.count == 1 else {
+        return "Nof arguments error".data(using: String.Encoding.utf8)
     }
     
-    public func execute() {
+    let name = arr[0]
+    
+    var value: String?
+    
+    for t in parameters.all {
         
-        if httpServer?.isRunning ?? false {
-            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Stopping HTTP server")
-            httpServer?.stop()
-            telemetry.httpServerStatus.value = "Stopping"
-        } else {
-            if httpServer == nil {
-                telemetry.httpServerStatus.value = "Cannot"
-            } else {
-                telemetry.httpServerStatus.value = "Not Running"
-            }
+        if t.name.caseInsensitiveCompare(name) == ComparisonResult.orderedSame {
+            value = t.stringValue
+            break
         }
-        
-        Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Command completed")
     }
+    
+    guard value != nil else {
+        return "\(name) is unknown".data(using: String.Encoding.utf8)
+    }
+    
+    
+    // Return the value
+    
+    return value!.data(using: String.Encoding.utf8)
 }

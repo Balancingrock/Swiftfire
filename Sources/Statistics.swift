@@ -1,9 +1,9 @@
 // =====================================================================================================================
 //
 //  File:       Statistics.swift
-//  Project:    SwiftfireCore
+//  Project:    Swiftfire
 //
-//  Version:    0.10.1
+//  Version:    0.10.7
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.7 - Merged SwiftfireCore into Swiftfire
 // 0.10.1 - Fixed warnings from XCode 8.3
 // 0.10.0 - Added count & foreverCount
 // 0.9.17 - Header update
@@ -56,6 +57,7 @@
 
 import Foundation
 import SwifterJSON
+import BRUtils
 
 
 public final class Statistics: VJsonSerializable {
@@ -126,7 +128,7 @@ public final class Statistics: VJsonSerializable {
         self.json.save(to: url)
     }
     
-    public func restore(fromFile url: URL?) -> FunctionResult<Bool> {
+    public func restore(fromFile url: URL?) -> Result<Bool> {
 
         guard let url = url else { return .success(true) }
         
@@ -148,7 +150,7 @@ public final class Statistics: VJsonSerializable {
         return .success(true)
     }
     
-    public func restore(fromVJson: VJson) -> FunctionResult<Bool> {
+    public func restore(fromVJson: VJson) -> Result<Bool> {
         
         guard let domains = StDomains(json: fromVJson|"Domains") else { return .error(message: "Item Domains is missing or contains error")}
         guard let clients = StClients(json: fromVJson|"Clients") else { return .error(message: "Item Clients is missing or contains error")}
@@ -266,7 +268,7 @@ public final class Statistics: VJsonSerializable {
         }
     }
     
-    private func addClientRecord(_ mutation: Mutation) -> FunctionResult<Bool> {
+    private func addClientRecord(_ mutation: Mutation) -> Result<Bool> {
         
         // =========================================================
         // Create the client part first, this must always be present
@@ -369,7 +371,7 @@ public final class Statistics: VJsonSerializable {
         return .success(true)
     }
     
-    private func updatePathPart(_ mutation: Mutation, _ onSuccess: (()->())? = nil) -> FunctionResult<Bool> {
+    private func updatePathPart(_ mutation: Mutation, _ onSuccess: (()->())? = nil) -> Result<Bool> {
         
         guard let urlstr = mutation.url else {
             return .error(message: "Missing URL in UpdatePathPartCommand")
@@ -417,7 +419,7 @@ public final class Statistics: VJsonSerializable {
         return .success(true)
     }
 
-    private func updateClient(_ mutation: Mutation) -> FunctionResult<Bool> {
+    private func updateClient(_ mutation: Mutation) -> Result<Bool> {
         
         guard let address = mutation.ipAddress else {
             return .error(message: "Missing client address in UpdateClientCommand")

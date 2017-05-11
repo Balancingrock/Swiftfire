@@ -59,7 +59,6 @@
 import Foundation
 import SwifterJSON
 import SwifterLog
-import SwiftfireCore
 
 private let COMMAND_NAME = "SaveBlacklistCommand"
 private let SOURCE = "Source"
@@ -116,7 +115,7 @@ extension SaveBlacklistCommand: MacCommand {
         Log.atNotice?.log(id: -1, source: #file.source(#function, #line))
         
         if source == "Server" {
-            if let url = FileURLs.serverBlacklistFile { serverBlacklist.save(toFile: url) }
+            if let url = StorageUrls.serverBlacklistFile { serverBlacklist.save(toFile: url) }
         }
         else {
             if let domain = domains.domain(forName: source) {

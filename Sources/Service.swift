@@ -1,9 +1,9 @@
 // =====================================================================================================================
 //
 //  File:       Service.swift
-//  Project:    SwiftfireCore
+//  Project:    Swiftfire
 //
-//  Version:    0.10.6
+//  Version:    0.10.7
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.7 - Merged SwiftfireCore into Swiftfire
 // 0.10.6 - Changed Response type to HttpResponse type.
 //        - Renamed ChainInfo to Info, split off definition of keys to separate file
 //        - Replaced HttHeader with HttpRequest

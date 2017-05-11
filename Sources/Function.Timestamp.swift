@@ -1,9 +1,9 @@
 // =====================================================================================================================
 //
-//  File:       Domain.Extensions.swift
+//  File:       Function.Timestamp.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.9.18
+//  Version:    0.10.7
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -11,7 +11,7 @@
 //  Blog:       http://swiftrien.blogspot.com
 //  Git:        https://github.com/Balancingrock/Swiftfire
 //
-//  Copyright:  (c) 2015-2017 Marinus van der Lugt, All rights reserved.
+//  Copyright:  (c) 2017 Marinus van der Lugt, All rights reserved.
 //
 //  License:    Use or redistribute this code any way you like with the following two provision:
 //
@@ -48,63 +48,64 @@
 //
 // History
 //
-// 0.9.18 - Header update
-// 0.9.15 - General update and switch to frameworks
-//        - Added removeUnknownServices & rebuildServices
-// 0.9.14 - Initial release
+// 0.10.7 - Initial release
 //
 // =====================================================================================================================
 // Description
 // =====================================================================================================================
 //
-// Add functionality to the Mutation (defined in SwiftfireCore)
+// Returns a timestamp in the format: yyyy-MM-dd HH:mm:ss of the current time in the server timezone.
+//
+//
+// Signature:
+// ----------
+//
+// .timestamp()
+//
+//
+// Parameters:
+// -----------
+//
+// None.
+//
+//
+// Other Input:
+// ------------
+//
+// None.
+//
+//
+// Returns:
+// --------
+//
+// The current time
+//
+//
+// Other Output:
+// -------------
+//
+// None.
+//
 //
 // =====================================================================================================================
 
 import Foundation
-import SwiftfireCore
 
 
-extension Domain {
+private var dateFormatter: DateFormatter = {
+    let ltf = DateFormatter()
+    ltf.dateFormat = "yyyy-MM-dd HH:mm:ss"
+    return ltf
+}()
 
+
+/// Returns the current time.
+///
+/// - Returns: The current time.
+
+func function_timestamp(_ args: Function.Arguments, _ info: inout Function.Info, _ environment: inout Function.Environment) -> Data? {
     
-    /// Returns the custom error message for the given http response code if there is one.
-    ///
-    /// - Parameter for: The error code for which to return the custom error message.
+    let now = dateFormatter.string(from: Date())
     
-    func customErrorResponse(for code: HttpResponseCode) -> Data? {
-        
-        do {
-            let url = URL(fileURLWithPath: sfresources).appendingPathComponent(code.rawValue.replacingOccurrences(of: " ", with: "_")).appendingPathExtension("html")
-            let reply = try Data(contentsOf: url)
-            return reply
-        } catch {
-            return nil
-        }        
-    }
-    
-    
-    /// Removes service names that are not in the available domain services
-    
-    func removeUnknownServices() {
-        
-        for (index, serviceName) in serviceNames.enumerated().reversed() {
-            if Swiftfire.services.registered[serviceName] == nil {
-                serviceNames.remove(at: index)
-            }
-        }
-    }
-    
-    
-    /// Rebuild the services member from the serviceNames and the available services (the later is a member of domainServices)
-    
-    func rebuildServices() {
-        
-        services = []
-        for serviceName in serviceNames {
-            if let service = Swiftfire.services.registered[serviceName] {
-                services.append(service)
-            }
-        }
-    }
+    return now.data(using: String.Encoding.utf8)
 }

@@ -59,7 +59,6 @@
 import Foundation
 import SwifterJSON
 import SwifterLog
-import SwiftfireCore
 
 private let COMMAND_NAME = "CreateDomainCommand"
 
@@ -119,15 +118,16 @@ extension CreateDomainCommand: MacCommand {
             return
         }
         
-        if let url = FileURLs.domainsDir {
+        if let url = StorageUrls.domainsDir {
             let domainUrl = url.appendingPathComponent(domainName, isDirectory: true)
-            let domain = Domain(supportDirectory: domainUrl)
-            domain.name = domainName
-            domain.serviceNames = defaultServices
-        
-            domains.add(domain: domain)
-        
-            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Added new domain with \(domain))")
+            if let domain = Domain(rootDir: domainUrl) {
+                domain.name = domainName
+                domain.serviceNames = defaultServices
+                domains.add(domain: domain)
+                Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Added new domain with \(domain))")
+            } else {
+                Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Failed to domain for \(domainName))")
+            }
 
         } else {
             

@@ -58,7 +58,6 @@
 import Foundation
 import SwifterJSON
 import SwifterLog
-import SwiftfireCore
 
 fileprivate let COMMAND_NAME = "UpdateServicesCommand"
 fileprivate let DOMAIN_NAME = "DomainName"

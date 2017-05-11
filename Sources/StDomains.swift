@@ -1,9 +1,9 @@
 // =====================================================================================================================
 //
 //  File:       StDomains.swift
-//  Project:    SwiftfireCore
+//  Project:    Swiftfire
 //
-//  Version:    0.10.0
+//  Version:    0.10.7
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.7 - Merged SwiftfireCore into Swiftfire
 // 0.10.0 - Added parameter nilOnDoNotTrace to getPathPart
 // 0.9.17 - Header update
 // 0.9.15 - Initial release

@@ -61,7 +61,6 @@
 import Foundation
 import SwifterJSON
 import SwifterLog
-import SwiftfireCore
 
 private let COMMAND_NAME = "RestoreServerParametersCommand"
 
@@ -109,7 +108,7 @@ extension RestoreServerParametersCommand: MacCommand {
         
         // Restore
         
-        if let url = FileURLs.parameterDefaultsFile {
+        if let url = StorageUrls.parameterDefaultsFile {
             switch parameters.restore(fromFile: url) {
             case let .error(message):
                 Log.atError?.log(id: -1, source: #file.source(#function, #line), message: message)

@@ -81,7 +81,6 @@
 
 import Foundation
 import SwifterLog
-import SwiftfireCore
 import SwifterSockets
 
 
@@ -116,7 +115,10 @@ func service_decodePostFormUrlEncoded(_ request: HttpRequest, _ connection: Conn
     
     // Check for data
     
-    guard let strData = request.payload, strData.count > 0 else { return .next }
+    guard let strData = request.payload, !strData.isEmpty else {
+        Log.atDebug?.log(id: connection.logId, source: #file.source(#function, #line), message: "No data to decode.")
+        return .next
+    }
     
     
     // Convert data to string
@@ -134,11 +136,12 @@ func service_decodePostFormUrlEncoded(_ request: HttpRequest, _ connection: Conn
     var nameValuePairs = str.components(separatedBy: "&")
     
     while nameValuePairs.count > 0 {
-        var nameValue = nameValuePairs[0].components(separatedBy: "=")
+        let nvPair = nameValuePairs.removeFirst()
+        var nameValue = nvPair.components(separatedBy: "=")
         switch nameValue.count {
         case 0: break // error, don't do anything
         case 1: postInfo[nameValue[0]] = ""
-        case 2: postInfo[nameValue[0]] = nameValue[1]
+        case 2: postInfo[nameValue[0]] = nameValue[1].removingPercentEncoding?.replacingOccurrences(of: "+", with: " ")
         default:
             let name = nameValue.removeFirst()
             postInfo[name] = nameValue.joined(separator: "=")
@@ -150,6 +153,8 @@ func service_decodePostFormUrlEncoded(_ request: HttpRequest, _ connection: Conn
     
     if postInfo.count > 0 { info[.postInfoKey] = postInfo }
     
+    
+    Log.atDebug?.log(id: connection.logId, source: #file.source(#function, #line), message: "Found \(postInfo.count) items")
     
     return .next
 }

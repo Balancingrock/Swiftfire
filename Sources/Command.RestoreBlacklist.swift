@@ -59,7 +59,6 @@
 import Foundation
 import SwifterJSON
 import SwifterLog
-import SwiftfireCore
 
 private let COMMAND_NAME = "RestoreBlacklistCommand"
 private let SOURCE = "Source"
@@ -116,7 +115,7 @@ extension RestoreBlacklistCommand: MacCommand {
         Log.atNotice?.log(id: -1, source: #file.source(#function, #line))
         
         if source == "Server" {
-            if let url = FileURLs.serverBlacklistFile {
+            if let url = StorageUrls.serverBlacklistFile {
                 switch serverBlacklist.restore(fromFile: url) {
                 case let .error(message):
                     Log.atError?.log(id: -1, source: #file.source(#function, #line), message: message)

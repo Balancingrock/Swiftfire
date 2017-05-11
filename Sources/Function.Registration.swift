@@ -54,7 +54,6 @@
 // =====================================================================================================================
 
 import Foundation
-import SwiftfireCore
 
 
 // =================================
@@ -68,20 +67,26 @@ import SwiftfireCore
 ///
 /// Optional argument: A string with the path of a resource for which the hitcount must be returned.
 ///
-/// Example: .nofPageHits()
+/// Example: .nofPageHits() will have the name "nofPageHits"
 
 let NOF_PAGE_HITS = "nofPageHits"
 let GET_SESSION = "getSession"
+let TIMESTAMP = "timestamp"
+let PARAMETER_VALUE = "parameterValue"
+let TELEMETRY_VALUE = "telemetryValue"
 
 
 // ==================================================
 // Add to the next function to register new functions
 // ==================================================
-// Notice that the sequence itself is not important
+// The sequence is not important
 
 /// Register the functions
 
 func registerFunctions() {
     functions.register(name: NOF_PAGE_HITS, function: function_nofPageHits)
     functions.register(name: GET_SESSION, function: function_getSession)
+    functions.register(name: TIMESTAMP, function: function_timestamp)
+    functions.register(name: PARAMETER_VALUE, function: function_parameterValue)
+    functions.register(name: TELEMETRY_VALUE, function: function_telemetryValue)
 }

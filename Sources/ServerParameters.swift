@@ -1,7 +1,7 @@
 // =====================================================================================================================
 //
 //  File:       Parameters.swift
-//  Project:    SwiftfireCore
+//  Project:    Swiftfire
 //
 //  Version:    0.10.7
 //
@@ -50,6 +50,7 @@
 //
 // 0.10.7 - Added adminSiteRoot
 //        - Removed SWIFTFIRE_VERSION
+//        - Merged SwiftfireCore into Swiftfire
 // 0.10.6 - Renamed to ServerParameters
 //        - Added ServerParameterNames
 // 0.10.5 - Increased version number
@@ -90,6 +91,7 @@
 import Foundation
 import SwifterJSON
 import SwifterLog
+import BRUtils
 
 
 public final class ServerParameters: CustomStringConvertible {
@@ -236,7 +238,7 @@ public final class ServerParameters: CustomStringConvertible {
     public let aslFacilityRecordAtAndAboveLevel = NamedIntValue(
         name: "AslLogLevel",
         about: "The minimum loglevel for entries written to the ASL [0..8].",
-        value: 2,
+        value: 8,
         resetValue: 2)
     
     
@@ -247,7 +249,7 @@ public final class ServerParameters: CustomStringConvertible {
     public let stdoutPrintAtAndAboveLevel = NamedIntValue(
         name: "StdoutLogLevel",
         about: "The minimum loglevel for entries written to STDOUT [0..8].",
-        value: 8,
+        value: 0,
         resetValue: 8)
     
     
@@ -437,7 +439,7 @@ public final class ServerParameters: CustomStringConvertible {
     
     /// Updates the parameter values from the parameter-defaults.json file if that file exists. It only updates those values that are found in the defaults file. All other parameters remain at their hard-coded default values. Parameters found in the defaults file that are not (no longer?) used will be flagged as errors in the log.
     
-    public func restore(fromFile url: URL) -> FunctionResult<String> {
+    public func restore(fromFile url: URL) -> Result<String> {
                 
         
         // Does the parameter defaults file exist?

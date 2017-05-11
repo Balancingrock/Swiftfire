@@ -84,7 +84,6 @@ import Foundation
 import SwifterJSON
 import SwifterLog
 import SwifterSockets
-import SwiftfireCore
 
 
 extension SFConnection {
@@ -241,11 +240,11 @@ extension SFConnection {
         // A special case is made for the server admin pseudo domain
         
         if let urlStr = request.url, urlStr.hasPrefix("/serveradmin") {
-            domain = serverAdminPseudoDomain
+            domain = serverAdminDomain
         }
         
-        if domains.count == 0 || serverAdminPseudoDomain.accounts.count == 0 {
-            domain = serverAdminPseudoDomain
+        if domains.count == 0 || serverAdminDomain.accounts.count == 0 {
+            domain = serverAdminDomain
         }
         
         if domain == nil {
@@ -599,7 +598,7 @@ extension SFConnection {
         
         // Form data is OK
         
-        _ = adminAccounts.newAccount(name: name, password: pwd1)
+        _ = serverAdminDomain.accounts.newAccount(name: name, password: pwd1)
         
         parameters.adminSiteRoot.setValue(indexUrl.path)
         

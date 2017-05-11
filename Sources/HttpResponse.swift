@@ -1,7 +1,7 @@
 // =====================================================================================================================
 //
 //  File:       HttpResponse.swift
-//  Project:    SwiftfireCore
+//  Project:    Swiftfire
 //
 //  Version:    0.10.7
 //
@@ -49,6 +49,7 @@
 // History
 //
 // 0.10.7 - Replaces SWIFTFIRE_VERSION with serverVersion.
+//        - Merged SwiftfireCore into Swiftfire
 // 0.10.6 - Introduced HttpResponse class. (Complete rewrite)
 // 0.9.17 - Header update
 // 0.9.15 - General update and switch to frameworks, initial release.

@@ -112,7 +112,6 @@
 
 import Foundation
 import SwifterLog
-import SwiftfireCore
 import SwifterSockets
 
 

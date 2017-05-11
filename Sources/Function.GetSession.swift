@@ -93,7 +93,6 @@
 // =====================================================================================================================
 
 import Foundation
-import SwiftfireCore
 
 
 /// Ensures that a session exists.

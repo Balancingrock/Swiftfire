@@ -59,7 +59,6 @@
 import Foundation
 import SwifterLog
 import SwifterJSON
-import SwiftfireCore
 
 private let COMMAND_NAME = "ReadStatisticsCommand"
 

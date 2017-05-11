@@ -1,6 +1,6 @@
 // =====================================================================================================================
 //
-//  File:       FileURLs.swift
+//  File:       StorageUrls.swift
 //  Project:    Swiftfire
 //
 //  Version:    0.10.7
@@ -50,6 +50,7 @@
 //
 // 0.10.7  - Added adminAccountsDir
 //         - Added adminSessionsDir
+//         - Renamed to storageUrls
 // 0.9.17  - Added paths for secure console connections
 // 0.9.15  - General update and switch to frameworks
 // 0.9.14  - Added serverBlacklist
@@ -97,7 +98,7 @@
 import Foundation
 
 
-final class FileURLs {
+final class StorageUrls {
     
     
     /// Create a directory url and ensure that the directory exists.

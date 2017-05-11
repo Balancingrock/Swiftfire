@@ -268,10 +268,14 @@ public class Session: CustomStringConvertible {
             str += " Is Exclusive: \(self.isExclusive)\n"
             str += " Timeout: \(self.timeout) Seconds\n"
             str += " Has expired: \(self.hasExpired)\n"
-            str += " Session Info:\n"
-            str += self.info.description.components(separatedBy: "\n").map({"  \($0)"}).joined(separator: "\n")
-            str += " Debug Info Array:\n"
-            str += self.debugInfo.description.components(separatedBy: "\n").map({"  \($0)"}).joined(separator: "\n")
+            if self.info.dict.count == 0 {
+                str += " Session Info: Empty\n"
+            } else {
+                str += " Session Info:\n"
+                str += self.info.description.components(separatedBy: "\n").map({" \($0)"}).joined(separator: "\n")
+            }
+            str += " Session Debug Info:\n"
+            str += self.debugInfo.description.components(separatedBy: "\n").map({" \($0)"}).joined(separator: "\n")
             return str
         }
     }
@@ -443,7 +447,7 @@ public final class Sessions: CustomStringConvertible {
     
     /// Create a new sessions object
     
-    public init(logDirUrl: URL? = nil) {
+    public init(logDirUrl: URL) {
         _logDirUrl = logDirUrl
         periodicPurge()
     }
@@ -498,7 +502,7 @@ public final class Sessions: CustomStringConvertible {
             guard let `self` = self else { return nil }
             let session = Session(address: address, domainName: domainName, connectionId: connectionId, allocationCount: allocationCount, timeout: timeout)
             self.active[session.id] = session
-            SwifterLog.atInfo?.log(id: logId, source: #file.source(#function, #line), message: "Created session with id = \(session.id.uuidString)")
+            Log.atInfo?.log(id: logId, source: #file.source(#function, #line), message: "Created session with id = \(session.id.uuidString)")
             return session
         }
     }
@@ -530,7 +534,7 @@ public final class Sessions: CustomStringConvertible {
         guard let session = active[id] else { return }
         storeSession(session)
         active[id] = nil
-        SwifterLog.atInfo?.log(id: -1, source: #file.source(#function, #line), message: "Purged inactive session for \(id.uuidString)")
+        Log.atInfo?.log(id: -1, source: #file.source(#function, #line), message: "Purged inactive session for \(id.uuidString)")
     }
     
     

@@ -63,7 +63,6 @@
 // =====================================================================================================================
 
 import Foundation
-import SwiftfireCore
 
 
 /// A class to create a log file containing HTTP request headers.
@@ -75,9 +74,8 @@ final class HttpHeaderLogger: Logfile {
     ///
     /// - Parameter inDirectory: A URL pointig at the directory in which to create the logger files.
     
-    init?(inDirectory url: URL?) {
-        guard let url = url else { return nil }
-        super.init(name: "HeaderLog", ext: "txt", dir: url, options: .newFileDailyAt(WallclockTime(hour: 0, minute: 0, second: 0)), .maxFileSize(parameters.maxFileSizeForHeaderLogging.value))
+    init(rootDir: URL) {
+        super.init(name: "HeaderLog", ext: "txt", dir: rootDir, options: .newFileDailyAt(WallclockTime(hour: 0, minute: 0, second: 0)), .maxFileSize(parameters.maxFileSizeForHeaderLogging.value))
     }
 
     

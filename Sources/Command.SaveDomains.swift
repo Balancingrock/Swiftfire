@@ -59,7 +59,6 @@
 import Foundation
 import SwifterJSON
 import SwifterLog
-import SwiftfireCore
 
 private let COMMAND_NAME = "SaveDomainsCommand"
 
@@ -101,7 +100,7 @@ extension SaveDomainsCommand: MacCommand {
     
     public func execute() {
         Log.atNotice?.log(id: -1, source: #file.source(#function, #line))
-        if let url = FileURLs.domainDefaultsFile {
+        if let url = StorageUrls.domainDefaultsFile {
             domains.save(toFile: url)
         } else {
             Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Missing file url")

@@ -1,7 +1,7 @@
 // =====================================================================================================================
 //
 //  File:       HttpRequest.swift
-//  Project:    SwiftfireCore
+//  Project:    Swiftfire
 //
 //  Version:    0.10.7
 //
@@ -49,6 +49,7 @@
 // History
 //
 // 0.10.7 - Added decoding of contentType
+//        - Merged SwiftfireCore into Swiftfire
 // 0.10.6 - Added cookies
 //        - Renamed from HttpHeader to HttpRequest
 // 0.9.17 - Header update

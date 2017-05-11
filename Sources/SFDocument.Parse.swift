@@ -85,7 +85,6 @@
 import Foundation
 import Ascii
 import SwifterJSON
-import SwiftfireCore
 
 
 // Constants
@@ -343,7 +342,7 @@ extension SFDocument {
             block.offset += 1
         })
         
-        block.offset -= 1 // After the last itteration above, offset was incremented for the loo-through, but that did not happen.
+        block.offset -= 1 // After the last itteration above, offset was incremented for the loop-through, but that did not happen.
         
         if let lastBlock = block.asCharacterBlock { blocks.append(lastBlock) }
     }

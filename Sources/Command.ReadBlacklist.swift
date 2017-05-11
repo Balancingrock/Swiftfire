@@ -60,7 +60,6 @@
 import Foundation
 import SwifterJSON
 import SwifterLog
-import SwiftfireCore
 
 fileprivate let COMMAND_NAME = "ReadBlacklistCommand"
 fileprivate let SOURCE = "Source"

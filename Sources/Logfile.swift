@@ -1,9 +1,9 @@
 // =====================================================================================================================
 //
 //  File:       Logfile.swift
-//  Project:    SwiftfireCore
+//  Project:    Swiftfire
 //
-//  Version:    0.10.6
+//  Version:    0.10.7
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.7 - Merged SwiftfireCore into Swiftfire
 // 0.10.6 - Code improvement: create strong self in closures
 // 0.9.17 - Header update
 // 0.9.15 - General update and switch to frameworks, SwiftfireCore split.
@@ -227,9 +228,7 @@ open class Logfile {
     ///   - dir: The URL of the directory in which the logfiles will be created.
     ///   - options: A series of option enums that will be processed in order, hence last-come overrides earlier same-option settings.
     
-    public init?(name: String = "logfile", ext: String = "txt", dir: URL?, options: InitOption ...) {
-        
-        guard let dir = dir else { return nil }
+    public init(name: String = "logfile", ext: String = "txt", dir: URL, options: InitOption ...) {
         
         self.filename = name
         self.fileExtension = ext

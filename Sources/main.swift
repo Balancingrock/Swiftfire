@@ -78,7 +78,6 @@
 
 import Foundation
 import SwifterLog
-import SwiftfireCore
 import SecureSockets
 import SwifterSockets
 
@@ -117,43 +116,72 @@ Log.theLogger.networkTransmitAtAndAboveLevel = SwifterLog.Level.none
 
 let parameters = ServerParameters()
 
-guard let parameterDefaultFile = FileURLs.parameterDefaultsFile else { emergencyExit("Could not construct parameter defaults filename") }
-
-switch parameters.restore(fromFile: parameterDefaultFile) {
-case let .error(message):   emergencyExit(message)
-case let .success(message):
-    if !message.isEmpty { Log.atNotice?.log(id: -1, source: "Main", message: message) }
+do {
+    guard let parameterDefaultFile = StorageUrls.parameterDefaultsFile else {
+        emergencyExit("Could not construct parameter defaults filename")
+    }
+    
+    switch parameters.restore(fromFile: parameterDefaultFile) {
+    case let .error(message):   emergencyExit(message)
+    case let .success(message):
+        if !message.isEmpty { Log.atNotice?.log(id: -1, source: "Main", message: message) }
+    }
+    
+    parameters.debugMode.value = true
+    
+    setupParametersDidSetActions()
+    
+    Log.atDebug?.log(id: -1, source: "Main", message: "Configuration parameters:\n\n\(parameters)\n")
 }
-
-setupParametersDidSetActions()
-
-Log.atDebug?.log(id: -1, source: "Main", message: "Configuration parameters:\n\n\(parameters)\n")
 
 
 // =================
 // Configure logging
 // =================
 
-guard let applicationLoggingDirectory = FileURLs.applicationLogDir?.path else { emergencyExit("Could not construct application log directory") }
+do {
+    guard let applicationLogDir = StorageUrls.applicationLogDir?.path else {
+        emergencyExit("Could not construct application log directory")
+    }
+    Log.theLogger.logfileDirectoryPath = applicationLogDir
+    
+    guard let fileLoglevel = Log.Level(rawValue: parameters.fileRecordAtAndAboveLevel.value) else {
+        emergencyExit("Could not construct file loglevel")
+    }
+    Log.theLogger.fileRecordAtAndAboveLevel = fileLoglevel
+    
+    Log.theLogger.logfileMaxNumberOfFiles = parameters.logfileMaxNofFiles.value
+    Log.theLogger.logfileMaxSizeInBytes = UInt64(parameters.logfileMaxSize.value) * 1024
+    
+    guard let aslLoglevel = Log.Level(rawValue: parameters.aslFacilityRecordAtAndAboveLevel.value) else {
+        emergencyExit("Could not construct asl loglevel")
+    }
+    Log.theLogger.aslFacilityRecordAtAndAboveLevel = aslLoglevel
+    
+    guard let stdoutLoglevel = Log.Level(rawValue: parameters.stdoutPrintAtAndAboveLevel.value) else {
+        emergencyExit("Could not construct stdout loglevel")
+    }
+    Log.theLogger.stdoutPrintAtAndAboveLevel = stdoutLoglevel
+    
+    guard let callbackLoglevel = Log.Level(rawValue: parameters.callbackAtAndAboveLevel.value) else {
+        emergencyExit("Could not construct callout loglevel")
+    }
+    Log.theLogger.callbackAtAndAboveLevel = callbackLoglevel
+    
+    guard let networkLoglevel = Log.Level(rawValue: parameters.networkTransmitAtAndAboveLevel.value) else {
+        emergencyExit("Could not construct network loglevel")
+    }
+    Log.theLogger.networkTransmitAtAndAboveLevel = networkLoglevel
+    
+    let address = parameters.networkLogtargetIpAddress.value
+    let port = parameters.networkLogtargetPortNumber.value
+    if !address.isEmpty && !port.isEmpty {
+        let target = SwifterLog.NetworkTarget(address: address, port: port)
+        Log.theLogger.connectToNetworkTarget(target)
+    }
 
-Log.theLogger.logfileDirectoryPath = applicationLoggingDirectory
-
-Log.theLogger.fileRecordAtAndAboveLevel = Log.Level(rawValue: parameters.fileRecordAtAndAboveLevel.value) ?? Log.Level.none
-Log.theLogger.logfileDirectoryPath = FileURLs.applicationLogDir!.path
-Log.theLogger.logfileMaxNumberOfFiles = parameters.logfileMaxNofFiles.value
-Log.theLogger.logfileMaxSizeInBytes = UInt64(parameters.logfileMaxSize.value) * 1024
-
-Log.theLogger.aslFacilityRecordAtAndAboveLevel = Log.Level(rawValue: parameters.aslFacilityRecordAtAndAboveLevel.value) ?? Log.Level.notice
-Log.theLogger.stdoutPrintAtAndAboveLevel = Log.Level(rawValue: parameters.stdoutPrintAtAndAboveLevel.value) ?? Log.Level.none
-Log.theLogger.callbackAtAndAboveLevel = Log.Level(rawValue: parameters.callbackAtAndAboveLevel.value) ?? Log.Level.none
-
-Log.theLogger.networkTransmitAtAndAboveLevel = Log.Level(rawValue: parameters.networkTransmitAtAndAboveLevel.value) ?? Log.Level.none
-if (parameters.networkLogtargetIpAddress.value != "") && (parameters.networkLogtargetPortNumber.value != "") {
-    let nettar = SwifterLog.NetworkTarget(address: parameters.networkLogtargetIpAddress.value, port: parameters.networkLogtargetPortNumber.value)
-    Log.theLogger.connectToNetworkTarget(nettar)
+    Log.atNotice?.log(id: -1, source: "Main", message: "Logging configured")
 }
-
-Log.atNotice?.log(id: -1, source: "Main", message: "Logging configured")
 
 
 // ======================================
@@ -161,7 +189,7 @@ Log.atNotice?.log(id: -1, source: "Main", message: "Logging configured")
 // ======================================
 
 // Purpose: To send the logging information to the Console if a console is attached.
-
+/*
 class LogForewarder: SwifterlogCallbackProtocol {
     
     func logInfo(_ time: Date, level: SwifterLog.Level, source: String, message: String) {
@@ -178,7 +206,7 @@ let logforewarder = LogForewarder()
 Log.theLogger.registerCallback(logforewarder)
 
 Log.atNotice?.log(id: -1, source: "Main", message: "Remote console logging set up (not started)")
-
+*/
 
 // ===============================================
 // Initialize the server level blacklisted clients
@@ -186,13 +214,18 @@ Log.atNotice?.log(id: -1, source: "Main", message: "Remote console logging set u
 
 let serverBlacklist = Blacklist()
 
-guard let serverBlacklistFile = FileURLs.serverBlacklistFile else { emergencyExit("Could not construct server blacklist file") }
+do {
+    guard let serverBlacklistFile = StorageUrls.serverBlacklistFile else {
+        emergencyExit("Could not construct server blacklist file url")
+    }
 
-switch serverBlacklist.restore(fromFile: serverBlacklistFile) {
-case let .error(message):   emergencyExit(message)
-case .success: break
+    switch serverBlacklist.restore(fromFile: serverBlacklistFile) {
+    case let .error(message):   emergencyExit(message)
+    case .success: break
+    }
+    
+    Log.atDebug?.log(id: -1, source: "Main", message: "Server Blacklist:\n\n\(serverBlacklist)\n")
 }
-Log.atDebug?.log(id: -1, source: "Main", message: "Server Blacklist:\n\n\(serverBlacklist)\n")
 
 
 // =========================
@@ -201,14 +234,18 @@ Log.atDebug?.log(id: -1, source: "Main", message: "Server Blacklist:\n\n\(server
 
 let statistics = Statistics()
 
-guard let statisticsFile = FileURLs.statisticsFile else { emergencyExit("Statistics file could not be constructed") }
-
-switch statistics.restore(fromFile: statisticsFile) {
-case let .error(message): emergencyExit(message)
-case .success: break
+do {
+    guard let statisticsFile = StorageUrls.statisticsFile else {
+        emergencyExit("Statistics file could not be constructed")
+    }
+    
+    switch statistics.restore(fromFile: statisticsFile) {
+    case let .error(message): emergencyExit(message)
+    case .success: break
+    }
+    
+    Log.atNotice?.log(id: -1, source: "Main", message: "Server statistics loaded.")
 }
-
-Log.atNotice?.log(id: -1, source: "Main", message: "Server statistics loaded.")
 
 
 // ========================
@@ -216,8 +253,12 @@ Log.atNotice?.log(id: -1, source: "Main", message: "Server statistics loaded.")
 // ========================
 
 let services = Service()
-registerServices()
-Log.atDebug?.log(id: -1, source: "Main", message: "Registered services:\n\n\(services)\n")
+
+do {
+    registerServices()
+
+    Log.atDebug?.log(id: -1, source: "Main", message: "Registered services:\n\n\(services)\n")
+}
 
 
 // ================================
@@ -225,15 +266,29 @@ Log.atDebug?.log(id: -1, source: "Main", message: "Registered services:\n\n\(ser
 // ================================
 
 let functions = Function()
-registerFunctions()
-Log.atDebug?.log(id: -1, source: "Main", message: "Registered functions:\n\n\(functions)\n")
+
+do {
+    registerFunctions()
+
+    Log.atDebug?.log(id: -1, source: "Main", message: "Registered functions:\n\n\(functions)\n")
+}
 
 
 // ============================
 // Setup the Http Header Logger
 // ============================
 
-let headerLogger = HttpHeaderLogger(inDirectory: FileURLs.headersLogDir)
+let headerLogger: HttpHeaderLogger
+
+do {
+    guard let headersLogDir = StorageUrls.headersLogDir else {
+        emergencyExit("Headers logging directory could nto be constructed")
+    }
+    
+    headerLogger = HttpHeaderLogger(rootDir: headersLogDir)
+    
+    Log.atDebug?.log(id: -1, source: "Main", message: "Created header logging directory in: \(headersLogDir)")
+}
 
 
 // ======================
@@ -242,30 +297,56 @@ let headerLogger = HttpHeaderLogger(inDirectory: FileURLs.headersLogDir)
 
 let domains = Domains()
 
-guard let defaultDomainsFile = FileURLs.domainDefaultsFile else { emergencyExit("Default domains file could not be constructed") }
-
-switch domains.restore(fromFile: defaultDomainsFile) {
-case let .error(message): emergencyExit(message)
-case let .success(message): Log.atNotice?.log(id: -1, source: "Main", message: message)
+do {
+    guard let defaultDomainsFile = StorageUrls.domainDefaultsFile else {
+        emergencyExit("Default domains file could not be constructed")
+    }
+    
+    switch domains.restore(fromFile: defaultDomainsFile) {
+    case let .error(message): emergencyExit(message)
+    case let .success(message): Log.atNotice?.log(id: -1, source: "Main", message: message)
+    }
+    
+    
+    // Remove unknown services from the domains
+    
+    domains.forEach() { $0.removeUnknownServices() }
+    
+    
+    // log the domain settings
+    
+    Log.atNotice?.log(id: -1, source: "Main", message: "Domain settings:\n\n\(domains)\n")
 }
 
 
-// Remove unknown services from the domains
-
-domains.forEach() { $0.removeUnknownServices() }
-
-
-// log the domain settings
-
-Log.atNotice?.log(id: -1, source: "Main", message: "Domain settings:\n\n\(domains)\n")
-
-
+// =====================================
 // Create the server admin pseudo domain
+// =====================================
 
-let serverAdminPseudoDomain = Domain(supportDirectory: FileURLs.serverAdminDir)
-serverAdminPseudoDomain.name = "serveradmin"
-serverAdminPseudoDomain.serviceNames = serverAdminServices // Defined in: Services.Registration.swift
-serverAdminPseudoDomain.sessionTimeout = 600 // Seconds
+let serverAdminDomain: Domain
+
+do {
+    guard let serverAdminDomainDir = StorageUrls.serverAdminDir else {
+        emergencyExit("The Server Admin (Pseudo) Domain directory could not be created")
+    }
+    
+    guard let domain = Domain(rootDir: serverAdminDomainDir) else {
+        emergencyExit("The Server Admin (Pseudo) Domain could not be created")
+    }
+    
+    serverAdminDomain = domain
+
+    serverAdminDomain.name = "serveradmin"
+    serverAdminDomain.enabled = true
+    serverAdminDomain.accessLogEnabled = true
+    serverAdminDomain.four04LogEnabled = true
+    serverAdminDomain.sessionLogEnabled = true
+    serverAdminDomain.serviceNames = serverAdminServices // Defined in: Services.Registration.swift
+    serverAdminDomain.rebuildServices()
+    serverAdminDomain.sessionTimeout = 600 // Seconds
+
+    Log.atNotice?.log(id: -1, source: "Main", message: "Created server admin (pseudo) domain")
+}
 
 
 // ==============================
@@ -274,11 +355,13 @@ serverAdminPseudoDomain.sessionTimeout = 600 // Seconds
 
 let connectionPool = ConnectionPool()
 
-connectionPool.sorter = { // Sorting makes debugging easier
-    (_ lhs: Connection, _ rhs: Connection) -> Bool in
-    let lhs = lhs as! SFConnection
-    let rhs = rhs as! SFConnection
-    return lhs.objectId < rhs.objectId
+do {
+    connectionPool.sorter = { // Sorting makes monitoring easier
+        (_ lhs: Connection, _ rhs: Connection) -> Bool in
+        let lhs = lhs as! SFConnection
+        let rhs = rhs as! SFConnection
+        return lhs.objectId < rhs.objectId
+    }
 }
 
 
@@ -315,8 +398,8 @@ var httpsServer: SecureSockets.SslServer?
 // Make sure certificates are present for the M&C connection
 // =========================================================
 
-if (!FileURLs.exists(url: FileURLs.sslConsoleServerCertificateFile) || !FileURLs.exists(url: FileURLs.sslConsoleServerPrivateKeyFile)) {
-    switch generateKeyAndCertificate(privateKeyLocation: FileURLs.sslConsoleServerPrivateKeyFile, certificateLocation: FileURLs.sslConsoleServerCertificateFile) {
+if (!StorageUrls.exists(url: StorageUrls.sslConsoleServerCertificateFile) || !StorageUrls.exists(url: StorageUrls.sslConsoleServerPrivateKeyFile)) {
+    switch generateKeyAndCertificate(privateKeyLocation: StorageUrls.sslConsoleServerPrivateKeyFile, certificateLocation: StorageUrls.sslConsoleServerCertificateFile) {
     case .error(let message): emergencyExit(message)
     case .success: Log.atNotice?.log(id: -1, source: "Main", message: "Certificate and private key for console connection generated")
     }
@@ -332,11 +415,11 @@ guard let macCtx = ServerCtx() else { emergencyExit("Cannot create server contex
 
 // Set the certificate & private key
 
-if case let .error(message) = macCtx.usePrivateKey(file: EncodedFile(path: FileURLs.sslConsoleServerPrivateKeyFile!.path, encoding: .pem)) {
+if case let .error(message) = macCtx.usePrivateKey(file: EncodedFile(path: StorageUrls.sslConsoleServerPrivateKeyFile!.path, encoding: .pem)) {
     emergencyExit(message)
 }
 
-if case let .error(message) = macCtx.useCertificate(file: EncodedFile(path: FileURLs.sslConsoleServerCertificateFile!.path, encoding: .pem)) {
+if case let .error(message) = macCtx.useCertificate(file: EncodedFile(path: StorageUrls.sslConsoleServerCertificateFile!.path, encoding: .pem)) {
     emergencyExit(message)
 }
 
@@ -347,8 +430,8 @@ guard let macCert: X509 = X509(ctx: macCtx) else { emergencyExit("Could not extr
 
 fileprivate let today = Date().javaDate
 
-if today < macCert.validNotBefore { emergencyExit("Console certificate in \(FileURLs.sslConsoleServerCertificateFile!.path) is not yet valid") }
-if today > macCert.validNotAfter  { emergencyExit("Console certificate in \(FileURLs.sslConsoleServerCertificateFile!.path) is no longer valid") }
+if today < macCert.validNotBefore { emergencyExit("Console certificate in \(StorageUrls.sslConsoleServerCertificateFile!.path) is not yet valid") }
+if today > macCert.validNotAfter  { emergencyExit("Console certificate in \(StorageUrls.sslConsoleServerCertificateFile!.path) is no longer valid") }
 
 fileprivate let validForDays = (macCert.validNotAfter - today)/Int64(24 * 60 * 60 * 1000)
 
@@ -358,7 +441,7 @@ Log.atInfo?.log(id: -1, source: "Main", message: "Server certificate for console
 // Check that there is a trusted console certificate
 
 var consoleServerCertificateFound = false
-if let urls = try? FileManager.default.contentsOfDirectory(at: FileURLs.sslConsoleTrustedClientsDir!, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles, .skipsSubdirectoryDescendants]) {
+if let urls = try? FileManager.default.contentsOfDirectory(at: StorageUrls.sslConsoleTrustedClientsDir!, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles, .skipsSubdirectoryDescendants]) {
     for url in urls {
         // If a certificate file format is found, then load it and check its validity period
         if url.pathExtension.compare("pem", options: String.CompareOptions.caseInsensitive, range: nil, locale: nil) == ComparisonResult.orderedSame {
@@ -409,7 +492,7 @@ private let macAcceptQueue = DispatchQueue(
 
 // Create a container for the certificate and private key
 
-guard let macCertKeyContainer = CertificateAndPrivateKeyFiles(pemCertificateFile: FileURLs.sslConsoleServerCertificateFile!.path, pemPrivateKeyFile: FileURLs.sslConsoleServerPrivateKeyFile!.path) else { emergencyExit("Could not create console server certificate & private key container") }
+guard let macCertKeyContainer = CertificateAndPrivateKeyFiles(pemCertificateFile: StorageUrls.sslConsoleServerCertificateFile!.path, pemPrivateKeyFile: StorageUrls.sslConsoleServerPrivateKeyFile!.path) else { emergencyExit("Could not create console server certificate & private key container") }
 
 
 // Create the server
@@ -422,7 +505,7 @@ _ = macServer.setOptions(
     .connectionObjectFactory(macConnectionFactory),
     .acceptLoopDuration(10),
     .errorHandler(macErrorHandler),
-    .trustedClientCertificates([FileURLs.sslConsoleTrustedClientsDir!.path]),
+    .trustedClientCertificates([StorageUrls.sslConsoleTrustedClientsDir!.path]),
     .serverCtx(macCtx)
 )
 
@@ -474,14 +557,14 @@ case .success:
     
     // Cleanup
     
-    serverAdminPseudoDomain.serverShutdown()
-    statistics.save(toFile: FileURLs.statisticsFile!)
+    _ = serverAdminDomain.serverShutdown()
+    statistics.save(toFile: StorageUrls.statisticsFile!)
     Log.atNotice?.log(id: -1, source: "Main", message: "Saved server statistics")
     
-    headerLogger?.close()
+    headerLogger.close()
     Log.atNotice?.log(id: -1, source: "Main", message: "Closed header logging file")
     
-    if let url = FileURLs.serverBlacklistFile {
+    if let url = StorageUrls.serverBlacklistFile {
         serverBlacklist.save(toFile: url)
         Log.atNotice?.log(id: -1, source: "Main", message: "Saved server blacklist")
     }
@@ -491,7 +574,7 @@ case .success:
     case .success: break;
     }
     
-    switch domains.save(toFile: FileURLs.domainDefaultsFile!) {
+    switch domains.save(toFile: StorageUrls.domainDefaultsFile!) {
     case .error(let message): Log.atError?.log(id: -1, source: "Main", message: "Error while saving the domains:\n\(message)")
     case .success: Log.atNotice?.log(id: -1, source: "Main", message: "Saved domains")
     }

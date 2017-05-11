@@ -1,9 +1,9 @@
 // =====================================================================================================================
 //
 //  File:       Blacklist.swift
-//  Project:    SwiftfireCore
+//  Project:    Swiftfire
 //
-//  Version:    0.10.6
+//  Version:    0.10.7
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.7 - Merged SwiftfireCore into Swiftfire
 // 0.10.6 - Minor description update
 // 0.9.17 - Header update
 // 0.9.15 - General update and switch to frameworks, SwiftfireCore split.
@@ -57,6 +58,7 @@
 import Foundation
 import SwifterJSON
 import SwifterSockets
+import BRUtils
 
 
 fileprivate let ENTRY = "Entry"
@@ -166,7 +168,7 @@ public final class Blacklist: VJsonSerializable, VJsonDeserializable, CustomStri
     /// - Returns: .success(true) if the operation was sucessfull, .error(message: String) if not.
     
     @discardableResult
-    public func save(toFile url: URL) -> FunctionResult<Bool> {
+    public func save(toFile url: URL) -> Result<Bool> {
         
         // Special case: If there are no blacklist clients and there is no blacklist file, then create an example blacklist file
         guard list.count != 0 else {
@@ -196,7 +198,7 @@ public final class Blacklist: VJsonSerializable, VJsonDeserializable, CustomStri
     ///
     /// - Returns: .success(true) if the operation was sucessfull, .error(message) if not.
 
-    public func restore(fromFile url: URL) -> FunctionResult<Bool> {
+    public func restore(fromFile url: URL) -> Result<Bool> {
         
         if !FileManager.default.isReadableFile(atPath: url.path) {
             // If there is no readable file, then assume no blacklisted clients

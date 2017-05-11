@@ -66,7 +66,6 @@
 // =====================================================================================================================
 
 import Foundation
-import SwiftfireCore
 
 
 // ==============================================
@@ -81,6 +80,8 @@ private let onlyGetOrPost = "Only GET / POST requests"
 private let getResourcePathFromUrl = "Get resource path from request URL"
 private let getFileAtResourcePath = "Get file at resource path"
 private let getSession = "Get Active Session"
+private let serverAdmin = "Handle server Admin Domain"
+private let decodePostFormUrlEncoded = "Decode post form urlencoded"
 
 
 // =================================================
@@ -98,6 +99,8 @@ func registerServices() {
     services.register(name: getResourcePathFromUrl, service: service_getResourcePathFromUrl)
     services.register(name: getFileAtResourcePath, service: service_getFileAtResourcePath)
     services.register(name: getSession, service: service_getSession)
+    services.register(name: serverAdmin, service: service_serverAdmin)
+    services.register(name: decodePostFormUrlEncoded, service: service_decodePostFormUrlEncoded)
 }
 
 
@@ -114,10 +117,14 @@ var defaultServices: Array<String> {
         onlyHttp10OrHttp11,
         onlyGetOrPost,
         getSession,
+        decodePostFormUrlEncoded,
         getResourcePathFromUrl,
         getFileAtResourcePath
     ]
 }
+
+
+/// The services for the server admin (pseudo) domain
 
 var serverAdminServices: Array<String> {
     return [
@@ -125,7 +132,7 @@ var serverAdminServices: Array<String> {
         onlyHttp10OrHttp11,
         onlyGetOrPost,
         getSession,
-        getResourcePathFromUrl,
-        getFileAtResourcePath
+        decodePostFormUrlEncoded,
+        serverAdmin
     ]
 }

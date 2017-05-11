@@ -59,7 +59,6 @@
 import Foundation
 import SwifterJSON
 import SwifterLog
-import SwiftfireCore
 
 private let CLIENT = "Client"
 private let NEW_VALUE = "NewValue"

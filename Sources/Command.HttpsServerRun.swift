@@ -60,7 +60,6 @@
 import Foundation
 import SwifterLog
 import SwifterJSON
-import SwiftfireCore
 import SecureSockets
 import SwifterSockets
 
@@ -203,7 +202,7 @@ extension HttpsServerRunCommand: MacCommand {
                 
                 // Log the conditions the server is running under
                 
-                logServerSetup(logger: SwifterLog.atNotice)
+                logServerSetup()
 
                 telemetry.httpsServerStatus.value = "Running"
             }
@@ -215,7 +214,7 @@ extension HttpsServerRunCommand: MacCommand {
 
 fileprivate func buildServerCtx() -> ServerCtx? {
     
-    guard let sslServerDir = FileURLs.sslServerDir else {
+    guard let sslServerDir = StorageUrls.sslServerDir else {
         Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "No sll server directory found")
         return nil
     }

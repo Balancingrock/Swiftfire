@@ -86,7 +86,6 @@ import Foundation
 import SwifterSockets
 import SwifterLog
 import SwifterJSON
-import SwiftfireCore
 
 
 var mac: MonitoringAndControlConnection?

@@ -59,7 +59,6 @@
 import Foundation
 import SwifterJSON
 import SwifterLog
-import SwiftfireCore
 
 private let COMMAND_NAME = "SaveServerParametersCommand"
 
@@ -101,7 +100,7 @@ extension SaveServerParametersCommand: MacCommand {
     
     public func execute() {
         Log.atNotice?.log(id: -1, source: #file.source(#function, #line))
-        if let url = FileURLs.parameterDefaultsFile {
+        if let url = StorageUrls.parameterDefaultsFile {
             parameters.save(toFile: url)
         } else {
             Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Could not construct default parameters filename")

@@ -77,7 +77,6 @@
 import Foundation
 import SwifterSockets
 import SwifterLog
-import SwiftfireCore
 
 
 /// Holds all data that is associated with an HTTP Connection.
@@ -297,7 +296,7 @@ final class SFConnection: SwifterSockets.Connection {
                     // Write the header to the log if so required
                     // Note: This is done now because there might be errors this request that would be missed if the log is not done at the earliest possible moment..
                     
-                    if parameters.headerLoggingEnabled.value { headerLogger?.record(connection: self, request: httpRequest!) }
+                    if parameters.headerLoggingEnabled.value { headerLogger.record(connection: self, request: httpRequest!) }
                 }
             }
             

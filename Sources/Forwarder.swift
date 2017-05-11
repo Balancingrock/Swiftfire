@@ -58,7 +58,6 @@
 import Foundation
 import SwifterSockets
 import SwifterLog
-import SwiftfireCore
 
 
 /// Creates a new forwarding connection.

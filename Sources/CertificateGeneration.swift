@@ -1,9 +1,9 @@
 // =====================================================================================================================
 //
 //  File:       CertificateGeneration.swift
-//  Project:    SwiftfireCore
+//  Project:    Swiftfire
 //
-//  Version:    0.9.18
+//  Version:    0.10.7
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.7 - Merged SwiftfireCore into Swiftfire
 // 0.9.18 - Moved Result from SwifterSockets to BRUtils
 // 0.9.17 - Initial release
 // =====================================================================================================================
@@ -106,8 +107,8 @@ public func generateKeyAndCertificate(privateKeyLocation keyUrl: URL?, certifica
     certificate.subjectCountryCode = "nl"
     certificate.issuerCountryCode = "nl"
     
-    certificate.subjectCommonName = "SwiftfireCore"
-    certificate.issuerCommonName = "SwiftfireCore"
+    certificate.subjectCommonName = "Swiftfire"
+    certificate.issuerCommonName = "Swiftfire"
     
     certificate.subjectOrganizationName = "Balancingrock"
     certificate.issuerOrganizationName = "Balancingrock"

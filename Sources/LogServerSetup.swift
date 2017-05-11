@@ -55,15 +55,17 @@
 import Foundation
 import SwifterLog
 
-func logServerSetup(logger: SwifterLog.Logger?) {
+func logServerSetup() {
     
-    logger?.log(id: -1, source: "LogServerSetup", message: "Configuration parameters values:\n\n\(parameters)\n")
+    Log.atNotice?.log(id: -1, source: "LogServerSetup", message: "Configuration parameters values:\n\n\(parameters)\n")
 
-    logger?.log(id: -1, source: "LogServerSetup", message: "Server Blacklist:\n\n\(serverBlacklist)\n")
+    Log.atNotice?.log(id: -1, source: "LogServerSetup", message: "Server Blacklist:\n\n\(serverBlacklist)\n")
 
-    logger?.log(id: -1, source: "LogServerSetup", message: "Registered Services:\n\n\(services)\n")
+    Log.atNotice?.log(id: -1, source: "LogServerSetup", message: "Registered Services:\n\n\(services)\n")
 
-    logger?.log(id: -1, source: "LogServerSetup", message: "Registered Functions:\n\n\(functions)\n")
+    Log.atNotice?.log(id: -1, source: "LogServerSetup", message: "Registered Functions:\n\n\(functions)\n")
     
-    logger?.log(id: -1, source: "LogServerSetup", message: "Domain settings:\n\n\(domains)\n")
+    Log.atNotice?.log(id: -1, source: "LogServerSetup", message: "Domain settings:\n\n\(domains)\n")
+    
+    Log.atNotice?.log(id: -1, source: "LogServerSetup", message: "ServerAdminDomain settings:\n\n\(serverAdminDomain)\n")
 }

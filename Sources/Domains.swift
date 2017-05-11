@@ -1,9 +1,9 @@
 // =====================================================================================================================
 //
 //  File:       Domains.swift
-//  Project:    SwiftfireCore
+//  Project:    Swiftfire
 //
-//  Version:    0.10.6
+//  Version:    0.10.7
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.7 - Merged SwiftfireCore into Swiftfire
 // 0.10.6 - Reworked updating of domain items
 // 0.9.18 - Added ctxs
 // 0.9.17 - Header update
@@ -69,6 +70,23 @@
 import Foundation
 import SwifterJSON
 import SecureSockets
+import BRUtils
+
+
+func + (lhs: Result<Bool>, rhs: Result<Bool>) -> Result<Bool> {
+    switch lhs {
+    case .error(let lmessage):
+        switch rhs {
+        case .error(let rmessage): return Result<Bool>.error(message: "\(lmessage)\n\(rmessage)")
+        case .success: return Result<Bool>.error(message: lmessage)
+        }
+    case .success(let lbool):
+        switch rhs {
+        case .error(let rmessage): return Result<Bool>.error(message: rmessage)
+        case .success(let rbool): return Result<Bool>.success(lbool && rbool)
+        }
+    }
+}
 
 
 /// The class that manages all domains.
@@ -242,8 +260,8 @@ public final class Domains: Sequence, CustomStringConvertible {
     
     /// Invokes serverShutdown on each domain.
     
-    public func serverShutdown() -> FunctionResult<Bool> {
-        return domains.reduce(FunctionResult<Bool>.success(true)) { $0 + $1.value.serverShutdown() }
+    public func serverShutdown() -> Result<Bool> {
+        return domains.reduce(Result<Bool>.success(true)) { $0 + $1.value.serverShutdown() }
     }
     
     
@@ -271,7 +289,7 @@ public final class Domains: Sequence, CustomStringConvertible {
     /// - Returns: .success(message) if the operation was successful, .error(message) otherwise.
     
     @discardableResult
-    public func restore(fromFile url: URL) -> FunctionResult<String> {
+    public func restore(fromFile url: URL) -> Result<String> {
         
         
         // Only if the domain-defaults file exists
@@ -314,7 +332,7 @@ public final class Domains: Sequence, CustomStringConvertible {
     /// - Returns: Either .success(true) or .error(message: String)
 
     @discardableResult
-    public func save(toFile url: URL) -> FunctionResult<Bool> {
+    public func save(toFile url: URL) -> Result<Bool> {
         
         let json = VJson()
         json["Domains"] &= self.json

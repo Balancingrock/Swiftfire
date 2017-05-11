@@ -1,7 +1,7 @@
 // =====================================================================================================================
 //
 //  File:       Telemetry.swift
-//  Project:    SwiftfireCore
+//  Project:    Swiftfire
 //
 private let version = "0.10.7b"
 //
@@ -49,6 +49,7 @@ private let version = "0.10.7b"
 // History
 //
 // 0.10.7 - Version number update
+//        - Merged SwiftfireCore into Swiftfire
 // 0.10.6 - Renamed from Telemetry to ServerTelemetry
 //        - Added ServerTelemetryName
 // 0.9.18 - Added http and https server status

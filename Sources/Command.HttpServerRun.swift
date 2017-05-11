@@ -64,7 +64,6 @@
 import Foundation
 import SwifterLog
 import SwifterJSON
-import SwiftfireCore
 import SecureSockets
 import SwifterSockets
 
@@ -176,7 +175,7 @@ extension HttpServerRunCommand: MacCommand {
             
             // Log the conditions the server is running under
             
-            logServerSetup(logger: SwifterLog.atNotice)
+            logServerSetup()
             
             telemetry.httpServerStatus.value = "Running"
         }

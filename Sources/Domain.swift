@@ -1,9 +1,9 @@
 // =====================================================================================================================
 //
 //  File:       Domain.swift
-//  Project:    SwiftfireCore
+//  Project:    Swiftfire
 //
-//  Version:    0.10.6
+//  Version:    0.10.7
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.7 - Merged SwiftfireCore into Swiftfire
 // 0.10.6 - Added sessionTimeout
 //        - Added sessionLogEnable
 //        - Added sessions
@@ -131,11 +132,11 @@ public final class Domain: Equatable, CustomStringConvertible, VJsonConvertible 
                 self._name = newValue.lowercased()
                 
                 // Change the name of the support directory
-                if let olddir = supportDirectory {
-                    let newdir = olddir.deletingLastPathComponent().appendingPathComponent(newValue.lowercased())
-                    try? FileManager.default.moveItem(at: olddir, to: newdir)
-                    supportDirectory = newdir
-                }
+                let olddir = supportDirectory
+                let newdir = olddir.deletingLastPathComponent().appendingPathComponent(newValue.lowercased())
+                try? FileManager.default.moveItem(at: olddir, to: newdir)
+                supportDirectory = newdir
+                
                 
                 // Post the name change notification
                 NotificationCenter.default.post(name: Domain.nameChangedNotificationName, object: self, userInfo: ["Old" : oldValue, "New" : newValue])
@@ -347,12 +348,12 @@ public final class Domain: Equatable, CustomStringConvertible, VJsonConvertible 
     
     /// The accounts associated withthis domain
     
-    public var accounts: Accounts
+    public var accounts: Accounts!
     
     
     // The support directories for this domain
     
-    public var supportDirectory: URL? {
+    public var supportDirectory: URL {
         didSet {
             // Cycle the logfiles off/on to make sure they are created in the right directory
             if accessLogEnabled {
@@ -370,7 +371,7 @@ public final class Domain: Equatable, CustomStringConvertible, VJsonConvertible 
     /// The directory for the access & 404 log files
     
     private lazy var loggingDir: URL? = {
-        guard let dir = self.supportDirectory else { return nil }
+        let dir = self.supportDirectory
         do {
             let url = dir.appendingPathComponent("logging", isDirectory: true)
             try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
@@ -384,7 +385,7 @@ public final class Domain: Equatable, CustomStringConvertible, VJsonConvertible 
     /// The directory for the settings files.
     
     private lazy var settingsDir: URL? = {
-        guard let dir = self.supportDirectory else { return nil }
+        let dir = self.supportDirectory
         do {
             let url = dir.appendingPathComponent("settings", isDirectory: true)
             try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
@@ -398,7 +399,7 @@ public final class Domain: Equatable, CustomStringConvertible, VJsonConvertible 
     /// The directory for the certificate files.
     
     private lazy var sslDir: URL? = {
-        guard let dir = self.supportDirectory else { return nil }
+        let dir = self.supportDirectory
         do {
             let url = dir.appendingPathComponent("ssl", isDirectory: true)
             try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
@@ -459,7 +460,7 @@ public final class Domain: Equatable, CustomStringConvertible, VJsonConvertible 
         domain["SessionLogEnabled"] &= sessionLogEnabled
         domain["SfResources"] &= sfresources
         domain["Telemetry"] &= telemetry.json
-        domain["SupportDirectory"] &= supportDirectory?.path ?? nil
+        domain["SupportDirectory"] &= supportDirectory.path
         domain["SessionTimeout"] &= sessionTimeout
         domain["ServiceNames"] &= VJson(serviceNames)
         return domain
@@ -468,12 +469,14 @@ public final class Domain: Equatable, CustomStringConvertible, VJsonConvertible 
     
     /// Create a new domain object.
     ///
-    /// - Parameter supportDirectory: The directory in which logfiles, settings etc will be stored.
+    /// - Parameter rootDir: The root directory for this domain.
     
-    public init(supportDirectory: URL?) {
-        self.supportDirectory = supportDirectory
-        self.sessions = Sessions(logDirUrl: sessionLogDir)
-        self.accounts = Accounts(root: accountsDir)
+    public init?(rootDir: URL) {
+        self.supportDirectory = rootDir
+        if sessionLogDir == nil { return nil }
+        self.sessions = Sessions(logDirUrl: sessionLogDir!)
+        if accountsDir == nil { return nil }
+        self.accounts = Accounts(root: accountsDir!)
     }
     
     
@@ -483,10 +486,23 @@ public final class Domain: Equatable, CustomStringConvertible, VJsonConvertible 
     
     public convenience init?(json: VJson?) {
         
+        guard let json = json else { return nil }
+
+        
+        // Create a default object
+        
+        let jsupDir = (json|"SupportDirectory")?.stringValue
+        
+        if jsupDir != nil, !jsupDir!.isEmpty {
+            let jsupDirUrl = URL(fileURLWithPath: jsupDir!, isDirectory: true)
+            self.init(rootDir: jsupDirUrl)
+        } else {
+            return nil
+        }
+
+        
         // Initialize the properties that must be present
         
-        guard let json = json else { return nil }
-                
         guard let jname   = (json|"Name")?.stringValue else { return nil }
         guard let jroot   = (json|"Root")?.stringValue else { return nil }
         guard let jfurl   = (json|"ForewardUrl")?.stringValue else { return nil }
@@ -496,16 +512,9 @@ public final class Domain: Equatable, CustomStringConvertible, VJsonConvertible 
         guard let jfour   = (json|"404LogEnabled")?.boolValue else { return nil }
         guard let jservicesNames = json|"ServiceNames" else { return nil }
         
-        let jsupDir = (json|"SupportDirectory")?.stringValue
-
-        if jsupDir != nil, !jsupDir!.isEmpty {
-            let jsupDirUrl = URL(fileURLWithPath: jsupDir!, isDirectory: true)
-            self.init(supportDirectory: jsupDirUrl)
-        } else {
-            self.init(supportDirectory: nil)
-        }
         
         // Upgrade
+        
         if (json|"SfResources")?.stringValue == nil { json["SfResources"] &= sfresources }
         let jsfresources = (json|"SfResources")!.stringValue!
 
@@ -514,6 +523,9 @@ public final class Domain: Equatable, CustomStringConvertible, VJsonConvertible 
         
         if (json|"SessionLogEnabled")?.boolValue == nil { json["SessionLogEnabled"] &= sessionLogEnabled }
         let jsessionlogenabled = (json|"SessionLogEnabled")!.boolValue!
+        
+        
+        // Setup
         
         self.name = jname
         self.root = jroot
@@ -558,7 +570,7 @@ public final class Domain: Equatable, CustomStringConvertible, VJsonConvertible 
     
     /// Save the contents of the blacklist to file.
     
-    public func saveBlacklist() -> FunctionResult<Bool> {
+    public func saveBlacklist() -> Result<Bool> {
         if let url = blacklistedClientsUrl {
             return blacklist.save(toFile: url)
         }
@@ -627,7 +639,7 @@ public final class Domain: Equatable, CustomStringConvertible, VJsonConvertible 
     
     /// Restore the contents of the blacklist from file.
     
-    public func restoreBlacklist() -> FunctionResult<Bool> {
+    public func restoreBlacklist() -> Result<Bool> {
         if let url = blacklistedClientsUrl {
             return blacklist.restore(fromFile: url)
         }
@@ -637,7 +649,7 @@ public final class Domain: Equatable, CustomStringConvertible, VJsonConvertible 
     
     /// Prepares for application (server) shutdown
 
-    public func serverShutdown() -> FunctionResult<Bool> {
+    public func serverShutdown() -> Result<Bool> {
         let result = saveBlacklist()
         accessLog?.close()
         four04Log?.close()
@@ -737,6 +749,47 @@ public final class Domain: Equatable, CustomStringConvertible, VJsonConvertible 
             }
             
         default: SwifterLog.atError?.log(id: -1, source: #file.source(#function, #line), message: "Unknown item name: \(item)")
+        }
+    }
+    
+    
+    /// Returns the custom error message for the given http response code if there is one.
+    ///
+    /// - Parameter for: The error code for which to return the custom error message.
+    
+    func customErrorResponse(for code: HttpResponseCode) -> Data? {
+        
+        do {
+            let url = URL(fileURLWithPath: sfresources).appendingPathComponent(code.rawValue.replacingOccurrences(of: " ", with: "_")).appendingPathExtension("html")
+            let reply = try Data(contentsOf: url)
+            return reply
+        } catch {
+            return nil
+        }
+    }
+    
+    
+    /// Removes service names that are not in the available domain services
+    
+    func removeUnknownServices() {
+        
+        for (index, serviceName) in serviceNames.enumerated().reversed() {
+            if Swiftfire.services.registered[serviceName] == nil {
+                serviceNames.remove(at: index)
+            }
+        }
+    }
+    
+    
+    /// Rebuild the services member from the serviceNames and the available services (the later is a member of domainServices)
+    
+    func rebuildServices() {
+        
+        services = []
+        for serviceName in serviceNames {
+            if let service = Swiftfire.services.registered[serviceName] {
+                services.append(service)
+            }
         }
     }
 }

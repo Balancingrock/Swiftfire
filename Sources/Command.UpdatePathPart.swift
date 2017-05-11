@@ -59,7 +59,6 @@
 import Foundation
 import SwifterJSON
 import SwifterLog
-import SwiftfireCore
 
 private let URLSTR = "Url"
 private let NEW_VALUE = "NewValue"

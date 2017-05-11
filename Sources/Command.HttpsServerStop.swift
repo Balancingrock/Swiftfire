@@ -56,7 +56,6 @@
 
 import Foundation
 import SwifterJSON
-import SwiftfireCore
 import SwifterLog
 
 private let COMMAND_NAME = "HttpsServerStopCommand"

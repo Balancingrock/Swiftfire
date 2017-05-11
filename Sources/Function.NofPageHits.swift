@@ -93,7 +93,6 @@
 // =====================================================================================================================
 
 import Foundation
-import SwiftfireCore
 
 
 /// Returns the number of hits for a relative resource path. The path should be relative to the root directory of the domain.

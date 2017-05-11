@@ -7,7 +7,6 @@
 //
 
 import Foundation
-import SwiftfireCore
 
 extension Function.Environment {
     
