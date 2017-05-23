@@ -248,9 +248,9 @@ do {
 }
 
 
-// ========================
-// Load the domain services
-// ========================
+// =================
+// Load the services
+// =================
 
 let services = Service()
 
@@ -261,9 +261,9 @@ do {
 }
 
 
-// ================================
-// Load the "Insert Here" functions
-// ================================
+// ==================
+// Load the functions
+// ==================
 
 let functions = Function()
 
@@ -330,13 +330,12 @@ do {
         emergencyExit("The Server Admin (Pseudo) Domain directory could not be created")
     }
     
-    guard let domain = Domain(rootDir: serverAdminDomainDir) else {
+    guard let domain = Domain(name: "serveradmin", root: serverAdminDomainDir) else {
         emergencyExit("The Server Admin (Pseudo) Domain could not be created")
     }
     
     serverAdminDomain = domain
 
-    serverAdminDomain.name = "serveradmin"
     serverAdminDomain.enabled = true
     serverAdminDomain.accessLogEnabled = true
     serverAdminDomain.four04LogEnabled = true
@@ -392,6 +391,9 @@ let httpsServerAcceptQueue = DispatchQueue(
 
 var httpServer: SwifterSockets.TipServer?
 var httpsServer: SecureSockets.SslServer?
+
+telemetry.httpServerStatus.setValue("Stopped")
+telemetry.httpsServerStatus.setValue("Stopped")
 
 
 // =========================================================
@@ -544,10 +546,7 @@ case .success:
     // Autostart servers if necessary
     // ==================================
     
-    if parameters.autoStartup.value {
-        HttpServerRunCommand().execute()
-        HttpsServerRunCommand().execute()
-    }
+    if parameters.autoStartup.value { restartHttpAndHttpsServers() }
     
     
     // Wait for the 'quit' command

@@ -146,7 +146,7 @@ public final class Domain: Equatable, CustomStringConvertible, VJsonConvertible 
             return self._name
         }
     }
-    private var _name: String = "domain.toplevel"
+    private var _name: String
     
     
     /// If the domain should map both the name with 'www' and without it to the same root, set this value to 'true'
@@ -427,7 +427,7 @@ public final class Domain: Equatable, CustomStringConvertible, VJsonConvertible 
     /// The directory for the account files.
     
     private lazy var accountsDir: URL? = {
-        guard let dir = self.loggingDir else { return nil }
+        let dir = self.supportDirectory
         do {
             let url = dir.appendingPathComponent("accounts", isDirectory: true)
             try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
@@ -469,10 +469,13 @@ public final class Domain: Equatable, CustomStringConvertible, VJsonConvertible 
     
     /// Create a new domain object.
     ///
-    /// - Parameter rootDir: The root directory for this domain.
+    /// - Parameters
+    ///   - name: The name for the domain
+    ///   - root: The root directory for this domain.
     
-    public init?(rootDir: URL) {
-        self.supportDirectory = rootDir
+    public init?(name: String, root: URL) {
+        self._name = name
+        self.supportDirectory = root
         if sessionLogDir == nil { return nil }
         self.sessions = Sessions(logDirUrl: sessionLogDir!)
         if accountsDir == nil { return nil }
@@ -492,10 +495,11 @@ public final class Domain: Equatable, CustomStringConvertible, VJsonConvertible 
         // Create a default object
         
         let jsupDir = (json|"SupportDirectory")?.stringValue
-        
+        guard let jname = (json|"Name")?.stringValue else { return nil }
+
         if jsupDir != nil, !jsupDir!.isEmpty {
             let jsupDirUrl = URL(fileURLWithPath: jsupDir!, isDirectory: true)
-            self.init(rootDir: jsupDirUrl)
+            self.init(name: jname, root: jsupDirUrl)
         } else {
             return nil
         }
@@ -503,7 +507,6 @@ public final class Domain: Equatable, CustomStringConvertible, VJsonConvertible 
         
         // Initialize the properties that must be present
         
-        guard let jname   = (json|"Name")?.stringValue else { return nil }
         guard let jroot   = (json|"Root")?.stringValue else { return nil }
         guard let jfurl   = (json|"ForewardUrl")?.stringValue else { return nil }
         guard let jwww    = (json|"IncludeWww")?.boolValue else { return nil }

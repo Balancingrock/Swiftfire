@@ -1,6 +1,6 @@
 // =====================================================================================================================
 //
-//  File:       Function.ParameterValue.swift
+//  File:       Function.SF.DomainsTable.swift
 //  Project:    Swiftfire
 //
 //  Version:    0.10.7
@@ -54,19 +54,19 @@
 // Description
 // =====================================================================================================================
 //
-// Returns the value of the requested parameter item.
+// Returns a table with all domains.
 //
 //
 // Signature:
 // ----------
 //
-// .parameterValue("name")
+// .sf-domainsTable()
 //
 //
 // Parameters:
 // -----------
 //
-// - name: The name of the parameter item.
+// None.
 //
 //
 // Other Input:
@@ -79,13 +79,10 @@
 // Returns:
 // --------
 //
-// The value of the requested parameter or one of the error messages:
-// - "<name> is unknown"
-// - "Illegal access"
-// - "Argument type error"
-// - "Nof arguments error"
+// The table with all parameters or:
 // - "Session error"
 // - "Account error"
+// - "Illegal access"
 //
 //
 // Other Output:
@@ -99,11 +96,11 @@
 import Foundation
 
 
-/// Returns the value of the requested parameter item.
+// Returns a table with all telemetry values.
 ///
-/// - Returns: The value of the requested parameter or "No access rights".
+/// - Returns: The table with all telemetry values.
 
-func function_parameterValue(_ args: Function.Arguments, _ info: inout Function.Info, _ environment: inout Function.Environment) -> Data? {
+func function_sf_domainsTable(_ args: Function.Arguments, _ info: inout Function.Info, _ environment: inout Function.Environment) -> Data? {
     
     
     // Check access rights
@@ -121,34 +118,23 @@ func function_parameterValue(_ args: Function.Arguments, _ info: inout Function.
     }
     
     
-    // Check parameter name
+    // The html code to be returned
     
-    guard case .array(let arr) = args else {
-        return "Argument type error".data(using: String.Encoding.utf8)
-    }
+    var table: String = "<table class=\"domains-table\"><thead><tr><th class=\"table-column-name\">Domain</th><th></th><th></th></thead><tbody>"
+    domains.forEach() { table.append($0.tableRow()) }
+    table.append("</tbody></table>")
     
-    guard arr.count == 1 else {
-        return "Nof arguments error".data(using: String.Encoding.utf8)
-    }
-    
-    let name = arr[0]
-    
-    var value: String?
-    
-    for t in parameters.all {
-        
-        if t.name.caseInsensitiveCompare(name) == ComparisonResult.orderedSame {
-            value = t.stringValue
-            break
-        }
-    }
-    
-    guard value != nil else {
-        return "\(name) is unknown".data(using: String.Encoding.utf8)
-    }
-    
-    
-    // Return the value
-    
-    return value!.data(using: String.Encoding.utf8)
+    return table.data(using: String.Encoding.utf8)
 }
+
+fileprivate extension Domain {
+    
+    func tableRow() -> String {
+        return "<tr>"
+        + "<td class=\"table-column-name\">\(self.name)</td>"
+            + "<td>\(postingLink(target: "/serveradmin/pages/domain.sf.html", text: "Edit", keyValuePairs: ["DomainName": name]))</td>"
+        + "<td>\(postingLink(target: "/serveradmin/pages/deletedomain.sf.html", text: "Delete", keyValuePairs: ["DomainName": name]))</td>"
+        + "</tr>"
+    }
+}
+

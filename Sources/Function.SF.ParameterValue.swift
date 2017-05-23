@@ -1,6 +1,6 @@
 // =====================================================================================================================
 //
-//  File:       SessionInfoKeys.swift
+//  File:       Function.SF.ParameterValue.swift
 //  Project:    Swiftfire
 //
 //  Version:    0.10.7
@@ -48,34 +48,107 @@
 //
 // History
 //
-// 0.10.7 - Typo in filename fixed.
-//        - Added accountKey.
-//        - Added preLoginUrlKey.
-// 0.10.6 - Initial release
+// 0.10.7 - Initial release
+//
+// =====================================================================================================================
+// Description
+// =====================================================================================================================
+//
+// Returns the value of the requested parameter item.
+//
+//
+// Signature:
+// ----------
+//
+// .parameterValue("name")
+//
+//
+// Parameters:
+// -----------
+//
+// - name: The name of the parameter item.
+//
+//
+// Other Input:
+// ------------
+//
+// session = environment.serviceInfo[.sessionKey] // Must be a non-expired session.
+// session[.accountKey] must contain an admin account
+//
+//
+// Returns:
+// --------
+//
+// The value of the requested parameter or one of the error messages:
+// - "<name> is unknown"
+// - "Illegal access"
+// - "Argument type error"
+// - "Nof arguments error"
+// - "Session error"
+// - "Account error"
+//
+//
+// Other Output:
+// -------------
+//
+// None.
+//
 //
 // =====================================================================================================================
 
 import Foundation
 
 
-/// Session Info key's
+/// Returns the value of the requested parameter item.
+///
+/// - Returns: The value of the requested parameter or "No access rights".
 
-public enum SessionInfoKey: String {
+func function_sf_parameterValue(_ args: Function.Arguments, _ info: inout Function.Info, _ environment: inout Function.Environment) -> Data? {
     
     
-    /// [Account] The account associated with this session.
-    ///
-    /// Only present if a user has "logged in".
+    // Check access rights
     
-    case accountKey = "Account"
+    guard let session = environment.serviceInfo[.sessionKey] as? Session else {
+        return "Session error".data(using: String.Encoding.utf8)
+    }
+    
+    guard let account = session.info[.accountKey] as? Account else {
+        return "Account error".data(using: String.Encoding.utf8)
+    }
+    
+    guard serverAdminDomain.accounts.contains(account.uuid) else {
+        return "Illegal access".data(using: String.Encoding.utf8)
+    }
     
     
-    /// [String] The url that was requested but discarded because a user needed to login first.
+    // Check parameter name
     
-    case preLoginUrlKey = "PreLoginUrl"
+    guard case .array(let arr) = args else {
+        return "Argument type error".data(using: String.Encoding.utf8)
+    }
+    
+    guard arr.count == 1 else {
+        return "Nof arguments error".data(using: String.Encoding.utf8)
+    }
+    
+    let name = arr[0]
+    
+    var value: String?
+    
+    for t in parameters.all {
+        
+        if t.name.caseInsensitiveCompare(name) == ComparisonResult.orderedSame {
+            value = t.stringValue
+            break
+        }
+    }
+    
+    guard value != nil else {
+        return "\(name) is unknown".data(using: String.Encoding.utf8)
+    }
     
     
-    /// [Int64] To prevent login attempts in rapid succession use this key to enfore a minimum delay between attempts.
+    // Return the value
     
-    case lastFailedLoginAttemptKey = "LastFailedLoginAttempt"
+    return value!.data(using: String.Encoding.utf8)
 }

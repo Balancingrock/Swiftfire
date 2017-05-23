@@ -84,6 +84,9 @@ import SwifterLog
 import SwifterSockets
 
 
+typealias PostInfo = Dictionary<String, String>
+
+
 /// Takes the data (utf-8 ncoded) from the request body and transforms it into a series of name/value pairs.
 ///
 /// - Note: For a full description of all effects of this operation see the file: Service.DecodePostFormUrlEncoded.swift
@@ -131,7 +134,7 @@ func service_decodePostFormUrlEncoded(_ request: HttpRequest, _ connection: Conn
 
     // Split into multiple name/value pairs
     
-    var postInfo: Dictionary<String, String> = [:]
+    var postInfo: PostInfo = [:]
     
     var nameValuePairs = str.components(separatedBy: "&")
     

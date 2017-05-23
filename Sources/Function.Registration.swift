@@ -72,8 +72,25 @@ import Foundation
 let NOF_PAGE_HITS = "nofPageHits"
 let GET_SESSION = "getSession"
 let TIMESTAMP = "timestamp"
-let PARAMETER_VALUE = "parameterValue"
-let TELEMETRY_VALUE = "telemetryValue"
+let POSTING_LINK = "postingLink"
+let POSTING_BUTTON = "postingButton"
+let POSTING_BUTTONED_INPUT = "postingButtonedInput"
+
+
+// Note: The functions below need an active (logged-in) server admin.
+
+let SF_PARAMETER_VALUE = "sf-parameterValue"
+let SF_TELEMETRY_VALUE = "sf-telemetryValue"
+let SF_COMMAND = "sf-command"
+let SF_PARAMETER_TABLE = "sf-parameterTable"
+let SF_TELEMETRY_TABLE = "sf-telemetryTable"
+let SF_DOMAINS_MENU = "sf-domainsMenu"
+let SF_DOMAINS_TABLE = "sf-domainsTable"
+let SF_DOMAIN_DETAIL = "sf-domainDetail"
+let SF_DELETE_DOMAIN = "sf-deleteDomain"
+let SF_DOMAIN_TELEMETRY_TABLE = "sf-domainTelemetryTable"
+let SF_POSTING_BUTTONED_INPUT = "sf-postingButtonedInput"
+let SF_DOMAIN_SERVICES_TABLE = "sf-domainServicesTable"
 
 
 // ==================================================
@@ -87,6 +104,19 @@ func registerFunctions() {
     functions.register(name: NOF_PAGE_HITS, function: function_nofPageHits)
     functions.register(name: GET_SESSION, function: function_getSession)
     functions.register(name: TIMESTAMP, function: function_timestamp)
-    functions.register(name: PARAMETER_VALUE, function: function_parameterValue)
-    functions.register(name: TELEMETRY_VALUE, function: function_telemetryValue)
+    functions.register(name: POSTING_LINK, function: function_postingLink)
+    functions.register(name: POSTING_BUTTON, function: function_postingButton)
+    functions.register(name: POSTING_BUTTONED_INPUT, function: function_postingButtonedInput)
+    functions.register(name: SF_PARAMETER_VALUE, function: function_sf_parameterValue)
+    functions.register(name: SF_TELEMETRY_VALUE, function: function_sf_telemetryValue)
+    functions.register(name: SF_COMMAND, function: function_sf_command)
+    functions.register(name: SF_PARAMETER_TABLE, function: function_sf_parameterTable)
+    functions.register(name: SF_TELEMETRY_TABLE, function: function_sf_telemetryTable)
+    functions.register(name: SF_DOMAINS_MENU, function: function_sf_domainsMenu)
+    functions.register(name: SF_DOMAINS_TABLE, function: function_sf_domainsTable)
+    functions.register(name: SF_DOMAIN_DETAIL, function: function_sf_domainDetail)
+    functions.register(name: SF_DELETE_DOMAIN, function: function_sf_deleteDomain)
+    functions.register(name: SF_DOMAIN_TELEMETRY_TABLE, function: function_sf_domainTelemetryTable)
+    functions.register(name: SF_DOMAIN_SERVICES_TABLE, function: function_sf_domainServicesTable)
+    functions.register(name: SF_POSTING_BUTTONED_INPUT, function: function_sf_postingButtonedInput)
 }

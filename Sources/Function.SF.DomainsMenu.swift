@@ -1,6 +1,6 @@
 // =====================================================================================================================
 //
-//  File:       SessionInfoKeys.swift
+//  File:       Function.SF.DomainsMenu.swift
 //  Project:    Swiftfire
 //
 //  Version:    0.10.7
@@ -48,34 +48,91 @@
 //
 // History
 //
-// 0.10.7 - Typo in filename fixed.
-//        - Added accountKey.
-//        - Added preLoginUrlKey.
-// 0.10.6 - Initial release
+// 0.10.7 - Initial release
+//
+// =====================================================================================================================
+// Description
+// =====================================================================================================================
+//
+// Returns a table with all domains.
+//
+//
+// Signature:
+// ----------
+//
+// .sf-domainsTable()
+//
+//
+// Parameters:
+// -----------
+//
+// None.
+//
+//
+// Other Input:
+// ------------
+//
+// session = environment.serviceInfo[.sessionKey] // Must be a non-expired session.
+// session[.accountKey] must contain an admin account
+//
+//
+// Returns:
+// --------
+//
+// The table with all parameters or:
+// - "Session error"
+// - "Account error"
+// - "Illegal access"
+//
+//
+// Other Output:
+// -------------
+//
+// None.
+//
 //
 // =====================================================================================================================
 
 import Foundation
 
 
-/// Session Info key's
+/// - Returns: A menu for the navbar containing all the domains as submenu items.
 
-public enum SessionInfoKey: String {
+func function_sf_domainsMenu(_ args: Function.Arguments, _ info: inout Function.Info, _ environment: inout Function.Environment) -> Data? {
     
     
-    /// [Account] The account associated with this session.
-    ///
-    /// Only present if a user has "logged in".
+    // Build the menu for the domains
     
-    case accountKey = "Account"
+    var menu: String = ""
+    +   "<input type=\"checkbox\" id=\"domains-checkbox\">"
+    +   "<label for=\"domains-checkbox\">"
+    +       "<div class=\"menu-item-separator\"><p><!-- empty but necessary --></p></div>"
+    +       "<div class=\"menu-item\">"
+    +           "<div class=\"menu-item-symbol\"><p><!-- empty but necessary! --></p></div>"
+    +           "<div class=\"menu-item-title\"><p>Domains</p></div>"
+    +       "</div>"
+    +   "</label>"
+    +   "<ul>"
+    +       "<li>"
+    +           "<div class=\"menu-subitem\">"
+    +               "<div class=\"menu-subitem-symbol\"></div>"
+    +               "<div class=\"menu-subitem-title\">"
+    +                   "<a href=\"/serveradmin/pages/domain-management.sf.html\"><p>Manage Domains</p></a>"
+    +               "</div>"
+    +           "</div>"
+    +       "</li>"
+
+    for domain in domains {
+
+        menu += "<li><div class=\"menu-subitem\"><div class=\"menu-subitem-symbol\"></div><div class=\"menu-subitem-title\">"
+        
+        menu += postingLink(target: "/serveradmin/pages/domain.sf.html", text: domain.name, keyValuePairs: ["DomainName": domain.name])
+        
+        menu += "</div></div></li>"
+    }
     
-    
-    /// [String] The url that was requested but discarded because a user needed to login first.
-    
-    case preLoginUrlKey = "PreLoginUrl"
-    
-    
-    /// [Int64] To prevent login attempts in rapid succession use this key to enfore a minimum delay between attempts.
-    
-    case lastFailedLoginAttemptKey = "LastFailedLoginAttempt"
+    menu += "</ul>"
+
+    return menu.data(using: String.Encoding.utf8)
 }
+

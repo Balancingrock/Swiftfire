@@ -3,7 +3,7 @@
 //  File:       SFDocument.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.6
+//  Version:    0.10.7
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.7 - Removed priority and prioritization from function blocks.
 // 0.10.6 - Change in parameter type
 // 0.10.0 - Initial release
 //
@@ -79,7 +80,7 @@ import KeyedCache
 
 /// This encapsulates a swiftfire document in its parsed form.
 
-final class SFDocument: EstimatedMemoryConsumption {
+final public class SFDocument: EstimatedMemoryConsumption {
 
     
     /// This cache contains SFDocuments that have already been processed.
@@ -97,12 +98,19 @@ final class SFDocument: EstimatedMemoryConsumption {
     
     /// A block of characters that does not contain a function.
     
-    final class CharacterBlock {
+    final public class CharacterBlock: CustomStringConvertible {
         
         
         /// The data in the block
         
-        let data: Data
+        public let data: Data
+        
+        
+        /// CustomStringConvertible
+        
+        public var description: String {
+            return "Characterblock contains \(data.count) bytes"
+        }
         
         
         /// Create a new instance
@@ -115,44 +123,36 @@ final class SFDocument: EstimatedMemoryConsumption {
     
     /// A block of characters that contains a function, with the details of the function completely parsed.
     
-    final class FunctionBlock {
+    final public class FunctionBlock: CustomStringConvertible {
+        
+        
+        /// The name of this function
+        
+        public let name: String
         
         
         /// References the function closure
         
-        let function: Function.Signature?
-        
-        
-        /// The priority of the function
-        
-        let priority: Int
+        public let function: Function.Signature?
         
         
         /// The arguments in the function brackets.
         
-        var arguments: Function.Arguments
+        public var arguments: Function.Arguments
         
 
-        // The index of this function block in the document's blocks list
+        /// CustomStringConvertible
         
-        fileprivate var blocksIndex: Int?
-        
-        
-        /// The index to the prioritized function table where this functionblock resides
-        
-        fileprivate var prioritizedIndex: Int?
-        
-        
-        /// The data returned by the function
-        
-        fileprivate var data: Data?
+        public var description: String {
+            return "FunctionBlock for function: \(name), with arguments: \(arguments)"
+        }
         
         
         /// Create a new instance
         
-        init(function: Function.Signature?, priority: Int, arguments: Function.Arguments) {
+        init(name: String, function: Function.Signature?, arguments: Function.Arguments) {
+            self.name = name
             self.function = function
-            self.priority = priority
             self.arguments = arguments
         }
     }
@@ -171,9 +171,9 @@ final class SFDocument: EstimatedMemoryConsumption {
     public let path: String
     
     
-    /// The buffer with all characters (UTF8) in the file
+    /// The buffer with all characters in the file
     
-    public let filedata: Data
+    public let filedata: String
     
     
     /// The time the file was last modified
@@ -217,7 +217,7 @@ final class SFDocument: EstimatedMemoryConsumption {
         
         guard let modificationDate = fileattributes[FileAttributeKey.modificationDate] as? Date else { return nil }
         guard let filesize = (fileattributes[FileAttributeKey.size] as? NSNumber)?.intValue else { return nil }
-        guard let data = filemanager.contents(atPath: path) else { return nil }
+        guard let data = try? String(contentsOfFile: path) else { return nil }
         
         
         // Assignment
@@ -230,12 +230,10 @@ final class SFDocument: EstimatedMemoryConsumption {
         
         // Parsing of the file
         
-        parse()
-        
-        
-        // Prioritize
-        
-        prioritize()
+        if !parse() {
+            Log.atCritical?.log(id: -1, source: #file.source(#function, #line), message: "Parse error in \(path), most likely cause is that the file cannot be converted to an UTF8 encoded string")
+            return nil
+        }
     }
     
     
@@ -245,20 +243,7 @@ final class SFDocument: EstimatedMemoryConsumption {
         
         // Thread safety: All data that is updated and/or returned must reside in local (stack) storage.
         
-        
-        // First execute the functions in the prioritized order
-        // Make a local copy of the prioritized function blocks.
-        
-        var fblocks = prioritizedFunctions
-        
         var info = Function.Info()
-        
-        for (index, fb) in fblocks.enumerated() {
-            fblocks[index].data = fb.function?(fb.arguments, &info, &environment)
-        }
-        
-        
-        // Merge the data
         
         var data = Data()
         
@@ -267,10 +252,8 @@ final class SFDocument: EstimatedMemoryConsumption {
             switch $0 {
             case .characterBlock(let cb): data.append(cb.data)
             case .functionBlock(let fb):
-                if let index = fb.prioritizedIndex {
-                    if let fbData = fblocks[index].data {
-                        data.append(fbData)
-                    }
+                if let fbData = fb.function?(fb.arguments, &info, &environment) {
+                    data.append(fbData)
                 }
             }
         })
@@ -329,44 +312,5 @@ final class SFDocument: EstimatedMemoryConsumption {
             
             return .success(doc)
         })
-    }
-    
-    
-    // Sorts the function blocks contained in the 'blocks' into the 'prioritizedFunctions' list. From high to low priority.
-    // Called from 'init'.
-    
-    fileprivate func prioritize() {
-        
-        
-        
-        // Make a list of only the function blocks in the document blocks
-
-        var fblocks: Array<FunctionBlock> = []
-        
-        for index in 0 ..< blocks.count {
-            switch blocks[index] {
-            case .characterBlock: break
-            case .functionBlock(let fb):
-                fb.blocksIndex = index
-                fblocks.append(fb)
-            }
-        }
-        
-        
-        // Sorth the function blocks according to their priority
-        
-        prioritizedFunctions = fblocks.sorted(by: { $0.priority > $1.priority })
-        
-        
-        // (Re)associate the function blocks in the document blocks and prioritizedFunctions
-        
-        for (index, fb) in prioritizedFunctions.enumerated() {
-            if let blocksIndex = fb.blocksIndex {
-                switch blocks[blocksIndex] {
-                case .functionBlock(let block): block.prioritizedIndex = index
-                case .characterBlock: break
-                }
-            }
-        }
     }
 }

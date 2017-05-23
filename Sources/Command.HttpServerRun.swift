@@ -95,7 +95,7 @@ public final class HttpServerRunCommand: MacMessage {
     
     
     /// The queue on which the server will accept client connection requests
-    
+    /*
     private static let acceptQueue: DispatchQueue = DispatchQueue(
         label: "Http Accept queue",
         qos: .userInteractive,
@@ -103,7 +103,7 @@ public final class HttpServerRunCommand: MacMessage {
         autoreleaseFrequency: DispatchQueue.AutoreleaseFrequency.inherit,
         target: nil)
     
-    
+    */
     /// Creates a new command.
     
     public init() {}

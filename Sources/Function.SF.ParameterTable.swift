@@ -1,6 +1,6 @@
 // =====================================================================================================================
 //
-//  File:       SessionInfoKeys.swift
+//  File:       Function.SF.ParameterTable.swift
 //  Project:    Swiftfire
 //
 //  Version:    0.10.7
@@ -48,34 +48,89 @@
 //
 // History
 //
-// 0.10.7 - Typo in filename fixed.
-//        - Added accountKey.
-//        - Added preLoginUrlKey.
-// 0.10.6 - Initial release
+// 0.10.7 - Initial release
+//
+// =====================================================================================================================
+// Description
+// =====================================================================================================================
+//
+// Returns a table with all parameter values including buttons to update the parameters.
+//
+//
+// Signature:
+// ----------
+//
+// .parameterTable()
+//
+//
+// Parameters:
+// -----------
+//
+// None.
+//
+//
+// Other Input:
+// ------------
+//
+// session = environment.serviceInfo[.sessionKey] // Must be a non-expired session.
+// session[.accountKey] must contain an admin account
+//
+//
+// Returns:
+// --------
+//
+// The table with all parameters or:
+// - "Session error"
+// - "Account error"
+// - "Illegal access"
+//
+//
+// Other Output:
+// -------------
+//
+// None.
+//
 //
 // =====================================================================================================================
 
 import Foundation
 
 
-/// Session Info key's
+/// Returns the value of the requested parameter item.
+///
+/// - Returns: The value of the requested parameter or "No access rights".
 
-public enum SessionInfoKey: String {
+func function_sf_parameterTable(_ args: Function.Arguments, _ info: inout Function.Info, _ environment: inout Function.Environment) -> Data? {
+
+
+    // Check access rights
     
+    guard let session = environment.serviceInfo[.sessionKey] as? Session else {
+        return "Session error".data(using: String.Encoding.utf8)
+    }
     
-    /// [Account] The account associated with this session.
-    ///
-    /// Only present if a user has "logged in".
+    guard let account = session.info[.accountKey] as? Account else {
+        return "Account error".data(using: String.Encoding.utf8)
+    }
     
-    case accountKey = "Account"
+    guard serverAdminDomain.accounts.contains(account.uuid) else {
+        return "Illegal access".data(using: String.Encoding.utf8)
+    }
+
     
+    // Create the table
+
+    var table: String = "<table class=\"parameter-table\"><thead><tr><th>Name</th><th>Value</th><th>Description</th><tr></thead><tbody>"
+    parameters.all.forEach() { if $0.name != parameters.adminSiteRoot.name { table.append($0.tableRow()) } }
+    table.append("</tbody></table>")
     
-    /// [String] The url that was requested but discarded because a user needed to login first.
-    
-    case preLoginUrlKey = "PreLoginUrl"
-    
-    
-    /// [Int64] To prevent login attempts in rapid succession use this key to enfore a minimum delay between attempts.
-    
-    case lastFailedLoginAttemptKey = "LastFailedLoginAttempt"
+    return table.data(using: String.Encoding.utf8)
 }
+
+fileprivate extension NamedValueProtocol {
+    
+    func tableRow() -> String {
+        return "<tr><td>\(self.name)</td><td><form action=\"/serveradmin/sfcommand/SetParameter\" method=\"post\"><input type=\"text\" name=\"\(self.name)\" value=\"\(self.stringValue)\"><input type=\"submit\" value=\"Update\"></form></td><td>\(self.about)</td></tr>"
+    }
+}
+

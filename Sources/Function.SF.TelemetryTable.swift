@@ -1,6 +1,6 @@
 // =====================================================================================================================
 //
-//  File:       SessionInfoKeys.swift
+//  File:       Function.SF.TelemetryTable.swift
 //  Project:    Swiftfire
 //
 //  Version:    0.10.7
@@ -48,34 +48,89 @@
 //
 // History
 //
-// 0.10.7 - Typo in filename fixed.
-//        - Added accountKey.
-//        - Added preLoginUrlKey.
-// 0.10.6 - Initial release
+// 0.10.7 - Initial release
+//
+// =====================================================================================================================
+// Description
+// =====================================================================================================================
+//
+// Returns a table with all telemetry values.
+//
+//
+// Signature:
+// ----------
+//
+// .parameterTable()
+//
+//
+// Parameters:
+// -----------
+//
+// None.
+//
+//
+// Other Input:
+// ------------
+//
+// session = environment.serviceInfo[.sessionKey] // Must be a non-expired session.
+// session[.accountKey] must contain an admin account
+//
+//
+// Returns:
+// --------
+//
+// The table with all parameters or:
+// - "Session error"
+// - "Account error"
+// - "Illegal access"
+//
+//
+// Other Output:
+// -------------
+//
+// None.
+//
 //
 // =====================================================================================================================
 
 import Foundation
 
 
-/// Session Info key's
+// Returns a table with all telemetry values.
+///
+/// - Returns: The table with all telemetry values.
 
-public enum SessionInfoKey: String {
+func function_sf_telemetryTable(_ args: Function.Arguments, _ info: inout Function.Info, _ environment: inout Function.Environment) -> Data? {
     
     
-    /// [Account] The account associated with this session.
-    ///
-    /// Only present if a user has "logged in".
+    // Check access rights
     
-    case accountKey = "Account"
+    guard let session = environment.serviceInfo[.sessionKey] as? Session else {
+        return "Session error".data(using: String.Encoding.utf8)
+    }
+    
+    guard let account = session.info[.accountKey] as? Account else {
+        return "Account error".data(using: String.Encoding.utf8)
+    }
+    
+    guard serverAdminDomain.accounts.contains(account.uuid) else {
+        return "Illegal access".data(using: String.Encoding.utf8)
+    }
     
     
-    /// [String] The url that was requested but discarded because a user needed to login first.
+    // Create the table
     
-    case preLoginUrlKey = "PreLoginUrl"
+    var table: String = "<table class=\"telemetry-table\"><thead><tr><th class=\"table-column-name\">Name</th><th class=\"table-column-value\">Value</th><th class=\"table-column-description\">Description</th><tr></thead><tbody>"
+    telemetry.all.forEach() { if $0.name != parameters.adminSiteRoot.name { table.append($0.tableRow()) } }
+    table.append("</tbody></table>")
     
-    
-    /// [Int64] To prevent login attempts in rapid succession use this key to enfore a minimum delay between attempts.
-    
-    case lastFailedLoginAttemptKey = "LastFailedLoginAttempt"
+    return table.data(using: String.Encoding.utf8)
 }
+
+fileprivate extension NamedValueProtocol {
+    
+    func tableRow() -> String {
+        return "<tr><td class=\"table-column-name\">\(self.name)</td><td class=\"table-column-value\">\(self.stringValue)</td><td class=\"table-column-description\">\(self.about)</td></tr>"
+    }
+}
+

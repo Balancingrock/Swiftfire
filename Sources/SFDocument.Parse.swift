@@ -56,15 +56,13 @@
 //
 // Note: {} = sequence, [] = optional, | = or, .. = any in range
 //
-// <function> ::= <leading-sign><name>[<priority-seperator>[<priority>]]<arguments>
+// <function> ::= <leading-sign><name><arguments>
 //
 // <leading-sign>          ::= "."
 // <name>                  ::= <letter>|<digit>|<allowed-signs-in-name>{<letter>|<digit>|<allowed-signs-in-name>}
 // <letter>                ::= "A" .. "Z" | "a" .. "z"
 // <digit>                 ::= "0" .. "9"
 // <allowed-signs-in-name> ::= "-"|"_"
-// <priority-seperator>    ::= ":"
-// <priority>              ::= <digit>{<digit>}
 //
 // <arguments>             ::= "("[<argument>[{<argument-separator><argument>}]]")"|<json-object>
 // <json-object>           ::= "{"<json-code>"}"
@@ -89,215 +87,276 @@ import SwifterJSON
 
 // Constants
 
-fileprivate let LEADING_SIGN = Ascii._DOT
-fileprivate let PRIORITY_SEPARATOR = Ascii._COLON
-fileprivate let OPEN_ARRAY_ARGUMENTS = Ascii._PARENTHESES_OPEN
-fileprivate let CLOSING_ARRAY_ARGUMENTS = Ascii._PARENTHESES_CLOSE
-fileprivate let ARRAY_ARGUMENTS_SEPARATOR = Ascii._COMMA
-fileprivate let OPEN_JSON_ARGUMENTS = Ascii._CURLY_BRACE_OPEN
-fileprivate let CLOSING_JSON_ARGUMENTS = Ascii._CURLY_BRACE_CLOSE
+fileprivate let validNameCharacter: CharacterSet = CharacterSet.init(charactersIn: "abcdefghijklmnopqrstuvwxyz0123456789ABCDEFGHIJKLMNOPQRSTUVWXYZ-_")
 
-fileprivate let VALID_NAME_CHARACTER: Array<Bool> = [
-    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-    true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  false, false, false, false, false, false,
-    false, true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,
-    true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  false, false, false, false, true,
-    false, true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,
-    true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  false, false, false, false, false,
-    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false
-]
-
-fileprivate let VALID_PRIORITY_CHARACTER: Array<Bool> = [
-    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-    true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  false, false, false, false, false, false,
-    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false
-]
-
-fileprivate let VALID_NUMBER_CHARACTER: Array<Bool> = [
-    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-    false, false, false, false, false, false, false, false, false, false, false, true,  false, true,  true,  false,
-    true,  true,  true,  true,  true,  true,  true,  true,  true,  true,  false, false, false, false, false, false,
-    false, false, false, false, false, true,  false, false, false, false, false, false, false, false, false, false,
-    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-    false, false, false, false, false, true,  false, false, false, false, false, false, false, false, false, false,
-    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false
-]
-
-fileprivate let VALID_BOOL_CHARACTER: Array<Bool> = [
-    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-    true,  true,  false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-    false, true,  false, false, false, true,  true,  false, false, false, false, false, true,  false, false, false,
-    false, false, true,  true,  true,  true,  false, false, false, false, false, false, false, false, false, false,
-    false, true,  false, false, false, true,  true,  false, false, false, false, false, true,  false, false, false,
-    false, false, true,  true,  true,  true,  false, false, false, false, false, false, false, false, false, false,
-    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false,
-    false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false
-]
-
-
-fileprivate extension Bool {
-    init?(special: String) {
-        if special.compare("true", options: [.diacriticInsensitive, .caseInsensitive], range: nil, locale: nil) == ComparisonResult.orderedSame { self = true }
-        else if special.compare("false", options: [.diacriticInsensitive, .caseInsensitive]) == ComparisonResult.orderedSame { self = false }
-        else if special.compare("yes", options: [.diacriticInsensitive, .caseInsensitive]) == ComparisonResult.orderedSame { self = true }
-        else if special.compare("no", options: [.diacriticInsensitive, .caseInsensitive]) == ComparisonResult.orderedSame { self = false }
-        else { return nil }
-    }
-}
+fileprivate let validPriorityCharacter: CharacterSet = CharacterSet.init(charactersIn: "0123456789")
 
 
 extension SFDocument {
     
     
-    // The different modi of the parser
+    /// Parse a document
+    ///
+    /// - Returns True on success, false if not.
     
-    fileprivate enum Mode {
-        case waitForLeadingSign
-        case readName
-        case readPriority
-        case readJsonArgument
-        case readArrayArgument
-        case skipJsonBytes(Int)
-        case readString
-        case readAfterBackslash
-    }
-    
-    
-    // Function block data
-    
-    class FunctionBlockData {
+    func parse() -> Bool {
         
-        var name: String = ""
         
-        var function: Function.Signature?
-        
-        var string: String = ""
+        // The different modi of the parser
+    
+        enum Mode {
+            case waitForLeadingSign
+            case readName
+            case readJsonArgument
+            case readArrayArgument
+            case readString
+            case readAfterBackslash
+            case readCommaOrNextOrEnd
+            case failed
+        }
 
-        var priority: Int = 0
+
+        // The data manipulated during parsing
+
+        var charBuf: String = "" // Buffers characters that do not belong to a function
+        var evalBuf: String = "" // Buffers characters that may belong to a function, except for possible json code
+        var jsonBuf: String = "" // Buffers characters that may consist of json code
+        var jsonNesting: Int = 0 // A counter that increments for "{" and decrements for "}"
+
+        var name: String = ""     // Characters that may make up the name of a function
+        var argument: String = "" // Characters that may make up te argument for an array parameter
         
-        var jsonArgument: VJson?
-        
-        var arrayArguments: Function.ArrayArguments = []
-        
-        var offset: Int = 0
-        
-        var characterBlockOffset: Int = 0
-        
-        var functionBlockOffset: Int = 0
-        
-        var data: Data
-        
-        init(data: Data) { self.data = data }
-        
-        func addNameCharacter(_ char: ASCII) {
-            name.append(Character(UnicodeScalar(char)))
-        }
-        
-        func markName() -> Bool {
-            function = functions.registered[name]?.function
-            return ( function != nil)
-        }
-        
-        func reset() {
-            name = ""
-            string = ""
-            priority = 0
-            jsonArgument = nil
-            arrayArguments = []
-        }
-        
-        func addPriorityCharacter(_ char: ASCII) {
-            string.append(Character(UnicodeScalar(char)))
-        }
-        
-        func setPriority() -> Bool {
-            if let num = Int(string) {
-                priority = num
-                return true
-            } else {
-                return false
-            }
-        }
-        
-        func addStringCharacter(_ char: ASCII) {
-            string.append(Character(UnicodeScalar(char)))
-        }
-        
-        func addArrayArgument() {
-            if string == "" { return }
-            arrayArguments.append(string)
-        }
-        
-        func markFunctionBlockOffset() {
-            functionBlockOffset = offset
-        }
-        
-        func markCharacterBlockOffset(adjust: Int = 0) {
-            characterBlockOffset = offset + adjust
-        }
-        
-        var asFunctionBlock: DocumentBlock {
-            let arguments: Function.Arguments = (jsonArgument != nil) ? .json(jsonArgument!) : .array(arrayArguments)
-            let fb = FunctionBlock(function: function, priority: priority, arguments: arguments)
+        var function: Function.Signature? // The function signature, determined after the name is complete
+        var array: Array<String> = []     // The array arguments for a function
+        var json: VJson?                  // The JSON argument for a function
+
+        func asJsonFunctionBlock() -> DocumentBlock {
+            let fb = FunctionBlock(name: name, function: function, arguments: Function.Arguments.json(json!))
+            Log.atDebug?.log(id: -1, source: #file.source(#function, #line), message: "Function block: \(fb)")
             return .functionBlock(fb)
         }
         
-        var asCharacterBlock: DocumentBlock? {
-            let length = functionBlockOffset - characterBlockOffset
-            if length == 0 { return nil }
-            let start = data.startIndex.advanced(by: characterBlockOffset)
-            let end = start.advanced(by: length)
-            let cb = CharacterBlock(data: data.subdata(in: Range(uncheckedBounds: (lower: start, upper: end))))
+        func asArrFunctionBlock() -> DocumentBlock {
+            let fb = FunctionBlock(name: name, function: function, arguments: Function.Arguments.array(array))
+            Log.atDebug?.log(id: -1, source: #file.source(#function, #line), message: "Function block: \(fb)")
+            return .functionBlock(fb)
+        }
+        
+        func asCharacterBlock() -> DocumentBlock? {
+            guard let data = charBuf.data(using: String.Encoding.utf8) else { return nil }
+            let cb = CharacterBlock(data: data)
+            Log.atDebug?.log(id: -1, source: #file.source(#function, #line), message: "Character block: \(cb)")
             return .characterBlock(cb)
         }
-    }
 
-    
-    /// Parse a document
-    ///
-    /// - Parameter doc: The document to parse
-    
-    func parse() {
         
+        // Parsing functions
+        
+        func waitForLeadingSign(_ char: Character) -> Mode {
+        
+            if char != "." {
+                charBuf.append(char)
+                return .waitForLeadingSign
+                
+            } else {
+                name = ""
+                evalBuf = "."
+                return .readName
+                
+            }
+        }
+
+        func readName(_ char: Character, _ unicode: UnicodeScalar) -> Mode {
+            
+            if validNameCharacter.contains(unicode) {
+                evalBuf.append(char)
+                name.append(char)
+                return .readName
+                
+            } else if char == "(" {
+                evalBuf.append(char)
+                function = functions.registered[name]?.function
+                if function != nil {
+                    array = []
+                    argument = ""
+                    return .readArrayArgument
+                } else {
+                    charBuf.append(evalBuf)
+                    return .waitForLeadingSign
+                }
+                
+            } else if char == "{" {
+                function = functions.registered[name]?.function
+                if function != nil  {
+                    jsonBuf = "{"
+                    jsonNesting = 1
+                    return .readJsonArgument
+                } else {
+                    charBuf.append(evalBuf)
+                    return .waitForLeadingSign
+                }
+                
+            } else if char == "." {
+                charBuf.append(evalBuf)
+                name = ""
+                evalBuf = "."
+                return .readName
+                
+            } else {
+                evalBuf.append(char)
+                charBuf.append(evalBuf)
+                return .waitForLeadingSign
+            }
+        }
+
+        func readJsonArgument(_ char: Character) -> Mode {
+            
+            if char == "{" {
+                jsonBuf.append(char)
+                jsonNesting += 1
+                return .readJsonArgument
+                
+            } else if char == "}" {
+                jsonBuf.append(char)
+                jsonNesting -= 1
+                if jsonNesting == 0 {
+                    // --
+                    if let cblock = asCharacterBlock() {
+                        self.blocks.append(cblock)
+                    } else {
+                        return .failed
+                    }
+                    charBuf = ""
+                    // --
+                    json = try? VJson.parse(string: jsonBuf)
+                    if json == nil {
+                        charBuf.append(jsonBuf)
+                        return .waitForLeadingSign
+                    } else {
+                        self.blocks.append(asJsonFunctionBlock())
+                        return .waitForLeadingSign
+                    }
+                } else {
+                    return .readJsonArgument
+                }
+                
+            } else {
+                jsonBuf.append(char)
+                return .readJsonArgument
+            }
+        }
+
+        func readArrayArgument(_ char: Character) -> Mode {
+            
+            if char == " " { // Skip spaces
+                evalBuf.append(char)
+                return .readArrayArgument
+                
+            } else if char == "\"" || char == "“" { // Begin of string
+                evalBuf.append(char)
+                return .readString
+                
+            } else if char == "," {
+                evalBuf.append(char)
+                array.append(argument)
+                argument = ""
+                return .readArrayArgument
+                
+            } else if char == ")" { // End of arguments
+                if !argument.isEmpty { array.append(argument) }
+                // --
+                if let cblock = asCharacterBlock() {
+                    self.blocks.append(cblock)
+                } else {
+                    return .failed
+                }
+                charBuf = ""
+                // --
+                self.blocks.append(asArrFunctionBlock())
+                return .waitForLeadingSign
+                
+            } else if char == "." { // Potential start of a new function block
+                charBuf.append(evalBuf)
+                name = ""
+                evalBuf = "."
+                return .readName
+                
+            } else {
+                evalBuf.append(char)
+                argument.append(char)
+                return .readArrayArgument
+            }
+        }
+
+        func readString(_ char: Character) -> Mode {
+            
+            if char == "\\" { // Escape of " and \ characters
+                evalBuf.append(char)
+                return .readAfterBackslash
+                
+            } else if char == "\"" || char == "”" { // End of string = end of argument
+                evalBuf.append(char)
+                array.append(argument)
+                argument = ""
+                return .readCommaOrNextOrEnd
+                
+            } else {
+                evalBuf.append(char)
+                argument.append(char)
+                return .readString
+            }
+        }
+        
+        func readCommaOrNextOrEnd(_ char: Character) -> Mode {
+            
+            if char == "," {
+                evalBuf.append(char)
+                return .readArrayArgument
+                
+            } else if char == ")" {
+                if !argument.isEmpty { array.append(argument) }
+                // --
+                if let cblock = asCharacterBlock() {
+                    self.blocks.append(cblock)
+                } else {
+                    return .failed
+                }
+                charBuf = ""
+                // --
+                self.blocks.append(asArrFunctionBlock())
+                return .waitForLeadingSign
+
+            } else if char == " " {
+                evalBuf.append(char)
+                return .readCommaOrNextOrEnd
+                
+            } else {
+                evalBuf.append(char)
+                argument.append(char)
+                return .readArrayArgument
+
+            }
+        }
+        
+        func readAfterBackslash(_ char: Character) -> Mode {
+            
+            if char == "\"" {
+                evalBuf.append(char)
+                argument.append(char)
+                return .readString
+                
+            } else if char == "\\" {
+                evalBuf.append(char)
+                argument.append(char)
+                return .readString
+                
+            } else {
+                evalBuf.append(char)
+                charBuf.append(evalBuf)
+                return .waitForLeadingSign
+            }
+        }
+
         
         // Empty previous parsing results
         
@@ -309,292 +368,43 @@ extension SFDocument {
         var mode: Mode = .waitForLeadingSign
 
         
-        // Function block data
+        // Set to success if parsing succeeds
         
-        let block: FunctionBlockData = FunctionBlockData(data: filedata)
+        var success = true
         
         
         // The main parser loop
         
-        filedata.forEach({
+        filedata.characters.forEach {
             
             char in
         
+            let unicodeScalar = String(char).unicodeScalars.first!
+            
             switch mode {
                 
-            case .waitForLeadingSign: mode = waitForLeadingSign(char, block)
-            case .readName:           mode = readName(char, block)
-            case .readPriority:       mode = readPriority(char, block)
-            case .readJsonArgument:   mode = readJsonArgument(char, block)
-            case .readArrayArgument:  mode = readArrayArgument(char, block)
-            case .readString:         mode = readString(char, block)
-            case .readAfterBackslash: mode = readAfterBackslash(char, block)
-                
-            case .skipJsonBytes(let num):
-                if num > 0 {
-                    mode = .skipJsonBytes(num - 1)
-                } else {
-                    mode = .waitForLeadingSign
-                    block.markCharacterBlockOffset()
-                }
+            case .waitForLeadingSign:   mode = waitForLeadingSign(char)
+            case .readName:             mode = readName(char, unicodeScalar)
+            case .readJsonArgument:     mode = readJsonArgument(char)
+            case .readArrayArgument:    mode = readArrayArgument(char)
+            case .readString:           mode = readString(char)
+            case .readAfterBackslash:   mode = readAfterBackslash(char)
+            case .readCommaOrNextOrEnd: mode = readCommaOrNextOrEnd(char)
+            case .failed:               success = false;
             }
-            
-            block.offset += 1
-        })
-        
-        block.offset -= 1 // After the last itteration above, offset was incremented for the loop-through, but that did not happen.
-        
-        if let lastBlock = block.asCharacterBlock { blocks.append(lastBlock) }
-    }
-    
-    fileprivate func waitForLeadingSign(_ char: ASCII, _ block: FunctionBlockData) -> Mode {
-        
-        if char == LEADING_SIGN {
-            
-            block.markFunctionBlockOffset()
-            return .readName
-            
-        } else {
-            
-            return .waitForLeadingSign
         }
-    }
-    
-    fileprivate func readName(_ char: ASCII, _ block: FunctionBlockData) -> Mode {
         
-        if VALID_NAME_CHARACTER[Int(char)] {
-            
-            // Add valid name characters to the name
-            
-            block.addNameCharacter(char)
-            return .readName
-            
-            
-        } else if char == PRIORITY_SEPARATOR {
-            
-            // Ends the name, starts reading the priority number
-            // Check if a function with this name exists, if not, then start over.
-            
-            if block.markName() {
-                return .readPriority
+        
+        // If the charBuf is not empty, then append it
+        
+        if success && !charBuf.isEmpty {
+            if let cb = asCharacterBlock() {
+                self.blocks.append(cb)
             } else {
-                block.reset()
-                return .waitForLeadingSign
+                return false
             }
-        
-        
-        } else if char == OPEN_ARRAY_ARGUMENTS {
-
-            // Ends the name, there is no priority, starts array argument(s)
-            // If no function with the found name exists, then start over.
-            
-            if block.markName() {
-                return .readArrayArgument
-            } else {
-                block.reset()
-                return .waitForLeadingSign
-            }
-            
-        
-        } else if char == OPEN_JSON_ARGUMENTS {
-        
-            // Ends the name, there is no priority, starts json argument
-            // If no function with the found name exists, then start over.
-            
-            if block.markName() {
-                return .readJsonArgument
-            } else {
-                return .waitForLeadingSign
-            }
-            
-            
-        } else if char == LEADING_SIGN {
-
-            // Throw away what was read, and start again with trying to read a name
-            
-            block.reset()
-            block.markFunctionBlockOffset()
-            return .readName
-        
-        
-        } else {
-            
-            // All other characters invalidate a function block
-            
-            block.reset()
-            return .waitForLeadingSign
         }
-    }
-    
-    fileprivate func readPriority(_ char: ASCII, _ block: FunctionBlockData) -> Mode {
         
-        if VALID_PRIORITY_CHARACTER[Int(char)] {
-            
-            // Add valid priority characters to the name
-            
-            block.addPriorityCharacter(char)
-            return .readPriority
-
-            
-        } else if char == OPEN_JSON_ARGUMENTS {
-            
-            // If the priority could be set continue reading the JSON argument.
-            // Otherwise reject the function block and start over.
-            
-            if block.setPriority() {
-                return .readJsonArgument
-            } else {
-                block.reset()
-                return .waitForLeadingSign
-            }
-            
-        
-        } else if char == OPEN_ARRAY_ARGUMENTS {
-            
-            // If the priority could be set continue reading the array argument.
-            // Otherwise reject the function block and start over.
-            
-            if block.setPriority() {
-                return .readArrayArgument
-            } else {
-                block.reset()
-                return .waitForLeadingSign
-            }
-
-            
-        } else if char == LEADING_SIGN {
-        
-            // Throw away what was read, and start again by trying to read a name
-            
-            block.reset()
-            block.markFunctionBlockOffset()
-            return .readName
-            
-            
-        } else {
-            
-            // All other characters result in an invalid function block
-            
-            block.reset()
-            return .waitForLeadingSign
-        }
-    }
-    
-    fileprivate func readJsonArgument(_ char: ASCII, _ block: FunctionBlockData) -> Mode {
-        
-        var jsonSize: Int = 0
-        
-        let jsonArgument: VJson? = filedata.withUnsafeBytes({
-            
-            (ptr: UnsafePointer<UInt8>) -> VJson? in
-            
-            let startOfJson = UnsafeMutableRawPointer(mutating: ptr).advanced(by: block.offset - 1)
-        
-            if let bufferPtr = VJson.findPossibleJsonCode(start: startOfJson, count: filedata.count - (block.offset - 1)) {
-            
-                jsonSize = bufferPtr.count
-                return try? VJson.parse(buffer: bufferPtr)
-                
-            } else {
-                
-                return nil
-            }
-        })
-
-        if jsonArgument != nil {
-            
-            block.jsonArgument = jsonArgument
-            if let cb = block.asCharacterBlock { self.blocks.append(cb) }
-            self.blocks.append(block.asFunctionBlock)
-            block.reset()
-            return .skipJsonBytes(jsonSize - 2)
-            
-        } else {
-            
-            // Failed to convert to JSON hierarchy, ignore block
-                
-            block.reset()
-            return .waitForLeadingSign
-        }
-    }
-
-    fileprivate func readArrayArgument(_ char: ASCII, _ block: FunctionBlockData) -> Mode {
-        
-        if char == Ascii._SPACE {
-            
-            // Skip spaces
-            
-            return .readArrayArgument
-        
-        } else if char == Ascii._DOUBLE_QUOTES {
-            
-            return .readString
-            
-        } else if char == CLOSING_ARRAY_ARGUMENTS {
-            
-            block.addArrayArgument()
-            if let cb = block.asCharacterBlock { self.blocks.append(cb) }
-            self.blocks.append(block.asFunctionBlock)
-            block.markCharacterBlockOffset(adjust: 1)
-            block.reset()
-            return .waitForLeadingSign
-            
-        } else if char == LEADING_SIGN {
-            
-            block.reset()
-            block.markFunctionBlockOffset()
-            return .readName
-            
-        } else if char == ARRAY_ARGUMENTS_SEPARATOR {
-            
-            block.addArrayArgument()
-            return .readArrayArgument
-            
-        } else {
-            
-            block.addStringCharacter(char)
-            return .readArrayArgument
-        }
-    }
-    
-    fileprivate func readString(_ char: ASCII, _ block: FunctionBlockData) -> Mode {
-    
-        if char == Ascii._BACKSLASH {
-            
-            return .readAfterBackslash
-            
-            
-        } else if char == Ascii._DOUBLE_QUOTES {
-            
-            block.addArrayArgument()
-            return .readArrayArgument
-            
-            
-        } else {
-            
-            block.addStringCharacter(char)
-            return .readString
-        }
-    }
-    
-    fileprivate func readAfterBackslash(_ char: ASCII, _ block: FunctionBlockData) -> Mode {
-        
-        if char == Ascii._DOUBLE_QUOTES {
-            
-            block.addStringCharacter(char)
-            return .readString
-            
-        } else if char == Ascii._BACKSLASH {
-            
-            block.addStringCharacter(char)
-            return .readString
-
-        } else {
-            
-            // All other characters result in an invalid function block
-            
-            block.reset()
-            return .waitForLeadingSign
-        }
+        return success
     }
 }

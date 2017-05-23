@@ -125,12 +125,10 @@ var defaultServices: Array<String> {
 
 
 /// The services for the server admin (pseudo) domain
+///
 
 var serverAdminServices: Array<String> {
     return [
-        blacklist,
-        onlyHttp10OrHttp11,
-        onlyGetOrPost,
         getSession,
         decodePostFormUrlEncoded,
         serverAdmin

@@ -87,9 +87,8 @@
 //   - headers
 //   - application
 //     - ... logfiles from SwifterLog
-//   - admin
-//     - accounts
-//     - sessions
+// - serveradmin
+//   - ... as for domains
 // - statistics
 //   - statistics.json
 //
@@ -223,21 +222,12 @@ final class StorageUrls {
     
     static var applicationLogDir: URL? = { dirUrl(logsDir, "application") }()
 
+        
+    // =================================================================================================================
+    /// The directory for the statistics file
     
-    /// The directory for server admin logging
-    
-    static var serverAdminDir: URL? = { dirUrl(logsDir, "admin") }()
-    
-    
-    /// The directory for server admin accounts
-    
-    static var adminAccountsDir: URL? = { dirUrl(serverAdminDir, "accounts") }()
+    static var serverAdminDir: URL? = { dirUrl(rootDir, "serveradmin") }()
 
-    
-    /// The directory for server admin session logging
-    
-    static var adminSessionsDir: URL? = { dirUrl(serverAdminDir, "sessions")}()
-    
     
     // =================================================================================================================
     /// The directory for the statistics file

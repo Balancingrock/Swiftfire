@@ -1,6 +1,6 @@
 // =====================================================================================================================
 //
-//  File:       Function.TelemetryValue.swift
+//  File:       Function.SF.DomainDetail.swift
 //  Project:    Swiftfire
 //
 //  Version:    0.10.7
@@ -54,38 +54,31 @@
 // Description
 // =====================================================================================================================
 //
-// Returns the value of the requested telemetry item.
+// Returns a detail of the current domain.
 //
 //
 // Signature:
 // ----------
 //
-// .telemetryValue("name")
+// .sf-domainDetail(item)
 //
 //
 // Parameters:
 // -----------
 //
-// - name: The name of the telemetry item.
+// item: An identifier with the name of the detail. Cuurently supported = "name".
 //
 //
 // Other Input:
 // ------------
 //
-// session = environment.serviceInfo[.sessionKey] // Must be a non-expired session.
-// session[.accountKey] must contain an admin account
+// service[.postInfoKey]["DomainName"] must contain the name of an existing domain.
 //
 //
 // Returns:
 // --------
 //
-// The value of the requested telemetry or one of the error messages:
-// - "<name> is unknown"
-// - "Illegal access"
-// - "Argument type error"
-// - "Nof arguments error"
-// - "Session error"
-// - "Account error"
+// The requested item or "***Error" in case of error.
 //
 //
 // Other Output:
@@ -99,14 +92,17 @@
 import Foundation
 
 
-/// Returns the value of the requested telemetry item.
-///
-/// - Returns: The value of the requested telemetry or "No access rights".
+/// - Returns: A detail of the current domain.
 
-func function_telemetryValue(_ args: Function.Arguments, _ info: inout Function.Info, _ environment: inout Function.Environment) -> Data? {
+func function_sf_domainDetail(_ args: Function.Arguments, _ info: inout Function.Info, _ environment: inout Function.Environment) -> Data? {
+
+    
+    // Check argument validity
+    
+    guard case .array(let arr) = args, arr.count == 1 else { return "***Error***".data(using: String.Encoding.utf8) }
     
     
-    // Check access rights
+    // Check that a server admin is logged in
     
     guard let session = environment.serviceInfo[.sessionKey] as? Session else {
         return "Session error".data(using: String.Encoding.utf8)
@@ -119,36 +115,31 @@ func function_telemetryValue(_ args: Function.Arguments, _ info: inout Function.
     guard serverAdminDomain.accounts.contains(account.uuid) else {
         return "Illegal access".data(using: String.Encoding.utf8)
     }
+
+    
+    // Check that a valid domain name was specified
+    
+    guard let postInfo = environment.serviceInfo[.postInfoKey] as? PostInfo,
+          let name = postInfo["DomainName"] else { return "***Error***".data(using: String.Encoding.utf8) }
+    
+    guard let domain = domains.domain(forName: name) else { return "***Error***".data(using: String.Encoding.utf8) }
     
     
-    // Check parameter name
+    // Return the asked for value
     
-    guard case .array(let arr) = args else {
-        return "Argument type error".data(using: String.Encoding.utf8)
+    let parameter = arr[0].lowercased()
+    
+    switch parameter {
+    case "name": return domain.name.data(using: String.Encoding.utf8)
+    case "wwwincluded": return domain.wwwIncluded.description.data(using: String.Encoding.utf8)
+    case "root": return domain.root.data(using: String.Encoding.utf8)
+    case "forewardurl": return domain.forwardUrl.data(using: String.Encoding.utf8)
+    case "enabled": return domain.enabled.description.data(using: String.Encoding.utf8)
+    case "accesslogenabled": return domain.accessLogEnabled.description.data(using: String.Encoding.utf8)
+    case "404logenabled": return domain.four04LogEnabled.description.data(using: String.Encoding.utf8)
+    case "sessionlogenabled": return domain.sessionLogEnabled.description.data(using: String.Encoding.utf8)
+    case "sfresources": return domain.sfresources.data(using: String.Encoding.utf8)
+    case "sessiontimeout": return domain.sessionTimeout.description.data(using: String.Encoding.utf8)
+    default: return "***Error***".data(using: String.Encoding.utf8)
     }
-    
-    guard arr.count == 1 else {
-        return "Nof arguments error".data(using: String.Encoding.utf8)
-    }
-    
-    let name = arr[0]
-    
-    var value: String?
-    
-    for t in telemetry.all {
-        
-        if t.name.caseInsensitiveCompare(name) == ComparisonResult.orderedSame {
-            value = t.stringValue
-            break
-        }
-    }
-    
-    guard value != nil else {
-        return "\(name) is unknown".data(using: String.Encoding.utf8)
-    }
-    
-    
-    // Return the value
-    
-    return value!.data(using: String.Encoding.utf8)
 }

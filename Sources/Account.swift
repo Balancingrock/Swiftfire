@@ -66,9 +66,66 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
     // Note: It uses the default EstimatedMemoryConsumption implementation.
     
     
+    /// The path for the file containing the account with the given ID
+    
+    public static func createFileUrl(accountsRoot: URL, id: Int) -> URL {
+        return createDirUrl(accountsRoot: accountsRoot, id: id).appendingPathComponent("Account").appendingPathExtension("json")
+    }
+    
+    
+    /// Create an account directory url from the given account ID relative to the given root url
+    ///
+    /// Example 1: id 2345 will result in: root/45/23/_Account/
+    ///
+    /// Example 2: id 12345 will result in: root/45/23/01/_Account/
+    
+    private static func createDirUrl(accountsRoot: URL, id: Int) -> URL {
+        
+        
+        // The account number will be broken up into reverse series of 0..99 (centi) fractions
+        
+        var centiFractions: Array<Int> = []
+        
+        var num = id
+        
+        while num >= 100 {
+            centiFractions.append(num % 100)
+            num = num / 100
+        }
+        centiFractions.append(num)
+        
+        
+        // Convert the centi parts to string
+        
+        let centiFractionsStr = centiFractions.map({ (num) -> String in
+            if num < 10 {
+                return "0\(num)"
+            } else {
+                return num.description
+            }
+        })
+        
+        
+        // And create the directory url
+        
+        var url = accountsRoot
+        centiFractionsStr.forEach({ url.appendPathComponent($0) })
+        url.appendPathComponent("_Account")
+        
+        try? FileManager.default.createDirectory(atPath: url.path, withIntermediateDirectories: true, attributes: nil)
+        
+        return url
+    }
+
+    
     /// A public unique identifier that can be used to reference this account
     
     public private(set) var uuid: String
+    
+    
+    /// The path of the file containing this account
+    
+    public var url: URL
     
     
     /// The name for this account. When the name is updated, it is automatically persisted. If persistence fails, the name is not updated. Protected against empty names, too long names (max 32 char) and too many name changes (max 19).
@@ -138,18 +195,6 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
     public var info = VJson()
     
     
-    /// The path for the directory associated with this account
-    
-    public private(set) var dirUrl: URL!
-    
-    
-    /// The path for the file containing this account
-    
-    public var fileUrl: URL {
-        return dirUrl.appendingPathComponent("Account").appendingPathExtension("json")
-    }
-
-    
     /// CustomStringConvertible
     
     public var description: String {
@@ -157,7 +202,7 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
         str += " Id: \(id)\n"
         str += " Uuid: \(uuid)\n"
         str += " Name: \(name)\n"
-        str += " fileUrl: \(fileUrl.path)\n"
+        //str += " fileUrl: \(fileUrl.path)\n"
         str += " Digest: \(digest)"
         if parameters.debugMode.value {
             str += "\n Salt: \(salt)\n"
@@ -175,7 +220,7 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
     
     /// A unique id for this account, used for storage purposes only.
     
-    private var id: Int
+    fileprivate var id: Int
     
     
     /// A name that uniquely identifies an account.
@@ -199,14 +244,14 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
     ///   - id: A unique integer
     ///   - name: String, should be unique for this account.
     ///   - passwordHash: An integer that must be matched to allow somebody to use this account.
-    ///   - rootDir: A URL pointing to the root directory for all accounts.
+    ///   - accountsRoot: A URL pointing to the root directory for all accounts.
     
-    fileprivate init?(id: Int, name: String, password: String, rootDir: URL) {
+    fileprivate init?(id: Int, name: String, password: String, accountsRoot: URL) {
         
         self.id = id
         self.uuid = UUID().uuidString
         self.names.insert(name, at: 0)
-        self.dirUrl = createDirUrl(root: rootDir)
+        self.url = Account.createFileUrl(accountsRoot: accountsRoot, id: id)
 
         let salt = createSalt()
         guard let digest = createDigest(password, salt: salt) else { return nil }
@@ -284,7 +329,7 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
     /// - Returns: On success nil, on failure a description of the error that occured.
     
     public func save() -> String? {
-        return self.json.save(to: fileUrl)
+        return self.json.save(to: url)
     }
     
     
@@ -295,8 +340,8 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
         for (index, name) in names.enumerated() {
             json["Names"][index] &= name
         }
-        json["Id:"] &= id
-        json["Uuid:"] &= UUID().uuidString
+        json["Id"] &= id
+        json["Uuid"] &= UUID().uuidString
         json["Digest"] &= digest
         json["Salt"] &= salt
         json["Info"] = info
@@ -305,15 +350,14 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
     }
     
     
-    /// Recreate from a JSON file
+    /// Deserialize from a VJson file
     
-    fileprivate convenience init?(root: URL, id: Int) {
+    fileprivate init?(url: URL) {
         
-        // Initialize with dummy's
-        self.init(id: id, name: "", password: "pwd", rootDir: root)
+        self.url = url
         
-        guard let json = VJson.parse(file: fileUrl, onError: { _,_,_ in } ) else { return nil }
-        
+        guard let json = try? VJson.parse(file: url) else { return nil }
+
         guard let jjnames = (json|"Names")?.arrayValue else { return nil }
         guard jjnames.count > 0 else { return nil }
         var jnames: Array<String> = []
@@ -450,51 +494,6 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
         
         return result
     }
-
-    
-    /// Create an account directory url from the given account ID relative to the given root url
-    ///
-    /// Example 1: id 2345 will result in: root/45/23/_Account/
-    ///
-    /// Example 2: id 12345 will result in: root/45/23/01/_Account/
-    
-    private func createDirUrl(root: URL) -> URL {
-        
-        
-        // The account number will be broken up into reverse series of 0..99 (centi) fractions
-        
-        var centiFractions: Array<Int> = []
-        
-        var num = id
-        
-        while num >= 100 {
-            centiFractions.append(num % 100)
-            num = num / 100
-        }
-        centiFractions.append(num)
-        
-        
-        // Convert the centi parts to string
-        
-        let centiFractionsStr = centiFractions.map({ (num) -> String in
-            if num < 10 {
-                return "0\(num)"
-            } else {
-                return num.description
-            }
-        })
-        
-        
-        // And create the directory url
-        
-        var url = root
-        centiFractionsStr.forEach({ url.appendPathComponent($0) })
-        url.appendPathComponent("_Account")
-        
-        try? FileManager.default.createDirectory(atPath: url.path, withIntermediateDirectories: true, attributes: nil)
-        
-        return url
-    }
 }
 
 public class Accounts {
@@ -558,6 +557,10 @@ public class Accounts {
         var isDir: ObjCBool = false
         if FileManager.default.fileExists(atPath: lutFile.path, isDirectory: &isDir) && !isDir.boolValue {
             loadLuts()
+        } else {
+            if regenerateLookupTable() {
+                saveLuts()
+            }
         }
     }
     
@@ -579,7 +582,7 @@ public class Accounts {
             
             for item in json {
                 if  let name = (item|"Name")?.stringValue,
-                    let uuid = (item|"Uuid:")?.stringValue,
+                    let uuid = (item|"Uuid")?.stringValue,
                     let id = (item|"Id")?.intValue {
                     nameLut[name] = id
                     uuidLut[uuid] = name
@@ -656,7 +659,7 @@ public class Accounts {
                 // Check the lookup table
             
                 if let id = nameLut[name] {
-                    if let a = Account(root: root, id: id) {
+                    if let a = Account(url: Account.createFileUrl(accountsRoot: root, id: id)) {
                         accountCache[name] = a
                         account = a
                     }
@@ -706,7 +709,7 @@ public class Accounts {
             // Create the new account
             
             lastAccountId += 1
-            if let account = Account(id: lastAccountId, name: name, password: password, rootDir: root) {
+            if let account = Account(id: lastAccountId, name: name, password: password, accountsRoot: root) {
             
                 // Add it to the lookup's and the cache
             
@@ -718,7 +721,7 @@ public class Accounts {
                 
             } else {
                 
-                SwifterLog.atError?.log(id: -1, source: #file.source(#function, #line), message: "")
+                Log.atError?.log(id: -1, source: #file.source(#function, #line))
                 return nil
             }
         }
@@ -752,8 +755,64 @@ public class Accounts {
     
     /// Regenerates the lookup table from the contents on disk
     
-    public func regenerateLookupTable(root: URL?) -> Bool {
-        fatalError("Not yet implemented")
+    public func regenerateLookupTable() -> Bool {
+        
+        var nameLut: Dictionary<String, Int> = [:]
+        var uuidLut: Dictionary<String, String> = [:]
+
+        
+        func processDirectory(dir: URL) -> Bool {
+            
+            let urls = try? FileManager.default.contentsOfDirectory(at: dir, includingPropertiesForKeys: [.isDirectoryKey], options: .skipsHiddenFiles)
+            
+            if let urls = urls {
+                
+                for url in urls {
+                    
+                    // If the url is a directory, then process it (recursive), if it is a file, try to read it as an account.
+                    
+                    if url.hasDirectoryPath {
+                        
+                        if !processDirectory(dir: url) {
+                            return false
+                        }
+                        
+                    } else {
+                        
+                        if let account = Account(url: url) {
+                            
+                            nameLut[account.name] = account.id
+                            uuidLut[account.uuid] = account.name
+                            
+                        } else {
+                            
+                            Log.atCritical?.log(id: -1, source: #file.source(#function, #line), message: "Failed to read account from \(url.path)")
+                            return false
+                        }
+                    }
+                }
+                
+                return true
+                
+            } else {
+                
+                Log.atCritical?.log(id: -1, source: #file.source(#function, #line), message: "Failed to read account directories from \(dir.path)")
+                return false
+            }
+        }
+        
+        if processDirectory(dir: root) {
+            
+            self.nameLut = nameLut
+            self.uuidLut = uuidLut
+            
+            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Regenerated the account LUT")
+            return true
+            
+        } else {
+            
+            return false
+        }
     }
 }
 

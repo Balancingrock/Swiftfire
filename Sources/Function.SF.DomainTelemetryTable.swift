@@ -1,6 +1,6 @@
 // =====================================================================================================================
 //
-//  File:       SessionInfoKeys.swift
+//  File:       Function.SF.DomainTelemetryTable.swift
 //  Project:    Swiftfire
 //
 //  Version:    0.10.7
@@ -48,34 +48,94 @@
 //
 // History
 //
-// 0.10.7 - Typo in filename fixed.
-//        - Added accountKey.
-//        - Added preLoginUrlKey.
-// 0.10.6 - Initial release
+// 0.10.7 - Initial release
+//
+// =====================================================================================================================
+// Description
+// =====================================================================================================================
+//
+// Returns a the html code containing the telemetry table of the current domain.
+//
+//
+// Signature:
+// ----------
+//
+// .sf-domainTelemetryTable()
+//
+//
+// Parameters:
+// -----------
+//
+// None.
+//
+//
+// Other Input:
+// ------------
+//
+// service[.postInfoKey]["DomainName"] must contain the name of an existing domain.
+//
+// CSS classes:
+// - The table has class 'domain-telemetry-table'
+//
+//
+// Returns:
+// --------
+//
+// The requested table or "***Error" in case of error.
+//
+//
+// Other Output:
+// -------------
+//
+// None.
+//
 //
 // =====================================================================================================================
 
 import Foundation
 
 
-/// Session Info key's
+/// - Returns: A detail of the current domain.
 
-public enum SessionInfoKey: String {
+func function_sf_domainTelemetryTable(_ args: Function.Arguments, _ info: inout Function.Info, _ environment: inout Function.Environment) -> Data? {
+
+    
+    // Check that a server admin is logged in
+    
+    guard let session = environment.serviceInfo[.sessionKey] as? Session else {
+        return "Session error".data(using: String.Encoding.utf8)
+    }
+    
+    guard let account = session.info[.accountKey] as? Account else {
+        return "Account error".data(using: String.Encoding.utf8)
+    }
+    
+    guard serverAdminDomain.accounts.contains(account.uuid) else {
+        return "Illegal access".data(using: String.Encoding.utf8)
+    }
     
     
-    /// [Account] The account associated with this session.
-    ///
-    /// Only present if a user has "logged in".
+    // Check that a valid domain name was specified
     
-    case accountKey = "Account"
+    guard let postInfo = environment.serviceInfo[.postInfoKey] as? PostInfo,
+        let name = postInfo["DomainName"] else { return "***Error***".data(using: String.Encoding.utf8) }
     
-    
-    /// [String] The url that was requested but discarded because a user needed to login first.
-    
-    case preLoginUrlKey = "PreLoginUrl"
+    guard let domain = domains.domain(forName: name) else { return "***Error***".data(using: String.Encoding.utf8) }
     
     
-    /// [Int64] To prevent login attempts in rapid succession use this key to enfore a minimum delay between attempts.
+    // Create the table
     
-    case lastFailedLoginAttemptKey = "LastFailedLoginAttempt"
+    var table: String = "<table class=\"domain-telemetry-table\"><thead><tr><th>Name</th><th>Value</th><th>Description</th><tr></thead><tbody>"
+    domain.telemetry.all.forEach() { table.append($0.tableRow()) }
+    table.append("</tbody></table>")
+    
+    return table.data(using: String.Encoding.utf8)    
 }
+
+fileprivate extension NamedValueProtocol {
+    
+    func tableRow() -> String {
+        return "<tr><td class=\"table-column-name\">\(self.name)</td><td class=\"table-column-value\">\(self.stringValue)</td><td class=\"table-column-description\">\(self.about)</td></tr>"
+    }
+}
+

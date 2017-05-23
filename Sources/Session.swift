@@ -272,7 +272,8 @@ public class Session: CustomStringConvertible {
                 str += " Session Info: Empty\n"
             } else {
                 str += " Session Info:\n"
-                str += self.info.description.components(separatedBy: "\n").map({" \($0)"}).joined(separator: "\n")
+                str += self.info.description.components(separatedBy: "\n").map({"  \($0)"}).joined(separator: "\n")
+                str += "\n"
             }
             str += " Session Debug Info:\n"
             str += self.debugInfo.description.components(separatedBy: "\n").map({" \($0)"}).joined(separator: "\n")

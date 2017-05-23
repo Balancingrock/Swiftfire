@@ -120,9 +120,16 @@ public final class Function: CustomStringConvertible {
     
     /// This enum ecapsulates the function arguments
     
-    public enum Arguments {
+    public enum Arguments: CustomStringConvertible {
         case array(ArrayArguments)
         case json(VJson)
+        
+        public var description: String {
+            switch self {
+            case .array(let arr): return "Array with \(arr.count) items"
+            case .json: return "JSON Object"
+            }
+        }
     }
     
     

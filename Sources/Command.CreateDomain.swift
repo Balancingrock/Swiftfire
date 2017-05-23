@@ -120,8 +120,7 @@ extension CreateDomainCommand: MacCommand {
         
         if let url = StorageUrls.domainsDir {
             let domainUrl = url.appendingPathComponent(domainName, isDirectory: true)
-            if let domain = Domain(rootDir: domainUrl) {
-                domain.name = domainName
+            if let domain = Domain(name: domainName, root: domainUrl) {
                 domain.serviceNames = defaultServices
                 domains.add(domain: domain)
                 Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Added new domain with \(domain))")
