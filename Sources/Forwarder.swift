@@ -3,7 +3,7 @@
 //  File:       Forwarder.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.6
+//  Version:    0.10.7
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.7 - Changed receiverData to processReceivedData
 // 0.10.6 - Update of receiverLoop
 // 0.9.18 - Header update
 //        - Replaced log with Log?
@@ -103,7 +104,7 @@ class Forwarder: SwifterSockets.Connection {
         closeForwarder()
     }
     
-    override func receiverData(_ buffer: UnsafeBufferPointer<UInt8>) -> Bool {
+    override func processReceivedData(_ buffer: UnsafeBufferPointer<UInt8>) -> Bool {
         _ = client?.transfer(buffer, callback: nil)
         return true
     }

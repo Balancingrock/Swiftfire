@@ -3,7 +3,7 @@
 //  File:       Function.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.6
+//  Version:    0.10.7
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.7 - Added newSession to Function.Environment
 // 0.10.6 - Updated Service.Response type to HttpResponse type
 //        - Renamed InfoKey to FunctionInfoKey and moved definition to new file.
 // 0.10.0 - Initial release
@@ -105,6 +106,23 @@ public final class Function: CustomStringConvertible {
             self.domain = domain
             self.response = response
             self.serviceInfo = serviceInfo
+        }
+        
+        
+        /// Creates a new session with the data contained in the environment
+        
+        public func newSession() -> Session? {
+            
+            guard let connection = (connection as? SFConnection) else { return nil }
+            
+            return domain.sessions.newSession(
+                address: connection.remoteAddress,
+                domainName: domain.name,
+                logId: connection.logId,
+                connectionId: connection.objectId,
+                allocationCount: connection.allocationCount,
+                timeout: domain.sessionTimeout
+            )
         }
     }
     

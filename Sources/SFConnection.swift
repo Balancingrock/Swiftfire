@@ -3,7 +3,7 @@
 //  File:       SFConnection.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.6
+//  Version:    0.10.7
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.7 - Bugfix: moved inactivity detection to front of receiver
 // 0.10.6 - Renamed HttpHeader to HttpRequest
 //        - Type of objectId changed from Int16 to Int
 //        - Type of allocationCount changed from Int32 to Int
@@ -253,8 +254,7 @@ final class SFConnection: SwifterSockets.Connection {
     
     /// This function stores the client data and checks if a complete HTTP Message has been received. If it has, it will start an http worker on the workerqueue, remove the message form the buffer and check for more messages.
     
-    override func receiverData(_ buffer: UnsafeBufferPointer<UInt8>) -> Bool {
-        
+    override func processReceivedData(_ buffer: UnsafeBufferPointer<UInt8>) -> Bool {
         
         Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: "Received \(buffer.count) bytes")
         
@@ -353,8 +353,6 @@ final class SFConnection: SwifterSockets.Connection {
             
             httpRequest = nil
         }
-        
-        inactivityDetectionRestart()
         
         return true
     }

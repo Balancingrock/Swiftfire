@@ -3,7 +3,7 @@
 //  File:       MonitoringAndControl.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.4
+//  Version:    0.10.7
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.7  - Changed receiverData to processReceivedData
 // 0.10.4  - Fixed problem where the inactivity timeout would crash the MAC connection.
 // 0.9.18  - Renamed server Start to Run (Issue 4)
 //         - Header update
@@ -198,7 +199,7 @@ final class MonitoringAndControlConnection: SwifterSockets.Connection {
     fileprivate var commandsByteCount = 0
     fileprivate var commandsBufferStartOfFreeArea: UnsafeMutableRawPointer
     
-    override func receiverData(_ buffer: UnsafeBufferPointer<UInt8>) -> Bool {
+    override func processReceivedData(_ buffer: UnsafeBufferPointer<UInt8>) -> Bool {
         
         Log.atDebug?.log(id: -1, source: "Monitoring And Control", message: "ReceiveData called, \(buffer.count) bytes received")
         
@@ -284,9 +285,7 @@ final class MonitoringAndControlConnection: SwifterSockets.Connection {
                 break BUFFER_LOOP
             }
         }
-        
-        inactivityDetectionRestart()
-        
+                
         return true
     }
 

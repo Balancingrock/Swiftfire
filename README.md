@@ -33,19 +33,19 @@ is translated to:
 
 or any other number of course.
 
-The best part is, you can define and write the functions yourself. And after registration Swiftfire takes care of the rest.
+The best part is, you can define and write the functions yourself.
 
-It is up to you to determine how much you want to do in Swift. For example, you could decide to have the entire landing page to be created by a function if index.html exists only of: `.buildLandingPage()`. (And of course you have implemented the function that is registered under the name `createLandingPage`)
+It is up to you to determine how much you want to do in Swift. For example, you could decide to have the entire landing page to be created by a function if index.sf.html exists only of: `.buildLandingPage()`. (And of course you have implemented the function that is registered under the name `createLandingPage`)
 
 ## No GUI?
+
+Note: In the current version 0.10.7 there is now a web based interface for a server administrator. It does not yet completey replace the SwiftfireConsole. However that is envisoned for the next release 0.10.8.
 
 No, Swiftfire is a faceless webserver application. It does not have a GUI.
 
 However there is anther project called [SwiftfireConsole](https://github.com/Balancingrock/SwiftfireConsole) that does have a GUI and can connect to a Swiftfire webserver.
 
 Thus for setup or monitoring a GUI is available.
-
-The GUI even implements a rudimentary tracking of the number of visitors to your site without needing third parties.
   
 ## Note
 
@@ -60,11 +60,13 @@ However: It does work! :-)
 - Out of the box support for static websites
 - Handles multiple domains
 - Sessions are supported
+- Accounts are supported
 - Client forwarding (to other hosts or a different port on the same host)
 - Integrated usage statistics (page visits)
 - Blacklisting (refusal of service) on IP basis for Server and per domain
 - Supports HTTP1.0 and HTTP1.1
 - Supports HTTPS
+- Web based interface for Swiftfire Administrator
 - Custom pages for errors (for example the infamous 404 page not found)
 - Logging of received headers possible
 - Logging of missing pages (404)
@@ -72,6 +74,8 @@ However: It does work! :-)
 
 ## Installation
 Please refer to the [installation instructions](http://swiftfire.nl/pages/manual/02_installation.html) on the [Swiftfire](http://swiftfire.nl) website.
+
+Note that the installation of SwiftfireCore and SwiftfireConsole is no longer necessary.
 
 ## Version history
 
@@ -84,16 +88,23 @@ Note: Planned releases are for information only and almost always change.
 
 #### 1.0.0 (Planned)
 
-- A few (1-6) months after v0.10.0 (Confidence building period)##
+- A few (1-6) months after v0.10.0 (Confidence building period)
 - Bugfixes
 - Small feature improvements (if necessary)
 - Code improvements
 
-#### 0.10.7 (Planned)
+#### 0.10.8 (Planned)
 
-- Add support for "Users"
+- Completion of server admin web based interface
+- Removal of code related to SwifterConsole (will no longer be supported)
 
-#### 0.10.6 (Current)
+#### 0.10.7 (Current)
+
+- Through an upgrade of SwifterSockets fixed two server bugs (one caused a crash the other ran out of connection objects)
+- Added server admin web based interface (still incomplete)
+- Added "Account" support
+
+#### 0.10.6
 
 - Added session support
 - Code improvements

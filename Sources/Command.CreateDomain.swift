@@ -3,7 +3,7 @@
 //  File:       Command.CreateDomain.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.0
+//  Version:    0.10.7
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.7 - Merged SwiftfireCore into Swiftfire
 // 0.10.0 - Renamed file from MacCommand to Command
 // 0.9.18 - Header update
 //        - Replaced log by Log?

@@ -3,7 +3,7 @@
 //  File:       Command.HttpsServerRun.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.6
+//  Version:    0.10.7
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.7 - Merged SwiftfireCore into Swiftfire
 // 0.10.6 - Update of server telemetry type
 // 0.10.1 - Fixed warnings under Xcode 8.3
 // 0.10.0 - Renamed HttpConnection to SFConnection
