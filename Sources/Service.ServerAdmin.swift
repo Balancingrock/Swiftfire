@@ -3,7 +3,7 @@
 //  File:       Service.ServerAdmin.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.7
+//  Version:    0.10.8
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.8 - Silenced warning during compilation
 // 0.10.7 - Initial release
 //
 // =====================================================================================================================
@@ -860,7 +861,7 @@ fileprivate func executeUpdateDomain(_ postInfo: inout PostInfo?) {
     }
     
     guard postInfo?.count ?? 0 == 1 else {
-        Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Too many key/value pairs postInfo \(postInfo)")
+        Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Too many key/value pairs postInfo \(String(describing:postInfo))")
         return
     }
     

@@ -3,7 +3,7 @@
 //  File:       Telemetry.swift
 //  Project:    Swiftfire
 //
-private let version = "0.10.7"
+private let version = "0.10.8"
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@ private let version = "0.10.7"
 //
 // History
 //
+// 0.10.8 - Version number update
 // 0.10.7 - Version number update
 //        - Merged SwiftfireCore into Swiftfire
 // 0.10.6 - Renamed from Telemetry to ServerTelemetry

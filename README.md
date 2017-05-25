@@ -93,12 +93,17 @@ Note: Planned releases are for information only and almost always change.
 - Small feature improvements (if necessary)
 - Code improvements
 
-#### 0.10.8 (Planned)
+#### 0.10.9 (Planned)
 
 - Completion of server admin web based interface
 - Removal of code related to SwifterConsole (will no longer be supported)
 
-#### 0.10.7 (Current)
+#### 0.10.8 (Current)
+
+- Silenced warning during compilation
+- Removed dependency on macOS 10.11
+
+#### 0.10.7
 
 - Through an upgrade of SwifterSockets fixed two server bugs (one caused a crash the other ran out of connection objects)
 - Added server admin web based interface (still incomplete)

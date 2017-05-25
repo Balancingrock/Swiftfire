@@ -3,7 +3,7 @@
 //  File:       Account.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.7
+//  Version:    0.10.8
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.8 - Removed dependecy on macOS 10.11
 // 0.10.7 - Initial release
 //
 // =====================================================================================================================
@@ -771,7 +772,8 @@ public class Accounts {
                     
                     // If the url is a directory, then process it (recursive), if it is a file, try to read it as an account.
                     
-                    if url.hasDirectoryPath {
+                    var isDir: ObjCBool = false
+                    if FileManager.default.fileExists(atPath: url.path, isDirectory: &isDir) && isDir.boolValue {
                         
                         if !processDirectory(dir: url) {
                             return false
