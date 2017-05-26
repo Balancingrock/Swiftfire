@@ -3,7 +3,7 @@
 //  File:       Service.ServerAdmin.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.8
+//  Version:    0.10.9
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.9 - Added server blacklist management
 // 0.10.8 - Silenced warning during compilation
 // 0.10.7 - Initial release
 //

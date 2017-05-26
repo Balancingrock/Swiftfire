@@ -3,7 +3,7 @@
 //  File:       Functions.Registration.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.6
+//  Version:    0.10.9
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.9 - Added sf-blacklistTable
 // 0.10.6 - Added getSession
 // 0.10.0 - Initial release
 //
