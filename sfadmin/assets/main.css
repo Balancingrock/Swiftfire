@@ -1033,22 +1033,29 @@ main {
 footer {
   color: #ffdd11; }
 
-.centered, .default-table, .status-table table, .parameter-table, .telemetry-table, .domains-table, .domain-details-table, .domain-telemetry-table, .domain-service-table {
+.centered, .default-table, .status-table table, .parameter-table, .telemetry-table, .server-blacklist-table, .domain-blacklist-table, .domains-table, .domain-details-table, .domain-telemetry-table, .domain-service-table {
   margin-left: auto;
   margin-right: auto; }
 
-.outlined-table, .default-table, .status-table table, .parameter-table, .telemetry-table, .domains-table, .domain-details-table, .domain-telemetry-table, .domain-service-table {
+.line {
+  border-top: #3090ff 2px solid;
+  margin-top: 7px;
+  margin-bottom: 7px;
+  margin-left: 0;
+  margin-right: 0; }
+
+.outlined-table, .default-table, .status-table table, .parameter-table, .telemetry-table, .server-blacklist-table, .domain-blacklist-table, .domains-table, .domain-details-table, .domain-telemetry-table, .domain-service-table {
   border-collapse: collapse; }
-  .outlined-table td, .default-table td, .status-table table td, .parameter-table td, .telemetry-table td, .domains-table td, .domain-details-table td, .domain-telemetry-table td, .domain-service-table td, .outlined-table th, .default-table th, .status-table table th, .parameter-table th, .telemetry-table th, .domains-table th, .domain-details-table th, .domain-telemetry-table th, .domain-service-table th {
+  .outlined-table td, .default-table td, .status-table table td, .parameter-table td, .telemetry-table td, .server-blacklist-table td, .domain-blacklist-table td, .domains-table td, .domain-details-table td, .domain-telemetry-table td, .domain-service-table td, .outlined-table th, .default-table th, .status-table table th, .parameter-table th, .telemetry-table th, .server-blacklist-table th, .domain-blacklist-table th, .domains-table th, .domain-details-table th, .domain-telemetry-table th, .domain-service-table th {
     border: 1px solid #e8e8e8; }
 
-.alternating-table-rows tr:nth-child(even), .default-table tr:nth-child(even), .status-table table tr:nth-child(even), .parameter-table tr:nth-child(even), .telemetry-table tr:nth-child(even), .domains-table tr:nth-child(even), .domain-details-table tr:nth-child(even), .domain-telemetry-table tr:nth-child(even), .domain-service-table tr:nth-child(even) {
+.alternating-table-rows tr:nth-child(even), .default-table tr:nth-child(even), .status-table table tr:nth-child(even), .parameter-table tr:nth-child(even), .telemetry-table tr:nth-child(even), .server-blacklist-table tr:nth-child(even), .domain-blacklist-table tr:nth-child(even), .domains-table tr:nth-child(even), .domain-details-table tr:nth-child(even), .domain-telemetry-table tr:nth-child(even), .domain-service-table tr:nth-child(even) {
   background-color: #e8e8e8; }
 
-.grey-table-header th, .default-table th, .status-table table th, .parameter-table th, .telemetry-table th, .domains-table th, .domain-details-table th, .domain-telemetry-table th, .domain-service-table th {
+.grey-table-header th, .default-table th, .status-table table th, .parameter-table th, .telemetry-table th, .server-blacklist-table th, .domain-blacklist-table th, .domains-table th, .domain-details-table th, .domain-telemetry-table th, .domain-service-table th {
   background-color: #e8e8e8; }
 
-.table-cell-margins td, .default-table td, .status-table table td, .parameter-table td, .telemetry-table td, .domains-table td, .domain-details-table td, .domain-telemetry-table td, .domain-service-table td, .table-cell-margins th, .default-table th, .status-table table th, .parameter-table th, .telemetry-table th, .domains-table th, .domain-details-table th, .domain-telemetry-table th, .domain-service-table th {
+.table-cell-margins td, .default-table td, .status-table table td, .parameter-table td, .telemetry-table td, .server-blacklist-table td, .domain-blacklist-table td, .domains-table td, .domain-details-table td, .domain-telemetry-table td, .domain-service-table td, .table-cell-margins th, .default-table th, .status-table table th, .parameter-table th, .telemetry-table th, .server-blacklist-table th, .domain-blacklist-table th, .domains-table th, .domain-details-table th, .domain-telemetry-table th, .domain-service-table th {
   padding: 7px 14px; }
 
 .status-table table input {
@@ -1061,6 +1068,14 @@ footer {
   text-align: center; }
 .telemetry-table .table-column-value {
   text-align: center; }
+
+.server-blacklist-create, .domain-blacklist-create {
+  display: flex;
+  flex-direction: row;
+  justify-content: center; }
+  .server-blacklist-create input, .domain-blacklist-create input {
+    margin-left: 7px;
+    margin-right: 7px; }
 
 .domain-details-table input {
   text-align: center; }

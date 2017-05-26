@@ -48,7 +48,7 @@
 //
 // History
 //
-// 0.10.9 - Added server blacklist management
+// 0.10.9 - Added server and domain blacklist management
 // 0.10.8 - Silenced warning during compilation
 // 0.10.7 - Initial release
 //
@@ -809,6 +809,9 @@ fileprivate func executeSfCommand(_ pathComponents: Array<String>, _ postInfo: i
     case "UpdateBlacklist": executeUpdateBlacklist(&postInfo); return .newPath("/pages/blacklist.sf.html")
     case "AddToBlacklist": executeAddToBlacklist(&postInfo); return .newPath("/pages/blacklist.sf.html")
     case "RemoveFromBlacklist": executeRemoveFromBlacklist(&postInfo); return .newPath("/pages/blacklist.sf.html")
+    case "UpdateDomainBlacklist": executeUpdateDomainBlacklist(&postInfo); return .newPath("/pages/domain-management.sf.html")
+    case "AddToDomainBlacklist": executeAddToDomainBlacklist(&postInfo); return .newPath("/pages/domain-management.sf.html")
+    case "RemoveFromDomainBlacklist": executeRemoveFromDomainBlacklist(&postInfo); return .newPath("/pages/domain-management.sf.html")
     default:
         Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Unknown sfcommand: \(commandName)")
         return .nop
@@ -888,6 +891,62 @@ fileprivate func executeAddToBlacklist(_ postInfo: inout PostInfo?) {
 fileprivate func executeRemoveFromBlacklist(_ postInfo: inout PostInfo?) {
     guard let (address, _) = postInfo?.popFirst() else { return }
     serverBlacklist.remove(ipAddress: address)
+}
+
+fileprivate func executeUpdateDomainBlacklist(_ postInfo: inout PostInfo?) {
+    let _ = postInfo?.removeValue(forKey: "submit")
+    guard let name = postInfo?.removeValue(forKey: "DomainName"),
+          let domain = domains.domain(forName: name) else {
+            Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Missing domain name")
+            return
+    }
+    guard let (address, action) = postInfo?.popFirst() else {
+        Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Missing address & action")
+        return
+    }
+    let newAction: Blacklist.Action = {
+        switch action {
+        case "close": return Blacklist.Action.closeConnection
+        case "503": return Blacklist.Action.send503ServiceUnavailable
+        case "401": return Blacklist.Action.send401Unauthorized
+        default:
+            Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Unknown action \(action)")
+            return Blacklist.Action.closeConnection
+        }
+    }()
+    domain.blacklist.update(action: newAction, forIpAddress: address)
+}
+
+fileprivate func executeAddToDomainBlacklist(_ postInfo: inout PostInfo?) {
+    let _ = postInfo?.removeValue(forKey: "submit")
+    guard let name = postInfo?.removeValue(forKey: "DomainName"),
+        let domain = domains.domain(forName: name) else {
+            Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Missing domain name")
+            return
+    }
+    guard let address = postInfo?["newEntry"] else { return }
+    guard let action = postInfo?["action"] else { return }
+    let newAction: Blacklist.Action = {
+        switch action {
+        case "close": return Blacklist.Action.closeConnection
+        case "503": return Blacklist.Action.send503ServiceUnavailable
+        case "401": return Blacklist.Action.send401Unauthorized
+        default:
+            Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Unknown action \(action)")
+            return Blacklist.Action.closeConnection
+        }
+    }()
+    domain.blacklist.add(ipAddress: address, action: newAction)
+}
+
+fileprivate func executeRemoveFromDomainBlacklist(_ postInfo: inout PostInfo?) {
+    guard let name = postInfo?.removeValue(forKey: "DomainName"),
+        let domain = domains.domain(forName: name) else {
+            Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Missing domain name")
+            return
+    }
+    guard let (address, _) = postInfo?.popFirst() else { return }
+    domain.blacklist.remove(ipAddress: address)
 }
 
 
