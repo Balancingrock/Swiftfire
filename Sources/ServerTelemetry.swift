@@ -3,7 +3,7 @@
 //  File:       Telemetry.swift
 //  Project:    Swiftfire
 //
-private let version = "0.10.8"
+private let version = "0.10.9"
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -11,7 +11,7 @@ private let version = "0.10.8"
 //  Blog:       http://swiftrien.blogspot.com
 //  Git:        https://github.com/Balancingrock/Swiftfire
 //
-//  Copyright:  (c) 2014-2016 Marinus van der Lugt, All rights reserved.
+//  Copyright:  (c) 2014-2017 Marinus van der Lugt, All rights reserved.
 //
 //  License:    Use or redistribute this code any way you like with the following two provision:
 //
@@ -48,6 +48,7 @@ private let version = "0.10.8"
 //
 // History
 //
+// 0.10.9 - Version number update
 // 0.10.8 - Version number update
 // 0.10.7 - Version number update
 //        - Merged SwiftfireCore into Swiftfire

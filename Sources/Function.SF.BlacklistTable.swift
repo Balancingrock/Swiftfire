@@ -1,6 +1,6 @@
 // =====================================================================================================================
 //
-//  File:       Function.SF.ParameterTable.swift
+//  File:       Function.SF.Blacklist.swift
 //  Project:    Swiftfire
 //
 //  Version:    0.10.9
@@ -48,20 +48,19 @@
 //
 // History
 //
-// 0.10.9 - Typo
-// 0.10.7 - Initial release
+// 0.10.9 - Initial release
 //
 // =====================================================================================================================
 // Description
 // =====================================================================================================================
 //
-// Returns a table with all parameter values including buttons to update the parameters.
+// Returns a table with all blacklisted addresses.
 //
 //
 // Signature:
 // ----------
 //
-// .sf-parameterTable()
+// .sf-blacklistTable()
 //
 //
 // Parameters:
@@ -80,7 +79,7 @@
 // Returns:
 // --------
 //
-// The table with all parameters or:
+// The table with all blacklisted addresses or:
 // - "Session error"
 // - "Account error"
 // - "Illegal access"
@@ -101,9 +100,9 @@ import Foundation
 ///
 /// - Returns: The value of the requested parameter or "No access rights".
 
-func function_sf_parameterTable(_ args: Function.Arguments, _ info: inout Function.Info, _ environment: inout Function.Environment) -> Data? {
-
-
+func function_sf_blacklistTable(_ args: Function.Arguments, _ info: inout Function.Info, _ environment: inout Function.Environment) -> Data? {
+    
+    
     // Check access rights
     
     guard let session = environment.serviceInfo[.sessionKey] as? Session else {
@@ -117,21 +116,20 @@ func function_sf_parameterTable(_ args: Function.Arguments, _ info: inout Functi
     guard serverAdminDomain.accounts.contains(account.uuid) else {
         return "Illegal access".data(using: String.Encoding.utf8)
     }
-
+    
     
     // Create the table
-
-    var table: String = "<table class=\"parameter-table\"><thead><tr><th>Name</th><th>Value</th><th>Description</th><tr></thead><tbody>"
-    parameters.all.forEach() { if $0.name != parameters.adminSiteRoot.name { table.append($0.tableRow()) } }
-    table.append("</tbody></table>")
     
-    return table.data(using: String.Encoding.utf8)
-}
-
-fileprivate extension NamedValueProtocol {
-    
-    func tableRow() -> String {
-        return "<tr><td>\(self.name)</td><td><form action=\"/serveradmin/sfcommand/SetParameter\" method=\"post\"><input type=\"text\" name=\"\(self.name)\" value=\"\(self.stringValue)\"><input type=\"submit\" value=\"Update\"></form></td><td>\(self.about)</td></tr>"
+    var table: String = "<table class=\"server-blacklist-table\"><thead><tr><th>Address</th><th>Action</th><th></th><tr></thead><tbody>"
+    serverBlacklist.list.forEach { (address, action) in
+        table += "<tr><td>\(address)</td><td>"
+        table += "<form action=\"/serveradmin/sfcommand/UpdateBlacklist\" method=\"post\"><input type=\"radio\" name=\"\(address)\" value=\"close\" \(action == .closeConnection ? "checked" : "")> Close Connection, <input type=\"radio\" name=\"\(address)\" value=\"503\" \(action == .send503ServiceUnavailable ? "checked" : "")> 503 Service Unavailable, <input type=\"radio\" name=\"\(address)\" value=\"401\" \(action == .send401Unauthorized ? "checked" : "")> 401 Unauthorized <input type=\"submit\" name=\"submit\" value=\"Update\"></form>"
+        table += "</td><td><form action=\"/serveradmin/sfcommand/RemoveFromBlacklist\" method=\"post\"><input type=\"submit\" name=\"\(address)\" value=\"Delete\"></form></td></tr>"
     }
+    table.append("</tbody></table></br>")
+    
+    let newEntry = "<form class=\"server-blacklist-create\" action=\"/serveradmin/sfcommand/AddToBlacklist\" method=\"post\"><div>Address: <input type=\"text\" name=\"newEntry\" value=\"\"></div>Action:<div><input type=\"radio\" name=\"action\" value=\"close\" checked> Close Connection</br><input type=\"radio\" name=\"action\" value=\"503\"> 503 Service Unavailable</br><input type=\"radio\" name=\"action\" value=\"401\"> 401 Unauthorized</div><div><input type=\"submit\" name=\"submit\" value=\"Add to Blacklist\"></div></form>"
+    
+    return (table + newEntry).data(using: String.Encoding.utf8)
 }
 

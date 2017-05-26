@@ -805,6 +805,9 @@ fileprivate func executeSfCommand(_ pathComponents: Array<String>, _ postInfo: i
     case "UpdateDomainServices": executeUpdateDomainServices(&postInfo); return .newPath("/pages/domain-management.sf.html")
     case "DeleteDomain": executeDeleteDomain(&postInfo); return .newPath("/pages/domain-management.sf.html")
     case "CreateDomain": executeCreateDomain(&postInfo); return .newPath("/pages/domain-management.sf.html")
+    case "UpdateBlacklist": executeUpdateBlacklist(&postInfo); return .newPath("/pages/blacklist.sf.html")
+    case "AddToBlacklist": executeAddToBlacklist(&postInfo); return .newPath("/pages/blacklist.sf.html")
+    case "RemoveFromBlacklist": executeRemoveFromBlacklist(&postInfo); return .newPath("/pages/blacklist.sf.html")
     default:
         Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Unknown sfcommand: \(commandName)")
         return .nop
@@ -844,6 +847,48 @@ fileprivate func executeReadParameters() {
         _ = parameters.restore(fromFile: url)
     }
 }
+
+fileprivate func executeUpdateBlacklist(_ postInfo: inout PostInfo?) {
+    let _ = postInfo?.removeValue(forKey: "submit")
+    guard let (address, action) = postInfo?.popFirst() else {
+        Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Missing address & action")
+        return
+    }
+    let newAction: Blacklist.Action = {
+        switch action {
+            case "close": return Blacklist.Action.closeConnection
+            case "503": return Blacklist.Action.send503ServiceUnavailable
+            case "401": return Blacklist.Action.send401Unauthorized
+        default:
+            Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Unknown action \(action)")
+            return Blacklist.Action.closeConnection
+        }
+    }()
+    serverBlacklist.update(action: newAction, forIpAddress: address)
+}
+
+fileprivate func executeAddToBlacklist(_ postInfo: inout PostInfo?) {
+    let _ = postInfo?.removeValue(forKey: "submit")
+    guard let address = postInfo?["newEntry"] else { return }
+    guard let action = postInfo?["action"] else { return }
+    let newAction: Blacklist.Action = {
+        switch action {
+        case "close": return Blacklist.Action.closeConnection
+        case "503": return Blacklist.Action.send503ServiceUnavailable
+        case "401": return Blacklist.Action.send401Unauthorized
+        default:
+            Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Unknown action \(action)")
+            return Blacklist.Action.closeConnection
+        }
+    }()
+    serverBlacklist.add(ipAddress: address, action: newAction)
+}
+
+fileprivate func executeRemoveFromBlacklist(_ postInfo: inout PostInfo?) {
+    guard let (address, _) = postInfo?.popFirst() else { return }
+    serverBlacklist.remove(ipAddress: address)
+}
+
 
 /// Update a parameter in a domain.
 

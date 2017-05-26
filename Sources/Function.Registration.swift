@@ -84,6 +84,7 @@ let SF_TELEMETRY_VALUE = "sf-telemetryValue"
 let SF_COMMAND = "sf-command"
 let SF_PARAMETER_TABLE = "sf-parameterTable"
 let SF_TELEMETRY_TABLE = "sf-telemetryTable"
+let SF_BLACKLIST_TABLE = "sf-blacklistTable"
 let SF_DOMAINS_MENU = "sf-domainsMenu"
 let SF_DOMAINS_TABLE = "sf-domainsTable"
 let SF_DOMAIN_DETAIL = "sf-domainDetail"
@@ -112,6 +113,7 @@ func registerFunctions() {
     functions.register(name: SF_COMMAND, function: function_sf_command)
     functions.register(name: SF_PARAMETER_TABLE, function: function_sf_parameterTable)
     functions.register(name: SF_TELEMETRY_TABLE, function: function_sf_telemetryTable)
+    functions.register(name: SF_BLACKLIST_TABLE, function: function_sf_blacklistTable)
     functions.register(name: SF_DOMAINS_MENU, function: function_sf_domainsMenu)
     functions.register(name: SF_DOMAINS_TABLE, function: function_sf_domainsTable)
     functions.register(name: SF_DOMAIN_DETAIL, function: function_sf_domainDetail)
