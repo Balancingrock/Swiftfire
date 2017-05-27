@@ -172,7 +172,7 @@ func service_onlyGetOrPost(_ request: HttpRequest, _ connection: Connection, _ d
     // It must be either a GET or POST operation
     // =============================================================================================================
 
-    guard (operation == HttpOperation.get || operation == HttpOperation.post) else {
+    guard (operation == .get || operation == .post) else {
         
         
         // Telemetry update

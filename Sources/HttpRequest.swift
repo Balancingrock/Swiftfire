@@ -48,7 +48,7 @@
 //
 // History
 //
-// 0.10.9 - HTTP code streamlining (merged HttpRequestField)
+// 0.10.9 - HTTP code streamlining (merged HttpRequestField and HttpOperation)
 // 0.10.7 - Added decoding of contentType
 //        - Merged SwiftfireCore into Swiftfire
 // 0.10.6 - Added cookies
@@ -79,6 +79,24 @@ public let CRLFCRLF = "\r\n\r\n"
 /// This class encodes the http request and offers functions to access its content.
 
 public final class HttpRequest: CustomStringConvertible {
+    
+    
+    // The types of available operations
+    
+    public enum Operation: String {
+        case get = "GET"
+        case head = "HEAD"
+        case post = "POST"
+        case put = "PUT"
+        case delete = "DELETE"
+        case trace = "TRACE"
+        case connect = "CONNECT"
+        
+        // If operations are added, be sure to include them in "allValues".
+        
+        public static let all: Array<Operation> = [.get, .head, .post, .put, .delete, .trace, .connect]
+    }
+
     
     /// This enum encodes the different kinds of header fields
     
@@ -279,8 +297,8 @@ public final class HttpRequest: CustomStringConvertible {
     
     /// Returns the operation or nil if none present
     
-    public lazy var operation: HttpOperation? = {
-        for t in HttpOperation.all {
+    public lazy var operation: Operation? = {
+        for t in Operation.all {
             let operatorRange = self.lines[0].range(of: t.rawValue, options: NSString.CompareOptions(), range: nil, locale: nil)
             if let range = operatorRange {
                 if range.lowerBound == self.lines[0].startIndex { return t }
