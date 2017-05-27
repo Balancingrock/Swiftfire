@@ -131,7 +131,7 @@ func service_onlyHttp10or11(_ request: Request, _ connection: Connection, _ doma
     // The version must be present
     // =============================================================================================================
     
-    guard let httpVersion = request.httpVersion else {
+    guard let httpVersion = request.version else {
         
         
         // Telemetry update

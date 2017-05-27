@@ -130,7 +130,7 @@ func service_onlyGetOrPost(_ request: Request, _ connection: Connection, _ domai
     // It must be either a GET or POST operation
     // =============================================================================================================
     
-    guard let operation = request.operation else {
+    guard let method = request.method else {
         
         
         // Telemetry update
@@ -170,10 +170,10 @@ func service_onlyGetOrPost(_ request: Request, _ connection: Connection, _ domai
 
     
     // =============================================================================================================
-    // It must be either a GET or POST operation
+    // It must be either a GET or POST method
     // =============================================================================================================
 
-    guard (operation == .get || operation == .post) else {
+    guard (method == .get || method == .post) else {
         
         
         // Telemetry update
@@ -189,7 +189,7 @@ func service_onlyGetOrPost(_ request: Request, _ connection: Connection, _ domai
         
         // Log update
         
-        let message = "Operation '\(operation.rawValue)' not supported)"
+        let message = "Method '\(method.rawValue)' not supported)"
         Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: message)
         
         

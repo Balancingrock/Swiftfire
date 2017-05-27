@@ -189,7 +189,7 @@ extension SFConnection {
 
         // The Http version is necessary to be able to prepare a response
         
-        guard let httpVersion = request.httpVersion else {
+        guard let httpVersion = request.version else {
             send400BadRequestResponse("HTTP Version not present", processingStartedAt: timestampResponseStart)
             return
         }
@@ -333,8 +333,8 @@ extension SFConnection {
             time: timeOfAccept,
             ipAddress: remoteAddress,
             url: request.url ?? "",
-            operation: request.operation?.rawValue ?? "",
-            version: request.httpVersion?.rawValue ?? "")
+            operation: request.method?.rawValue ?? "",
+            version: request.version?.rawValue ?? "")
 
         
         // =============================================================================================================

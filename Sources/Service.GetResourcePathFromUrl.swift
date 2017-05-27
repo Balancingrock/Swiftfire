@@ -244,7 +244,7 @@ func service_getResourcePathFromUrl(_ request: Request, _ connection: Connection
         
         // Only for get operations
         
-        if request.operation != .get { return path }
+        if request.method != .get { return path }
         
         
         // There must be a questionmark in the path
