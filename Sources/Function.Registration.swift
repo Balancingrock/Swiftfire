@@ -94,6 +94,7 @@ let SF_DOMAIN_TELEMETRY_TABLE = "sf-domainTelemetryTable"
 let SF_POSTING_BUTTONED_INPUT = "sf-postingButtonedInput"
 let SF_DOMAIN_SERVICES_TABLE = "sf-domainServicesTable"
 let SF_DOMAIN_BLACKLIST_TABLE = "sf-domainBlacklistTable"
+let SF_STATISTICS_PAGE = "sf-statisticsPage"
 
 
 // ==================================================
@@ -124,4 +125,5 @@ func registerFunctions() {
     functions.register(name: SF_DOMAIN_SERVICES_TABLE, function: function_sf_domainServicesTable)
     functions.register(name: SF_DOMAIN_BLACKLIST_TABLE, function: function_sf_domainBlacklistTable)
     functions.register(name: SF_POSTING_BUTTONED_INPUT, function: function_sf_postingButtonedInput)
+    functions.register(name: SF_STATISTICS_PAGE, function: function_sf_statisticsPage)
 }
