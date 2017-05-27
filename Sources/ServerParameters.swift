@@ -3,7 +3,7 @@
 //  File:       Parameters.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.7
+//  Version:    0.10.9
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.9 - Removed Monitoring & control related parameters
 // 0.10.7 - Added adminSiteRoot
 //        - Removed SWIFTFIRE_VERSION
 //        - Merged SwiftfireCore into Swiftfire
@@ -198,39 +199,6 @@ public final class ServerParameters: CustomStringConvertible {
         resetValue: 10)
     
     
-    /// When the M&C connection has been established, it will remain locked to the given connection until no activity has been detected for this amount of time. Note that when a console periodically retrieves telemetry, that interval should be shorter than this inactvity timeout or else another console could take over. Time is in seconds.
-    ///
-    /// Default: 600 [Sec]
-    
-    public let macInactivityTimeout = NamedIntValue(
-        name: "MacInactivityTimeout",
-        about: "Close the M&C connection when inactive for this long [Sec]",
-        value: 600,
-        resetValue: 600)
-    
-    
-    /// When set to true the http server will automatically be started upon start of the application. Note that domains should be defined and active for this to have any effect.
-    ///
-    /// Default: True
-
-    public let autoStartup = NamedBoolValue(
-        name: "AutoStartup",
-        about: "When 'true', the HTTP/S servers will be started on application boot.",
-        value: true,
-        resetValue: true)
-    
-    
-    /// The port number on which Swiftfire will listen for M&C connections.
-    ///
-    /// Default: 2043
-    
-    public let macPortNumber = NamedStringValue(
-        name: "MonitoringAndControlPortNumber",
-        about: "The port number on which M&C connections will be accepted.",
-        value: "2043",
-        resetValue: "2043")
-    
-
     /// The ASL threshold, logging information at this level (or above) will be written to the ASL Facility
     ///
     /// Default: 2 = SwifterLog.Level.notice
@@ -253,7 +221,7 @@ public final class ServerParameters: CustomStringConvertible {
         resetValue: 8)
     
     
-    /// The callback threshold, logging information at this level (or above) will be send to the Swiftfire Console
+    /// The callback threshold, logging information at this level (or above) will be send to the registered callbacks.
     ///
     /// Default: 8 = SwifterLog.Level.none
 
@@ -423,9 +391,6 @@ public final class ServerParameters: CustomStringConvertible {
         all.append(networkTransmitAtAndAboveLevel)
         all.append(networkLogtargetIpAddress)
         all.append(networkLogtargetPortNumber)
-        all.append(autoStartup)
-        all.append(macPortNumber)
-        all.append(macInactivityTimeout)
         all.append(logfileMaxSize)
         all.append(logfileMaxNofFiles)
         all.append(maxFileSizeForHeaderLogging)

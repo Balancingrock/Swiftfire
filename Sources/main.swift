@@ -3,7 +3,7 @@
 //  File:       main.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.6
+//  Version:    0.10.9
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.9  - Removed M&C, always start servers
 // 0.10.6  - Renamed parameters and telemetry type
 // 0.10.1  - Fixed new warnings from xcode 8.3
 // 0.10.0  - Included support for function calls
@@ -183,30 +184,6 @@ do {
     Log.atNotice?.log(id: -1, source: "Main", message: "Logging configured")
 }
 
-
-// ======================================
-// Configure callback for log information
-// ======================================
-
-// Purpose: To send the logging information to the Console if a console is attached.
-/*
-class LogForewarder: SwifterlogCallbackProtocol {
-    
-    func logInfo(_ time: Date, level: SwifterLog.Level, source: String, message: String) {
-        if let mac = mac {
-            let logline = LogLine(time: time as Date, level: level, source: source, message: message)
-            // Use the buffered transfer itself to repevent duplicate STDout logging.
-            mac.bufferedTransfer(LogLineReply(logline).json.code)
-        }
-    }
-}
-
-let logforewarder = LogForewarder()
-
-Log.theLogger.registerCallback(logforewarder)
-
-Log.atNotice?.log(id: -1, source: "Main", message: "Remote console logging set up (not started)")
-*/
 
 // ===============================================
 // Initialize the server level blacklisted clients
@@ -475,45 +452,8 @@ if consoleServerCertificateFound {
 }
 
 
-// ============================================================
-// Initialize the port for the Monitoring and Control interface
-// ============================================================
-
-Log.atNotice?.log(id: -1, source: "Main", message: "Initializing M&C loop on port \(parameters.macPortNumber)")
-
-
-// The thread for the process that communicates with the console (mac).
-
-private let macAcceptQueue = DispatchQueue(
-    label: "M&C Accept queue",
-    qos: .userInteractive,
-    attributes: [],
-    autoreleaseFrequency: DispatchQueue.AutoreleaseFrequency.inherit,
-    target: nil)
-
-
-// Create a container for the certificate and private key
-
-guard let macCertKeyContainer = CertificateAndPrivateKeyFiles(pemCertificateFile: StorageUrls.sslConsoleServerCertificateFile!.path, pemPrivateKeyFile: StorageUrls.sslConsoleServerPrivateKeyFile!.path) else { emergencyExit("Could not create console server certificate & private key container") }
-
-
-// Create the server
-
-let macServer = SslServer()
-_ = macServer.setOptions(
-    .port(parameters.macPortNumber.value),
-    .maxPendingConnectionRequests(1),
-    .acceptQueue(macAcceptQueue),
-    .connectionObjectFactory(macConnectionFactory),
-    .acceptLoopDuration(10),
-    .errorHandler(macErrorHandler),
-    .trustedClientCertificates([StorageUrls.sslConsoleTrustedClientsDir!.path]),
-    .serverCtx(macCtx)
-)
-
-
 // ====================================
-// Caal out to the custom setup routine
+// Call out to the custom setup routine
 // ====================================
 
 Log.atNotice?.log(id: -1, source: "Main", message: "Calling out to custom setup")
@@ -523,70 +463,49 @@ customSetup()
 Log.atNotice?.log(id: -1, source: "Main", message: "Finished custom setup")
 
 
-// =====================================
-// Start the monitoring and control loop
-// =====================================
+// ==================================
+// Start servers
+// ==================================
 
-switch macServer.start() {
-    
-case let .error(message):
-    
-    Log.atEmergency?.log(id: -1, source: "Main", message: "Swiftfire terminated with error '\(message)'")
-    
-    sleep(10)
-    
-    exit(EXIT_FAILURE)
-    
-    
-case .success:
-    
-    Log.atNotice?.log(id: -1, source: "Main", message: "Listening for M&C connections")
-    
-    // ==================================
-    // Autostart servers if necessary
-    // ==================================
-    
-    if parameters.autoStartup.value { restartHttpAndHttpsServers() }
-    
-    
-    // Wait for the 'quit' command
-    
-    while !quitSwiftfire { sleep(2) }
-    
-    
-    // Cleanup
-    
-    _ = serverAdminDomain.serverShutdown()
-    statistics.save(toFile: StorageUrls.statisticsFile!)
-    Log.atNotice?.log(id: -1, source: "Main", message: "Saved server statistics")
-    
-    headerLogger.close()
-    Log.atNotice?.log(id: -1, source: "Main", message: "Closed header logging file")
-    
-    if let url = StorageUrls.serverBlacklistFile {
-        serverBlacklist.save(toFile: url)
-        Log.atNotice?.log(id: -1, source: "Main", message: "Saved server blacklist")
-    }
-    
-    switch domains.serverShutdown() {
-    case .error(let message): Log.atError?.log(id: -1, source: "Main", message: "Error while shutting down the domains:\n\(message)")
-    case .success: break;
-    }
-    
-    switch domains.save(toFile: StorageUrls.domainDefaultsFile!) {
-    case .error(let message): Log.atError?.log(id: -1, source: "Main", message: "Error while saving the domains:\n\(message)")
-    case .success: Log.atNotice?.log(id: -1, source: "Main", message: "Saved domains")
-    }
-    
-    Log.atNotice?.log(id: -1, source: "Main", message: "Swiftfire terminated normally")
-    
-    
-    // Give other tasks time to complete
-    
-    sleep(10)
-    
-    exit(EXIT_SUCCESS)
+restartHttpAndHttpsServers()
+
+// Wait for the 'quit' command
+
+while !quitSwiftfire { sleep(2) }
+
+
+// Cleanup
+
+_ = serverAdminDomain.serverShutdown()
+statistics.save(toFile: StorageUrls.statisticsFile!)
+Log.atNotice?.log(id: -1, source: "Main", message: "Saved server statistics")
+
+headerLogger.close()
+Log.atNotice?.log(id: -1, source: "Main", message: "Closed header logging file")
+
+if let url = StorageUrls.serverBlacklistFile {
+    serverBlacklist.save(toFile: url)
+    Log.atNotice?.log(id: -1, source: "Main", message: "Saved server blacklist")
 }
+
+switch domains.serverShutdown() {
+case .error(let message): Log.atError?.log(id: -1, source: "Main", message: "Error while shutting down the domains:\n\(message)")
+case .success: break;
+}
+
+switch domains.save(toFile: StorageUrls.domainDefaultsFile!) {
+case .error(let message): Log.atError?.log(id: -1, source: "Main", message: "Error while saving the domains:\n\(message)")
+case .success: Log.atNotice?.log(id: -1, source: "Main", message: "Saved domains")
+}
+
+Log.atNotice?.log(id: -1, source: "Main", message: "Swiftfire terminated normally")
+
+
+// Give other tasks time to complete
+
+sleep(10)
+
+exit(EXIT_SUCCESS)
 
 
 // === End ===
