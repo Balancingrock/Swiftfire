@@ -3,7 +3,7 @@
 //  File:       Service.GetSession.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.6
+//  Version:    0.10.9
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.9 - HTTP code streamlining
 // 0.10.6 - Initial release
 //
 // =====================================================================================================================
@@ -104,7 +105,7 @@ func service_getSession(_ request: HttpRequest, _ connection: Connection, _ doma
     
     guard let connection = connection as? SFConnection else {
         Log.atCritical?.log(id: -1, source: #file.source(#function, #line), message: "Failed to cast Connection as SFConnection")
-        response.code = HttpResponseCode.code500_InternalServerError
+        response.code = HttpResponse.Code._500_InternalServerError
         return .abort
     }
 

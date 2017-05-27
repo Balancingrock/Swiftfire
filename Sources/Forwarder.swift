@@ -3,7 +3,7 @@
 //  File:       Forwarder.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.7
+//  Version:    0.10.9
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.9 - HTTP code streamlining
 // 0.10.7 - Changed receiverData to processReceivedData
 // 0.10.6 - Update of receiverLoop
 // 0.9.18 - Header update
@@ -89,7 +90,7 @@ class Forwarder: SwifterSockets.Connection {
     
     override func receiverLoop() -> Bool {
         let reply = HttpResponse()
-        reply.code = HttpResponseCode.code408_RequestTimeout
+        reply.code = HttpResponse.Code._408_RequestTimeout
         reply.version = HttpVersion.http1_1
         reply.createErrorPayload(message: "Forwarding target timed out.")
         if let data = reply.data {

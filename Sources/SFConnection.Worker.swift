@@ -3,7 +3,7 @@
 //  File:       HttpConnection.HttpWorker.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.6
+//  Version:    0.10.9
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.9 - HTTP code streamlining
 // 0.10.6 - Updated parameters to services & transmission of response
 //        - Renamed chain... to service...
 //        - Added freeing of session.
@@ -107,7 +108,7 @@ extension SFConnection {
         // Reply to client
         
         let response = HttpResponse()
-        response.code = .code400_BadRequest
+        response.code = ._400_BadRequest
         response.version = .http1_1
         response.createErrorPayload(message: "<p>\(message)</p>")
         if let data = response.data {
@@ -120,7 +121,7 @@ extension SFConnection {
         // Statistics update
         
         let mutation = Mutation.createAddClientRecord(from: self)
-        mutation.httpResponseCode = HttpResponseCode.code400_BadRequest.rawValue
+        mutation.httpResponseCode = HttpResponse.Code._400_BadRequest.rawValue
         mutation.responseDetails = message
         mutation.requestReceived = processingStartedAt
         statistics.submit(mutation: mutation, onError: {
@@ -149,7 +150,7 @@ extension SFConnection {
         // Reply to client
         
         let response = HttpResponse()
-        response.code = .code500_InternalServerError
+        response.code = ._500_InternalServerError
         response.version = .http1_1
         response.createErrorPayload(message: "<p>\(message)</p>")
         if let data = response.data {
@@ -163,7 +164,7 @@ extension SFConnection {
         // Statistics update
         
         let mutation = Mutation.createAddClientRecord(from: self)
-        mutation.httpResponseCode = HttpResponseCode.code500_InternalServerError.rawValue
+        mutation.httpResponseCode = HttpResponse.Code._500_InternalServerError.rawValue
         mutation.responseDetails = message
         mutation.requestReceived = processingStartedAt
         statistics.submit(mutation: mutation, onError: {

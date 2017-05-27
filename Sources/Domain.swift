@@ -3,7 +3,7 @@
 //  File:       Domain.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.7
+//  Version:    0.10.9
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.9 - HTTP code streamlining
 // 0.10.7 - Merged SwiftfireCore into Swiftfire
 // 0.10.6 - Added sessionTimeout
 //        - Added sessionLogEnable
@@ -760,7 +761,7 @@ public final class Domain: Equatable, CustomStringConvertible, VJsonConvertible 
     ///
     /// - Parameter for: The error code for which to return the custom error message.
     
-    func customErrorResponse(for code: HttpResponseCode) -> Data? {
+    func customErrorResponse(for code: HttpResponse.Code) -> Data? {
         
         do {
             let url = URL(fileURLWithPath: sfresources).appendingPathComponent(code.rawValue.replacingOccurrences(of: " ", with: "_")).appendingPathExtension("html")

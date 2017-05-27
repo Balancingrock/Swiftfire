@@ -3,7 +3,7 @@
 //  File:       Service.GetFileAtResourcePath.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.7
+//  Version:    0.10.9
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.9 - HTTP code streamlining
 // 0.10.7 - Typo in comments
 // 0.10.6 - Interface update
 //        - Renamed chain... to service...
@@ -139,7 +140,7 @@ func service_getFileAtResourcePath(_ request: HttpRequest, _ connection: Connect
         // Mutation update
         
         let mutation = Mutation.createAddClientRecord(from: connection)
-        mutation.httpResponseCode = HttpResponseCode.code500_InternalServerError.rawValue
+        mutation.httpResponseCode = HttpResponse.Code._500_InternalServerError.rawValue
         mutation.url = resourcePath
         mutation.responseDetails = message
         mutation.requestReceived = info[.responseStartedKey] as? Int64 ?? 0
@@ -151,7 +152,7 @@ func service_getFileAtResourcePath(_ request: HttpRequest, _ connection: Connect
         
         // Response
         
-        response.code = HttpResponseCode.code500_InternalServerError
+        response.code = HttpResponse.Code._500_InternalServerError
     }
     
     
@@ -227,7 +228,7 @@ func service_getFileAtResourcePath(_ request: HttpRequest, _ connection: Connect
         
     // Response
         
-    response.code = HttpResponseCode.code200_OK
+    response.code = HttpResponse.Code._200_OK
     response.contentType = mimeType(forPath: resourcePath) ?? mimeTypeDefault
     response.payload = payload
         

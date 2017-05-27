@@ -3,7 +3,7 @@
 //  File:       Service.Blacklist.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.6
+//  Version:    0.10.9
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.9 - HTTP code streamlining
 // 0.10.6 - Interface update
 //        - Renamed chain... to service...
 //        - Renamed HttpHeader to HttpRequest
@@ -151,7 +152,7 @@ func service_blacklist(_ request: HttpRequest, _ connection: Connection, _ domai
 
         Log.atNotice?.log(id: logId, source: #file.source(#function, #line), message: "Domain rejected blacklisted client \(connection.remoteAddress) with 401 reply")
         
-        response.code = HttpResponseCode.code401_Unauthorized
+        response.code = HttpResponse.Code._401_Unauthorized
         
         return .next
         
@@ -162,7 +163,7 @@ func service_blacklist(_ request: HttpRequest, _ connection: Connection, _ domai
 
         Log.atNotice?.log(id: logId, source: #file.source(#function, #line), message: "Domain rejected blacklisted client \(connection.remoteAddress) with 503 reply")
         
-        response.code = HttpResponseCode.code503_ServiceUnavailable
+        response.code = HttpResponse.Code._503_ServiceUnavailable
 
         return .next
     }

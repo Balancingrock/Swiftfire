@@ -3,7 +3,7 @@
 //  File:       Service.OnlyHttp10or11.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.6
+//  Version:    0.10.9
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.9 - HTTP code streamlining
 // 0.10.6 - Interface update
 //        - Renamed chain... to service...
 //        - Renamed HttpHeader to HttpRequest
@@ -152,7 +153,7 @@ func service_onlyHttp10or11(_ request: HttpRequest, _ connection: Connection, _ 
         // Mutation update
         
         let mutation = Mutation.createAddClientRecord(from: connection)
-        mutation.httpResponseCode = HttpResponseCode.code400_BadRequest.rawValue
+        mutation.httpResponseCode = HttpResponse.Code._400_BadRequest.rawValue
         mutation.responseDetails = message
         mutation.requestReceived = info[.responseStartedKey] as? Int64 ?? 0
         statistics.submit(mutation: mutation, onError: {
@@ -163,7 +164,7 @@ func service_onlyHttp10or11(_ request: HttpRequest, _ connection: Connection, _ 
         
         // Response
         
-        response.code = HttpResponseCode.code400_BadRequest
+        response.code = HttpResponse.Code._400_BadRequest
         return .next
     }
     
@@ -195,7 +196,7 @@ func service_onlyHttp10or11(_ request: HttpRequest, _ connection: Connection, _ 
         // Mutation update
         
         let mutation = Mutation.createAddClientRecord(from: connection)
-        mutation.httpResponseCode = HttpResponseCode.code505_HttpVersionNotSupported.rawValue
+        mutation.httpResponseCode = HttpResponse.Code._505_HttpVersionNotSupported.rawValue
         mutation.responseDetails = message
         mutation.requestReceived = info[.responseStartedKey] as? Int64 ?? 0
         statistics.submit(mutation: mutation, onError: {
@@ -206,7 +207,7 @@ func service_onlyHttp10or11(_ request: HttpRequest, _ connection: Connection, _ 
         
         // Response
         
-        response.code = HttpResponseCode.code505_HttpVersionNotSupported
+        response.code = HttpResponse.Code._505_HttpVersionNotSupported
         return .next
     }
     
