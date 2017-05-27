@@ -3,7 +3,7 @@
 //  File:       Function.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.7
+//  Version:    0.10.9
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.9 - Streamlined and folded http API into its own project
 // 0.10.7 - Added newSession to Function.Environment
 // 0.10.6 - Updated Service.Response type to HttpResponse type
 //        - Renamed InfoKey to FunctionInfoKey and moved definition to new file.
@@ -59,6 +60,7 @@ import Foundation
 import SwifterLog
 import SwifterJSON
 import SwifterSockets
+import Http
 
 
 public final class Function: CustomStringConvertible {
@@ -71,7 +73,7 @@ public final class Function: CustomStringConvertible {
         
         /// Header from the HTTP(S) request
         
-        public var request: HttpRequest
+        public var request: Request
         
         
         /// The connection. Will in fact always be an SFConnection and can be force cast (as! SFConnection).
@@ -88,7 +90,7 @@ public final class Function: CustomStringConvertible {
         
         /// The response for the HTTP(S) request (may be empty still, depends on previous services)
         
-        public var response: HttpResponse
+        public var response: Response
         
         
         /// The service chain info object.
@@ -100,7 +102,7 @@ public final class Function: CustomStringConvertible {
         ///
         /// - Note: the connection must in fact be an SFConnection.
         
-        public init(request: HttpRequest, connection: Connection, domain: Domain, response: inout HttpResponse, serviceInfo: inout Service.Info) {
+        public init(request: Request, connection: Connection, domain: Domain, response: inout Response, serviceInfo: inout Service.Info) {
             self.request = request
             self.connection = connection
             self.domain = domain

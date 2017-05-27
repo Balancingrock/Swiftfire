@@ -48,7 +48,7 @@
 //
 // History
 //
-// 0.10.9 - HTTP code streamlining
+// 0.10.9 - Streamlined and folded http API into its own project
 // 0.10.6 - Interface update
 //        - Renamed chain... to service...
 //        - Renamed HttpHeader to HttpRequest
@@ -100,7 +100,7 @@
 import Foundation
 import SwifterLog
 import SwifterSockets
-
+import Http
 
 /// Checks if the client IP address is in the domain.blacklist.
 ///
@@ -115,7 +115,7 @@ import SwifterSockets
 ///
 /// - Returns: On error .abort, on success .next.
 
-func service_blacklist(_ request: HttpRequest, _ connection: Connection, _ domain: Domain, _ info: inout Service.Info, _ response: inout HttpResponse) -> Service.Result {
+func service_blacklist(_ request: Request, _ connection: Connection, _ domain: Domain, _ info: inout Service.Info, _ response: inout Response) -> Service.Result {
     
     
     // Abort immediately if there is already a response code
@@ -152,7 +152,7 @@ func service_blacklist(_ request: HttpRequest, _ connection: Connection, _ domai
 
         Log.atNotice?.log(id: logId, source: #file.source(#function, #line), message: "Domain rejected blacklisted client \(connection.remoteAddress) with 401 reply")
         
-        response.code = HttpResponse.Code._401_Unauthorized
+        response.code = Response.Code._401_Unauthorized
         
         return .next
         
@@ -163,7 +163,7 @@ func service_blacklist(_ request: HttpRequest, _ connection: Connection, _ domai
 
         Log.atNotice?.log(id: logId, source: #file.source(#function, #line), message: "Domain rejected blacklisted client \(connection.remoteAddress) with 503 reply")
         
-        response.code = HttpResponse.Code._503_ServiceUnavailable
+        response.code = Response.Code._503_ServiceUnavailable
 
         return .next
     }

@@ -48,7 +48,7 @@
 //
 // History
 //
-// 0.10.9 - HTTP code streamlining
+// 0.10.9 - Streamlined and folded http API into its own project
 // 0.10.7 - Merged SwiftfireCore into Swiftfire
 // 0.10.6 - Added sessionTimeout
 //        - Added sessionLogEnable
@@ -87,6 +87,7 @@ import SwifterJSON
 import SwifterLog
 import SecureSockets
 import BRUtils
+import Http
 
 
 /// An extension to allow easier creation of an array of VJson objects.
@@ -193,7 +194,7 @@ public final class Domain: Equatable, CustomStringConvertible, VJsonConvertible 
                 
             // If there is one item, then there is no ':' in the string, the new value is then the address
                 
-            if strs.count == 1 { forwardHost = HttpHost(address: value, port: nil) ; return }
+            if strs.count == 1 { forwardHost = Http.Host(address: value, port: nil) ; return }
                 
             
             // The first item is the address, the second is the port.
@@ -207,7 +208,7 @@ public final class Domain: Equatable, CustomStringConvertible, VJsonConvertible 
                 let rawPort = strs[1].trimmingCharacters(in: NSCharacterSet.whitespaces)
                 let port: String? = rawPort.isEmpty ? nil : rawPort
                 
-                forwardHost = HttpHost(address: address, port: port)
+                forwardHost = Http.Host(address: address, port: port)
                 
             } else {
                 
@@ -223,7 +224,7 @@ public final class Domain: Equatable, CustomStringConvertible, VJsonConvertible 
     ///
     /// This value is set by assigning a new value to forwardUrl.
     
-    public private(set) var forwardHost: HttpHost?
+    public private(set) var forwardHost: Http.Host?
     
     
     /// Can be used to (temporary) disable a domain without destroying all associated settings, logfiles, data etc.
@@ -761,7 +762,7 @@ public final class Domain: Equatable, CustomStringConvertible, VJsonConvertible 
     ///
     /// - Parameter for: The error code for which to return the custom error message.
     
-    func customErrorResponse(for code: HttpResponse.Code) -> Data? {
+    func customErrorResponse(for code: Response.Code) -> Data? {
         
         do {
             let url = URL(fileURLWithPath: sfresources).appendingPathComponent(code.rawValue.replacingOccurrences(of: " ", with: "_")).appendingPathExtension("html")

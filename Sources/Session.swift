@@ -3,7 +3,7 @@
 //  File:       Session.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.7
+//  Version:    0.10.9
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.9 - Streamlined and folded http API into its own project
 // 0.10.7 - Fixed bug: made info public.
 //        - Added subscript access to SessionDictionary
 //        - Renamed SessionDictionary to SessionInfo
@@ -68,7 +69,7 @@
 import Foundation
 import SwifterJSON
 import SwifterLog
-
+import Http
 
 /// A record with debugging info. Specifically this record allows the developper to associate connections with sessions such that debugging information in the log (which also contains the connection id) can be associated with a session.
 
@@ -170,10 +171,10 @@ public class Session: CustomStringConvertible {
     
     // A cookie that will represent this session in the outgoing http response.
     
-    public var cookie: HttpCookie {
+    public var cookie: Cookie {
         return Session.queue.sync {
-            let sessionTimeout = HttpCookie.Timeout.maxAge(self.timeout)
-            return HttpCookie(name: Session.cookieId, value: id.uuidString, timeout: sessionTimeout, path: "/", domain: nil, secure: nil, httpOnly: true)
+            let sessionTimeout = Cookie.Timeout.maxAge(self.timeout)
+            return Cookie(name: Session.cookieId, value: id.uuidString, timeout: sessionTimeout, path: "/", domain: nil, secure: nil, httpOnly: true)
         }
     }
     

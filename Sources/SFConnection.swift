@@ -3,7 +3,7 @@
 //  File:       SFConnection.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.7
+//  Version:    0.10.9
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.9 - Streamlined and folded http API into its own project
 // 0.10.7 - Bugfix: moved inactivity detection to front of receiver
 // 0.10.6 - Renamed HttpHeader to HttpRequest
 //        - Type of objectId changed from Int16 to Int
@@ -78,7 +79,7 @@
 import Foundation
 import SwifterSockets
 import SwifterLog
-
+import Http
 
 /// Holds all data that is associated with an HTTP Connection.
 
@@ -175,7 +176,7 @@ final class SFConnection: SwifterSockets.Connection {
     
     /// The received HTTP request
     
-    var httpRequest: HttpRequest?
+    var httpRequest: Request?
     
 
     /// The data received from a client.
@@ -276,7 +277,7 @@ final class SFConnection: SwifterSockets.Connection {
                 
                 // See if the header is complete
                 
-                if let request = HttpRequest(data: messageBuffer) {
+                if let request = Request(data: messageBuffer) {
                     
                     
                     // Store the header for future reference

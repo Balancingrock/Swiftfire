@@ -48,7 +48,7 @@
 //
 // History
 //
-// 0.10.9 - HTTP code streamlining
+// 0.10.9 - Streamlined and folded http API into its own project
 // 0.10.7 - Typo in comments
 //        - Skips if the resource path keys are already present in info.
 // 0.10.6 - Interface update
@@ -114,6 +114,7 @@
 import Foundation
 import SwifterLog
 import SwifterSockets
+import Http
 
 
 /// Takes the URL from the request header and transforms it into a path that points at an existing resource
@@ -129,7 +130,7 @@ import SwifterSockets
 ///
 /// - Returns: On error .abort, on success .next.
 
-func service_getResourcePathFromUrl(_ request: HttpRequest, _ connection: Connection, _ domain: Domain, _ info: inout Service.Info, _ response: inout HttpResponse) -> Service.Result {
+func service_getResourcePathFromUrl(_ request: Request, _ connection: Connection, _ domain: Domain, _ info: inout Service.Info, _ response: inout Response) -> Service.Result {
     
     
     func handle400_BadRequestError(message: String) {
@@ -154,7 +155,7 @@ func service_getResourcePathFromUrl(_ request: HttpRequest, _ connection: Connec
         // Mutation update
         
         let mutation = Mutation.createAddClientRecord(from: connection)
-        mutation.httpResponseCode = HttpResponse.Code._400_BadRequest.rawValue
+        mutation.httpResponseCode = Response.Code._400_BadRequest.rawValue
         mutation.responseDetails = message
         mutation.requestReceived = info[.responseStartedKey] as? Int64 ?? 0
         statistics.submit(mutation: mutation, onError: {
@@ -165,7 +166,7 @@ func service_getResourcePathFromUrl(_ request: HttpRequest, _ connection: Connec
         
         // Response
         
-        response.code = HttpResponse.Code._400_BadRequest
+        response.code = Response.Code._400_BadRequest
     }
     
     
@@ -190,7 +191,7 @@ func service_getResourcePathFromUrl(_ request: HttpRequest, _ connection: Connec
         // Mutation update
         
         let mutation = Mutation.createAddClientRecord(from: connection)
-        mutation.httpResponseCode = HttpResponse.Code._404_NotFound.rawValue
+        mutation.httpResponseCode = Response.Code._404_NotFound.rawValue
         mutation.responseDetails = "Resource for url '\(path)' not found"
         mutation.requestReceived = info[.responseStartedKey] as? Int64 ?? 0
         statistics.submit(mutation: mutation, onError: {
@@ -201,7 +202,7 @@ func service_getResourcePathFromUrl(_ request: HttpRequest, _ connection: Connec
         
         // Response
         
-        response.code = HttpResponse.Code._404_NotFound
+        response.code = Response.Code._404_NotFound
     }
 
     
@@ -221,7 +222,7 @@ func service_getResourcePathFromUrl(_ request: HttpRequest, _ connection: Connec
         // Mutation update
         
         let mutation = Mutation.createAddClientRecord(from: connection)
-        mutation.httpResponseCode = HttpResponse.Code._403_Forbidden.rawValue
+        mutation.httpResponseCode = Response.Code._403_Forbidden.rawValue
         mutation.responseDetails = "Access for url '\(path)' not allowed"
         mutation.requestReceived = info[.responseStartedKey] as? Int64 ?? 0
         statistics.submit(mutation: mutation, onError: {
@@ -232,7 +233,7 @@ func service_getResourcePathFromUrl(_ request: HttpRequest, _ connection: Connec
         
         // Response
         
-        response.code = HttpResponse.Code._403_Forbidden
+        response.code = Response.Code._403_Forbidden
     }
 
     

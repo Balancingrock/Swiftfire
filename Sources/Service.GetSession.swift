@@ -48,7 +48,7 @@
 //
 // History
 //
-// 0.10.9 - HTTP code streamlining
+// 0.10.9 - Streamlined and folded http API into its own project
 // 0.10.6 - Initial release
 //
 // =====================================================================================================================
@@ -83,6 +83,7 @@
 import Foundation
 import SwifterLog
 import SwifterSockets
+import Http
 
 
 /// Ensures that a session exists if the sessionTimeout for the given domain is > 0.
@@ -98,14 +99,14 @@ import SwifterSockets
 ///
 /// - Returns: On error .abort, on success .next.
 
-func service_getSession(_ request: HttpRequest, _ connection: Connection, _ domain: Domain, _ info: inout Service.Info, _ response: inout HttpResponse) -> Service.Result {
+func service_getSession(_ request: Request, _ connection: Connection, _ domain: Domain, _ info: inout Service.Info, _ response: inout Response) -> Service.Result {
 
     
     // The connection is a SFConnection
     
     guard let connection = connection as? SFConnection else {
         Log.atCritical?.log(id: -1, source: #file.source(#function, #line), message: "Failed to cast Connection as SFConnection")
-        response.code = HttpResponse.Code._500_InternalServerError
+        response.code = Response.Code._500_InternalServerError
         return .abort
     }
 

@@ -3,7 +3,7 @@
 //  File:       Service.DecodePostFormUrlEncoded.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.7
+//  Version:    0.10.9
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.9 - Streamlined and folded http API into its own project
 // 0.10.7 - Initial release
 //
 // =====================================================================================================================
@@ -82,6 +83,7 @@
 import Foundation
 import SwifterLog
 import SwifterSockets
+import Http
 
 
 typealias PostInfo = Dictionary<String, String>
@@ -100,7 +102,7 @@ typealias PostInfo = Dictionary<String, String>
 ///
 /// - Returns: On error .abort, on success .next.
 
-func service_decodePostFormUrlEncoded(_ request: HttpRequest, _ connection: Connection, _ domain: Domain, _ info: inout Service.Info, _ response: inout HttpResponse) -> Service.Result {
+func service_decodePostFormUrlEncoded(_ request: Request, _ connection: Connection, _ domain: Domain, _ info: inout Service.Info, _ response: inout Response) -> Service.Result {
     
     
     // Abort immediately if there is already a response code

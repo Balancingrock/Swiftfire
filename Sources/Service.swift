@@ -3,7 +3,7 @@
 //  File:       Service.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.7
+//  Version:    0.10.9
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.9 - Streamlined and folded http API into its own project
 // 0.10.7 - Merged SwiftfireCore into Swiftfire
 // 0.10.6 - Changed Response type to HttpResponse type.
 //        - Renamed ChainInfo to Info, split off definition of keys to separate file
@@ -62,6 +63,7 @@
 import Foundation
 import SwifterSockets
 import SwifterLog
+import Http
 
 
 /// Services are processes that generate an output and/or side effects from the given input. A domain can have multiple services but they all run sequentially. Each of the services also receives the output of the services that went before it.
@@ -116,7 +118,7 @@ public final class Service: CustomStringConvertible {
     ///
     /// - Returns: 'true' to continue the service chain, 'false' to abort it. Note: this is designed to abort a service chain in case of errors, but it may be usefull in other situations as well. However normally the service chain is expected to continue from start to finish such that every service gets a chance to perform its intended function. Returning 'false' for non-error cases places conditions on the sequence of services which necessitates proper end user instructions.
 
-    public typealias Signature = (_ request: HttpRequest, _ connection: Connection, _ domain: Domain, _ info: inout Service.Info, _ response: inout HttpResponse) -> Service.Result
+    public typealias Signature = (_ request: Request, _ connection: Connection, _ domain: Domain, _ info: inout Service.Info, _ response: inout Response) -> Service.Result
 
 
     /// The combo of name and service

@@ -48,7 +48,7 @@
 //
 // History
 //
-// 0.10.9 - HTTP code streamlining
+// 0.10.9 - Streamlined and folded http API into its own project
 // 0.10.6 - Updated parameters to services & transmission of response
 //        - Renamed chain... to service...
 //        - Added freeing of session.
@@ -85,6 +85,7 @@ import Foundation
 import SwifterJSON
 import SwifterLog
 import SwifterSockets
+import Http
 
 
 extension SFConnection {
@@ -107,7 +108,7 @@ extension SFConnection {
         
         // Reply to client
         
-        let response = HttpResponse()
+        let response = Response()
         response.code = ._400_BadRequest
         response.version = .http1_1
         response.createErrorPayload(message: "<p>\(message)</p>")
@@ -121,7 +122,7 @@ extension SFConnection {
         // Statistics update
         
         let mutation = Mutation.createAddClientRecord(from: self)
-        mutation.httpResponseCode = HttpResponse.Code._400_BadRequest.rawValue
+        mutation.httpResponseCode = Response.Code._400_BadRequest.rawValue
         mutation.responseDetails = message
         mutation.requestReceived = processingStartedAt
         statistics.submit(mutation: mutation, onError: {
@@ -149,7 +150,7 @@ extension SFConnection {
         
         // Reply to client
         
-        let response = HttpResponse()
+        let response = Response()
         response.code = ._500_InternalServerError
         response.version = .http1_1
         response.createErrorPayload(message: "<p>\(message)</p>")
@@ -164,7 +165,7 @@ extension SFConnection {
         // Statistics update
         
         let mutation = Mutation.createAddClientRecord(from: self)
-        mutation.httpResponseCode = HttpResponse.Code._500_InternalServerError.rawValue
+        mutation.httpResponseCode = Response.Code._500_InternalServerError.rawValue
         mutation.responseDetails = message
         mutation.requestReceived = processingStartedAt
         statistics.submit(mutation: mutation, onError: {
@@ -178,7 +179,7 @@ extension SFConnection {
     /// Examines the http message header for a servicable request and creates the corresponding response.
     /// Implementation justification:
     
-    func worker(_ request: HttpRequest) {
+    func worker(_ request: Request) {
         
         
         // To determine how long it takes to create a response message
@@ -199,7 +200,7 @@ extension SFConnection {
         // =============================================================================================================
 
         var domain: Domain!
-        var host: HttpHost
+        var host: Http.Host
         
         
         // Find the host. For HTTP 1.1 this must be provided in the request, for HTTP 1.0 it should be defined in the parameter 'http1_0DomainName'
@@ -213,14 +214,14 @@ extension SFConnection {
             
             // No host found, and this is a HTTP1.0 request, then use the predefined http1_0DomainName as the 'host'.
             
-            if httpVersion == HttpVersion.http1_0 {
+            if httpVersion == Version.http1_0 {
                 
                 
                 // Find the domain, if none is found, then http 1.0 is not supported
                 
                 if domains.domain(forName: parameters.http1_0DomainName.value) != nil {
                     
-                    host = HttpHost(address: parameters.http1_0DomainName.value, port: nil)
+                    host = Host(address: parameters.http1_0DomainName.value, port: nil)
                     
                 } else {
                 
@@ -342,7 +343,7 @@ extension SFConnection {
 
         Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: "Starting domain services")
 
-        var response = HttpResponse()
+        var response = Response()
         response.version = httpVersion
         response.contentType = mimeTypeDefault
         

@@ -48,7 +48,7 @@
 //
 // History
 //
-// 0.10.9 - HTTP code streamlining
+// 0.10.9 - Streamlined and folded http API into its own project
 // 0.10.7 - Typo in comments
 // 0.10.6 - Interface update
 //        - Renamed chain... to service...
@@ -105,6 +105,7 @@
 import Foundation
 import SwifterLog
 import SwifterSockets
+import Http
 
 
 /// Retrieve the file content from the resource path and put it in the response payload.
@@ -120,7 +121,7 @@ import SwifterSockets
 ///
 /// - Returns: On error .abort, on success .next.
 
-func service_getFileAtResourcePath(_ request: HttpRequest, _ connection: Connection, _ domain: Domain, _ info: inout Service.Info, _ response: inout HttpResponse) -> Service.Result {
+func service_getFileAtResourcePath(_ request: Request, _ connection: Connection, _ domain: Domain, _ info: inout Service.Info, _ response: inout Response) -> Service.Result {
     
     
 
@@ -140,7 +141,7 @@ func service_getFileAtResourcePath(_ request: HttpRequest, _ connection: Connect
         // Mutation update
         
         let mutation = Mutation.createAddClientRecord(from: connection)
-        mutation.httpResponseCode = HttpResponse.Code._500_InternalServerError.rawValue
+        mutation.httpResponseCode = Response.Code._500_InternalServerError.rawValue
         mutation.url = resourcePath
         mutation.responseDetails = message
         mutation.requestReceived = info[.responseStartedKey] as? Int64 ?? 0
@@ -152,7 +153,7 @@ func service_getFileAtResourcePath(_ request: HttpRequest, _ connection: Connect
         
         // Response
         
-        response.code = HttpResponse.Code._500_InternalServerError
+        response.code = Response.Code._500_InternalServerError
     }
     
     
@@ -228,7 +229,7 @@ func service_getFileAtResourcePath(_ request: HttpRequest, _ connection: Connect
         
     // Response
         
-    response.code = HttpResponse.Code._200_OK
+    response.code = Response.Code._200_OK
     response.contentType = mimeType(forPath: resourcePath) ?? mimeTypeDefault
     response.payload = payload
         

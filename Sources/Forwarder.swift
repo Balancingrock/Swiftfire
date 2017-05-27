@@ -48,7 +48,7 @@
 //
 // History
 //
-// 0.10.9 - HTTP code streamlining
+// 0.10.9 - Streamlined and folded http API into its own project
 // 0.10.7 - Changed receiverData to processReceivedData
 // 0.10.6 - Update of receiverLoop
 // 0.9.18 - Header update
@@ -60,7 +60,7 @@
 import Foundation
 import SwifterSockets
 import SwifterLog
-
+import Http
 
 /// Creates a new forwarding connection.
 
@@ -89,9 +89,9 @@ class Forwarder: SwifterSockets.Connection {
     }
     
     override func receiverLoop() -> Bool {
-        let reply = HttpResponse()
-        reply.code = HttpResponse.Code._408_RequestTimeout
-        reply.version = HttpVersion.http1_1
+        let reply = Response()
+        reply.code = Response.Code._408_RequestTimeout
+        reply.version = Version.http1_1
         reply.createErrorPayload(message: "Forwarding target timed out.")
         if let data = reply.data {
             _ = client?.transfer(data, callback: nil)

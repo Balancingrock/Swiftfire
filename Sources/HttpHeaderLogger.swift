@@ -3,7 +3,7 @@
 //  File:       HttpHeaderLogger.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.6
+//  Version:    0.10.9
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.9 - Streamlined and folded http API into its own project
 // 0.10.6 - Renamed HttpHeader to HttpRequest
 // 0.10.0 - Renamed HttpConnection to SFConnection
 // 0.9.18 - Header update
@@ -63,7 +64,7 @@
 // =====================================================================================================================
 
 import Foundation
-
+import Http
 
 /// A class to create a log file containing HTTP request headers.
 
@@ -85,7 +86,7 @@ final class HttpHeaderLogger: Logfile {
     ///   - connection: The connection through which the client is connected.
     ///   - request: The request to be added.
     
-    func record(connection: SFConnection, request: HttpRequest) {
+    func record(connection: SFConnection, request: Request) {
   
         
         // Create the message

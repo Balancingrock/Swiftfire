@@ -49,7 +49,7 @@
 // History
 //
 // 0.10.9 - Added server and domain blacklist management
-//        - HTTP code streamlining
+//        - Streamlined and folded http API into its own project
 // 0.10.8 - Silenced warning during compilation
 // 0.10.7 - Initial release
 //
@@ -87,6 +87,7 @@
 import Foundation
 import SwifterLog
 import SwifterSockets
+import Http
 
 
 private var dateFormatter: DateFormatter = {
@@ -121,7 +122,7 @@ private let SERVER_ADMIN_LOGIN_PWD  = "ServerAdminLoginPwd"
 ///
 /// - Returns: On error .abort, on success .next.
 
-func service_serverAdmin(_ request: HttpRequest, _ connection: Connection, _ domain: Domain, _ info: inout Service.Info, _ response: inout HttpResponse) -> Service.Result {
+func service_serverAdmin(_ request: Request, _ connection: Connection, _ domain: Domain, _ info: inout Service.Info, _ response: inout Response) -> Service.Result {
     
     
     
@@ -152,8 +153,8 @@ func service_serverAdmin(_ request: HttpRequest, _ connection: Connection, _ dom
             +    "</body>"
             + "</html>"
         
-        response.code = HttpResponse.Code._200_OK
-        response.version = HttpVersion.http1_1
+        response.code = Response.Code._200_OK
+        response.version = Version.http1_1
         response.contentType = mimeTypeHtml
         response.payload = html.data(using: String.Encoding.utf8)
     }
@@ -177,14 +178,14 @@ func service_serverAdmin(_ request: HttpRequest, _ connection: Connection, _ dom
                 
                 Log.atError?.log(id: (connection as? SFConnection)!.logId, source: #file.source(#function, #line), message: message)
                 
-                response.code = HttpResponse.Code._500_InternalServerError
+                response.code = Response.Code._500_InternalServerError
                 
             case .success(let doc):
                 
                 var environment = Function.Environment(request: request, connection: connection, domain: domain, response: &response, serviceInfo: &info)
                 
                 response.payload = doc.getContent(with: &environment)
-                response.code = HttpResponse.Code._200_OK
+                response.code = Response.Code._200_OK
                 response.contentType = mimeTypeHtml
             }
 
@@ -214,8 +215,8 @@ func service_serverAdmin(_ request: HttpRequest, _ connection: Connection, _ dom
                 + "</html>"
         }
         
-        response.code = HttpResponse.Code._200_OK
-        response.version = HttpVersion.http1_1
+        response.code = Response.Code._200_OK
+        response.version = Version.http1_1
         response.contentType = mimeTypeHtml
         response.payload = html!.data(using: String.Encoding.utf8)
     }
@@ -254,8 +255,8 @@ func service_serverAdmin(_ request: HttpRequest, _ connection: Connection, _ dom
             +    "</body>"
             + "</html>"
         
-        response.code = HttpResponse.Code._200_OK
-        response.version = HttpVersion.http1_1
+        response.code = Response.Code._200_OK
+        response.version = Version.http1_1
         response.contentType = mimeTypeHtml
         response.payload = html.data(using: String.Encoding.utf8)
     }
@@ -269,7 +270,7 @@ func service_serverAdmin(_ request: HttpRequest, _ connection: Connection, _ dom
     
     guard let connection = connection as? SFConnection else {
         Log.atCritical?.log(id: -1, source: #file.source(#function, #line), message: "Failed to cast Connection as SFConnection")
-        response.code = HttpResponse.Code._500_InternalServerError
+        response.code = Response.Code._500_InternalServerError
         return .abort
     }
     
@@ -278,7 +279,7 @@ func service_serverAdmin(_ request: HttpRequest, _ connection: Connection, _ dom
     
     guard domain === serverAdminDomain else {
         Log.atError?.log(id: connection.logId, source: #file.source(#function, #line), message: "Domain should be serverAdminDomain")
-        response.code = HttpResponse.Code._500_InternalServerError
+        response.code = Response.Code._500_InternalServerError
         return .abort
     }
     
@@ -287,7 +288,7 @@ func service_serverAdmin(_ request: HttpRequest, _ connection: Connection, _ dom
     
     guard let urlstr = request.url else {
         Log.atError?.log(id: connection.logId, source: #file.source(#function, #line), message: "No request URL found")
-        response.code = HttpResponse.Code._400_BadRequest
+        response.code = Response.Code._400_BadRequest
         return .abort
     }
     
@@ -321,7 +322,7 @@ func service_serverAdmin(_ request: HttpRequest, _ connection: Connection, _ dom
     guard let session = info[.sessionKey] as? Session else {
         Log.atCritical?.log(id: connection.logId, source: #file.source(#function, #line), message: "No session found, this service should come AFTER the 'getSession' service.")
         domain.telemetry.nof500.increment()
-        response.code = HttpResponse.Code._500_InternalServerError
+        response.code = Response.Code._500_InternalServerError
         return .abort
     }
     
@@ -400,7 +401,7 @@ func service_serverAdmin(_ request: HttpRequest, _ connection: Connection, _ dom
                     
                     Log.atCritical?.log(id: connection.logId, source: #file.source(#function, #line), message: "Failed to create admin account for: \(name)")
                     
-                    response.code = HttpResponse.Code._500_InternalServerError
+                    response.code = Response.Code._500_InternalServerError
                     
                     return .abort
                 }
@@ -636,7 +637,7 @@ func service_serverAdmin(_ request: HttpRequest, _ connection: Connection, _ dom
                 
                 if adminSiteRootIsValid(connection.filemanager) {
                 
-                    response.code = HttpResponse.Code._404_NotFound
+                    response.code = Response.Code._404_NotFound
                     
                 } else {
                 
@@ -658,7 +659,7 @@ func service_serverAdmin(_ request: HttpRequest, _ connection: Connection, _ dom
                 
                 if adminSiteRootIsValid(connection.filemanager) {
 
-                    response.code = HttpResponse.Code._403_Forbidden
+                    response.code = Response.Code._403_Forbidden
                     
                 } else {
                     
@@ -677,7 +678,7 @@ func service_serverAdmin(_ request: HttpRequest, _ connection: Connection, _ dom
         
         if adminSiteRootIsValid(connection.filemanager) {
 
-            response.code = HttpResponse.Code._404_NotFound
+            response.code = Response.Code._404_NotFound
             
         } else {
             
@@ -705,7 +706,7 @@ func service_serverAdmin(_ request: HttpRequest, _ connection: Connection, _ dom
             
             Log.atError?.log(id: connection.logId, source: #file.source(#function, #line), message: message)
 
-            response.code = HttpResponse.Code._500_InternalServerError
+            response.code = Response.Code._500_InternalServerError
             
             return .next
             
@@ -715,7 +716,7 @@ func service_serverAdmin(_ request: HttpRequest, _ connection: Connection, _ dom
             var environment = Function.Environment(request: request, connection: connection, domain: domain, response: &response, serviceInfo: &info)
             
             response.payload = doc.getContent(with: &environment)
-            response.code = HttpResponse.Code._200_OK
+            response.code = Response.Code._200_OK
             response.contentType = mimeType(forPath: absPath) ?? mimeTypeHtml
         }
         
@@ -726,13 +727,13 @@ func service_serverAdmin(_ request: HttpRequest, _ connection: Connection, _ dom
             
             Log.atError?.log(id: connection.logId, source: #file.source(#function, #line), message: "Reading contents of file failed (but file is reported readable), resource: \(absPath)")
 
-            response.code = HttpResponse.Code._500_InternalServerError
+            response.code = Response.Code._500_InternalServerError
 
             return .next
         }
         
         response.payload = data
-        response.code = HttpResponse.Code._200_OK
+        response.code = Response.Code._200_OK
         response.contentType = mimeType(forPath: absPath) ?? mimeTypeDefault
     }
     
@@ -749,7 +750,7 @@ func service_serverAdmin(_ request: HttpRequest, _ connection: Connection, _ dom
     
     // Response
     
-    response.code = HttpResponse.Code._200_OK
+    response.code = Response.Code._200_OK
     response.contentType = mimeType(forPath: absPath) ?? mimeTypeDefault
     
     return .next
@@ -788,7 +789,7 @@ fileprivate enum CommandExecutionResult {
     case nop
 }
 
-fileprivate func executeSfCommand(_ pathComponents: Array<String>, _ postInfo: inout PostInfo?, _ session: Session, _ info: inout Service.Info, _ response: inout HttpResponse) -> CommandExecutionResult {
+fileprivate func executeSfCommand(_ pathComponents: Array<String>, _ postInfo: inout PostInfo?, _ session: Session, _ info: inout Service.Info, _ response: inout Response) -> CommandExecutionResult {
     
     Log.atDebug?.log(id: -1, source: #file.source(#function, #line))
 

@@ -48,7 +48,7 @@
 //
 // History
 //
-// 0.10.9 - HTTP code streamlining
+// 0.10.9 - Streamlined and folded http API into its own project
 // 0.10.6 - Interface update
 //        - Renamed chain... to service...
 //        - Renamed HttpHeader to HttpRequest
@@ -102,6 +102,7 @@
 import Foundation
 import SwifterLog
 import SwifterSockets
+import Http
 
 
 /// Generate an error code if the request is not GET or POST operation.
@@ -117,7 +118,7 @@ import SwifterSockets
 ///
 /// - Returns: On error .abort, on success .next.
 
-func service_onlyGetOrPost(_ request: HttpRequest, _ connection: Connection, _ domain: Domain, _ info: inout Service.Info, _ response: inout HttpResponse) -> Service.Result {
+func service_onlyGetOrPost(_ request: Request, _ connection: Connection, _ domain: Domain, _ info: inout Service.Info, _ response: inout Response) -> Service.Result {
     
     
     // Abort immediately if there is already a response code
@@ -152,7 +153,7 @@ func service_onlyGetOrPost(_ request: HttpRequest, _ connection: Connection, _ d
         // Mutation update
         
         let mutation = Mutation.createAddClientRecord(from: connection)
-        mutation.httpResponseCode = HttpResponse.Code._400_BadRequest.rawValue
+        mutation.httpResponseCode = Response.Code._400_BadRequest.rawValue
         mutation.responseDetails = message
         mutation.requestReceived = info[.responseStartedKey] as? Int64 ?? 0
         statistics.submit(mutation: mutation, onError: {
@@ -163,7 +164,7 @@ func service_onlyGetOrPost(_ request: HttpRequest, _ connection: Connection, _ d
         
         // Response
         
-        response.code = HttpResponse.Code._400_BadRequest
+        response.code = Response.Code._400_BadRequest
         return .next
     }
 
@@ -195,7 +196,7 @@ func service_onlyGetOrPost(_ request: HttpRequest, _ connection: Connection, _ d
         // Mutation update
         
         let mutation = Mutation.createAddClientRecord(from: connection)
-        mutation.httpResponseCode = HttpResponse.Code._501_NotImplemented.rawValue
+        mutation.httpResponseCode = Response.Code._501_NotImplemented.rawValue
         mutation.responseDetails = message
         mutation.requestReceived = info[.responseStartedKey] as? Int64 ?? 0
         statistics.submit(mutation: mutation, onError: {
@@ -206,7 +207,7 @@ func service_onlyGetOrPost(_ request: HttpRequest, _ connection: Connection, _ d
         
         // Response
         
-        response.code = HttpResponse.Code._501_NotImplemented
+        response.code = Response.Code._501_NotImplemented
         return .next
     }
 
