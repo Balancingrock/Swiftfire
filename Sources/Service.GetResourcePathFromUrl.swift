@@ -261,7 +261,7 @@ func service_getResourcePathFromUrl(_ request: Request, _ connection: Connection
         
         // The second part contains the name/value pairs
         
-        var getDict: Dictionary<String, String> = [:]
+        let getDict = ReferencedDictionary()
         
         var nameValuePairs = parts[1].components(separatedBy: "&")
         

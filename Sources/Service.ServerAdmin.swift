@@ -834,7 +834,11 @@ fileprivate func executeSetRoot(_ postInfo: PostInfo?) {
 }
 
 fileprivate func executeSetParameter(_ postInfo: PostInfo?) {
-    OUTER: for (key, value) in postInfo ?? [:] {
+    guard let postInfo = postInfo else {
+        Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Missing postInfo")
+        return
+    }
+    OUTER: for (key, value) in postInfo {
         for p in parameters.all {
             if p.name == key {
                 _ = p.setValue(value)

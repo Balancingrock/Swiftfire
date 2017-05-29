@@ -49,6 +49,7 @@
 // History
 //
 // 0.10.9 - Streamlined and folded http API into its own project
+//          Changed PostInfo into a ReferencedDictionary
 // 0.10.7 - Initial release
 //
 // =====================================================================================================================
@@ -86,8 +87,10 @@ import SwifterSockets
 import Http
 
 
-typealias PostInfo = Dictionary<String, String>
+/// The container for the post info.
 
+typealias PostInfo = ReferencedDictionary
+    
 
 /// Takes the data (utf-8 ncoded) from the request body and transforms it into a series of name/value pairs.
 ///
@@ -136,7 +139,7 @@ func service_decodePostFormUrlEncoded(_ request: Request, _ connection: Connecti
 
     // Split into multiple name/value pairs
     
-    var postInfo: PostInfo = [:]
+    let postInfo: PostInfo = PostInfo()
     
     var nameValuePairs = str.components(separatedBy: "&")
     
