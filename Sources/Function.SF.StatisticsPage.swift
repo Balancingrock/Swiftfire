@@ -140,6 +140,30 @@ func function_sf_statisticsPage(_ args: Function.Arguments, _ info: inout Functi
         }
     }
     
+    struct urlCheckboxForm: CustomStringConvertible {
+        var value: Bool
+        var path: String
+        var description: String {
+            return "<form method=\"post\" action=\"/serveradmin/sfcommand/UpdateDoNotTraceUrl\">\(path)<div><input type=\"checkbox\" name=\"checkbox\"\(value ? " checked" : "")> \(Button("Update"))</div></form>"
+        }
+        init(_ value: Bool, path: String) {
+            self.value = value
+            self.path = path
+        }
+    }
+    
+    struct clientCheckboxForm: CustomStringConvertible {
+        var value: Bool
+        var client: String
+        var description: String {
+            return "<form method=\"post\" action=\"/serveradmin/sfcommand/UpdateDoNotTraceClient\">\(Hidden("Client", client))<div><input type=\"checkbox\" name=\"checkbox\"\(value ? " checked" : "")> \(Button("Update"))</div></form>"
+        }
+        init(_ value: Bool, client: String) {
+            self.value = value
+            self.client = client
+        }
+    }
+
     
     // Check access rights
     
@@ -219,7 +243,7 @@ func function_sf_statisticsPage(_ args: Function.Arguments, _ info: inout Functi
                     backButtonCode = DomainForm("Back", content: "").description
                 }
                 
-                result += "<table class=\"statistics-domains-table\"><thead><tr><th colspan=\"3\"><div>URL: \(part!.fullUrl)\(backButtonCode)</div></th></tr><tr><th>Accesses</th><th>URL Part</th><th>Do Not Trace</th></tr></thead><tbody>"
+                result += "<table class=\"statistics-domains-table\"><thead><tr><th colspan=\"3\"><div>Dir: \(part!.fullUrl)\(backButtonCode)</div></th></tr><tr><th>Accesses</th><th>File / Dir</th><th>Do Not Trace</th></tr></thead><tbody>"
                 
                 
                 // Ad the rows
@@ -259,7 +283,7 @@ func function_sf_statisticsPage(_ args: Function.Arguments, _ info: inout Functi
                     if isDir.boolValue { details += DomainForm("Detail", content: pathCode).description }
                     
                     
-                    result += "<tr><td>\(row.foreverCount)</td><td><div>\(row.pathPart)\(details)</div></td><td>\(row.doNotTrace ? "true" : "false")</td></tr>"
+                    result += "<tr><td>\(row.foreverCount)</td><td><div>\(row.pathPart)\(details)</div></td><td>\(urlCheckboxForm(row.doNotTrace, path: pathCode))</tr>"
                 }
                 
                 
@@ -276,14 +300,14 @@ func function_sf_statisticsPage(_ args: Function.Arguments, _ info: inout Functi
             
             // Add the table header
             
-            result += "<table class=\"statistics-domains-table\"><thead><tr><th>Accesses</th><th>URL Part</th><th>Do Not Trace</th></tr></thead><tbody>"
+            result += "<table class=\"statistics-domains-table\"><thead><tr><th>Accesses</th><th>File / Dir</th><th>Do Not Trace</th></tr></thead><tbody>"
             
             
             // Ad the rows
             
             for row in statistics.domains.domains {
                 
-                result += "<tr><td>\(row.foreverCount)</td><td><div>\(row.pathPart)\(DomainForm("Detail", content: Hidden("Domain", row.pathPart).description))</div></td><td>\(row.doNotTrace ? "true" : "false")</td></tr>"
+                result += "<tr><td>\(row.foreverCount)</td><td><div>\(row.pathPart)\(DomainForm("Detail", content: Hidden("Domain", row.pathPart).description))</div></td><td>\(urlCheckboxForm(row.doNotTrace, path: Hidden("Domain", row.pathPart).description))</td></tr>"
             }
             
             
@@ -310,7 +334,7 @@ func function_sf_statisticsPage(_ args: Function.Arguments, _ info: inout Functi
         
         for row in statistics.clients.clients {
             
-            result += "<tr><td>\(row.address)</td><td>\(row.records.count)</td><td>\(row.doNotTrace ? "true" : "false")</td></tr>"
+            result += "<tr><td>\(row.address)</td><td>\(row.records.count)</td><td><div>\(clientCheckboxForm(row.doNotTrace, client: row.address))</div></td></tr>"
         }
         
         

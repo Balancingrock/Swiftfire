@@ -50,6 +50,7 @@
 //
 // 0.10.9 - Added server and domain blacklist management
 //        - Streamlined and folded http API into its own project
+//        - Added statistics
 // 0.10.8 - Silenced warning during compilation
 // 0.10.7 - Initial release
 //
@@ -814,6 +815,9 @@ fileprivate func executeSfCommand(_ pathComponents: Array<String>, _ postInfo: i
     case "UpdateDomainBlacklist": executeUpdateDomainBlacklist(&postInfo); return .newPath("/pages/domain-management.sf.html")
     case "AddToDomainBlacklist": executeAddToDomainBlacklist(&postInfo); return .newPath("/pages/domain-management.sf.html")
     case "RemoveFromDomainBlacklist": executeRemoveFromDomainBlacklist(&postInfo); return .newPath("/pages/domain-management.sf.html")
+    case "UpdateDoNotTraceUrl": executeUpdateDoNotTraceUrl(&postInfo); return .newPath("/pages/statistics.sf.html")
+    case "UpdateDoNotTraceClient": executeUpdateDoNotTraceClient(&postInfo); return .newPath("/pages/statistics.sf.html")
+        
     default:
         Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Unknown sfcommand: \(commandName)")
         return .nop
@@ -949,6 +953,52 @@ fileprivate func executeRemoveFromDomainBlacklist(_ postInfo: inout PostInfo?) {
     }
     guard let (address, _) = postInfo?.popFirst() else { return }
     domain.blacklist.remove(ipAddress: address)
+}
+
+/// Do not trace properties
+
+fileprivate func executeUpdateDoNotTraceUrl(_ postInfo: inout PostInfo?) {
+    
+    // Ensure that there is a domain path part
+    guard let name = postInfo?["Domain"],
+        let domain = statistics.domains.getDomain(for: name) else {
+            Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Missing domain name or name unknown '\(postInfo?.description ?? "No postInfo")'")
+            return
+    }
+    
+    // 'walk' to the path part that needs updating
+    var part = domain
+    while let nextPart = postInfo?[part.pathPart] {
+        if let aPart = part.getPathPart(for: nextPart) {
+            part = aPart
+        } else {
+            Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Unknown pathpart \(nextPart) in postInfo '\(postInfo?.description ?? "No postInfo")'")
+            return
+        }
+    }
+    
+    // Update the path part
+    part.doNotTrace = (postInfo?["checkbox"] != nil)
+    
+    // Remove the last key/value pair to prevent gui glitches
+    var keyOfPart: String?
+    postInfo?.forEach({ (key: String, value: String) in
+        if value == part.pathPart {
+            keyOfPart = key
+        }
+    })
+    if let key = keyOfPart {
+        _ = postInfo?.removeValue(forKey: key)
+    }
+}
+
+fileprivate func executeUpdateDoNotTraceClient(_ postInfo: inout PostInfo?) {
+    guard let address = postInfo?["Client"],
+        let client = statistics.clients.getClient(for: address) else {
+        Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Missing client address or address unknown '\(postInfo?.description ?? "No postInfo")'")
+        return
+    }
+    client.doNotTrace = (postInfo?["checkbox"] != nil)
 }
 
 
