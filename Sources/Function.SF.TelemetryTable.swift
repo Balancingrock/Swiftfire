@@ -94,6 +94,7 @@
 // =====================================================================================================================
 
 import Foundation
+import Html
 
 
 // Returns a table with all telemetry values.
@@ -120,17 +121,16 @@ func function_sf_telemetryTable(_ args: Function.Arguments, _ info: inout Functi
     
     // Create the table
     
-    var table: String = "<table class=\"telemetry-table\"><thead><tr><th class=\"table-column-name\">Name</th><th class=\"table-column-value\">Value</th><th class=\"table-column-description\">Description</th><tr></thead><tbody>"
-    telemetry.all.forEach() { if $0.name != parameters.adminSiteRoot.name { table.append($0.tableRow()) } }
-    table.append("</tbody></table>")
+    var table = Table(klass: "telemetry-table", columnTitles: "Name", "Value", "Description")
+    telemetry.all.forEach() { table.append($0.tableRow()) }
     
-    return table.data(using: String.Encoding.utf8)
+    return table.html.data(using: String.Encoding.utf8)
 }
 
 fileprivate extension NamedValueProtocol {
     
-    func tableRow() -> String {
-        return "<tr><td class=\"table-column-name\">\(self.name)</td><td class=\"table-column-value\">\(self.stringValue)</td><td class=\"table-column-description\">\(self.about)</td></tr>"
+    func tableRow() -> Tr {
+        return Tr(Td(klass: "table-column-name", self.name), Td(klass: "table-column-value", self.stringValue), Td(klass: "table-column-description", self.about))
     }
 }
 

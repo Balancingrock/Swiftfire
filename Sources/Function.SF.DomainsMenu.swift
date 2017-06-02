@@ -94,45 +94,44 @@
 // =====================================================================================================================
 
 import Foundation
+import Html
 
 
 /// - Returns: A menu for the navbar containing all the domains as submenu items.
 
 func function_sf_domainsMenu(_ args: Function.Arguments, _ info: inout Function.Info, _ environment: inout Function.Environment) -> Data? {
     
+    let checkbox = Input(.checkbox, [], "domains-checkbox")
     
-    // Build the menu for the domains
+    let placeholder = P("<!-- empty but necessary! -->")
+    let menuItemTitle = Div(klass: "menu-item-title", P("Domains"))
+    let menuItemSymbol = Div(klass: "menu-item-symbol", placeholder)
+    let menuItem = Div(klass: "menu-item", menuItemSymbol, menuItemTitle)
+    let menuItemSeparator = Div(klass: "menu-item-separator", placeholder)
+    let label = Label(forId: "domains-checkbox", menuItemSeparator, menuItem)
     
-    var menu: String = ""
-    +   "<input type=\"checkbox\" id=\"domains-checkbox\">"
-    +   "<label for=\"domains-checkbox\">"
-    +       "<div class=\"menu-item-separator\"><p><!-- empty but necessary --></p></div>"
-    +       "<div class=\"menu-item\">"
-    +           "<div class=\"menu-item-symbol\"><p><!-- empty but necessary! --></p></div>"
-    +           "<div class=\"menu-item-title\"><p>Domains</p></div>"
-    +       "</div>"
-    +   "</label>"
-    +   "<ul>"
-    +       "<li>"
-    +           "<div class=\"menu-subitem\">"
-    +               "<div class=\"menu-subitem-symbol\"></div>"
-    +               "<div class=\"menu-subitem-title\">"
-    +                   "<a href=\"/serveradmin/pages/domain-management.sf.html\"><p>Manage Domains</p></a>"
-    +               "</div>"
-    +           "</div>"
-    +       "</li>"
-
+    let link = A(href: "/serveradmin/pages/domain-management.sf.html", P("Manage Domains"))
+    let firstMenuSubitemTitle = Div(klass: "menu-subitem-title", link)
+    let firstMenuSubitemSymbol = Div(klass: "menu-subitem-symbol", [])
+    let firstMenuSubitem = Div(klass: "menu-subitem", firstMenuSubitemSymbol, firstMenuSubitemTitle)
+    let firstListItem = Li(firstMenuSubitem)
+    
+    var list = Ul(firstListItem)
+    
     for domain in domains {
-
-        menu += "<li><div class=\"menu-subitem\"><div class=\"menu-subitem-symbol\"></div><div class=\"menu-subitem-title\">"
         
-        menu += postingLink(target: "/serveradmin/pages/domain.sf.html", text: domain.name, keyValuePairs: ["DomainName": domain.name])
+        let link = postingLink(target: "/serveradmin/pages/domain.sf.html", text: domain.name, keyValuePairs: ["DomainName": domain.name])
         
-        menu += "</div></div></li>"
+        let menuSubitemTitle = Div(klass: "menu-subitem-title", link)
+        let menuSubitemSymbol = Div(klass: "menu-subitem-symbol", [])
+        let menuSubitem = Div(klass: "menu-subitem", menuSubitemSymbol, menuSubitemTitle)
+        let listItem = Li(menuSubitem)
+        
+        list.append(listItem)
     }
     
-    menu += "</ul>"
-
-    return menu.data(using: String.Encoding.utf8)
+    // If the next expression fails, it will be noticable during tests
+    
+    return (checkbox.html + label.html + list.html).data(using: String.Encoding.utf8)!
 }
 

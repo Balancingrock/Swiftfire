@@ -94,6 +94,7 @@
 // =====================================================================================================================
 
 import Foundation
+import Html
 
 
 /// Returns the value of the requested parameter item.
@@ -120,16 +121,40 @@ func function_sf_blacklistTable(_ args: Function.Arguments, _ info: inout Functi
     
     // Create the table
     
-    var table: String = "<table class=\"server-blacklist-table\"><thead><tr><th>Address</th><th>Action</th><th></th><tr></thead><tbody>"
+    var table = Table(klass: ["server-blacklist-table"], columnTitles: "Address", "Action", "")
     serverBlacklist.list.forEach { (address, action) in
-        table += "<tr><td>\(address)</td><td>"
-        table += "<form action=\"/serveradmin/sfcommand/UpdateBlacklist\" method=\"post\"><input type=\"radio\" name=\"\(address)\" value=\"close\" \(action == .closeConnection ? "checked" : "")> Close Connection, <input type=\"radio\" name=\"\(address)\" value=\"503\" \(action == .send503ServiceUnavailable ? "checked" : "")> 503 Service Unavailable, <input type=\"radio\" name=\"\(address)\" value=\"401\" \(action == .send401Unauthorized ? "checked" : "")> 401 Unauthorized <input type=\"submit\" name=\"submit\" value=\"Update\"></form>"
-        table += "</td><td><form action=\"/serveradmin/sfcommand/RemoveFromBlacklist\" method=\"post\"><input type=\"submit\" name=\"\(address)\" value=\"Delete\"></form></td></tr>"
+
+        let addressCell = Td(address)
+
+        let radioButtonClose = Input.radio(name: address, value: "close", checked: (action == .closeConnection))
+        let radioButton503 = Input.radio(name: address, value: "503", checked: (action == .send503ServiceUnavailable))
+        let radioButton401 = Input.radio(name: address, value: "401", checked: (action == .send401Unauthorized))
+        let updateButton = Input.submit(title: "Update")
+        let updateForm = Form(method: .post, action: "/serveradmin/sfcommand/UpdateBlacklist", radioButtonClose, " Close Connection, ", radioButton503, " 503 Service Unavailable, ", radioButton401, " 401 Unauthorized ", updateButton)
+        let updateCell = Td(updateForm)
+        
+        let deleteButton = Input.submit(name: address, title: "Delete")
+        let deleteForm = Form(method: .post, action: "/serveradmin/sfcommand/RemoveFromBlacklist", deleteButton)
+        let deleteCell = Td(deleteForm)
+        
+        table.appendRow(addressCell, updateCell, deleteCell)
     }
-    table.append("</tbody></table></br>")
     
-    let newEntry = "<form class=\"server-blacklist-create\" action=\"/serveradmin/sfcommand/AddToBlacklist\" method=\"post\"><div>Address: <input type=\"text\" name=\"newEntry\" value=\"\"></div>Action:<div><input type=\"radio\" name=\"action\" value=\"close\" checked> Close Connection</br><input type=\"radio\" name=\"action\" value=\"503\"> 503 Service Unavailable</br><input type=\"radio\" name=\"action\" value=\"401\"> 401 Unauthorized</div><div><input type=\"submit\" name=\"submit\" value=\"Add to Blacklist\"></div></form>"
+    let textField = Input.text(name: "newEntry", value: "")
+    let textDiv = Div("Address: ", textField)
+
+    let radioButtonClose = Input.radio(name: "action", value: "close", checked: true)
+    let radioButton503 = Input.radio(name: "action", value: "503", checked: false)
+    let radioButton401 = Input.radio(name: "action", value: "401", checked: false)
+    let radioDiv = Div(radioButtonClose, " Close Connection", Br(),
+                       radioButton503, " 503 Service Unavailable", Br(),
+                       radioButton401, " 401 Unauthorized")
     
-    return (table + newEntry).data(using: String.Encoding.utf8)
+    let submitButton = Input.submit(title: "Add to Blacklist")
+    let submitDiv = Div(submitButton)
+
+    let createForm = Form(klass: ["server-blacklist-create"], method: .post, action: "/serveradmin/sfcommand/AddToBlacklist", textDiv, radioDiv, submitDiv)
+    
+    return (table.html + Br().html + createForm.html).data(using: String.Encoding.utf8)
 }
 

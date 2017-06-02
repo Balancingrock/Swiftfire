@@ -94,6 +94,7 @@
 // =====================================================================================================================
 
 import Foundation
+import Html
 
 
 // Returns a table with all telemetry values.
@@ -120,21 +121,19 @@ func function_sf_domainsTable(_ args: Function.Arguments, _ info: inout Function
     
     // The html code to be returned
     
-    var table: String = "<table class=\"domains-table\"><thead><tr><th class=\"table-column-name\">Domain</th><th></th><th></th></thead><tbody>"
-    domains.forEach() { table.append($0.tableRow()) }
-    table.append("</tbody></table>")
+    var table = Table(klass: "domains-table", columnTitles: "Domain", "", "")
+    domains.forEach() { table.append($0.tableRow2()) }
     
-    return table.data(using: String.Encoding.utf8)
+    return table.html.data(using: String.Encoding.utf8)
 }
 
 fileprivate extension Domain {
     
-    func tableRow() -> String {
-        return "<tr>"
-        + "<td class=\"table-column-name\">\(self.name)</td>"
-            + "<td>\(postingLink(target: "/serveradmin/pages/domain.sf.html", text: "Edit", keyValuePairs: ["DomainName": name]))</td>"
-        + "<td>\(postingLink(target: "/serveradmin/pages/deletedomain.sf.html", text: "Delete", keyValuePairs: ["DomainName": name]))</td>"
-        + "</tr>"
+    func tableRow2() -> Tr {
+        let nameCell = Td(klass: "table-column-name", self.name)
+        let editCell = Td(postingLink(target: "/serveradmin/pages/domain.sf.html", text: "Edit", keyValuePairs: ["DomainName": name]))
+        let deleteCell = Td(postingLink(target: "/serveradmin/pages/deletedomain.sf.html", text: "Delete", keyValuePairs: ["DomainName": name]))
+        return Tr(nameCell, editCell, deleteCell)
     }
 }
 

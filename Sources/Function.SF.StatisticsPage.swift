@@ -98,6 +98,7 @@
 // =====================================================================================================================
 
 import Foundation
+import Html
 
 
 // Returns a table with all telemetry values.
@@ -105,65 +106,6 @@ import Foundation
 /// - Returns: The table with all telemetry values.
 
 func function_sf_statisticsPage(_ args: Function.Arguments, _ info: inout Function.Info, _ environment: inout Function.Environment) -> Data? {
-    
-    struct Button: CustomStringConvertible {
-        var title: String
-        var description: String {
-            return "<input type=\"submit\" value=\"\(title)\">"
-        }
-        init(_ title: String) {
-            self.title = title
-        }
-    }
-    
-    struct Hidden: CustomStringConvertible {
-        var name: String
-        var value: String
-        var description: String {
-            return "<input type=\"hidden\" name=\"\(name)\" value=\"\(value)\">"
-        }
-        init(_ name: String, _ value: String) {
-            self.name = name
-            self.value = value
-        }
-    }
-    
-    struct DomainForm: CustomStringConvertible {
-        var content: String
-        var title: String
-        var description: String {
-            return "<form method=\"post\" action=\"/serveradmin/pages/statistics.sf.html\">\(Hidden("RequestedPage", "Domains"))\(content)\(Button(title))</form>"
-        }
-        init(_ title: String, content: String) {
-            self.title = title
-            self.content = content
-        }
-    }
-    
-    struct urlCheckboxForm: CustomStringConvertible {
-        var value: Bool
-        var path: String
-        var description: String {
-            return "<form method=\"post\" action=\"/serveradmin/sfcommand/UpdateDoNotTraceUrl\">\(path)<div><input type=\"checkbox\" name=\"checkbox\"\(value ? " checked" : "")> \(Button("Update"))</div></form>"
-        }
-        init(_ value: Bool, path: String) {
-            self.value = value
-            self.path = path
-        }
-    }
-    
-    struct clientCheckboxForm: CustomStringConvertible {
-        var value: Bool
-        var client: String
-        var description: String {
-            return "<form method=\"post\" action=\"/serveradmin/sfcommand/UpdateDoNotTraceClient\">\(Hidden("Client", client))<div><input type=\"checkbox\" name=\"checkbox\"\(value ? " checked" : "")> \(Button("Update"))</div></form>"
-        }
-        init(_ value: Bool, client: String) {
-            self.value = value
-            self.client = client
-        }
-    }
-
     
     // Check access rights
     
@@ -197,7 +139,14 @@ func function_sf_statisticsPage(_ args: Function.Arguments, _ info: inout Functi
         // Button to select domains or clients list
         // ----------------------------------------
         
-        result += "<h2 style=\"text-align:center;\">URL Visits</h2><div class=\"statistics-switch-div\"><form action=\"/serveradmin/pages/statistics.sf.html\" method=\"post\">\(Hidden("RequestedPage", "Clients"))\(Button("Switch to Client View"))</form></div>"
+        let hidden = Input.hidden(name: "RequestedPage", value: "Clients")
+        let button = Input.submit(title: "Switch to Client View")
+        let form = Form(method: .post, action: "/serveradmin/pages/statistics.sf.html", hidden, button)
+        let header = H2(klass: "statistics-h2", "URL Visits")
+        let switchContainer = Div(klass: "statistics-switch-div", form)
+        
+        result += header.html
+        result += switchContainer.html
         
         // The domains list
         // ----------------
@@ -223,28 +172,31 @@ func function_sf_statisticsPage(_ args: Function.Arguments, _ info: inout Functi
                 var backButtonCode: String = ""
                 if part?.previous != nil {
                     
-                    backButtonCode = "\(Hidden("Domain", domainName))"
+                    backButtonCode = Input.hidden(name: "Domain", value: domainName).html
                     
                     var pathPart = domainName
                     while true {
                         if let nextPathPart = postInfo[pathPart] {
                             if postInfo[nextPathPart] != nil {
-                                backButtonCode += Hidden(pathPart, nextPathPart).description
+                                backButtonCode += Input.hidden(name: pathPart, value: nextPathPart).html
                             }
                             pathPart = nextPathPart
                         } else {
                             break
                         }
                     }
-
-                    backButtonCode = DomainForm("Back", content: backButtonCode).description
+                    
+                    backButtonCode = Form(method: .post, action: "/serveradmin/pages/statistics.sf.html", Input.hidden(name: "RequestedPage", value: "Domains"), backButtonCode, Input.submit(title: "Back")).html
                     
                 } else {
-                    backButtonCode = DomainForm("Back", content: "").description
+                    backButtonCode = Form(method: .post, action: "/serveradmin/pages/statistics.sf.html", Input.hidden(name: "RequestedPage", value: "Domains"), Input.submit(title: "Back")).html
                 }
                 
-                result += "<table class=\"statistics-domains-table\"><thead><tr><th colspan=\"3\"><div>Dir: \(part!.fullUrl)\(backButtonCode)</div></th></tr><tr><th>Accesses</th><th>File / Dir</th><th>Do Not Trace</th></tr></thead><tbody>"
-                
+                var headerTopCell = Th(Div("Dir: ", part!.fullUrl, backButtonCode))
+                headerTopCell.colspan = 3
+                let tableHeader = Thead(Tr(headerTopCell), Tr(Th("Accesses"), Th("File / Dir"), Th("Do Not Trace")))
+                var table = Table(klass: "statistics-domains-table", header: tableHeader)
+
                 
                 // Ad the rows
                 
@@ -253,15 +205,16 @@ func function_sf_statisticsPage(_ args: Function.Arguments, _ info: inout Functi
                     
                     // Create the path button postInfo
                     
-                    var pathCode = "\(Hidden("RequestedPage", "Domains"))\(Hidden("Domain", domainName))"
+                    var pathCode = Input.hidden(name: "RequestedPage", value: "Domains").html
+                    pathCode += Input.hidden(name: "Domain", value: domainName).html
                     
                     var pathPart = domainName
                     while true {
                         if let nextPathPart = postInfo[pathPart] {
-                            pathCode += Hidden(pathPart, nextPathPart).description
+                            pathCode += Input.hidden(name: pathPart, value: nextPathPart).html
                             pathPart = nextPathPart
                         } else {
-                            pathCode += Hidden(pathPart, row.pathPart).description
+                            pathCode += Input.hidden(name: pathPart, value: row.pathPart).html
                             break
                         }
                     }
@@ -280,16 +233,27 @@ func function_sf_statisticsPage(_ args: Function.Arguments, _ info: inout Functi
                     // Create 'details' button
                     
                     var details: String = ""
-                    if isDir.boolValue { details += DomainForm("Detail", content: pathCode).description }
+                    if isDir.boolValue {
+                        
+                        let button = Input.submit(title: "Detail")
+                        let hidden = Input.hidden(name: "RequestedPage", value: "Domains")
+                        let form = Form(method: .post, action: "/serveradmin/pages/statistics.sf.html", hidden, pathCode, button)
+                        
+                        details += form.html
+                    }
                     
-                    
-                    result += "<tr><td>\(row.foreverCount)</td><td><div>\(row.pathPart)\(details)</div></td><td>\(urlCheckboxForm(row.doNotTrace, path: pathCode))</tr>"
+                    let form = Form(method: .post, action: "/serveradmin/sfcommand/UpdateDoNotTraceUrl", pathCode, Div(Input.checkbox(name: "checkbox", value: "", checked: row.doNotTrace), Input.submit(title: "Update")))
+                    let cell1 = Td(row.foreverCount.description)
+                    let cell2 = Td(Div(row.pathPart, details))
+                    let cell3 = Td(form)
+                    let tableRow = Tr(cell1, cell2, cell3)
+                    table.append(tableRow)
                 }
                 
                 
                 // Add the end of table
                 
-                result += "</tbody></table>"
+                result += table.html
 
             } else {
                 
@@ -300,20 +264,33 @@ func function_sf_statisticsPage(_ args: Function.Arguments, _ info: inout Functi
             
             // Add the table header
             
-            result += "<table class=\"statistics-domains-table\"><thead><tr><th>Accesses</th><th>File / Dir</th><th>Do Not Trace</th></tr></thead><tbody>"
-            
+            var table = Table(klass: "statistics-domains-table", columnTitles: "Accesses", "File / Dir", "Do Not Trace")
             
             // Ad the rows
             
             for row in statistics.domains.domains {
+
+                let dntButton = Input.submit(title: "Update")
+                let dntCheckbox = Input.checkbox(name: "checkbox", value: "", checked: row.doNotTrace)
+                let dntDiv = Div(dntCheckbox, " ", dntButton)
+                let dntPath = Input.hidden(name: "Domain", value: row.pathPart)
+                let dntForm = Form(method: .post, action: "/serveradmin/sfcommand/UpdateDoNotTraceUrl", dntPath, dntDiv)
                 
-                result += "<tr><td>\(row.foreverCount)</td><td><div>\(row.pathPart)\(DomainForm("Detail", content: Hidden("Domain", row.pathPart).description))</div></td><td>\(urlCheckboxForm(row.doNotTrace, path: Hidden("Domain", row.pathPart).description))</td></tr>"
+                let detailButton = Input.submit(title: "Detail")
+                let detailPath = Input.hidden(name: "Domain", value: row.pathPart)
+                let detailPage = Input.hidden(name: "RequestedPage", value: "Domains")
+                let detailForm = Form(method: .post, action: "/serveradmin/pages/statistics.sf.html", detailPage, detailPath, detailButton)
+                let detailDiv = Div(row.pathPart, detailForm)
+                
+                let row = Tr(Td(row.foreverCount.description), Td(detailDiv), Td(dntForm))
+                
+                table.append(row)
             }
             
             
             // Add the end of table
             
-            result += "</tbody></table>"
+            result += table.html
         }
         
         
@@ -321,26 +298,30 @@ func function_sf_statisticsPage(_ args: Function.Arguments, _ info: inout Functi
         
         // Show the list of clients
         
-        result += "<h2 style=\"text-align:center;\">Client visits</h2><div class=\"statistics-switch-div\"><form action=\"/serveradmin/pages/statistics.sf.html\" method=\"post\"><input type=\"hidden\" name=\"RequestedPage\" value=\"Domains\"><input type=\"submit\" value=\"Switch to URL View\"></form></div>"
+        let hidden = Input.hidden(name: "RequestedPage", value: "Domains")
+        let button = Input.submit(title: "Switch to URL View")
+        let form = Form(method: .post, action: "/serveradmin/pages/statistics.sf.html", hidden, button)
+        let header = H2(klass: "statistics-h2", "Client Visits")
+        let switchContainer = Div(klass: "statistics-switch-div", form)
         
-        
-        // The client list
-        
-        // Add the table header
-        
-        result += "<table class=\"statistics-clients-table\"><thead><tr><th>Address</th><th>Count</th><th>Do Not Trace</th></tr></thead><tbody>"
+        result += header.html
+        result += switchContainer.html
 
+        var table = Table(klass: "statistics-clients-table", columnTitles: "Address", "Count", "Do Not Trace")
+        
         // Ad the rows
         
         for row in statistics.clients.clients {
             
-            result += "<tr><td>\(row.address)</td><td>\(row.records.count)</td><td><div>\(clientCheckboxForm(row.doNotTrace, client: row.address))</div></td></tr>"
+            let form = Form(method: .post, action: "/serveradmin/sfcommand/UpdateDoNotTraceClient", Input.hidden(name: "Client", value: row.address), Input.checkbox(name: "checkbox", value: "", checked: row.doNotTrace), " ", Input.submit(title: "Update"))
+            
+            table.append(Tr(Td(row.address), Td(row.records.count.description), Td(form)))
         }
         
         
         // Add the end of table
         
-        result += "</tbody></table>"
+        result += table.html
     }
         
     return result.data(using: String.Encoding.utf8)

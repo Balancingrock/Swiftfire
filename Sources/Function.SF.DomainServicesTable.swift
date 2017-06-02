@@ -93,6 +93,7 @@
 // =====================================================================================================================
 
 import Foundation
+import Html
 
 
 /// - Returns: A detail of the current domain.
@@ -149,7 +150,8 @@ func function_sf_domainServicesTable(_ args: Function.Arguments, _ info: inout F
     
     // Create the table
     
-    var table: String = "<form action=\"/serveradmin/sfcommand/UpdateDomainServices\" method=\"post\"><input type=\"hidden\" name=\"DomainName\" value=\"\(domain.name)\"><table class=\"domain-service-table\"><thead><tr><th>Index</th><th>Seq.</th><th>Service Name</th><th>Used</th></tr></thead><tbody>"
+    let hidden = Input.hidden(name: "DomainName", value: domain.name)
+    var table = Table(klass: ["domain-service-table"], columnTitles: "Index", "Seq.", "Service Name", "Used")
 
     for row in tableRows {
         
@@ -157,13 +159,18 @@ func function_sf_domainServicesTable(_ args: Function.Arguments, _ info: inout F
         let nameName = "nameName\(row.rowIndex)"
         let usedName = "usedName\(row.rowIndex)"
         
-        table += "<tr><td>\(row.rowIndex)</td><td><input type=\"text\" name=\"\(seqName)\" value=\"\(row.rowIndex)\" style=\"width:3em;\"></td><td><input type=\"text\" name=\"\(nameName)\" value=\"\(row.name)\" style=\"width:20em;\"></td><td><input type=\"checkbox\" name=\"\(usedName)\" value=\"\(usedName)\" \(row.usedByDomain ? "checked" : "")></td></tr>"
+        let sequenceEntry = Input.text(klass: ["seq-column"], name: seqName, value: row.rowIndex.description)
+        var serviceName = Input.text(klass: ["name-column"], name: nameName, value: row.name)
+        serviceName.disabled = true
+        let usedCheckbox = Input.checkbox(klass: ["used-column"], name: usedName, value: usedName, checked: row.usedByDomain)
+        
+        table.appendRow(Td(row.rowIndex.description), Td(sequenceEntry), Td(serviceName), Td(usedCheckbox))
     }
     
+    let submitButton = Input.submit(klass: "service-submit-form", name: "Submit", title: "Update Services")
+    let form = Form(method: .post, action: "/serveradmin/sfcommand/UpdateDomainServices", hidden, table, submitButton)
     
-    table.append("</tbody></table><input type=\"Submit\" name=\"Submit\" value=\"Update Services\" style=\"display:block; margin: 1em auto 1em auto;\"></form>")
-    
-    return table.data(using: String.Encoding.utf8)
+    return form.html.data(using: String.Encoding.utf8)
 }
 
 

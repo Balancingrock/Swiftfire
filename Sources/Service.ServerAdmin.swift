@@ -51,6 +51,7 @@
 // 0.10.9 - Added server and domain blacklist management
 //        - Streamlined and folded http API into its own project
 //        - Added statistics
+//        - Added testing of valid addresses when blacklisting
 // 0.10.8 - Silenced warning during compilation
 // 0.10.7 - Initial release
 //
@@ -883,7 +884,7 @@ fileprivate func executeUpdateBlacklist(_ postInfo: inout PostInfo?) {
 
 fileprivate func executeAddToBlacklist(_ postInfo: inout PostInfo?) {
     let _ = postInfo?.removeValue(forKey: "submit")
-    guard let address = postInfo?["newEntry"] else { return }
+    guard let address = postInfo?["newEntry"], isValidIpAddress(address) else { return }
     guard let action = postInfo?["action"] else { return }
     let newAction: Blacklist.Action = {
         switch action {
@@ -934,7 +935,7 @@ fileprivate func executeAddToDomainBlacklist(_ postInfo: inout PostInfo?) {
             Log.atError?.log(id: -1, source: #file.source(#function, #line), message: "Missing domain name")
             return
     }
-    guard let address = postInfo?["newEntry"] else { return }
+    guard let address = postInfo?["newEntry"], isValidIpAddress(address) else { return }
     guard let action = postInfo?["action"] else { return }
     let newAction: Blacklist.Action = {
         switch action {

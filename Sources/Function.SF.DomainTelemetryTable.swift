@@ -93,6 +93,7 @@
 // =====================================================================================================================
 
 import Foundation
+import Html
 
 
 /// - Returns: A detail of the current domain.
@@ -125,17 +126,19 @@ func function_sf_domainTelemetryTable(_ args: Function.Arguments, _ info: inout 
     
     // Create the table
     
-    var table: String = "<table class=\"domain-telemetry-table\"><thead><tr><th>Name</th><th>Value</th><th>Description</th><tr></thead><tbody>"
+    var table = Table(klass: "domain-telemetry-table", columnTitles: "Name", "Value", "Description")
     domain.telemetry.all.forEach() { table.append($0.tableRow()) }
-    table.append("</tbody></table>")
     
-    return table.data(using: String.Encoding.utf8)    
+    return table.html.data(using: String.Encoding.utf8)
 }
 
 fileprivate extension NamedValueProtocol {
     
-    func tableRow() -> String {
-        return "<tr><td class=\"table-column-name\">\(self.name)</td><td class=\"table-column-value\">\(self.stringValue)</td><td class=\"table-column-description\">\(self.about)</td></tr>"
+    func tableRow() -> Tr {
+        let nameCell = Td(klass: "table-column-name", self.name)
+        let valueCell = Td(klass: "table-column-value", self.stringValue)
+        let aboutCell = Td(klass: "table-column-description", self.about)
+        return Tr(nameCell, valueCell, aboutCell)
     }
 }
 

@@ -90,9 +90,10 @@
 // =====================================================================================================================
 
 import Foundation
+import Html
 
 
-/// - Returns: A detail of the current domain.
+/// - Returns: A button with an action to remove a domain.
 
 func function_sf_deleteDomain(_ args: Function.Arguments, _ info: inout Function.Info, _ environment: inout Function.Environment) -> Data? {
     
@@ -131,5 +132,8 @@ func function_sf_deleteDomain(_ args: Function.Arguments, _ info: inout Function
     
     // Return the button code
     
-    return postingButton(target: "/serveradmin/sfcommand/DeleteDomain", title: "Delete Domain \(name)", keyValuePairs: ["DomainName":name]).data(using: .utf8)
+    let button = Button.submit(klass: ["posting-button-button"], name: "DomainName", value: name, title: "Delete Domain \(name)")
+    let form = Form(klass: ["posting-button-form"], method: .post, action: "/serveradmin/sfcommand/DeleteDomain", button)
+    
+    return form.html.data(using: .utf8)
 }

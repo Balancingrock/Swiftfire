@@ -95,7 +95,7 @@
 // =====================================================================================================================
 
 import Foundation
-
+import Html
 
 /// Returns the value of the requested parameter item.
 ///
@@ -120,18 +120,26 @@ func function_sf_parameterTable(_ args: Function.Arguments, _ info: inout Functi
 
     
     // Create the table
-
-    var table: String = "<table class=\"parameter-table\"><thead><tr><th>Name</th><th>Value</th><th>Description</th><tr></thead><tbody>"
-    parameters.all.forEach() { if $0.name != parameters.adminSiteRoot.name { table.append($0.tableRow()) } }
-    table.append("</tbody></table>")
     
-    return table.data(using: String.Encoding.utf8)
+    var table = Table(klass: ["parameter-table"], header: Thead(titles: "Name", "Value", "Description"))
+    parameters.all.forEach() { if $0.name != parameters.adminSiteRoot.name { table.append($0.tableRow()) }}
+  
+    return table.html.data(using: String.Encoding.utf8)
 }
 
 fileprivate extension NamedValueProtocol {
     
-    func tableRow() -> String {
-        return "<tr><td>\(self.name)</td><td><form action=\"/serveradmin/sfcommand/SetParameter\" method=\"post\"><input type=\"text\" name=\"\(self.name)\" value=\"\(self.stringValue)\"><input type=\"submit\" value=\"Update\"></form></td><td>\(self.about)</td></tr>"
+    func tableRow() -> Tr {
+        let nameCell = Td(self.name)
+
+        let textField = Input.text(name: self.name, value: self.stringValue)
+        let submitButton = Input.submit(title: "Update")
+        let form = Form(method: .post, action: "/serveradmin/sfcommand/SetParameter", textField, submitButton)
+        let valueCell = Td(form)
+        
+        let aboutCell = Td(self.about)
+        
+        return Tr(nameCell, valueCell, aboutCell)
     }
 }
 

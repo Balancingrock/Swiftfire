@@ -114,6 +114,7 @@
 // =====================================================================================================================
 
 import Foundation
+import Html
 
 
 /// Builds a form with a button for the given command.
@@ -132,14 +133,12 @@ func function_sf_command(_ args: Function.Arguments, _ info: inout Function.Info
     switch array.count {
         
     case 1: // 1 argument = button only
-    
-        form = "<form action=\"/serveradmin/sfcommand/\(array[0])\" method=\"post\"><input type=\"submit\" value=\"\(array[0])\"></form>"
-    
+        
+        form = Form(method: .post, action: "/serveradmin/sfcommand/\(array[0])", Input.submit(title: array[0])).html
         
     case 2:
         
-        form = "<form action=\"/serveradmin/sfcommand/\(array[0])\" method=\"post\"><input type=\"submit\" value=\"\(array[1])\"></form>"
-
+        form = Form(method: .post, action: "/serveradmin/sfcommand/\(array[0])", Input.submit(title: array[1])).html
     
 /*    case 3:
         
