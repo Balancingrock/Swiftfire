@@ -1,6 +1,6 @@
 # Build websites in Swift.
 
-The Swiftfire webserver can be extended with functions and services written in Swift. Making it possible to create entire websites written in nothing else but HTML, CSS and Swift. No other languages, frameworks or external services necessary.
+The Swiftfire webserver can be extended with functions and services written in Swift. Making it possible to create entire websites written in nothing else but HTML, CSS and Swift. No other languages, frameworks or external services necessary, with a minor exception for openSSL.
 
 Since the website and server-software are merged into one, you will need access to your own server-hardware. This can be any old computer as long as it is able to run MacOS 10.11 (El Capitan).
 
@@ -14,16 +14,17 @@ This is a very high level overview of how Swiftfire can use Swift code to create
 
 Every domain that is hosted under Swiftfire implements a stack of services. By default that stack implements a static website.
 
-For each (valid and accepted) request that arrives at the server, Swiftfire finds the stack of services to execute and does so one by one.
+For each (valid and accepted) request that arrives at the server, Swiftfire finds the stack of services to execute  and does so one by one.
 
-You can add your own services to modify or extend de default behaviour. However adding services is probabely not done too often. It is nice to know that it is possible, but it is not anticipated that many users will want to do so.
+You can add your own services to modify or extend de default behaviour.
 
-It is in the custom "functions" that the real power of Swiftfire rests.
+However it is much more likely that you will want to create your own functions.
 
-One service in the stack of services retrieves the requested resource from disk and verifies if it must be parsed.
-If it must be parsed it scans the file for "functions". Any function that is found is executed, and the result of the execution is injected into the resource at the exact spot of the function. The function itself is removed.
+Functions can be used to inject HTML code into otherwise "static" web pages. Giving them dynamic qualities.
 
-In an example:
+One of the services in the stack of services retrieves the requested page from disk and verifies if it must be parsed. If it must be parsed it scans the file for 'functions'. Any function that is found is executed, and the result of the execution is injected into the page at the exact spot of the function. The function itself is removed.
+
+An example:
 
     <p>This page has been accessed .nofPageHits() times</p>
 
@@ -35,17 +36,13 @@ or any other number of course.
 
 The best part is, you can define and write the functions yourself.
 
-It is up to you to determine how much you want to do in Swift. For example, you could decide to have the entire landing page to be created by a function if index.sf.html exists only of: `.buildLandingPage()`. (And of course you have implemented the function that is registered under the name `createLandingPage`)
+It is up to you to determine how much you want to do in Swift. For example, you could decide to have the entire landing page to be created by a function. To do that let index.sf.html exists only of: `.buildLandingPage()`. And of course you have to implement the function that is registered under the name `buildLandingPage`.
 
-## No GUI?
+## GUI
 
-Note: In the current version 0.10.7 there is now a web based interface for a server administrator. It does not yet completey replace the SwiftfireConsole. However that is envisoned for the next release 0.10.8.
+Swiftfire is a faceless webserver application. However it comes with a website that can be used for administration purposes. On initial start of the server, any request on the port on which the server listens will result in a landing page that asks to create an admin account and the directory in which the administration site is installed.
 
-No, Swiftfire is a faceless webserver application. It does not have a GUI.
-
-However there is anther project called [SwiftfireConsole](https://github.com/Balancingrock/SwiftfireConsole) that does have a GUI and can connect to a Swiftfire webserver.
-
-Thus for setup or monitoring a GUI is available.
+Once set up, any access to the port that has as its URL: '/serveradmin' will end up on the login page of the server administrator website. Note that the login is only as secure as the protocol. Use HTTP only when accessing from within a private LAN.
   
 ## Note
 
@@ -55,7 +52,7 @@ However: It does work! :-)
 
 ## Features
 
-- Allows HTML and CSS code injection from functions written in Swift
+- Allows code injection (HTML and CSS) from functions written in Swift
 - Allows website services to be implemented in Swift 
 - Out of the box support for static websites
 - Handles multiple domains
@@ -75,8 +72,6 @@ However: It does work! :-)
 ## Installation
 Please refer to the [installation instructions](http://swiftfire.nl/pages/manual/02_installation.html) on the [Swiftfire](http://swiftfire.nl) website.
 
-Note that the installation of SwiftfireCore and SwiftfireConsole is no longer necessary.
-
 ## Version history
 
 Note: Planned releases are for information only and almost always change.
@@ -93,12 +88,17 @@ Note: Planned releases are for information only and almost always change.
 - Small feature improvements (if necessary)
 - Code improvements
 
-#### 0.10.9 (Planned)
+#### 0.10.10 (Planned)
+
+- Better HTML support for code generation (improving the admin interface)
+- Improved handling for (very) large HTTP request bodies (asynchronous processing).
+
+#### 0.10.9 (Current)
 
 - Completion of server admin web based interface
-- Removal of code related to SwifterConsole (will no longer be supported)
+- Removal of code related to SwifterConsole (no longer supported)
 
-#### 0.10.8 (Current)
+#### 0.10.8
 
 - Silenced warning during compilation
 - Removed dependency on macOS 10.11
