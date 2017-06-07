@@ -3,7 +3,7 @@
 //  File:       Service.ServerAdmin.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.9
+//  Version:    0.10.10
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,8 @@
 //
 // History
 //
+// 0.10.10 - Changed signature of function to use SFConnection
+//         - Bugfix: Added sfcommands SaveDomains and ReadDomains
 // 0.10.9 - Added server and domain blacklist management
 //        - Streamlined and folded http API into its own project
 //        - Added statistics
@@ -117,14 +119,14 @@ private let SERVER_ADMIN_LOGIN_PWD  = "ServerAdminLoginPwd"
 ///
 /// - Parameters:
 ///   - request: The HTTP request.
-///   - connection: The HttpConnection object that is used for this connection.
+///   - connection: The SFConnection object that is used for this connection.
 ///   - domain: The domain that is serviced for this request.
 ///   - info: A dictionary for communication between services.
 ///   - response: An object that can receive information to be returned in response to the request.
 ///
 /// - Returns: On error .abort, on success .next.
 
-func service_serverAdmin(_ request: Request, _ connection: Connection, _ domain: Domain, _ info: inout Service.Info, _ response: inout Response) -> Service.Result {
+func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: inout Service.Info, _ response: inout Response) -> Service.Result {
     
     
     
@@ -174,11 +176,11 @@ func service_serverAdmin(_ request: Request, _ connection: Connection, _ domain:
             let rootUrl = URL(fileURLWithPath: rootPath)
             let loginUrl = rootUrl.appendingPathComponent("login.sf.html")
             
-            switch SFDocument.factory(path: loginUrl.path, filemanager: (connection as? SFConnection)!.filemanager) {
+            switch SFDocument.factory(path: loginUrl.path, filemanager: connection.filemanager) {
                 
             case .error(let message):
                 
-                Log.atError?.log(id: (connection as? SFConnection)!.logId, source: #file.source(#function, #line), message: message)
+                Log.atError?.log(id: connection.logId, source: #file.source(#function, #line), message: message)
                 
                 response.code = Response.Code._500_InternalServerError
                 
@@ -266,15 +268,6 @@ func service_serverAdmin(_ request: Request, _ connection: Connection, _ domain:
     // Exit if there is a code already
     
     if response.code != nil { return .next }
-    
-    
-    // The connection is a SFConnection
-    
-    guard let connection = connection as? SFConnection else {
-        Log.atCritical?.log(id: -1, source: #file.source(#function, #line), message: "Failed to cast Connection as SFConnection")
-        response.code = Response.Code._500_InternalServerError
-        return .abort
-    }
     
     
     // Only service the serverAdminPseudoDomain
@@ -810,6 +803,8 @@ fileprivate func executeSfCommand(_ pathComponents: Array<String>, _ postInfo: i
     case "UpdateDomainServices": executeUpdateDomainServices(&postInfo); return .newPath("/pages/domain-management.sf.html")
     case "DeleteDomain": executeDeleteDomain(&postInfo); return .newPath("/pages/domain-management.sf.html")
     case "CreateDomain": executeCreateDomain(&postInfo); return .newPath("/pages/domain-management.sf.html")
+    case "SaveDomains": executeSaveDomains(); return .newPath("/pages/domain-management.sf.html")
+    case "ReadDomains": executeReadDomains(); return .newPath("/pages/domain-management.sf.html")
     case "UpdateBlacklist": executeUpdateBlacklist(&postInfo); return .newPath("/pages/blacklist.sf.html")
     case "AddToBlacklist": executeAddToBlacklist(&postInfo); return .newPath("/pages/blacklist.sf.html")
     case "RemoveFromBlacklist": executeRemoveFromBlacklist(&postInfo); return .newPath("/pages/blacklist.sf.html")
@@ -860,6 +855,18 @@ fileprivate func executeSaveParameters() {
 fileprivate func executeReadParameters() {
     if let url = StorageUrls.parameterDefaultsFile {
         _ = parameters.restore(fromFile: url)
+    }
+}
+
+fileprivate func executeSaveDomains() {
+    if let url = StorageUrls.domainDefaultsFile {
+        _ = domains.save(toFile: url)
+    }
+}
+
+fileprivate func executeReadDomains() {
+    if let url = StorageUrls.domainDefaultsFile {
+        _ = domains.restore(fromFile: url)
     }
 }
 
@@ -1173,7 +1180,7 @@ fileprivate func executeQuitSwiftfire() {
         httpServer?.stop()
         httpsServer?.stop()
     
-        sleep(5)
+        _ = Darwin.sleep(5)
     
         quitSwiftfire = true
     }
