@@ -3,7 +3,7 @@
 //  File:       Function.SF.DomainServicesTable.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.7
+//  Version:    0.10.10
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.10 - Fixed problem that prevented updates to the service table
 // 0.10.7 - Initial release
 //
 // =====================================================================================================================
@@ -159,12 +160,13 @@ func function_sf_domainServicesTable(_ args: Function.Arguments, _ info: inout F
         let nameName = "nameName\(row.rowIndex)"
         let usedName = "usedName\(row.rowIndex)"
         
+        let serviceNameHidden = Input.hidden(name: nameName, value: row.name)
         let sequenceEntry = Input.text(klass: ["seq-column"], name: seqName, value: row.rowIndex.description)
         var serviceName = Input.text(klass: ["name-column"], name: nameName, value: row.name)
         serviceName.disabled = true
         let usedCheckbox = Input.checkbox(klass: ["used-column"], name: usedName, value: usedName, checked: row.usedByDomain)
         
-        table.appendRow(Td(row.rowIndex.description), Td(sequenceEntry), Td(serviceName), Td(usedCheckbox))
+        table.appendRow(Td(row.rowIndex.description), Td(sequenceEntry), Td(serviceName, serviceNameHidden), Td(usedCheckbox))
     }
     
     let submitButton = Input.submit(klass: "service-submit-form", name: "Submit", title: "Update Services")
