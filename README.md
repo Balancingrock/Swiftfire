@@ -78,7 +78,6 @@ Note: Planned releases are for information only and almost always change.
 
 #### 2.0.0 (Thought about)
 
-- Session support
 - Add URL redirection list
 
 #### 1.0.0 (Planned)
@@ -88,12 +87,12 @@ Note: Planned releases are for information only and almost always change.
 - Small feature improvements (if necessary)
 - Code improvements
 
-#### 0.10.10 (Planned)
+#### 0.10.10 (Current)
 
 - Better HTML support for code generation (improving the admin interface)
-- Improved handling for (very) large HTTP request bodies (asynchronous processing).
+- Added handling of (very) large HTTP request bodies
 
-#### 0.10.9 (Current)
+#### 0.10.9
 
 - Completion of server admin web based interface
 - Removal of code related to SwifterConsole (no longer supported)
