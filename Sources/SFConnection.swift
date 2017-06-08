@@ -3,7 +3,7 @@
 //  File:       SFConnection.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.9
+//  Version:    0.10.10
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,8 @@
 //
 // History
 //
+// 0.10.10 - Added capability to handle (very) large request bodies.
+//         - Made class public
 // 0.10.9 - Streamlined and folded http API into its own project
 // 0.10.7 - Bugfix: moved inactivity detection to front of receiver
 // 0.10.6 - Renamed HttpHeader to HttpRequest
@@ -80,10 +82,11 @@ import Foundation
 import SwifterSockets
 import SwifterLog
 import Http
+import BRUtils
 
 /// Holds all data that is associated with an HTTP Connection.
 
-final class SFConnection: SwifterSockets.Connection {
+public final class SFConnection: SwifterSockets.Connection {
     
     
     // A unique object id allows a correlation between statistics and the logfile (debug level)
@@ -108,7 +111,7 @@ final class SFConnection: SwifterSockets.Connection {
     ///   - remoteAddress: The address of the remote computer.
     ///   - options: The options to be set for the connection. The options inactivityDetectionThreshold and inactivityAction are used by this operation and should not be set externally.
     
-    override func prepare(for type: SwifterSockets.InterfaceAccess, remoteAddress address: String, options: [Option]) -> Bool {
+    override public func prepare(for type: SwifterSockets.InterfaceAccess, remoteAddress address: String, options: [Option]) -> Bool {
         
         // In case of inactivity, close the connection.
         var localOptions = options
@@ -123,11 +126,13 @@ final class SFConnection: SwifterSockets.Connection {
         // Reinitialize internal data
         
         self.forwarder = nil
-        self.messageBuffer = Data()
+        self.headerData = nil
         self.httpRequest = nil
         self.maxSendBufferSize = nil
         self.abortProcessing = false
         self.mustClose = false
+        self.bodyRemainingBytes = 0
+        self.bodyChunk = nil
         
         return true
     }
@@ -161,7 +166,12 @@ final class SFConnection: SwifterSockets.Connection {
     
     /// The dispatch queue on which connections process the data from the client
     
-    let workerQueue = DispatchQueue(label: "Worker queue for SFConnection object")
+    let workerQueue = DispatchQueue(label: "Worker queue")
+    
+    
+    /// The body receipt queue
+    
+    let bodyQueue = DispatchQueue(label: "Http Request Body Queue")
     
     
     /// The file manager to be used for this connection object
@@ -176,12 +186,12 @@ final class SFConnection: SwifterSockets.Connection {
     
     /// The received HTTP request
     
-    var httpRequest: Request?
+    fileprivate var httpRequest: Request?
     
 
     /// The data received from a client.
 
-    var messageBuffer = Data()
+    var headerData: Data?
 
 
     /// The socket on which to forward incoming requests from the client
@@ -194,7 +204,7 @@ final class SFConnection: SwifterSockets.Connection {
     var mustClose = false
     
     
-    override func connectionWasClosed() {
+    override public func connectionWasClosed() {
     
         
         // Record the closing
@@ -202,39 +212,26 @@ final class SFConnection: SwifterSockets.Connection {
         Log.atInfo?.log(id: self.logId, source: #file.source(#function, #line), message: "Closing connection")
         
         
-        // Close a potential forwarding socket
-        
-        self.forwarder = nil // deinit will close the target client
-        
-        
-        // Clean out old stuff so a new client can use this object
-        
-        self.messageBuffer = Data()
-        self.httpRequest = nil
-        self.maxSendBufferSize = nil
-        self.abortProcessing = false
-        self.mustClose = false
-        
-
         // Free this connection object
+        
         connectionPool.free(connection: self)
     }
     
-    override func transmitterReady(_ id: Int) {
+    override public func transmitterReady(_ id: Int) {
         Log.atDebug?.log(id: logId, source: #file.source(#function, #line))
     }
     
-    override func transmitterTimeout(_ id: Int) {
+    override public func transmitterTimeout(_ id: Int) {
         Log.atDebug?.log(id: logId, source: #file.source(#function, #line))
         super.transmitterTimeout(id)
     }
     
-    override func transmitterError(_ id: Int, _ message: String) {
+    override public func transmitterError(_ id: Int, _ message: String) {
         Log.atError?.log(id: logId, source: #file.source(#function, #line), message: message)
         super.transmitterError(id, message)
     }
     
-    override func transmitterClosed(_ id: Int) {
+    override public func transmitterClosed(_ id: Int) {
         Log.atDebug?.log(id: logId, source: #file.source(#function, #line))
         super.transmitterClosed(id)
     }
@@ -242,120 +239,195 @@ final class SFConnection: SwifterSockets.Connection {
     
     // MARK: - SwifterSocketsReceiver protocol overrides
     
-    override func receiverClosed() {}
+    override public func receiverClosed() {}
     
-    override func receiverError(_ message: String) {
+    override public func receiverError(_ message: String) {
         Log.atError?.log(id: logId, source: #file.source(#function, #line), message: "Error event: \(message)")
     }
     
-    override func receiverLoop() -> Bool {
+    override public func receiverLoop() -> Bool {
         return true // Continue receiving
     }
     
     
-    /// This function stores the client data and checks if a complete HTTP Message has been received. If it has, it will start an http worker on the workerqueue, remove the message form the buffer and check for more messages.
+    /// Checks if a complete HTTP Request Header has been received. If it has, it will start an http worker on the workerqueue. The body data may not be completely received at that point.
+
+    override public func processReceivedData(_ buffer: UnsafeBufferPointer<UInt8>) -> Bool {
     
-    override func processReceivedData(_ buffer: UnsafeBufferPointer<UInt8>) -> Bool {
+        // If there is no httpRequest present, the incoming data must be examined for new requests
         
-        Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: "Received \(buffer.count) bytes")
+        if httpRequest == nil {
         
-        
-        // Add the new data
-        
-        messageBuffer.append(buffer)
-        
-        
-        // See if there are complete messages
-        
-        SCAN_FOR_COMPLETE_MESSAGES: while true {
+            
+            // Append the new data to (potentially present) older data
+            
+            headerData = headerData ?? Data()
+            headerData?.append(buffer)
             
             
-            // If there is no request, try to read a header
+            // Keep scanning for new requests until no request could be created
             
-            if httpRequest == nil {
+            while let request = Request(&headerData!) {
                 
+                if request.body.count == request.contentLength {
+                    
+                    // The request is complete, dispatch it to the worker thread
+                    
+                    workerQueue.async() {
+                        [request, unowned self] in
+                        self.worker(request)
+                    }
+                    
+                } else {
                 
-                // See if the header is complete
-                
-                if let request = Request(data: messageBuffer) {
-                    
-                    
-                    // Store the header for future reference
-                    
-                    httpRequest = request
-                    
-                    
-                    // The header is complete
-                    
-                    Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: "HTTP Request Header complete")
-                    
-                    
-                    // =======================
-                    // The header is complete.
-                    // =======================
-                    
-                    // Write the header to the log if so required
-                    // Note: This is done now because there might be errors this request that would be missed if the log is not done at the earliest possible moment..
-                    
-                    if parameters.headerLoggingEnabled.value { headerLogger.record(connection: self, request: httpRequest!) }
+                    if request.body.count < request.contentLength {
+                        
+                        // The request is incomplete, still the worker thread is started, the worker thread must request the completion of the body.
+                        
+                        httpRequest = request
+                        
+                        bodyRemainingBytes = request.contentLength - request.body.count
+                        
+                        workerQueue.async() {
+                            [request, unowned self] in
+                            self.worker(request)
+                        }
+                        
+                        break;
+                        
+                    } else {
+                        
+                        Log.atEmergency?.log(id: logId, source: #file.source(#function, #line), message: "Coding error")
+                    }
                 }
             }
             
-            
-            // ====================================
-            // If there is no header break the scan
-            // ====================================
-            
-            if httpRequest == nil { break SCAN_FOR_COMPLETE_MESSAGES }
+            return true // Continue receiver loop
+        
+        } else {
             
             
-            // =========================
-            // Check for a complete body
-            // =========================
+            // The current request is being processed by a worker thread, but its body is incomplete. Write the data to the chunk storage for the worker thread to fetch it.
             
-            let bodyLength = httpRequest!.contentLength
-            let messageSize = bodyLength + httpRequest!.headerLength
+            let chunk: Data
             
-            if messageSize > messageBuffer.count { break SCAN_FOR_COMPLETE_MESSAGES }
-            
-            
-            // ====================
-            // The body is complete
-            // ====================
-            
-            
-            // Create duplicates of the header and body and pass these to the worker. This way the worker has sole access to the data it works on. Note that the header is a class and can thus be copied as is if the local header is set to nil afterwards.
-            
-            let bodyRange = Range(uncheckedBounds: (lower: httpRequest!.headerLength, upper: messageSize))
-            httpRequest!.payload = messageBuffer.subdata(in: bodyRange)
-            
-            Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: "HTTP Message Body complete, dispatching worker")
-            
-            
-            // =====================
-            // Start the Http Worker
-            // =====================
-            
-            workerQueue.async() {
-                [httpRequest, unowned self] in
-                self.worker(httpRequest!)
+            if buffer.count >= bodyRemainingBytes {
+                
+                
+                // The body will be completed with this chunk
+                
+                chunk = Data(bytes: buffer.baseAddress!, count: bodyRemainingBytes)
+                
+                
+                // The worker thread will fetch the chunk in due time. If there is data left in the buffer after removing the chunk, then this data must be processed before the receiverLoop is started again.
+                
+                
+                // See if there is any data left
+                
+                let remainingBufferBytes = buffer.count - bodyRemainingBytes
+
+                
+                // The previous httpRequest is now considered complete, even if the worker thread has not yet collected the last body chunk.
+                
+                bodyRemainingBytes = 0
+                httpRequest = nil
+
+
+                // Process any remaining data - if necessary
+                
+                if remainingBufferBytes > 0 {
+
+                    // Recursive call to take care of possible new requests. Note that new requests will be put on the (serial) worker thread, i.e. any new requests will simply 'sit' until the current request has been dealth with.
+                    
+                    let newBuffer = UnsafeMutableRawPointer.allocate(bytes: remainingBufferBytes, alignedTo: 1)
+                    newBuffer.copyBytes(from: buffer.baseAddress!.advanced(by: bodyRemainingBytes), count: remainingBufferBytes)
+                    
+                    _ = self.processReceivedData(UnsafeBufferPointer<UInt8>(start: newBuffer.assumingMemoryBound(to: UInt8.self), count: remainingBufferBytes))
+                }
+
+            } else {
+                
+                // All the new data is a part of the body currently beiing processed by a worker thread.
+                
+                chunk = Data(buffer)
             }
             
+
+            // Note that making the chunk available has been kept to the last possible moment. This ensures that all currently received data was processed before the 'get chunk' operation can restart a new receiverLoop.
             
-            // ===========================================================
-            // Remove the message from the buffer and the header from self
-            // ===========================================================
+            bodyQueue.async {
+                [chunk, unowned self] in
+                if self.bodyChunk != nil {
+                    Log.atEmergency?.log(id: self.logId, source: #file.source(#function, #line), message: "Coding error")
+                }
+                self.bodyChunk = chunk
+            }
+
             
-            let unprocessedRange = Range(uncheckedBounds: (lower: messageSize, upper: messageBuffer.count))
-            messageBuffer = messageBuffer.subdata(in: unprocessedRange)
-            
-            
-            // For the next go-around
-            
-            httpRequest = nil
+            // Even if the bodyGetNextChunk starts a new receiverLoop, this is of no importance anymore. There is no more data or processing flow that could be disrupted. The current receiverLoop can simply terminate, even if another is already active.
+
+            return false // Stop the receiver loop
+        }
+    }
+    
+    
+    /// If not-nil, the next chunk of unprocessed body data.
+    
+    private var bodyChunk: Data?
+    
+    
+    /// The bytes remaining to be received from the client for the current request body.
+    
+    private var bodyRemainingBytes = 0
+    
+    
+    /// Returns immediately if body data was received before this call was made. If no data was received, it will return as soon as some data is received. If no data is received at all it will wait for a minimum of the time as specified in the timeout interval.
+    ///
+    /// This is potentially a blocking call that will suspend the current thread until data is received or the timeout interval elapses.
+    ///
+    /// The same data will never be offered twice. If the callee needs more data it must make sure to store the data itself as each received byte of body data will only be offered once through this call.
+    ///
+    /// The transfer of data from a client to the server is chunked: a clients sends data and the server must retrieve this data before the sever will accept new data from the same client. To achieve this, after each received block of data the
+    ///
+    /// - Parameters:
+    ///   - timeout: This time is the maximum time to wait for data to be received.
+    ///   - pollingInterval: Check every so much time of there was data received in the intervening time.
+    ///
+    /// - Returns: Nil if no data was available before the timeout interval elapsed or if the remaining bytes is zero (this constitues a code path error). Othewise a data object is returned with the data that was received so far.
+    
+    public func bodyGetNextChunk(timeout: TimeInterval, pollingInterval: TimeInterval) -> Data? {
+
+        func pollForData() -> Data? {
+            return bodyQueue.sync {
+                () -> Data? in
+                if bodyChunk != nil {
+                    let b = bodyChunk
+                    bodyChunk = nil
+                    return b
+                } else {
+                    return nil
+                }
+            }
         }
         
-        return true
+        
+        // The timeout specified in the call to this operation takes precedence over the inactivity timeout.
+        
+        incrementUsageCount()
+        defer { decrementUsageCount() }
+        
+        let stopAfter = Date().addingTimeInterval(timeout).unixTime
+        
+        while true {
+            if let chunk = pollForData() {
+                startReceiverLoop()
+                return chunk
+            } else if Date().unixTime < stopAfter {
+                _ = sleep(pollingInterval)
+            } else {
+                return nil
+            }
+        }
     }
 }
 

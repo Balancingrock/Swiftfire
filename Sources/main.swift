@@ -3,7 +3,7 @@
 //  File:       main.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.9
+//  Version:    0.10.10
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.10 - Added 'Darwin' to sleep statements.
 // 0.10.9  - Removed M&C, always start servers
 // 0.10.6  - Renamed parameters and telemetry type
 // 0.10.1  - Fixed new warnings from xcode 8.3
@@ -92,7 +93,7 @@ typealias Log = SwifterLog
 
 fileprivate func emergencyExit(_ message: String) -> Never {
     Log.atEmergency?.log(id: -1, source: "Main", message: message)
-    sleep(2) // Give the logger some time to do its work
+    _ = Darwin.sleep(2) // Give the logger some time to do its work
     fatalError(message)
 }
 
@@ -471,7 +472,7 @@ restartHttpAndHttpsServers()
 
 // Wait for the 'quit' command
 
-while !quitSwiftfire { sleep(2) }
+while !quitSwiftfire { _ = Darwin.sleep(2) }
 
 
 // Cleanup
@@ -503,7 +504,7 @@ Log.atNotice?.log(id: -1, source: "Main", message: "Swiftfire terminated normall
 
 // Give other tasks time to complete
 
-sleep(10)
+_ = Darwin.sleep(10)
 
 exit(EXIT_SUCCESS)
 

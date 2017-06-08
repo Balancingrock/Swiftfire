@@ -160,7 +160,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
         response.code = Response.Code._200_OK
         response.version = Version.http1_1
         response.contentType = mimeTypeHtml
-        response.payload = html.data(using: String.Encoding.utf8)
+        response.body = html.data(using: String.Encoding.utf8)
     }
     
     func loginAdminAccountPage() {
@@ -188,7 +188,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
                 
                 var environment = Function.Environment(request: request, connection: connection, domain: domain, response: &response, serviceInfo: &info)
                 
-                response.payload = doc.getContent(with: &environment)
+                response.body = doc.getContent(with: &environment)
                 response.code = Response.Code._200_OK
                 response.contentType = mimeTypeHtml
             }
@@ -222,7 +222,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
         response.code = Response.Code._200_OK
         response.version = Version.http1_1
         response.contentType = mimeTypeHtml
-        response.payload = html!.data(using: String.Encoding.utf8)
+        response.body = html!.data(using: String.Encoding.utf8)
     }
 
     func adminStatusPage(message: String? = nil) {
@@ -262,7 +262,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
         response.code = Response.Code._200_OK
         response.version = Version.http1_1
         response.contentType = mimeTypeHtml
-        response.payload = html.data(using: String.Encoding.utf8)
+        response.body = html.data(using: String.Encoding.utf8)
     }
     
     // Exit if there is a code already
@@ -710,7 +710,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
             
             var environment = Function.Environment(request: request, connection: connection, domain: domain, response: &response, serviceInfo: &info)
             
-            response.payload = doc.getContent(with: &environment)
+            response.body = doc.getContent(with: &environment)
             response.code = Response.Code._200_OK
             response.contentType = mimeType(forPath: absPath) ?? mimeTypeHtml
         }
@@ -727,7 +727,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
             return .next
         }
         
-        response.payload = data
+        response.body = data
         response.code = Response.Code._200_OK
         response.contentType = mimeType(forPath: absPath) ?? mimeTypeDefault
     }

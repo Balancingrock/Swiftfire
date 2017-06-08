@@ -3,7 +3,7 @@
 //  File:       RestartHttpAndHttpsServers.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.7
+//  Version:    0.10.10
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.10 - Added 'Darwin' to sleep statements.
 // 0.10.7 - Initial release
 // =====================================================================================================================
 
@@ -78,7 +79,7 @@ func restartHttpAndHttpsServers() {
         
         var waitLimiter = 0
         while httpServer?.isRunning ?? true {
-            sleep(1)
+            _ = Darwin.sleep(1)
             if waitLimiter == 60 { break }
             waitLimiter += 1
         }
@@ -104,7 +105,7 @@ func restartHttpAndHttpsServers() {
         
         var waitLimiter = 0
         while httpsServer?.isRunning ?? true {
-            sleep(1)
+            _ = Darwin.sleep(1)
             if waitLimiter == 60 { break }
             waitLimiter += 1
         }

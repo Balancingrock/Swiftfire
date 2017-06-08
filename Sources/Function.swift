@@ -3,7 +3,7 @@
 //  File:       Function.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.9
+//  Version:    0.10.10
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.10 - Changed signature of connection to SFConnection
 // 0.10.9 - Streamlined and folded http API into its own project
 // 0.10.7 - Added newSession to Function.Environment
 // 0.10.6 - Updated Service.Response type to HttpResponse type
@@ -80,7 +81,7 @@ public final class Function: CustomStringConvertible {
         ///
         /// Visibility rules prevent the use of SFConnection as the type.
         
-        public var connection: Connection
+        public var connection: SFConnection
         
         
         /// The domain for which the function is called.
@@ -102,7 +103,7 @@ public final class Function: CustomStringConvertible {
         ///
         /// - Note: the connection must in fact be an SFConnection.
         
-        public init(request: Request, connection: Connection, domain: Domain, response: inout Response, serviceInfo: inout Service.Info) {
+        public init(request: Request, connection: SFConnection, domain: Domain, response: inout Response, serviceInfo: inout Service.Info) {
             self.request = request
             self.connection = connection
             self.domain = domain
@@ -114,8 +115,6 @@ public final class Function: CustomStringConvertible {
         /// Creates a new session with the data contained in the environment
         
         public func newSession() -> Session? {
-            
-            guard let connection = (connection as? SFConnection) else { return nil }
             
             return domain.sessions.newSession(
                 address: connection.remoteAddress,

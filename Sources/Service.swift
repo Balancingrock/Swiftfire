@@ -3,7 +3,7 @@
 //  File:       Service.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.9
+//  Version:    0.10.10
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,8 @@
 //
 // History
 //
+// 0.10.10 - Clarified use of payload in the request
+//         - Changed service signature to use SFConnection instead of Connection
 // 0.10.9 - Streamlined and folded http API into its own project
 // 0.10.7 - Merged SwiftfireCore into Swiftfire
 // 0.10.6 - Changed Response type to HttpResponse type.
@@ -111,14 +113,15 @@ public final class Service: CustomStringConvertible {
     ///
     /// - Parameters:
     ///   - request: The HTTP request that resulted in this service call.
-    ///   - connection: The HTTP Connection which is used by this request.
+    ///     - payload: The body of the request, will be 'nil' if the body has not been received yet. (Found within 'request')
+    ///   - connection: The SFConnection which is used by this request.
     ///   - domain: The domain to be serviced.
     ///   - info: The information dictionary passed along the chain. Can contain parameters for downstream services. Initial contents is a single entry
     ///   - response: The service response from a higher piority service (i.e. earlier in the service chain). The initial response has all items set to nil.
     ///
     /// - Returns: 'true' to continue the service chain, 'false' to abort it. Note: this is designed to abort a service chain in case of errors, but it may be usefull in other situations as well. However normally the service chain is expected to continue from start to finish such that every service gets a chance to perform its intended function. Returning 'false' for non-error cases places conditions on the sequence of services which necessitates proper end user instructions.
 
-    public typealias Signature = (_ request: Request, _ connection: Connection, _ domain: Domain, _ info: inout Service.Info, _ response: inout Response) -> Service.Result
+    public typealias Signature = (_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: inout Service.Info, _ response: inout Response) -> Service.Result
 
 
     /// The combo of name and service

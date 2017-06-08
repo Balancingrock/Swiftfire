@@ -3,7 +3,7 @@
 //  File:       Service.GetFileAtResourcePath.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.9
+//  Version:    0.10.10
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.10 - Changed signature of function to use SFConnection
 // 0.10.9 - Streamlined and folded http API into its own project
 // 0.10.7 - Typo in comments
 // 0.10.6 - Interface update
@@ -114,14 +115,14 @@ import Http
 ///
 /// - Parameters:
 ///   - header: The header of the HTTP request.
-///   - connection: The HttpConnection object that is used for this connection.
+///   - connection: The SFConnection object that is used for this connection.
 ///   - domain: The domain that is serviced for this request.
 ///   - info: A dictionary for communication between services.
 ///   - response: An object that can receive information to be returned in response to the request.
 ///
 /// - Returns: On error .abort, on success .next.
 
-func service_getFileAtResourcePath(_ request: Request, _ connection: Connection, _ domain: Domain, _ info: inout Service.Info, _ response: inout Response) -> Service.Result {
+func service_getFileAtResourcePath(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: inout Service.Info, _ response: inout Response) -> Service.Result {
     
     
 
@@ -162,11 +163,6 @@ func service_getFileAtResourcePath(_ request: Request, _ connection: Connection,
     if response.code != nil { return .next }
 
     
-    // Aliases
-    
-    let connection = (connection as! SFConnection)
-    
-    
     // =================================================================================================================
     // Make sure a resource path string is present in the chainInfo
     // =================================================================================================================
@@ -183,7 +179,7 @@ func service_getFileAtResourcePath(_ request: Request, _ connection: Connection,
     // Fetch the requested resource
     // =================================================================================================================
     
-    let payload: Data
+    let body: Data
     
     // If the file can contain function calls, then process it. Otherwise return the file as read.
     
@@ -201,7 +197,7 @@ func service_getFileAtResourcePath(_ request: Request, _ connection: Connection,
 
             var environment = Function.Environment(request: request, connection: connection, domain: domain, response: &response, serviceInfo: &info)
             
-            payload = doc.getContent(with: &environment)
+            body = doc.getContent(with: &environment)
         }
         
         
@@ -213,7 +209,7 @@ func service_getFileAtResourcePath(_ request: Request, _ connection: Connection,
             return .next
         }
         
-        payload = data
+        body = data
     }
     
     
@@ -231,7 +227,7 @@ func service_getFileAtResourcePath(_ request: Request, _ connection: Connection,
         
     response.code = Response.Code._200_OK
     response.contentType = mimeType(forPath: resourcePath) ?? mimeTypeDefault
-    response.payload = payload
+    response.body = body
         
     return .next
 }

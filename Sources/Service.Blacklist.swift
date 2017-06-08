@@ -3,7 +3,7 @@
 //  File:       Service.Blacklist.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.9
+//  Version:    0.10.10
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.10 - Changed signature of function to use SFConnection
 // 0.10.9 - Streamlined and folded http API into its own project
 // 0.10.6 - Interface update
 //        - Renamed chain... to service...
@@ -108,14 +109,14 @@ import Http
 ///
 /// - Parameters:
 ///   - request: The HTTP request.
-///   - connection: The HttpConnection object that is used for this connection.
+///   - connection: The SFConnection object that is used for this connection.
 ///   - domain: The domain that is serviced for this request.
 ///   - info: A dictionary for communication between services.
 ///   - response: An object that can receive information to be returned in response to the request.
 ///
 /// - Returns: On error .abort, on success .next.
 
-func service_blacklist(_ request: Request, _ connection: Connection, _ domain: Domain, _ info: inout Service.Info, _ response: inout Response) -> Service.Result {
+func service_blacklist(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: inout Service.Info, _ response: inout Response) -> Service.Result {
     
     
     // Abort immediately if there is already a response code

@@ -3,7 +3,7 @@
 //  File:       HttpConnection.HttpWorker.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.9
+//  Version:    0.10.10
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.10 - Added 'Darwin' to sleep statements.
 // 0.10.9 - Streamlined and folded http API into its own project
 // 0.10.6 - Updated parameters to services & transmission of response
 //        - Renamed chain... to service...
@@ -296,7 +297,7 @@ extension SFConnection {
             
                 if forwarder != nil {
                     var data: Data = request.asData()!
-                    if let payload = request.payload { data.append(payload) }
+                    if let body = request.body { data.append(body) }
                     _ = forwarder?.transfer(data, callback: nil)
                 }
             }
@@ -407,9 +408,9 @@ extension SFConnection {
         
         // If there is no playload try to create the default domain reply
         
-        if response.payload == nil {
-            response.payload = domain.customErrorResponse(for: code)
-            if response.payload != nil {
+        if response.body == nil {
+            response.body = domain.customErrorResponse(for: code)
+            if response.body != nil {
                 response.contentType = mimeTypeHtml
             }
         }
@@ -417,9 +418,9 @@ extension SFConnection {
         
         // If there is stil no payload, try the server default
         
-        if response.payload == nil {
+        if response.body == nil {
             response.createErrorPayload()
-            if response.payload != nil {
+            if response.body != nil {
                 response.contentType = mimeTypeHtml
             }
         }

@@ -3,7 +3,7 @@
 //  File:       Function.SF.StatisticsPage.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.9
+//  Version:    0.10.10
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.10 - Changed Connection to SFConnection
 // 0.10.9 - Initial release
 //
 // =====================================================================================================================
@@ -228,7 +229,7 @@ func function_sf_statisticsPage(_ args: Function.Arguments, _ info: inout Functi
                     var url = URL(fileURLWithPath: domain.root)
                     components?.forEach({ url = url.appendingPathComponent($0) })
                     var isDir: ObjCBool = false
-                    (environment.connection as? SFConnection)?.filemanager.fileExists(atPath: url.path, isDirectory: &isDir)
+                    environment.connection.filemanager.fileExists(atPath: url.path, isDirectory: &isDir)
                     
                     // Create 'details' button
                     

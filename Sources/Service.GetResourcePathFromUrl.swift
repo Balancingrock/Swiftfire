@@ -3,7 +3,7 @@
 //  File:       Service.GetResourcePathFromUrl.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.9
+//  Version:    0.10.10
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.10 - Changed signature of function to use SFConnection
 // 0.10.9 - Streamlined and folded http API into its own project
 // 0.10.7 - Typo in comments
 //        - Skips if the resource path keys are already present in info.
@@ -119,18 +120,18 @@ import Http
 
 /// Takes the URL from the request header and transforms it into a path that points at an existing resource
 ///
-/// - Note: For a full description of all effects of this operation see the file: DomainService.GetResourcePathFromUrl.swift
+/// - Note: For a full description of all effects of this operation see the file: Service.GetResourcePathFromUrl.swift
 ///
 /// - Parameters:
 ///   - request: The HTTP request.
-///   - connection: The HttpConnection object that is used for this connection.
+///   - connection: The SFConnection object that is used for this connection.
 ///   - domain: The domain that is serviced for this request.
 ///   - info: A dictionary for communication between services.
 ///   - response: An object that can receive information to be returned in response to the request.
 ///
 /// - Returns: On error .abort, on success .next.
 
-func service_getResourcePathFromUrl(_ request: Request, _ connection: Connection, _ domain: Domain, _ info: inout Service.Info, _ response: inout Response) -> Service.Result {
+func service_getResourcePathFromUrl(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: inout Service.Info, _ response: inout Response) -> Service.Result {
     
     
     func handle400_BadRequestError(message: String) {
@@ -143,7 +144,6 @@ func service_getResourcePathFromUrl(_ request: Request, _ connection: Connection
         
         // Aliases
         
-        let connection = (connection as! SFConnection)
         let logId = connection.interface?.logId ?? -2
         
         
@@ -178,11 +178,6 @@ func service_getResourcePathFromUrl(_ request: Request, _ connection: Connection
         domain.telemetry.nof404.increment()
         
         
-        // Aliases
-        
-        let connection = (connection as! SFConnection)
-
-        
         // Conditional recording of all 404 path errors
         
         domain.recordIn404Log(path)
@@ -212,11 +207,6 @@ func service_getResourcePathFromUrl(_ request: Request, _ connection: Connection
         // Telemetry update
         
         domain.telemetry.nof403.increment()
-        
-        
-        // Aliases
-        
-        let connection = (connection as! SFConnection)
         
         
         // Mutation update
@@ -299,15 +289,7 @@ func service_getResourcePathFromUrl(_ request: Request, _ connection: Connection
     if info[.absoluteResourcePathKey] != nil { return .next }
     if info[.relativeResourcePathKey] != nil { return .next }
         
-    
-    // Aliases
-    
-    guard let connection = (connection as? SFConnection) else {
-        Log.atCritical?.log(id: -1, source: #file.source(#function, #line), message: "Type conflict: should be an SFConnection")
-        return .next
-    }
-
-    
+        
     // =============================================================================================================
     // Determine the resource path
     // =============================================================================================================

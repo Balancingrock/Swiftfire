@@ -3,7 +3,7 @@
 //  File:       DomainServices.Registration.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.7
+//  Version:    0.10.10
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.10 - Added wait until body is complete
 // 0.10.7 - Added getSession to the default list of services
 // 0.10.6 - Renamed services
 //        - Added getSession
@@ -82,6 +83,7 @@ private let getFileAtResourcePath = "Get file at resource path"
 private let getSession = "Get Active Session"
 private let serverAdmin = "Handle server Admin Domain"
 private let decodePostFormUrlEncoded = "Decode post form urlencoded"
+private let waitUntilBodyComplete = "Wait until body is received"
 
 
 // =================================================
@@ -101,6 +103,7 @@ func registerServices() {
     services.register(name: getSession, service: service_getSession)
     services.register(name: serverAdmin, service: service_serverAdmin)
     services.register(name: decodePostFormUrlEncoded, service: service_decodePostFormUrlEncoded)
+    services.register(name: waitUntilBodyComplete, service: service_waitUntilBodyComplete)
 }
 
 
@@ -117,6 +120,7 @@ var defaultServices: Array<String> {
         onlyHttp10OrHttp11,
         onlyGetOrPost,
         getSession,
+        waitUntilBodyComplete,
         decodePostFormUrlEncoded,
         getResourcePathFromUrl,
         getFileAtResourcePath
@@ -130,6 +134,7 @@ var defaultServices: Array<String> {
 var serverAdminServices: Array<String> {
     return [
         getSession,
+        waitUntilBodyComplete,
         decodePostFormUrlEncoded,
         serverAdmin
     ]
