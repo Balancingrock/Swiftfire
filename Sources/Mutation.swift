@@ -49,6 +49,7 @@
 // History
 //
 // 0.10.11 - Replaced SwifterJSON with VJson
+//         - Merged createAddClientRecord
 // 0.10.7 - Merged SwiftfireCore into Swiftfire
 // 0.9.17 - Header update
 // 0.9.15 - General update and switch to frameworks
@@ -114,6 +115,22 @@ public final class Mutation {
     public static func createEmptyDatabase() -> Mutation { return Mutation(kind: .EmptyDatabase) }
 */
     
+    
+    /// Create a new ClientMutation and initialize it with the content from the connection.
+    ///
+    /// - Parameter from: The HTTP Connection to use for setup.
+    ///
+    /// - Returns: A partly initialized client mutation.
+    
+    static func createAddClientRecord(from connection: SFConnection) -> Mutation {
+        let mutation = Mutation.createAddClientRecord()
+        mutation.ipAddress = connection.remoteAddress
+        mutation.connectionAllocationCount = Int32(connection.allocationCount)
+        mutation.connectionObjectId = Int16(connection.objectId)
+        mutation.socket = connection.logId
+        return mutation
+    }
+
     
     /// Create a mutation from the given JSON code if possible. Nil otherwise.
     
