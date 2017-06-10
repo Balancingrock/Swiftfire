@@ -3,7 +3,7 @@
 //  File:       HttpConnection.HttpWorker.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.10
+//  Version:    0.10.11
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.11 - Renamed createErrorMessageInBody
 // 0.10.10 - Added 'Darwin' to sleep statements.
 // 0.10.9 - Streamlined and folded http API into its own project
 // 0.10.6 - Updated parameters to services & transmission of response
@@ -112,7 +113,7 @@ extension SFConnection {
         let response = Response()
         response.code = ._400_BadRequest
         response.version = .http1_1
-        response.createErrorPayload(message: "<p>\(message)</p>")
+        response.createErrorMessageInBody(message: "<p>\(message)</p>")
         if let data = response.data {
             transfer(data)
         } else {
@@ -154,7 +155,7 @@ extension SFConnection {
         let response = Response()
         response.code = ._500_InternalServerError
         response.version = .http1_1
-        response.createErrorPayload(message: "<p>\(message)</p>")
+        response.createErrorMessageInBody(message: "<p>\(message)</p>")
         if let data = response.data {
             transfer(data)
         } else {
@@ -419,7 +420,7 @@ extension SFConnection {
         // If there is stil no payload, try the server default
         
         if response.body == nil {
-            response.createErrorPayload()
+            response.createErrorMessageInBody()
             if response.body != nil {
                 response.contentType = mimeTypeHtml
             }
