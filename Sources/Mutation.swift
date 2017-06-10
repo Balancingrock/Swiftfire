@@ -3,7 +3,7 @@
 //  File:       Mutation.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.7
+//  Version:    0.10.11
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.11 - Replaced SwifterJSON with VJson
 // 0.10.7 - Merged SwiftfireCore into Swiftfire
 // 0.9.17 - Header update
 // 0.9.15 - General update and switch to frameworks
@@ -58,7 +59,7 @@
 // =====================================================================================================================
 
 import Foundation
-import SwifterJSON
+import VJson
 
 
 // Definitions for JSON code

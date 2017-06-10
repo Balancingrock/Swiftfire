@@ -3,7 +3,7 @@
 //  File:       StPathPart.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.7
+//  Version:    0.10.11
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.11 - Replaced SwifterJSON with VJson
 // 0.10.7 - Merged SwiftfireCore into Swiftfire
 // 0.10.1 - Fixed warnings from Xcode 8.3
 // 0.10.0 - Added parameter nilOnDoNotTrace to getPathPart
@@ -56,7 +57,7 @@
 // =====================================================================================================================
 
 import Foundation
-import SwifterJSON
+import VJson
 
 
 /// Records the number of accesses this part of the URL has had.

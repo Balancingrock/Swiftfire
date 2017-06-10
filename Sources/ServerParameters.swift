@@ -3,7 +3,7 @@
 //  File:       Parameters.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.9
+//  Version:    0.10.11
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.11 - Replaced SwifterJSON with VJson
 // 0.10.9 - Removed Monitoring & control related parameters
 // 0.10.7 - Added adminSiteRoot
 //        - Removed SWIFTFIRE_VERSION
@@ -90,7 +91,7 @@
 // =====================================================================================================================
 
 import Foundation
-import SwifterJSON
+import VJson
 import SwifterLog
 import BRUtils
 

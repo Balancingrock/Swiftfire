@@ -3,7 +3,7 @@
 //  File:       StClientRecord.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.7
+//  Version:    0.10.11
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.11 - Replaced SwifterJSON with VJson
 // 0.10.7 - Merged SwiftfireCore into Swiftfire
 // 0.10.5 - Bugfix, host, url. response code, response details can be nil
 //        - Added debug output.
@@ -56,7 +57,7 @@
 // =====================================================================================================================
 
 import Foundation
-import SwifterJSON
+import VJson
 import SwifterLog
 
 

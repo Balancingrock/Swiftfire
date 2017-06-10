@@ -3,7 +3,7 @@
 //  File:       Account.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.8
+//  Version:    0.10.11
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.11 - Replaced SwifterJSON with VJson
 // 0.10.8 - Removed dependecy on macOS 10.11
 // 0.10.7 - Initial release
 //
@@ -55,7 +56,7 @@
 
 import Foundation
 import SwifterLog
-import SwifterJSON
+import VJson
 import KeyedCache
 import COpenSsl
 

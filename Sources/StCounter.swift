@@ -3,7 +3,7 @@
 //  File:       StCounter.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.7
+//  Version:    0.10.11
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,13 +48,14 @@
 //
 // History
 //
+// 0.10.11 - Replaced SwifterJSON with VJson
 // 0.10.7 - Merged SwiftfireCore into Swiftfire
 // 0.9.17 - Header update
 // 0.9.15 - Initial release
 // =====================================================================================================================
 
 import Foundation
-import SwifterJSON
+import VJson
 
 
 /// A counter for a path part. It contains the counter for a previous time period, thus creating a list of counters for successive time periods. Though counters are only created when an actual increment takes place.

@@ -56,7 +56,7 @@
 
 
 import Foundation
-import SwifterJSON
+import VJson
 
 
 /// Root class for the command and control interface.

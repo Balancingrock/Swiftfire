@@ -49,6 +49,7 @@
 // History
 //
 // 0.10.11 - Renamed createErrorMessageInBody
+//         - Replaced SwifterJSON with VJson
 // 0.10.10 - Added 'Darwin' to sleep statements.
 // 0.10.9 - Streamlined and folded http API into its own project
 // 0.10.6 - Updated parameters to services & transmission of response
@@ -84,7 +85,7 @@
 // =====================================================================================================================
 
 import Foundation
-import SwifterJSON
+import VJson
 import SwifterLog
 import SwifterSockets
 import Http
