@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.11 - Removed console related stuff
 // 0.10.7  - Added adminAccountsDir
 //         - Added adminSessionsDir
 //         - Renamed to storageUrls
@@ -71,12 +72,7 @@
 //
 // root
 // - ssl
-//   - console
-//     - trusted-client-certificates
-//       (must run "c_rehash ." command when something changes in this directory)
-//     - server
-//       - certificate.pem
-//       - private-key.pem
+//   - server
 // - domains
 //   - domain-defaults.json
 //   - ... subdirectories for each domain
@@ -159,31 +155,6 @@ final class StorageUrls {
     /// Ssl support directory
     
     static var sslDir: URL? = { dirUrl(rootDir, "ssl") }()
-    
-    
-    /// The directory with certificate and key for the console connection
-    
-    static var sslConsoleDir: URL? = { dirUrl(sslDir, "console") }()
-
-    
-    /// The directory with trusted console certificates
-    
-    static var sslConsoleTrustedClientsDir: URL? = { dirUrl(sslConsoleDir, "trusted-client-certificates") }()
-    
-    
-    /// The directory with the certificate and private key certificates
-    
-    static var sslConsoleServerDir: URL? = { dirUrl(sslConsoleDir, "server") }()
-    
-    
-    /// The certificate to be used for the console connection
-    
-    static var sslConsoleServerCertificateFile: URL? = { fileUrl(sslConsoleServerDir, "certificate.pem") }()
-
-    
-    /// The private key to be used for the console connection
-    
-    static var sslConsoleServerPrivateKeyFile: URL? = { fileUrl(sslConsoleServerDir, "private-key.pem") }()
     
     
     /// The directory for the server certificate & private key
