@@ -4,8 +4,8 @@ Number;Found;Fixed;Project;Problem;Remark
 3;0.9.15;0.9.18;Console;Blacklist window: remove ‘stat’ button & column;
 4;0.9.15;0.9.18;Console;Rename the start button to ‘run’ (Also rename the start command to run) Also in the “Services” window.;
 5;0.9.15;0.9.18;Swiftfire;Rename ‘closure’ to ‘service’ in the register services function.;
-6;0.9.17;;Swiftfire;Replace log with Log.at<level>?.log;
-7;0.9.17;;Console;Disconnecting the console creates an SSL_ERROR_SYSCALL;Probably because the connection is terminated before SSL has completed its negotiation process.
+6;0.9.17;0.10.10;Swiftfire;Replace log with Log.at<level>?.log;
+7;0.9.17;0.10.10;Console;Disconnecting the console creates an SSL_ERROR_SYSCALL;
 8;0.9.17;;All;Analyse compile time & decrease it;
 9;;;;;
 10;;;;;
