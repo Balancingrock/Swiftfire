@@ -275,7 +275,7 @@ public final class SFConnection: SwifterSockets.Connection {
                 
                 // Log the header of the request
                 
-                if parameters.headerLoggingEnabled.value { headerLogger.record(connection: self, request: httpRequest!) }
+                if parameters.headerLoggingEnabled.value { headerLogger.record(connection: self, request: request) }
                 
                 
                 // Check if the body is complete
