@@ -88,12 +88,18 @@ Note: Planned releases are for information only and almost always change.
 - Small feature improvements (if necessary)
 - Code improvements
 
-#### 0.10.10 (Planned)
+#### 0.10.11 (Current)
+
+- Bugfix: fixed hanger on URLs containing an 'and' (&) sign
+- Bugfix: added header logging back in
+- Upgraded SwifterJSON to VJson
+
+#### 0.10.10
 
 - Better HTML support for code generation (improving the admin interface)
 - Improved handling for (very) large HTTP request bodies (asynchronous processing).
 
-#### 0.10.9 (Current)
+#### 0.10.9
 
 - Completion of server admin web based interface
 - Removal of code related to SwifterConsole (no longer supported)
