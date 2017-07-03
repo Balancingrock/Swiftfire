@@ -377,7 +377,7 @@ telemetry.httpsServerStatus.setValue("Stopped")
 // =========================================================
 // Make sure certificates are present for the M&C connection
 // =========================================================
-
+/*
 if (!StorageUrls.exists(url: StorageUrls.sslConsoleServerCertificateFile) || !StorageUrls.exists(url: StorageUrls.sslConsoleServerPrivateKeyFile)) {
     switch generateKeyAndCertificate(privateKeyLocation: StorageUrls.sslConsoleServerPrivateKeyFile, certificateLocation: StorageUrls.sslConsoleServerCertificateFile) {
     case .error(let message): emergencyExit(message)
@@ -451,7 +451,7 @@ if consoleServerCertificateFound {
 } else {
     Log.atError?.log(id: -1, source: "Main", message: "No Trusted Console Certificate found")
 }
-
+*/
 
 // ====================================
 // Call out to the custom setup routine

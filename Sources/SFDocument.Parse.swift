@@ -3,7 +3,7 @@
 //  File:       SFDocument.Parse.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.0
+//  Version:    0.10.11
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.11 - Replaced SwifterJSON with VJson
 // 0.10.0 - Initial release
 //
 // =====================================================================================================================
@@ -82,7 +83,7 @@
 
 import Foundation
 import Ascii
-import SwifterJSON
+import VJson
 
 
 // Constants

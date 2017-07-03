@@ -3,7 +3,7 @@
 //  File:       Domain.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.9
+//  Version:    0.10.11
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.11 - Replaced SwifterJSON with VJson
 // 0.10.9 - Streamlined and folded http API into its own project
 // 0.10.7 - Merged SwiftfireCore into Swiftfire
 // 0.10.6 - Added sessionTimeout
@@ -83,7 +84,7 @@
 // =====================================================================================================================
 
 import Foundation
-import SwifterJSON
+import VJson
 import SwifterLog
 import SecureSockets
 import BRUtils

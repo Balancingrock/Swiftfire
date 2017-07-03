@@ -3,7 +3,7 @@
 //  File:       Service.GetResourcePathFromUrl.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.10
+//  Version:    0.10.11
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.11 - Fixed endless loop problem in name/value pairs
 // 0.10.10 - Changed signature of function to use SFConnection
 // 0.10.9 - Streamlined and folded http API into its own project
 // 0.10.7 - Typo in comments
@@ -256,7 +257,7 @@ func service_getResourcePathFromUrl(_ request: Request, _ connection: SFConnecti
         var nameValuePairs = parts[1].components(separatedBy: "&")
         
         while nameValuePairs.count > 0 {
-            var nameValue = nameValuePairs[0].components(separatedBy: "=")
+            var nameValue = nameValuePairs.removeFirst().components(separatedBy: "=")
             switch nameValue.count {
             case 0: break // error, don't do anything
             case 1: getDict[nameValue[0]] = ""

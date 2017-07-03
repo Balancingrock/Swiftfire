@@ -6,4 +6,7 @@ This does not constitute a promise for implementation, just a list of things tha
 - Improve error handling: not all errors should lead to termination
 - EINTR (interrupted) should lead to retry on: accept, read, send, select. (i.e. operational calls, not setup calls)
 - ECONNABORTED should lead to retry on accept
-- Make it impossible in the GUI to request anything but closeConnection for the server level blacklist
+
+- Add trusted certificate to serveradmin
+- Make the special trigger 'serveradmin' configurable
+- Consider a better approach to simply listing all client accesses. This list will get way to long to be manageable. Maybe a searchable list? by time of access and/or address? or sort it by times accessed?

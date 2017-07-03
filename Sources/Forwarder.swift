@@ -3,7 +3,7 @@
 //  File:       Forwarder.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.9
+//  Version:    0.10.11
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.11 - Renaming createErrorMessageInBody
 // 0.10.9 - Streamlined and folded http API into its own project
 // 0.10.7 - Changed receiverData to processReceivedData
 // 0.10.6 - Update of receiverLoop
@@ -92,7 +93,7 @@ class Forwarder: SwifterSockets.Connection {
         let reply = Response()
         reply.code = Response.Code._408_RequestTimeout
         reply.version = Version.http1_1
-        reply.createErrorPayload(message: "Forwarding target timed out.")
+        reply.createErrorMessageInBody(message: "Forwarding target timed out.")
         if let data = reply.data {
             _ = client?.transfer(data, callback: nil)
         }

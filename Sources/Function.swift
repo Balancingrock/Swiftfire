@@ -3,7 +3,7 @@
 //  File:       Function.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.10
+//  Version:    0.10.11
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.11 - Replaced SwifterJSON with VJson
 // 0.10.10 - Changed signature of connection to SFConnection
 // 0.10.9 - Streamlined and folded http API into its own project
 // 0.10.7 - Added newSession to Function.Environment
@@ -59,7 +60,7 @@
 
 import Foundation
 import SwifterLog
-import SwifterJSON
+import VJson
 import SwifterSockets
 import Http
 

@@ -3,7 +3,7 @@
 //  File:       Session.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.9
+//  Version:    0.10.11
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.11 - Replaced SwifterJSON with VJson
 // 0.10.9 - Streamlined and folded http API into its own project
 // 0.10.7 - Fixed bug: made info public.
 //        - Added subscript access to SessionDictionary
@@ -67,7 +68,7 @@
 // =====================================================================================================================
 
 import Foundation
-import SwifterJSON
+import VJson
 import SwifterLog
 import Http
 

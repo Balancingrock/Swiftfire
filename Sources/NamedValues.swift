@@ -3,7 +3,7 @@
 //  File:       NamedValues.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.7
+//  Version:    0.10.11
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.11 - Replaced SwifterJSON with VJson
 // 0.10.7 - Merged SwiftfireCore into Swiftfire
 // 0.10.6 - Reworked & renamed from UIntTelemetry to NamesValues
 // 0.9.17 - Header update
@@ -59,7 +60,7 @@
 // =====================================================================================================================
 
 import Foundation
-import SwifterJSON
+import VJson
 import SwifterLog
 import BRUtils
 

@@ -3,7 +3,7 @@
 //  File:       SFConnection.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.10
+//  Version:    0.10.11
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.11 - Bugfix: Added header logging (was removed during update)
 // 0.10.10 - Added capability to handle (very) large request bodies.
 //         - Made class public
 // 0.10.9 - Streamlined and folded http API into its own project
@@ -268,6 +269,16 @@ public final class SFConnection: SwifterSockets.Connection {
             // Keep scanning for new requests until no request could be created
             
             while let request = Request(&headerData!) {
+                
+                Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: "HTTP Request Header complete")
+
+                
+                // Log the header of the request
+                
+                if parameters.headerLoggingEnabled.value { headerLogger.record(connection: self, request: request) }
+                
+                
+                // Check if the body is complete
                 
                 if request.body.count == request.contentLength {
                     
