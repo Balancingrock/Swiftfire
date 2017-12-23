@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.12 - Added transfer response and restart session
 // 0.10.10 - Added wait until body is complete
 // 0.10.7 - Added getSession to the default list of services
 // 0.10.6 - Renamed services
@@ -84,6 +85,8 @@ private let getSession = "Get Active Session"
 private let serverAdmin = "Handle server Admin Domain"
 private let decodePostFormUrlEncoded = "Decode post form urlencoded"
 private let waitUntilBodyComplete = "Wait until body is received"
+private let transferResponse = "Transfer Response"
+private let restartSessionTimeout = "Restart Session Timeout"
 
 
 // =================================================
@@ -104,6 +107,8 @@ func registerServices() {
     services.register(name: serverAdmin, service: service_serverAdmin)
     services.register(name: decodePostFormUrlEncoded, service: service_decodePostFormUrlEncoded)
     services.register(name: waitUntilBodyComplete, service: service_waitUntilBodyComplete)
+    services.register(name: transferResponse, service: service_transferResponse)
+    services.register(name: restartSessionTimeout, service: service_restartSessionTimeout)
 }
 
 
@@ -123,7 +128,9 @@ var defaultServices: Array<String> {
         waitUntilBodyComplete,
         decodePostFormUrlEncoded,
         getResourcePathFromUrl,
-        getFileAtResourcePath
+        getFileAtResourcePath,
+        transferResponse,
+        restartSessionTimeout
     ]
 }
 

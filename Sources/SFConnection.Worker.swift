@@ -49,6 +49,8 @@
 // History
 //
 // 0.10.12 - Upgraded to SwifterLog 1.1.0
+//         - Separated the response transfer into its own service
+//         - Separated the session restart into its own service
 // 0.10.11 - Renamed createErrorMessageInBody
 //         - Replaced SwifterJSON with VJson
 // 0.10.10 - Added 'Darwin' to sleep statements.
@@ -393,11 +395,15 @@ extension SFConnection {
                     message: "Service: \(item.name)",
                     from: Source(id: logId, file: #file, type: "SFConnection", function: #function, line: #line)
                 )
+            }
 
-                // ******************** SERVICE CALL
-                if item.service(request, self, domain, &serviceInfo, &response) == .abort { break }
-                // ********************
             
+            // ******************** SERVICE CALL
+            if item.service(request, self, domain, &serviceInfo, &response) == .abort { break }
+            // ********************
+            
+            if parameters.debugMode.value {
+
                 if serviceInfo.dict.count == 0 {
                     Log.atDebug?.log(
                         message: "\n\nService info is empty",
@@ -416,98 +422,25 @@ extension SFConnection {
                     message: "\n\n\(response)\n",
                     from: Source(id: logId, file: #file, type: "SFConnection", function: #function, line: #line)
                 )
-                
-            } else {
-                
-                // ******************** SERVICE CALL
-                if item.service(request, self, domain, &serviceInfo, &response) == .abort { break }
-                // ********************
             }
         }
         
-        Log.atDebug?.log(
-            message: "Domain services completed with code = \(response.code?.rawValue ?? "None")",
-            from: Source(id: logId, file: #file, function: #function, line: #line)
-        )
-        
-        
-        // =============================================================================================================
-        // Session maintenance
-        // =============================================================================================================
-
-        // If a session is present, set the cookie request in the response to restart the session timeout
-        
-        if let session = serviceInfo[.sessionKey] as? Session {
-            if session.isActiveKeepActive {
-                response.cookies.append(session.cookie)
-                Log.atDebug?.log(
-                    message: "Session cookie added to response with id = \(session.id.uuidString)",
-                    from: Source(id: logId, file: #file, function: #function, line: #line)
-                )
-            }
-        }
-        
-        
-        // =============================================================================================================
-        // Send reply
-        // =============================================================================================================
-        
-        // If there is no code, nothing will be returned
-        
-        guard let code = response.code else { return }
-        
-        
-        // If there is no playload try to create the default domain reply
-        
-        if response.body == nil {
-            response.body = domain.customErrorResponse(for: code)
-            if response.body != nil {
-                response.contentType = mimeTypeHtml
-            }
-        }
-        
-        
-        // If there is stil no payload, try the server default
-        
-        if response.body == nil {
-            response.createErrorMessageInBody()
-            if response.body != nil {
-                response.contentType = mimeTypeHtml
-            }
-        }
-        
-            
-        // Send the response
-            
-        if let reply = response.data {
-            
-            
-            bufferedTransfer(reply)
-            
-        } else {
-            
-            Log.atError?.log(
-                message: "Failed to create response data",
-                from: Source(id: logId, file: #file, function: #function, line: #line)
-            )
-        }
-
         
         // Update the statistics
             
-        let mutation = Mutation.createAddClientRecord(from: self)
-        mutation.domain = domain.name
-        mutation.url = serviceInfo[.relativeResourcePathKey] as? String ?? "Unknown resource path"
-        mutation.httpResponseCode = code.rawValue
-        mutation.responseDetails = ""
-        mutation.requestReceived = timestampResponseStart
-        statistics.submit(mutation: mutation, onError: {
-            [unowned self] (message: String) in
-            Log.atError?.log(
-                message: message,
-                from: Source(id: self.logId, file: #file, function: #function, line: #line)
-            )
-        })
+        //let mutation = Mutation.createAddClientRecord(from: self)
+        //mutation.domain = domain.name
+        //mutation.url = serviceInfo[.relativeResourcePathKey] as? String ?? "Unknown resource path"
+        //mutation.httpResponseCode = code.rawValue
+        //mutation.responseDetails = ""
+        //mutation.requestReceived = timestampResponseStart
+        //statistics.submit(mutation: mutation, onError: {
+        //    [unowned self] (message: String) in
+        //    Log.atError?.log(
+        //        message: message,
+        //        from: Source(id: self.logId, file: #file, function: #function, line: #line)
+        //    )
+        //})
 
         Log.atInfo?.log(
             message: "Response took \(Date().javaDate - timestampResponseStart) milli seconds",
