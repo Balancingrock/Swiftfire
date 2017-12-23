@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.12 - Upgraded to SwifterLog 1.1.0
 // 0.10.10 - Changed Connection to SFConnection
 // 0.10.6 - Renamed chain... to service...
 // 0.10.1 - Fixed warnings in xcode 8.3
@@ -94,6 +95,7 @@
 // =====================================================================================================================
 
 import Foundation
+import SwifterLog
 
 
 /// Returns the number of hits for a relative resource path. The path should be relative to the root directory of the domain.
@@ -122,7 +124,7 @@ func function_nofPageHits(_ args: Function.Arguments, _ info: inout Function.Inf
         count = statistics.foreverCount(domain: environment.domain.name, path: path)
     }
 
-    Log.atDebug?.log(id: environment.connection.logId, source: #file.source(#function, #line), message: "ForeverCount for \(path ?? "Unknown") = \(count)")
+    Log.atDebug?.log(message: "ForeverCount for \(path ?? "Unknown") = \(count)", from: Source(id: Int(environment.connection.logId), file: #file, function: #function, line: #line))
 
     return count.description.data(using: String.Encoding.utf8)
 }

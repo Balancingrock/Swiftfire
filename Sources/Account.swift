@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.12 - Upgraded to SwifterLog 1.1.0
 // 0.10.11 - Replaced SwifterJSON with VJson
 // 0.10.8 - Removed dependecy on macOS 10.11
 // 0.10.7 - Initial release
@@ -139,7 +140,9 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
             if names.count > 0 {
                 return names[0]
             } else {
-                SwifterLog.atError?.log(id: -1, source: #file.source(#function, #line), message: "Array with names is empty")
+                Log.atError?.log(
+                    message: "Array with names is empty",
+                    from: Source(id: -1, file: #file, type: "Account", function: #function, line: #line))
                 return ""
             }
         }
@@ -165,7 +168,9 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
             // Save the new values, if the save fails, then undo the change.
             
             if let error = save() {
-                SwifterLog.atError?.log(id: -1, source: #file.source(#function, #line), message: "Cannot save account \(self), error message = \(error)")
+                Log.atError?.log(
+                    message: "Cannot save account \(self), error message = \(error)",
+                    from: Source(id: -1, file: #file, type: "Account", function: #function, line: #line))
                 
             } else {
                 
@@ -262,7 +267,9 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
         self.digest = digest
         
         if let error = save() {
-            SwifterLog.atError?.log(id: -1, source: #file.source(#function, #line), message: "Cannot save account\n\n\(self),\n\n Error message = \(error)\n")
+            Log.atError?.log(
+                message: "Cannot save account\n\n\(self),\n\n Error message = \(error)\n",
+                from: Source(id: -1, file: #file, type: "Account", function: #function, line: #line))
             return nil
         }
     }
@@ -296,7 +303,9 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
         // Save the new values, if the save fails, then restore the old values.
         
         if let error = save() {
-            SwifterLog.atError?.log(id: -1, source: #file.source(#function, #line), message: "Cannot save account \(self), error message = \(error)")
+            Log.atError?.log(
+                message: "Cannot save account \(self), error message = \(error)",
+                from: Source(id: -1, file: #file, type: "Account", function: #function, line: #line))
             self.salt = oldSalt
             self.digest = oldDigest
             return false
@@ -318,7 +327,9 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
     public func hasSameDigest(as pwd: String) -> Bool {
         
         guard let testDigest = createDigest(pwd, salt: salt) else {
-            SwifterLog.atCritical?.log(id: -1, source: #file.source(#function, #line), message: "Cannot create digest")
+            Log.atCritical?.log(
+                message: "Cannot create digest",
+                from: Source(id: -1, file: #file, type: "Account", function: #function, line: #line))
             return false
         }
         
@@ -436,7 +447,9 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
         // Create the digest generator
         
         guard let digester = EVP_MD_CTX_new() else {
-            SwifterLog.atEmergency?.log(id: -1, source: #file.source(#function, #line), message: "Cannot allocate digest generator")
+            Log.atEmergency?.log(
+                message: "Cannot allocate digest generator",
+                from: Source(id: -1, file: #file, type: "Account", function: #function, line: #line))
             return nil
         }
         defer { EVP_MD_CTX_free(digester) }
@@ -445,7 +458,9 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
         // Initialize the digester
         
         if EVP_DigestInit(digester, EVP_sha384()) == 0 {
-            SwifterLog.atEmergency?.log(id: -1, source: #file.source(#function, #line), message: "Cannot initialize digest generator")
+            Log.atEmergency?.log(
+                message: "Cannot initialize digest generator",
+                from: Source(id: -1, file: #file, type: "Account", function: #function, line: #line))
             return nil
         }
         
@@ -456,7 +471,9 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
             if saltData.withUnsafeBytes({ (ptr) -> Bool in
                 return EVP_DigestUpdate(digester, UnsafeRawPointer(ptr), saltData.count) == 0
             }) {
-                SwifterLog.atEmergency?.log(id: -1, source: #file.source(#function, #line), message: "Cannot update digest generator with salt")
+                Log.atEmergency?.log(
+                    message: "Cannot update digest generator with salt",
+                    from: Source(id: -1, file: #file, type: "Account", function: #function, line: #line))
                 return nil
             }
         }
@@ -468,7 +485,9 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
             if strData.withUnsafeBytes({ (ptr) -> Bool in
                 return EVP_DigestUpdate(digester, UnsafeRawPointer(ptr), strData.count) == 0
             }) {
-                SwifterLog.atEmergency?.log(id: -1, source: #file.source(#function, #line), message: "Cannot update digest generator with string")
+                Log.atEmergency?.log(
+                    message: "Cannot update digest generator with string",
+                    from: Source(id: -1, file: #file, type: "Account", function: #function, line: #line))
                 return nil
             }
         }
@@ -479,7 +498,9 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
         let outputBuffer = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(EVP_MAX_MD_SIZE))
         var outputLength: UInt32 = 0
         if EVP_DigestFinal(digester, outputBuffer, &outputLength) == 0 {
-            SwifterLog.atEmergency?.log(id: -1, source: #file.source(#function, #line), message: "Cannot extract digest generator result")
+            Log.atEmergency?.log(
+                message: "Cannot extract digest generator result",
+                from: Source(id: -1, file: #file, type: "Account", function: #function, line: #line))
             return nil
         }
         
@@ -579,7 +600,9 @@ public class Accounts {
     private func loadLuts() {
         
         if let json = VJson.parse(file: lutFile, onError: { (_, _, error) in
-            SwifterLog.atCritical?.log(id: -1, source: #file.source(#function, #line), message: "Failed to load accounts lookup table from \(lutFile.path), error message = \(error)")
+            Log.atCritical?.log(
+                message: "Failed to load accounts lookup table from \(lutFile.path), error message = \(error)",
+                from: Source(id: -1, file: #file, type: "Account", function: #function, line: #line))
         }) {
             
             for item in json {
@@ -590,7 +613,9 @@ public class Accounts {
                     uuidLut[uuid] = name
                     if id > lastAccountId { lastAccountId = id }
                 } else {
-                    SwifterLog.atCritical?.log(id: -1, source: #file.source(#function, #line), message: "Failed to load accounts  lookup table from \(lutFile.path), error message = Cannot read name, uuid or id from entry \(item)")
+                    Log.atCritical?.log(
+                        message: "Failed to load accounts  lookup table from \(lutFile.path), error message = Cannot read name, uuid or id from entry \(item)",
+                        from: Source(id: -1, file: #file, type: "Account", function: #function, line: #line))
                     return
                 }
             }
@@ -614,7 +639,9 @@ public class Accounts {
             } else {
                 if once {
                     once = false
-                    SwifterLog.atCritical?.log(id: -1, source: #file.source(#function, #line), message: "Account lookup tables are damaged, possible account loss. Regenerate the luts to recover the accounts")
+                    Log.atCritical?.log(
+                        message: "Account lookup tables are damaged, possible account loss. Regenerate the luts to recover the accounts",
+                        from: Source(id: -1, file: #file, type: "Account", function: #function, line: #line))
                 }
             }
         }
@@ -723,7 +750,7 @@ public class Accounts {
                 
             } else {
                 
-                Log.atError?.log(id: -1, source: #file.source(#function, #line))
+                Log.atError?.log(from: Source(id: -1, file: #file, type: "Account", function: #function, line: #line))
                 return nil
             }
         }
@@ -789,7 +816,9 @@ public class Accounts {
                             
                         } else {
                             
-                            Log.atCritical?.log(id: -1, source: #file.source(#function, #line), message: "Failed to read account from \(url.path)")
+                            Log.atCritical?.log(
+                                message: "Failed to read account from \(url.path)",
+                                from: Source(id: -1, file: #file, type: "Account", function: #function, line: #line))
                             return false
                         }
                     }
@@ -799,7 +828,9 @@ public class Accounts {
                 
             } else {
                 
-                Log.atCritical?.log(id: -1, source: #file.source(#function, #line), message: "Failed to read account directories from \(dir.path)")
+                Log.atCritical?.log(
+                    message: "Failed to read account directories from \(dir.path)",
+                    from: Source(id: -1, file: #file, type: "Account", function: #function, line: #line))
                 return false
             }
         }
@@ -809,7 +840,9 @@ public class Accounts {
             self.nameLut = nameLut
             self.uuidLut = uuidLut
             
-            Log.atNotice?.log(id: -1, source: #file.source(#function, #line), message: "Regenerated the account LUT")
+            Log.atNotice?.log(
+                message: "Regenerated the account LUT",
+                from: Source(id: -1, file: #file, type: "Account", function: #function, line: #line))
             return true
             
         } else {

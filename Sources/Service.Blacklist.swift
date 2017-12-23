@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.12 - Upgraded to SwifterLog 1.1.0
 // 0.10.10 - Changed signature of function to use SFConnection
 // 0.10.9 - Streamlined and folded http API into its own project
 // 0.10.6 - Interface update
@@ -126,7 +127,7 @@ func service_blacklist(_ request: Request, _ connection: SFConnection, _ domain:
     
     // Aliases
     
-    let logId = connection.interface?.logId ?? -2
+    let logId = Int(connection.interface?.logId ?? -2)
     
     
     // Check if the client IP is blacklisted
@@ -142,7 +143,10 @@ func service_blacklist(_ request: Request, _ connection: SFConnection, _ domain:
         
         domain.telemetry.nofBlacklistedAccesses.increment()
         
-        Log.atNotice?.log(id: logId, source: #file.source(#function, #line), message: "Domain rejected blacklisted client \(connection.remoteAddress) by closing the connection")
+        Log.atNotice?.log(
+            message: "Domain rejected blacklisted client \(connection.remoteAddress) by closing the connection",
+            from: Source(id: logId, file: #file, function: #function, line: #line)
+        )
         
         return .abort
         
@@ -151,7 +155,10 @@ func service_blacklist(_ request: Request, _ connection: SFConnection, _ domain:
         
         domain.telemetry.nofBlacklistedAccesses.increment()
 
-        Log.atNotice?.log(id: logId, source: #file.source(#function, #line), message: "Domain rejected blacklisted client \(connection.remoteAddress) with 401 reply")
+        Log.atNotice?.log(
+            message: "Domain rejected blacklisted client \(connection.remoteAddress) with 401 reply",
+            from: Source(id: logId, file: #file, function: #function, line: #line)
+        )
         
         response.code = Response.Code._401_Unauthorized
         
@@ -162,7 +169,10 @@ func service_blacklist(_ request: Request, _ connection: SFConnection, _ domain:
         
         domain.telemetry.nofBlacklistedAccesses.increment()
 
-        Log.atNotice?.log(id: logId, source: #file.source(#function, #line), message: "Domain rejected blacklisted client \(connection.remoteAddress) with 503 reply")
+        Log.atNotice?.log(
+            message: "Domain rejected blacklisted client \(connection.remoteAddress) with 503 reply",
+            from: Source(id: logId, file: #file, function: #function, line: #line)
+        )
         
         response.code = Response.Code._503_ServiceUnavailable
 

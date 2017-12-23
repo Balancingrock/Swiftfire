@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.12 - Upgraded to SwifterLog 1.1.0
 // 0.10.7 - Removed priority and prioritization from function blocks.
 // 0.10.6 - Change in parameter type
 // 0.10.0 - Initial release
@@ -74,6 +75,7 @@
 // =====================================================================================================================
 
 import Foundation
+import SwifterLog
 import BRUtils
 import KeyedCache
 
@@ -231,7 +233,10 @@ final public class SFDocument: EstimatedMemoryConsumption {
         // Parsing of the file
         
         if !parse() {
-            Log.atCritical?.log(id: -1, source: #file.source(#function, #line), message: "Parse error in \(path), most likely cause is that the file cannot be converted to an UTF8 encoded string")
+            Log.atCritical?.log(
+                message: "Parse error in \(path), most likely cause is that the file cannot be converted to an UTF8 encoded string",
+                from: Source(id: -1, file: #file, type: "SFDocument", function: #function, line: #line)
+            )
             return nil
         }
     }

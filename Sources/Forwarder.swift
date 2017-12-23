@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.12 - Upgraded to SwifterLog 1.1.0
 // 0.10.11 - Renaming createErrorMessageInBody
 // 0.10.9 - Streamlined and folded http API into its own project
 // 0.10.7 - Changed receiverData to processReceivedData
@@ -102,7 +103,7 @@ class Forwarder: SwifterSockets.Connection {
     }
     
     override func receiverError(_ message: String) {
-        Log.atError?.log(id: client!.interface!.logId, source: #file.source(#function, #line), message: message)
+        Log.atError?.log(message: message, from: Source(id: Int(client!.interface!.logId), file: #file, type: "Forwarder", function: #function, line: #line))
         closeForwarder()
     }
     

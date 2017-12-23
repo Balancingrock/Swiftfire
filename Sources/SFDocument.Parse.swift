@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.12 - Upgraded to SwifterLog 1.1.0
 // 0.10.11 - Replaced SwifterJSON with VJson
 // 0.10.0 - Initial release
 //
@@ -82,6 +83,7 @@
 // =====================================================================================================================
 
 import Foundation
+import SwifterLog
 import Ascii
 import VJson
 
@@ -133,20 +135,29 @@ extension SFDocument {
 
         func asJsonFunctionBlock() -> DocumentBlock {
             let fb = FunctionBlock(name: name, function: function, arguments: Function.Arguments.json(json!))
-            Log.atDebug?.log(id: -1, source: #file.source(#function, #line), message: "Function block: \(fb)")
+            Log.atDebug?.log(
+                message: "Function block: \(fb)",
+                from: Source(id: -1, file: #file, type: "SFDocument", function: #function, line: #line)
+            )
             return .functionBlock(fb)
         }
         
         func asArrFunctionBlock() -> DocumentBlock {
             let fb = FunctionBlock(name: name, function: function, arguments: Function.Arguments.array(array))
-            Log.atDebug?.log(id: -1, source: #file.source(#function, #line), message: "Function block: \(fb)")
+            Log.atDebug?.log(
+                message: "Function block: \(fb)",
+                from: Source(id: -1, file: #file, type: "SFDocument", function: #function, line: #line)
+            )
             return .functionBlock(fb)
         }
         
         func asCharacterBlock() -> DocumentBlock? {
             guard let data = charBuf.data(using: String.Encoding.utf8) else { return nil }
             let cb = CharacterBlock(data: data)
-            Log.atDebug?.log(id: -1, source: #file.source(#function, #line), message: "Character block: \(cb)")
+            Log.atDebug?.log(
+                message: "Character block: \(cb)",
+                from: Source(id: -1, file: #file, type: "SFDocument", function: #function, line: #line)
+            )
             return .characterBlock(cb)
         }
 

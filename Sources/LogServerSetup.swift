@@ -48,7 +48,8 @@
 //
 // History
 //
-// 0.10.0 - Initial release
+// 0.10.12 - Upgraded to SwifterLog 1.1.0
+// 0.10.0  - Initial release
 //
 // =====================================================================================================================
 
@@ -57,15 +58,15 @@ import SwifterLog
 
 func logServerSetup() {
     
-    Log.atNotice?.log(id: -1, source: "LogServerSetup", message: "Configuration parameters values:\n\n\(parameters)\n")
-
-    Log.atNotice?.log(id: -1, source: "LogServerSetup", message: "Server Blacklist:\n\n\(serverBlacklist)\n")
-
-    Log.atNotice?.log(id: -1, source: "LogServerSetup", message: "Registered Services:\n\n\(services)\n")
-
-    Log.atNotice?.log(id: -1, source: "LogServerSetup", message: "Registered Functions:\n\n\(functions)\n")
+    Log.atNotice?.log(message: "Configuration parameters values:\n\n\(parameters)\n", from: Source(id: -1, file: #file, function: #function, line: #line))
     
-    Log.atNotice?.log(id: -1, source: "LogServerSetup", message: "Domain settings:\n\n\(domains)\n")
+    Log.atNotice?.log(message: "Server Blacklist:\n\n\(serverBlacklist)\n", from: Source(id: -1, file: #file, function: #function, line: #line))
     
-    Log.atNotice?.log(id: -1, source: "LogServerSetup", message: "ServerAdminDomain settings:\n\n\(serverAdminDomain)\n")
+    Log.atNotice?.log(message: "Registered Services:\n\n\(services)\n", from: Source(id: -1, file: #file, function: #function, line: #line))
+    
+    Log.atNotice?.log(message: "Registered Functions:\n\n\(functions)\n", from: Source(id: -1, file: #file, function: #function, line: #line))
+    
+    Log.atNotice?.log(message: "Domain settings:\n\n\(domains)\n", from: Source(id: -1, file: #file, function: #function, line: #line))
+    
+    Log.atNotice?.log(message: "ServerAdminDomain settings:\n\n\(serverAdminDomain)\n", from: Source(id: -1, file: #file, function: #function, line: #line))
 }

@@ -48,6 +48,8 @@
 //
 // History
 //
+// 0.10.12 - Changed logId to Int instead of Int32 to make it SwifterLog 1.1.0 compatible
+//         - Upgraded to SwifterLog 1.1.0
 // 0.10.11 - Bugfix: Added header logging (was removed during update)
 // 0.10.10 - Added capability to handle (very) large request bodies.
 //         - Made class public
@@ -150,7 +152,7 @@ public final class SFConnection: SwifterSockets.Connection {
     
     /// The ID to be used when logging.
     
-    var logId: Int32 { return Int32(objectId << 16) + Int32(Int16(interface?.logId ?? -1)) }
+    var logId: Int { return (objectId << 16) + Int(Int16(interface?.logId ?? -1)) }
     
     
     /// The number of times this connection object was allocated
@@ -210,7 +212,10 @@ public final class SFConnection: SwifterSockets.Connection {
         
         // Record the closing
         
-        Log.atInfo?.log(id: self.logId, source: #file.source(#function, #line), message: "Closing connection")
+        Log.atInfo?.log(
+            message: "Closing connection",
+            from: Source(id: logId, file: #file, type: "SFConnection", function: #function, line: #line)
+        )
         
         
         // Free this connection object
@@ -219,21 +224,30 @@ public final class SFConnection: SwifterSockets.Connection {
     }
     
     override public func transmitterReady(_ id: Int) {
-        Log.atDebug?.log(id: logId, source: #file.source(#function, #line))
+        Log.atDebug?.log(
+            from: Source(id: logId, file: #file, type: "SFConnection", function: #function, line: #line)
+        )
     }
     
     override public func transmitterTimeout(_ id: Int) {
-        Log.atDebug?.log(id: logId, source: #file.source(#function, #line))
+        Log.atDebug?.log(
+            from: Source(id: logId, file: #file, type: "SFConnection", function: #function, line: #line)
+        )
         super.transmitterTimeout(id)
     }
     
     override public func transmitterError(_ id: Int, _ message: String) {
-        Log.atError?.log(id: logId, source: #file.source(#function, #line), message: message)
+        Log.atError?.log(
+            message: message,
+            from: Source(id: logId, file: #file, type: "SFConnection", function: #function, line: #line)
+        )
         super.transmitterError(id, message)
     }
     
     override public func transmitterClosed(_ id: Int) {
-        Log.atDebug?.log(id: logId, source: #file.source(#function, #line))
+        Log.atDebug?.log(
+            from: Source(id: logId, file: #file, type: "SFConnection", function: #function, line: #line)
+        )
         super.transmitterClosed(id)
     }
     
@@ -243,7 +257,10 @@ public final class SFConnection: SwifterSockets.Connection {
     override public func receiverClosed() {}
     
     override public func receiverError(_ message: String) {
-        Log.atError?.log(id: logId, source: #file.source(#function, #line), message: "Error event: \(message)")
+        Log.atError?.log(
+            message: "Error event: \(message)",
+            from: Source(id: logId, file: #file, type: "SFConnection", function: #function, line: #line)
+        )
     }
     
     override public func receiverLoop() -> Bool {
@@ -270,7 +287,10 @@ public final class SFConnection: SwifterSockets.Connection {
             
             while let request = Request(&headerData!) {
                 
-                Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: "HTTP Request Header complete")
+                Log.atDebug?.log(
+                    message: "HTTP Request Header complete",
+                    from: Source(id: logId, file: #file, type: "SFConnection", function: #function, line: #line)
+                )
 
                 
                 // Log the header of the request
@@ -308,7 +328,10 @@ public final class SFConnection: SwifterSockets.Connection {
                         
                     } else {
                         
-                        Log.atEmergency?.log(id: logId, source: #file.source(#function, #line), message: "Coding error")
+                        Log.atEmergency?.log(
+                            message: "Coding error",
+                            from: Source(id: logId, file: #file, type: "SFConnection", function: #function, line: #line)
+                        )
                     }
                 }
             }
@@ -369,7 +392,10 @@ public final class SFConnection: SwifterSockets.Connection {
             bodyQueue.async {
                 [chunk, unowned self] in
                 if self.bodyChunk != nil {
-                    Log.atEmergency?.log(id: self.logId, source: #file.source(#function, #line), message: "Coding error")
+                    Log.atEmergency?.log(
+                        message: "Coding error",
+                        from: Source(id: self.logId, file: #file, type: "SFConnection", function: #function, line: #line)
+                    )
                 }
                 self.bodyChunk = chunk
             }
@@ -468,7 +494,10 @@ func httpConnectionFactory(_ cType: SwifterSockets.InterfaceAccess, _ remoteAddr
     if count > 0 { telemetry.nofAcceptWaitsForConnectionObject.increment() }
     
     guard let connection = availableConnection as? SFConnection else {
-        Log.atEmergency?.log(id: -1, source: #file.source(#function, #line), message: "SF Connection could not be allocated, client at \(remoteAddress) will be rejected")
+        Log.atEmergency?.log(
+            message: "SF Connection could not be allocated, client at \(remoteAddress) will be rejected",
+            from: Source(id: -1, file: #file, type: "SFConnection", function: #function, line: #line)
+        )
         return nil
     }
     
@@ -480,13 +509,19 @@ func httpConnectionFactory(_ cType: SwifterSockets.InterfaceAccess, _ remoteAddr
     
     // Create log entry that can be used to associate this place in the logfile with data from the statistics.
     
-    Log.atDebug?.log(id: cType.logId, source: #file.source(#function, #line), message: "Allocating connection object \(connection.objectId) to client from address \(remoteAddress) on socket \(cType.logId) with allocation count \(connection.allocationCount)")
+    Log.atDebug?.log(
+        message: "Allocating connection object \(connection.objectId) to client from address \(remoteAddress) on socket \(cType.logId) with allocation count \(connection.allocationCount)",
+        from: Source(id: Int(cType.logId), file: #file, type: "SFConnection", function: #function, line: #line)
+    )
     
     
     // Configure the connection
     
     if !connection.prepare(for: cType, remoteAddress: remoteAddress, options: []) {
-        Log.atEmergency?.log(id: -1, source: #file.source(#function, #line), message: "Cannot prepare SF connection \(connection.objectId) for reuse")
+        Log.atEmergency?.log(
+            message: "Cannot prepare SF connection \(connection.objectId) for reuse",
+            from: Source(id: -1, file: #file, type: "SFConnection", function: #function, line: #line)
+        )
         connectionPool.free(connection: connection)
         return nil
     }

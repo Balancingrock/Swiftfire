@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.12 - Upgraded to SwifterLog 1.1.0
 // 0.10.10 - Changed signature of function to use SFConnection
 // 0.10.9 - Streamlined and folded http API into its own project
 // 0.10.7 - Typo in comments
@@ -136,7 +137,10 @@ func service_getFileAtResourcePath(_ request: Request, _ connection: SFConnectio
         
         // Log update
         
-        Log.atCritical?.log(id: connection.logId, source: #file.source(#function, #line), message: message)
+        Log.atCritical?.log(
+            message: message,
+            from: Source(id: connection.logId, file: #file, function: #function, line: #line)
+        )
         
         
         // Mutation update
@@ -148,7 +152,10 @@ func service_getFileAtResourcePath(_ request: Request, _ connection: SFConnectio
         mutation.requestReceived = info[.responseStartedKey] as? Int64 ?? 0
         statistics.submit(mutation: mutation, onError: {
             (message: String) in
-            Log.atError?.log(id: connection.logId, source: #file.source(#function, #line), message: "Error during statistics submission:\(message)")
+            Log.atError?.log(
+                message: "Error during statistics submission:\(message)",
+                from: Source(id: connection.logId, file: #file, function: #function, line: #line)
+            )
         })
         
         
@@ -172,7 +179,10 @@ func service_getFileAtResourcePath(_ request: Request, _ connection: SFConnectio
         return .next
     }
 
-    Log.atDebug?.log(id: connection.logId, source: #file.source(#function, #line), message: "Resource path = \(resourcePath)")
+    Log.atDebug?.log(
+        message: "Resource path = \(resourcePath)",
+        from: Source(id: connection.logId, file: #file, function: #function, line: #line)
+    )
     
     
     // =================================================================================================================

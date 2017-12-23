@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.12 - Upgraded to SwifterLog 1.1.0
 // 0.10.11 - Renamed createErrorMessageInBody
 //         - Replaced SwifterJSON with VJson
 // 0.10.10 - Added 'Darwin' to sleep statements.
@@ -106,7 +107,10 @@ extension SFConnection {
         
         // Log update
         
-        Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: message)
+        Log.atDebug?.log(
+            message: message,
+            from: Source(id: logId, file: #file, type: "SFConnection", function: #function, line: #line)
+        )
         
         
         // Reply to client
@@ -118,7 +122,10 @@ extension SFConnection {
         if let data = response.data {
             transfer(data)
         } else {
-            Log.atError?.log(id: logId, source: #file.source(#function, #line), message: "Failed to create HTTP reply with message = '\(message)'")
+            Log.atError?.log(
+                message: "Failed to create HTTP reply with message = '\(message)'",
+                from: Source(id: logId, file: #file, type: "SFConnection", function: #function, line: #line)
+            )
         }
         
         
@@ -130,7 +137,10 @@ extension SFConnection {
         mutation.requestReceived = processingStartedAt
         statistics.submit(mutation: mutation, onError: {
             [unowned self] (message: String) in
-            Log.atError?.log(id: self.logId, source: #file.source(#function, #line), message: message)
+            Log.atError?.log(
+                message: message,
+                from: Source(id: self.logId, file: #file, type: "SFConnection", function: #function, line: #line)
+            )
         })
 
     }
@@ -148,7 +158,10 @@ extension SFConnection {
         
         // Logging update
         
-        Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: message)
+        Log.atDebug?.log(
+            message: message,
+            from: Source(id: logId, file: #file, type: "SFConnection", function: #function, line: #line)
+        )
         
         
         // Reply to client
@@ -160,7 +173,10 @@ extension SFConnection {
         if let data = response.data {
             transfer(data)
         } else {
-            Log.atError?.log(id: logId, source: #file.source(#function, #line), message: "Failed to create HTTP reply with message = '\(message)'")
+            Log.atError?.log(
+                message: "Failed to create HTTP reply with message = '\(message)'",
+                from: Source(id: logId, file: #file, type: "SFConnection", function: #function, line: #line)
+            )
         }
 
     
@@ -173,7 +189,10 @@ extension SFConnection {
         mutation.requestReceived = processingStartedAt
         statistics.submit(mutation: mutation, onError: {
             [unowned self] (message: String) in
-            Log.atError?.log(id: self.logId, source: #file.source(#function, #line), message: message)
+            Log.atError?.log(
+                message: message,
+                from: Source(id: self.logId, file: #file, type: "SFConnection", function: #function, line: #line)
+            )
         })
 
     }
@@ -275,7 +294,10 @@ extension SFConnection {
             }
         }
 
-        Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: "Request for domain: \(domain.name)")
+        Log.atDebug?.log(
+            message: "Request for domain: \(domain.name)",
+            from: Source(id: logId, file: #file, type: "SFConnection", function: #function, line: #line)
+        )
         
         
         // =============================================================================================================
@@ -290,7 +312,10 @@ extension SFConnection {
                 let result = SwifterSockets.connectToTipServer(atAddress: domain.forwardHost!.address, atPort: (domain.forwardHost!.port ?? "80"), connectionObjectFactory: forwardingConnectionFactory)
                 
                 if case let .error(message) = result {
-                    Log.atError?.log(id: logId, source: #file.source(#function, #line), message: message)
+                    Log.atError?.log(
+                        message: message,
+                        from: Source(id: logId, file: #file, type: "SFConnection", function: #function, line: #line)
+                    )
                 }
                 if case let .success(conn) = result {
                     forwarder = conn as? Forwarder
@@ -314,7 +339,10 @@ extension SFConnection {
             mutation.requestReceived = timestampResponseStart
             statistics.submit(mutation: mutation) {
                 [unowned self] (message: String) in
-                Log.atError?.log(id: self.logId, source: #file.source(#function, #line), message: message)
+                Log.atError?.log(
+                    message: message,
+                    from: Source(id: self.logId, file: #file, type: "SFConnection", function: #function, line: #line)
+                )
             }
 
             return
@@ -344,7 +372,10 @@ extension SFConnection {
         // Execute the service chain
         // =============================================================================================================
 
-        Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: "Starting domain services")
+        Log.atDebug?.log(
+            message: "Starting domain services",
+            from: Source(id: logId, file: #file, type: "SFConnection", function: #function, line: #line)
+        )
 
         var response = Response()
         response.version = httpVersion
@@ -358,21 +389,33 @@ extension SFConnection {
             
             if parameters.debugMode.value {
 
-                Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: "Service: \(item.name)")
+                Log.atDebug?.log(
+                    message: "Service: \(item.name)",
+                    from: Source(id: logId, file: #file, type: "SFConnection", function: #function, line: #line)
+                )
 
                 // ******************** SERVICE CALL
                 if item.service(request, self, domain, &serviceInfo, &response) == .abort { break }
                 // ********************
             
                 if serviceInfo.dict.count == 0 {
-                    Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: "\n\nService info is empty")
+                    Log.atDebug?.log(
+                        message: "\n\nService info is empty",
+                        from: Source(id: logId, file: #file, type: "SFConnection", function: #function, line: #line)
+                    )
                 } else {
                     var str = ""
                     str += serviceInfo.dict.map({ key, value in "Key: \(key), Value: \(value)" }).joined(separator: "\n")
-                    Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: "\n\nService info:\n\(str)\n")
+                    Log.atDebug?.log(
+                        message: "\n\nService info:\n\(str)\n",
+                        from: Source(id: logId, file: #file, type: "SFConnection", function: #function, line: #line)
+                    )
                 }
                 
-                Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: "\n\n\(response)\n")
+                Log.atDebug?.log(
+                    message: "\n\n\(response)\n",
+                    from: Source(id: logId, file: #file, type: "SFConnection", function: #function, line: #line)
+                )
                 
             } else {
                 
@@ -382,7 +425,10 @@ extension SFConnection {
             }
         }
         
-        Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: "Domain services completed with code = \(response.code?.rawValue ?? "None")")
+        Log.atDebug?.log(
+            message: "Domain services completed with code = \(response.code?.rawValue ?? "None")",
+            from: Source(id: logId, file: #file, function: #function, line: #line)
+        )
         
         
         // =============================================================================================================
@@ -394,7 +440,10 @@ extension SFConnection {
         if let session = serviceInfo[.sessionKey] as? Session {
             if session.isActiveKeepActive {
                 response.cookies.append(session.cookie)
-                Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: "Session cookie added to response with id = \(session.id.uuidString)")
+                Log.atDebug?.log(
+                    message: "Session cookie added to response with id = \(session.id.uuidString)",
+                    from: Source(id: logId, file: #file, function: #function, line: #line)
+                )
             }
         }
         
@@ -437,10 +486,13 @@ extension SFConnection {
             
         } else {
             
-            Log.atError?.log(id: logId, source: #file.source(#function, #line), message: "Failed to create response data")
+            Log.atError?.log(
+                message: "Failed to create response data",
+                from: Source(id: logId, file: #file, function: #function, line: #line)
+            )
         }
 
-            
+        
         // Update the statistics
             
         let mutation = Mutation.createAddClientRecord(from: self)
@@ -451,11 +503,17 @@ extension SFConnection {
         mutation.requestReceived = timestampResponseStart
         statistics.submit(mutation: mutation, onError: {
             [unowned self] (message: String) in
-            Log.atError?.log(id: self.logId, source: #file.source(#function, #line), message: message)
+            Log.atError?.log(
+                message: message,
+                from: Source(id: self.logId, file: #file, function: #function, line: #line)
+            )
         })
 
-        Log.atInfo?.log(id: logId, source: #file.source(#function, #line), message: "Response took \(Date().javaDate - timestampResponseStart) milli seconds")            
-    }    
+        Log.atInfo?.log(
+            message: "Response took \(Date().javaDate - timestampResponseStart) milli seconds",
+            from: Source(id: logId, file: #file, type: "SFConnection", function: #function, line: #line)
+        )
+    }
 }
 
 

@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.12 - Upgraded to SwifterLog 1.1.0
 // 0.10.10 - Initial release
 //
 // =====================================================================================================================
@@ -120,7 +121,10 @@ func service_waitUntilBodyComplete(_ request: Request, _ connection: SFConnectio
     // If the content length is zero, no body is expected.
     
     if request.contentLength == request.body.count {
-        Log.atDebug?.log(id: connection.logId, source: #file.source(#function, #line), message: "Body already complete")
+        Log.atDebug?.log(
+            message: "Body already complete",
+            from: Source(id: connection.logId, file: #file, function: #function, line: #line)
+        )
         return .next
     }
     
@@ -129,13 +133,19 @@ func service_waitUntilBodyComplete(_ request: Request, _ connection: SFConnectio
         
     var remainingBytes = request.contentLength
     
-    Log.atDebug?.log(id: connection.logId, source: #file.source(#function, #line), message: "Remaining bytes = \(remainingBytes)")
+    Log.atDebug?.log(
+        message: "Remaining bytes = \(remainingBytes)",
+        from: Source(id: connection.logId, file: #file, function: #function, line: #line)
+    )
     
     while remainingBytes > 0 {
         if let chunk = connection.bodyGetNextChunk(timeout: 10.0, pollingInterval: 0.05) {
             request.body?.append(chunk)
             remainingBytes -= chunk.count
-            Log.atDebug?.log(id: connection.logId, source: #file.source(#function, #line), message: "Remaining bytes = \(remainingBytes)")
+            Log.atDebug?.log(
+                message: "Remaining bytes = \(remainingBytes)",
+                from: Source(id: connection.logId, file: #file, function: #function, line: #line)
+            )
         } else {
             // Timeout: abort processing
             response.code = Response.Code._408_RequestTimeout

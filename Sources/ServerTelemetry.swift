@@ -3,7 +3,7 @@
 //  File:       Telemetry.swift
 //  Project:    Swiftfire
 //
-private let version = "0.10.11"
+private let version = "0.10.12beta"
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -48,6 +48,8 @@ private let version = "0.10.11"
 //
 // History
 //
+// 0.10.12 - Upgraded to SwifterLog 1.1.0
+//           Upgraded to VJson 0.10.8
 // 0.10.11 - Replaced SwifterJSON with VJson
 // 0.10.10 - Version number update
 // 0.10.9 - Version number update
@@ -183,16 +185,25 @@ public final class ServerTelemetry: CustomStringConvertible, VJsonConvertible {
         for item in all {
             if let strval = (json|item.name)?.stringValue {
                 if item.setValue(strval) {
-                    json.remove(child: (json|item.name)!)
+                    json.remove((json|item.name)!)
                 } else {
-                    SwifterLog.atError?.log(id: -1, source: #file.source(#function, #line), message: "Failed to set value for \(item.name) to \(strval)")
+                    Log.atError?.log(
+                        message: "Failed to set value for \(item.name) to \(strval)",
+                        from: Source(id: -1, file: #file, function: #function, line: #line)
+                    )
                 }
             } else {
-                SwifterLog.atError?.log(id: -1, source: #file.source(#function, #line), message: "Missing value for \(item.name)")
+                Log.atError?.log(
+                    message: "Missing value for \(item.name)",
+                    from: Source(id: -1, file: #file, function: #function, line: #line)
+                )
             }
         }
         if json.nofChildren != 0 {
-            SwifterLog.atError?.log(id: -1, source: #file.source(#function, #line), message: "Superfluous items in source: \(json.code)")
+            Log.atError?.log(
+                message: "Superfluous items in source: \(json.code)",
+                from: Source(id: -1, file: #file, function: #function, line: #line)
+            )
             return nil
         }
     }

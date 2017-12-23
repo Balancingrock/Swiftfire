@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.12 - Updated for SwifterLog 1.1.0
 // 0.10.11 - Replaced SwifterJSON with VJson
 //         - Merged createAddClientRecord
 // 0.10.7 - Merged SwiftfireCore into Swiftfire
@@ -127,7 +128,7 @@ public final class Mutation {
         mutation.ipAddress = connection.remoteAddress
         mutation.connectionAllocationCount = Int32(connection.allocationCount)
         mutation.connectionObjectId = Int16(connection.objectId)
-        mutation.socket = connection.logId
+        mutation.socket = Int32(connection.logId)
         return mutation
     }
 

@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.12 - Upgraded to SwifterLog 1.1.0
 // 0.10.10 - Changed signature of function to use SFConnection
 // 0.10.9 - Streamlined and folded http API into its own project
 //          Changed PostInfo into a ReferencedDictionary
@@ -117,7 +118,10 @@ func service_decodePostFormUrlEncoded(_ request: Request, _ connection: SFConnec
     // Check for data
     
     guard let strData = request.body, !strData.isEmpty else {
-        Log.atDebug?.log(id: connection.logId, source: #file.source(#function, #line), message: "No data to decode.")
+        Log.atDebug?.log(
+            message: "No data to decode.",
+            from: Source(id: connection.logId, file: #file, function: #function, line: #line)
+        )
         return .next
     }
     
@@ -125,7 +129,10 @@ func service_decodePostFormUrlEncoded(_ request: Request, _ connection: SFConnec
     // Convert data to string
     
     guard let str = String.init(data: strData, encoding: String.Encoding.utf8) else {
-        Log.atDebug?.log(id: connection.logId, source: #file.source(#function, #line), message: "Cannot convert form urlencoded data to an UTF8 string")
+        Log.atDebug?.log(
+            message: "Cannot convert form urlencoded data to an UTF8 string",
+            from: Source(id: connection.logId, file: #file, function: #function, line: #line)
+        )
         return .next
     }
     
@@ -155,7 +162,10 @@ func service_decodePostFormUrlEncoded(_ request: Request, _ connection: SFConnec
     if postInfo.count > 0 { info[.postInfoKey] = postInfo }
     
     
-    Log.atDebug?.log(id: connection.logId, source: #file.source(#function, #line), message: "Found \(postInfo.count) items")
+    Log.atDebug?.log(
+        message: "Found \(postInfo.count) items",
+        from: Source(id: connection.logId, file: #file, function: #function, line: #line)
+    )
     
     return .next
 }

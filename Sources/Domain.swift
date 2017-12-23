@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.12 - Upgraded to SwifterLog 1.1.0
 // 0.10.11 - Replaced SwifterJSON with VJson
 // 0.10.9 - Streamlined and folded http API into its own project
 // 0.10.7 - Merged SwiftfireCore into Swiftfire
@@ -704,7 +705,10 @@ public final class Domain: Equatable, CustomStringConvertible, VJsonConvertible 
             if let b = Bool.init(lettersOrDigits: value) {
                 wwwIncluded = b
             } else {
-                SwifterLog.atError?.log(id: -1, source: #file.source(#function, #line), message: "Cannot convert: \(value) to bool")
+                Log.atError?.log(
+                    message: "Cannot convert: \(value) to bool",
+                    from: Source(id: -1, file: #file, type: "Domain", function: #function, line: #line)
+                )
             }
             
         case "Root":
@@ -717,28 +721,40 @@ public final class Domain: Equatable, CustomStringConvertible, VJsonConvertible 
             if let b = Bool.init(lettersOrDigits: value) {
                 enabled = b
             } else {
-                SwifterLog.atError?.log(id: -1, source: #file.source(#function, #line), message: "Cannot convert: \(value) to bool")
+                Log.atError?.log(
+                    message: "Cannot convert: \(value) to bool",
+                    from: Source(id: -1, file: #file, type: "Domain", function: #function, line: #line)
+                )
             }
             
         case "AccessLogEnabled":
             if let b = Bool.init(lettersOrDigits: value) {
                 accessLogEnabled = b
             } else {
-                SwifterLog.atError?.log(id: -1, source: #file.source(#function, #line), message: "Cannot convert: \(value) to bool")
+                Log.atError?.log(
+                    message: "Cannot convert: \(value) to bool",
+                    from: Source(id: -1, file: #file, type: "Domain", function: #function, line: #line)
+                )
             }
             
         case "404LogEnabled":
             if let b = Bool.init(lettersOrDigits: value) {
                 four04LogEnabled = b
             } else {
-                SwifterLog.atError?.log(id: -1, source: #file.source(#function, #line), message: "Cannot convert: \(value) to bool")
+                Log.atError?.log(
+                    message: "Cannot convert: \(value) to bool",
+                    from: Source(id: -1, file: #file, type: "Domain", function: #function, line: #line)
+                )
             }
 
         case "SessionLogEnabled":
             if let b = Bool.init(lettersOrDigits: value) {
                 sessionLogEnabled = b
             } else {
-                SwifterLog.atError?.log(id: -1, source: #file.source(#function, #line), message: "Cannot convert: \(value) to bool")
+                Log.atError?.log(
+                    message: "Cannot convert: \(value) to bool",
+                    from: Source(id: -1, file: #file, type: "Domain", function: #function, line: #line)
+                )
             }
             
         case "SfResources":
@@ -751,10 +767,16 @@ public final class Domain: Equatable, CustomStringConvertible, VJsonConvertible 
             if let i = Int(value) {
                 sessionTimeout = i
             } else {
-                SwifterLog.atError?.log(id: -1, source: #file.source(#function, #line), message: "Cannot convert: \(value) to Int")
+                Log.atError?.log(
+                    message: "Cannot convert: \(value) to Int",
+                    from: Source(id: -1, file: #file, type: "Domain", function: #function, line: #line)
+                )
             }
             
-        default: SwifterLog.atError?.log(id: -1, source: #file.source(#function, #line), message: "Unknown item name: \(item)")
+        default: Log.atError?.log(
+            message: "Unknown item name: \(item)",
+            from: Source(id: -1, file: #file, type: "Domain", function: #function, line: #line)
+            )
         }
     }
     

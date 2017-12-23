@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.12 - Upgraded to SwifterLog 1.1.0
 // 0.10.10 - Changed signature of function to use SFConnection
 // 0.10.9 - Streamlined and folded http API into its own project
 // 0.10.6 - Interface update
@@ -142,13 +143,16 @@ func service_onlyHttp10or11(_ request: Request, _ connection: SFConnection, _ do
         
         // Aliases
         
-        let logId = connection.interface?.logId ?? -2
+        let logId = Int(connection.interface?.logId ?? -2)
 
         
         // Log update
         
         let message = "HTTP Version not present"
-        Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: message)
+        Log.atDebug?.log(
+            message: message,
+            from: Source(id: logId, file: #file, function: #function, line: #line)
+        )
         
         
         // Mutation update
@@ -159,7 +163,10 @@ func service_onlyHttp10or11(_ request: Request, _ connection: SFConnection, _ do
         mutation.requestReceived = info[.responseStartedKey] as? Int64 ?? 0
         statistics.submit(mutation: mutation, onError: {
             (message: String) in
-            Log.atError?.log(id: connection.logId, source: #file.source(#function, #line), message: "Error during statistics submission:\(message)")
+            Log.atError?.log(
+                message: "Error during statistics submission:\(message)",
+                from: Source(id: connection.logId, file: #file, function: #function, line: #line)
+            )
         })
         
         
@@ -184,13 +191,16 @@ func service_onlyHttp10or11(_ request: Request, _ connection: SFConnection, _ do
         
         // Aliases
         
-        let logId = connection.interface?.logId ?? -2
+        let logId = Int(connection.interface?.logId ?? -2)
 
         
         // Log update
         
         let message = "HTTP Version '\(httpVersion)' not supported"
-        Log.atDebug?.log(id: logId, source: #file.source(#function, #line), message: message)
+        Log.atDebug?.log(
+            message: message,
+            from: Source(id: logId, file: #file, function: #function, line: #line)
+        )
         
         
         // Mutation update
@@ -201,7 +211,10 @@ func service_onlyHttp10or11(_ request: Request, _ connection: SFConnection, _ do
         mutation.requestReceived = info[.responseStartedKey] as? Int64 ?? 0
         statistics.submit(mutation: mutation, onError: {
             (message: String) in
-            Log.atError?.log(id: connection.logId, source: #file.source(#function, #line), message: "Error during statistics submission:\(message)")
+            Log.atError?.log(
+                message: "Error during statistics submission:\(message)",
+                from: Source(id: connection.logId, file: #file, function: #function, line: #line)
+            )
         })
         
         

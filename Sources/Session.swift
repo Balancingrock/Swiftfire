@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.12 - Upgraded to SwifterLog 1.1.0
 // 0.10.11 - Replaced SwifterJSON with VJson
 // 0.10.9 - Streamlined and folded http API into its own project
 // 0.10.7 - Fixed bug: made info public.
@@ -466,7 +467,7 @@ public final class Sessions: CustomStringConvertible {
     ///
     /// - Returns: The requested session or nil.
     
-    public func getActiveSession(for id: UUID, logId: Int32) -> Session? {
+    public func getActiveSession(for id: UUID, logId: Int) -> Session? {
         
         return Sessions.queue.sync {
             
@@ -499,13 +500,16 @@ public final class Sessions: CustomStringConvertible {
     
     /// Creates a new session and adds it to the active sessions.
     
-    public func newSession(address: String, domainName: String, logId: Int32, connectionId: Int, allocationCount: Int, timeout: Int) -> Session? {
+    public func newSession(address: String, domainName: String, logId: Int, connectionId: Int, allocationCount: Int, timeout: Int) -> Session? {
         return Sessions.queue.sync {
             [weak self] in
             guard let `self` = self else { return nil }
             let session = Session(address: address, domainName: domainName, connectionId: connectionId, allocationCount: allocationCount, timeout: timeout)
             self.active[session.id] = session
-            Log.atInfo?.log(id: logId, source: #file.source(#function, #line), message: "Created session with id = \(session.id.uuidString)")
+            Log.atInfo?.log(
+                message: "Created session with id = \(session.id.uuidString)",
+                from: Source(id: logId, file: #file, function: #function, line: #line)
+            )
             return session
         }
     }
@@ -537,7 +541,10 @@ public final class Sessions: CustomStringConvertible {
         guard let session = active[id] else { return }
         storeSession(session)
         active[id] = nil
-        Log.atInfo?.log(id: -1, source: #file.source(#function, #line), message: "Purged inactive session for \(id.uuidString)")
+        Log.atInfo?.log(
+            message: "Purged inactive session for \(id.uuidString)",
+            from: Source(id: -1, file: #file, type: "Session", function: #function, line: #line)
+        )
     }
     
     

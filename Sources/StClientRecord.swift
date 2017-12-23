@@ -135,40 +135,40 @@ public final class StClientRecord: VJsonConvertible {
         guard let json = json else { return nil }
         
         guard let jConnectionAllocationCount = (json|"a")?.int32Value else {
-            SwifterLog.atDebug?.log(id: -1, source: #file.source(#function, #line), message: "Could not read allocation count 'a'")
+//            SwifterLog.atDebug?.log(id: -1, source: #file.source(#function, #line), message: "Could not read allocation count 'a'")
             return nil
         }
         
         guard let jConnectionObjectId = (json|"c")?.int16Value else {
-            SwifterLog.atDebug?.log(id: -1, source: #file.source(#function, #line), message: "Could not read object id 'c'")
+//            SwifterLog.atDebug?.log(id: -1, source: #file.source(#function, #line), message: "Could not read object id 'c'")
             return nil }
         
         guard let jHost = json|"o" else {
-            SwifterLog.atDebug?.log(id: -1, source: #file.source(#function, #line), message: "Could not read host 'o'")
+//            SwifterLog.atDebug?.log(id: -1, source: #file.source(#function, #line), message: "Could not read host 'o'")
             return nil }
         
         guard let jHttpResponseCode = json|"h" else {
-            SwifterLog.atDebug?.log(id: -1, source: #file.source(#function, #line), message: "Could not read response code 'h'")
+//            SwifterLog.atDebug?.log(id: -1, source: #file.source(#function, #line), message: "Could not read response code 'h'")
             return nil }
         
         guard let jRequestCompleted = (json|"d")?.int64Value else {
-            SwifterLog.atDebug?.log(id: -1, source: #file.source(#function, #line), message: "Could not read request completed 'd'")
+//            SwifterLog.atDebug?.log(id: -1, source: #file.source(#function, #line), message: "Could not read request completed 'd'")
             return nil }
         
         guard let jRequestReceived = (json|"r")?.int64Value else {
-            SwifterLog.atDebug?.log(id: -1, source: #file.source(#function, #line), message: "Could not read request received 'r'")
+//            SwifterLog.atDebug?.log(id: -1, source: #file.source(#function, #line), message: "Could not read request received 'r'")
             return nil }
         
         guard let jResponseDetails = json|"t" else {
-            SwifterLog.atDebug?.log(id: -1, source: #file.source(#function, #line), message: "Could not read response details 't'")
+//            SwifterLog.atDebug?.log(id: -1, source: #file.source(#function, #line), message: "Could not read response details 't'")
             return nil }
         
         guard let jSocket = (json|"s")?.int32Value else {
-            SwifterLog.atDebug?.log(id: -1, source: #file.source(#function, #line), message: "Could not read socket 's'")
+//            SwifterLog.atDebug?.log(id: -1, source: #file.source(#function, #line), message: "Could not read socket 's'")
             return nil }
         
         guard let jUrl = json|"u" else {
-            SwifterLog.atDebug?.log(id: -1, source: #file.source(#function, #line), message: "Could not read url 'u'")
+//            SwifterLog.atDebug?.log(id: -1, source: #file.source(#function, #line), message: "Could not read url 'u'")
             return nil }
         
         self.connectionAllocationCount = jConnectionAllocationCount

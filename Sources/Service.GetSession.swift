@@ -48,6 +48,7 @@
 //
 // History
 //
+// 0.10.12 - Upgraded to SwifterLog 1.1.0
 // 0.10.10 - Changed signature of function to use SFConnection
 // 0.10.9 - Streamlined and folded http API into its own project
 // 0.10.6 - Initial release
@@ -112,7 +113,10 @@ func service_getSession(_ request: Request, _ connection: SFConnection, _ domain
     
     let sessionCookies = request.cookies.filter({ $0.name == Session.cookieId })
     
-    Log.atDebug?.log(id: connection.logId, source: #file.source(#function, #line), message: "Found: \(sessionCookies.count) session cookie(s)")
+    Log.atDebug?.log(
+        message: "Found: \(sessionCookies.count) session cookie(s)",
+        from: Source(id: connection.logId, file: #file, function: #function, line: #line)
+    )
 
     
     
@@ -124,7 +128,10 @@ func service_getSession(_ request: Request, _ connection: SFConnection, _ domain
             
             if let session = domain.sessions.getActiveSession(for: id, logId: connection.logId) {
                 
-                Log.atDebug?.log(id: connection.logId, source: #file.source(#function, #line), message: "Received active session with id: \(id)")
+                Log.atDebug?.log(
+                    message: "Received active session with id: \(id)",
+                    from: Source(id: connection.logId, file: #file, function: #function, line: #line)
+                )
                 
                 if parameters.debugMode.value {
                     
@@ -142,7 +149,10 @@ func service_getSession(_ request: Request, _ connection: SFConnection, _ domain
                 
             } else {
                 
-                Log.atDebug?.log(id: connection.logId, source: #file.source(#function, #line), message: "Session with id: \(id) has expired")
+                Log.atDebug?.log(
+                    message: "Session with id: \(id) has expired",
+                    from: Source(id: connection.logId, file: #file, function: #function, line: #line)
+                )
             }
         }
     }
@@ -164,13 +174,19 @@ func service_getSession(_ request: Request, _ connection: SFConnection, _ domain
     
         info[.sessionKey] = session
 
-        Log.atDebug?.log(id: connection.logId, source: #file.source(#function, #line), message: "No active session found, created new session with id: \(session.id.uuidString)")
-
+        Log.atDebug?.log(
+            message: "No active session found, created new session with id: \(session.id.uuidString)",
+            from: Source(id: connection.logId, file: #file, function: #function, line: #line)
+        )
+        
     } else {
         
         // Error
         
-        Log.atCritical?.log(id: connection.logId, source: #file.source(#function, #line), message: "No active session found, failed to create new session")
+        Log.atCritical?.log(
+            message: "No active session found, failed to create new session",
+            from: Source(id: connection.logId, file: #file, function: #function, line: #line)
+        )
     }
     
     return .next
