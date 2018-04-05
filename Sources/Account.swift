@@ -3,7 +3,7 @@
 //  File:       Account.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.11
+//  Version:    0.10.12
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -49,6 +49,10 @@
 // History
 //
 // 0.10.12 - Upgraded to SwifterLog 1.1.0
+//         - Added saving of LUT after account creation to prevent:
+//           1) Loss of account if server crashes before ordinary shutdown.
+//           2) Prevent lock-out of admin due to empty admin LUT being saved.
+//         - Fixed problem where saved accounts and LUT accounts has different UUID's.
 // 0.10.11 - Replaced SwifterJSON with VJson
 // 0.10.8 - Removed dependecy on macOS 10.11
 // 0.10.7 - Initial release
@@ -354,7 +358,7 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
             json["Names"][index] &= name
         }
         json["Id"] &= id
-        json["Uuid"] &= UUID().uuidString
+        json["Uuid"] &= uuid
         json["Digest"] &= digest
         json["Salt"] &= salt
         json["Info"] = info
@@ -626,8 +630,11 @@ public class Accounts {
     /// Save the lookup tables to file
     
     private func saveLuts() {
-        var once = true
+        
+        var once = true // Prevents repeated entries in the log
+        
         let json = VJson.array()
+        
         uuidLut.forEach {
             (uuid, name) in
             if let id = nameLut[name] {
@@ -645,7 +652,13 @@ public class Accounts {
                 }
             }
         }
-        json.save(to: lutFile)
+        
+        // Prevent saving of empty LUTs to avoid situations where an empty LUT prevents regeneration of LUT.
+        // (This is apotential problem for admin accounts which would cause repeated requesting of admin credentials)
+        
+        if uuidLut.count > 0 {
+            json.save(to: lutFile)
+        }
     }
     
     
@@ -740,12 +753,18 @@ public class Accounts {
             lastAccountId += 1
             if let account = Account(id: lastAccountId, name: name, password: password, accountsRoot: root) {
             
+                
                 // Add it to the lookup's and the cache
             
                 uuidLut[account.uuid] = name
                 nameLut[name] = lastAccountId
                 accountCache[name] = account
             
+                
+                // Save the lut
+                
+                saveLuts()
+                
                 return account
                 
             } else {

@@ -1,426 +1,182 @@
 <!DOCTYPE html>
-
-
-
-
-
 <html>
+	
+<!-- include head.html -->
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="apple-touch-icon" sizes="180x180" href="/serveradmin/icons/apple-touch-icon.png">
+	<link rel="icon" type="image/png" sizes="32x32" href="/serveradmin/icons/favicon-32x32.png">
+	<link rel="icon" type="image/png" sizes="16x16" href="/serveradmin/icons/favicon-16x16.png">
+	<link rel="manifest" href="/serveradmin/icons/manifest.json">
+	<link rel="mask-icon" href="/serveradmin/icons/safari-pinned-tab.svg" color="#5bbad5">
+	<link rel="shortcut icon" href="/serveradmin/icons/favicon.ico">
+	<meta name="msapplication-config" content="/serveradmin/icons/browserconfig.xml">
+	<meta name="theme-color" content="#ffffff">
 
-	<head>
-  <meta charset="utf-8">
-  <meta http-equiv="X-UA-Compatible" content="IE=edge">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+	<title>Parameters</title>
 
-  <title>Parameters</title>
+	<meta name="description" content="Swiftfire Server Admin">
 
-  
-  <meta name="description" content="Swiftfire Server Admin">
-
-  <link rel="stylesheet" href="/serveradmin/assets/main.css">
-  <link rel="canonical" href="/serveradmin/pages/parameters.sf.html">
-  <link rel="alternate" type="application/rss+xml" title="Swiftfire Server Admin" href="/serveradmin/feed.xml">
-  
-  <!-- Include google analytics for production build and if necessary -->
-  
-  
-  <!-- Include cookie consent for production build when enabled -->
-  
-
+	<link rel="stylesheet" href="/serveradmin/assets/main.css">
+	<link rel="canonical" href="/serveradmin/pages/parameters.sf.html">
+	<link rel="alternate" type="application/rss+xml" title="Swiftfire Server Admin" href="/serveradmin/feed.xml">
 </head>
-
+<!-- end of include head.html -->
 
 	
   	<body class="body-panel">
-  	
-  		
-  		<div class="navbanner-panel"><!-- Title of the site is always visible -->
-<div class="navbanner-title">
-	<div class="banner-icon"></div>
-	<p class="site-title-text">Swiftfire Server Admin</p>
-</div>
-
-<!-- The menu symbol will only be shown on narrow and medium layout -->
-<div class="navbanner-label">
-	<label for="menu-checkbox"><p><!-- empty but necessary! --></p></label> 
-</div>
-<input type="checkbox" id="menu-checkbox">
-
-<!-- Separator between banner and navigation bar. Visibility depends on screen width. -->
-<div class="nav-top-divider"></div>
-
-<!-- Navigation bar visibility depends on screen width. -->
-<nav class="navbanner-menu">
-
-	<!-- Create a list of top menu item titles -->
-	
-	
-	
-	
-
-	<!-- Using the above list, create the menu and submenu's -->
-	<ul>
-			
-		<!-- Home page -->
+<!-- include banner-area.html -->
+<input type="checkbox" id="banner-menu-symbol">
+<div class="banner-area banner-area-in-dom">
+	<div class="banner"></div>
+	<div class="icon-container">
 		
+<!-- include banner-icon.html -->
+<div class="banner-icon"></div>
+<!-- end of include banner-icon.html -->
+
+	</div>
+	<div class="title-area-container">
 		
-		<li>
-			<div class="menu-item">
-				<div class="menu-item-symbol"></div>
-				<div class="menu-item-title"><a href="/serveradmin"><p>Home</p></a></div>
+<!-- include banner-title-area.html -->
+<div class="title-area">
+	<div class="title">
+		<p>Swiftfire Server Admin</p>
+	</div>
+	<div class="subtitle">
+		<p>easy to use and highly customizable</p>
+	</div>
+</div>
+<!-- end of include banner-title-area.html -->
+
+	</div>
+	<div class="label-container"><label for="banner-menu-symbol"><p><!-- empty but necessary! --></p></label></div>
+	<div class="menubar-top-separator"></div>
+	
+<!-- include menubar.html -->
+<nav class="menubar">
+<!-- include menubar-icon.html -->
+<div class="menubar-icon"></div>
+<!-- end of include menubar-icon.html -->
+
+	<div class="item">
+		<div class="title">
+			<label class="symbol"><p></p></label>
+			<div class="text"><a href="/serveradmin/index.html"><p>Home</p></a></div>
+		</div>
+	</div>
+	<div class="item-separator"><p><!-- empty but necessary --></p></div>
+	<div class="item">
+		<input type="checkbox" id="Login-checkbox">
+		<div class="title">
+			<label class="symbol" for="Login-checkbox">
+				<p></p>
+			</label>
+			<div class="text">
+				<a href="/serveradmin/login.sf.html"><p>Login</p></a>
 			</div>
-		</li>
+		</div>
+	</div>
+	<div class="item-separator"><p><!-- empty but necessary --></p></div>
+	<div class="item">
+		<input type="checkbox" id="Logout-checkbox">
+		<div class="title">
+			<label class="symbol" for="Logout-checkbox">
+				<p></p>
+			</label>
+			<div class="text">
+				<a href="/serveradmin/logout.sf.html"><p>Logout</p></a>
+			</div>
+		</div>
+	</div>
+	<div class="item-separator"><p><!-- empty but necessary --></p></div>
+	<div class="item isActiveSelection">
+		<input type="checkbox" id="Parameters-checkbox">
+		<div class="title">
+			<label class="symbol" for="Parameters-checkbox">
+				<p></p>
+			</label>
+			<div class="text">
+				<a href="/serveradmin/pages/parameters.sf.html"><p>Parameters</p></a>
+			</div>
+		</div>
+	</div>
+	<div class="item-separator"><p><!-- empty but necessary --></p></div>
+	<div class="item">
+		<input type="checkbox" id="Telemetry-checkbox">
+		<div class="title">
+			<label class="symbol" for="Telemetry-checkbox">
+				<p></p>
+			</label>
+			<div class="text">
+				<a href="/serveradmin/pages/telemetry.sf.html"><p>Telemetry</p></a>
+			</div>
+		</div>
+	</div>
+	<div class="item-separator"><p><!-- empty but necessary --></p></div>
+	<div class="item">
+		<input type="checkbox" id="Blacklist-checkbox">
+		<div class="title">
+			<label class="symbol" for="Blacklist-checkbox">
+				<p></p>
+			</label>
+			<div class="text">
+				<a href="/serveradmin/pages/blacklist.sf.html"><p>Blacklist</p></a>
+			</div>
+		</div>
+	</div><!-- Domains menu -->
 		
-		<!-- Page menus -->
-		
-		
-			<!-- Create a list of sub menu item titles -->
-			
-
-			<li>
-
-				<!-- Create top menu item -->
-				<input type="checkbox" id="Login-checkbox">
-				<label for="Login-checkbox">
-					<div class="menu-item-separator"><p><!-- empty but necessary --></p></div>
-					<div class="menu-item">
-						<div class="menu-item-symbol">
-						
-						</div>
-						<div class="menu-item-title">
-							<!-- Find page to link to -->
-						
-						
-							
-						
-							
-						
-							
-						
-							
-						
-							
-						
-							
-						
-							
-								
-									<a href="/serveradmin/login.sf.html"><p>Login</p></a>
-								
-								
-								
-						
-						</div>
-					</div>
-				</label>
-				
-				<!-- Create sub menu items -->
-				
-			</li>
-		
-		
-			<!-- Create a list of sub menu item titles -->
-			
-
-			<li>
-
-				<!-- Create top menu item -->
-				<input type="checkbox" id="Logout-checkbox">
-				<label for="Logout-checkbox">
-					<div class="menu-item-separator"><p><!-- empty but necessary --></p></div>
-					<div class="menu-item">
-						<div class="menu-item-symbol">
-						
-						</div>
-						<div class="menu-item-title">
-							<!-- Find page to link to -->
-						
-						
-							
-						
-							
-						
-							
-						
-							
-						
-							
-						
-							
-						
-							
-						
-							
-								
-									<a href="/serveradmin/logout.sf.html"><p>Logout</p></a>
-								
-								
-								
-						
-						</div>
-					</div>
-				</label>
-				
-				<!-- Create sub menu items -->
-				
-			</li>
-		
-		
-			<!-- Create a list of sub menu item titles -->
-			
-
-			<li>
-
-				<!-- Create top menu item -->
-				<input type="checkbox" id="Parameters-checkbox">
-				<label for="Parameters-checkbox">
-					<div class="menu-item-separator"><p><!-- empty but necessary --></p></div>
-					<div class="menu-item">
-						<div class="menu-item-symbol">
-						
-						</div>
-						<div class="menu-item-title">
-							<!-- Find page to link to -->
-						
-						
-							
-						
-							
-						
-							
-						
-							
-						
-							
-						
-							
-						
-							
-						
-							
-						
-							
-								
-									<a href="/serveradmin/pages/parameters.sf.html"><p>Parameters</p></a>
-								
-								
-								
-						
-						</div>
-					</div>
-				</label>
-				
-				<!-- Create sub menu items -->
-				
-			</li>
-		
-		
-			<!-- Create a list of sub menu item titles -->
-			
-
-			<li>
-
-				<!-- Create top menu item -->
-				<input type="checkbox" id="Telemetry-checkbox">
-				<label for="Telemetry-checkbox">
-					<div class="menu-item-separator"><p><!-- empty but necessary --></p></div>
-					<div class="menu-item">
-						<div class="menu-item-symbol">
-						
-						</div>
-						<div class="menu-item-title">
-							<!-- Find page to link to -->
-						
-						
-							
-						
-							
-						
-							
-						
-							
-						
-							
-						
-							
-						
-							
-						
-							
-						
-							
-						
-							
-						
-							
-						
-							
-						
-							
-								
-									<a href="/serveradmin/pages/telemetry.sf.html"><p>Telemetry</p></a>
-								
-								
-								
-						
-						</div>
-					</div>
-				</label>
-				
-				<!-- Create sub menu items -->
-				
-			</li>
-		
-		
-			<!-- Create a list of sub menu item titles -->
-			
-
-			<li>
-
-				<!-- Create top menu item -->
-				<input type="checkbox" id="Blacklist-checkbox">
-				<label for="Blacklist-checkbox">
-					<div class="menu-item-separator"><p><!-- empty but necessary --></p></div>
-					<div class="menu-item">
-						<div class="menu-item-symbol">
-						
-						</div>
-						<div class="menu-item-title">
-							<!-- Find page to link to -->
-						
-						
-							
-								
-									<a href="/serveradmin/pages/blacklist.sf.html"><p>Blacklist</p></a>
-								
-								
-								
-						
-						</div>
-					</div>
-				</label>
-				
-				<!-- Create sub menu items -->
-				
-			</li>
-		
-		
-			<!-- Create a list of sub menu item titles -->
-			
-
-			<li>
-
-				<!-- Create top menu item -->
-				<input type="checkbox" id="Statistics-checkbox">
-				<label for="Statistics-checkbox">
-					<div class="menu-item-separator"><p><!-- empty but necessary --></p></div>
-					<div class="menu-item">
-						<div class="menu-item-symbol">
-						
-						</div>
-						<div class="menu-item-title">
-							<!-- Find page to link to -->
-						
-						
-							
-						
-							
-						
-							
-						
-							
-						
-							
-						
-							
-						
-							
-						
-							
-						
-							
-						
-							
-						
-							
-						
-							
-								
-									<a href="/serveradmin/pages/statistics.sf.html"><p>Statistics</p></a>
-								
-								
-								
-						
-						</div>
-					</div>
-				</label>
-				
-				<!-- Create sub menu items -->
-				
-			</li>
-		
-
-		<!-- Domains menu -->
-		
-		<li>.sf-domainsMenu()</li>
-		
-		<!-- Categories menu -->
-		
-		
-	</ul>
+	.sf-domainsMenu()
 </nav>
+<!-- end of include menubar.html -->
 
-<!-- Separator between navigation bar and column panel. Visibility depends on screen width. -->
-<div class="nav-bottom-divider"></div>
-</div>
-  		
+	<div class="menubar-bottom-separator"></div>
+</div><!-- end of include banner-area.html -->
+
 
 		<div class="column-panel">
 
-			
-							
-			
-
-
 			<div class="primary-column">
-			  	
-				<main><article class="page" itemscope itemtype="http://schema.org/Article">
+				<main>
 
-  <header class="page-header">
-    <h1 class="page-title" itemprop="name headline">Parameters</h1>
-    <p class="page-meta"></p>
-  </header>
-
-  <div class="page-content" itemprop="articleBody">
-    <p class="text-centered">When updating values, make sure to use “Save to File” to persist the change(s).</p>
+<!-- Start of main content -->
+<article class="page" itemscope itemtype="http://schema.org/Article">
+	<header class="page-header">
+		<h1 class="page-title" itemprop="name headline">Parameters</h1>
+		<p class="page-meta"></p>
+	</header>
+	<div class="page-content" itemprop="articleBody">
+<!-- Page content -->
+   <p class="text-centered">When updating values, make sure to use “Save to File” to persist the change(s).</p>
 
 <div class="centered-buttons">
 .sf-command(SaveParameters, "Save to File").sf-command(ReadParameters, "Reload from File")
 </div>
 <p>.sf-parameterTable()</p>
 
-  </div>
-
-  
+<!-- End of page content -->
+</div>
 </article>
-</main>
+
+<!-- End of main content -->
+
+				</main>
 			</div>
-			
-			
-			
-			   
-			
 
 		</div>
-
-		<div class="footer-divider"></div>
-
-		<div class="footer-panel"><footer>
+		<div class="footer-separator"></div>
+		<div class="footer-panel">
+	
+<!-- include footer.html -->
+<footer>
 	<div>
 		<p>Swiftfire Server Admin</p>
 	</div>
 </footer>
-</div>
+<!-- end of include footer.html -->
 
+		</div>
   	</body>
-
 </html>

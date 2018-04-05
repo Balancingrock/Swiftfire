@@ -129,20 +129,21 @@ var defaultServices: Array<String> {
         decodePostFormUrlEncoded,
         getResourcePathFromUrl,
         getFileAtResourcePath,
-        transferResponse,
-        restartSessionTimeout
+        restartSessionTimeout,
+        transferResponse
     ]
 }
 
 
 /// The services for the server admin (pseudo) domain
-///
 
 var serverAdminServices: Array<String> {
     return [
         getSession,
         waitUntilBodyComplete,
         decodePostFormUrlEncoded,
-        serverAdmin
+        serverAdmin,
+        restartSessionTimeout,
+        transferResponse
     ]
 }

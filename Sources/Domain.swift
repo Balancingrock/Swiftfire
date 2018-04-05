@@ -101,9 +101,9 @@ extension String: VJsonSerializable {
 
 /// Represents an internet domain.
 
-public final class Domain: Equatable, CustomStringConvertible, VJsonConvertible {
+public final class Domain: CustomStringConvertible, VJsonConvertible {
     
-    public static func == (lhs: Domain, rhs: Domain) -> Bool {
+/*    public static func == (lhs: Domain, rhs: Domain) -> Bool {
         if lhs.name as String != rhs.name as String { return false }
         if lhs.wwwIncluded != rhs.wwwIncluded { return false }
         if lhs.root as String != rhs.root as String { return false }
@@ -115,7 +115,7 @@ public final class Domain: Equatable, CustomStringConvertible, VJsonConvertible 
         if lhs.sessionLogEnabled != rhs.sessionLogEnabled { return false }
         if lhs.sessionTimeout != rhs.sessionTimeout { return false }
         return true
-    }
+    }*/
 
     
     /// A notification with this name is fired when the name of this domain is changed.
@@ -304,7 +304,11 @@ public final class Domain: Equatable, CustomStringConvertible, VJsonConvertible 
     
     /// The names of the services used by this domain.
     
-    public var serviceNames: Array<String> = []
+    public var serviceNames: Array<String> = [] {
+        didSet {
+            rebuildServices()
+        }
+    }
     
     
     /// The services used by this domain.
@@ -321,6 +325,33 @@ public final class Domain: Equatable, CustomStringConvertible, VJsonConvertible 
     public var telemetry: DomainTelemetry = DomainTelemetry()
     
     
+    /// The visitor statistics database
+    
+    private var statistics: VisitorStatistics?
+    
+    
+    /// The number of visits per statistics file
+    
+    private var visitsPerStatisticsFile: Int = 1000
+    
+    
+    /// Daily wrap of staticstics file
+    ///
+    /// Note: The actual rollover time is determined by the time of the first access after this time.
+    
+    private var statisticsRolloverTime: WallclockTime = WallclockTime(hour: 0, minute: 0, second: 0)
+    
+    
+    /// The number of recent request logs to be kept
+    
+    private var nofRecentRequestLogs: Int = 0
+    
+    
+    /// The number of recent response logs to be kept
+    
+    private var nofRecentResponseLogs: Int = 0
+    
+
     // The access log & 404 log
     
     private var accessLog: AccessLog?
@@ -385,6 +416,20 @@ public final class Domain: Equatable, CustomStringConvertible, VJsonConvertible 
         }
     }()
     
+    
+    /// The directory for the statistics files
+    
+    private lazy var statisticsDir: URL? = {
+        let dir = self.supportDirectory
+        do {
+            let url = dir.appendingPathComponent("statistics", isDirectory: true)
+            try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
+            return url
+        } catch {
+            return nil
+        }
+    }()
+
     
     /// The directory for the settings files.
     
@@ -467,6 +512,10 @@ public final class Domain: Equatable, CustomStringConvertible, VJsonConvertible 
         domain["SupportDirectory"] &= supportDirectory.path
         domain["SessionTimeout"] &= sessionTimeout
         domain["ServiceNames"] &= VJson(serviceNames)
+        domain["StatisticsRolloverTime"] &= statisticsRolloverTime.description
+        domain["VisitsPerStatisticsFile"] &= visitsPerStatisticsFile
+        domain["NofRecentRequestLogs"] &= nofRecentRequestLogs
+        domain["NofRecentResponseLogs"] &= nofRecentResponseLogs
         return domain
     }
     
@@ -484,6 +533,7 @@ public final class Domain: Equatable, CustomStringConvertible, VJsonConvertible 
         self.sessions = Sessions(logDirUrl: sessionLogDir!)
         if accountsDir == nil { return nil }
         self.accounts = Accounts(root: accountsDir!)
+        self.statistics = VisitorStatistics(directory: statisticsDir, timeForDailyLogRestart: WallclockTime.init(hour: 0, minute: 0, second: 0), maxRowCount: 10)
     }
     
     
@@ -531,6 +581,18 @@ public final class Domain: Equatable, CustomStringConvertible, VJsonConvertible 
         if (json|"SessionLogEnabled")?.boolValue == nil { json["SessionLogEnabled"] &= sessionLogEnabled }
         let jsessionlogenabled = (json|"SessionLogEnabled")!.boolValue!
         
+        if (json|"StatisticsRolloverTime")?.string == nil { json["StatisticsRolloverTime"] &= statisticsRolloverTime.description }
+        let jstatisticsRolloverTime = (json|"StatisticsRolloverTime")!.string!
+        
+        if (json|"VisitsPerStatisticsFile")?.intValue == nil { json["VisitsPerStatisticsFile"] &= visitsPerStatisticsFile }
+        let jvisitsPerStatisticsFile = (json|"VisitsPerStatisticsFile")!.intValue!
+        
+        if (json|"NofRecentRequestLogs")?.intValue == nil { json["NofRecentRequestLogs"] &= nofRecentRequestLogs }
+        let jnofRecentRequestLogs = (json|"NofRecentRequestLogs")!.intValue!
+
+        if (json|"NofRecentResponseLogs")?.intValue == nil { json["NofRecentResponseLogs"] &= nofRecentResponseLogs }
+        let jnofRecentResponseLogs = (json|"NofRecentResponseLogs")!.intValue!
+
         
         // Setup
         
@@ -544,6 +606,10 @@ public final class Domain: Equatable, CustomStringConvertible, VJsonConvertible 
         self.sessionLogEnabled = jsessionlogenabled
         self.sfresources = jsfresources
         self.sessionTimeout = jsessiontimeout
+        self.statisticsRolloverTime = WallclockTime(jstatisticsRolloverTime) ?? WallclockTime(hour: 0, minute: 0, second: 0)
+        self.visitsPerStatisticsFile = jvisitsPerStatisticsFile
+        self.nofRecentResponseLogs = jnofRecentResponseLogs
+        self.nofRecentRequestLogs = jnofRecentRequestLogs
 
         
         // Initialize the properties that may be present
@@ -572,6 +638,12 @@ public final class Domain: Equatable, CustomStringConvertible, VJsonConvertible 
             if four04LogEnabled { four04Log = Four04Log(logDir: loggingDir) }
             if sessionLogEnabled { sessions.logDirUrl = sessionLogDir }
         }
+
+        
+        // Add the staistics logger
+        
+        self.statistics = VisitorStatistics(directory: statisticsDir, timeForDailyLogRestart: WallclockTime.init(hour: 0, minute: 0, second: 0), maxRowCount: 10)
+
     }
     
     
@@ -660,6 +732,7 @@ public final class Domain: Equatable, CustomStringConvertible, VJsonConvertible 
         let result = saveBlacklist()
         accessLog?.close()
         four04Log?.close()
+        statistics?.close()
         return result
     }
     
@@ -669,15 +742,19 @@ public final class Domain: Equatable, CustomStringConvertible, VJsonConvertible 
     public var description: String {
         var str = "Domain: \(name)\n"
         str += "--------------------------------------------\n"
-        str += " Include 'www'       = \(wwwIncluded)\n"
-        str += " Root directory      = \(root)\n"
-        str += " Enabled             = \(enabled)\n"
-        str += " Forward to          = \(forwardUrl)\n"
-        str += " Enable Access Log   = \(accessLogEnabled)\n"
-        str += " Enable 404 Log      = \(four04LogEnabled)\n"
-        str += " Enable Session Log  = \(sessionLogEnabled)\n"
-        str += " Session Timeout     = \(sessionTimeout)\n"
-        str += " Swiftfire resources = \(sfresources)\n"
+        str += " Include 'www'              = \(wwwIncluded)\n"
+        str += " Root directory             = \(root)\n"
+        str += " Enabled                    = \(enabled)\n"
+        str += " Forward to                 = \(forwardUrl)\n"
+        str += " Enable Access Log          = \(accessLogEnabled)\n"
+        str += " Enable 404 Log             = \(four04LogEnabled)\n"
+        str += " Enable Session Log         = \(sessionLogEnabled)\n"
+        str += " Session Timeout            = \(sessionTimeout)\n"
+        str += " Swiftfire resources        = \(sfresources)\n"
+        str += " VisitsPerStatisticsFile    = \(visitsPerStatisticsFile)\n"
+        str += " StatisticsFileRolloverTime = \(statisticsRolloverTime)\n"
+        str += " nofRecentRequestLogged     = \(nofRecentRequestLogs)\n"
+        str += " nofRecentResponseLogged    = \(nofRecentResponseLogs)\n"
         if serviceNames.count == 0 {
             str += "\nDomain Service Names:\n None\n"
         } else {
@@ -773,6 +850,46 @@ public final class Domain: Equatable, CustomStringConvertible, VJsonConvertible 
                 )
             }
             
+        case "StatisticsRolloverTime":
+            if let t = WallclockTime(value) {
+                statisticsRolloverTime = t
+            } else {
+                Log.atError?.log(
+                    message: "Cannot convert: \(value) to WallclockTime",
+                    from: Source(id: -1, file: #file, type: "Domain", function: #function, line: #line)
+                )
+            }
+
+        case "VisitsPerStatisticsFile":
+            if let i = Int(value) {
+                visitsPerStatisticsFile = i
+            } else {
+                Log.atError?.log(
+                    message: "Cannot convert: \(value) to Int",
+                    from: Source(id: -1, file: #file, type: "Domain", function: #function, line: #line)
+                )
+            }
+            
+        case "NofRecentRequestLogs":
+            if let i = Int(value) {
+                nofRecentRequestLogs = i
+            } else {
+                Log.atError?.log(
+                    message: "Cannot convert: \(value) to Int",
+                    from: Source(id: -1, file: #file, type: "Domain", function: #function, line: #line)
+                )
+            }
+
+        case "NofRecentResponseLogs":
+            if let i = Int(value) {
+                nofRecentResponseLogs = i
+            } else {
+                Log.atError?.log(
+                    message: "Cannot convert: \(value) to Int",
+                    from: Source(id: -1, file: #file, type: "Domain", function: #function, line: #line)
+                )
+            }
+
         default: Log.atError?.log(
             message: "Unknown item name: \(item)",
             from: Source(id: -1, file: #file, type: "Domain", function: #function, line: #line)
@@ -819,6 +936,13 @@ public final class Domain: Equatable, CustomStringConvertible, VJsonConvertible 
                 services.append(service)
             }
         }
+    }
+    
+    
+    /// Update the visitor statistics
+    
+    func recordStatistics(_ visit: Visit) {
+//        statistics?.append(visit)
     }
 }
 

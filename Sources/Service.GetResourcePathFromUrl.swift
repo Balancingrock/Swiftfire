@@ -157,21 +157,6 @@ func service_getResourcePathFromUrl(_ request: Request, _ connection: SFConnecti
         )
         
         
-        // Mutation update
-        
-        let mutation = Mutation.createAddClientRecord(from: connection)
-        mutation.httpResponseCode = Response.Code._400_BadRequest.rawValue
-        mutation.responseDetails = message
-        mutation.requestReceived = info[.responseStartedKey] as? Int64 ?? 0
-        statistics.submit(mutation: mutation, onError: {
-            (message: String) in
-            Log.atError?.log(
-                message: "Error during statistics submission:\(message)",
-                from: Source(id: connection.logId, file: #file, function: #function, line: #line)
-            )
-        })
-        
-        
         // Response
         
         response.code = Response.Code._400_BadRequest
@@ -191,21 +176,6 @@ func service_getResourcePathFromUrl(_ request: Request, _ connection: SFConnecti
         domain.recordIn404Log(path)
         
 
-        // Mutation update
-        
-        let mutation = Mutation.createAddClientRecord(from: connection)
-        mutation.httpResponseCode = Response.Code._404_NotFound.rawValue
-        mutation.responseDetails = "Resource for url '\(path)' not found"
-        mutation.requestReceived = info[.responseStartedKey] as? Int64 ?? 0
-        statistics.submit(mutation: mutation, onError: {
-            (message: String) in
-            Log.atError?.log(
-                message: "Error during statistics submission:\(message)",
-                from: Source(id: connection.logId, file: #file, function: #function, line: #line)
-            )
-        })
-        
-        
         // Response
         
         response.code = Response.Code._404_NotFound
@@ -218,21 +188,6 @@ func service_getResourcePathFromUrl(_ request: Request, _ connection: SFConnecti
         // Telemetry update
         
         domain.telemetry.nof403.increment()
-        
-        
-        // Mutation update
-        
-        let mutation = Mutation.createAddClientRecord(from: connection)
-        mutation.httpResponseCode = Response.Code._403_Forbidden.rawValue
-        mutation.responseDetails = "Access for url '\(path)' not allowed"
-        mutation.requestReceived = info[.responseStartedKey] as? Int64 ?? 0
-        statistics.submit(mutation: mutation, onError: {
-            (message: String) in
-            Log.atError?.log(
-                message: "Error during statistics submission:\(message)",
-                from: Source(id: connection.logId, file: #file, function: #function, line: #line)
-            )
-        })
         
         
         // Response

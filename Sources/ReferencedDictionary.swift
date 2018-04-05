@@ -1,11 +1,9 @@
-//
-//  ReferencedDictionary.swift
 // =====================================================================================================================
 //
 //  File:       ReferencedDictionary.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.9
+//  Version:    0.10.12
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -50,6 +48,7 @@
 //
 // History
 //
+// 0.10.12 - If the key contains 'Pwd', the value content will be replaced with '********' in the logfile.
 // 0.10.9 - Initial release
 //
 // =====================================================================================================================
@@ -66,7 +65,7 @@ final class ReferencedDictionary: Sequence, CustomStringConvertible {
     public var count: Int { return store.count }
     
     public var description: String {
-        return store.reduce("[", { return "\($0), \($1.key):\($1.value)" }).appending("]")
+        return store.reduce("[", { return "\($0), \($1.key):\($1.key.contains("Pwd") ? "********": $1.value)" }).appending("]")
     }
     
     public func makeIterator() -> DictionaryIterator<String, String> {

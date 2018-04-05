@@ -134,6 +134,10 @@ public struct SessionInfo: CustomStringConvertible {
         get { return dict[key] }
     }
     
+    public mutating func remove(key: SessionInfoKey) {
+        dict.removeValue(forKey: key)
+    }
+    
     fileprivate var dict: Dictionary<SessionInfoKey, CustomStringConvertible> = [:]
     
     fileprivate var json: VJson {

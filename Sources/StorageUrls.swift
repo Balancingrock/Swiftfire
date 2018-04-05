@@ -102,7 +102,7 @@ final class StorageUrls {
     ///   - root: The directory in/from which to create/retrieve the requested directory
     ///   - name: The name for the directory
     
-    private static func dirUrl(_ root: URL?, _ name: String) -> URL? {
+    static func dirUrl(_ root: URL?, _ name: String) -> URL? {
         
         guard let root = root else { return nil }
         
@@ -122,7 +122,7 @@ final class StorageUrls {
     ///   - root: The directory in/from which to create/retrieve the requested file
     ///   - name: The name for the file
     
-    private static func fileUrl(_ root: URL?, _ name: String) -> URL? {
+    static func fileUrl(_ root: URL?, _ name: String) -> URL? {
         guard let root = root else { return nil }
         return root.appendingPathComponent(name)
     }

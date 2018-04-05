@@ -153,22 +153,7 @@ func service_onlyGetOrPost(_ request: Request, _ connection: SFConnection, _ dom
             from: Source(id: logId, file: #file, function: #function, line: #line)
         )
         
-        
-        // Mutation update
-        
-        let mutation = Mutation.createAddClientRecord(from: connection)
-        mutation.httpResponseCode = Response.Code._400_BadRequest.rawValue
-        mutation.responseDetails = message
-        mutation.requestReceived = info[.responseStartedKey] as? Int64 ?? 0
-        statistics.submit(mutation: mutation, onError: {
-            (message: String) in
-            Log.atError?.log(
-                message: "Error during statistics submission:\(message)",
-                from: Source(id: connection.logId, file: #file, function: #function, line: #line)
-            )
-        })
-        
-        
+
         // Response
         
         response.code = Response.Code._400_BadRequest
@@ -200,21 +185,6 @@ func service_onlyGetOrPost(_ request: Request, _ connection: SFConnection, _ dom
             message: message,
             from: Source(id: logId, file: #file, function: #function, line: #line)
         )
-        
-        
-        // Mutation update
-        
-        let mutation = Mutation.createAddClientRecord(from: connection)
-        mutation.httpResponseCode = Response.Code._501_NotImplemented.rawValue
-        mutation.responseDetails = message
-        mutation.requestReceived = info[.responseStartedKey] as? Int64 ?? 0
-        statistics.submit(mutation: mutation, onError: {
-            (message: String) in
-            Log.atError?.log(
-                message: "Error during statistics submission:\(message)",
-                from: Source(id: connection.logId, file: #file, function: #function, line: #line)
-            )
-        })
         
         
         // Response

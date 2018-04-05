@@ -211,7 +211,7 @@ do {
 // Initialize the statistics
 // =========================
 
-let statistics = Statistics()
+/*let statistics = Statistics()
 
 do {
     guard let statisticsFile = StorageUrls.statisticsFile else {
@@ -224,7 +224,7 @@ do {
     }
     
     Log.atNotice?.log(message: "Server statistics loaded.", from: Source(id: -1, file: #file, function: #function, line: #line))
-}
+}*/
 
 
 // =================
@@ -479,8 +479,8 @@ while !quitSwiftfire { _ = Darwin.sleep(2) }
 // Cleanup
 
 _ = serverAdminDomain.serverShutdown()
-statistics.save(toFile: StorageUrls.statisticsFile!)
-Log.atNotice?.log(message: "Saved server statistics", from: Source(id: -1, file: #file, function: #function, line: #line))
+//statistics.save(toFile: StorageUrls.statisticsFile!)
+//Log.atNotice?.log(message: "Saved server statistics", from: Source(id: -1, file: #file, function: #function, line: #line))
 
 headerLogger.close()
 Log.atNotice?.log(message: "Closed header logging file", from: Source(id: -1, file: #file, function: #function, line: #line))

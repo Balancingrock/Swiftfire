@@ -3,7 +3,7 @@
 //  File:       HttpConnection.HttpWorker.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.11
+//  Version:    0.10.12
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -51,6 +51,7 @@
 // 0.10.12 - Upgraded to SwifterLog 1.1.0
 //         - Separated the response transfer into its own service
 //         - Separated the session restart into its own service
+//         - Rewrote statistics package
 // 0.10.11 - Renamed createErrorMessageInBody
 //         - Replaced SwifterJSON with VJson
 // 0.10.10 - Added 'Darwin' to sleep statements.
@@ -129,22 +130,6 @@ extension SFConnection {
                 from: Source(id: logId, file: #file, type: "SFConnection", function: #function, line: #line)
             )
         }
-        
-        
-        // Statistics update
-        
-        let mutation = Mutation.createAddClientRecord(from: self)
-        mutation.httpResponseCode = Response.Code._400_BadRequest.rawValue
-        mutation.responseDetails = message
-        mutation.requestReceived = processingStartedAt
-        statistics.submit(mutation: mutation, onError: {
-            [unowned self] (message: String) in
-            Log.atError?.log(
-                message: message,
-                from: Source(id: self.logId, file: #file, type: "SFConnection", function: #function, line: #line)
-            )
-        })
-
     }
     
     
@@ -180,23 +165,6 @@ extension SFConnection {
                 from: Source(id: logId, file: #file, type: "SFConnection", function: #function, line: #line)
             )
         }
-
-    
-    
-        // Statistics update
-        
-        let mutation = Mutation.createAddClientRecord(from: self)
-        mutation.httpResponseCode = Response.Code._500_InternalServerError.rawValue
-        mutation.responseDetails = message
-        mutation.requestReceived = processingStartedAt
-        statistics.submit(mutation: mutation, onError: {
-            [unowned self] (message: String) in
-            Log.atError?.log(
-                message: message,
-                from: Source(id: self.logId, file: #file, type: "SFConnection", function: #function, line: #line)
-            )
-        })
-
     }
     
     
@@ -269,11 +237,25 @@ extension SFConnection {
             domain = serverAdminDomain
         }
         
-        if domains.count == 0 || serverAdminDomain.accounts.count == 0 {
+        
+        // If there is no serverAdminDomain account, request the creation of server admin account
+        
+        if serverAdminDomain.accounts.count == 0 {
             domain = serverAdminDomain
         }
         
+        
+        // If there are no domains defined, always switch to the serveradmin domain
+        
+        if domains.count == 0 {
+            domain = serverAdminDomain
+        }
+        
+        
+        // If the domain is not set, retrieve the domain from the request
+        
         if domain == nil {
+        
             
             // Get the domain from the host
             
@@ -334,7 +316,7 @@ extension SFConnection {
             // The forwarding connection will be closed when the forwarding target closes its connection. Until then all data received from the forwarding target will be routed to the client.
 
             // Statistics update
-            let mutation = Mutation.createAddClientRecord(from: self)
+            /*let mutation = Mutation.createAddClientRecord(from: self)
             mutation.domain = domain.name
             mutation.httpResponseCode = "Unavailable"
             mutation.responseDetails = "Forwarding of domain '\(host.address)'"
@@ -345,7 +327,7 @@ extension SFConnection {
                     message: message,
                     from: Source(id: self.logId, file: #file, type: "SFConnection", function: #function, line: #line)
                 )
-            }
+            }*/
 
             return
         }
@@ -427,23 +409,27 @@ extension SFConnection {
         
         
         // Update the statistics
-            
-        //let mutation = Mutation.createAddClientRecord(from: self)
-        //mutation.domain = domain.name
-        //mutation.url = serviceInfo[.relativeResourcePathKey] as? String ?? "Unknown resource path"
-        //mutation.httpResponseCode = code.rawValue
-        //mutation.responseDetails = ""
-        //mutation.requestReceived = timestampResponseStart
-        //statistics.submit(mutation: mutation, onError: {
-        //    [unowned self] (message: String) in
-        //    Log.atError?.log(
-        //        message: message,
-        //        from: Source(id: self.logId, file: #file, function: #function, line: #line)
-        //    )
-        //})
-
+        
+        let completed = Date().javaDate
+        let session = serviceInfo[.sessionKey] as? Session
+        
+        let visit = Visit(
+            received: timestampResponseStart,
+            completed: completed,
+            url: serviceInfo[.relativeResourcePathKey] as? String ?? "Unknown",
+            address: self.remoteAddress,
+            session: session?.id,
+            account: (session?[.accountKey] as? Account)?.uuid,
+            responseCode: response.code ?? Response.Code._500_InternalServerError,
+            request: request.asData(),
+            responseData: response.data
+        )
+        
+        domain.recordStatistics(visit)
+ 
+        
         Log.atInfo?.log(
-            message: "Response took \(Date().javaDate - timestampResponseStart) milli seconds",
+            message: "Response took \(completed - timestampResponseStart) milli seconds",
             from: Source(id: logId, file: #file, type: "SFConnection", function: #function, line: #line)
         )
     }

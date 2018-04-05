@@ -141,23 +141,7 @@ func service_getFileAtResourcePath(_ request: Request, _ connection: SFConnectio
             message: message,
             from: Source(id: connection.logId, file: #file, function: #function, line: #line)
         )
-        
-        
-        // Mutation update
-        
-        let mutation = Mutation.createAddClientRecord(from: connection)
-        mutation.httpResponseCode = Response.Code._500_InternalServerError.rawValue
-        mutation.url = resourcePath
-        mutation.responseDetails = message
-        mutation.requestReceived = info[.responseStartedKey] as? Int64 ?? 0
-        statistics.submit(mutation: mutation, onError: {
-            (message: String) in
-            Log.atError?.log(
-                message: "Error during statistics submission:\(message)",
-                from: Source(id: connection.logId, file: #file, function: #function, line: #line)
-            )
-        })
-        
+
         
         // Response
         

@@ -49,6 +49,7 @@
 // History
 //
 // 0.10.12 - Upgraded to SwifterLog 1.1.0
+//         - Removed old statistics code
 // 0.10.10 - Changed signature of function to use SFConnection
 //         - Bugfix: Added sfcommands SaveDomains and ReadDomains
 // 0.10.9 - Added server and domain blacklist management
@@ -269,6 +270,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
         response.body = html.data(using: String.Encoding.utf8)
     }
     
+    
     // Exit if there is a code already
     
     if response.code != nil { return .next }
@@ -298,7 +300,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
     }
     
     
-    // If the url contains '/serveradmin' then remove it'.
+    // If the url contains '/serveradmin' then remove that part.
     
     var url = URL(fileURLWithPath: urlstr)
     var pathComponents = url.pathComponents
@@ -390,7 +392,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
                 }
                 
                 
-                // Credentials are valid, create account
+                // Credentials are considered valid, create account
                 
                 if let account = serverAdminDomain.accounts.newAccount(name: name, password: pwd1) {
                     
@@ -442,7 +444,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
             
             // There is a server account, only accept login.
         
-            // Prevent breakin attempts by demanding a 2 second wait since the last login attempt
+            // Prevent brute force breakin attempts by imposing a 2 second wait since the last login attempt
 
             if let previousAttempt = session[.lastFailedLoginAttemptKey] as? Int64 {
                 let now = Date().javaDate
@@ -454,23 +456,34 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
             }
             
             
-            // No (further) delay necessary
+            // Get name/pwd from admin and check if it is known.
             
             if  let name = postInfo[SERVER_ADMIN_LOGIN_NAME],
                 let pwd = postInfo[SERVER_ADMIN_LOGIN_PWD] {
                 
+                
+                // Get the account for the login data
+                
                 if let account = serverAdminDomain.accounts.getAccount(for: name, using: pwd) {
                 
                     Log.atNotice?.log(
-                        message: "Admin \(name) logged in",
+                        message: "Admin \(name) logged in, \(account.uuid)",
                         from: Source(id: connection.logId, file: #file, function: #function, line: #line)
                     )
                     
+                    
+                    // Associate the account with the session. This allows access for subsequent admin pages.
+                    
                     session[.accountKey] = account
+                    
+                    
+                    // If an admin tried to access an protected page while not logged-in, then the URL of that page is stored in the session.
+                    // Restore the original URL such that the admin is taken to the page he wanted to access.
                     
                     if let url = session[.preLoginUrlKey] as? String {
                         
-                        // There is url, but do not accept the login page itself, otherwise the login page would be shown again, probably confusing the user.
+                        // If the admin went directly for the login page, then redirect the URL to the status page (empty path).
+                        // Not doing so would cause the login page to be displayed again.
                         
                         if url == "/login.html" {
                             relPath = ""
@@ -482,11 +495,18 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
                         relPath = ""
                     }
                     
+                    
+                    // Remove the previous access url from the session.
+                    
                     session[.preLoginUrlKey] = nil
+                    
                     
                     /*** Fallthrough ***/
                     
+                    
                 } else {
+                    
+                    // The login attempt failed, no account found.
                     
                     Log.atNotice?.log(
                         message: "Admin login failed for \(name)",
@@ -513,9 +533,9 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
     }
     
     
-    // =================================================================================================
-    // If this is not a request for a CSS file, then should be an active server admin account to proceed
-    // =================================================================================================
+    // ==================================================================================================
+    // If this is not a request for a CSS file, there should be an active server admin account to proceed
+    // ==================================================================================================
     
     if let fileExtension = relPath.components(separatedBy: ".").last,
         fileExtension.caseInsensitiveCompare("css") == ComparisonResult.orderedSame {
@@ -523,7 +543,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
         // It is an css file, let it go through. This is necessary because some pages will be returned while there is no active admin account. These pages can only render successfully if the formatting is allowed through.
         
     } else {
-    
+            
         guard let account = session.info[.accountKey] as? Account, serverAdminDomain.accounts.contains(account.uuid) else {
             
             // A server admin should login first
@@ -711,7 +731,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
         
         // Error recovery: Make sure the adminSiteRoot is valid
         
-        if adminSiteRootIsValid(connection.filemanager) {
+        if !adminSiteRootIsValid(connection.filemanager) {
 
             response.code = Response.Code._404_NotFound
             
@@ -860,8 +880,6 @@ fileprivate func executeSfCommand(_ pathComponents: Array<String>, _ postInfo: i
     case "UpdateDomainBlacklist": executeUpdateDomainBlacklist(&postInfo); return .newPath("/pages/domain-management.sf.html")
     case "AddToDomainBlacklist": executeAddToDomainBlacklist(&postInfo); return .newPath("/pages/domain-management.sf.html")
     case "RemoveFromDomainBlacklist": executeRemoveFromDomainBlacklist(&postInfo); return .newPath("/pages/domain-management.sf.html")
-    case "UpdateDoNotTraceUrl": executeUpdateDoNotTraceUrl(&postInfo); return .newPath("/pages/statistics.sf.html")
-    case "UpdateDoNotTraceClient": executeUpdateDoNotTraceClient(&postInfo); return .newPath("/pages/statistics.sf.html")
         
     default:
         Log.atError?.log(
@@ -1056,61 +1074,6 @@ fileprivate func executeRemoveFromDomainBlacklist(_ postInfo: inout PostInfo?) {
     }
     guard let (address, _) = postInfo?.popFirst() else { return }
     domain.blacklist.remove(ipAddress: address)
-}
-
-/// Do not trace properties
-
-fileprivate func executeUpdateDoNotTraceUrl(_ postInfo: inout PostInfo?) {
-    
-    // Ensure that there is a domain path part
-    guard let name = postInfo?["Domain"],
-        let domain = statistics.domains.getDomain(for: name) else {
-            Log.atError?.log(
-                message: "Missing domain name or name unknown '\(postInfo?.description ?? "No postInfo")'",
-                from: Source(id: -1, file: #file, function: #function, line: #line)
-            )
-            return
-    }
-    
-    // 'walk' to the path part that needs updating
-    var part = domain
-    while let nextPart = postInfo?[part.pathPart] {
-        if let aPart = part.getPathPart(for: nextPart) {
-            part = aPart
-        } else {
-            Log.atError?.log(
-                message: "Unknown pathpart \(nextPart) in postInfo '\(postInfo?.description ?? "No postInfo")'",
-                from: Source(id: -1, file: #file, function: #function, line: #line)
-            )
-            return
-        }
-    }
-    
-    // Update the path part
-    part.doNotTrace = (postInfo?["checkbox"] != nil)
-    
-    // Remove the last key/value pair to prevent gui glitches
-    var keyOfPart: String?
-    postInfo?.forEach({ (key: String, value: String) in
-        if value == part.pathPart {
-            keyOfPart = key
-        }
-    })
-    if let key = keyOfPart {
-        _ = postInfo?.removeValue(forKey: key)
-    }
-}
-
-fileprivate func executeUpdateDoNotTraceClient(_ postInfo: inout PostInfo?) {
-    guard let address = postInfo?["Client"],
-        let client = statistics.clients.getClient(for: address) else {
-            Log.atError?.log(
-                message: "Missing client address or address unknown '\(postInfo?.description ?? "No postInfo")'",
-                from: Source(id: -1, file: #file, function: #function, line: #line)
-            )
-        return
-    }
-    client.doNotTrace = (postInfo?["checkbox"] != nil)
 }
 
 

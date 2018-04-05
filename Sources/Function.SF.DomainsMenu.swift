@@ -101,37 +101,42 @@ import Html
 
 func function_sf_domainsMenu(_ args: Function.Arguments, _ info: inout Function.Info, _ environment: inout Function.Environment) -> Data? {
     
-    let checkbox = Input(.checkbox, [], "domains-checkbox")
+    func subitem(link: String) -> Div {
+        let text = Div(klass:"text", link)
+        let symbol = Div(klass: "symbol")
+        let title = Div(klass: "title", symbol, text)
+        return Div(klass: "subitem", title)
+    }
     
-    let placeholder = P("<!-- empty but necessary! -->")
-    let menuItemTitle = Div(klass: "menu-item-title", P("Domains"))
-    let menuItemSymbol = Div(klass: "menu-item-symbol", placeholder)
-    let menuItem = Div(klass: "menu-item", menuItemSymbol, menuItemTitle)
-    let menuItemSeparator = Div(klass: "menu-item-separator", placeholder)
-    let label = Label(forId: "domains-checkbox", menuItemSeparator, menuItem)
+
+    let checkbox = Input(.checkbox, [], "domain-checkbox")
+
+    let label = Label(klass: "symbol", forId: "domain-checkbox", P(klass: "code"))
+    
+    let text = Div(klass: "text", P(klass: "paddingAsLInk", "Domains"))
+
+    let title = Div(klass: "title", label, text)
+    
+    var dropdown = Div(klass: "dropdown")
+
+    dropdown.append(Div(klass: "subitem-separator", P("<!-- empty but necessary! -->")))
     
     let link = A(href: "/serveradmin/pages/domain-management.sf.html", P("Manage Domains"))
-    let firstMenuSubitemTitle = Div(klass: "menu-subitem-title", link)
-    let firstMenuSubitemSymbol = Div(klass: "menu-subitem-symbol", [])
-    let firstMenuSubitem = Div(klass: "menu-subitem", firstMenuSubitemSymbol, firstMenuSubitemTitle)
-    let firstListItem = Li(firstMenuSubitem)
-    
-    var list = Ul(firstListItem)
+
+    dropdown.append(subitem(link: link.html))
     
     for domain in domains {
-        
-        let link = postingLink(target: "/serveradmin/pages/domain.sf.html", text: domain.name, keyValuePairs: ["DomainName": domain.name])
-        
-        let menuSubitemTitle = Div(klass: "menu-subitem-title", link)
-        let menuSubitemSymbol = Div(klass: "menu-subitem-symbol", [])
-        let menuSubitem = Div(klass: "menu-subitem", menuSubitemSymbol, menuSubitemTitle)
-        let listItem = Li(menuSubitem)
-        
-        list.append(listItem)
+        dropdown.append(Div(klass: "subitem-separator", P("<!-- empty but necessary! -->")))
+        dropdown.append(subitem(link: postingLink(target: "/serveradmin/pages/domain.sf.html", text: domain.name, keyValuePairs: ["DomainName": domain.name])))
     }
+
+    let item = Div(klass: "item", checkbox, title, dropdown)
+    
+    let item_separator = Div(klass: "item-separator", P("<!-- empty but necessary! -->"))
+    
     
     // If the next expression fails, it will be noticable during tests
     
-    return (checkbox.html + label.html + list.html).data(using: String.Encoding.utf8)!
+    return (item_separator.html + item.html).data(using: String.Encoding.utf8)!
 }
 

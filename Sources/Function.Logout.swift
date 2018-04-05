@@ -1,9 +1,9 @@
 // =====================================================================================================================
 //
-//  File:       StClient.swift
+//  File:       Function.Logout.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.11
+//  Version:    0.10.12
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -11,7 +11,7 @@
 //  Blog:       http://swiftrien.blogspot.com
 //  Git:        https://github.com/Balancingrock/Swiftfire
 //
-//  Copyright:  (c) 2014-2017 Marinus van der Lugt, All rights reserved.
+//  Copyright:  (c) 2017 Marinus van der Lugt, All rights reserved.
 //
 //  License:    Use or redistribute this code any way you like with the following two provision:
 //
@@ -28,7 +28,7 @@
 //   - You can send payment via paypal to: sales@balancingrock.nl
 //   - Or wire bitcoins to: 1GacSREBxPy1yskLMc9de2nofNv2SNdwqH
 //
-//  I prefer the above two, but if these options don't suit you, you might also send me a gift from my amazon.co.uk
+//  I prefer the above two, but if these options don't suit you, you can also send me a gift from my amazon.co.uk
 //  wishlist: http://www.amazon.co.uk/gp/registry/wishlist/34GNMPZKAQ0OO/ref=cm_sw_em_r_wsl_cE3Tub013CKN6_wb
 //
 //  If you like to pay in another way, please contact me at rien@balancingrock.nl
@@ -48,68 +48,71 @@
 //
 // History
 //
-// 0.10.11 - Replaced SwifterJSON with VJson
-// 0.10.7 - Merged SwiftfireCore into Swiftfire
-// 0.9.17 - Header update
-// 0.9.15 - Initial release
+// 0.10.12 - Initial release
+//
+// =====================================================================================================================
+// Description
+// =====================================================================================================================
+//
+// Removes the account from the session.
+//
+//
+// Signature:
+// ----------
+//
+// .logout()
+//
+//
+// Parameters:
+// -----------
+//
+// None.
+//
+//
+// Other Input:
+// ------------
+//
+// environment.request: The HTTP request. Will be tested for the existence of a cookie with the session ID.
+// environment.domain.sessions: The active session list. If a session ID cookie was found, it will be tested for an active session.
+//
+//
+// Returns:
+// --------
+//
+// nil
+//
+//
+// Other Output:
+// -------------
+//
+// environment.info[.sessionKey] = Session // => Active session.
+//
+//
 // =====================================================================================================================
 
 import Foundation
-import VJson
 
 
-/// Client information.
+/// Ensures that a session does not have an account associated with it.
+///
+/// Has no effect if no account is present.
+///
+/// - Returns: Always nil.
 
-public final class StClient: VJsonConvertible {
-
-    
-    /// The address of the client
-    
-    public var address: String
-        
-    
-    /// If this is set to 'true' then the client info will not be updated for this client.
-    
-    public var doNotTrace: Bool = false
+func function_logout(_ args: Function.Arguments, _ info: inout Function.Info, _ environment: inout Function.Environment) -> Data? {
     
     
-    /// A list of all accesses for this client
+    // Find the session
     
-    public var records: [StClientRecord] = []
+    guard let session = environment.serviceInfo[.sessionKey] as? Session else { return nil }
     
     
-    /// Stores all information in a VJson hierarchy
-
-    public var json: VJson {
-        let json = VJson()
-        json["a"] &= address
-        json["d"] &= doNotTrace
-        json["r"] &= VJson(records)
-        return json
-    }
-
+    // Remove the account
     
-    /// Recreates the content from the given VJson hierarchy.
+    session.info.remove(key: .accountKey)
     
-    public init?(json: VJson?) {
-        guard let json = json else { return nil }
-        guard let jAddress    = (json|"a")?.stringValue else { return nil }
-        guard let jDoNotTrace = (json|"d")?.boolValue else { return nil }
-        guard let jRecords    = (json|"r") else { return nil }
-        
-        for jRecord in jRecords {
-            guard let record = StClientRecord(json: jRecord) else { return nil }
-            records.append(record)
-        }
-        
-        self.address = jAddress
-        self.doNotTrace = jDoNotTrace
-    }
-
     
-    /// Create a new object
+    // No data returned
     
-    public init(address: String) {
-        self.address = address
-    }
+    return nil
 }

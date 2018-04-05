@@ -70,7 +70,7 @@ import Foundation
 ///
 /// Example: .nofPageHits() will have the name "nofPageHits"
 
-let NOF_PAGE_HITS = "nofPageHits"
+let LOGOUT = "logout"
 let GET_SESSION = "getSession"
 let TIMESTAMP = "timestamp"
 let POSTING_LINK = "postingLink"
@@ -105,8 +105,8 @@ let SF_STATISTICS_PAGE = "sf-statisticsPage"
 /// Register the functions
 
 func registerFunctions() {
-    functions.register(name: NOF_PAGE_HITS, function: function_nofPageHits)
     functions.register(name: GET_SESSION, function: function_getSession)
+    functions.register(name: LOGOUT, function: function_logout)
     functions.register(name: TIMESTAMP, function: function_timestamp)
     functions.register(name: POSTING_LINK, function: function_postingLink)
     functions.register(name: POSTING_BUTTON, function: function_postingButton)
@@ -125,5 +125,4 @@ func registerFunctions() {
     functions.register(name: SF_DOMAIN_SERVICES_TABLE, function: function_sf_domainServicesTable)
     functions.register(name: SF_DOMAIN_BLACKLIST_TABLE, function: function_sf_domainBlacklistTable)
     functions.register(name: SF_POSTING_BUTTONED_INPUT, function: function_sf_postingButtonedInput)
-    functions.register(name: SF_STATISTICS_PAGE, function: function_sf_statisticsPage)
 }
