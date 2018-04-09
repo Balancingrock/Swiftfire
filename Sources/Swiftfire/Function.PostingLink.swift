@@ -130,7 +130,7 @@ func postingLink(target: String, text: String, keyValuePairs: Dictionary<String,
     if keyValuePairs.isEmpty { return "***Error***" }
     var dict = keyValuePairs
     let pair = dict.remove(at: dict.startIndex)
-    return "<form method=\"post\" action=\"\(target)\" class=\"posting-link-form\">\(dict.reduce("", { return $0.0.appending("<input type=\"hidden\" name=\"\($0.1.key)\" value=\"\($0.1.value)\">") }))<button type=\"submit\" name=\"\(pair.key)\" value=\"\(pair.value)\" class=\"posting-link-button\">\(text)</button></form>"
+    return "<form method=\"post\" action=\"\(target)\" class=\"posting-link-form\">\(dict.reduce("", { (p, q) in return p.appending("<input type=\"hidden\" name=\"\(q.key)\" value=\"\(q.value)\">") }))<button type=\"submit\" name=\"\(pair.key)\" value=\"\(pair.value)\" class=\"posting-link-button\">\(text)</button></form>"
 }
 
 

@@ -359,7 +359,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
                     from: Source(id: connection.logId, file: #file, function: #function, line: #line)
                 )
                 
-                guard !name.isEmpty, name.characters.count < 30 else {
+                guard !name.isEmpty, name.utf8.count < 30 else {
                     createAdminAccountPage(name: "", nameColor: "red", pwdColor: "black", rootColor: "black")
                     return .next
                 }

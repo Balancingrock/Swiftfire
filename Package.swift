@@ -1,13 +1,24 @@
+// swift-tools-version:4.0
+
 import PackageDescription
 
 let package = Package(
     name: "Swiftfire",
+    products: [
+        .executable(name: "Swiftfire", targets: ["Swiftfire"])
+    ],
     dependencies: [
-        .Package(url: "https://github.com/Balancingrock/SwifterLog", Version(1, 1, 1)),
-        .Package(url: "https://github.com/Balancingrock/SecureSockets", Version(0, 4, 11)),
-        .Package(url: "https://github.com/Balancingrock/KeyedCache", Version(0, 6, 0)),
-        .Package(url: "https://github.com/Balancingrock/BRBON", Version(0, 4, 2)),
-        .Package(url: "https://github.com/Balancingrock/Http", Version(0, 0, 5)),
-        .Package(url: "https://github.com/Balancingrock/Html", Version(0, 0, 2))
+        .package(url: "https://github.com/Balancingrock/SwifterLog", from: "1.2.0"),
+        .package(url: "https://github.com/Balancingrock/SecureSockets", from: "0.5.0"),
+        .package(url: "https://github.com/Balancingrock/KeyedCache", from: "0.7.0"),
+        .package(url: "https://github.com/Balancingrock/BRBON", from: "0.6.0"),
+        .package(url: "https://github.com/Balancingrock/Http", from: "0.1.0"),
+        .package(url: "https://github.com/Balancingrock/Html", from: "0.1.0")
+    ],
+    targets: [
+        .target(
+            name: "Swiftfire",
+            dependencies: ["SwifterLog", "SecureSockets", "KeyedCache", "BRBON", "Http", "Html"]
+        )
     ]
 )

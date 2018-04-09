@@ -122,7 +122,7 @@ open class Logfile {
             
             if let fileUrl = fileUrl {
                 
-                if FileManager.default.createFile(atPath: fileUrl.path, contents: nil, attributes: [FileAttributeKey.posixPermissions.rawValue : NSNumber(value: 0o640)]) {
+                if FileManager.default.createFile(atPath: fileUrl.path, contents: nil, attributes: [FileAttributeKey(rawValue: FileAttributeKey.posixPermissions.rawValue) : NSNumber(value: 0o640)]) {
                     _fileHandle = FileHandle(forUpdatingAtPath: fileUrl.path)
                     if let startData = createFileStart()?.data(using: String.Encoding.utf8, allowLossyConversion: true) { _fileHandle?.write(startData) }
                     _filepathForNotice = fileUrl.path
@@ -142,7 +142,7 @@ open class Logfile {
                         
                         // Remove all files that do not contain the choosen filename
                         
-                        let onlyLogfiles = files.flatMap({$0.path.contains(filename) ? $0 : nil})
+                        let onlyLogfiles = files.compactMap({$0.path.contains(filename) ? $0 : nil})
                         
                         if onlyLogfiles.count > maxNofFiles! {
                             let sortedLogfiles = onlyLogfiles.sorted(by: { $0.lastPathComponent < $1.lastPathComponent })

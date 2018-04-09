@@ -373,8 +373,8 @@ public final class SFConnection: SwifterSockets.Connection {
 
                     // Recursive call to take care of possible new requests. Note that new requests will be put on the (serial) worker thread, i.e. any new requests will simply 'sit' until the current request has been dealth with.
                     
-                    let newBuffer = UnsafeMutableRawPointer.allocate(bytes: remainingBufferBytes, alignedTo: 1)
-                    newBuffer.copyBytes(from: buffer.baseAddress!.advanced(by: bodyRemainingBytes), count: remainingBufferBytes)
+                    let newBuffer = UnsafeMutableRawPointer.allocate(byteCount: remainingBufferBytes, alignment: 1)
+                    newBuffer.copyMemory(from: buffer.baseAddress!.advanced(by: bodyRemainingBytes), byteCount: remainingBufferBytes)
                     
                     _ = self.processReceivedData(UnsafeBufferPointer<UInt8>(start: newBuffer.assumingMemoryBound(to: UInt8.self), count: remainingBufferBytes))
                 }

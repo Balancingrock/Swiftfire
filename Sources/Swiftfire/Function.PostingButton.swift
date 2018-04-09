@@ -1,6 +1,6 @@
 // =====================================================================================================================
 //
-//  File:       Function.PostingButtonedInput.swift
+//  File:       Function.PostingButton.swift
 //  Project:    Swiftfire
 //
 //  Version:    0.10.7
@@ -54,42 +54,37 @@
 // Description
 // =====================================================================================================================
 //
-/// Creates an input field with associated button that will post a URL plus key/value combination(s) when clicked.
+/// Creates a (text) link that will post the key/value combination when clicked.
 //
 //
 // Signature:
 // ----------
 //
-// .postingButtonedInput(target, inputName, inputValue, buttonTitle)
+// .postingButton(target, title, key, value)
 //
-// Note: More key/value pairs may be added at the end. i.e.:
-// .postingButtonedInput(target, inputName, inputValue, buttonTitle, key1, value1, key2, value2, etc...)
-//
+// Note: More key/value pairs may be added at the end. i.e. .postingButton(target, title, key1, value1, ke2, value2, etc...)
 //
 // Parameters:
 // -----------
 //
-// target: The target page for the link.
-// inputName: The name of the input field, this name will be returned in the posted key/value pairs.
-// inputValue: The initial value displayed in the input field.
-// buttonTitle: The title for the button.
-// key: (optional) The key of the key/value pair that will be POST-ed.
-// value: (optional) The value of the key/value pair that will be POST-ed
+// target: The target url for the form containing the button.
+// title: The button title.
+// key: The key of the key/value pair that will be POST-ed.
+// value: The value of the key/value pair that will be POST-ed
 //
 //
 // Other Input:
 // ------------
 //
 // CSS:
-//    - class for form: posting-buttoned-input-form
-//    - class for input: posting-buttoned-input-input
-//    - class for button: posting-buttoned-input-button
+//    - class of form: posting-button-form
+//    - class of input: posting-button-button
 //
 //
 // Returns:
 // --------
 //
-// On success: The HTML code (a form).
+// On success: The HTML code (a form) that constitutes the button.
 // On error: ***Error***
 //
 //
@@ -103,31 +98,26 @@
 import Foundation
 
 
-/// Creates a string with the HTML code necessary to display an input field with a button to the right of it.
+/// Creates a string with the HTML code necessary to create a button that contains a POST-ed key/value pair.
 ///
 /// - Parameters:
-///   - target: The target page for the link.
-///   - inputName: The name of the input field, this name will be returned in the posted key/value pairs.
-///   - inputValue: The initial value displayed in the input field.
-///   - buttonTitle: The title for the button.
-///   - keyValuePairs: (optional) Additional key/value pair that will be POST-ed.
+///   - target: The target url for the form containing the button.
+///   - title: The button title.
+///   - key: The key of the key/value pair that will be POST-ed.
+///   - value: The value of the key/value pair that will be POST-ed.
 
-func postingButtonedInput(target: String, inputName: String, inputValue: String, buttonTitle: String, keyValuePairs: Dictionary<String, String> = [:]) -> String {
+func postingButton(target: String, title: String, keyValuePairs: Dictionary<String, String>) -> String {
+    if keyValuePairs.isEmpty { return "***Error***" }
     var dict = keyValuePairs
-    var buttonName: String?
-    var buttonValue: String?
-    if !dict.isEmpty {
-        let pair = dict.remove(at: dict.startIndex)
-        buttonName = pair.key
-        buttonValue = pair.value
-    }
-    return "<form method=\"post\" action=\"\(target)\" class=\"posting-buttoned-input-form\">\(dict.reduce("", { return $0.0.appending("<input type=\"hidden\" name=\"\($0.1.key)\" value=\"\($0.1.value)\">") }))<input class=\"posting-buttoned-input-input\"  type=\"text\" name=\"\(inputName)\" value=\"\(inputValue)\"</input><button type=\"submit\" name=\"\(buttonName ?? "")\" value=\"\(buttonValue ?? "")\" class=\"posting-buttoned-input-button\">\(buttonTitle)</button></form>"
+    let pair = dict.remove(at: dict.startIndex)
+    return "<form method=\"post\" action=\"\(target)\" class=\"posting-button-form\">\(dict.reduce("", { (p, q) in return p.appending("<input type=\"hidden\" name=\"\(q.key)\" value=\"\(q.value)\">") }))<button type=\"submit\" name=\"\(pair.key)\" value=\"\(pair.value)\" class=\"posting-button-button\">\(title)</button></form>"
 }
 
 
-/// Creates a (text) link that will post the key/value combination when clicked.
+/// Creates a button that will post the key/value combination when clicked.
 
-func function_postingButtonedInput(_ args: Function.Arguments, _ info: inout Function.Info, _ environment: inout Function.Environment) -> Data? {
+func function_postingButton(_ args: Function.Arguments, _ info: inout Function.Info, _ environment: inout Function.Environment) -> Data? {
+    
     
     // Check for minimum the 4 arguments and an even number of arguments
     
@@ -146,5 +136,5 @@ func function_postingButtonedInput(_ args: Function.Arguments, _ info: inout Fun
     
     // Create html code
     
-    return postingButtonedInput(target: arr[0], inputName: arr[1], inputValue: arr[2], buttonTitle: arr[3], keyValuePairs: dict).data(using: String.Encoding.utf8)
+    return postingButton(target: arr[0], title: arr[1], keyValuePairs: dict).data(using: String.Encoding.utf8)
 }

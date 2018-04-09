@@ -155,7 +155,7 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
             // Protection
             
             if newValue.isEmpty { return }
-            if newValue.characters.count > 32 { return }
+            if newValue.utf8.count > 32 { return }
             if names.count > 20 { return }
             
             
@@ -418,7 +418,7 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
         // Allocate a buffer
         
         let randBytes = UnsafeMutablePointer<UInt8>.allocate(capacity: saltSize)
-        defer { randBytes.deallocate(capacity: saltSize) }
+        defer { randBytes.deallocate() }
         
         
         // Fill the buffer
@@ -517,7 +517,7 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
             }
         }
         
-        outputBuffer.deallocate(capacity: Int(EVP_MAX_MD_SIZE))
+        outputBuffer.deallocate()
         
         return result
     }

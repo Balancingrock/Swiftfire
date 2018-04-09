@@ -307,7 +307,7 @@ fileprivate func buildServerCtx() -> ServerCtx? {
     
     // Filter for PEM files
     
-    let pemFiles = files.flatMap({ $0.pathExtension.compare("pem", options: [.caseInsensitive], range: nil, locale: nil) == ComparisonResult.orderedSame ? $0 : nil })
+    let pemFiles = files.compactMap({ $0.pathExtension.compare("pem", options: [.caseInsensitive], range: nil, locale: nil) == ComparisonResult.orderedSame ? $0 : nil })
     
     if pemFiles.count == 0 {
         Log.atInfo?.log(
@@ -320,7 +320,7 @@ fileprivate func buildServerCtx() -> ServerCtx? {
     
     // Filter for files containing 'cert'
     
-    let certFiles = pemFiles.flatMap({ $0.lastPathComponent.contains("cert") ? $0 : nil })
+    let certFiles = pemFiles.compactMap({ $0.lastPathComponent.contains("cert") ? $0 : nil })
     
     if certFiles.count != 1 {
         if certFiles.count == 0 {
@@ -340,7 +340,7 @@ fileprivate func buildServerCtx() -> ServerCtx? {
     
     // Filter for files containing 'key'
     
-    let keyFiles = pemFiles.flatMap({ $0.lastPathComponent.contains("key") ? $0 : nil })
+    let keyFiles = pemFiles.compactMap({ $0.lastPathComponent.contains("key") ? $0 : nil })
     
     if keyFiles.count != 1 {
         if keyFiles.count == 0 {

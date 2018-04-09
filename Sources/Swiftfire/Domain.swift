@@ -671,21 +671,21 @@ public final class Domain: CustomStringConvertible, VJsonConvertible {
         
         // Filter for PEM files
         
-        let pemFiles = files.flatMap({ $0.pathExtension.compare("pem", options: [.caseInsensitive], range: nil, locale: nil) == ComparisonResult.orderedSame ? $0 : nil })
+        let pemFiles = files.compactMap({ $0.pathExtension.compare("pem", options: [.caseInsensitive], range: nil, locale: nil) == ComparisonResult.orderedSame ? $0 : nil })
         
         if pemFiles.count == 0 { return .error(message: "No pem files found in \(sslDir.path)") }
         
         
         // Filter for files containing 'cert'
         
-        let certFiles = pemFiles.flatMap({ $0.lastPathComponent.contains("cert") ? $0 : nil })
+        let certFiles = pemFiles.compactMap({ $0.lastPathComponent.contains("cert") ? $0 : nil })
         
         if certFiles.count != 1 { return .error(message: "No certificate file found in \(sslDir.path) (filename should contain the lowercase characters 'cert'") }
         
         
         // Filter for files containing 'key'
         
-        let keyFiles = pemFiles.flatMap({ $0.lastPathComponent.contains("key") ? $0 : nil })
+        let keyFiles = pemFiles.compactMap({ $0.lastPathComponent.contains("key") ? $0 : nil })
         
         if keyFiles.count != 1 { return .error(message: "No (private) key file found in \(sslDir.path) (filename should contain the lowercase characters 'key'") }
         

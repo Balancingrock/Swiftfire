@@ -387,10 +387,11 @@ extension SFDocument {
         
         // The main parser loop
         
-        filedata.characters.forEach {
+        
+        filedata.forEach {
             
             char in
-        
+            
             let unicodeScalar = String(char).unicodeScalars.first!
             
             switch mode {
