@@ -82,12 +82,17 @@ Note: Planned releases are for information only and almost always change.
 
 #### 1.0.0 (Planned)
 
-- A few (1-6) months after v0.10.0 (Confidence building period)
+- A few (1-6) months after v0.12.0 (Confidence building period)
 - Bugfixes
 - Small feature improvements (if necessary)
 - Code improvements
 
-#### 0.10.11 (Current)
+#### 0.11.0 (Current)
+
+- Temporary release for code consolidation purposes while migrating to Swift 4 and SPM 4.
+- Do not use this release, it does not compile!
+
+#### 0.10.11
 
 - Bugfix: fixed hanger on URLs containing an 'and' (&) sign
 - Bugfix: added header logging back in
