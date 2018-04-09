@@ -87,7 +87,11 @@ Note: Planned releases are for information only and almost always change.
 - Small feature improvements (if necessary)
 - Code improvements
 
-#### 0.11.0 (Current)
+#### 0.11.1 (Current)
+
+- Restored compilability (Still, do not use this release)
+
+#### 0.11.0
 
 - Temporary release for code consolidation purposes while migrating to Swift 4 and SPM 4.
 - Do not use this release, it does not compile!
