@@ -373,7 +373,7 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
         
         self.url = url
         
-        guard let json = try? VJson.parse(file: url) else { return nil }
+        guard let json = ((try? VJson.parse(file: url)) as VJson??) else { return nil }
 
         guard let jjnames = (json|"Names")?.arrayValue else { return nil }
         guard jjnames.count > 0 else { return nil }
@@ -605,7 +605,7 @@ public class Accounts {
         
         if let json = VJson.parse(file: lutFile, onError: { (_, _, _, mess) in
             Log.atCritical?.log(
-                "Failed to load accounts lookup table from \(lutFile.path), error message = \(mess)",
+                "Failed to load accounts lookup table from \(self.lutFile.path), error message = \(mess)",
                 from: Source(id: -1, file: #file, type: "Account", function: #function, line: #line))
         }) {
             

@@ -255,14 +255,14 @@ public extension Date {
     
     /// The wallclock time from self in the current calendar
     
-    public var wallclockTime: WallclockTime {
+    var wallclockTime: WallclockTime {
         let comp = Calendar.current.dateComponents([.hour, .minute, .second], from: self as Date)
         return WallclockTime(hour: comp.hour!, minute: comp.minute!, second: comp.second!)
     }
     
     /// A new NSDate set to the first future wallclock time in the current calendar
     
-    public static func firstFutureDate(with wallclockTime: WallclockTime) -> Date {
+    static func firstFutureDate(with wallclockTime: WallclockTime) -> Date {
         var components = DateComponents()
         components.hour = wallclockTime.hour
         components.minute = wallclockTime.minute

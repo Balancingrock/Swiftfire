@@ -418,7 +418,7 @@ public final class ServerParameters: CustomStringConvertible {
         
         // Parse the parameter defaults file
         
-        guard let j = try? VJson.parse(file: url), let json = j else {
+        guard let j = ((try? VJson.parse(file: url)) as VJson??), let json = j else {
             return .error(message: "Could not retrieve JSON code from parameter-defaults file.")
         }
 

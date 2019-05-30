@@ -372,7 +372,7 @@ public final class Domains: Sequence, CustomStringConvertible {
     /// - Parameter file: The URL of the file to deserialize.
     
     public convenience init?(file url: URL) {
-        guard let json = try? VJson.parse(file: url) else { return nil }
+        guard let json = ((try? VJson.parse(file: url)) as VJson??) else { return nil }
         self.init(json: json|"Domains")
     }
     
