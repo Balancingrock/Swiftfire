@@ -145,7 +145,7 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
                 return names[0]
             } else {
                 Log.atError?.log(
-                    message: "Array with names is empty",
+                    "Array with names is empty",
                     from: Source(id: -1, file: #file, type: "Account", function: #function, line: #line))
                 return ""
             }
@@ -173,7 +173,7 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
             
             if let error = save() {
                 Log.atError?.log(
-                    message: "Cannot save account \(self), error message = \(error)",
+                    "Cannot save account \(self), error message = \(error)",
                     from: Source(id: -1, file: #file, type: "Account", function: #function, line: #line))
                 
             } else {
@@ -214,9 +214,9 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
         str += " Uuid: \(uuid)\n"
         str += " Name: \(name)\n"
         //str += " fileUrl: \(fileUrl.path)\n"
-        str += " Digest: \(digest)"
+        str += " Digest: \(String(describing: digest))"
         if parameters.debugMode.value {
-            str += "\n Salt: \(salt)\n"
+            str += "\n Salt: \(String(describing: salt))\n"
             if oldNames.count == 0 {
                 str += " No old names\n"
             } else {
@@ -272,7 +272,7 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
         
         if let error = save() {
             Log.atError?.log(
-                message: "Cannot save account\n\n\(self),\n\n Error message = \(error)\n",
+                "Cannot save account\n\n\(self),\n\n Error message = \(error)\n",
                 from: Source(id: -1, file: #file, type: "Account", function: #function, line: #line))
             return nil
         }
@@ -308,7 +308,7 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
         
         if let error = save() {
             Log.atError?.log(
-                message: "Cannot save account \(self), error message = \(error)",
+                "Cannot save account \(self), error message = \(error)",
                 from: Source(id: -1, file: #file, type: "Account", function: #function, line: #line))
             self.salt = oldSalt
             self.digest = oldDigest
@@ -332,7 +332,7 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
         
         guard let testDigest = createDigest(pwd, salt: salt) else {
             Log.atCritical?.log(
-                message: "Cannot create digest",
+                "Cannot create digest",
                 from: Source(id: -1, file: #file, type: "Account", function: #function, line: #line))
             return false
         }
@@ -452,7 +452,7 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
         
         guard let digester = EVP_MD_CTX_new() else {
             Log.atEmergency?.log(
-                message: "Cannot allocate digest generator",
+                "Cannot allocate digest generator",
                 from: Source(id: -1, file: #file, type: "Account", function: #function, line: #line))
             return nil
         }
@@ -463,7 +463,7 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
         
         if EVP_DigestInit(digester, EVP_sha384()) == 0 {
             Log.atEmergency?.log(
-                message: "Cannot initialize digest generator",
+                "Cannot initialize digest generator",
                 from: Source(id: -1, file: #file, type: "Account", function: #function, line: #line))
             return nil
         }
@@ -476,7 +476,7 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
                 return EVP_DigestUpdate(digester, UnsafeRawPointer(ptr), saltData.count) == 0
             }) {
                 Log.atEmergency?.log(
-                    message: "Cannot update digest generator with salt",
+                    "Cannot update digest generator with salt",
                     from: Source(id: -1, file: #file, type: "Account", function: #function, line: #line))
                 return nil
             }
@@ -490,7 +490,7 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
                 return EVP_DigestUpdate(digester, UnsafeRawPointer(ptr), strData.count) == 0
             }) {
                 Log.atEmergency?.log(
-                    message: "Cannot update digest generator with string",
+                    "Cannot update digest generator with string",
                     from: Source(id: -1, file: #file, type: "Account", function: #function, line: #line))
                 return nil
             }
@@ -503,7 +503,7 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
         var outputLength: UInt32 = 0
         if EVP_DigestFinal(digester, outputBuffer, &outputLength) == 0 {
             Log.atEmergency?.log(
-                message: "Cannot extract digest generator result",
+                "Cannot extract digest generator result",
                 from: Source(id: -1, file: #file, type: "Account", function: #function, line: #line))
             return nil
         }
@@ -603,9 +603,9 @@ public class Accounts {
     
     private func loadLuts() {
         
-        if let json = VJson.parse(file: lutFile, onError: { (_, _, error) in
+        if let json = VJson.parse(file: lutFile, onError: { (_, _, _, mess) in
             Log.atCritical?.log(
-                message: "Failed to load accounts lookup table from \(lutFile.path), error message = \(error)",
+                "Failed to load accounts lookup table from \(lutFile.path), error message = \(mess)",
                 from: Source(id: -1, file: #file, type: "Account", function: #function, line: #line))
         }) {
             
@@ -618,7 +618,7 @@ public class Accounts {
                     if id > lastAccountId { lastAccountId = id }
                 } else {
                     Log.atCritical?.log(
-                        message: "Failed to load accounts  lookup table from \(lutFile.path), error message = Cannot read name, uuid or id from entry \(item)",
+                        "Failed to load accounts  lookup table from \(lutFile.path), error message = Cannot read name, uuid or id from entry \(item)",
                         from: Source(id: -1, file: #file, type: "Account", function: #function, line: #line))
                     return
                 }
@@ -647,7 +647,7 @@ public class Accounts {
                 if once {
                     once = false
                     Log.atCritical?.log(
-                        message: "Account lookup tables are damaged, possible account loss. Regenerate the luts to recover the accounts",
+                        "Account lookup tables are damaged, possible account loss. Regenerate the luts to recover the accounts",
                         from: Source(id: -1, file: #file, type: "Account", function: #function, line: #line))
                 }
             }
@@ -836,7 +836,7 @@ public class Accounts {
                         } else {
                             
                             Log.atCritical?.log(
-                                message: "Failed to read account from \(url.path)",
+                                "Failed to read account from \(url.path)",
                                 from: Source(id: -1, file: #file, type: "Account", function: #function, line: #line))
                             return false
                         }
@@ -848,7 +848,7 @@ public class Accounts {
             } else {
                 
                 Log.atCritical?.log(
-                    message: "Failed to read account directories from \(dir.path)",
+                    "Failed to read account directories from \(dir.path)",
                     from: Source(id: -1, file: #file, type: "Account", function: #function, line: #line))
                 return false
             }
@@ -860,7 +860,7 @@ public class Accounts {
             self.uuidLut = uuidLut
             
             Log.atNotice?.log(
-                message: "Regenerated the account LUT",
+                "Regenerated the account LUT",
                 from: Source(id: -1, file: #file, type: "Account", function: #function, line: #line))
             return true
             

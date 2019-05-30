@@ -114,7 +114,7 @@ func service_getSession(_ request: Request, _ connection: SFConnection, _ domain
     let sessionCookies = request.cookies.filter({ $0.name == Session.cookieId })
     
     Log.atDebug?.log(
-        message: "Found: \(sessionCookies.count) session cookie(s)",
+        "Found: \(sessionCookies.count) session cookie(s)",
         from: Source(id: connection.logId, file: #file, function: #function, line: #line)
     )
 
@@ -129,7 +129,7 @@ func service_getSession(_ request: Request, _ connection: SFConnection, _ domain
             if let session = domain.sessions.getActiveSession(for: id, logId: connection.logId) {
                 
                 Log.atDebug?.log(
-                    message: "Received active session with id: \(id)",
+                    "Received active session with id: \(id)",
                     from: Source(id: connection.logId, file: #file, function: #function, line: #line)
                 )
                 
@@ -150,7 +150,7 @@ func service_getSession(_ request: Request, _ connection: SFConnection, _ domain
             } else {
                 
                 Log.atDebug?.log(
-                    message: "Session with id: \(id) has expired",
+                    "Session with id: \(id) has expired",
                     from: Source(id: connection.logId, file: #file, function: #function, line: #line)
                 )
             }
@@ -175,7 +175,7 @@ func service_getSession(_ request: Request, _ connection: SFConnection, _ domain
         info[.sessionKey] = session
 
         Log.atDebug?.log(
-            message: "No active session found, created new session with id: \(session.id.uuidString)",
+            "No active session found, created new session with id: \(session.id.uuidString)",
             from: Source(id: connection.logId, file: #file, function: #function, line: #line)
         )
         
@@ -184,7 +184,7 @@ func service_getSession(_ request: Request, _ connection: SFConnection, _ domain
         // Error
         
         Log.atCritical?.log(
-            message: "No active session found, failed to create new session",
+            "No active session found, failed to create new session",
             from: Source(id: connection.logId, file: #file, function: #function, line: #line)
         )
     }

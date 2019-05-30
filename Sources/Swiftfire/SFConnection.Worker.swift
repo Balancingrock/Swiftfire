@@ -111,7 +111,7 @@ extension SFConnection {
         // Log update
         
         Log.atDebug?.log(
-            message: message,
+            message,
             from: Source(id: logId, file: #file, type: "SFConnection", function: #function, line: #line)
         )
         
@@ -126,7 +126,7 @@ extension SFConnection {
             transfer(data)
         } else {
             Log.atError?.log(
-                message: "Failed to create HTTP reply with message = '\(message)'",
+                "Failed to create HTTP reply with message = '\(message)'",
                 from: Source(id: logId, file: #file, type: "SFConnection", function: #function, line: #line)
             )
         }
@@ -146,7 +146,7 @@ extension SFConnection {
         // Logging update
         
         Log.atDebug?.log(
-            message: message,
+            message,
             from: Source(id: logId, file: #file, type: "SFConnection", function: #function, line: #line)
         )
         
@@ -161,7 +161,7 @@ extension SFConnection {
             transfer(data)
         } else {
             Log.atError?.log(
-                message: "Failed to create HTTP reply with message = '\(message)'",
+                "Failed to create HTTP reply with message = '\(message)'",
                 from: Source(id: logId, file: #file, type: "SFConnection", function: #function, line: #line)
             )
         }
@@ -279,7 +279,7 @@ extension SFConnection {
         }
 
         Log.atDebug?.log(
-            message: "Request for domain: \(domain.name)",
+            "Request for domain: \(domain.name)",
             from: Source(id: logId, file: #file, type: "SFConnection", function: #function, line: #line)
         )
         
@@ -297,7 +297,7 @@ extension SFConnection {
                 
                 if case let .error(message) = result {
                     Log.atError?.log(
-                        message: message,
+                        message,
                         from: Source(id: logId, file: #file, type: "SFConnection", function: #function, line: #line)
                     )
                 }
@@ -357,7 +357,7 @@ extension SFConnection {
         // =============================================================================================================
 
         Log.atDebug?.log(
-            message: "Starting domain services",
+            "Starting domain services",
             from: Source(id: logId, file: #file, type: "SFConnection", function: #function, line: #line)
         )
 
@@ -374,7 +374,7 @@ extension SFConnection {
             if parameters.debugMode.value {
 
                 Log.atDebug?.log(
-                    message: "Service: \(item.name)",
+                    "Service: \(item.name)",
                     from: Source(id: logId, file: #file, type: "SFConnection", function: #function, line: #line)
                 )
             }
@@ -388,20 +388,20 @@ extension SFConnection {
 
                 if serviceInfo.dict.count == 0 {
                     Log.atDebug?.log(
-                        message: "\n\nService info is empty",
+                        "\n\nService info is empty",
                         from: Source(id: logId, file: #file, type: "SFConnection", function: #function, line: #line)
                     )
                 } else {
                     var str = ""
                     str += serviceInfo.dict.map({ key, value in "Key: \(key), Value: \(value)" }).joined(separator: "\n")
                     Log.atDebug?.log(
-                        message: "\n\nService info:\n\(str)\n",
+                        "\n\nService info:\n\(str)\n",
                         from: Source(id: logId, file: #file, type: "SFConnection", function: #function, line: #line)
                     )
                 }
                 
                 Log.atDebug?.log(
-                    message: "\n\n\(response)\n",
+                    "\n\n\(response)\n",
                     from: Source(id: logId, file: #file, type: "SFConnection", function: #function, line: #line)
                 )
             }
@@ -429,7 +429,7 @@ extension SFConnection {
  
         
         Log.atInfo?.log(
-            message: "Response took \(completed - timestampResponseStart) milli seconds",
+            "Response took \(completed - timestampResponseStart) milli seconds",
             from: Source(id: logId, file: #file, type: "SFConnection", function: #function, line: #line)
         )
     }

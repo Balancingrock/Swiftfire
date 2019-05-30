@@ -149,7 +149,7 @@ func service_onlyGetOrPost(_ request: Request, _ connection: SFConnection, _ dom
         
         let message = "Could not extract operation"
         Log.atDebug?.log(
-            message: message,
+            message,
             from: Source(id: logId, file: #file, function: #function, line: #line)
         )
         
@@ -182,7 +182,7 @@ func service_onlyGetOrPost(_ request: Request, _ connection: SFConnection, _ dom
         
         let message = "Method '\(method.rawValue)' not supported)"
         Log.atDebug?.log(
-            message: message,
+            message,
             from: Source(id: logId, file: #file, function: #function, line: #line)
         )
         

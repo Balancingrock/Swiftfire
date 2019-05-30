@@ -119,7 +119,7 @@ func service_decodePostFormUrlEncoded(_ request: Request, _ connection: SFConnec
     
     guard let strData = request.body, !strData.isEmpty else {
         Log.atDebug?.log(
-            message: "No data to decode.",
+            "No data to decode.",
             from: Source(id: connection.logId, file: #file, function: #function, line: #line)
         )
         return .next
@@ -130,7 +130,7 @@ func service_decodePostFormUrlEncoded(_ request: Request, _ connection: SFConnec
     
     guard let str = String.init(data: strData, encoding: String.Encoding.utf8) else {
         Log.atDebug?.log(
-            message: "Cannot convert form urlencoded data to an UTF8 string",
+            "Cannot convert form urlencoded data to an UTF8 string",
             from: Source(id: connection.logId, file: #file, function: #function, line: #line)
         )
         return .next
@@ -163,7 +163,7 @@ func service_decodePostFormUrlEncoded(_ request: Request, _ connection: SFConnec
     
     
     Log.atDebug?.log(
-        message: "Found \(postInfo.count) items",
+        "Found \(postInfo.count) items",
         from: Source(id: connection.logId, file: #file, function: #function, line: #line)
     )
     

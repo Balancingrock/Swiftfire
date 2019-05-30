@@ -103,17 +103,17 @@ func function_sf_deleteDomain(_ args: Function.Arguments, _ info: inout Function
     // Check that a server admin is logged in
     
     guard let session = environment.serviceInfo[.sessionKey] as? Session else {
-        Log.atError?.log(message: "No session found", from: Source(id: -1, file: #file, function: #function, line: #line))
+        Log.atError?.log("No session found", from: Source(id: -1, file: #file, function: #function, line: #line))
         return "***Error***".data(using: String.Encoding.utf8)
     }
     
     guard let account = session.info[.accountKey] as? Account else {
-        Log.atError?.log(message: "No account found", from: Source(id: -1, file: #file, function: #function, line: #line))
+        Log.atError?.log("No account found", from: Source(id: -1, file: #file, function: #function, line: #line))
         return "***Error***".data(using: String.Encoding.utf8)
     }
     
     guard serverAdminDomain.accounts.contains(account.uuid) else {
-        Log.atError?.log(message: "Not an admin account: '\(account.name)'", from: Source(id: -1, file: #file, function: #function, line: #line))
+        Log.atError?.log("Not an admin account: '\(account.name)'", from: Source(id: -1, file: #file, function: #function, line: #line))
         return "***Error***".data(using: String.Encoding.utf8)
     }
     
@@ -122,12 +122,12 @@ func function_sf_deleteDomain(_ args: Function.Arguments, _ info: inout Function
     
     guard let postInfo = environment.serviceInfo[.postInfoKey] as? PostInfo,
         let name = postInfo["DomainName"] else {
-            Log.atError?.log(message: "Missing DomainName", from: Source(id: -1, file: #file, function: #function, line: #line))
+            Log.atError?.log("Missing DomainName", from: Source(id: -1, file: #file, function: #function, line: #line))
             return "***Error***".data(using: String.Encoding.utf8)
     }
     
     guard domains.contains(domainWithName: name) else {
-        Log.atError?.log(message: "Domain with name \(name) does not exist", from: Source(id: -1, file: #file, function: #function, line: #line))
+        Log.atError?.log("Domain with name \(name) does not exist", from: Source(id: -1, file: #file, function: #function, line: #line))
         return "***Error***".data(using: String.Encoding.utf8)
     }
     

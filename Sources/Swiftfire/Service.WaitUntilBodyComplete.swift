@@ -122,7 +122,7 @@ func service_waitUntilBodyComplete(_ request: Request, _ connection: SFConnectio
     
     if request.contentLength == request.body.count {
         Log.atDebug?.log(
-            message: "Body already complete",
+            "Body already complete",
             from: Source(id: connection.logId, file: #file, function: #function, line: #line)
         )
         return .next
@@ -134,7 +134,7 @@ func service_waitUntilBodyComplete(_ request: Request, _ connection: SFConnectio
     var remainingBytes = request.contentLength
     
     Log.atDebug?.log(
-        message: "Remaining bytes = \(remainingBytes)",
+        "Remaining bytes = \(remainingBytes)",
         from: Source(id: connection.logId, file: #file, function: #function, line: #line)
     )
     
@@ -143,7 +143,7 @@ func service_waitUntilBodyComplete(_ request: Request, _ connection: SFConnectio
             request.body?.append(chunk)
             remainingBytes -= chunk.count
             Log.atDebug?.log(
-                message: "Remaining bytes = \(remainingBytes)",
+                "Remaining bytes = \(remainingBytes)",
                 from: Source(id: connection.logId, file: #file, function: #function, line: #line)
             )
         } else {

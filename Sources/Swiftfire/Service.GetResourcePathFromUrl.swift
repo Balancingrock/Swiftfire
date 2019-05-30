@@ -152,7 +152,7 @@ func service_getResourcePathFromUrl(_ request: Request, _ connection: SFConnecti
         // Log update
         
         Log.atCritical?.log(
-            message: message,
+            message,
             from: Source(id: logId, file: #file, function: #function, line: #line)
         )
         

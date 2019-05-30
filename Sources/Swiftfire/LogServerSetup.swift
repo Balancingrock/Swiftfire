@@ -58,15 +58,15 @@ import SwifterLog
 
 func logServerSetup() {
     
-    Log.atNotice?.log(message: "Configuration parameters values:\n\n\(parameters)\n", from: Source(id: -1, file: #file, function: #function, line: #line))
+    Log.atNotice?.log("Configuration parameters values:\n\n\(parameters)\n", from: Source(id: -1, file: #file, function: #function, line: #line))
     
-    Log.atNotice?.log(message: "Server Blacklist:\n\n\(serverBlacklist)\n", from: Source(id: -1, file: #file, function: #function, line: #line))
+    Log.atNotice?.log("Server Blacklist:\n\n\(serverBlacklist)\n", from: Source(id: -1, file: #file, function: #function, line: #line))
     
-    Log.atNotice?.log(message: "Registered Services:\n\n\(services)\n", from: Source(id: -1, file: #file, function: #function, line: #line))
+    Log.atNotice?.log("Registered Services:\n\n\(services)\n", from: Source(id: -1, file: #file, function: #function, line: #line))
     
-    Log.atNotice?.log(message: "Registered Functions:\n\n\(functions)\n", from: Source(id: -1, file: #file, function: #function, line: #line))
+    Log.atNotice?.log("Registered Functions:\n\n\(functions)\n", from: Source(id: -1, file: #file, function: #function, line: #line))
     
-    Log.atNotice?.log(message: "Domain settings:\n\n\(domains)\n", from: Source(id: -1, file: #file, function: #function, line: #line))
+    Log.atNotice?.log("Domain settings:\n\n\(domains)\n", from: Source(id: -1, file: #file, function: #function, line: #line))
     
-    Log.atNotice?.log(message: "ServerAdminDomain settings:\n\n\(serverAdminDomain)\n", from: Source(id: -1, file: #file, function: #function, line: #line))
+    Log.atNotice?.log("ServerAdminDomain settings:\n\n\(serverAdminDomain)\n", from: Source(id: -1, file: #file, function: #function, line: #line))
 }

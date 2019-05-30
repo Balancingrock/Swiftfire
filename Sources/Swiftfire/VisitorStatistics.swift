@@ -79,14 +79,14 @@ fileprivate let accountColumnName = NameField("Account")!
 fileprivate let responseCodeColumnName = NameField("ResponseCode")!
 fileprivate let entryUuidColumnName = NameField("EntryUuid")!
 
-fileprivate let receivedColumn = ColumnSpecification(type: .int64, name: receivedColumnName, byteCount: 8)
-fileprivate let completedColumn = ColumnSpecification(type: .int64, name: completedColumnName, byteCount: 8)
-fileprivate let urlColumn = ColumnSpecification(type: .array, name: urlColumnName, byteCount: 512)
-fileprivate let addressColumn = ColumnSpecification(type: .crcString, name: addressColumnName, byteCount: 49)
-fileprivate let sessionColumn = ColumnSpecification(type: .uuid, name: sessionColumnName, byteCount: 16)
-fileprivate let accountColumn = ColumnSpecification(type: .crcString, name: accountColumnName, byteCount: 54)
-fileprivate let responseCodeColumn = ColumnSpecification(type: .crcString, name: responseCodeColumnName, byteCount: 48)
-fileprivate let entryUuidColumn = ColumnSpecification(type: .uuid, name: entryUuidColumnName, byteCount: 16)
+fileprivate let receivedColumn = ColumnSpecification(type: .int64, nameField: receivedColumnName, byteCount: 8)
+fileprivate let completedColumn = ColumnSpecification(type: .int64, nameField: completedColumnName, byteCount: 8)
+fileprivate let urlColumn = ColumnSpecification(type: .array, nameField: urlColumnName, byteCount: 512)
+fileprivate let addressColumn = ColumnSpecification(type: .crcString, nameField: addressColumnName, byteCount: 49)
+fileprivate let sessionColumn = ColumnSpecification(type: .uuid, nameField: sessionColumnName, byteCount: 16)
+fileprivate let accountColumn = ColumnSpecification(type: .crcString, nameField: accountColumnName, byteCount: 54)
+fileprivate let responseCodeColumn = ColumnSpecification(type: .crcString, nameField: responseCodeColumnName, byteCount: 48)
+fileprivate let entryUuidColumn = ColumnSpecification(type: .uuid, nameField: entryUuidColumnName, byteCount: 16)
 
 fileprivate let visitorDbColumns: Array<ColumnSpecification> = [receivedColumn, completedColumn, urlColumn, addressColumn, sessionColumn, accountColumn, responseCodeColumn, entryUuidColumn]
 
@@ -181,7 +181,7 @@ struct Visit {
         
         guard let columnIndex = portal.column else {
             Log.atError?.log(
-                message: "Column should be present",
+                "Column should be present",
                 from: Source(id: -1, file: #file, type: "VisitorStatistics", function: #function, line: #line)
             )
             return
@@ -196,20 +196,19 @@ struct Visit {
         case urlColumnIndex:
             
             let parts = url.components(separatedBy: "/")
-            let arr = BrbonArray(content: parts, type: .string)
-            let am = ItemManager.createArrayManager(arr)
-            portal.assignField(at: portal.index!, in: portal.column!, fromManager: am)
+            let am = ItemManager.createArrayManager(values: parts)
+            portal.assignField(atRow: portal.index!, inColumn: portal.column!, fromManager: am)
             
             
-        case addressColumnIndex: portal.crcString = address.crcString
+        case addressColumnIndex: portal.crcString =  BRCrcString(address)
         case sessionColumnIndex: portal.uuid = session
-        case accountColumnIndex: portal.crcString = account?.crcString ?? "None".crcString
-        case responseCodeColumnIndex: portal.crcString = responseCode.rawValue.crcString
+        case accountColumnIndex: portal.crcString = BRCrcString(account ?? "None")
+        case responseCodeColumnIndex: portal.crcString = BRCrcString(responseCode.rawValue)
         case entryUuidColumnIndex: portal.uuid = uuid
 
         default:
             Log.atError?.log(
-                message: "Unknown column index \(columnIndex)",
+                "Unknown column index \(columnIndex)",
                 from: Source(id: -1, file: #file, type: "VisitorStatistics", function: #function, line: #line)
             )
             return
@@ -277,7 +276,7 @@ final class VisitorStatistics {
             try FileManager.default.createDirectory(at: dirurl, withIntermediateDirectories: true, attributes: nil)
         } catch let error {
             Log.atError?.log(
-                message: "Could not create directory at \(dirurl.path), message = \(error.localizedDescription)",
+                "Could not create directory at \(dirurl.path), message = \(error.localizedDescription)",
                 from: Source(id: -1, file: #file, type: "VisitorStatistics", function: #function, line: #line)
             )
         }
@@ -293,7 +292,7 @@ final class VisitorStatistics {
             try FileManager.default.createDirectory(at: dirurl, withIntermediateDirectories: true, attributes: nil)
         } catch let error {
             Log.atError?.log(
-                message: "Could not create directory at \(dirurl.path), message = \(error.localizedDescription)",
+                "Could not create directory at \(dirurl.path), message = \(error.localizedDescription)",
                 from: Source(id: -1, file: #file, type: "VisitorStatistics", function: #function, line: #line)
             )
         }
@@ -309,7 +308,7 @@ final class VisitorStatistics {
             try FileManager.default.createDirectory(at: dirurl, withIntermediateDirectories: true, attributes: nil)
         } catch let error {
             Log.atError?.log(
-                message: "Could not create directory at \(dirurl.path), message = \(error.localizedDescription)",
+                "Could not create directory at \(dirurl.path), message = \(error.localizedDescription)",
                 from: Source(id: -1, file: #file, type: "VisitorStatistics", function: #function, line: #line)
             )
         }
@@ -360,8 +359,8 @@ final class VisitorStatistics {
         
         // Always create a new database
         
-        self.dbase = ItemManager.createTableManager(columns: visitorDbColumns, name: nil, initialRowAllocation: 1000, minimalBufferIncrement: 0, endianness: machineEndianness)
-        
+        var columns = visitorDbColumns
+        self.dbase = ItemManager.createTableManager(columns: &columns, initialRowsAllocated: 1000, endianness: machineEndianness)
     }
     
     
@@ -371,13 +370,13 @@ final class VisitorStatistics {
             try dbase.data.write(to: visitorStatisticsUrl)
         } catch let error {
             Log.atError?.log(
-                message: "Cannot write visitor log to directory: \(directory), error = (\(error.localizedDescription))",
+                "Cannot write visitor log to directory: \(directory), error = (\(error.localizedDescription))",
                 from: Source(id: -1, file: #file, type: "VisitorStatistics", function: #function, line: #line)
             )
         }
 
         Log.atNotice?.log(
-            message: "Domain statistics saved",
+            "Domain statistics saved",
             from: Source(id: -1, file: #file, type: "VisitorStatistics", function: #function, line: #line)
         )
     }
@@ -391,7 +390,7 @@ final class VisitorStatistics {
             try dbase.data.write(to: visitorStatisticsUrl)
         } catch let error {
             Log.atError?.log(
-                message: "Cannot write visitor log to directory: \(directory), error = (\(error.localizedDescription))",
+                "Cannot write visitor log to directory: \(directory), error = (\(error.localizedDescription))",
                 from: Source(id: -1, file: #file, type: "VisitorStatistics", function: #function, line: #line)
             )
         }
@@ -457,8 +456,8 @@ final class VisitorStatistics {
         // Make the new recording
         
         let dm = ItemManager.createDictionaryManager()
-        dm.root.updateValue(visit.url, forName: "url")
-        dm.root.updateValue(visit.request, forName: "request")
+        dm.root!.updateItem(visit.url, withName: "url")
+        dm.root!.updateItem(visit.request, withName: "request")
         try? dm.data.write(to: requestRecordingURL(visit.uuid))
     }
     
@@ -499,8 +498,8 @@ final class VisitorStatistics {
         // Make the new recording
         
         let dm = ItemManager.createDictionaryManager()
-        dm.root.updateValue(visit.url, forName: "url")
-        dm.root.updateValue(visit.responseData, forName: "response")
+        dm.root.updateItem(visit.url, withName: "url")
+        dm.root.updateItem(visit.responseData, withName: "response")
         try? dm.data.write(to: responseRecordingURL(visit.uuid))
     }
     

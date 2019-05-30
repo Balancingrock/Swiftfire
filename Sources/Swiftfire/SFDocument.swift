@@ -234,7 +234,7 @@ final public class SFDocument: EstimatedMemoryConsumption {
         
         if !parse() {
             Log.atCritical?.log(
-                message: "Parse error in \(path), most likely cause is that the file cannot be converted to an UTF8 encoded string",
+                "Parse error in \(path), most likely cause is that the file cannot be converted to an UTF8 encoded string",
                 from: Source(id: -1, file: #file, type: "SFDocument", function: #function, line: #line)
             )
             return nil

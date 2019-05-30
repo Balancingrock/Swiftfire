@@ -138,7 +138,7 @@ func service_getFileAtResourcePath(_ request: Request, _ connection: SFConnectio
         // Log update
         
         Log.atCritical?.log(
-            message: message,
+            message,
             from: Source(id: connection.logId, file: #file, function: #function, line: #line)
         )
 
@@ -164,7 +164,7 @@ func service_getFileAtResourcePath(_ request: Request, _ connection: SFConnectio
     }
 
     Log.atDebug?.log(
-        message: "Resource path = \(resourcePath)",
+        "Resource path = \(resourcePath)",
         from: Source(id: connection.logId, file: #file, function: #function, line: #line)
     )
     

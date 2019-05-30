@@ -111,7 +111,7 @@ func service_restartSessionTimeout(_ request: Request, _ connection: SFConnectio
         if session.isActiveKeepActive {
             response.cookies.append(session.cookie)
             Log.atDebug?.log(
-                message: "Session cookie added to response with id = \(session.id.uuidString)",
+                "Session cookie added to response with id = \(session.id.uuidString)",
                 from: Source(id: connection.logId, file: #file, function: #function, line: #line)
             )
         }

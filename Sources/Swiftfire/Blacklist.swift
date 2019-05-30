@@ -206,9 +206,10 @@ public final class Blacklist: VJsonSerializable, VJsonDeserializable, CustomStri
             return .success(true)
         }
         
-        let json: VJson
+        let json: VJson!
         do {
             json = try VJson.parse(file: url)
+            if json == nil { throw NSError() }
         } catch {
             return .error(message: "Could not read blacklistedAddresses, message = \(error), file: \(url.path)")
         }

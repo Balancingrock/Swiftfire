@@ -783,7 +783,7 @@ public final class Domain: CustomStringConvertible, VJsonConvertible {
                 wwwIncluded = b
             } else {
                 Log.atError?.log(
-                    message: "Cannot convert: \(value) to bool",
+                    "Cannot convert: \(value) to bool",
                     from: Source(id: -1, file: #file, type: "Domain", function: #function, line: #line)
                 )
             }
@@ -799,7 +799,7 @@ public final class Domain: CustomStringConvertible, VJsonConvertible {
                 enabled = b
             } else {
                 Log.atError?.log(
-                    message: "Cannot convert: \(value) to bool",
+                    "Cannot convert: \(value) to bool",
                     from: Source(id: -1, file: #file, type: "Domain", function: #function, line: #line)
                 )
             }
@@ -809,7 +809,7 @@ public final class Domain: CustomStringConvertible, VJsonConvertible {
                 accessLogEnabled = b
             } else {
                 Log.atError?.log(
-                    message: "Cannot convert: \(value) to bool",
+                    "Cannot convert: \(value) to bool",
                     from: Source(id: -1, file: #file, type: "Domain", function: #function, line: #line)
                 )
             }
@@ -819,7 +819,7 @@ public final class Domain: CustomStringConvertible, VJsonConvertible {
                 four04LogEnabled = b
             } else {
                 Log.atError?.log(
-                    message: "Cannot convert: \(value) to bool",
+                    "Cannot convert: \(value) to bool",
                     from: Source(id: -1, file: #file, type: "Domain", function: #function, line: #line)
                 )
             }
@@ -829,7 +829,7 @@ public final class Domain: CustomStringConvertible, VJsonConvertible {
                 sessionLogEnabled = b
             } else {
                 Log.atError?.log(
-                    message: "Cannot convert: \(value) to bool",
+                    "Cannot convert: \(value) to bool",
                     from: Source(id: -1, file: #file, type: "Domain", function: #function, line: #line)
                 )
             }
@@ -845,7 +845,7 @@ public final class Domain: CustomStringConvertible, VJsonConvertible {
                 sessionTimeout = i
             } else {
                 Log.atError?.log(
-                    message: "Cannot convert: \(value) to Int",
+                    "Cannot convert: \(value) to Int",
                     from: Source(id: -1, file: #file, type: "Domain", function: #function, line: #line)
                 )
             }
@@ -855,7 +855,7 @@ public final class Domain: CustomStringConvertible, VJsonConvertible {
                 statisticsRolloverTime = t
             } else {
                 Log.atError?.log(
-                    message: "Cannot convert: \(value) to WallclockTime",
+                    "Cannot convert: \(value) to WallclockTime",
                     from: Source(id: -1, file: #file, type: "Domain", function: #function, line: #line)
                 )
             }
@@ -865,7 +865,7 @@ public final class Domain: CustomStringConvertible, VJsonConvertible {
                 visitsPerStatisticsFile = i
             } else {
                 Log.atError?.log(
-                    message: "Cannot convert: \(value) to Int",
+                    "Cannot convert: \(value) to Int",
                     from: Source(id: -1, file: #file, type: "Domain", function: #function, line: #line)
                 )
             }
@@ -875,7 +875,7 @@ public final class Domain: CustomStringConvertible, VJsonConvertible {
                 nofRecentRequestLogs = i
             } else {
                 Log.atError?.log(
-                    message: "Cannot convert: \(value) to Int",
+                    "Cannot convert: \(value) to Int",
                     from: Source(id: -1, file: #file, type: "Domain", function: #function, line: #line)
                 )
             }
@@ -885,13 +885,13 @@ public final class Domain: CustomStringConvertible, VJsonConvertible {
                 nofRecentResponseLogs = i
             } else {
                 Log.atError?.log(
-                    message: "Cannot convert: \(value) to Int",
+                    "Cannot convert: \(value) to Int",
                     from: Source(id: -1, file: #file, type: "Domain", function: #function, line: #line)
                 )
             }
 
         default: Log.atError?.log(
-            message: "Unknown item name: \(item)",
+            "Unknown item name: \(item)",
             from: Source(id: -1, file: #file, type: "Domain", function: #function, line: #line)
             )
         }

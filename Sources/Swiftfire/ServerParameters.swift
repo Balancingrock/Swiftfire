@@ -418,7 +418,7 @@ public final class ServerParameters: CustomStringConvertible {
         
         // Parse the parameter defaults file
         
-        guard let json = try? VJson.parse(file: url) else {
+        guard let j = try? VJson.parse(file: url), let json = j else {
             return .error(message: "Could not retrieve JSON code from parameter-defaults file.")
         }
 
@@ -429,7 +429,7 @@ public final class ServerParameters: CustomStringConvertible {
         for item in all {
             if let strval = (json|item.name)?.stringValue {
                 if item.setValue(strval) {
-                    json.remove(childrenWith: item.name)
+                    json.removeItems(forName: item.name)
                 } else {
                     message += "Failed to set value for \(item.name) to \(strval)\n"
                 }
@@ -472,10 +472,10 @@ func setupParametersDidSetActions() {
     
     parameters.aslFacilityRecordAtAndAboveLevel.addDidSetAction {
         if let level = SwifterLog.Level.factory(parameters.aslFacilityRecordAtAndAboveLevel.value) {
-            Log.singleton.aslFacilityRecordAtAndAboveLevel = level
+            Log.singleton.osLogFacilityRecordAtAndAboveLevel = level
         } else {
             Log.atError?.log(
-                message: "Cannot create loglevel from \(parameters.aslFacilityRecordAtAndAboveLevel.value) for aslFacilityRecordAtAndAboveLevel",
+                "Cannot create loglevel from \(parameters.aslFacilityRecordAtAndAboveLevel.value) for aslFacilityRecordAtAndAboveLevel",
                 from: Source(id: -1, file: #file, function: #function, line: #line)
             )
         }
@@ -486,7 +486,7 @@ func setupParametersDidSetActions() {
             Log.singleton.fileRecordAtAndAboveLevel = level
         } else {
             Log.atError?.log(
-                message: "Cannot create loglevel from \(parameters.fileRecordAtAndAboveLevel.value) for fileRecordAtAndAboveLevel",
+                "Cannot create loglevel from \(parameters.fileRecordAtAndAboveLevel.value) for fileRecordAtAndAboveLevel",
                 from: Source(id: -1, file: #file, function: #function, line: #line)
             )
         }
@@ -497,7 +497,7 @@ func setupParametersDidSetActions() {
             Log.singleton.callbackAtAndAboveLevel = level
         } else {
             Log.atError?.log(
-                message: "Cannot create loglevel from \(parameters.callbackAtAndAboveLevel.value) for callbackAtAndAboveLevel",
+                "Cannot create loglevel from \(parameters.callbackAtAndAboveLevel.value) for callbackAtAndAboveLevel",
                 from: Source(id: -1, file: #file, function: #function, line: #line)
             )
         }
@@ -508,7 +508,7 @@ func setupParametersDidSetActions() {
             Log.singleton.stdoutPrintAtAndAboveLevel = level
         } else {
             Log.atError?.log(
-                message: "Cannot create loglevel from \(parameters.stdoutPrintAtAndAboveLevel.value) for stdoutPrintAtAndAboveLevel",
+                "Cannot create loglevel from \(parameters.stdoutPrintAtAndAboveLevel.value) for stdoutPrintAtAndAboveLevel",
                 from: Source(id: -1, file: #file, function: #function, line: #line)
             )
         }
@@ -518,7 +518,7 @@ func setupParametersDidSetActions() {
         if let level = SwifterLog.Level.factory(parameters.networkTransmitAtAndAboveLevel.value) {
             Log.singleton.networkTransmitAtAndAboveLevel = level
         } else {
-            Log.atError?.log(message: "Cannot create loglevel from \(parameters.networkTransmitAtAndAboveLevel.value) for networkTransmitAtAndAboveLevel",
+            Log.atError?.log("Cannot create loglevel from \(parameters.networkTransmitAtAndAboveLevel.value) for networkTransmitAtAndAboveLevel",
                 from: Source(id: -1, file: #file, function: #function, line: #line)
             )
         }

@@ -213,7 +213,7 @@ public final class SFConnection: SwifterSockets.Connection {
         // Record the closing
         
         Log.atInfo?.log(
-            message: "Closing connection",
+            "Closing connection",
             from: Source(id: logId, file: #file, type: "SFConnection", function: #function, line: #line)
         )
         
@@ -238,7 +238,7 @@ public final class SFConnection: SwifterSockets.Connection {
     
     override public func transmitterError(_ id: Int, _ message: String) {
         Log.atError?.log(
-            message: message,
+            message,
             from: Source(id: logId, file: #file, type: "SFConnection", function: #function, line: #line)
         )
         super.transmitterError(id, message)
@@ -258,7 +258,7 @@ public final class SFConnection: SwifterSockets.Connection {
     
     override public func receiverError(_ message: String) {
         Log.atError?.log(
-            message: "Error event: \(message)",
+            "Error event: \(message)",
             from: Source(id: logId, file: #file, type: "SFConnection", function: #function, line: #line)
         )
     }
@@ -288,7 +288,7 @@ public final class SFConnection: SwifterSockets.Connection {
             while let request = Request(&headerData!) {
                 
                 Log.atDebug?.log(
-                    message: "HTTP Request Header complete",
+                    "HTTP Request Header complete",
                     from: Source(id: logId, file: #file, type: "SFConnection", function: #function, line: #line)
                 )
 
@@ -329,7 +329,7 @@ public final class SFConnection: SwifterSockets.Connection {
                     } else {
                         
                         Log.atEmergency?.log(
-                            message: "Coding error",
+                            "Coding error",
                             from: Source(id: logId, file: #file, type: "SFConnection", function: #function, line: #line)
                         )
                     }
@@ -393,7 +393,7 @@ public final class SFConnection: SwifterSockets.Connection {
                 [chunk, unowned self] in
                 if self.bodyChunk != nil {
                     Log.atEmergency?.log(
-                        message: "Coding error",
+                        "Coding error",
                         from: Source(id: self.logId, file: #file, type: "SFConnection", function: #function, line: #line)
                     )
                 }
@@ -495,7 +495,7 @@ func httpConnectionFactory(_ cType: SwifterSockets.InterfaceAccess, _ remoteAddr
     
     guard let connection = availableConnection as? SFConnection else {
         Log.atEmergency?.log(
-            message: "SF Connection could not be allocated, client at \(remoteAddress) will be rejected",
+            "SF Connection could not be allocated, client at \(remoteAddress) will be rejected",
             from: Source(id: -1, file: #file, type: "SFConnection", function: #function, line: #line)
         )
         return nil
@@ -510,7 +510,7 @@ func httpConnectionFactory(_ cType: SwifterSockets.InterfaceAccess, _ remoteAddr
     // Create log entry that can be used to associate this place in the logfile with data from the statistics.
     
     Log.atDebug?.log(
-        message: "Allocating connection object \(connection.objectId) to client from address \(remoteAddress) on socket \(cType.logId) with allocation count \(connection.allocationCount)",
+        "Allocating connection object \(connection.objectId) to client from address \(remoteAddress) on socket \(cType.logId) with allocation count \(connection.allocationCount)",
         from: Source(id: Int(cType.logId), file: #file, type: "SFConnection", function: #function, line: #line)
     )
     
@@ -519,7 +519,7 @@ func httpConnectionFactory(_ cType: SwifterSockets.InterfaceAccess, _ remoteAddr
     
     if !connection.prepare(for: cType, remoteAddress: remoteAddress, options: []) {
         Log.atEmergency?.log(
-            message: "Cannot prepare SF connection \(connection.objectId) for reuse",
+            "Cannot prepare SF connection \(connection.objectId) for reuse",
             from: Source(id: -1, file: #file, type: "SFConnection", function: #function, line: #line)
         )
         connectionPool.free(connection: connection)

@@ -106,7 +106,7 @@ import SwifterLog
 
 func function_nofPageHits(_ args: Function.Arguments, _ info: inout Function.Info, _ environment: inout Function.Environment) -> Data? {
     
-    var count: Int64 = -1
+    let count: Int64 = -1
     
     var path: String?
     
@@ -120,11 +120,11 @@ func function_nofPageHits(_ args: Function.Arguments, _ info: inout Function.Inf
         path = environment.serviceInfo[.relativeResourcePathKey] as? String
     }
 
-    if let path = path {
-        count = statistics.foreverCount(domain: environment.domain.name, path: path)
-    }
+//    if let path = path {
+//        count = statistics.foreverCount(domain: environment.domain.name, path: path)
+//    }
 
-    Log.atDebug?.log(message: "ForeverCount for \(path ?? "Unknown") = \(count)", from: Source(id: Int(environment.connection.logId), file: #file, function: #function, line: #line))
+    Log.atDebug?.log("ForeverCount for \(path ?? "Unknown") = \(count)", from: Source(id: Int(environment.connection.logId), file: #file, function: #function, line: #line))
 
     return count.description.data(using: String.Encoding.utf8)
 }

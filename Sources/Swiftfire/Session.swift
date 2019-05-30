@@ -511,7 +511,7 @@ public final class Sessions: CustomStringConvertible {
             let session = Session(address: address, domainName: domainName, connectionId: connectionId, allocationCount: allocationCount, timeout: timeout)
             self.active[session.id] = session
             Log.atInfo?.log(
-                message: "Created session with id = \(session.id.uuidString)",
+                "Created session with id = \(session.id.uuidString)",
                 from: Source(id: logId, file: #file, function: #function, line: #line)
             )
             return session
@@ -546,7 +546,7 @@ public final class Sessions: CustomStringConvertible {
         storeSession(session)
         active[id] = nil
         Log.atInfo?.log(
-            message: "Purged inactive session for \(id.uuidString)",
+            "Purged inactive session for \(id.uuidString)",
             from: Source(id: -1, file: #file, type: "Session", function: #function, line: #line)
         )
     }

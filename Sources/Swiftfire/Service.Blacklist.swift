@@ -144,7 +144,7 @@ func service_blacklist(_ request: Request, _ connection: SFConnection, _ domain:
         domain.telemetry.nofBlacklistedAccesses.increment()
         
         Log.atNotice?.log(
-            message: "Domain rejected blacklisted client \(connection.remoteAddress) by closing the connection",
+            "Domain rejected blacklisted client \(connection.remoteAddress) by closing the connection",
             from: Source(id: logId, file: #file, function: #function, line: #line)
         )
         
@@ -156,7 +156,7 @@ func service_blacklist(_ request: Request, _ connection: SFConnection, _ domain:
         domain.telemetry.nofBlacklistedAccesses.increment()
 
         Log.atNotice?.log(
-            message: "Domain rejected blacklisted client \(connection.remoteAddress) with 401 reply",
+            "Domain rejected blacklisted client \(connection.remoteAddress) with 401 reply",
             from: Source(id: logId, file: #file, function: #function, line: #line)
         )
         
@@ -170,7 +170,7 @@ func service_blacklist(_ request: Request, _ connection: SFConnection, _ domain:
         domain.telemetry.nofBlacklistedAccesses.increment()
 
         Log.atNotice?.log(
-            message: "Domain rejected blacklisted client \(connection.remoteAddress) with 503 reply",
+            "Domain rejected blacklisted client \(connection.remoteAddress) with 503 reply",
             from: Source(id: logId, file: #file, function: #function, line: #line)
         )
         

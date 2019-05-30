@@ -103,7 +103,7 @@ class Forwarder: SwifterSockets.Connection {
     }
     
     override func receiverError(_ message: String) {
-        Log.atError?.log(message: message, from: Source(id: Int(client!.interface!.logId), file: #file, type: "Forwarder", function: #function, line: #line))
+        Log.atError?.log(message, from: Source(id: Int(client!.interface!.logId), file: #file, type: "Forwarder", function: #function, line: #line))
         closeForwarder()
     }
     

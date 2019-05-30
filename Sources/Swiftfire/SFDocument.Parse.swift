@@ -136,7 +136,7 @@ extension SFDocument {
         func asJsonFunctionBlock() -> DocumentBlock {
             let fb = FunctionBlock(name: name, function: function, arguments: Function.Arguments.json(json!))
             Log.atDebug?.log(
-                message: "Function block: \(fb)",
+                "Function block: \(fb)",
                 from: Source(id: -1, file: #file, type: "SFDocument", function: #function, line: #line)
             )
             return .functionBlock(fb)
@@ -145,7 +145,7 @@ extension SFDocument {
         func asArrFunctionBlock() -> DocumentBlock {
             let fb = FunctionBlock(name: name, function: function, arguments: Function.Arguments.array(array))
             Log.atDebug?.log(
-                message: "Function block: \(fb)",
+                "Function block: \(fb)",
                 from: Source(id: -1, file: #file, type: "SFDocument", function: #function, line: #line)
             )
             return .functionBlock(fb)
@@ -155,7 +155,7 @@ extension SFDocument {
             guard let data = charBuf.data(using: String.Encoding.utf8) else { return nil }
             let cb = CharacterBlock(data: data)
             Log.atDebug?.log(
-                message: "Character block: \(cb)",
+                "Character block: \(cb)",
                 from: Source(id: -1, file: #file, type: "SFDocument", function: #function, line: #line)
             )
             return .characterBlock(cb)
@@ -240,12 +240,17 @@ extension SFDocument {
                     }
                     charBuf = ""
                     // --
-                    json = try? VJson.parse(string: jsonBuf)
-                    if json == nil {
+                    do {
+                        json = try VJson.parse(string: jsonBuf)
+                        if json == nil {
+                            charBuf.append(jsonBuf)
+                            return .waitForLeadingSign
+                        } else {
+                            self.blocks.append(asJsonFunctionBlock())
+                            return .waitForLeadingSign
+                        }
+                    } catch _ {
                         charBuf.append(jsonBuf)
-                        return .waitForLeadingSign
-                    } else {
-                        self.blocks.append(asJsonFunctionBlock())
                         return .waitForLeadingSign
                     }
                 } else {

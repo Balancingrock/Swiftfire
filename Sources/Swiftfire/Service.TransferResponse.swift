@@ -105,7 +105,7 @@ func service_transferResponse(_ request: Request, _ connection: SFConnection, _ 
     // Log the code (should be present)
     
     Log.atDebug?.log(
-        message: "Domain services completed with code = \(response.code?.rawValue ?? "None")",
+        "Domain services completed with code = \(response.code?.rawValue ?? "None")",
         from: Source(id: connection.logId, file: #file, function: #function, line: #line)
     )
 
@@ -144,7 +144,7 @@ func service_transferResponse(_ request: Request, _ connection: SFConnection, _ 
     } else {
         
         Log.atError?.log(
-            message: "Failed to create response data",
+            "Failed to create response data",
             from: Source(id: connection.logId, file: #file, type: "SFConnection", function: #function, line: #line)
         )
     }

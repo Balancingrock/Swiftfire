@@ -93,7 +93,7 @@ typealias Log = SwifterLog.Logger
 /// Stops the startup process.
 
 fileprivate func emergencyExit(_ message: String) -> Never {
-    Log.atEmergency?.log(message: message, from: Source(id: -1, file: #file, function: #function, line: #line))
+    Log.atEmergency?.log(message, from: Source(id: -1, file: #file, function: #function, line: #line))
     _ = Darwin.sleep(2) // Give the logger some time to do its work
     fatalError(message)
 }
@@ -106,7 +106,7 @@ var quitSwiftfire: Bool = false
 
 // Set default logging levels to gain some output if anything goes wrong before the log levels are set to the application values
 
-Log.singleton.aslFacilityRecordAtAndAboveLevel = SwifterLog.Level.none
+Log.singleton.osLogFacilityRecordAtAndAboveLevel = SwifterLog.Level.none
 Log.singleton.fileRecordAtAndAboveLevel = SwifterLog.Level.none
 Log.singleton.stdoutPrintAtAndAboveLevel = SwifterLog.Level.debug
 Log.singleton.callbackAtAndAboveLevel = SwifterLog.Level.none
@@ -127,14 +127,14 @@ do {
     switch parameters.restore(fromFile: parameterDefaultFile) {
     case let .error(message):   emergencyExit(message)
     case let .success(message):
-        if !message.isEmpty { Log.atNotice?.log(message: message, from: Source(id: -1, file: #file, function: #function, line: #line)) }
+        if !message.isEmpty { Log.atNotice?.log(message, from: Source(id: -1, file: #file, function: #function, line: #line)) }
     }
     
     parameters.debugMode.value = true
     
     setupParametersDidSetActions()
     
-    Log.atDebug?.log(message: "Configuration parameters:\n\n\(parameters)\n", from: Source(id: -1, file: #file, function: #function, line: #line))
+    Log.atDebug?.log("Configuration parameters:\n\n\(parameters)\n", from: Source(id: -1, file: #file, function: #function, line: #line))
 }
 
 
@@ -159,7 +159,7 @@ do {
     guard let aslLoglevel = SwifterLog.Level.factory(parameters.aslFacilityRecordAtAndAboveLevel.value) else {
         emergencyExit("Could not construct asl loglevel")
     }
-    Log.singleton.aslFacilityRecordAtAndAboveLevel = aslLoglevel
+    Log.singleton.osLogFacilityRecordAtAndAboveLevel = aslLoglevel
     
     guard let stdoutLoglevel = SwifterLog.Level.factory(parameters.stdoutPrintAtAndAboveLevel.value) else {
         emergencyExit("Could not construct stdout loglevel")
@@ -183,7 +183,7 @@ do {
         Log.network.connectToNetworkTarget(target)
     }
     
-    Log.atNotice?.log(message: "Logging configured", from: Source(id: -1, file: #file, function: #function, line: #line))
+    Log.atNotice?.log("Logging configured", from: Source(id: -1, file: #file, function: #function, line: #line))
 }
 
 
@@ -203,7 +203,7 @@ do {
     case .success: break
     }
     
-    Log.atDebug?.log(message: "Server Blacklist:\n\n\(serverBlacklist)\n", from: Source(id: -1, file: #file, function: #function, line: #line))
+    Log.atDebug?.log("Server Blacklist:\n\n\(serverBlacklist)\n", from: Source(id: -1, file: #file, function: #function, line: #line))
 }
 
 
@@ -236,7 +236,7 @@ let services = Service()
 do {
     registerServices()
 
-    Log.atDebug?.log(message: "Registered services:\n\n\(services)\n", from: Source(id: -1, file: #file, function: #function, line: #line))
+    Log.atDebug?.log("Registered services:\n\n\(services)\n", from: Source(id: -1, file: #file, function: #function, line: #line))
 }
 
 
@@ -249,7 +249,7 @@ let functions = Function()
 do {
     registerFunctions()
 
-    Log.atDebug?.log(message: "Registered functions:\n\n\(functions)\n", from: Source(id: -1, file: #file, function: #function, line: #line))
+    Log.atDebug?.log("Registered functions:\n\n\(functions)\n", from: Source(id: -1, file: #file, function: #function, line: #line))
 }
 
 
@@ -266,7 +266,7 @@ do {
     
     headerLogger = HttpHeaderLogger(rootDir: headersLogDir)
     
-    Log.atDebug?.log(message: "Created header logging directory in: \(headersLogDir)", from: Source(id: -1, file: #file, function: #function, line: #line))
+    Log.atDebug?.log("Created header logging directory in: \(headersLogDir)", from: Source(id: -1, file: #file, function: #function, line: #line))
 }
 
 
@@ -283,7 +283,7 @@ do {
     
     switch domains.restore(fromFile: defaultDomainsFile) {
     case let .error(message): emergencyExit(message)
-    case let .success(message): Log.atNotice?.log(message: message, from: Source(id: -1, file: #file, function: #function, line: #line))
+    case let .success(message): Log.atNotice?.log(message, from: Source(id: -1, file: #file, function: #function, line: #line))
     }
     
     
@@ -294,7 +294,7 @@ do {
     
     // log the domain settings
     
-    Log.atNotice?.log(message: "Domain settings:\n\n\(domains)\n", from: Source(id: -1, file: #file, function: #function, line: #line))
+    Log.atNotice?.log("Domain settings:\n\n\(domains)\n", from: Source(id: -1, file: #file, function: #function, line: #line))
 }
 
 
@@ -323,7 +323,7 @@ do {
     serverAdminDomain.rebuildServices()
     serverAdminDomain.sessionTimeout = 600 // Seconds
 
-    Log.atNotice?.log(message: "Created server admin (pseudo) domain", from: Source(id: -1, file: #file, function: #function, line: #line))
+    Log.atNotice?.log("Created server admin (pseudo) domain", from: Source(id: -1, file: #file, function: #function, line: #line))
 }
 
 
@@ -458,11 +458,11 @@ if consoleServerCertificateFound {
 // Call out to the custom setup routine
 // ====================================
 
-Log.atNotice?.log(message: "Calling out to custom setup", from: Source(id: -1, file: #file, function: #function, line: #line))
+Log.atNotice?.log("Calling out to custom setup", from: Source(id: -1, file: #file, function: #function, line: #line))
 
 customSetup()
 
-Log.atNotice?.log(message: "Finished custom setup", from: Source(id: -1, file: #file, function: #function, line: #line))
+Log.atNotice?.log("Finished custom setup", from: Source(id: -1, file: #file, function: #function, line: #line))
 
 
 // ==================================
@@ -483,24 +483,24 @@ _ = serverAdminDomain.serverShutdown()
 //Log.atNotice?.log(message: "Saved server statistics", from: Source(id: -1, file: #file, function: #function, line: #line))
 
 headerLogger.close()
-Log.atNotice?.log(message: "Closed header logging file", from: Source(id: -1, file: #file, function: #function, line: #line))
+Log.atNotice?.log("Closed header logging file", from: Source(id: -1, file: #file, function: #function, line: #line))
 
 if let url = StorageUrls.serverBlacklistFile {
     serverBlacklist.save(toFile: url)
-    Log.atNotice?.log(message: "Saved server blacklist", from: Source(id: -1, file: #file, function: #function, line: #line))
+    Log.atNotice?.log("Saved server blacklist", from: Source(id: -1, file: #file, function: #function, line: #line))
 }
 
 switch domains.serverShutdown() {
-case .error(let message): Log.atError?.log(message: "Error while shutting down the domains:\n\(message)", from: Source(id: -1, file: #file, function: #function, line: #line))
+case .error(let message): Log.atError?.log("Error while shutting down the domains:\n\(message)", from: Source(id: -1, file: #file, function: #function, line: #line))
 case .success: break;
 }
 
 switch domains.save(toFile: StorageUrls.domainDefaultsFile!) {
-case .error(let message): Log.atError?.log(message: "Error while saving the domains:\n\(message)", from: Source(id: -1, file: #file, function: #function, line: #line))
-case .success: Log.atNotice?.log(message: "Saved domains", from: Source(id: -1, file: #file, function: #function, line: #line))
+case .error(let message): Log.atError?.log("Error while saving the domains:\n\(message)", from: Source(id: -1, file: #file, function: #function, line: #line))
+case .success: Log.atNotice?.log("Saved domains", from: Source(id: -1, file: #file, function: #function, line: #line))
 }
 
-Log.atNotice?.log(message: "Swiftfire terminated normally", from: Source(id: -1, file: #file, function: #function, line: #line))
+Log.atNotice?.log("Swiftfire terminated normally", from: Source(id: -1, file: #file, function: #function, line: #line))
 
 
 // Give other tasks time to complete

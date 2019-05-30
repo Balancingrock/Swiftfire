@@ -61,14 +61,14 @@ import SwifterLog
 
 fileprivate func httpServerErrorHandler(message: String) {
     Log.atError?.log(
-        message: message,
+        message,
         from: Source(id: -1, file: #file, function: #function, line: #line)
     )
 }
 
 fileprivate func httpsServerErrorHandler(message: String) {
     Log.atError?.log(
-        message: message,
+        message,
         from: Source(id: -1, file: #file, function: #function, line: #line)
     )
 }
@@ -82,7 +82,7 @@ func restartHttpAndHttpsServers() {
     if httpServer?.isRunning ?? false {
         
         Log.atNotice?.log(
-            message: "Stopping HTTP server",
+            "Stopping HTTP server",
             from: Source(id: -1, file: #file, function: #function, line: #line)
         )
         
@@ -111,7 +111,7 @@ func restartHttpAndHttpsServers() {
     if httpsServer?.isRunning ?? false {
         
         Log.atNotice?.log(
-            message: "Stopping HTTPS server",
+            "Stopping HTTPS server",
             from: Source(id: -1, file: #file, function: #function, line: #line)
         )
         
@@ -145,7 +145,7 @@ func restartHttpAndHttpsServers() {
         connectionPool.create(num: parameters.maxNofAcceptedConnections.value, generator: { return SFConnection() })
         
         Log.atNotice?.log(
-            message: "Initialized the connection pool with \(parameters.maxNofAcceptedConnections) http connections",
+            "Initialized the connection pool with \(parameters.maxNofAcceptedConnections) http connections",
             from: Source(id: -1, file: #file, function: #function, line: #line)
         )
         
@@ -171,7 +171,7 @@ func restartHttpAndHttpsServers() {
     case nil:
         
         Log.atCritical?.log(
-            message: "No HTTP server created",
+            "No HTTP server created",
             from: Source(id: -1, file: #file, function: #function, line: #line)
         )
         telemetry.httpServerStatus.value = "Cannot"
@@ -180,7 +180,7 @@ func restartHttpAndHttpsServers() {
     case let .error(message)?:
         
         Log.atError?.log(
-            message: message,
+            message,
             from: Source(id: -1, file: #file, function: #function, line: #line)
         )
         telemetry.httpServerStatus.value = "Error, see log"
@@ -189,7 +189,7 @@ func restartHttpAndHttpsServers() {
     case .success?:
         
         Log.atNotice?.log(
-            message: "HTTP Server started on port \(parameters.httpServicePortNumber)",
+            "HTTP Server started on port \(parameters.httpServicePortNumber)",
             from: Source(id: -1, file: #file, function: #function, line: #line)
         )
         
@@ -216,7 +216,7 @@ func restartHttpAndHttpsServers() {
     if serverCtx == nil && domainCtxs.count == 0 {
         
         Log.atCritical?.log(
-            message: "No certificate or private key (or combo) found, cannot start the HTTPS server",
+            "No certificate or private key (or combo) found, cannot start the HTTPS server",
             from: Source(id: -1, file: #file, function: #function, line: #line)
         )
         
@@ -251,7 +251,7 @@ func restartHttpAndHttpsServers() {
         case nil:
             
             Log.atCritical?.log(
-                message: "No HTTPS server created",
+                "No HTTPS server created",
                 from: Source(id: -1, file: #file, function: #function, line: #line)
             )
             telemetry.httpsServerStatus.value = "Cannot"
@@ -260,7 +260,7 @@ func restartHttpAndHttpsServers() {
         case let .error(message)?:
             
             Log.atError?.log(
-                message: message,
+                message,
                 from: Source(id: -1, file: #file, function: #function, line: #line)
             )
             telemetry.httpsServerStatus.value = "Error"
@@ -269,7 +269,7 @@ func restartHttpAndHttpsServers() {
         case .success?:
             
             Log.atNotice?.log(
-                message: "HTTPS Server started on port \(parameters.httpsServicePortNumber)",
+                "HTTPS Server started on port \(parameters.httpsServicePortNumber)",
                 from: Source(id: -1, file: #file, function: #function, line: #line)
             )
             
@@ -286,7 +286,7 @@ fileprivate func buildServerCtx() -> ServerCtx? {
     
     guard let sslServerDir = StorageUrls.sslServerDir else {
         Log.atError?.log(
-            message: "No sll server directory found",
+            "No sll server directory found",
             from: Source(id: -1, file: #file, function: #function, line: #line)
         )
         return nil
@@ -298,7 +298,7 @@ fileprivate func buildServerCtx() -> ServerCtx? {
     guard let files = try? FileManager.default.contentsOfDirectory(at: sslServerDir, includingPropertiesForKeys: [.isReadableKey], options: [.skipsSubdirectoryDescendants, .skipsPackageDescendants, .skipsHiddenFiles]) else {
         
         Log.atWarning?.log(
-            message: "Directory \(sslServerDir.path) is empty (no cert or key file found)",
+            "Directory \(sslServerDir.path) is empty (no cert or key file found)",
             from: Source(id: -1, file: #file, function: #function, line: #line)
         )
         return nil
@@ -311,7 +311,7 @@ fileprivate func buildServerCtx() -> ServerCtx? {
     
     if pemFiles.count == 0 {
         Log.atInfo?.log(
-            message: "No pem files found in \(sslServerDir.path)",
+            "No pem files found in \(sslServerDir.path)",
             from: Source(id: -1, file: #file, function: #function, line: #line)
         )
         return nil
@@ -325,12 +325,12 @@ fileprivate func buildServerCtx() -> ServerCtx? {
     if certFiles.count != 1 {
         if certFiles.count == 0 {
             Log.atInfo?.log(
-                message: "No certificate file found in \(sslServerDir.path) (filename should contain the lowercase characters 'cert'",
+                "No certificate file found in \(sslServerDir.path) (filename should contain the lowercase characters 'cert'",
                 from: Source(id: -1, file: #file, function: #function, line: #line)
             )
         } else {
             Log.atInfo?.log(
-                message: "Too many certificate files found in \(sslServerDir.path) (filenames  containing the lowercase characters 'cert'",
+                "Too many certificate files found in \(sslServerDir.path) (filenames  containing the lowercase characters 'cert'",
                 from: Source(id: -1, file: #file, function: #function, line: #line)
             )
         }
@@ -345,12 +345,12 @@ fileprivate func buildServerCtx() -> ServerCtx? {
     if keyFiles.count != 1 {
         if keyFiles.count == 0 {
             Log.atInfo?.log(
-                message: "No (private) key file found in \(sslServerDir.path) (filename should contain the lowercase characters 'key'",
+                "No (private) key file found in \(sslServerDir.path) (filename should contain the lowercase characters 'key'",
                 from: Source(id: -1, file: #file, function: #function, line: #line)
             )
         } else {
             Log.atInfo?.log(
-                message: "Too many (private) key files found in \(sslServerDir.path) (filenames containing the lowercase characters 'key'",
+                "Too many (private) key files found in \(sslServerDir.path) (filenames containing the lowercase characters 'key'",
                 from: Source(id: -1, file: #file, function: #function, line: #line)
             )
         }
@@ -362,7 +362,7 @@ fileprivate func buildServerCtx() -> ServerCtx? {
     
     guard let ctx = ServerCtx() else {
         Log.atError?.log(
-            message: "Server context creation failed",
+            "Server context creation failed",
             from: Source(id: -1, file: #file, function: #function, line: #line)
         )
         return nil
@@ -373,7 +373,7 @@ fileprivate func buildServerCtx() -> ServerCtx? {
     
     if case let .error(message) = ctx.useCertificate(file: EncodedFile(path: certFiles[0].path, encoding: .pem)) {
         Log.atWarning?.log(
-            message: message,
+            message,
             from: Source(id: -1, file: #file, function: #function, line: #line)
         )
         return nil
@@ -381,7 +381,7 @@ fileprivate func buildServerCtx() -> ServerCtx? {
     
     if case let .error(message) = ctx.usePrivateKey(file: EncodedFile(path: keyFiles[0].path, encoding: .pem)) {
         Log.atWarning?.log(
-            message: message,
+            message,
             from: Source(id: -1, file: #file, function: #function, line: #line)
         )
         return nil
@@ -389,7 +389,7 @@ fileprivate func buildServerCtx() -> ServerCtx? {
     
     if case let .error(message) = ctx.checkPrivateKey() {
         Log.atWarning?.log(
-            message: message,
+            message,
             from: Source(id: -1, file: #file, function: #function, line: #line)
         )
         return nil
@@ -400,7 +400,7 @@ fileprivate func buildServerCtx() -> ServerCtx? {
     
     guard let cert = X509(ctx: ctx) else {
         Log.atWarning?.log(
-            message: "Failure retrieving certificate store from context",
+            "Failure retrieving certificate store from context",
             from: Source(id: -1, file: #file, function: #function, line: #line)
         )
         return nil
@@ -410,7 +410,7 @@ fileprivate func buildServerCtx() -> ServerCtx? {
     
     if today < cert.validNotBefore {
         Log.atWarning?.log(
-            message: "Certificate at \(certFiles[0].path) is not yet valid",
+            "Certificate at \(certFiles[0].path) is not yet valid",
             from: Source(id: -1, file: #file, function: #function, line: #line)
         )
         return nil
@@ -418,7 +418,7 @@ fileprivate func buildServerCtx() -> ServerCtx? {
     
     if today > cert.validNotAfter {
         Log.atWarning?.log(
-            message: "Certificate at \(certFiles[0].path) is no longer valid",
+            "Certificate at \(certFiles[0].path) is no longer valid",
             from: Source(id: -1, file: #file, function: #function, line: #line)
         )
         return nil
@@ -427,7 +427,7 @@ fileprivate func buildServerCtx() -> ServerCtx? {
     let validForDays = (cert.validNotAfter - today)/Int64(24 * 60 * 60 * 1000)
     
     Log.atInfo?.log(
-        message: "Server certificate is valid for \(validForDays) more days",
+        "Server certificate is valid for \(validForDays) more days",
         from: Source(id: -1, file: #file, function: #function, line: #line)
     )
     
@@ -445,7 +445,7 @@ fileprivate func checkDomainCtxs() -> [ServerCtx] {
         switch domain.ctx {
             
         case let .error(message): Log.atWarning?.log(
-            message: message,
+            message,
             from: Source(id: -1, file: #file, function: #function, line: #line)
             )
             
@@ -458,14 +458,14 @@ fileprivate func checkDomainCtxs() -> [ServerCtx] {
                 if today < cert!.validNotBefore {
                     
                     Log.atWarning?.log(
-                        message: "Certificate for domain \(domain.name) is not yet valid",
+                        "Certificate for domain \(domain.name) is not yet valid",
                         from: Source(id: -1, file: #file, function: #function, line: #line)
                     )
                     
                 } else if today > cert!.validNotAfter {
                     
                     Log.atWarning?.log(
-                        message: "Certificate for domain \(domain.name) is no longer valid",
+                        "Certificate for domain \(domain.name) is no longer valid",
                         from: Source(id: -1, file: #file, function: #function, line: #line)
                     )
                     
@@ -474,7 +474,7 @@ fileprivate func checkDomainCtxs() -> [ServerCtx] {
                     let validForDays = (cert!.validNotAfter - today)/Int64(24 * 60 * 60 * 1000)
                     
                     Log.atInfo?.log(
-                        message: "Server certificate is valid for \(validForDays) more days",
+                        "Server certificate is valid for \(validForDays) more days",
                         from: Source(id: -1, file: #file, function: #function, line: #line)
                     )
                     
@@ -484,7 +484,7 @@ fileprivate func checkDomainCtxs() -> [ServerCtx] {
             } else {
                 
                 Log.atInfo?.log(
-                    message: "Cannot extract certificate of domain \(domain.name)",
+                    "Cannot extract certificate of domain \(domain.name)",
                     from: Source(id: -1, file: #file, function: #function, line: #line)
                 )
             }

@@ -150,7 +150,7 @@ func service_onlyHttp10or11(_ request: Request, _ connection: SFConnection, _ do
         
         let message = "HTTP Version not present"
         Log.atDebug?.log(
-            message: message,
+            message,
             from: Source(id: logId, file: #file, function: #function, line: #line)
         )
         
@@ -183,7 +183,7 @@ func service_onlyHttp10or11(_ request: Request, _ connection: SFConnection, _ do
         
         let message = "HTTP Version '\(httpVersion)' not supported"
         Log.atDebug?.log(
-            message: message,
+            message,
             from: Source(id: logId, file: #file, function: #function, line: #line)
         )
         

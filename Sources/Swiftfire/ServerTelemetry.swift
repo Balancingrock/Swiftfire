@@ -185,23 +185,23 @@ public final class ServerTelemetry: CustomStringConvertible, VJsonConvertible {
         for item in all {
             if let strval = (json|item.name)?.stringValue {
                 if item.setValue(strval) {
-                    json.remove((json|item.name)!)
+                    _ = json.removeChild((json|item.name)!)
                 } else {
                     Log.atError?.log(
-                        message: "Failed to set value for \(item.name) to \(strval)",
+                        "Failed to set value for \(item.name) to \(strval)",
                         from: Source(id: -1, file: #file, function: #function, line: #line)
                     )
                 }
             } else {
                 Log.atError?.log(
-                    message: "Missing value for \(item.name)",
+                    "Missing value for \(item.name)",
                     from: Source(id: -1, file: #file, function: #function, line: #line)
                 )
             }
         }
         if json.nofChildren != 0 {
             Log.atError?.log(
-                message: "Superfluous items in source: \(json.code)",
+                "Superfluous items in source: \(json.code)",
                 from: Source(id: -1, file: #file, function: #function, line: #line)
             )
             return nil
