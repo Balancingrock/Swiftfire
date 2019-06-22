@@ -3,15 +3,14 @@
 //  File:       VisitorStatistics.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.12
+//  Version:    1.0.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
 //  Website:    http://swiftfire.nl/
-//  Blog:       http://swiftrien.blogspot.com
 //  Git:        https://github.com/Balancingrock/Swiftfire
 //
-//  Copyright:  (c) 2017 Marinus van der Lugt, All rights reserved.
+//  Copyright:  (c) 2017-2019 Marinus van der Lugt, All rights reserved.
 //
 //  License:    Use or redistribute this code any way you like with the following two provision:
 //
@@ -22,33 +21,23 @@
 //
 //  I also ask you to please leave this header with the source code.
 //
-//  I strongly believe that voluntarism is the way for societies to function optimally. Thus I have choosen to leave it
-//  up to you to determine the price for this code. You pay me whatever you think this code is worth to you.
+//  Like you, I need to make a living:
 //
-//   - You can send payment via paypal to: sales@balancingrock.nl
+//   - You can send payment (you choose the amount) via paypal to: sales@balancingrock.nl
 //   - Or wire bitcoins to: 1GacSREBxPy1yskLMc9de2nofNv2SNdwqH
 //
-//  I prefer the above two, but if these options don't suit you, you might also send me a gift from my amazon.co.uk
-//  wishlist: http://www.amazon.co.uk/gp/registry/wishlist/34GNMPZKAQ0OO/ref=cm_sw_em_r_wsl_cE3Tub013CKN6_wb
-//
 //  If you like to pay in another way, please contact me at rien@balancingrock.nl
-//
-//  (It is always a good idea to visit the website/blog/google to ensure that you actually pay me and not some imposter)
-//
-//  For private and non-profit use the suggested price is the price of 1 good cup of coffee, say $4.
-//  For commercial use the suggested price is the price of 1 good meal, say $20.
-//
-//  You are however encouraged to pay more ;-)
 //
 //  Prices/Quotes for support, modifications or enhancements can be obtained from: rien@balancingrock.nl
 //
 // =====================================================================================================================
-// PLEASE let me know about bugs, improvements and feature requests. (rien@balancingrock.nl)
+// PLEASE let me know about bugs, improvements and feature requests. (again: rien@balancingrock.nl)
 // =====================================================================================================================
 //
 // History
 //
-// 0.10.12 - Initial release
+// 1.0.0 Raised to v1.0.0, Removed old change log,
+//
 // =====================================================================================================================
 
 import Foundation
@@ -79,25 +68,27 @@ fileprivate let accountColumnName = NameField("Account")!
 fileprivate let responseCodeColumnName = NameField("ResponseCode")!
 fileprivate let entryUuidColumnName = NameField("EntryUuid")!
 
-fileprivate let receivedColumn = ColumnSpecification(type: .int64, nameField: receivedColumnName, byteCount: 8)
-fileprivate let completedColumn = ColumnSpecification(type: .int64, nameField: completedColumnName, byteCount: 8)
-fileprivate let urlColumn = ColumnSpecification(type: .array, nameField: urlColumnName, byteCount: 512)
-fileprivate let addressColumn = ColumnSpecification(type: .crcString, nameField: addressColumnName, byteCount: 49)
-fileprivate let sessionColumn = ColumnSpecification(type: .uuid, nameField: sessionColumnName, byteCount: 16)
-fileprivate let accountColumn = ColumnSpecification(type: .crcString, nameField: accountColumnName, byteCount: 54)
-fileprivate let responseCodeColumn = ColumnSpecification(type: .crcString, nameField: responseCodeColumnName, byteCount: 48)
-fileprivate let entryUuidColumn = ColumnSpecification(type: .uuid, nameField: entryUuidColumnName, byteCount: 16)
+fileprivate let visitsTableTemplate: ItemManager = {
+    let receivedColumn = ColumnSpecification(type: .int64, nameField: receivedColumnName, byteCount: 8)
+    let completedColumn = ColumnSpecification(type: .int64, nameField: completedColumnName, byteCount: 8)
+    let urlColumn = ColumnSpecification(type: .array, nameField: urlColumnName, byteCount: 512)
+    let addressColumn = ColumnSpecification(type: .crcString, nameField: addressColumnName, byteCount: 49)
+    let sessionColumn = ColumnSpecification(type: .uuid, nameField: sessionColumnName, byteCount: 16)
+    let accountColumn = ColumnSpecification(type: .crcString, nameField: accountColumnName, byteCount: 54)
+    let responseCodeColumn = ColumnSpecification(type: .crcString, nameField: responseCodeColumnName, byteCount: 48)
+    let entryUuidColumn = ColumnSpecification(type: .uuid, nameField: entryUuidColumnName, byteCount: 16)
+    var columns: Array<ColumnSpecification> = [receivedColumn, completedColumn, urlColumn, addressColumn, sessionColumn, accountColumn, responseCodeColumn, entryUuidColumn]
+    return ItemManager.createTableManager(columns: &columns, initialRowsAllocated: 1, endianness: machineEndianness)
+}()
 
-fileprivate let visitorDbColumns: Array<ColumnSpecification> = [receivedColumn, completedColumn, urlColumn, addressColumn, sessionColumn, accountColumn, responseCodeColumn, entryUuidColumn]
-
-fileprivate let receivedColumnIndex = 0
-fileprivate let completedColumnIndex = 1
-fileprivate let urlColumnIndex = 2
-fileprivate let addressColumnIndex = 3
-fileprivate let sessionColumnIndex = 4
-fileprivate let accountColumnIndex = 5
-fileprivate let responseCodeColumnIndex = 6
-fileprivate let entryUuidColumnIndex = 7
+fileprivate var receivedColumnIndex: Int! = { return visitsTableTemplate.root.tableColumnIndex(for: receivedColumnName) }()
+fileprivate let completedColumnIndex: Int! = { return visitsTableTemplate.root.tableColumnIndex(for: completedColumnName) }()
+fileprivate let urlColumnIndex: Int! = { return visitsTableTemplate.root.tableColumnIndex(for: urlColumnName) }()
+fileprivate let addressColumnIndex: Int! = { return visitsTableTemplate.root.tableColumnIndex(for: addressColumnName) }()
+fileprivate let sessionColumnIndex: Int! = { return visitsTableTemplate.root.tableColumnIndex(for: sessionColumnName) }()
+fileprivate let accountColumnIndex: Int! = { return visitsTableTemplate.root.tableColumnIndex(for: accountColumnName) }()
+fileprivate let responseCodeColumnIndex: Int! = { return visitsTableTemplate.root.tableColumnIndex(for: responseCodeColumnName) }()
+fileprivate let entryUuidColumnIndex: Int! = { return visitsTableTemplate.root.tableColumnIndex(for: entryUuidColumnName) }()
 
 
 struct Visit {
@@ -180,18 +171,20 @@ struct Visit {
     func writeToTableFields(portal: Portal) {
         
         guard let columnIndex = portal.column else {
-            Log.atError?.log(
-                "Column should be present",
-                from: Source(id: -1, file: #file, type: "VisitorStatistics", function: #function, line: #line)
-            )
+            Log.atError?.log("Column should be present", type: "VisitorStatistics")
             return
         }
         
         switch columnIndex {
             
-        case receivedColumnIndex: portal.int64 = received
+        case receivedColumnIndex:
             
-        case completedColumnIndex: portal.int64 = completed
+            portal.int64 = received
+            
+            
+        case completedColumnIndex:
+            
+            portal.int64 = completed
 
         case urlColumnIndex:
             
@@ -200,17 +193,33 @@ struct Visit {
             portal.assignField(atRow: portal.index!, inColumn: portal.column!, fromManager: am)
             
             
-        case addressColumnIndex: portal.crcString =  BRCrcString(address)
-        case sessionColumnIndex: portal.uuid = session
-        case accountColumnIndex: portal.crcString = BRCrcString(account ?? "None")
-        case responseCodeColumnIndex: portal.crcString = BRCrcString(responseCode.rawValue)
-        case entryUuidColumnIndex: portal.uuid = uuid
+        case addressColumnIndex:
+            
+            portal.crcString =  BRCrcString(address)
 
+
+        case sessionColumnIndex:
+            
+            portal.uuid = session
+        
+        
+        case accountColumnIndex:
+            
+            portal.crcString = BRCrcString(account ?? "None")
+
+
+        case responseCodeColumnIndex:
+            
+            portal.crcString = BRCrcString(responseCode.rawValue)
+
+
+        case entryUuidColumnIndex:
+            
+            portal.uuid = uuid
+
+            
         default:
-            Log.atError?.log(
-                "Unknown column index \(columnIndex)",
-                from: Source(id: -1, file: #file, type: "VisitorStatistics", function: #function, line: #line)
-            )
+            Log.atError?.log("Unknown column index \(columnIndex)", type: "VisitorStatistics")
             return
         }
     }
@@ -275,10 +284,7 @@ final class VisitorStatistics {
         do {
             try FileManager.default.createDirectory(at: dirurl, withIntermediateDirectories: true, attributes: nil)
         } catch let error {
-            Log.atError?.log(
-                "Could not create directory at \(dirurl.path), message = \(error.localizedDescription)",
-                from: Source(id: -1, file: #file, type: "VisitorStatistics", function: #function, line: #line)
-            )
+            Log.atError?.log("Could not create directory at \(dirurl.path), message = \(error.localizedDescription)", type: "VisitorStatistics")
         }
         return dirurl
     }
@@ -291,10 +297,7 @@ final class VisitorStatistics {
         do {
             try FileManager.default.createDirectory(at: dirurl, withIntermediateDirectories: true, attributes: nil)
         } catch let error {
-            Log.atError?.log(
-                "Could not create directory at \(dirurl.path), message = \(error.localizedDescription)",
-                from: Source(id: -1, file: #file, type: "VisitorStatistics", function: #function, line: #line)
-            )
+            Log.atError?.log("Could not create directory at \(dirurl.path), message = \(error.localizedDescription)", type: "VisitorStatistics")
         }
         return dirurl
     }
@@ -307,10 +310,7 @@ final class VisitorStatistics {
         do {
             try FileManager.default.createDirectory(at: dirurl, withIntermediateDirectories: true, attributes: nil)
         } catch let error {
-            Log.atError?.log(
-                "Could not create directory at \(dirurl.path), message = \(error.localizedDescription)",
-                from: Source(id: -1, file: #file, type: "VisitorStatistics", function: #function, line: #line)
-            )
+            Log.atError?.log("Could not create directory at \(dirurl.path), message = \(error.localizedDescription)", type: "VisitorStatistics")
         }
         return dirurl
     }
@@ -359,8 +359,7 @@ final class VisitorStatistics {
         
         // Always create a new database
         
-        var columns = visitorDbColumns
-        self.dbase = ItemManager.createTableManager(columns: &columns, initialRowsAllocated: 1000, endianness: machineEndianness)
+        self.dbase = visitsTableTemplate.copyWithRecalculatedBufferSize(ask: 1000 * visitsTableTemplate.data.count)
     }
     
     
@@ -369,16 +368,10 @@ final class VisitorStatistics {
         do {
             try dbase.data.write(to: visitorStatisticsUrl)
         } catch let error {
-            Log.atError?.log(
-                "Cannot write visitor log to directory: \(directory), error = (\(error.localizedDescription))",
-                from: Source(id: -1, file: #file, type: "VisitorStatistics", function: #function, line: #line)
-            )
+            Log.atError?.log("Cannot write visitor log to directory: \(directory), error = (\(error.localizedDescription))", type: "VisitorStatistics")
         }
 
-        Log.atNotice?.log(
-            "Domain statistics saved",
-            from: Source(id: -1, file: #file, type: "VisitorStatistics", function: #function, line: #line)
-        )
+        Log.atNotice?.log("Domain statistics saved", type: "VisitorStatistics")
     }
     
     private func restartVisitorStatistics() {
@@ -389,10 +382,7 @@ final class VisitorStatistics {
         do {
             try dbase.data.write(to: visitorStatisticsUrl)
         } catch let error {
-            Log.atError?.log(
-                "Cannot write visitor log to directory: \(directory), error = (\(error.localizedDescription))",
-                from: Source(id: -1, file: #file, type: "VisitorStatistics", function: #function, line: #line)
-            )
+            Log.atError?.log("Cannot write visitor log to directory: \(directory), error = (\(error.localizedDescription))", type: "VisitorStatistics")
         }
         
         

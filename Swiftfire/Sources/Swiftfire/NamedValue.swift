@@ -1,6 +1,6 @@
 // =====================================================================================================================
 //
-//  File:       ReferencedDictionary.swift
+//  File:       NamedValue.swift
 //  Project:    Swiftfire
 //
 //  Version:    1.0.0
@@ -10,7 +10,7 @@
 //  Website:    http://swiftfire.nl/
 //  Git:        https://github.com/Balancingrock/Swiftfire
 //
-//  Copyright:  (c) 2017-2019 Marinus van der Lugt, All rights reserved.
+//  Copyright:  (c) 2014-2019 Marinus van der Lugt, All rights reserved.
 //
 //  License:    Use or redistribute this code any way you like with the following two provision:
 //
@@ -43,41 +43,41 @@
 import Foundation
 
 
-/// A referenced look-up container.
-
-final class ReferencedDictionary  {
+class NamedValue {
     
-    private var store: Dictionary<String, String> = [:]
+    
+    /// The queue on which all access will take place
+    
+    static let queue = DispatchQueue(label: "NamedValues")
+    
+    
+    /// The queue on which all didSetActions will take place. If a GUI has to be updated, set this to the DispatchQueue.main.
+    
+    static var actionsQueue = DispatchQueue(label: "NamedValuesDidSetActions")
+
+    
+    /// The name of the item (implements part of NamedValueProtocol)
+    
+    var name: String
+    
+    
+    /// A description of what the value is for (can be used in GUIs) (implements part of NamedValueProtocol)
+    
+    var about: String
+
+    
+    /// The action to be executed after an update
+    
+    var didSetActions: [DidSetActionSignature] = []
+    
+    
+    /// Create a new object
+    
+    init(name: String, about: String) {
+        self.name = name
+        self.about = about
+    }
 }
 
-extension ReferencedDictionary {
-    
-    var count: Int { return store.count }
-    
-    func popFirst() -> (String, String)? {
-        return store.popFirst()
-    }
-    
-    func removeValue(forKey key: String) -> String? {
-        return store.removeValue(forKey: key)
-    }
-    
-    subscript(key: String) -> String? {
-        get { return store[key] }
-        set { store[key] = newValue }
-    }
-}
 
-extension ReferencedDictionary: Sequence {
-    
-    func makeIterator() -> DictionaryIterator<String, String> {
-        return store.makeIterator()
-    }
-}
 
-extension ReferencedDictionary: CustomStringConvertible {
-    
-    var description: String {
-        return store.reduce("[", { return "\($0), \($1.key):\($1.key.contains("Pwd") ? "********": $1.value)" }).appending("]")
-    }
-}

@@ -3,15 +3,14 @@
 //  File:       Function.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.11
+//  Version:    1.0.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
 //  Website:    http://swiftfire.nl/
-//  Blog:       http://swiftrien.blogspot.com
 //  Git:        https://github.com/Balancingrock/Swiftfire
 //
-//  Copyright:  (c) 2017 Marinus van der Lugt, All rights reserved.
+//  Copyright:  (c) 2017-2019 Marinus van der Lugt, All rights reserved.
 //
 //  License:    Use or redistribute this code any way you like with the following two provision:
 //
@@ -22,39 +21,22 @@
 //
 //  I also ask you to please leave this header with the source code.
 //
-//  I strongly believe that voluntarism is the way for societies to function optimally. Thus I have choosen to leave it
-//  up to you to determine the price for this code. You pay me whatever you think this code is worth to you.
+//  Like you, I need to make a living:
 //
-//   - You can send payment via paypal to: sales@balancingrock.nl
+//   - You can send payment (you choose the amount) via paypal to: sales@balancingrock.nl
 //   - Or wire bitcoins to: 1GacSREBxPy1yskLMc9de2nofNv2SNdwqH
 //
-//  I prefer the above two, but if these options don't suit you, you can also send me a gift from my amazon.co.uk
-//  wishlist: http://www.amazon.co.uk/gp/registry/wishlist/34GNMPZKAQ0OO/ref=cm_sw_em_r_wsl_cE3Tub013CKN6_wb
-//
 //  If you like to pay in another way, please contact me at rien@balancingrock.nl
-//
-//  (It is always a good idea to visit the website/blog/google to ensure that you actually pay me and not some imposter)
-//
-//  For private and non-profit use the suggested price is the price of 1 good cup of coffee, say $4.
-//  For commercial use the suggested price is the price of 1 good meal, say $20.
-//
-//  You are however encouraged to pay more ;-)
 //
 //  Prices/Quotes for support, modifications or enhancements can be obtained from: rien@balancingrock.nl
 //
 // =====================================================================================================================
-// PLEASE let me know about bugs, improvements and feature requests. (rien@balancingrock.nl)
+// PLEASE let me know about bugs, improvements and feature requests. (again: rien@balancingrock.nl)
 // =====================================================================================================================
 //
 // History
 //
-// 0.10.11 - Replaced SwifterJSON with VJson
-// 0.10.10 - Changed signature of connection to SFConnection
-// 0.10.9 - Streamlined and folded http API into its own project
-// 0.10.7 - Added newSession to Function.Environment
-// 0.10.6 - Updated Service.Response type to HttpResponse type
-//        - Renamed InfoKey to FunctionInfoKey and moved definition to new file.
-// 0.10.0 - Initial release
+// 1.0.0 Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 
@@ -65,46 +47,46 @@ import SwifterSockets
 import Http
 
 
-public final class Function: CustomStringConvertible {
+final class Function {
     
     
     /// Should it be necessary, the environment holds references to the original request as well as the connection object that is used and the response so far.
     
-    public final class Environment {
+    final class Environment {
         
         
         /// Header from the HTTP(S) request
         
-        public var request: Request
+        var request: Request
         
         
         /// The connection. Will in fact always be an SFConnection and can be force cast (as! SFConnection).
         ///
         /// Visibility rules prevent the use of SFConnection as the type.
         
-        public var connection: SFConnection
+        var connection: SFConnection
         
         
         /// The domain for which the function is called.
         
-        public var domain: Domain
+        var domain: Domain
         
         
         /// The response for the HTTP(S) request (may be empty still, depends on previous services)
         
-        public var response: Response
+        var response: Response
         
         
         /// The service chain info object.
         
-        public var serviceInfo: Service.Info
+        var serviceInfo: Service.Info
         
         
         /// Create a new instance
         ///
         /// - Note: the connection must in fact be an SFConnection.
         
-        public init(request: Request, connection: SFConnection, domain: Domain, response: inout Response, serviceInfo: inout Service.Info) {
+        init(request: Request, connection: SFConnection, domain: Domain, response: inout Response, serviceInfo: inout Service.Info) {
             self.request = request
             self.connection = connection
             self.domain = domain
@@ -115,7 +97,7 @@ public final class Function: CustomStringConvertible {
         
         /// Creates a new session with the data contained in the environment
         
-        public func newSession() -> Session? {
+        func newSession() -> Session? {
             
             return domain.sessions.newSession(
                 address: connection.remoteAddress,
@@ -134,17 +116,17 @@ public final class Function: CustomStringConvertible {
     /// All other strings will be String.
     /// Note that it is not necessary to put quotes on a string unless it should contain blanks.
     
-    public typealias ArrayArguments = Array<String>
-    public typealias VJsonArgument = VJson
+    typealias ArrayArguments = Array<String>
+    typealias VJsonArgument = VJson
     
     
     /// This enum ecapsulates the function arguments
     
-    public enum Arguments: CustomStringConvertible {
+    enum Arguments: CustomStringConvertible {
         case array(ArrayArguments)
         case json(VJson)
         
-        public var description: String {
+        var description: String {
             switch self {
             case .array(let arr): return "Array with \(arr.count) items"
             case .json: return "JSON Object"
@@ -155,20 +137,20 @@ public final class Function: CustomStringConvertible {
     
     /// The type used to transfer data between function calls.
     
-    public typealias Info = Dictionary<FunctionInfoKey, Any>
+    typealias Info = Dictionary<FunctionInfoKey, Any>
     
     
     /// The signature of the "Insert Content Here" function calls
     
-    public typealias Signature = (_ args: Function.Arguments, _ info: inout Function.Info, _ environment: inout Function.Environment) -> Data?
+    typealias Signature = (_ args: Function.Arguments, _ info: inout Function.Info, _ environment: inout Function.Environment) -> Data?
 
     
     /// The combo of name and function
     
-    public struct Entry {
-        public let name: String
-        public let function: Function.Signature
-        public init(_ name: String, _ function: @escaping Function.Signature) {
+    struct Entry {
+        let name: String
+        let function: Function.Signature
+        init(_ name: String, _ function: @escaping Function.Signature) {
             self.name = name
             self.function = function
         }
@@ -177,12 +159,18 @@ public final class Function: CustomStringConvertible {
     
     /// The available functions
     
-    public var registered: Dictionary<String, Function.Entry> = [:]
+    var registered: Dictionary<String, Function.Entry> = [:]
     
     
     /// Make this class instantiable
     
-    public init() {}
+    init() {}
+}
+
+
+// MARK: - Operational
+
+extension Function {
     
     
     /// Register a function
@@ -194,7 +182,7 @@ public final class Function: CustomStringConvertible {
     /// - Returns: True if the function was added, false if it was already present.
     
     @discardableResult
-    public func register(name: String, function: @escaping Function.Signature) -> Bool {
+    func register(name: String, function: @escaping Function.Signature) -> Bool {
         if registered[name] == nil {
             registered[name] = Entry(name, function)
             return true
@@ -202,10 +190,14 @@ public final class Function: CustomStringConvertible {
             return false
         }
     }
+}
+
+
+// MARK: - CustomStringConvertible
+
+extension Function: CustomStringConvertible {
     
-    /// Print the names of the registered functions to a string
-    
-    public var description: String {
+    var description: String {
         var str = "Registered functions:\n"
         for (index, function) in registered.enumerated() {
             str += " Function name = \(function.key)"

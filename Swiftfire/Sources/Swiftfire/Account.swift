@@ -3,15 +3,14 @@
 //  File:       Account.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.12
+//  Version:    1.0.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
 //  Website:    http://swiftfire.nl/
-//  Blog:       http://swiftrien.blogspot.com
 //  Git:        https://github.com/Balancingrock/Swiftfire
 //
-//  Copyright:  (c) 2017 Marinus van der Lugt, All rights reserved.
+//  Copyright:  (c) 2017-2019 Marinus van der Lugt, All rights reserved.
 //
 //  License:    Use or redistribute this code any way you like with the following two provision:
 //
@@ -22,40 +21,22 @@
 //
 //  I also ask you to please leave this header with the source code.
 //
-//  I strongly believe that voluntarism is the way for societies to function optimally. Thus I have choosen to leave it
-//  up to you to determine the price for this code. You pay me whatever you think this code is worth to you.
+//  Like you, I need to make a living:
 //
-//   - You can send payment via paypal to: sales@balancingrock.nl
+//   - You can send payment (you choose the amount) via paypal to: sales@balancingrock.nl
 //   - Or wire bitcoins to: 1GacSREBxPy1yskLMc9de2nofNv2SNdwqH
 //
-//  I prefer the above two, but if these options don't suit you, you can also send me a gift from my amazon.co.uk
-//  wishlist: http://www.amazon.co.uk/gp/registry/wishlist/34GNMPZKAQ0OO/ref=cm_sw_em_r_wsl_cE3Tub013CKN6_wb
-//
 //  If you like to pay in another way, please contact me at rien@balancingrock.nl
-//
-//  (It is always a good idea to visit the website/blog/google to ensure that you actually pay me and not some imposter)
-//
-//  For private and non-profit use the suggested price is the price of 1 good cup of coffee, say $4.
-//  For commercial use the suggested price is the price of 1 good meal, say $20.
-//
-//  You are however encouraged to pay more ;-)
 //
 //  Prices/Quotes for support, modifications or enhancements can be obtained from: rien@balancingrock.nl
 //
 // =====================================================================================================================
-// PLEASE let me know about bugs, improvements and feature requests. (rien@balancingrock.nl)
+// PLEASE let me know about bugs, improvements and feature requests. (again: rien@balancingrock.nl)
 // =====================================================================================================================
 //
 // History
 //
-// 0.10.12 - Upgraded to SwifterLog 1.1.0
-//         - Added saving of LUT after account creation to prevent:
-//           1) Loss of account if server crashes before ordinary shutdown.
-//           2) Prevent lock-out of admin due to empty admin LUT being saved.
-//         - Fixed problem where saved accounts and LUT accounts has different UUID's.
-// 0.10.11 - Replaced SwifterJSON with VJson
-// 0.10.8 - Removed dependecy on macOS 10.11
-// 0.10.7 - Initial release
+// 1.0.0 Raised to v1.0.0, Removed old change log, 
 //
 // =====================================================================================================================
 
@@ -68,15 +49,193 @@ import COpenSsl
 
 /// An account within swiftfire. Used for admin account and can be used for domain accounts as well.
 
-public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
+final class Account: EstimatedMemoryConsumption {
     
     // Note: It uses the default EstimatedMemoryConsumption implementation.
     
     
+    /// A public unique identifier that can be used to reference this account
+    
+    private(set) var uuid: String
+
+    
+    /// The name for this account. When the name is updated, it is automatically persisted. If persistence fails, the name is not updated. Protected against empty names, too long names (max 32 char) and too many name changes (max 19).
+    ///
+    /// - Note: Updates are not thread safe, make sure that the session is 'exclusive' before updating.
+    
+    var name: String {
+        get {
+            if names.count > 0 {
+                return names[0]
+            } else {
+                Log.atError?.log("Array with names is empty", type: "Account")
+                return ""
+            }
+        }
+        set {
+            
+            // Protection
+            
+            if newValue.isEmpty { return }
+            if newValue.utf8.count > 32 { return }
+            if names.count > 20 { return }
+            
+            
+            // Do not add if the name did not change.
+            
+            if names.count > 0, newValue == names[0] { return }
+            
+            
+            // Add the new name
+            
+            names.insert(newValue, at: 0)
+            
+            
+            // Save the new values, if the save fails, then undo the change.
+            assertionFailure("The call to saveUserData below this line is wrong!, replace with correct code")
+            if let error = saveUserData() {
+                Log.atError?.log("Cannot save account \(self), error message = \(error)", type: "Account")
+                
+            } else {
+                
+                names.removeFirst()
+            }
+        }
+    }
+
+    
+    /// A unique id for this account, used for storage purposes only.
+    
+    fileprivate var id: Int
+    
+    
+    /// A name that uniquely identifies an account.
+    
+    private var names: Array<String> = []
+    
+    
+    /// The digest for the user password.
+    
+    private var digest: String!
+    
+    
+    /// The password salt
+    
+    private var salt: String!
+    
+    
+    /// The path of the file containing this account
+    
+    fileprivate var url: URL
+    
+    
+    /// Convenience data storage for data that needs to be associated with the account. Use for small amounts only. Not thread save.
+    ///
+    /// - Note: Updates to this member are __not__ saved automatically. You must call _save_ immediately after updating to ensure persistence of the data.
+    ///
+    /// - Note: Intended for small parameters only. If larger data storage is needed, use the _dirUrl_ instead and store the data directly to disk.
+    ///
+    /// - Note: Updates are not thread safe, make sure that the session is 'exclusive' before updating.
+    ///
+    /// - Note: Be carefull: attackers may try to bring a site down by storing illegal or too much data. Never store data untested for validity and size.
+    
+    var info = VJson()
+    
+    
+    /// Create a new instance
+    ///
+    /// - Paramaters:
+    ///   - id: A unique integer
+    ///   - name: String, should be unique for this account.
+    ///   - passwordHash: An integer that must be matched to allow somebody to use this account.
+    ///   - accountsRoot: A URL pointing to the root directory for all accounts.
+    
+    fileprivate init?(id: Int, name: String, password: String, accountsRoot: URL) {
+        
+        self.id = id
+        self.uuid = UUID().uuidString
+        self.names.insert(name, at: 0)
+        self.url = Account.createFileUrl(in: accountsRoot, with: id)
+        
+        let salt = createSalt()
+        guard let digest = createDigest(for: password, with: salt) else { return nil }
+        
+        self.salt = salt
+        self.digest = digest
+        
+        if let error = saveUserData() {
+            Log.atError?.log("Cannot save account\n\n\(self),\n\n Error message = \(error)\n", type: "Account")
+            return nil
+        }
+    }
+    
+    
+    /// Deserialize from a VJson file
+    
+    fileprivate init?(url: URL) {
+        
+        self.url = url
+        
+        guard let json = ((try? VJson.parse(file: url)) as VJson??) else { return nil }
+        
+        guard let jjnames = (json|"Names")?.arrayValue else { return nil }
+        guard jjnames.count > 0 else { return nil }
+        var jnames: Array<String> = []
+        for jname in jjnames {
+            guard let name = jname.stringValue else { return nil }
+            jnames.append(name)
+        }
+        guard let jid = (json|"Id")?.intValue else { return nil }
+        guard let juuid = (json|"Uuid")?.stringValue else { return nil }
+        guard let jdigest = (json|"Digest")?.stringValue else { return nil }
+        guard let jsalt = (json|"Salt")?.stringValue else { return nil }
+        guard let jinfo = json|"Info" else { return nil }
+        guard jinfo.isObject else { return nil }
+        
+        self.names = jnames
+        self.id = jid
+        self.uuid = juuid
+        self.digest = jdigest
+        self.salt = jsalt
+        self.info = jinfo
+    }
+
+
+    /// Serialize to VJson
+    
+    private var json: VJson {
+        let json = VJson()
+        for (index, name) in names.enumerated() {
+            json["Names"][index] &= name
+        }
+        json["Id"] &= id
+        json["Uuid"] &= uuid
+        json["Digest"] &= digest
+        json["Salt"] &= salt
+        json["Info"] = info
+        
+        return json
+    }
+
+    
+    /// Save the user data to file.
+    ///
+    /// - Returns: On success nil, on failure a description of the error that occured.
+    
+    func saveUserData() -> String? {
+        return self.json.save(to: url)
+    }
+}
+
+
+// MARK: - Class Static
+
+extension Account {
+    
     /// The path for the file containing the account with the given ID
     
-    public static func createFileUrl(accountsRoot: URL, id: Int) -> URL {
-        return createDirUrl(accountsRoot: accountsRoot, id: id).appendingPathComponent("Account").appendingPathExtension("json")
+    static func createFileUrl(in directory: URL, with id: Int) -> URL {
+        return createDirUrl(in: directory, for: id).appendingPathComponent("Account").appendingPathExtension("json")
     }
     
     
@@ -86,7 +245,7 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
     ///
     /// Example 2: id 12345 will result in: root/45/23/01/_Account/
     
-    private static func createDirUrl(accountsRoot: URL, id: Int) -> URL {
+    private static func createDirUrl(in accountsRoot: URL, for id: Int) -> URL {
         
         
         // The account number will be broken up into reverse series of 0..99 (centi) fractions
@@ -123,92 +282,17 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
         
         return url
     }
+}
 
-    
-    /// A public unique identifier that can be used to reference this account
-    
-    public private(set) var uuid: String
-    
-    
-    /// The path of the file containing this account
-    
-    public var url: URL
-    
-    
-    /// The name for this account. When the name is updated, it is automatically persisted. If persistence fails, the name is not updated. Protected against empty names, too long names (max 32 char) and too many name changes (max 19).
-    ///
-    /// - Note: Updates are not thread safe, make sure that the session is 'exclusive' before updating.
-    
-    public var name: String {
-        get {
-            if names.count > 0 {
-                return names[0]
-            } else {
-                Log.atError?.log(
-                    "Array with names is empty",
-                    from: Source(id: -1, file: #file, type: "Account", function: #function, line: #line))
-                return ""
-            }
-        }
-        set {
-            
-            // Protection
-            
-            if newValue.isEmpty { return }
-            if newValue.utf8.count > 32 { return }
-            if names.count > 20 { return }
-            
-            
-            // Do not add if the name did not change.
-            
-            if names.count > 0, newValue == names[0] { return }
-            
-            
-            // Add the new name
-            
-            names.insert(newValue, at: 0)
-            
-            
-            // Save the new values, if the save fails, then undo the change.
-            
-            if let error = save() {
-                Log.atError?.log(
-                    "Cannot save account \(self), error message = \(error)",
-                    from: Source(id: -1, file: #file, type: "Account", function: #function, line: #line))
-                
-            } else {
-                
-                names.removeFirst()
-            }
-        }
-    }
-    
-    
-    /// A list of all the old names this account has had.
-    
-    public var oldNames: Array<String> {
-        var old = names
-        if old.count > 0 { old.removeFirst() }
-        return old
-    }
-    
-    
-    /// Convenience data storage for the account. Use for small sized data only. Not thread save.
-    ///
-    /// - Note: Updates to this member are __not__ saved automatically. You must call _save_ immediately after updating to ensure persistence of the data.
-    ///
-    /// - Note: Intended for small parameters only. If larger data storage is needed, use the _dirUrl_ instead and store the data directly to disk.
-    ///
-    /// - Note: Updates are not thread safe, make sure that the session is 'exclusive' before updating.
-    ///
-    /// - Note: Be carefull: attackers may try to bring a site down by storing illegal or too much data. Never store data untested for validity and size.
-    
-    public var info = VJson()
+
+// MARK:- JSON
+
+extension Account: CustomStringConvertible {
     
     
     /// CustomStringConvertible
     
-    public var description: String {
+    var description: String {
         var str = "Account\n"
         str += " Id: \(id)\n"
         str += " Uuid: \(uuid)\n"
@@ -217,68 +301,33 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
         str += " Digest: \(String(describing: digest))"
         if parameters.debugMode.value {
             str += "\n Salt: \(String(describing: salt))\n"
-            if oldNames.count == 0 {
+            if historicalNames.count == 0 {
                 str += " No old names\n"
             } else {
                 str += " Old names:\n"
-                oldNames.forEach({ str += "  \($0)\n"})
+                historicalNames.forEach({ str += "  \($0)\n"})
             }
             str += " Info: \(info.description)"
         }
         return str
     }
+}
     
-    
-    /// A unique id for this account, used for storage purposes only.
-    
-    fileprivate var id: Int
-    
-    
-    /// A name that uniquely identifies an account.
-    
-    private var names: Array<String> = []
-    
-    
-    /// The digest for the user password.
-    
-    private var digest: String!
-    
-    
-    /// The password salt
-    
-    private var salt: String!
 
-    
-    /// Create a new instance
-    ///
-    /// - Paramaters:
-    ///   - id: A unique integer
-    ///   - name: String, should be unique for this account.
-    ///   - passwordHash: An integer that must be matched to allow somebody to use this account.
-    ///   - accountsRoot: A URL pointing to the root directory for all accounts.
-    
-    fileprivate init?(id: Int, name: String, password: String, accountsRoot: URL) {
-        
-        self.id = id
-        self.uuid = UUID().uuidString
-        self.names.insert(name, at: 0)
-        self.url = Account.createFileUrl(accountsRoot: accountsRoot, id: id)
+// MARK: - Functional interface
 
-        let salt = createSalt()
-        guard let digest = createDigest(password, salt: salt) else { return nil }
+extension Account {
+    
 
-        self.salt = salt
-        self.digest = digest
-        
-        if let error = save() {
-            Log.atError?.log(
-                "Cannot save account\n\n\(self),\n\n Error message = \(error)\n",
-                from: Source(id: -1, file: #file, type: "Account", function: #function, line: #line))
-            return nil
-        }
+    /// A list of all the old names this account has had.
+    
+    var historicalNames: Array<String> {
+        var old = names
+        if old.count > 0 { old.removeFirst() }
+        return old
     }
     
-    
+
     /// Update password (digest). A new salt is created also. If the operation fails, the values of the salt and the digest will remain as they are.
     ///
     /// - Note: Updates are not thread safe, make sure that the session is 'exclusive' before updating.
@@ -287,7 +336,7 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
     ///
     /// - Returns: True if the operation succeeded, false if not.
     
-    public func updatePassword(_ str: String) -> Bool {
+    func updatePassword(_ str: String) -> Bool {
         
         // Keep the old values until we are sure the old ones are saved.
         
@@ -298,7 +347,7 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
         // Create and set the new values
         
         let salt = createSalt()
-        guard let digest = createDigest(str, salt: salt) else { return false }
+        guard let digest = createDigest(for: str, with: salt) else { return false }
         
         self.salt = salt
         self.digest = digest
@@ -306,10 +355,8 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
         
         // Save the new values, if the save fails, then restore the old values.
         
-        if let error = save() {
-            Log.atError?.log(
-                "Cannot save account \(self), error message = \(error)",
-                from: Source(id: -1, file: #file, type: "Account", function: #function, line: #line))
+        if let error = saveUserData() {
+            Log.atError?.log("Cannot save account \(self), error message = \(error)", type: "Account")
             self.salt = oldSalt
             self.digest = oldDigest
             return false
@@ -328,73 +375,14 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
     ///
     /// - Returns: False if the digest cannot be created or when it does not match.
     
-    public func hasSameDigest(as pwd: String) -> Bool {
+    fileprivate func hasSameDigest(as pwd: String) -> Bool {
         
-        guard let testDigest = createDigest(pwd, salt: salt) else {
-            Log.atCritical?.log(
-                "Cannot create digest",
-                from: Source(id: -1, file: #file, type: "Account", function: #function, line: #line))
+        guard let testDigest = createDigest(for: pwd, with: salt) else {
+            Log.atCritical?.log("Cannot create digest", type: "Account")
             return false
         }
         
         return digest == testDigest
-    }
-    
-    
-    /// Save the user data to file.
-    ///
-    /// - Returns: On success nil, on failure a description of the error that occured.
-    
-    public func save() -> String? {
-        return self.json.save(to: url)
-    }
-    
-    
-    /// Serialize to VJson
-    
-    private var json: VJson {
-        let json = VJson()
-        for (index, name) in names.enumerated() {
-            json["Names"][index] &= name
-        }
-        json["Id"] &= id
-        json["Uuid"] &= uuid
-        json["Digest"] &= digest
-        json["Salt"] &= salt
-        json["Info"] = info
-        
-        return json
-    }
-    
-    
-    /// Deserialize from a VJson file
-    
-    fileprivate init?(url: URL) {
-        
-        self.url = url
-        
-        guard let json = ((try? VJson.parse(file: url)) as VJson??) else { return nil }
-
-        guard let jjnames = (json|"Names")?.arrayValue else { return nil }
-        guard jjnames.count > 0 else { return nil }
-        var jnames: Array<String> = []
-        for jname in jjnames {
-            guard let name = jname.stringValue else { return nil }
-            jnames.append(name)
-        }
-        guard let jid = (json|"Id")?.intValue else { return nil }
-        guard let juuid = (json|"Uuid")?.stringValue else { return nil }
-        guard let jdigest = (json|"Digest")?.stringValue else { return nil }
-        guard let jsalt = (json|"Salt")?.stringValue else { return nil }
-        guard let jinfo = json|"Info" else { return nil }
-        guard jinfo.isObject else { return nil }
-        
-        self.names = jnames
-        self.id = jid
-        self.uuid = juuid
-        self.digest = jdigest
-        self.salt = jsalt
-        self.info = jinfo
     }
     
     
@@ -445,15 +433,13 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
     
     /// Creates a digest for the given string and salt combination.
     
-    private func createDigest(_ str: String, salt: String) -> String? {
+    private func createDigest(for str: String, with salt: String) -> String? {
         
         
         // Create the digest generator
         
         guard let digester = EVP_MD_CTX_new() else {
-            Log.atEmergency?.log(
-                "Cannot allocate digest generator",
-                from: Source(id: -1, file: #file, type: "Account", function: #function, line: #line))
+            Log.atEmergency?.log("Cannot allocate digest generator", type: "Account")
             return nil
         }
         defer { EVP_MD_CTX_free(digester) }
@@ -462,9 +448,7 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
         // Initialize the digester
         
         if EVP_DigestInit(digester, EVP_sha384()) == 0 {
-            Log.atEmergency?.log(
-                "Cannot initialize digest generator",
-                from: Source(id: -1, file: #file, type: "Account", function: #function, line: #line))
+            Log.atEmergency?.log("Cannot initialize digest generator", type: "Account")
             return nil
         }
         
@@ -475,9 +459,7 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
             if saltData.withUnsafeBytes({ (ptr) -> Bool in
                 return EVP_DigestUpdate(digester, UnsafeRawPointer(ptr), saltData.count) == 0
             }) {
-                Log.atEmergency?.log(
-                    "Cannot update digest generator with salt",
-                    from: Source(id: -1, file: #file, type: "Account", function: #function, line: #line))
+                Log.atEmergency?.log("Cannot update digest generator with salt", type: "Account")
                 return nil
             }
         }
@@ -489,9 +471,7 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
             if strData.withUnsafeBytes({ (ptr) -> Bool in
                 return EVP_DigestUpdate(digester, UnsafeRawPointer(ptr), strData.count) == 0
             }) {
-                Log.atEmergency?.log(
-                    "Cannot update digest generator with string",
-                    from: Source(id: -1, file: #file, type: "Account", function: #function, line: #line))
+                Log.atEmergency?.log("Cannot update digest generator with string", type: "Account")
                 return nil
             }
         }
@@ -502,9 +482,7 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
         let outputBuffer = UnsafeMutablePointer<UInt8>.allocate(capacity: Int(EVP_MAX_MD_SIZE))
         var outputLength: UInt32 = 0
         if EVP_DigestFinal(digester, outputBuffer, &outputLength) == 0 {
-            Log.atEmergency?.log(
-                "Cannot extract digest generator result",
-                from: Source(id: -1, file: #file, type: "Account", function: #function, line: #line))
+            Log.atEmergency?.log("Cannot extract digest generator result", type: "Account")
             return nil
         }
         
@@ -523,7 +501,10 @@ public class Account: EstimatedMemoryConsumption, CustomStringConvertible {
     }
 }
 
-public class Accounts {
+
+// MARK: - An accounts manager
+
+class AccountManager {
 
     
     // The queue for concurrent access protection
@@ -560,16 +541,12 @@ public class Accounts {
     
     /// The number of accounts
     
-    public var count: Int {
-        return nameLut.count
-    }
+    var count: Int { return nameLut.count }
     
     
     /// Returns 'true' if there are no accounts yet
     
-    public var isEmpty: Bool {
-        return nameLut.isEmpty
-    }
+    var isEmpty: Bool { return nameLut.isEmpty }
     
     
     /// The account cache
@@ -579,22 +556,28 @@ public class Accounts {
     
     /// Initialize from file
     
-    public init(root: URL) {
+    init(root: URL) {
         self.root = root
         var isDir: ObjCBool = false
         if FileManager.default.fileExists(atPath: lutFile.path, isDirectory: &isDir) && !isDir.boolValue {
             loadLuts()
         } else {
-            if regenerateLookupTable() {
+            if regenerateLuts() {
                 saveLuts()
             }
         }
     }
     
+}
+
+
+// MARK: - Storage
+
+extension AccountManager {
     
     /// Save the accounts
     
-    public func save() {
+    func save() {
         saveLuts()
     }
     
@@ -604,9 +587,7 @@ public class Accounts {
     private func loadLuts() {
         
         if let json = VJson.parse(file: lutFile, onError: { (_, _, _, mess) in
-            Log.atCritical?.log(
-                "Failed to load accounts lookup table from \(self.lutFile.path), error message = \(mess)",
-                from: Source(id: -1, file: #file, type: "Account", function: #function, line: #line))
+            Log.atCritical?.log("Failed to load accounts lookup table from \(self.lutFile.path), error message = \(mess)", type: "Accounts")
         }) {
             
             for item in json {
@@ -617,9 +598,7 @@ public class Accounts {
                     uuidLut[uuid] = name
                     if id > lastAccountId { lastAccountId = id }
                 } else {
-                    Log.atCritical?.log(
-                        "Failed to load accounts  lookup table from \(lutFile.path), error message = Cannot read name, uuid or id from entry \(item)",
-                        from: Source(id: -1, file: #file, type: "Account", function: #function, line: #line))
+                    Log.atCritical?.log("Failed to load accounts lookup table from \(lutFile.path), error message = Cannot read name, uuid or id from entry \(item)", type: "Accounts")
                     return
                 }
             }
@@ -646,9 +625,7 @@ public class Accounts {
             } else {
                 if once {
                     once = false
-                    Log.atCritical?.log(
-                        "Account lookup tables are damaged, possible account loss. Regenerate the luts to recover the accounts",
-                        from: Source(id: -1, file: #file, type: "Account", function: #function, line: #line))
+                    Log.atCritical?.log("Account lookup tables are damaged, possible account loss. Regenerate the luts to recover the accounts", type: "Accounts")
                 }
             }
         }
@@ -662,15 +639,88 @@ public class Accounts {
     }
     
     
+    /// Regenerates the lookup table from the contents on disk
+    
+    func regenerateLuts() -> Bool {
+        
+        var nameLut: Dictionary<String, Int> = [:]
+        var uuidLut: Dictionary<String, String> = [:]
+        
+        
+        func processDirectory(dir: URL) -> Bool {
+            
+            let urls = try? FileManager.default.contentsOfDirectory(at: dir, includingPropertiesForKeys: [.isDirectoryKey], options: .skipsHiddenFiles)
+            
+            if let urls = urls {
+                
+                for url in urls {
+                    
+                    // If the url is a directory, then process it (recursive), if it is a file, try to read it as an account.
+                    
+                    var isDir: ObjCBool = false
+                    if FileManager.default.fileExists(atPath: url.path, isDirectory: &isDir) && isDir.boolValue {
+                        
+                        if !processDirectory(dir: url) {
+                            return false
+                        }
+                        
+                    } else {
+                        
+                        if let account = Account(url: url) {
+                            
+                            nameLut[account.name] = account.id
+                            uuidLut[account.uuid] = account.name
+                            
+                        } else {
+                            
+                            Log.atCritical?.log("Failed to read account from \(url.path)", type: "Accounts")
+                            return false
+                        }
+                    }
+                }
+                
+                return true
+                
+            } else {
+                
+                Log.atCritical?.log("Failed to read account directories from \(dir.path)", type: "Accounts")
+                return false
+            }
+        }
+        
+        Log.atWarning?.log("Attempting to recreate account LUT from raw account data", type: "Accounts")
+        
+        if processDirectory(dir: root) {
+            
+            self.nameLut = nameLut
+            self.uuidLut = uuidLut
+            
+            Log.atNotice?.log("Regenerated the account LUT", type: "Accounts")
+            return true
+            
+        } else {
+            
+            Log.atCritical?.log("Could not recreate account LUT from raw account data, accounts may have been lost!", type: "Accounts")
+            return false
+        }
+    }
+
+    
     /// Change the root directory url.
     ///
     /// - Note: This will only change the URL, not the disk contents.
     
-    public func changeRoot(to url: URL) {
-        Accounts.queue.async {
+    func changeRoot(to url: URL) {
+        AccountManager.queue.async {
             self.root = url
         }
     }
+}
+
+
+// MARK: - Operational interface
+
+extension AccountManager {
     
     
     /// Returns the account for the given name and password. First it will try to read the account from the cache. If the cache does not contain the account it will try to find it in the lookup table and if found, load it from file. The password hash must matches the account hash.
@@ -681,7 +731,7 @@ public class Accounts {
     ///
     /// - Returns: On success the account, otherwise nil.
     
-    public func getAccount(for name: String, using password: String) -> Account? {
+    func getAccount(for name: String, using password: String) -> Account? {
 
         
         // Only valid parameters
@@ -689,7 +739,7 @@ public class Accounts {
         if password.isEmpty { return nil }
         if name.isEmpty { return nil }
         
-        return Accounts.queue.sync {
+        return AccountManager.queue.sync {
 
             
             // Try to extract it from the cache
@@ -701,7 +751,7 @@ public class Accounts {
                 // Check the lookup table
             
                 if let id = nameLut[name] {
-                    if let a = Account(url: Account.createFileUrl(accountsRoot: root, id: id)) {
+                    if let a = Account(url: Account.createFileUrl(in: root, with: id)) {
                         accountCache[name] = a
                         account = a
                     }
@@ -733,9 +783,9 @@ public class Accounts {
     ///
     /// - Returns: Nil if the input parameters are invalid or if the account already exists. The new account if it was created.
     
-    public func newAccount(name: String, password: String) -> Account? {
+    func newAccount(name: String, password: String) -> Account? {
         
-        return Accounts.queue.sync {
+        return AccountManager.queue.sync {
 
             // Only valid parameters
             
@@ -769,7 +819,7 @@ public class Accounts {
                 
             } else {
                 
-                Log.atError?.log(from: Source(id: -1, file: #file, type: "Account", function: #function, line: #line))
+                Log.atError?.log()
                 return nil
             }
         }
@@ -782,8 +832,8 @@ public class Accounts {
     ///
     /// - Returns: True if the uuid is contained in this list. False otherwise.
     
-    public func contains(_ uuid: String) -> Bool {
-        return Accounts.queue.sync {
+    func contains(_ uuid: String) -> Bool {
+        return AccountManager.queue.sync {
             return uuidLut[uuid] != nil
         }
     }
@@ -793,80 +843,10 @@ public class Accounts {
     ///
     /// - Returns: True if the given name is available as an account name.
     
-    public func available(name: String) -> Bool {
+    func available(name: String) -> Bool {
         
-        return Accounts.queue.sync {
+        return AccountManager.queue.sync {
             return nameLut[name] == nil
-        }
-    }
-    
-    
-    /// Regenerates the lookup table from the contents on disk
-    
-    public func regenerateLookupTable() -> Bool {
-        
-        var nameLut: Dictionary<String, Int> = [:]
-        var uuidLut: Dictionary<String, String> = [:]
-
-        
-        func processDirectory(dir: URL) -> Bool {
-            
-            let urls = try? FileManager.default.contentsOfDirectory(at: dir, includingPropertiesForKeys: [.isDirectoryKey], options: .skipsHiddenFiles)
-            
-            if let urls = urls {
-                
-                for url in urls {
-                    
-                    // If the url is a directory, then process it (recursive), if it is a file, try to read it as an account.
-                    
-                    var isDir: ObjCBool = false
-                    if FileManager.default.fileExists(atPath: url.path, isDirectory: &isDir) && isDir.boolValue {
-                        
-                        if !processDirectory(dir: url) {
-                            return false
-                        }
-                        
-                    } else {
-                        
-                        if let account = Account(url: url) {
-                            
-                            nameLut[account.name] = account.id
-                            uuidLut[account.uuid] = account.name
-                            
-                        } else {
-                            
-                            Log.atCritical?.log(
-                                "Failed to read account from \(url.path)",
-                                from: Source(id: -1, file: #file, type: "Account", function: #function, line: #line))
-                            return false
-                        }
-                    }
-                }
-                
-                return true
-                
-            } else {
-                
-                Log.atCritical?.log(
-                    "Failed to read account directories from \(dir.path)",
-                    from: Source(id: -1, file: #file, type: "Account", function: #function, line: #line))
-                return false
-            }
-        }
-        
-        if processDirectory(dir: root) {
-            
-            self.nameLut = nameLut
-            self.uuidLut = uuidLut
-            
-            Log.atNotice?.log(
-                "Regenerated the account LUT",
-                from: Source(id: -1, file: #file, type: "Account", function: #function, line: #line))
-            return true
-            
-        } else {
-            
-            return false
         }
     }
 }

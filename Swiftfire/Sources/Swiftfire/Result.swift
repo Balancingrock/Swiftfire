@@ -1,6 +1,6 @@
 // =====================================================================================================================
 //
-//  File:       ReferencedDictionary.swift
+//  File:       Result.swift
 //  Project:    Swiftfire
 //
 //  Version:    1.0.0
@@ -10,7 +10,7 @@
 //  Website:    http://swiftfire.nl/
 //  Git:        https://github.com/Balancingrock/Swiftfire
 //
-//  Copyright:  (c) 2017-2019 Marinus van der Lugt, All rights reserved.
+//  Copyright:  (c) 2019 Marinus van der Lugt, All rights reserved.
 //
 //  License:    Use or redistribute this code any way you like with the following two provision:
 //
@@ -41,43 +41,20 @@
 // =====================================================================================================================
 
 import Foundation
+import BRUtils
 
 
-/// A referenced look-up container.
-
-final class ReferencedDictionary  {
-    
-    private var store: Dictionary<String, String> = [:]
-}
-
-extension ReferencedDictionary {
-    
-    var count: Int { return store.count }
-    
-    func popFirst() -> (String, String)? {
-        return store.popFirst()
-    }
-    
-    func removeValue(forKey key: String) -> String? {
-        return store.removeValue(forKey: key)
-    }
-    
-    subscript(key: String) -> String? {
-        get { return store[key] }
-        set { store[key] = newValue }
-    }
-}
-
-extension ReferencedDictionary: Sequence {
-    
-    func makeIterator() -> DictionaryIterator<String, String> {
-        return store.makeIterator()
-    }
-}
-
-extension ReferencedDictionary: CustomStringConvertible {
-    
-    var description: String {
-        return store.reduce("[", { return "\($0), \($1.key):\($1.key.contains("Pwd") ? "********": $1.value)" }).appending("]")
+func + (lhs: Result<Bool>, rhs: Result<Bool>) -> Result<Bool> {
+    switch lhs {
+    case .error(let lmessage):
+        switch rhs {
+        case .error(let rmessage): return Result<Bool>.error(message: "\(lmessage)\n\(rmessage)")
+        case .success: return Result<Bool>.error(message: lmessage)
+        }
+    case .success(let lbool):
+        switch rhs {
+        case .error(let rmessage): return Result<Bool>.error(message: rmessage)
+        case .success(let rbool): return Result<Bool>.success(lbool && rbool)
+        }
     }
 }

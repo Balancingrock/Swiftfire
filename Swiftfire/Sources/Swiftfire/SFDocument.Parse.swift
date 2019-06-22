@@ -3,15 +3,14 @@
 //  File:       SFDocument.Parse.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.11
+//  Version:    1.0.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
 //  Website:    http://swiftfire.nl/
-//  Blog:       http://swiftrien.blogspot.com
 //  Git:        https://github.com/Balancingrock/Swiftfire
 //
-//  Copyright:  (c) 2017 Marinus van der Lugt, All rights reserved.
+//  Copyright:  (c) 2017-2019 Marinus van der Lugt, All rights reserved.
 //
 //  License:    Use or redistribute this code any way you like with the following two provision:
 //
@@ -22,35 +21,22 @@
 //
 //  I also ask you to please leave this header with the source code.
 //
-//  I strongly believe that voluntarism is the way for societies to function optimally. Thus I have choosen to leave it
-//  up to you to determine the price for this code. You pay me whatever you think this code is worth to you.
+//  Like you, I need to make a living:
 //
-//   - You can send payment via paypal to: sales@balancingrock.nl
+//   - You can send payment (you choose the amount) via paypal to: sales@balancingrock.nl
 //   - Or wire bitcoins to: 1GacSREBxPy1yskLMc9de2nofNv2SNdwqH
 //
-//  I prefer the above two, but if these options don't suit you, you can also send me a gift from my amazon.co.uk
-//  wishlist: http://www.amazon.co.uk/gp/registry/wishlist/34GNMPZKAQ0OO/ref=cm_sw_em_r_wsl_cE3Tub013CKN6_wb
-//
 //  If you like to pay in another way, please contact me at rien@balancingrock.nl
-//
-//  (It is always a good idea to visit the website/blog/google to ensure that you actually pay me and not some imposter)
-//
-//  For private and non-profit use the suggested price is the price of 1 good cup of coffee, say $4.
-//  For commercial use the suggested price is the price of 1 good meal, say $20.
-//
-//  You are however encouraged to pay more ;-)
 //
 //  Prices/Quotes for support, modifications or enhancements can be obtained from: rien@balancingrock.nl
 //
 // =====================================================================================================================
-// PLEASE let me know about bugs, improvements and feature requests. (rien@balancingrock.nl)
+// PLEASE let me know about bugs, improvements and feature requests. (again: rien@balancingrock.nl)
 // =====================================================================================================================
 //
 // History
 //
-// 0.10.12 - Upgraded to SwifterLog 1.1.0
-// 0.10.11 - Replaced SwifterJSON with VJson
-// 0.10.0 - Initial release
+// 1.0.0 Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 //
@@ -58,20 +44,22 @@
 //
 // Note: {} = sequence, [] = optional, | = or, .. = any in range
 //
-// <function> ::= <leading-sign><name><arguments>
+// <function> ::= <leading-sign><name>[<priority-seperator>[<priority>]]<arguments>
 //
 // <leading-sign>          ::= "."
-// <name>                  ::= <letter>|<digit>|<allowed-signs-in-name>{<letter>|<digit>|<allowed-signs-in-name>}
+// <name>                  ::= <letter>|<digit>|<allowed-signs-in-name>{[<letter>|<digit>|<allowed-signs-in-name>]}
 // <letter>                ::= "A" .. "Z" | "a" .. "z"
 // <digit>                 ::= "0" .. "9"
 // <allowed-signs-in-name> ::= "-"|"_"
+// <priority-seperator>    ::= ":"
+// <priority>              ::= <digit>{[<digit>]}
 //
 // <arguments>             ::= "("[<argument>[{<argument-separator><argument>}]]")"|<json-object>
 // <json-object>           ::= "{"<json-code>"}"
 // <argument>              ::= <string>|<quoted-string>
 // <arguments-separator>   ::= ","
-// <string>                ::= {" "}<name>{" "}
-// <quoted-string>         ::= {" "}"""{<printable>}"""{" "}
+// <string>                ::= {[" "]}<name>{[" "]}
+// <quoted-string>         ::= {[" "]}"""{<printable>}"""{[" "]}
 //
 // Examples:
 // .numberOfHits()
@@ -135,29 +123,20 @@ extension SFDocument {
 
         func asJsonFunctionBlock() -> DocumentBlock {
             let fb = FunctionBlock(name: name, function: function, arguments: Function.Arguments.json(json!))
-            Log.atDebug?.log(
-                "Function block: \(fb)",
-                from: Source(id: -1, file: #file, type: "SFDocument", function: #function, line: #line)
-            )
+            Log.atDebug?.log("Function block: \(fb)", type: "SFDocument")
             return .functionBlock(fb)
         }
         
         func asArrFunctionBlock() -> DocumentBlock {
             let fb = FunctionBlock(name: name, function: function, arguments: Function.Arguments.array(array))
-            Log.atDebug?.log(
-                "Function block: \(fb)",
-                from: Source(id: -1, file: #file, type: "SFDocument", function: #function, line: #line)
-            )
+            Log.atDebug?.log("Function block: \(fb)", type: "SFDocument")
             return .functionBlock(fb)
         }
         
         func asCharacterBlock() -> DocumentBlock? {
             guard let data = charBuf.data(using: String.Encoding.utf8) else { return nil }
             let cb = CharacterBlock(data: data)
-            Log.atDebug?.log(
-                "Character block: \(cb)",
-                from: Source(id: -1, file: #file, type: "SFDocument", function: #function, line: #line)
-            )
+            Log.atDebug?.log("Character block: \(cb)", type: "SFDocument")
             return .characterBlock(cb)
         }
 

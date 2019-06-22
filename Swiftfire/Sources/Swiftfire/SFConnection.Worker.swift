@@ -3,15 +3,14 @@
 //  File:       HttpConnection.HttpWorker.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.12
+//  Version:    1.0.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
 //  Website:    http://swiftfire.nl/
-//  Blog:       http://swiftrien.blogspot.com
 //  Git:        https://github.com/Balancingrock/Swiftfire
 //
-//  Copyright:  (c) 2014-2017 Marinus van der Lugt, All rights reserved.
+//  Copyright:  (c) 2014-2019 Marinus van der Lugt, All rights reserved.
 //
 //  License:    Use or redistribute this code any way you like with the following two provision:
 //
@@ -22,61 +21,22 @@
 //
 //  I also ask you to please leave this header with the source code.
 //
-//  I strongly believe that voluntarism is the way for societies to function optimally. Thus I have choosen to leave it
-//  up to you to determine the price for this code. You pay me whatever you think this code is worth to you.
+//  Like you, I need to make a living:
 //
-//   - You can send payment via paypal to: sales@balancingrock.nl
+//   - You can send payment (you choose the amount) via paypal to: sales@balancingrock.nl
 //   - Or wire bitcoins to: 1GacSREBxPy1yskLMc9de2nofNv2SNdwqH
 //
-//  I prefer the above two, but if these options don't suit you, you can also send me a gift from my amazon.co.uk
-//  wishlist: http://www.amazon.co.uk/gp/registry/wishlist/34GNMPZKAQ0OO/ref=cm_sw_em_r_wsl_cE3Tub013CKN6_wb
-//
 //  If you like to pay in another way, please contact me at rien@balancingrock.nl
-//
-//  (It is always a good idea to visit the website/blog/google to ensure that you actually pay me and not some imposter)
-//
-//  For private and non-profit use the suggested price is the price of 1 good cup of coffee, say $4.
-//  For commercial use the suggested price is the price of 1 good meal, say $20.
-//
-//  You are however encouraged to pay more ;-)
 //
 //  Prices/Quotes for support, modifications or enhancements can be obtained from: rien@balancingrock.nl
 //
 // =====================================================================================================================
-// PLEASE let me know about bugs, improvements and feature requests. (rien@balancingrock.nl)
+// PLEASE let me know about bugs, improvements and feature requests. (again: rien@balancingrock.nl)
 // =====================================================================================================================
 //
 // History
 //
-// 0.10.12 - Upgraded to SwifterLog 1.1.0
-//         - Separated the response transfer into its own service
-//         - Separated the session restart into its own service
-//         - Rewrote statistics package
-// 0.10.11 - Renamed createErrorMessageInBody
-//         - Replaced SwifterJSON with VJson
-// 0.10.10 - Added 'Darwin' to sleep statements.
-// 0.10.9 - Streamlined and folded http API into its own project
-// 0.10.6 - Updated parameters to services & transmission of response
-//        - Renamed chain... to service...
-//        - Added freeing of session.
-// 0.10.6 - Renamed HttpHeader to HttpRequest
-// 0.10.5 - Added more debug output
-// 0.10.0 - Renamed HttpConnection to SFConnection
-// 0.9.18 - Header update
-//        - Replaced log by Log?
-// 0.9.15 - General update and switch to frameworks
-//        - Updated domainServices
-// 0.9.14 - Added support for HTTP 1.0
-//        - Upgraded to Xcode 8 beta 6
-// 0.9.13 - Upgraded to Xcode 8 beta 3 (Swift 3)
-// 0.9.11 - Added support for usage statistics
-// 0.9.6  - Header update
-// 0.9.3  - Added incrementing of serverTelemetry.nofHttp400Replies if the host cannot be mapped to a domain
-//        - Split "domain not found" error into "domain not found" and "domain not enabled"
-//        - Removed port information from "domain not found/enabled" error
-// 0.9.2  - Made forwarding case cleaner
-//        - Moved the code that provides a response to the Domain class
-// 0.9.0  - Initial release
+// 1.0.0 Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 // Description
@@ -110,10 +70,7 @@ extension SFConnection {
         
         // Log update
         
-        Log.atDebug?.log(
-            message,
-            from: Source(id: logId, file: #file, type: "SFConnection", function: #function, line: #line)
-        )
+        Log.atDebug?.log(message, id: logId, type: "SFConnection")
         
         
         // Reply to client
@@ -125,10 +82,7 @@ extension SFConnection {
         if let data = response.data {
             transfer(data)
         } else {
-            Log.atError?.log(
-                "Failed to create HTTP reply with message = '\(message)'",
-                from: Source(id: logId, file: #file, type: "SFConnection", function: #function, line: #line)
-            )
+            Log.atError?.log("Failed to create HTTP reply with message = '\(message)'", id: logId, type: "SFConnection")
         }
     }
     
@@ -145,10 +99,7 @@ extension SFConnection {
         
         // Logging update
         
-        Log.atDebug?.log(
-            message,
-            from: Source(id: logId, file: #file, type: "SFConnection", function: #function, line: #line)
-        )
+        Log.atDebug?.log(message, id: logId, type: "SFConnection")
         
         
         // Reply to client
@@ -160,10 +111,7 @@ extension SFConnection {
         if let data = response.data {
             transfer(data)
         } else {
-            Log.atError?.log(
-                "Failed to create HTTP reply with message = '\(message)'",
-                from: Source(id: logId, file: #file, type: "SFConnection", function: #function, line: #line)
-            )
+            Log.atError?.log("Failed to create HTTP reply with message = '\(message)'", id: logId, type: "SFConnection")
         }
     }
     
@@ -278,10 +226,7 @@ extension SFConnection {
             }
         }
 
-        Log.atDebug?.log(
-            "Request for domain: \(domain.name)",
-            from: Source(id: logId, file: #file, type: "SFConnection", function: #function, line: #line)
-        )
+        Log.atDebug?.log("Request for domain: \(domain.name)", id: logId, type: "SFConnection")
         
         
         // =============================================================================================================
@@ -296,10 +241,7 @@ extension SFConnection {
                 let result = SwifterSockets.connectToTipServer(atAddress: domain.forwardHost!.address, atPort: (domain.forwardHost!.port ?? "80"), connectionObjectFactory: forwardingConnectionFactory)
                 
                 if case let .error(message) = result {
-                    Log.atError?.log(
-                        message,
-                        from: Source(id: logId, file: #file, type: "SFConnection", function: #function, line: #line)
-                    )
+                    Log.atError?.log(message, id: logId, type: "SFConnection")
                 }
                 if case let .success(conn) = result {
                     forwarder = conn as? Forwarder
@@ -356,10 +298,7 @@ extension SFConnection {
         // Execute the service chain
         // =============================================================================================================
 
-        Log.atDebug?.log(
-            "Starting domain services",
-            from: Source(id: logId, file: #file, type: "SFConnection", function: #function, line: #line)
-        )
+        Log.atDebug?.log("Starting domain services", id: logId, type: "SFConnection")
 
         var response = Response()
         response.version = httpVersion
@@ -373,10 +312,7 @@ extension SFConnection {
             
             if parameters.debugMode.value {
 
-                Log.atDebug?.log(
-                    "Service: \(item.name)",
-                    from: Source(id: logId, file: #file, type: "SFConnection", function: #function, line: #line)
-                )
+                Log.atDebug?.log("Service: \(item.name)", id: logId, type: "SFConnection")
             }
 
             
@@ -387,23 +323,14 @@ extension SFConnection {
             if parameters.debugMode.value {
 
                 if serviceInfo.dict.count == 0 {
-                    Log.atDebug?.log(
-                        "\n\nService info is empty",
-                        from: Source(id: logId, file: #file, type: "SFConnection", function: #function, line: #line)
-                    )
+                    Log.atDebug?.log( "\n\nService info is empty", id: logId, type: "SFConnection")
                 } else {
                     var str = ""
                     str += serviceInfo.dict.map({ key, value in "Key: \(key), Value: \(value)" }).joined(separator: "\n")
-                    Log.atDebug?.log(
-                        "\n\nService info:\n\(str)\n",
-                        from: Source(id: logId, file: #file, type: "SFConnection", function: #function, line: #line)
-                    )
+                    Log.atDebug?.log("\n\nService info:\n\(str)\n", id: logId, type: "SFConnection")
                 }
                 
-                Log.atDebug?.log(
-                    "\n\n\(response)\n",
-                    from: Source(id: logId, file: #file, type: "SFConnection", function: #function, line: #line)
-                )
+                Log.atDebug?.log("\n\n\(response)\n", id: logId, type: "SFConnection")
             }
         }
         
@@ -428,10 +355,7 @@ extension SFConnection {
         domain.recordStatistics(visit)
  
         
-        Log.atInfo?.log(
-            "Response took \(completed - timestampResponseStart) milli seconds",
-            from: Source(id: logId, file: #file, type: "SFConnection", function: #function, line: #line)
-        )
+        Log.atInfo?.log("Response took \(completed - timestampResponseStart) milli seconds", id: logId, type: "SFConnection")
     }
 }
 

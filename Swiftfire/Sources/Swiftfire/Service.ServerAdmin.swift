@@ -3,15 +3,14 @@
 //  File:       Service.ServerAdmin.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.10
+//  Version:    1.0.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
 //  Website:    http://swiftfire.nl/
-//  Blog:       http://swiftrien.blogspot.com
 //  Git:        https://github.com/Balancingrock/Swiftfire
 //
-//  Copyright:  (c) 2017 Marinus van der Lugt, All rights reserved.
+//  Copyright:  (c) 2017-2019 Marinus van der Lugt, All rights reserved.
 //
 //  License:    Use or redistribute this code any way you like with the following two provision:
 //
@@ -22,42 +21,22 @@
 //
 //  I also ask you to please leave this header with the source code.
 //
-//  I strongly believe that voluntarism is the way for societies to function optimally. Thus I have choosen to leave it
-//  up to you to determine the price for this code. You pay me whatever you think this code is worth to you.
+//  Like you, I need to make a living:
 //
-//   - You can send payment via paypal to: sales@balancingrock.nl
+//   - You can send payment (you choose the amount) via paypal to: sales@balancingrock.nl
 //   - Or wire bitcoins to: 1GacSREBxPy1yskLMc9de2nofNv2SNdwqH
 //
-//  I prefer the above two, but if these options don't suit you, you can also send me a gift from my amazon.co.uk
-//  wishlist: http://www.amazon.co.uk/gp/registry/wishlist/34GNMPZKAQ0OO/ref=cm_sw_em_r_wsl_cE3Tub013CKN6_wb
-//
 //  If you like to pay in another way, please contact me at rien@balancingrock.nl
-//
-//  (It is always a good idea to visit the website/blog/google to ensure that you actually pay me and not some imposter)
-//
-//  For private and non-profit use the suggested price is the price of 1 good cup of coffee, say $4.
-//  For commercial use the suggested price is the price of 1 good meal, say $20.
-//
-//  You are however encouraged to pay more ;-)
 //
 //  Prices/Quotes for support, modifications or enhancements can be obtained from: rien@balancingrock.nl
 //
 // =====================================================================================================================
-// PLEASE let me know about bugs, improvements and feature requests. (rien@balancingrock.nl)
+// PLEASE let me know about bugs, improvements and feature requests. (again: rien@balancingrock.nl)
 // =====================================================================================================================
 //
 // History
 //
-// 0.10.12 - Upgraded to SwifterLog 1.1.0
-//         - Removed old statistics code
-// 0.10.10 - Changed signature of function to use SFConnection
-//         - Bugfix: Added sfcommands SaveDomains and ReadDomains
-// 0.10.9 - Added server and domain blacklist management
-//        - Streamlined and folded http API into its own project
-//        - Added statistics
-//        - Added testing of valid addresses when blacklisting
-// 0.10.8 - Silenced warning during compilation
-// 0.10.7 - Initial release
+// 1.0.0 Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 // Description
@@ -279,10 +258,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
     // Only service the serverAdminPseudoDomain
     
     guard domain === serverAdminDomain else {
-        Log.atError?.log(
-            "Domain should be serverAdminDomain",
-            from: Source(id: connection.logId, file: #file, function: #function, line: #line)
-        )
+        Log.atError?.log("Domain should be serverAdminDomain", id: connection.logId)
         response.code = Response.Code._500_InternalServerError
         return .abort
     }
@@ -291,10 +267,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
     // Prepare the url
     
     guard let urlstr = request.url else {
-        Log.atError?.log(
-            "No request URL found",
-            from: Source(id: connection.logId, file: #file, function: #function, line: #line)
-        )
+        Log.atError?.log("No request URL found", id: connection.logId)
         response.code = Response.Code._400_BadRequest
         return .abort
     }
@@ -327,10 +300,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
     // ======================================================================
     
     guard let session = info[.sessionKey] as? Session else {
-        Log.atCritical?.log(
-            "No session found, this service should come AFTER the 'getSession' service.",
-            from: Source(id: connection.logId, file: #file, function: #function, line: #line)
-        )
+        Log.atCritical?.log("No session found, this service should come AFTER the 'getSession' service.", id: connection.logId)
         domain.telemetry.nof500.increment()
         response.code = Response.Code._500_InternalServerError
         return .abort
@@ -354,10 +324,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
                 
                 // Check the credentials
                 
-                Log.atDebug?.log(
-                    "Found admin account creation credentials for: \(name)",
-                    from: Source(id: connection.logId, file: #file, function: #function, line: #line)
-                )
+                Log.atDebug?.log("Found admin account creation credentials for: \(name)", id: connection.logId)
                 
                 guard !name.isEmpty, name.utf8.count < 30 else {
                     createAdminAccountPage(name: "", nameColor: "red", pwdColor: "black", rootColor: "black")
@@ -396,10 +363,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
                 
                 if let account = serverAdminDomain.accounts.newAccount(name: name, password: pwd1) {
                     
-                    Log.atNotice?.log(
-                        "Created admin account for: '\(name)'",
-                        from: Source(id: connection.logId, file: #file, function: #function, line: #line)
-                    )
+                    Log.atNotice?.log("Created admin account for: '\(name)'", id: connection.logId)
                     
                     parameters.adminSiteRoot.value = root
                     
@@ -415,10 +379,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
     
                 } else {
                     
-                    Log.atCritical?.log(
-                        "Failed to create admin account for: \(name)",
-                        from: Source(id: connection.logId, file: #file, function: #function, line: #line)
-                    )
+                    Log.atCritical?.log("Failed to create admin account for: \(name)", id: connection.logId)
                     
                     response.code = Response.Code._500_InternalServerError
                     
@@ -429,10 +390,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
                 
                 // One or more account creation details missing
                 
-                Log.atDebug?.log(
-                    "Admin account creation credential(s) missing",
-                    from: Source(id: connection.logId, file: #file, function: #function, line: #line)
-                )
+                Log.atDebug?.log("Admin account creation credential(s) missing", id: connection.logId)
                 
                 createAdminAccountPage(name: "", nameColor: "black", pwdColor: "black", rootColor: "black")
                 
@@ -466,10 +424,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
                 
                 if let account = serverAdminDomain.accounts.getAccount(for: name, using: pwd) {
                 
-                    Log.atNotice?.log(
-                        "Admin \(name) logged in, \(account.uuid)",
-                        from: Source(id: connection.logId, file: #file, function: #function, line: #line)
-                    )
+                    Log.atNotice?.log("Admin \(name) logged in, \(account.uuid)", id: connection.logId)
                     
                     
                     // Associate the account with the session. This allows access for subsequent admin pages.
@@ -508,10 +463,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
                     
                     // The login attempt failed, no account found.
                     
-                    Log.atNotice?.log(
-                        "Admin login failed for \(name)",
-                        from: Source(id: connection.logId, file: #file, function: #function, line: #line)
-                    )
+                    Log.atNotice?.log("Admin login failed for \(name)", id: connection.logId)
                     
                     
                     // Failed login, reset possible account
@@ -550,10 +502,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
             
             if serverAdminDomain.accounts.isEmpty {
                 
-                Log.atDebug?.log(
-                    "An admin account must be created first",
-                    from: Source(id: connection.logId, file: #file, function: #function, line: #line)
-                )
+                Log.atDebug?.log("An admin account must be created first", id: connection.logId)
                 
                 
                 // Return the account creation page
@@ -562,10 +511,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
                 
             } else {
                 
-                Log.atDebug?.log(
-                    "An admin should login first",
-                    from: Source(id: connection.logId, file: #file, function: #function, line: #line)
-                )
+                Log.atDebug?.log("An admin should login first", id: connection.logId)
                 
                 
                 // Return the account login page
@@ -642,10 +588,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
 
     var absPath = parameters.adminSiteRoot.value + relPath
     
-    Log.atDebug?.log(
-        "Looking for file at path: '\(absPath)'",
-        from: Source(id: connection.logId, file: #file, function: #function, line: #line)
-    )
+    Log.atDebug?.log("Looking for file at path: '\(absPath)'", id: connection.logId)
 
     
     // Check for the request file, build a new path if necessary
@@ -744,10 +687,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
     }
     
     
-    Log.atDebug?.log(
-        "Reading file at path: \(absPath)",
-        from: Source(id: connection.logId, file: #file, function: #function, line: #line)
-    )
+    Log.atDebug?.log("Reading file at path: \(absPath)", id: connection.logId)
 
     
     // =================================================================================================================
@@ -786,10 +726,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
         
         guard let data = connection.filemanager.contents(atPath: absPath) else {
             
-            Log.atError?.log(
-                "Reading contents of file failed (but file is reported readable), resource: \(absPath)",
-                from: Source(id: connection.logId, file: #file, function: #function, line: #line)
-            )
+            Log.atError?.log("Reading contents of file failed (but file is reported readable), resource: \(absPath)", id: connection.logId)
 
             response.code = Response.Code._500_InternalServerError
 
@@ -882,10 +819,7 @@ fileprivate func executeSfCommand(_ pathComponents: Array<String>, _ postInfo: i
     case "RemoveFromDomainBlacklist": executeRemoveFromDomainBlacklist(&postInfo); return .newPath("/pages/domain-management.sf.html")
         
     default:
-        Log.atError?.log(
-            "Unknown sfcommand: \(commandName)",
-            from: Source(id: -1, file: #file, function: #function, line: #line)
-        )
+        Log.atError?.log("Unknown sfcommand: \(commandName)")
         return .nop
     }
 }
@@ -896,35 +830,23 @@ fileprivate func executeSetRoot(_ postInfo: PostInfo?) {
     if let url = StorageUrls.parameterDefaultsFile {
         parameters.save(toFile: url)
     }
-    Log.atNotice?.log(
-        "Set admin root directory to: \(root)",
-        from: Source(id: -1, file: #file, function: #function, line: #line)
-    )
+    Log.atNotice?.log("Set admin root directory to: \(root)")
 }
 
 fileprivate func executeSetParameter(_ postInfo: PostInfo?) {
     guard let postInfo = postInfo else {
-        Log.atError?.log(
-            "Missing postInfo",
-            from: Source(id: -1, file: #file, function: #function, line: #line)
-        )
+        Log.atError?.log("Missing postInfo")
         return
     }
     OUTER: for (key, value) in postInfo {
         for p in parameters.all {
             if p.name == key {
                 _ = p.setValue(value)
-                Log.atNotice?.log(
-                    "Setting parameter '\(key)' to '\(value)'",
-                    from: Source(id: -1, file: #file, function: #function, line: #line)
-                )
+                Log.atNotice?.log("Setting parameter '\(key)' to '\(value)'")
                 continue OUTER
             }
         }
-        Log.atError?.log(
-            "Unknown parameter name \(key)",
-            from: Source(id: -1, file: #file, function: #function, line: #line)
-        )
+        Log.atError?.log("Unknown parameter name \(key)")
     }
 }
 
@@ -955,125 +877,98 @@ fileprivate func executeReadDomains() {
 fileprivate func executeUpdateBlacklist(_ postInfo: inout PostInfo?) {
     let _ = postInfo?.removeValue(forKey: "submit")
     guard let (address, action) = postInfo?.popFirst() else {
-        Log.atError?.log(
-            "Missing address & action",
-            from: Source(id: -1, file: #file, function: #function, line: #line)
-        )
+        Log.atError?.log("Missing address & action")
         return
     }
-    let newAction: Blacklist.Action = {
+    let newAction: BlacklistAction = {
         switch action {
-            case "close": return Blacklist.Action.closeConnection
-            case "503": return Blacklist.Action.send503ServiceUnavailable
-            case "401": return Blacklist.Action.send401Unauthorized
+            case "close": return .closeConnection
+            case "503": return .send503ServiceUnavailable
+            case "401": return .send401Unauthorized
         default:
-            Log.atError?.log(
-                "Unknown action \(action)",
-                from: Source(id: -1, file: #file, function: #function, line: #line)
-            )
-            return Blacklist.Action.closeConnection
+            Log.atError?.log("Unknown action \(action)")
+            return .closeConnection
         }
     }()
-    serverBlacklist.update(action: newAction, forIpAddress: address)
+    serverBlacklist.update(action: newAction, for: address)
 }
 
 fileprivate func executeAddToBlacklist(_ postInfo: inout PostInfo?) {
     let _ = postInfo?.removeValue(forKey: "submit")
     guard let address = postInfo?["newEntry"], isValidIpAddress(address) else { return }
     guard let action = postInfo?["action"] else { return }
-    let newAction: Blacklist.Action = {
+    let newAction: BlacklistAction = {
         switch action {
-        case "close": return Blacklist.Action.closeConnection
-        case "503": return Blacklist.Action.send503ServiceUnavailable
-        case "401": return Blacklist.Action.send401Unauthorized
+        case "close": return .closeConnection
+        case "503": return .send503ServiceUnavailable
+        case "401": return .send401Unauthorized
         default:
-            Log.atError?.log(
-                "Unknown action \(action)",
-                from: Source(id: -1, file: #file, function: #function, line: #line)
-            )
-            return Blacklist.Action.closeConnection
+            Log.atError?.log("Unknown action \(action)")
+            return .closeConnection
         }
     }()
-    serverBlacklist.add(ipAddress: address, action: newAction)
+    serverBlacklist.add(address, action: newAction)
 }
 
 fileprivate func executeRemoveFromBlacklist(_ postInfo: inout PostInfo?) {
     guard let (address, _) = postInfo?.popFirst() else { return }
-    serverBlacklist.remove(ipAddress: address)
+    serverBlacklist.remove(address)
 }
 
 fileprivate func executeUpdateDomainBlacklist(_ postInfo: inout PostInfo?) {
     let _ = postInfo?.removeValue(forKey: "submit")
     guard let name = postInfo?.removeValue(forKey: "DomainName"),
           let domain = domains.domain(forName: name) else {
-            Log.atError?.log(
-                "Missing domain name",
-                from: Source(id: -1, file: #file, function: #function, line: #line)
-            )
+            Log.atError?.log("Missing domain name")
             return
     }
     guard let (address, action) = postInfo?.popFirst() else {
-        Log.atError?.log(
-            "Missing address & action",
-            from: Source(id: -1, file: #file, function: #function, line: #line)
-        )
+        Log.atError?.log("Missing address & action")
         return
     }
-    let newAction: Blacklist.Action = {
+    let newAction: BlacklistAction = {
         switch action {
-        case "close": return Blacklist.Action.closeConnection
-        case "503": return Blacklist.Action.send503ServiceUnavailable
-        case "401": return Blacklist.Action.send401Unauthorized
+        case "close": return .closeConnection
+        case "503": return .send503ServiceUnavailable
+        case "401": return .send401Unauthorized
         default:
-            Log.atError?.log(
-                "Unknown action \(action)",
-                from: Source(id: -1, file: #file, function: #function, line: #line)
-            )
-            return Blacklist.Action.closeConnection
+            Log.atError?.log("Unknown action \(action)")
+            return .closeConnection
         }
     }()
-    domain.blacklist.update(action: newAction, forIpAddress: address)
+    domain.blacklist.update(action: newAction, for: address)
 }
 
 fileprivate func executeAddToDomainBlacklist(_ postInfo: inout PostInfo?) {
     let _ = postInfo?.removeValue(forKey: "submit")
     guard let name = postInfo?.removeValue(forKey: "DomainName"),
         let domain = domains.domain(forName: name) else {
-            Log.atError?.log(
-                "Missing domain name",
-                from: Source(id: -1, file: #file, function: #function, line: #line)
-            )
+            Log.atError?.log("Missing domain name")
             return
     }
     guard let address = postInfo?["newEntry"], isValidIpAddress(address) else { return }
     guard let action = postInfo?["action"] else { return }
-    let newAction: Blacklist.Action = {
+    let newAction: BlacklistAction = {
         switch action {
-        case "close": return Blacklist.Action.closeConnection
-        case "503": return Blacklist.Action.send503ServiceUnavailable
-        case "401": return Blacklist.Action.send401Unauthorized
+        case "close": return .closeConnection
+        case "503": return .send503ServiceUnavailable
+        case "401": return .send401Unauthorized
         default:
-            Log.atError?.log(
-                "Unknown action \(action)",
-                from: Source(id: -1, file: #file, function: #function, line: #line)
-            )
-            return Blacklist.Action.closeConnection
+            Log.atError?.log("Unknown action \(action)")
+            return .closeConnection
         }
     }()
-    domain.blacklist.add(ipAddress: address, action: newAction)
+    domain.blacklist.add(address, action: newAction)
 }
 
 fileprivate func executeRemoveFromDomainBlacklist(_ postInfo: inout PostInfo?) {
     guard let name = postInfo?.removeValue(forKey: "DomainName"),
         let domain = domains.domain(forName: name) else {
-            Log.atError?.log(
-                "Missing domain name",
-                from: Source(id: -1, file: #file, function: #function, line: #line)
-            )
+            Log.atError?.log("Missing domain name")
             return
     }
     guard let (address, _) = postInfo?.popFirst() else { return }
-    domain.blacklist.remove(ipAddress: address)
+    domain.blacklist.remove(address)
 }
 
 
@@ -1082,35 +977,23 @@ fileprivate func executeRemoveFromDomainBlacklist(_ postInfo: inout PostInfo?) {
 fileprivate func executeUpdateDomain(_ postInfo: inout PostInfo?) {
     
     guard let name = postInfo?["DomainName"] else {
-        Log.atError?.log(
-            "Missing postInfo",
-            from: Source(id: -1, file: #file, function: #function, line: #line)
-        )
+        Log.atError?.log("Missing postInfo")
         return
     }
     _ = postInfo?.removeValue(forKey: "DomainName")
     
     guard let domain = domains.domain(forName: name) else {
-        Log.atError?.log(
-            "Missing DomainName in postInfo",
-            from: Source(id: -1, file: #file, function: #function, line: #line)
-        )
+        Log.atError?.log("Missing DomainName in postInfo")
         return
     }
     
     guard postInfo?.count ?? 0 == 1 else {
-        Log.atError?.log(
-            "Too many key/value pairs postInfo \(String(describing:postInfo))",
-            from: Source(id: -1, file: #file, function: #function, line: #line)
-        )
+        Log.atError?.log("Too many key/value pairs postInfo \(String(describing:postInfo))")
         return
     }
     
     guard let (key, value) = postInfo?.popFirst() else {
-        Log.atError?.log(
-            "Missing parameter name and value in postInfo",
-            from: Source(id: -1, file: #file, function: #function, line: #line)
-        )
+        Log.atError?.log("Missing parameter name and value in postInfo")
         return
     }
     
@@ -1126,10 +1009,7 @@ fileprivate func executeUpdateDomain(_ postInfo: inout PostInfo?) {
     case "sfresources": domain.sfresources = value
     case "sessiontimeout": domain.sessionTimeout = Int(value) ?? domain.sessionTimeout
     default:
-        Log.atError?.log(
-            "Unknown key '\(key)' with value '\(value)'",
-            from: Source(id: -1, file: #file, function: #function, line: #line)
-        )
+        Log.atError?.log("Unknown key '\(key)' with value '\(value)'")
     }
 }
 
@@ -1160,17 +1040,11 @@ fileprivate func executeUpdateDomainServices(_ postInfo: inout PostInfo?) {
                 if let newName = postInfo?["nameName\(index)"] {
                     serviceArr.append(ServiceItem(index: newIndex, name: newName))
                 } else {
-                    Log.atError?.log(
-                        "Missing nameName for index \(index)",
-                        from: Source(id: -1, file: #file, function: #function, line: #line)
-                    )
+                    Log.atError?.log("Missing nameName for index \(index)")
                 }
         
             } else {
-                Log.atError?.log(
-                    "Missing seqName for index \(index)",
-                    from: Source(id: -1, file: #file, function: #function, line: #line)
-                )
+                Log.atError?.log("Missing seqName for index \(index)")
             }
         }
         index += 1
@@ -1191,27 +1065,18 @@ fileprivate func executeUpdateDomainServices(_ postInfo: inout PostInfo?) {
 fileprivate func executeDeleteDomain(_ postInfo: inout PostInfo?) {
     
     guard let name = postInfo?["DomainName"] else {
-        Log.atError?.log(
-            "Missing DomainName in postInfo",
-            from: Source(id: -1, file: #file, function: #function, line: #line)
-        )
+        Log.atError?.log("Missing DomainName in postInfo")
         return
     }
     
     guard domains.contains(domainWithName: name) else {
-        Log.atError?.log(
-            "Domain '\(name)' does not exist",
-            from: Source(id: -1, file: #file, function: #function, line: #line)
-        )
+        Log.atError?.log("Domain '\(name)' does not exist")
         return
     }
     
     domains.remove(domainWithName: name)
     
-    Log.atNotice?.log(
-        "Deleted domain '\(name)')",
-        from: Source(id: -1, file: #file, function: #function, line: #line)
-    )
+    Log.atNotice?.log("Deleted domain '\(name)')")
 }
 
 
@@ -1220,18 +1085,12 @@ fileprivate func executeDeleteDomain(_ postInfo: inout PostInfo?) {
 fileprivate func executeCreateDomain(_ postInfo: inout PostInfo?) {
     
     guard let name = postInfo?["DomainName"] else {
-        Log.atError?.log(
-            "Missing DomainName in postInfo",
-            from: Source(id: -1, file: #file, function: #function, line: #line)
-        )
+        Log.atError?.log("Missing DomainName in postInfo")
         return
     }
     
     guard !domains.contains(domainWithName: name) else {
-        Log.atError?.log(
-            "Domain '\(name)' already exists",
-            from: Source(id: -1, file: #file, function: #function, line: #line)
-        )
+        Log.atError?.log("Domain '\(name)' already exists")
         return
     }
     
@@ -1239,26 +1098,17 @@ fileprivate func executeCreateDomain(_ postInfo: inout PostInfo?) {
         
         let domainUrl = url.appendingPathComponent(name, isDirectory: true)
         
-        if let domain = Domain(name: name, root: domainUrl) {
+        if let domain = Domain(name: name, manager: domains, root: domainUrl) {
             domain.serviceNames = defaultServices
             domains.add(domain: domain)
-            Log.atNotice?.log(
-                "Added new domain with \(domain))",
-                from: Source(id: -1, file: #file, function: #function, line: #line)
-            )
+            Log.atNotice?.log("Added new domain with \(domain))")
         } else {
-            Log.atNotice?.log(
-                "Failed to domain for \(name))",
-                from: Source(id: -1, file: #file, function: #function, line: #line)
-            )
+            Log.atNotice?.log("Failed to domain for \(name))")
         }
         
     } else {
         
-        Log.atError?.log(
-            "Failed to retrieve domains directory)",
-            from: Source(id: -1, file: #file, function: #function, line: #line)
-        )
+        Log.atError?.log("Failed to retrieve domains directory)")
     }
 
 }
@@ -1273,7 +1123,7 @@ fileprivate let restartQueue = DispatchQueue(label: "Restart queue")
 
 fileprivate func executeRestart() {
     
-    Log.atNotice?.log(from: Source(id: -1, file: #file, function: #function, line: #line))
+    Log.atNotice?.log()
     
     restartQueue.asyncAfter(deadline: DispatchTime.now() + 2) {
         
@@ -1293,5 +1143,5 @@ fileprivate func executeQuitSwiftfire() {
         quitSwiftfire = true
     }
     
-    Log.atNotice?.log(from: Source(id: -1, file: #file, function: #function, line: #line))
+    Log.atNotice?.log()
 }

@@ -3,15 +3,14 @@
 //  File:       Session.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.11
+//  Version:    1.0.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
 //  Website:    http://swiftfire.nl/
-//  Blog:       http://swiftrien.blogspot.com
 //  Git:        https://github.com/Balancingrock/Swiftfire
 //
-//  Copyright:  (c) 2017 Marinus van der Lugt, All rights reserved.
+//  Copyright:  (c) 2017-2019 Marinus van der Lugt, All rights reserved.
 //
 //  License:    Use or redistribute this code any way you like with the following two provision:
 //
@@ -22,39 +21,22 @@
 //
 //  I also ask you to please leave this header with the source code.
 //
-//  I strongly believe that voluntarism is the way for societies to function optimally. Thus I have choosen to leave it
-//  up to you to determine the price for this code. You pay me whatever you think this code is worth to you.
+//  Like you, I need to make a living:
 //
-//   - You can send payment via paypal to: sales@balancingrock.nl
+//   - You can send payment (you choose the amount) via paypal to: sales@balancingrock.nl
 //   - Or wire bitcoins to: 1GacSREBxPy1yskLMc9de2nofNv2SNdwqH
 //
-//  I prefer the above two, but if these options don't suit you, you can also send me a gift from my amazon.co.uk
-//  wishlist: http://www.amazon.co.uk/gp/registry/wishlist/34GNMPZKAQ0OO/ref=cm_sw_em_r_wsl_cE3Tub013CKN6_wb
-//
 //  If you like to pay in another way, please contact me at rien@balancingrock.nl
-//
-//  (It is always a good idea to visit the website/blog/google to ensure that you actually pay me and not some imposter)
-//
-//  For private and non-profit use the suggested price is the price of 1 good cup of coffee, say $4.
-//  For commercial use the suggested price is the price of 1 good meal, say $20.
-//
-//  You are however encouraged to pay more ;-)
 //
 //  Prices/Quotes for support, modifications or enhancements can be obtained from: rien@balancingrock.nl
 //
 // =====================================================================================================================
-// PLEASE let me know about bugs, improvements and feature requests. (rien@balancingrock.nl)
+// PLEASE let me know about bugs, improvements and feature requests. (again: rien@balancingrock.nl)
 // =====================================================================================================================
 //
 // History
 //
-// 0.10.12 - Upgraded to SwifterLog 1.1.0
-// 0.10.11 - Replaced SwifterJSON with VJson
-// 0.10.9 - Streamlined and folded http API into its own project
-// 0.10.7 - Fixed bug: made info public.
-//        - Added subscript access to SessionDictionary
-//        - Renamed SessionDictionary to SessionInfo
-// 0.10.6 - Initial release
+// 1.0.0 Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 //
@@ -72,6 +54,7 @@ import Foundation
 import VJson
 import SwifterLog
 import Http
+
 
 /// A record with debugging info. Specifically this record allows the developper to associate connections with sessions such that debugging information in the log (which also contains the connection id) can be associated with a session.
 
@@ -127,14 +110,14 @@ private struct DebugInfoArray: CustomStringConvertible {
 
 /// The session information store
 
-public struct SessionInfo: CustomStringConvertible {
+struct SessionInfo: CustomStringConvertible {
     
-    public subscript(key: SessionInfoKey) -> CustomStringConvertible? {
+    subscript(key: SessionInfoKey) -> CustomStringConvertible? {
         set { dict[key] = newValue }
         get { return dict[key] }
     }
     
-    public mutating func remove(key: SessionInfoKey) {
+    mutating func remove(key: SessionInfoKey) {
         dict.removeValue(forKey: key)
     }
     
@@ -148,7 +131,7 @@ public struct SessionInfo: CustomStringConvertible {
         return json
     }
     
-    public var description: String {
+    var description: String {
         return dict.map({ "\($0.key): \($0.value)" }).sorted().joined(separator: ",\n")
     }
 }
@@ -156,7 +139,7 @@ public struct SessionInfo: CustomStringConvertible {
 
 /// The session for statefull client experiences.
 
-public class Session: CustomStringConvertible {
+class Session: CustomStringConvertible {
 
     
     /// The queue on which all session functions run
@@ -172,12 +155,12 @@ public class Session: CustomStringConvertible {
     
     /// The Session ID name used in the cookies.
     
-    public static let cookieId = "SessionId"
+    static let cookieId = "SessionId"
 
     
     // A cookie that will represent this session in the outgoing http response.
     
-    public var cookie: Cookie {
+    var cookie: Cookie {
         return Session.queue.sync {
             let sessionTimeout = Cookie.Timeout.maxAge(self.timeout)
             return Cookie(name: Session.cookieId, value: id.uuidString, timeout: sessionTimeout, path: "/", domain: nil, secure: nil, httpOnly: true)
@@ -187,22 +170,22 @@ public class Session: CustomStringConvertible {
     
     /// The ID for this Session
     
-    public let id: UUID = UUID()
+    let id: UUID = UUID()
 
     
     /// The time this session was started.
     
-    public let started: Int64 = Date().javaDate
+    let started: Int64 = Date().javaDate
     
     
-    /// The time this session was used for the last time.
+    /// The time this session was active for the last time.
     
-    public fileprivate(set) var lastActivity: Int64
+    fileprivate(set) var lastActivity: Int64
     
     
     /// A custom dictionary for information that must be associated with the session.
     
-    public var info: SessionInfo = SessionInfo()
+    var info: SessionInfo = SessionInfo()
     
     
     /// The timeout for this session in seconds.
@@ -214,7 +197,7 @@ public class Session: CustomStringConvertible {
     ///
     /// - Note: This function cannot be used to determine if the session is still active. Use 'isActiveKeepActive' to determine if the session is still active (and update 'lastActivity' in the process).
     
-    public var hasExpired: Bool {
+    var hasExpired: Bool {
         let now = Date().javaDate
         return now > lastActivity + Int64(timeout * 1000)
     }
@@ -222,7 +205,7 @@ public class Session: CustomStringConvertible {
     
     /// Keeps the session active if it is still active. It does this by updating the 'lastActivity' to now if the session is still active.
     
-    public var isActiveKeepActive: Bool {
+    var isActiveKeepActive: Bool {
         return Session.queue.sync {
             [weak self] in
             guard let `self` = self else { return false }
@@ -239,7 +222,7 @@ public class Session: CustomStringConvertible {
     
     /// The subscript operators to access the information in the session info store
     
-    public subscript(key: SessionInfoKey) -> CustomStringConvertible? {
+    subscript(key: SessionInfoKey) -> CustomStringConvertible? {
         set {
             Session.queue.async {
                 [weak self] in
@@ -264,7 +247,7 @@ public class Session: CustomStringConvertible {
     
     /// Textual representation
     
-    public var description: String {
+    var description: String {
         return Session.queue.sync {
             [weak self] in
             guard let `self` = self else { return "" }
@@ -318,7 +301,7 @@ public class Session: CustomStringConvertible {
     
     /// Adds an activity to the list of debug information. Also updates the 'lastActivity'.
     
-    public func addActivity(address: String, domainName: String, connectionId: Int, allocationCount: Int) {
+    func addActivity(address: String, domainName: String, connectionId: Int, allocationCount: Int) {
         Session.queue.async {
             [weak self] in
             guard let `self` = self else { return }
@@ -331,7 +314,7 @@ public class Session: CustomStringConvertible {
     
     /// For exclusive use of the session. If the value is true then exclusive use of this session has been granted.
     
-    public private(set) var isExclusive: Bool = false
+    private(set) var isExclusive: Bool = false
     
     
     /// Claim exclusivity of the session. Exclusivity can be used if a session must be protected again concurrent use by multiple connection requests.
@@ -340,7 +323,7 @@ public class Session: CustomStringConvertible {
     ///
     /// - Returns: 'True' if exclusivity was successfully claimed, 'false' otherwise.
     
-    public func claimExclusivity() -> Bool {
+    func claimExclusivity() -> Bool {
         return Session.queue.sync {
             [weak self] in
             guard let `self` = self else { return false }
@@ -353,7 +336,7 @@ public class Session: CustomStringConvertible {
     
     /// Release exclusivity of the session
     
-    public func releaseExclusivity() {
+    func releaseExclusivity() {
         Session.queue.async {
             [weak self] in
             guard let `self` = self else { return }
@@ -364,7 +347,7 @@ public class Session: CustomStringConvertible {
 }
 
 
-public final class Sessions: CustomStringConvertible {
+final class Sessions: CustomStringConvertible {
 
     
     /// The time format used for the filenames
@@ -389,7 +372,7 @@ public final class Sessions: CustomStringConvertible {
     
     /// The directory in which the session information will be stored if it denotes a directory. No session information will be stored if left (or set to) nil.
     
-    public var logDirUrl: URL? {
+    var logDirUrl: URL? {
         set {
             Sessions.queue.sync {
                 [weak self] in
@@ -411,7 +394,7 @@ public final class Sessions: CustomStringConvertible {
     ///
     /// - Note: The expired sessions will be removed before the tally is made.
     
-    public var count: Int {
+    var count: Int {
         return Sessions.queue.sync {
             
             [weak self] in
@@ -430,7 +413,7 @@ public final class Sessions: CustomStringConvertible {
     
     /// Create a textual representation
     
-    public var description: String {
+    var description: String {
         
         return Sessions.queue.sync {
             
@@ -455,7 +438,7 @@ public final class Sessions: CustomStringConvertible {
     
     /// Create a new sessions object
     
-    public init(logDirUrl: URL) {
+    init(logDirUrl: URL) {
         _logDirUrl = logDirUrl
         periodicPurge()
     }
@@ -471,7 +454,7 @@ public final class Sessions: CustomStringConvertible {
     ///
     /// - Returns: The requested session or nil.
     
-    public func getActiveSession(for id: UUID, logId: Int) -> Session? {
+    func getActiveSession(for id: UUID, logId: Int) -> Session? {
         
         return Sessions.queue.sync {
             
@@ -504,7 +487,7 @@ public final class Sessions: CustomStringConvertible {
     
     /// Creates a new session and adds it to the active sessions.
     
-    public func newSession(address: String, domainName: String, logId: Int, connectionId: Int, allocationCount: Int, timeout: Int) -> Session? {
+    func newSession(address: String, domainName: String, logId: Int, connectionId: Int, allocationCount: Int, timeout: Int) -> Session? {
         return Sessions.queue.sync {
             [weak self] in
             guard let `self` = self else { return nil }

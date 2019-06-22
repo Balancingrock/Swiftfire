@@ -3,15 +3,14 @@
 //  File:       main.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.10
+//  Version:    1.0.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
 //  Website:    http://swiftfire.nl/
-//  Blog:       http://swiftrien.blogspot.com
 //  Git:        https://github.com/Balancingrock/Swiftfire
 //
-//  Copyright:  (c) 2014-2017 Marinus van der Lugt, All rights reserved.
+//  Copyright:  (c) 2014-2019 Marinus van der Lugt, All rights reserved.
 //
 //  License:    Use or redistribute this code any way you like with the following two provision:
 //
@@ -22,54 +21,22 @@
 //
 //  I also ask you to please leave this header with the source code.
 //
-//  I strongly believe that voluntarism is the way for societies to function optimally. Thus I have choosen to leave it
-//  up to you to determine the price for this code. You pay me whatever you think this code is worth to you.
+//  Like you, I need to make a living:
 //
-//   - You can send payment via paypal to: sales@balancingrock.nl
+//   - You can send payment (you choose the amount) via paypal to: sales@balancingrock.nl
 //   - Or wire bitcoins to: 1GacSREBxPy1yskLMc9de2nofNv2SNdwqH
 //
-//  I prefer the above two, but if these options don't suit you, you might also send me a gift from my amazon.co.uk
-//  wishlist: http://www.amazon.co.uk/gp/registry/wishlist/34GNMPZKAQ0OO/ref=cm_sw_em_r_wsl_cE3Tub013CKN6_wb
-//
 //  If you like to pay in another way, please contact me at rien@balancingrock.nl
-//
-//  (It is always a good idea to visit the website/blog/google to ensure that you actually pay me and not some imposter)
-//
-//  For private and non-profit use the suggested price is the price of 1 good cup of coffee, say $4.
-//  For commercial use the suggested price is the price of 1 good meal, say $20.
-//
-//  You are however encouraged to pay more ;-)
 //
 //  Prices/Quotes for support, modifications or enhancements can be obtained from: rien@balancingrock.nl
 //
 // =====================================================================================================================
-// PLEASE let me know about bugs, improvements and feature requests. (rien@balancingrock.nl)
+// PLEASE let me know about bugs, improvements and feature requests. (again: rien@balancingrock.nl)
 // =====================================================================================================================
 //
 // History
 //
-// 0.10.12 - Upgraded to SwifterLog 1.1.0
-// 0.10.10 - Added 'Darwin' to sleep statements.
-// 0.10.9  - Removed M&C, always start servers
-// 0.10.6  - Renamed parameters and telemetry type
-// 0.10.1  - Fixed new warnings from xcode 8.3
-// 0.10.0  - Included support for function calls
-// 0.9.18  - Renames Start command to Run
-//         - Header update
-//         - Replaced log with Log?
-// 0.9.15  - General update and switch to frameworks
-// 0.9.14  - Added loading of server level blacklisted clients
-//         - Upgraded to Xcode 8 beta 6
-// 0.9.13  - Upgraded to Xcode 8 beta 3 (Swift 3)
-// 0.9.12  - Switched to 'toConsole' protocol (in Comms.swift) for communication with the console.
-// 0.9.11  - Moved some global definitions to other files
-// 0.9.7   - Added closing of header logging file on normal termination
-//         - Changed logging of parameters and domains to occur after the setup of the logger
-// 0.9.6   - Header update
-//         - Merged Startup into Parameters
-// 0.9.3   - Added serverTelemetry
-// 0.9.1   - Minor changes to accommodate changes in SwifterSockets and SwifterLog
-// 0.9.0   - Initial release
+// 1.0.0 Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 // Description
@@ -93,7 +60,7 @@ typealias Log = SwifterLog.Logger
 /// Stops the startup process.
 
 fileprivate func emergencyExit(_ message: String) -> Never {
-    Log.atEmergency?.log(message, from: Source(id: -1, file: #file, function: #function, line: #line))
+    Log.atEmergency?.log(message)
     _ = Darwin.sleep(2) // Give the logger some time to do its work
     fatalError(message)
 }
@@ -127,14 +94,14 @@ do {
     switch parameters.restore(fromFile: parameterDefaultFile) {
     case let .error(message):   emergencyExit(message)
     case let .success(message):
-        if !message.isEmpty { Log.atNotice?.log(message, from: Source(id: -1, file: #file, function: #function, line: #line)) }
+        if !message.isEmpty { Log.atNotice?.log(message) }
     }
     
     parameters.debugMode.value = true
     
     setupParametersDidSetActions()
     
-    Log.atDebug?.log("Configuration parameters:\n\n\(parameters)\n", from: Source(id: -1, file: #file, function: #function, line: #line))
+    Log.atDebug?.log("Configuration parameters:\n\n\(parameters)\n")
 }
 
 
@@ -156,10 +123,10 @@ do {
     Log.logfiles.maxNumberOfFiles = parameters.logfileMaxNofFiles.value
     Log.logfiles.maxSizeInBytes = UInt64(parameters.logfileMaxSize.value) * 1024
     
-    guard let aslLoglevel = SwifterLog.Level.factory(parameters.aslFacilityRecordAtAndAboveLevel.value) else {
+    guard let osLogLoglevel = SwifterLog.Level.factory(parameters.osLogRecordAtAndAboveLevel.value) else {
         emergencyExit("Could not construct asl loglevel")
     }
-    Log.singleton.osLogFacilityRecordAtAndAboveLevel = aslLoglevel
+    Log.singleton.osLogFacilityRecordAtAndAboveLevel = osLogLoglevel
     
     guard let stdoutLoglevel = SwifterLog.Level.factory(parameters.stdoutPrintAtAndAboveLevel.value) else {
         emergencyExit("Could not construct stdout loglevel")
@@ -183,7 +150,7 @@ do {
         Log.network.connectToNetworkTarget(target)
     }
     
-    Log.atNotice?.log("Logging configured", from: Source(id: -1, file: #file, function: #function, line: #line))
+    Log.atNotice?.log("Logging configured")
 }
 
 
@@ -198,12 +165,12 @@ do {
         emergencyExit("Could not construct server blacklist file url")
     }
 
-    switch serverBlacklist.restore(fromFile: serverBlacklistFile) {
+    switch serverBlacklist.restore(from: serverBlacklistFile) {
     case let .error(message):   emergencyExit(message)
     case .success: break
     }
     
-    Log.atDebug?.log("Server Blacklist:\n\n\(serverBlacklist)\n", from: Source(id: -1, file: #file, function: #function, line: #line))
+    Log.atDebug?.log("Server Blacklist:\n\n\(serverBlacklist)\n")
 }
 
 
@@ -236,7 +203,7 @@ let services = Service()
 do {
     registerServices()
 
-    Log.atDebug?.log("Registered services:\n\n\(services)\n", from: Source(id: -1, file: #file, function: #function, line: #line))
+    Log.atDebug?.log("Registered services:\n\n\(services)\n")
 }
 
 
@@ -249,7 +216,7 @@ let functions = Function()
 do {
     registerFunctions()
 
-    Log.atDebug?.log("Registered functions:\n\n\(functions)\n", from: Source(id: -1, file: #file, function: #function, line: #line))
+    Log.atDebug?.log("Registered functions:\n\n\(functions)\n")
 }
 
 
@@ -266,7 +233,7 @@ do {
     
     headerLogger = HttpHeaderLogger(rootDir: headersLogDir)
     
-    Log.atDebug?.log("Created header logging directory in: \(headersLogDir)", from: Source(id: -1, file: #file, function: #function, line: #line))
+    Log.atDebug?.log("Created header logging directory in: \(headersLogDir)")
 }
 
 
@@ -283,7 +250,7 @@ do {
     
     switch domains.restore(fromFile: defaultDomainsFile) {
     case let .error(message): emergencyExit(message)
-    case let .success(message): Log.atNotice?.log(message, from: Source(id: -1, file: #file, function: #function, line: #line))
+    case let .success(message): Log.atNotice?.log(message)
     }
     
     
@@ -294,7 +261,7 @@ do {
     
     // log the domain settings
     
-    Log.atNotice?.log("Domain settings:\n\n\(domains)\n", from: Source(id: -1, file: #file, function: #function, line: #line))
+    Log.atNotice?.log("Domain settings:\n\n\(domains)\n")
 }
 
 
@@ -323,7 +290,7 @@ do {
     serverAdminDomain.rebuildServices()
     serverAdminDomain.sessionTimeout = 600 // Seconds
 
-    Log.atNotice?.log("Created server admin (pseudo) domain", from: Source(id: -1, file: #file, function: #function, line: #line))
+    Log.atNotice?.log("Created server admin (pseudo) domain")
 }
 
 
@@ -382,10 +349,10 @@ telemetry.httpsServerStatus.setValue("Stopped")
 if (!StorageUrls.exists(url: StorageUrls.sslConsoleServerCertificateFile) || !StorageUrls.exists(url: StorageUrls.sslConsoleServerPrivateKeyFile)) {
     switch generateKeyAndCertificate(privateKeyLocation: StorageUrls.sslConsoleServerPrivateKeyFile, certificateLocation: StorageUrls.sslConsoleServerCertificateFile) {
     case .error(let message): emergencyExit(message)
-    case .success: Log.atNotice?.log(id: -1, source: "Main", message: "Certificate and private key for console connection generated")
+    case .success: Log.atNotice?.log("Certificate and private key for console connection generated")
     }
 } else {
-    Log.atNotice?.log(id: -1, source: "Main", message: "Certificate and private key files for console connection present")
+    Log.atNotice?.log("Certificate and private key files for console connection present")
 }
 
 
@@ -416,7 +383,7 @@ if today > macCert.validNotAfter  { emergencyExit("Console certificate in \(Stor
 
 fileprivate let validForDays = (macCert.validNotAfter - today)/Int64(24 * 60 * 60 * 1000)
 
-Log.atInfo?.log(id: -1, source: "Main", message: "Server certificate for console interface is valid for \(validForDays) more days")
+Log.atInfo?.log("Server certificate for console interface is valid for \(validForDays) more days")
 
 
 // Check that there is a trusted console certificate
@@ -429,16 +396,16 @@ if let urls = try? FileManager.default.contentsOfDirectory(at: StorageUrls.sslCo
             // Load the file into a certificate store
             guard let ctx = ServerCtx() else { emergencyExit("Failed to create context for trusted console certificates check") }
             if case let .error(message) = ctx.useCertificate(file: EncodedFile(path: url.path, encoding: .pem)) {
-                Log.atWarning?.log(id: -1, source: "Main", message: "Failed to load trusted console certificate at \(url.path)")
+                Log.atWarning?.log("Failed to load trusted console certificate at \(url.path)")
             } else {
                 if let cert = X509(ctx: ctx) {
                     if today < cert.validNotBefore {
-                        Log.atWarning?.log(id: -1, source: "Main", message: "Trusted console certificate in \(url.path) is not yet valid")
+                        Log.atWarning?.log("Trusted console certificate in \(url.path) is not yet valid")
                     } else if today > cert.validNotAfter {
-                        Log.atWarning?.log(id: -1, source: "Main", message: "Trusted console certificate in \(url.path) is no longer valid")
+                        Log.atWarning?.log("Trusted console certificate in \(url.path) is no longer valid")
                     } else {
                         let validForDays = (macCert.validNotAfter - today)/Int64(24 * 60 * 60 * 1000)
-                        Log.atInfo?.log(id: -1, source: "Main", message: "Trusted console certificate in \(url.path) is valid for \(validForDays) more days")
+                        Log.atInfo?.log("Trusted console certificate in \(url.path) is valid for \(validForDays) more days")
                         consoleServerCertificateFound = true
                     }
                 }
@@ -448,9 +415,9 @@ if let urls = try? FileManager.default.contentsOfDirectory(at: StorageUrls.sslCo
 }
 
 if consoleServerCertificateFound {
-    Log.atNotice?.log(id: -1, source: "Main", message: "Trusted Console Certificate(s) present")
+    Log.atNotice?.log("Trusted Console Certificate(s) present")
 } else {
-    Log.atError?.log(id: -1, source: "Main", message: "No Trusted Console Certificate found")
+    Log.atError?.log("No Trusted Console Certificate found")
 }
 */
 
@@ -458,11 +425,11 @@ if consoleServerCertificateFound {
 // Call out to the custom setup routine
 // ====================================
 
-Log.atNotice?.log("Calling out to custom setup", from: Source(id: -1, file: #file, function: #function, line: #line))
+Log.atNotice?.log("Calling out to custom setup")
 
 customSetup()
 
-Log.atNotice?.log("Finished custom setup", from: Source(id: -1, file: #file, function: #function, line: #line))
+Log.atNotice?.log("Finished custom setup")
 
 
 // ==================================
@@ -480,27 +447,27 @@ while !quitSwiftfire { _ = Darwin.sleep(2) }
 
 _ = serverAdminDomain.serverShutdown()
 //statistics.save(toFile: StorageUrls.statisticsFile!)
-//Log.atNotice?.log(message: "Saved server statistics", from: Source(id: -1, file: #file, function: #function, line: #line))
+//Log.atNotice?.log("Saved server statistics")
 
 headerLogger.close()
-Log.atNotice?.log("Closed header logging file", from: Source(id: -1, file: #file, function: #function, line: #line))
+Log.atNotice?.log("Closed header logging file")
 
 if let url = StorageUrls.serverBlacklistFile {
-    serverBlacklist.save(toFile: url)
-    Log.atNotice?.log("Saved server blacklist", from: Source(id: -1, file: #file, function: #function, line: #line))
+    serverBlacklist.save(to: url)
+    Log.atNotice?.log("Saved server blacklist")
 }
 
 switch domains.serverShutdown() {
-case .error(let message): Log.atError?.log("Error while shutting down the domains:\n\(message)", from: Source(id: -1, file: #file, function: #function, line: #line))
+case .error(let message): Log.atError?.log("Error while shutting down the domains:\n\(message)")
 case .success: break;
 }
 
 switch domains.save(toFile: StorageUrls.domainDefaultsFile!) {
-case .error(let message): Log.atError?.log("Error while saving the domains:\n\(message)", from: Source(id: -1, file: #file, function: #function, line: #line))
-case .success: Log.atNotice?.log("Saved domains", from: Source(id: -1, file: #file, function: #function, line: #line))
+case .error(let message): Log.atError?.log("Error while saving the domains:\n\(message)")
+case .success: Log.atNotice?.log("Saved domains")
 }
 
-Log.atNotice?.log("Swiftfire terminated normally", from: Source(id: -1, file: #file, function: #function, line: #line))
+Log.atNotice?.log("Swiftfire terminated normally")
 
 
 // Give other tasks time to complete

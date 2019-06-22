@@ -3,15 +3,14 @@
 //  File:       Logfile.AccessLog.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.7
+//  Version:    1.0.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
 //  Website:    http://swiftfire.nl/
-//  Blog:       http://swiftrien.blogspot.com
 //  Git:        https://github.com/Balancingrock/Swiftfire
 //
-//  Copyright:  (c) 2014-2017 Marinus van der Lugt, All rights reserved.
+//  Copyright:  (c) 2014-2019 Marinus van der Lugt, All rights reserved.
 //
 //  License:    Use or redistribute this code any way you like with the following two provision:
 //
@@ -22,45 +21,29 @@
 //
 //  I also ask you to please leave this header with the source code.
 //
-//  I strongly believe that voluntarism is the way for societies to function optimally. Thus I have choosen to leave it
-//  up to you to determine the price for this code. You pay me whatever you think this code is worth to you.
+//  Like you, I need to make a living:
 //
-//   - You can send payment via paypal to: sales@balancingrock.nl
+//   - You can send payment (you choose the amount) via paypal to: sales@balancingrock.nl
 //   - Or wire bitcoins to: 1GacSREBxPy1yskLMc9de2nofNv2SNdwqH
 //
-//  I prefer the above two, but if these options don't suit you, you might also send me a gift from my amazon.co.uk
-//  wishlist: http://www.amazon.co.uk/gp/registry/wishlist/34GNMPZKAQ0OO/ref=cm_sw_em_r_wsl_cE3Tub013CKN6_wb
-//
 //  If you like to pay in another way, please contact me at rien@balancingrock.nl
-//
-//  (It is always a good idea to visit the website/blog/google to ensure that you actually pay me and not some imposter)
-//
-//  For private and non-profit use the suggested price is the price of 1 good cup of coffee, say $4.
-//  For commercial use the suggested price is the price of 1 good meal, say $20.
-//
-//  You are however encouraged to pay more ;-)
 //
 //  Prices/Quotes for support, modifications or enhancements can be obtained from: rien@balancingrock.nl
 //
 // =====================================================================================================================
-// PLEASE let me know about bugs, improvements and feature requests. (rien@balancingrock.nl)
+// PLEASE let me know about bugs, improvements and feature requests. (again: rien@balancingrock.nl)
 // =====================================================================================================================
 //
 // History
 //
-// 0.10.7 - Merged SwiftfireCore into Swiftfire
-// 0.9.17 - Header update
-// 0.9.15 - General update and switch to frameworks, SwiftfireCore split.
-// 0.9.13 - Upgraded to Xcode 8 beta 3 (Swift 3)
-// 0.9.9  - Changed maxsize to 1MB
-//        - Renamed FileLog to Logfile.
-// 0.9.7  - Initial release
+// 1.0.0 Raised to v1.0.0, Removed old change log,
+//
 // =====================================================================================================================
 
 import Foundation
 
 
-public final class AccessLog: Logfile {
+final class AccessLog: Logfile {
     
     public init?(logDir: URL) {
         super.init(name: "AccessLog", ext: "csv", dir: logDir, options: .maxFileSize(1024), .newFileDailyAt(WallclockTime(hour: 0, minute: 0, second: 0)))

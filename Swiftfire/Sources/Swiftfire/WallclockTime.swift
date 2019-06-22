@@ -3,15 +3,14 @@
 //  File:       WallclockTime.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.7
+//  Version:    1.0.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
 //  Website:    http://swiftfire.nl/
-//  Blog:       http://swiftrien.blogspot.com
 //  Git:        https://github.com/Balancingrock/Swiftfire
 //
-//  Copyright:  (c) 2016-2017 Marinus van der Lugt, All rights reserved.
+//  Copyright:  (c) 2016-2019 Marinus van der Lugt, All rights reserved.
 //
 //  License:    Use or redistribute this code any way you like with the following two provision:
 //
@@ -22,40 +21,23 @@
 //
 //  I also ask you to please leave this header with the source code.
 //
-//  I strongly believe that voluntarism is the way for societies to function optimally. Thus I have choosen to leave it
-//  up to you to determine the price for this code. You pay me whatever you think this code is worth to you.
+//  Like you, I need to make a living:
 //
-//   - You can send payment via paypal to: sales@balancingrock.nl
+//   - You can send payment (you choose the amount) via paypal to: sales@balancingrock.nl
 //   - Or wire bitcoins to: 1GacSREBxPy1yskLMc9de2nofNv2SNdwqH
 //
-//  I prefer the above two, but if these options don't suit you, you might also send me a gift from my amazon.co.uk
-//  wishlist: http://www.amazon.co.uk/gp/registry/wishlist/34GNMPZKAQ0OO/ref=cm_sw_em_r_wsl_cE3Tub013CKN6_wb
-//
 //  If you like to pay in another way, please contact me at rien@balancingrock.nl
-//
-//  (It is always a good idea to visit the website/blog/google to ensure that you actually pay me and not some imposter)
-//
-//  For private and non-profit use the suggested price is the price of 1 good cup of coffee, say $4.
-//  For commercial use the suggested price is the price of 1 good meal, say $20.
-//
-//  You are however encouraged to pay more ;-)
 //
 //  Prices/Quotes for support, modifications or enhancements can be obtained from: rien@balancingrock.nl
 //
 // =====================================================================================================================
-// PLEASE let me know about bugs, improvements and feature requests. (rien@balancingrock.nl)
+// PLEASE let me know about bugs, improvements and feature requests. (again: rien@balancingrock.nl)
 // =====================================================================================================================
 //
 // History
 //
-// 0.10.7 - Merged SwiftfireCore into Swiftfire
-// 0.9.17 - Header update
-// 0.9.15 - General update and switch to frameworks, SwiftfireCore
-// 0.9.14 - Upgraded to Xcode 8 beta 6
-// 0.9.13 - Upgraded to Xcode 8 beta 3 (Swift 3)
-// 0.9.10 - Improved init of WallclockTime, added init from string, added compliance to Equatable and CustomStringConvertible
-// 0.9.9  - Replaced NSCalendarOptions.MatchFirst with NSCalendarOptions.MatchNextTime because the former caused an exception in playground
-// 0.9.7  - Initial release
+// 1.0.0 Raised to v1.0.0, Removed old change log,
+//
 // =====================================================================================================================
 
 
@@ -64,20 +46,20 @@ import Foundation
 
 /// A 24-hour wallclock implementation
 
-public struct WallclockTime: CustomStringConvertible, Equatable {
+struct WallclockTime: CustomStringConvertible, Equatable {
     
-    public static func == (lhs: WallclockTime, rhs: WallclockTime) -> Bool {
+    static func == (lhs: WallclockTime, rhs: WallclockTime) -> Bool {
         if lhs.hour != rhs.hour { return false }
         if lhs.minute != rhs.minute { return false }
         if lhs.second != rhs.second { return false }
         return true
     }
     
-    public static func != (lhs: WallclockTime, rhs: WallclockTime) -> Bool {
+    static func != (lhs: WallclockTime, rhs: WallclockTime) -> Bool {
         return !(lhs == rhs)
     }
     
-    public static func > (lhs: WallclockTime, rhs: WallclockTime) -> Bool {
+    static func > (lhs: WallclockTime, rhs: WallclockTime) -> Bool {
         if lhs.hour < rhs.hour { return false }
         if lhs.hour > rhs.hour { return true }
         // lhs.hour == rhs.hour
@@ -90,22 +72,22 @@ public struct WallclockTime: CustomStringConvertible, Equatable {
         return false
     }
     
-    public static func < (lhs: WallclockTime, rhs: WallclockTime) -> Bool {
+    static func < (lhs: WallclockTime, rhs: WallclockTime) -> Bool {
         if lhs == rhs { return false }
         return !(lhs > rhs)
     }
     
-    public static func >= (lhs: WallclockTime, rhs: WallclockTime) -> Bool {
+    static func >= (lhs: WallclockTime, rhs: WallclockTime) -> Bool {
         if lhs == rhs { return true }
         return (lhs > rhs)
     }
     
-    public static func <= (lhs: WallclockTime, rhs: WallclockTime) -> Bool {
+    static func <= (lhs: WallclockTime, rhs: WallclockTime) -> Bool {
         if lhs == rhs { return true }
         return (lhs < rhs)
     }
     
-    public static func + (lhs: WallclockTime, rhs: WallclockTime) -> (time: WallclockTime, tomorrow: Bool) {
+    static func + (lhs: WallclockTime, rhs: WallclockTime) -> (time: WallclockTime, tomorrow: Bool) {
         var seconds = lhs.second + rhs.second
         var minutes = lhs.minute + rhs.minute
         var hours = lhs.hour + rhs.hour
@@ -118,29 +100,29 @@ public struct WallclockTime: CustomStringConvertible, Equatable {
         }
     }
     
-    public static func + (lhs: Date, rhs: WallclockTime) -> Date {
+    static func + (lhs: Date, rhs: WallclockTime) -> Date {
         return Calendar.current.date(byAdding: rhs.dateComponents as DateComponents, to: lhs as Date)!
     }
     
 
     /// Hour
     
-    public let hour: Int
+    let hour: Int
     
     
     /// Minute
     
-    public let minute: Int
+    let minute: Int
     
     
     /// Second
     
-    public let second: Int
+    let second: Int
     
     
     /// Textual representation of this object
     
-    public var description: String { return "\(hour):\(minute):\(second)" }
+    var description: String { return "\(hour):\(minute):\(second)" }
     
     
     /// Creates a new object with the given units.
@@ -152,7 +134,7 @@ public struct WallclockTime: CustomStringConvertible, Equatable {
     ///   - minute: The value for the minute component.
     ///   - second: The value for the second component
     
-    public init(hour: Int, minute: Int, second: Int) {
+    init(hour: Int, minute: Int, second: Int) {
         self.second = second % 60
         let minutesFromSeconds = (second - second % 60) / 60
         let minute = minute + minutesFromSeconds
@@ -169,7 +151,7 @@ public struct WallclockTime: CustomStringConvertible, Equatable {
     ///
     /// - Parameter string: The textual representation of the wallclock time. Up to three integers seperated by a ':' character.
     
-    public init?(_ string: String) {
+    init?(_ string: String) {
         let parts = string.components(separatedBy: ":")
         switch parts.count {
         case 0:
@@ -241,7 +223,7 @@ public struct WallclockTime: CustomStringConvertible, Equatable {
     
     /// Self represented as a DateComponents
     
-    public var dateComponents: DateComponents {
+    var dateComponents: DateComponents {
         var comp = DateComponents()
         comp.hour = self.hour
         comp.minute = self.minute
@@ -251,7 +233,7 @@ public struct WallclockTime: CustomStringConvertible, Equatable {
 }
 
 
-public extension Date {
+extension Date {
     
     /// The wallclock time from self in the current calendar
     

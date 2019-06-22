@@ -3,15 +3,14 @@
 //  File:       Domain.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.10.11
+//  Version:    1.0.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
 //  Website:    http://swiftfire.nl/
-//  Blog:       http://swiftrien.blogspot.com
 //  Git:        https://github.com/Balancingrock/Swiftfire
 //
-//  Copyright:  (c) 2014-2017 Marinus van der Lugt, All rights reserved.
+//  Copyright:  (c) 2014-2019 Marinus van der Lugt, All rights reserved.
 //
 //  License:    Use or redistribute this code any way you like with the following two provision:
 //
@@ -22,65 +21,22 @@
 //
 //  I also ask you to please leave this header with the source code.
 //
-//  I strongly believe that voluntarism is the way for societies to function optimally. Thus I have choosen to leave it
-//  up to you to determine the price for this code. You pay me whatever you think this code is worth to you.
+//  Like you, I need to make a living:
 //
-//   - You can send payment via paypal to: sales@balancingrock.nl
+//   - You can send payment (you choose the amount) via paypal to: sales@balancingrock.nl
 //   - Or wire bitcoins to: 1GacSREBxPy1yskLMc9de2nofNv2SNdwqH
 //
-//  I prefer the above two, but if these options don't suit you, you can also send me a gift from my amazon.co.uk
-//  wishlist: http://www.amazon.co.uk/gp/registry/wishlist/34GNMPZKAQ0OO/ref=cm_sw_em_r_wsl_cE3Tub013CKN6_wb
-//
 //  If you like to pay in another way, please contact me at rien@balancingrock.nl
-//
-//  (It is always a good idea to visit the website/blog/google to ensure that you actually pay me and not some imposter)
-//
-//  For private and non-profit use the suggested price is the price of 1 good cup of coffee, say $4.
-//  For commercial use the suggested price is the price of 1 good meal, say $20.
-//
-//  You are however encouraged to pay more ;-)
 //
 //  Prices/Quotes for support, modifications or enhancements can be obtained from: rien@balancingrock.nl
 //
 // =====================================================================================================================
-// PLEASE let me know about bugs, improvements and feature requests. (rien@balancingrock.nl)
+// PLEASE let me know about bugs, improvements and feature requests. (again: rien@balancingrock.nl)
 // =====================================================================================================================
 //
 // History
 //
-// 0.10.12 - Upgraded to SwifterLog 1.1.0
-// 0.10.11 - Replaced SwifterJSON with VJson
-// 0.10.9 - Streamlined and folded http API into its own project
-// 0.10.7 - Merged SwiftfireCore into Swiftfire
-// 0.10.6 - Added sessionTimeout
-//        - Added sessionLogEnable
-//        - Added sessions
-//        - Changed updating of items
-// 0.10.3 - Bugfix: Added unwrap before using loggingDir
-// 0.9.18 - Bugfix: name of folder updated when domain name changes
-//        - Added certificateDir
-//        - Added ctx
-// 0.9.17 - Header update
-//        - Made the supportDirectory optional
-// 0.9.15 - General update and switch to frameworks, SwiftfireCore split.
-// 0.9.14 - Added client blacklist
-//        - Added swiftfire-resource directory setting
-//        - Upgraded to Xcode 8 beta 6
-// 0.9.13 - Upgraded to Xcode 8 beta 3 (Swift 3)
-// 0.9.11 - Removed domain statistis.
-//        - Updated for VJson 0.9.8
-// 0.9.10 - Added domain statistics.
-// 0.9.8  - Fixed bug that would prevent the creation of accessLog and four04Log
-// 0.9.7  - Added logging options for Access and 404
-// 0.9.6  - Header update
-//        - Changed init(json) to accept initializations without telemetry
-// 0.9.4  - Accomodated new VJson testing
-//        - Made _name private
-// 0.9.3  - Added domain telemetry
-//        - Corrected description of forwardUrlItemTitle
-// 0.9.2  - Removed 'final' from the class definition
-//        - Added enableHttpPreprocessor, enableHttpPostprocessor, httpWorkerPreprocessor and httpWorkerPostprocessor
-// 0.9.0  - Initial release
+// 1.0.0 Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 
@@ -92,44 +48,24 @@ import BRUtils
 import Http
 
 
-/// An extension to allow easier creation of an array of VJson objects.
-
-extension String: VJsonSerializable {
-    public var json: VJson { return VJson(self) }
-}
-
-
 /// Represents an internet domain.
 
-public final class Domain: CustomStringConvertible, VJsonConvertible {
+final public class Domain {
     
-/*    public static func == (lhs: Domain, rhs: Domain) -> Bool {
-        if lhs.name as String != rhs.name as String { return false }
-        if lhs.wwwIncluded != rhs.wwwIncluded { return false }
-        if lhs.root as String != rhs.root as String { return false }
-        if lhs.sfresources as String != rhs.sfresources as String { return false }
-        if lhs.forwardUrl as String != rhs.forwardUrl as String { return false }
-        if lhs.enabled != rhs.enabled { return false }
-        if lhs.accessLogEnabled != rhs.accessLogEnabled { return false }
-        if lhs.four04LogEnabled != rhs.four04LogEnabled { return false }
-        if lhs.sessionLogEnabled != rhs.sessionLogEnabled { return false }
-        if lhs.sessionTimeout != rhs.sessionTimeout { return false }
-        return true
-    }*/
 
+    /// A link back to the domain manager
     
-    /// A notification with this name is fired when the name of this domain is changed.
-    
-    public static let nameChangedNotificationName = Notification.Name("NameChanged")
+    unowned var manager: Domains?
     
     
     /// The domain name plus extension. Use the 'www' prefix if it is necessary to differentiate between two domains: one with and one without the 'www'.
     ///
     /// - Note: The name will always be all-lowercase, even when set using uppercase letters.
     
-    public var name: String {
+    var name: String {
+        // Since the value is forced lowercase, didSet cannot be used.
         set {
-            if _name != newValue.lowercased() {
+            if name != newValue.lowercased() {
     
                 // Update the _name
                 let oldValue = _name
@@ -141,9 +77,7 @@ public final class Domain: CustomStringConvertible, VJsonConvertible {
                 try? FileManager.default.moveItem(at: olddir, to: newdir)
                 supportDirectory = newdir
                 
-                
-                // Post the name change notification
-                NotificationCenter.default.post(name: Domain.nameChangedNotificationName, object: self, userInfo: ["Old" : oldValue, "New" : newValue])
+                manager?.domainNameChanged(from: oldValue, to: newValue)
             }
         }
         get {
@@ -155,17 +89,17 @@ public final class Domain: CustomStringConvertible, VJsonConvertible {
     
     /// If the domain should map both the name with 'www' and without it to the same root, set this value to 'true'
     
-    public var wwwIncluded: Bool = true
+    var wwwIncluded: Bool = true
     
     
     /// The root folder for this domain.
     
-    public var root: String = "/Library/WebServer/Documents"
+    var root: String = "/Library/WebServer/Documents"
     
     
     /// The Swiftfire resource directory
     
-    public var sfresources: String = ""
+    var sfresources: String = ""
     
     
     /// If this is non-empty, the domain will be rerouted to this host. The HTTP header host field will remain unchanged. Even when re-routed to another port. The host must be identified as an <address>:<port> combination where either address or port is optional.
@@ -173,7 +107,7 @@ public final class Domain: CustomStringConvertible, VJsonConvertible {
     /// Example: domain = "mysite.com", forewardUrl = ":6777" results in rerouting all "mysite.com" requests to "mysite.com:6777"
     /// Example: domain = "mysite.com", forewardUrl = "yoursite.org:6777" results in rerouting all "mysite.com" requests to "yoursite.org:6777"
 
-    public var forwardUrl: String  {
+    var forwardUrl: String  {
         
         get {
             guard let newHost = forwardHost else { return "" }
@@ -226,17 +160,17 @@ public final class Domain: CustomStringConvertible, VJsonConvertible {
     ///
     /// This value is set by assigning a new value to forwardUrl.
     
-    public private(set) var forwardHost: Http.Host?
+    private(set) var forwardHost: Http.Host?
     
     
     /// Can be used to (temporary) disable a domain without destroying all associated settings, logfiles, data etc.
     
-    public var enabled: Bool = false
+    var enabled: Bool = false
     
     
     /// Enables the access log when set to true
     
-    public var accessLogEnabled: Bool = false {
+    var accessLogEnabled: Bool = false {
         didSet {
             // Exit if nothing changed
             guard accessLogEnabled != oldValue else { return }
@@ -257,7 +191,7 @@ public final class Domain: CustomStringConvertible, VJsonConvertible {
     
     /// Enables the 404 log when set to true
     
-    public var four04LogEnabled: Bool = false {
+    var four04LogEnabled: Bool = false {
         didSet {
             // Exit if nothing changed
             guard four04LogEnabled != oldValue else { return }
@@ -278,7 +212,7 @@ public final class Domain: CustomStringConvertible, VJsonConvertible {
     
     /// Enables the session log when set to true
     
-    public var sessionLogEnabled: Bool = false {
+    var sessionLogEnabled: Bool = false {
         didSet {
             // Exit if nothing changed
             guard sessionLogEnabled != oldValue else { return }
@@ -294,17 +228,17 @@ public final class Domain: CustomStringConvertible, VJsonConvertible {
     
     /// The session timeout in seconds. A value of <= 0 means that no sessions will be created.
     
-    public var sessionTimeout: Int = 0
+    var sessionTimeout: Int = 0
     
     
     /// The domain specific blacklist
     
-    public var blacklist = Blacklist()
+    var blacklist = Blacklist()
     
     
     /// The names of the services used by this domain.
     
-    public var serviceNames: Array<String> = [] {
+    var serviceNames: Array<String> = [] {
         didSet {
             rebuildServices()
         }
@@ -317,12 +251,12 @@ public final class Domain: CustomStringConvertible, VJsonConvertible {
     ///
     /// - Note: The user has to ensure that the values are current and synchronised with serviceNames.
 
-    public var services: Array<Service.Entry> = []
+    var services: Array<Service.Entry> = []
     
     
     /// The domain telemetry
     
-    public var telemetry: DomainTelemetry = DomainTelemetry()
+    var telemetry: DomainTelemetry = DomainTelemetry()
     
     
     /// The visitor statistics database
@@ -360,7 +294,7 @@ public final class Domain: CustomStringConvertible, VJsonConvertible {
     
     /// Adding to the access log
     
-    public func recordInAccessLog(time: Int64, ipAddress: String, url: String, operation: String, version: String) {
+    func recordInAccessLog(time: Int64, ipAddress: String, url: String, operation: String, version: String) {
         if accessLogEnabled {
             accessLog?.record(time: time, ipAddress: ipAddress, url: url, operation: operation, version: version)
         }
@@ -369,7 +303,7 @@ public final class Domain: CustomStringConvertible, VJsonConvertible {
     
     /// Adding to the 404 log
     
-    public func recordIn404Log(_ resourcePath: String) {
+    func recordIn404Log(_ resourcePath: String) {
         if four04LogEnabled {
             four04Log?.record(message: resourcePath)
         }
@@ -378,17 +312,17 @@ public final class Domain: CustomStringConvertible, VJsonConvertible {
     
     /// The sessions for this domain
     
-    public var sessions: Sessions!
+    var sessions: Sessions!
 
     
     /// The accounts associated withthis domain
     
-    public var accounts: Accounts!
+    var accounts: AccountManager!
     
     
     // The support directories for this domain
     
-    public var supportDirectory: URL {
+    var supportDirectory: URL {
         didSet {
             // Cycle the logfiles off/on to make sure they are created in the right directory
             if accessLogEnabled {
@@ -495,171 +429,34 @@ public final class Domain: CustomStringConvertible, VJsonConvertible {
     }()
 
     
-    /// The JSON representation for this object
-    
-    public var json: VJson {
-        let domain = VJson.object()
-        domain["Name"] &= name
-        domain["IncludeWww"] &= wwwIncluded
-        domain["Root"] &= root
-        domain["ForewardUrl"] &= forwardUrl
-        domain["Enabled"] &= enabled
-        domain["AccessLogEnabled"] &= accessLogEnabled
-        domain["404LogEnabled"] &= four04LogEnabled
-        domain["SessionLogEnabled"] &= sessionLogEnabled
-        domain["SfResources"] &= sfresources
-        domain["Telemetry"] &= telemetry.json
-        domain["SupportDirectory"] &= supportDirectory.path
-        domain["SessionTimeout"] &= sessionTimeout
-        domain["ServiceNames"] &= VJson(serviceNames)
-        domain["StatisticsRolloverTime"] &= statisticsRolloverTime.description
-        domain["VisitsPerStatisticsFile"] &= visitsPerStatisticsFile
-        domain["NofRecentRequestLogs"] &= nofRecentRequestLogs
-        domain["NofRecentResponseLogs"] &= nofRecentResponseLogs
-        return domain
-    }
-    
-    
     /// Create a new domain object.
     ///
     /// - Parameters
-    ///   - name: The name for the domain
+    ///   - name: The name for the domain.
+    ///   - manager: The domain manager (optional)
     ///   - root: The root directory for this domain.
     
-    public init?(name: String, root: URL) {
+    init?(name: String, manager: Domains? = nil, root: URL) {
+        self.manager = manager
         self._name = name
         self.supportDirectory = root
         if sessionLogDir == nil { return nil }
         self.sessions = Sessions(logDirUrl: sessionLogDir!)
         if accountsDir == nil { return nil }
-        self.accounts = Accounts(root: accountsDir!)
+        self.accounts = AccountManager(root: accountsDir!)
         self.statistics = VisitorStatistics(directory: statisticsDir, timeForDailyLogRestart: WallclockTime.init(hour: 0, minute: 0, second: 0), maxRowCount: 10)
     }
-    
-    
-    /// Recreate a domain object from a VJson hierarchy
-    ///
-    /// - Parameter json: The VJson hierarchy from which to recreate this object.
-    
-    public convenience init?(json: VJson?) {
-        
-        guard let json = json else { return nil }
+}
 
-        
-        // Create a default object
-        
-        let jsupDir = (json|"SupportDirectory")?.stringValue
-        guard let jname = (json|"Name")?.stringValue else { return nil }
 
-        if jsupDir != nil, !jsupDir!.isEmpty {
-            let jsupDirUrl = URL(fileURLWithPath: jsupDir!, isDirectory: true)
-            self.init(name: jname, root: jsupDirUrl)
-        } else {
-            return nil
-        }
+// MARK: - Operational
 
-        
-        // Initialize the properties that must be present
-        
-        guard let jroot   = (json|"Root")?.stringValue else { return nil }
-        guard let jfurl   = (json|"ForewardUrl")?.stringValue else { return nil }
-        guard let jwww    = (json|"IncludeWww")?.boolValue else { return nil }
-        guard let jenab   = (json|"Enabled")?.boolValue else { return nil }
-        guard let jacc    = (json|"AccessLogEnabled")?.boolValue else { return nil }
-        guard let jfour   = (json|"404LogEnabled")?.boolValue else { return nil }
-        guard let jservicesNames = json|"ServiceNames" else { return nil }
-        
-        
-        // Upgrade
-        
-        if (json|"SfResources")?.stringValue == nil { json["SfResources"] &= sfresources }
-        let jsfresources = (json|"SfResources")!.stringValue!
-
-        if (json|"SessionTimeout")?.intValue == nil { json["SessionTimeout"] &= sessionTimeout }
-        let jsessiontimeout = (json|"SessionTimeout")!.intValue!
-        
-        if (json|"SessionLogEnabled")?.boolValue == nil { json["SessionLogEnabled"] &= sessionLogEnabled }
-        let jsessionlogenabled = (json|"SessionLogEnabled")!.boolValue!
-        
-        if (json|"StatisticsRolloverTime")?.string == nil { json["StatisticsRolloverTime"] &= statisticsRolloverTime.description }
-        let jstatisticsRolloverTime = (json|"StatisticsRolloverTime")!.string!
-        
-        if (json|"VisitsPerStatisticsFile")?.intValue == nil { json["VisitsPerStatisticsFile"] &= visitsPerStatisticsFile }
-        let jvisitsPerStatisticsFile = (json|"VisitsPerStatisticsFile")!.intValue!
-        
-        if (json|"NofRecentRequestLogs")?.intValue == nil { json["NofRecentRequestLogs"] &= nofRecentRequestLogs }
-        let jnofRecentRequestLogs = (json|"NofRecentRequestLogs")!.intValue!
-
-        if (json|"NofRecentResponseLogs")?.intValue == nil { json["NofRecentResponseLogs"] &= nofRecentResponseLogs }
-        let jnofRecentResponseLogs = (json|"NofRecentResponseLogs")!.intValue!
-
-        
-        // Setup
-        
-        self.name = jname
-        self.root = jroot
-        self.forwardUrl = jfurl
-        self.wwwIncluded = jwww
-        self.enabled = jenab
-        self.accessLogEnabled = jacc
-        self.four04LogEnabled = jfour
-        self.sessionLogEnabled = jsessionlogenabled
-        self.sfresources = jsfresources
-        self.sessionTimeout = jsessiontimeout
-        self.statisticsRolloverTime = WallclockTime(jstatisticsRolloverTime) ?? WallclockTime(hour: 0, minute: 0, second: 0)
-        self.visitsPerStatisticsFile = jvisitsPerStatisticsFile
-        self.nofRecentResponseLogs = jnofRecentResponseLogs
-        self.nofRecentRequestLogs = jnofRecentRequestLogs
-
-        
-        // Initialize the properties that may be present
-
-        if let jtelemetry = DomainTelemetry(json: (json|"Telemetry")) { self.telemetry = jtelemetry }
-        if let url = blacklistedClientsUrl {
-            switch blacklist.restore(fromFile: url) {
-            case .error: return nil
-            case .success: break
-            }
-        }
-        
-        
-        // Add the service names
-        
-        for jserviceName in jservicesNames {
-            guard let name = jserviceName.stringValue else { return nil }
-            serviceNames.append(name)
-        }
-
-        
-        // Setup the loggers if they are enabled
-        
-        if let loggingDir = loggingDir {
-            if accessLogEnabled { accessLog = AccessLog(logDir: loggingDir) }
-            if four04LogEnabled { four04Log = Four04Log(logDir: loggingDir) }
-            if sessionLogEnabled { sessions.logDirUrl = sessionLogDir }
-        }
-
-        
-        // Add the staistics logger
-        
-        self.statistics = VisitorStatistics(directory: statisticsDir, timeForDailyLogRestart: WallclockTime.init(hour: 0, minute: 0, second: 0), maxRowCount: 10)
-
-    }
-    
-    
-    /// Save the contents of the blacklist to file.
-    
-    public func saveBlacklist() -> Result<Bool> {
-        if let url = blacklistedClientsUrl {
-            return blacklist.save(toFile: url)
-        }
-        return .error(message: "No blacklisted clients URL found")
-    }
+extension Domain {
     
     
     /// Return a new SSL context with the private key/certificate combination for the domain
     
-    public var ctx: Result<ServerCtx> {
+    var ctx: Result<ServerCtx> {
         
         guard let sslDir = sslDir else { return .error(message: "No sll directory found for domain: \(name)") }
         
@@ -716,19 +513,9 @@ public final class Domain: CustomStringConvertible, VJsonConvertible {
     }
     
     
-    /// Restore the contents of the blacklist from file.
-    
-    public func restoreBlacklist() -> Result<Bool> {
-        if let url = blacklistedClientsUrl {
-            return blacklist.restore(fromFile: url)
-        }
-        return .error(message: "No blacklisted clients URL found")
-    }
-    
-    
     /// Prepares for application (server) shutdown
 
-    public func serverShutdown() -> Result<Bool> {
+    func serverShutdown() -> Result<Bool> {
         let result = saveBlacklist()
         accessLog?.close()
         four04Log?.close()
@@ -737,41 +524,9 @@ public final class Domain: CustomStringConvertible, VJsonConvertible {
     }
     
     
-    /// Part of the domain content in a readable form
+    /// Update the domain parameter with the given name from the given string.
     
-    public var description: String {
-        var str = "Domain: \(name)\n"
-        str += "--------------------------------------------\n"
-        str += " Include 'www'              = \(wwwIncluded)\n"
-        str += " Root directory             = \(root)\n"
-        str += " Enabled                    = \(enabled)\n"
-        str += " Forward to                 = \(forwardUrl)\n"
-        str += " Enable Access Log          = \(accessLogEnabled)\n"
-        str += " Enable 404 Log             = \(four04LogEnabled)\n"
-        str += " Enable Session Log         = \(sessionLogEnabled)\n"
-        str += " Session Timeout            = \(sessionTimeout)\n"
-        str += " Swiftfire resources        = \(sfresources)\n"
-        str += " VisitsPerStatisticsFile    = \(visitsPerStatisticsFile)\n"
-        str += " StatisticsFileRolloverTime = \(statisticsRolloverTime)\n"
-        str += " nofRecentRequestLogged     = \(nofRecentRequestLogs)\n"
-        str += " nofRecentResponseLogged    = \(nofRecentResponseLogs)\n"
-        if serviceNames.count == 0 {
-            str += "\nDomain Service Names:\n None\n"
-        } else {
-            str += "\nDomain Service Names:\n"
-            serviceNames.forEach() { str += " service name = \($0)\n" }
-        }
-        str += "\nDomain Telemetry:\n"
-        str += telemetry.description
-        str += "\n\nDomain Blacklist:\n"
-        str += blacklist.description
-        return str
-    }
-    
-    
-    /// Update the item with the given name from the given string.
-    
-    public func update(item: String, to value: String) {
+    func update(item: String, to value: String) {
         
         switch item {
             
@@ -944,6 +699,199 @@ public final class Domain: CustomStringConvertible, VJsonConvertible {
     func recordStatistics(_ visit: Visit) {
 //        statistics?.append(visit)
     }
+    
+    
+    /// Restore the contents of the blacklist from file.
+    
+    func restoreBlacklist() -> Result<Bool> {
+        if let url = blacklistedClientsUrl {
+            return blacklist.restore(from: url)
+        }
+        return .error(message: "No blacklisted clients URL found")
+    }
+    
+    
+    /// Save the contents of the blacklist to file.
+    
+    func saveBlacklist() -> Result<Bool> {
+        if let url = blacklistedClientsUrl {
+            return blacklist.save(to: url)
+        }
+        return .error(message: "No blacklisted clients URL found")
+    }
 }
 
 
+// MARK: - VJsonConvertible
+
+extension Domain {
+    
+    /// The JSON representation for this object
+    
+    var json: VJson {
+        let domain = VJson.object()
+        domain["Name"] &= name
+        domain["IncludeWww"] &= wwwIncluded
+        domain["Root"] &= root
+        domain["ForewardUrl"] &= forwardUrl
+        domain["Enabled"] &= enabled
+        domain["AccessLogEnabled"] &= accessLogEnabled
+        domain["404LogEnabled"] &= four04LogEnabled
+        domain["SessionLogEnabled"] &= sessionLogEnabled
+        domain["SfResources"] &= sfresources
+        domain["Telemetry"] &= telemetry.json
+        domain["SupportDirectory"] &= supportDirectory.path
+        domain["SessionTimeout"] &= sessionTimeout
+        domain["ServiceNames"] &= VJson(serviceNames)
+        domain["StatisticsRolloverTime"] &= statisticsRolloverTime.description
+        domain["VisitsPerStatisticsFile"] &= visitsPerStatisticsFile
+        domain["NofRecentRequestLogs"] &= nofRecentRequestLogs
+        domain["NofRecentResponseLogs"] &= nofRecentResponseLogs
+        return domain
+    }
+
+    
+    /// Recreate a domain object from a VJson hierarchy
+    ///
+    /// - Parameter json: The VJson hierarchy from which to recreate this object.
+    
+    convenience init?(json: VJson?, manager: Domains) {
+        
+        guard let json = json else { return nil }
+        
+        
+        // Create a default object
+        
+        let jsupDir = (json|"SupportDirectory")?.stringValue
+        guard let jname = (json|"Name")?.stringValue else { return nil }
+        
+        if jsupDir != nil, !jsupDir!.isEmpty {
+            let jsupDirUrl = URL(fileURLWithPath: jsupDir!, isDirectory: true)
+            self.init(name: jname, manager: manager, root: jsupDirUrl)
+        } else {
+            return nil
+        }
+        
+        
+        // Initialize the properties that must be present
+        
+        guard let jroot   = (json|"Root")?.stringValue else { return nil }
+        guard let jfurl   = (json|"ForewardUrl")?.stringValue else { return nil }
+        guard let jwww    = (json|"IncludeWww")?.boolValue else { return nil }
+        guard let jenab   = (json|"Enabled")?.boolValue else { return nil }
+        guard let jacc    = (json|"AccessLogEnabled")?.boolValue else { return nil }
+        guard let jfour   = (json|"404LogEnabled")?.boolValue else { return nil }
+        guard let jservicesNames = json|"ServiceNames" else { return nil }
+        
+        
+        // Upgrade
+        
+        if (json|"SfResources")?.stringValue == nil { json["SfResources"] &= sfresources }
+        let jsfresources = (json|"SfResources")!.stringValue!
+        
+        if (json|"SessionTimeout")?.intValue == nil { json["SessionTimeout"] &= sessionTimeout }
+        let jsessiontimeout = (json|"SessionTimeout")!.intValue!
+        
+        if (json|"SessionLogEnabled")?.boolValue == nil { json["SessionLogEnabled"] &= sessionLogEnabled }
+        let jsessionlogenabled = (json|"SessionLogEnabled")!.boolValue!
+        
+        if (json|"StatisticsRolloverTime")?.string == nil { json["StatisticsRolloverTime"] &= statisticsRolloverTime.description }
+        let jstatisticsRolloverTime = (json|"StatisticsRolloverTime")!.string!
+        
+        if (json|"VisitsPerStatisticsFile")?.intValue == nil { json["VisitsPerStatisticsFile"] &= visitsPerStatisticsFile }
+        let jvisitsPerStatisticsFile = (json|"VisitsPerStatisticsFile")!.intValue!
+        
+        if (json|"NofRecentRequestLogs")?.intValue == nil { json["NofRecentRequestLogs"] &= nofRecentRequestLogs }
+        let jnofRecentRequestLogs = (json|"NofRecentRequestLogs")!.intValue!
+        
+        if (json|"NofRecentResponseLogs")?.intValue == nil { json["NofRecentResponseLogs"] &= nofRecentResponseLogs }
+        let jnofRecentResponseLogs = (json|"NofRecentResponseLogs")!.intValue!
+        
+        
+        // Setup
+        
+        self.name = jname
+        self.root = jroot
+        self.forwardUrl = jfurl
+        self.wwwIncluded = jwww
+        self.enabled = jenab
+        self.accessLogEnabled = jacc
+        self.four04LogEnabled = jfour
+        self.sessionLogEnabled = jsessionlogenabled
+        self.sfresources = jsfresources
+        self.sessionTimeout = jsessiontimeout
+        self.statisticsRolloverTime = WallclockTime(jstatisticsRolloverTime) ?? WallclockTime(hour: 0, minute: 0, second: 0)
+        self.visitsPerStatisticsFile = jvisitsPerStatisticsFile
+        self.nofRecentResponseLogs = jnofRecentResponseLogs
+        self.nofRecentRequestLogs = jnofRecentRequestLogs
+        
+        
+        // Initialize the properties that may be present
+        
+        if let jtelemetry = DomainTelemetry(json: (json|"Telemetry")) { self.telemetry = jtelemetry }
+        if let url = blacklistedClientsUrl {
+            switch blacklist.restore(from: url) {
+            case .error: return nil
+            case .success: break
+            }
+        }
+        
+        
+        // Add the service names
+        
+        for jserviceName in jservicesNames {
+            guard let name = jserviceName.stringValue else { return nil }
+            serviceNames.append(name)
+        }
+        
+        
+        // Setup the loggers if they are enabled
+        
+        if let loggingDir = loggingDir {
+            if accessLogEnabled { accessLog = AccessLog(logDir: loggingDir) }
+            if four04LogEnabled { four04Log = Four04Log(logDir: loggingDir) }
+            if sessionLogEnabled { sessions.logDirUrl = sessionLogDir }
+        }
+        
+        
+        // Add the staistics logger
+        
+        self.statistics = VisitorStatistics(directory: statisticsDir, timeForDailyLogRestart: WallclockTime.init(hour: 0, minute: 0, second: 0), maxRowCount: 10)
+    }
+
+}
+
+// MARK: - CustomStringConvertible
+
+extension Domain: CustomStringConvertible {
+    
+    
+    public var description: String {
+        var str = "Domain: \(name)\n"
+        str += "--------------------------------------------\n"
+        str += " Include 'www'              = \(wwwIncluded)\n"
+        str += " Root directory             = \(root)\n"
+        str += " Enabled                    = \(enabled)\n"
+        str += " Forward to                 = \(forwardUrl)\n"
+        str += " Enable Access Log          = \(accessLogEnabled)\n"
+        str += " Enable 404 Log             = \(four04LogEnabled)\n"
+        str += " Enable Session Log         = \(sessionLogEnabled)\n"
+        str += " Session Timeout            = \(sessionTimeout)\n"
+        str += " Swiftfire resources        = \(sfresources)\n"
+        str += " VisitsPerStatisticsFile    = \(visitsPerStatisticsFile)\n"
+        str += " StatisticsFileRolloverTime = \(statisticsRolloverTime)\n"
+        str += " nofRecentRequestLogged     = \(nofRecentRequestLogs)\n"
+        str += " nofRecentResponseLogged    = \(nofRecentResponseLogs)\n"
+        if serviceNames.count == 0 {
+            str += "\nDomain Service Names:\n None\n"
+        } else {
+            str += "\nDomain Service Names:\n"
+            serviceNames.forEach() { str += " service name = \($0)\n" }
+        }
+        str += "\nDomain Telemetry:\n"
+        str += telemetry.description
+        str += "\n\nDomain Blacklist:\n"
+        str += blacklist.description
+        return str
+    }
+}

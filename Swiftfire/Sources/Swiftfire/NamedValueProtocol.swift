@@ -1,6 +1,6 @@
 // =====================================================================================================================
 //
-//  File:       ReferencedDictionary.swift
+//  File:       NamedValueProtocol.swift
 //  Project:    Swiftfire
 //
 //  Version:    1.0.0
@@ -10,7 +10,7 @@
 //  Website:    http://swiftfire.nl/
 //  Git:        https://github.com/Balancingrock/Swiftfire
 //
-//  Copyright:  (c) 2017-2019 Marinus van der Lugt, All rights reserved.
+//  Copyright:  (c) 2019 Marinus van der Lugt, All rights reserved.
 //
 //  License:    Use or redistribute this code any way you like with the following two provision:
 //
@@ -41,43 +41,48 @@
 // =====================================================================================================================
 
 import Foundation
+import VJson
+import SwifterLog
+import BRUtils
 
 
-/// A referenced look-up container.
+/// For the action to be performed when an update is successful
 
-final class ReferencedDictionary  {
-    
-    private var store: Dictionary<String, String> = [:]
-}
+typealias DidSetActionSignature = () -> Void
 
-extension ReferencedDictionary {
-    
-    var count: Int { return store.count }
-    
-    func popFirst() -> (String, String)? {
-        return store.popFirst()
-    }
-    
-    func removeValue(forKey key: String) -> String? {
-        return store.removeValue(forKey: key)
-    }
-    
-    subscript(key: String) -> String? {
-        get { return store[key] }
-        set { store[key] = newValue }
-    }
-}
 
-extension ReferencedDictionary: Sequence {
-    
-    func makeIterator() -> DictionaryIterator<String, String> {
-        return store.makeIterator()
-    }
-}
+/// This contains the operations that have no default implementation.
 
-extension ReferencedDictionary: CustomStringConvertible {
+protocol NamedValueProtocol {
     
-    var description: String {
-        return store.reduce("[", { return "\($0), \($1.key):\($1.key.contains("Pwd") ? "********": $1.value)" }).appending("]")
-    }
+    /// The name of the item
+    
+    var name: String { get }
+    
+    
+    /// A description of what the value is for (can be used in GUIs)
+    
+    var about: String { get }
+    
+    
+    /// The value as string
+    
+    var stringValue: String { get }
+    
+    
+    /// Set the value to the value contained in the given string.
+    ///
+    /// - Returns: True if the operation was successful
+    
+    func setValue(_ value: String) -> Bool
+    
+    
+    // Reset the contained value to its initial value.
+    
+    func reset()
+    
+    
+    /// Adds an action to be executed after an update
+    
+    func addDidSetAction(_ action: @escaping DidSetActionSignature)
 }
