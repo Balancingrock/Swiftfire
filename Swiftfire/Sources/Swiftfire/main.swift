@@ -80,6 +80,11 @@ Log.singleton.callbackAtAndAboveLevel = SwifterLog.Level.none
 Log.singleton.networkTransmitAtAndAboveLevel = SwifterLog.Level.none
 
 
+// First message
+
+Log.atNotice?.log("Starting Swiftfire webserver")
+
+
 // =======================================
 // Initialize the configuration parameters
 // =======================================

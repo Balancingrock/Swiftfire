@@ -155,7 +155,7 @@ final class ServerParameters {
     /// Default: 2 = SwifterLog.Level.notice
 
     let osLogRecordAtAndAboveLevel = NamedIntValue(
-        name: "osLogLevel",
+        name: "OsLogLevel",
         about: "The minimum loglevel for entries written to the os log [0..8].",
         value: 8,
         resetValue: 2)
