@@ -79,9 +79,9 @@ final class Service {
         case next
         
         
-        /// When the services should be aborted
+        /// When the services should be aborted.
         ///
-        /// It is recommended to use this only when errors are detected that prevent further processing.
+        /// Note that when an abort is returned, no other service will be called, not even the service that would return a reply to the client.
         
         case abort
     }

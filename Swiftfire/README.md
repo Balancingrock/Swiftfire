@@ -71,6 +71,13 @@ However: It does work! :-)
 ## Installation
 Please refer to the [installation instructions](http://swiftfire.nl/pages/manual/02_installation.html) on the [Swiftfire](http://swiftfire.nl) website.
 
+## Building with Xcode
+- Clone the git repository
+- Switch to the Swiftfire/Swiftfire directory (i.e. the same directory that holds the `Sources` directory
+- Run $ swift package update
+- Run $ swift package generate-xcodeproj
+Then double click the xcode project file and build the project.
+
 ## Version history
 
 Note: Planned releases are for information only and almost always change.

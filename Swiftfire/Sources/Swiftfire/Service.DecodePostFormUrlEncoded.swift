@@ -89,7 +89,7 @@ typealias PostInfo = ReferencedDictionary
 ///   - info: A dictionary for communication between services.
 ///   - response: An object that can receive information to be returned in response to the request.
 ///
-/// - Returns: On error .abort, on success .next.
+/// - Returns: Always .next.
 
 func service_decodePostFormUrlEncoded(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: inout Service.Info, _ response: inout Response) -> Service.Result {
     

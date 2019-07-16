@@ -105,7 +105,7 @@ private let SERVER_ADMIN_LOGIN_PWD  = "ServerAdminLoginPwd"
 ///   - info: A dictionary for communication between services.
 ///   - response: An object that can receive information to be returned in response to the request.
 ///
-/// - Returns: On error .abort, on success .next.
+/// - Returns: Always .next
 
 func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: inout Service.Info, _ response: inout Response) -> Service.Result {
     
@@ -113,30 +113,32 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
     
     func createAdminAccountPage(name: String, nameColor: String, pwdColor: String, rootColor: String) {
         
-        let html: String = "<!DOCTYPE html>"
-            + "<html>"
-            +    "<head>"
-            +       "<title>Swiftfire Admin Setup</title>"
-            +    "</head>"
-            +    "<body>"
-            +       "<div>"
-            +          "<form action=\"/serveradmin\" method=\"post\">"
-            +             "<div>"
-            +                "<h3>Server Admin Setup</h3>"
-            +                "<p style=\"margin-bottom:0px;color:\(nameColor);\">Admin:</p>"
-            +                "<input type=\"text\" name=\"\(SERVER_ADMIN_CREATE_ACCOUNT_NAME)\" value=\"\(name)\"><br>"
-            +                "<p style=\"margin-bottom:0px;color:\(pwdColor);\">Password:</p>"
-            +                "<input type=\"password\" name=\"\(SERVER_ADMIN_CREATE_ACCOUNT_PWD1)\" value=\"\"><br>"
-            +                "<p style=\"margin-bottom:0px;color:\(pwdColor);\">Repeat:</p>"
-            +                "<input type=\"password\" name=\"\(SERVER_ADMIN_CREATE_ACCOUNT_PWD2)\" value=\"\"><br>"
-            +                "<p style=\"margin-bottom:0px;color:\(rootColor);\">Root directory for the server admin site:</p>"
-            +                "<input type=\"text\" name=\"\(SERVER_ADMIN_CREATE_ACCOUNT_ROOT)\" value=\"\" style=\"min-width:300px;\"><br><br>"
-            +                "<input type=\"submit\" value=\"Submit\">"
-            +              "</div>"
-            +           "</form>"
-            +       "</div>"
-            +    "</body>"
-            + "</html>"
+        let html: String = """
+            <!DOCTYPE html>"
+            <html>
+               <head>
+                  <title>Swiftfire Admin Setup</title>
+               </head>
+               <body>
+                  <div>
+                     <form action="/serveradmin" method="post">
+                        <div>
+                           <h3>Server Admin Setup</h3>
+                           <p style="margin-bottom:0px;color:\(nameColor);">Admin:</p>
+                           <input type="text" name="\(SERVER_ADMIN_CREATE_ACCOUNT_NAME)" value="\(name)"><br>
+                           <p style="margin-bottom:0px;color:\(pwdColor);">Password:</p>
+                           <input type="password" name="\(SERVER_ADMIN_CREATE_ACCOUNT_PWD1)" value=""><br>
+                           <p style="margin-bottom:0px;color:\(pwdColor);">Repeat:</p>
+                           <input type="password" name="\(SERVER_ADMIN_CREATE_ACCOUNT_PWD2)" value=""><br>
+                           <p style="margin-bottom:0px;color:\(rootColor);">Root directory for the server admin site:</p>
+                           <input type="text" name="\(SERVER_ADMIN_CREATE_ACCOUNT_ROOT)" value="" style="min-width:300px;"><br><br>
+                           <input type="submit" value="Submit">
+                         </div>
+                      </form>
+                  </div>
+               </body>
+            </html>
+        """
         
         response.code = Response.Code._200_OK
         response.version = Version.http1_1
@@ -181,26 +183,28 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
         }
         
         if html == nil {
-            html = "<!DOCTYPE html>"
-                + "<html>"
-                +    "<head>"
-                +       "<title>Swiftfire Admin Login</title>"
-                +    "</head>"
-                +    "<body>"
-                +       "<div>"
-                +          "<form action=\"/serveradmin\" method=\"post\">"
-                +             "<div>"
-                +                "<h3>Server Admin Login</h3>"
-                +                "<p style=\"margin-bottom:0px;\">Name:</p>"
-                +                "<input type=\"text\" name=\"ServerAdminLoginName\" value=\"Server Admin\"><br>"
-                +                "<p style=\"margin-bottom:0px;\">Password:</p>"
-                +                "<input type=\"password\" name=\"ServerAdminLoginPwd\" value=\"\"><br>"
-                +                "<input type=\"submit\" value=\"Submit\">"
-                +              "</div>"
-                +           "</form>"
-                +       "</div>"
-                +    "</body>"
-                + "</html>"
+            html = """
+                <!DOCTYPE html>
+                <html>
+                   <head>
+                      <title>Swiftfire Admin Login</title>
+                   </head>
+                   <body>
+                      <div>
+                         <form action="/serveradmin" method="post">
+                            <div>
+                               <h3>Server Admin Login</h3>
+                               <p style="margin-bottom:0px;">Name:</p>
+                               <input type="text" name="ServerAdminLoginName" value="Server Admin"><br>
+                               <p style="margin-bottom:0px;">Password:</p>
+                               <input type="password" name="ServerAdminLoginPwd" value=""><br>
+                               <input type="submit" value="Submit">
+                             </div>
+                          </form>
+                      </div>
+                   </body>
+                </html>
+            """
         }
         
         response.code = Response.Code._200_OK
@@ -221,27 +225,29 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
         
         let message = message ?? "Set root directory for server admin site:"
         
-        let html: String = "<!DOCTYPE html>"
-            + "<html>"
-            +    "<head>"
-            +       "<title>Swiftfire Status</title>"
-            +    "</head>"
-            +    "<body>"
-            +       "<div>"
-            +          "<h3>Swiftfire Status at \(dateFormatter.string(from: Date()))</h3>"
-            +          "<p style=\"margin-bottom:0px;\">Swiftfire Version  : \(telemetry.serverVersion.value)</p>"
-            +          "<p style=\"margin-bottom:0px;\">HTTP Server Status : \(telemetry.httpServerStatus.value)</p>"
-            +          "<p style=\"margin-bottom:0px;\">HTTPS Server Status: \(telemetry.httpsServerStatus.value)</p>"
-            +          "<form action=\"/serveradmin/sfcommand/SetRoot\" method=\"post\">"
-            +             "<div>"
-            +                "<p style=\"margin-bottom:0px;color:\(rootColor);\">\(message)</p>"
-            +                "<input type=\"text\" name=\"\(SERVER_ADMIN_CREATE_ACCOUNT_ROOT)\" value=\"\(parameters.adminSiteRoot.value)\">"
-            +                "<input type=\"submit\" value=\"Submit/Visit\">"
-            +              "</div>"
-            +           "</form>"
-            +       "</div>"
-            +    "</body>"
-            + "</html>"
+        let html: String = """
+            <!DOCTYPE html>
+            <html>
+               <head>
+                  <title>Swiftfire Status</title>
+               </head>
+               <body>
+                  <div>
+                     <h3>Swiftfire Status at \(dateFormatter.string(from: Date()))</h3>
+                     <p style="margin-bottom:0px;">Swiftfire Version  : \(telemetry.serverVersion.value)</p>
+                     <p style="margin-bottom:0px;">HTTP Server Status : \(telemetry.httpServerStatus.value)</p>
+                     <p style="margin-bottom:0px;">HTTPS Server Status: \(telemetry.httpsServerStatus.value)</p>
+                     <form action="/serveradmin/sfcommand/SetRoot" method="post">
+                        <div>
+                           <p style="margin-bottom:0px;color:\(rootColor);">\(message)</p>
+                           <input type="text" name="\(SERVER_ADMIN_CREATE_ACCOUNT_ROOT)" value="\(parameters.adminSiteRoot.value)">
+                           <input type="submit" value="Submit/Visit">
+                         </div>
+                      </form>
+                  </div>
+               </body>
+            </html>
+            """
         
         response.code = Response.Code._200_OK
         response.version = Version.http1_1
@@ -258,9 +264,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
     // Only service the serverAdminPseudoDomain
     
     guard domain === serverAdminDomain else {
-        Log.atError?.log("Domain should be serverAdminDomain", id: connection.logId)
-        response.code = Response.Code._500_InternalServerError
-        return .abort
+        return .next
     }
     
     
@@ -269,7 +273,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
     guard let urlstr = request.url else {
         Log.atError?.log("No request URL found", id: connection.logId)
         response.code = Response.Code._400_BadRequest
-        return .abort
+        return .next
     }
     
     
@@ -303,7 +307,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
         Log.atCritical?.log("No session found, this service should come AFTER the 'getSession' service.", id: connection.logId)
         domain.telemetry.nof500.increment()
         response.code = Response.Code._500_InternalServerError
-        return .abort
+        return .next
     }
     
     
@@ -383,7 +387,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
                     
                     response.code = Response.Code._500_InternalServerError
                     
-                    return .abort
+                    return .next
                 }
                 
             } else {
