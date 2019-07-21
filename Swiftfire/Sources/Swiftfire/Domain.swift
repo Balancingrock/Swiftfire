@@ -226,6 +226,31 @@ final public class Domain {
     }
     
     
+    /// Enable PHP by setting the path to a PHP interpreter
+    
+    var phpPath: URL?
+    
+    
+    /// Set the options to be passed to the PHP interpreter
+    
+    var phpOptions: String?
+    
+    
+    /// When true, a request for index.htm(l) will be mapped to index.php if there is no index.htm(l)
+    
+    var phpMapIndex: Bool = true
+    
+    
+    /// When true, any request for a *.htm(l) file will be mapped to *.php if there is no *.htm(l)
+    
+    var phpMapAll: Bool = false
+    
+    
+    /// The timeout for a PHP interpreter run in milli seconds
+    
+    var phpTimeout: Int = 100
+    
+    
     /// The session timeout in seconds. A value of <= 0 means that no sessions will be created.
     
     var sessionTimeout: Int = 0
@@ -392,6 +417,20 @@ final public class Domain {
         }
     }()
 
+    
+    /// The directory used when processing PHP files.
+    
+    lazy var phpDir: URL? = {
+        let dir = self.supportDirectory
+        do {
+            let url = dir.appendingPathComponent("php", isDirectory: true)
+            try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
+            return url
+        } catch {
+            return nil
+        }
+    }()
+    
     
     /// The directory for the session log files.
     
@@ -589,6 +628,14 @@ extension Domain {
                 )
             }
             
+        case "PhpPath":
+            if FileManager.default.isExecutableFile(atPath: value) {
+                phpPath = URL(fileURLWithPath: value)
+            }
+            
+        case "PhpOptions":
+            phpOptions = value
+            
         case "SfResources":
             sfresources = value
             
@@ -697,7 +744,7 @@ extension Domain {
     /// Update the visitor statistics
     
     func recordStatistics(_ visit: Visit) {
-//        statistics?.append(visit)
+        statistics?.append(visit)
     }
     
     
@@ -738,6 +785,10 @@ extension Domain {
         domain["AccessLogEnabled"] &= accessLogEnabled
         domain["404LogEnabled"] &= four04LogEnabled
         domain["SessionLogEnabled"] &= sessionLogEnabled
+        domain["PhpPath"] &= phpPath?.path ?? ""
+        domain["PhpOptions"] &= phpOptions ?? ""
+        domain["PhpMapIndex"] &= phpMapIndex
+        domain["PhpMapAll"] &= phpMapAll
         domain["SfResources"] &= sfresources
         domain["Telemetry"] &= telemetry.json
         domain["SupportDirectory"] &= supportDirectory.path
@@ -782,7 +833,10 @@ extension Domain {
         guard let jacc    = (json|"AccessLogEnabled")?.boolValue else { return nil }
         guard let jfour   = (json|"404LogEnabled")?.boolValue else { return nil }
         guard let jservicesNames = json|"ServiceNames" else { return nil }
-        
+       
+        let jphppath    = (json|"PhpPath")?.stringValue
+        let jphpoptions = (json|"PhpOptions")?.stringValue
+
         
         // Upgrade
         
@@ -807,6 +861,12 @@ extension Domain {
         if (json|"NofRecentResponseLogs")?.intValue == nil { json["NofRecentResponseLogs"] &= nofRecentResponseLogs }
         let jnofRecentResponseLogs = (json|"NofRecentResponseLogs")!.intValue!
         
+        if (json|"PhpMapIndex")?.boolValue == nil { json["PhpMapIndex"] &= phpMapIndex }
+        let jphpmapindex = (json|"PhpMapIndex")!.boolValue!
+
+        if (json|"PhpMapAll")?.boolValue == nil { json["PhpMapAll"] &= phpMapAll }
+        let jphpmapall = (json|"PhpMapAll")!.boolValue!
+
         
         // Setup
         
@@ -824,7 +884,8 @@ extension Domain {
         self.visitsPerStatisticsFile = jvisitsPerStatisticsFile
         self.nofRecentResponseLogs = jnofRecentResponseLogs
         self.nofRecentRequestLogs = jnofRecentRequestLogs
-        
+        self.phpMapIndex = jphpmapindex
+        self.phpMapAll = jphpmapall
         
         // Initialize the properties that may be present
         
@@ -835,6 +896,11 @@ extension Domain {
             case .success: break
             }
         }
+        
+        if let jphppath = jphppath, jphppath.count > 0 {
+            self.phpPath = URL(fileURLWithPath: jphppath)
+        }
+        self.phpOptions = jphpoptions
         
         
         // Add the service names
@@ -877,6 +943,10 @@ extension Domain: CustomStringConvertible {
         str += " Enable 404 Log             = \(four04LogEnabled)\n"
         str += " Enable Session Log         = \(sessionLogEnabled)\n"
         str += " Session Timeout            = \(sessionTimeout)\n"
+        str += " PHP Path                   = \(phpPath?.path ?? "Not Set")\n"
+        str += " PHP Options                = \(phpOptions ?? "")\n"
+        str += " PHP Map Index              = \(phpMapIndex)\n"
+        str += " PHP Map All                = \(phpMapAll)\n"
         str += " Swiftfire resources        = \(sfresources)\n"
         str += " VisitsPerStatisticsFile    = \(visitsPerStatisticsFile)\n"
         str += " StatisticsFileRolloverTime = \(statisticsRolloverTime)\n"

@@ -152,6 +152,11 @@ func function_sf_postingButtonedInput(_ args: Function.Arguments, _ info: inout 
                     case "enabled": value = domain.enabled.description
                     case "accesslogenabled": value = domain.accessLogEnabled.description
                     case "404logenabled": value = domain.four04LogEnabled.description
+                    case "phppath": value = (domain.phpPath?.path ?? "").description
+                    case "phpoptions": value = domain.phpPath == nil ? "" : (domain.phpOptions ?? "").description
+                    case "phpmapindex": value = domain.phpPath == nil ? "" : domain.phpMapIndex.description
+                    case "phpmapall": value = domain.phpPath == nil ? "" : domain.phpMapAll.description
+                    case "phptimeout": value = domain.phpTimeout.description
                     case "sessionlogenabled": value = domain.sessionLogEnabled.description
                     case "sfresources": value = domain.sfresources
                     case "sessiontimeout": value = domain.sessionTimeout.description

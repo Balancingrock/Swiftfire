@@ -109,7 +109,17 @@ func postingButtonedInput(target: String, inputName: String, inputValue: String,
         buttonName = pair.key
         buttonValue = pair.value
     }
-    return "<form method=\"post\" action=\"\(target)\" class=\"posting-buttoned-input-form\">\(dict.reduce("", { (p, q) in return p.appending("<input type=\"hidden\" name=\"\(q.key)\" value=\"\(q.value)\">") }))<input class=\"posting-buttoned-input-input\"  type=\"text\" name=\"\(inputName)\" value=\"\(inputValue)\"</input><button type=\"submit\" name=\"\(buttonName ?? "")\" value=\"\(buttonValue ?? "")\" class=\"posting-buttoned-input-button\">\(buttonTitle)</button></form>"
+    return """
+        <form method="post" action="\(target)" class="posting-buttoned-input-form">
+            \(dict.reduce("", {
+                (p, q) in return p.appending("""
+                    <input type="hidden" name="\(q.key)" value="\(q.value)">
+                """)
+            }))
+            <input class="posting-buttoned-input-input" type="text" name="\(inputName)" value="\(inputValue)"</input>
+            <button type="submit" name="\(buttonName ?? "")" value="\(buttonValue ?? "")" class="posting-buttoned-input-button">\(buttonTitle)</button>
+        </form>
+        """
 }
 
 

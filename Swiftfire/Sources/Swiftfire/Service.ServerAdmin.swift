@@ -1010,6 +1010,35 @@ fileprivate func executeUpdateDomain(_ postInfo: inout PostInfo?) {
     case "accesslogenabled": domain.accessLogEnabled = Bool(lettersOrDigits: value) ?? domain.accessLogEnabled
     case "404logenabled": domain.four04LogEnabled = Bool(lettersOrDigits: value) ?? domain.four04LogEnabled
     case "sessionlogenabled": domain.sessionLogEnabled = Bool(lettersOrDigits: value) ?? domain.sessionLogEnabled
+    case "phppath":
+        domain.phpPath = nil
+        if FileManager.default.isExecutableFile(atPath: value) {
+            let url = URL(fileURLWithPath: value)
+            if url.lastPathComponent == "php" {
+                domain.phpPath = URL(fileURLWithPath: value)
+            }
+        }
+    case "phpoptions":
+        if domain.phpPath != nil {
+            domain.phpOptions = value
+        }
+    case "phpmapindex":
+        if domain.phpPath != nil {
+            domain.phpMapIndex = Bool(lettersOrDigits: value) ?? domain.phpMapIndex
+        }
+    case "phpmapall":
+        if domain.phpPath != nil {
+            if Bool(lettersOrDigits: value) ?? domain.phpMapAll {
+                domain.phpMapAll = true
+                domain.phpMapIndex = true
+            } else {
+                domain.phpMapAll = false
+            }
+        }
+    case "phptimeout":
+        if domain.phpPath != nil {
+            domain.phpTimeout = Int(value) ?? domain.phpTimeout
+        }
     case "sfresources": domain.sfresources = value
     case "sessiontimeout": domain.sessionTimeout = Int(value) ?? domain.sessionTimeout
     default:

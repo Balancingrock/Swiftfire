@@ -88,6 +88,11 @@
 // return: .next
 //
 // =====================================================================================================================
+//
+// Implementation note: This routine could be written with fewer lines of code, however I want optimal speed for
+// static html and .sf.html which is why the implementation was "unrolled".
+//
+// =====================================================================================================================
 
 import Foundation
 import SwifterLog
@@ -275,9 +280,6 @@ func service_getResourcePathFromUrl(_ request: Request, _ connection: SFConnecti
             
             for name in acceptedIndexNames {
                 
-                
-                // Check for an 'index.html' file
-                
                 let tpath = (fullPath as NSString).appendingPathComponent(name)
                 
                 if connection.filemanager.isReadableFile(atPath: tpath) {
@@ -290,7 +292,28 @@ func service_getResourcePathFromUrl(_ request: Request, _ connection: SFConnecti
             }
             
             
-            // Neither file exists, and directory access is not allowed
+            // If PHP is enabled and index mapping is enabled then try index.php ad index.sf.php as well
+            
+            if (domain.phpPath != nil) && domain.phpMapIndex {
+                
+                let acceptedIndexNames = ["index.php", "index.sf.php"]
+                
+                for name in acceptedIndexNames {
+                    
+                    let tpath = (fullPath as NSString).appendingPathComponent(name)
+                    
+                    if connection.filemanager.isReadableFile(atPath: tpath) {
+                        
+                        info[.absoluteResourcePathKey] = tpath as String
+                        info[.relativeResourcePathKey] = (partialPath as NSString).appendingPathComponent(name)
+                        
+                        return .next
+                    }
+                }
+            }
+            
+            
+            // Neither file exists, and directory access is never allowed
             
             handle404_NotFoundError(path: partialPath)
             
@@ -318,45 +341,105 @@ func service_getResourcePathFromUrl(_ request: Request, _ connection: SFConnecti
         
     } else {
         
-        // If an "<name>.<ext>" file is requested, then check also for a "<name>.sf.<ext>" file
+        
+        // The requested resource does not exists
+        
+        let dirpath = (fullPath as NSString).deletingLastPathComponent
+        let filename = (fullPath as NSString).lastPathComponent
+        let name = (filename as NSString).deletingPathExtension
+        let ext = (filename as NSString).pathExtension
 
-        func addSf(toPath: String) -> String? {
-            let pathWithoutExtension = (toPath as NSString).deletingPathExtension
-            let extensionPart = (toPath as NSString).pathExtension
-            return ((pathWithoutExtension as NSString).appendingPathExtension("sf") as NSString?)?.appendingPathExtension(extensionPart)
+        
+        // Exclude directories
+        
+        if ext.isEmpty {
+            handle404_NotFoundError(path: partialPath)
+            return .next
         }
         
-        if let sfFullPath = addSf(toPath: fullPath) {
         
-            if connection.filemanager.fileExists(atPath: sfFullPath, isDirectory: &isDirectory) {
-                
-                if !isDirectory.boolValue {
-                    
-                    // It is a file
-                    
-                    if connection.filemanager.isReadableFile(atPath: sfFullPath) {
-                        
-                        info[.absoluteResourcePathKey] = sfFullPath
-                        
-                        let sfPartialPath = addSf(toPath: partialPath) ?? partialPath // Default should never be used
+        // First check for <name>.sf.<ext>
+        
+        let alternateFilepathSf = (dirpath as NSString).appendingPathComponent(name + ".sf." + ext)
+        
+        if connection.filemanager.fileExists(atPath: alternateFilepathSf, isDirectory: &isDirectory) {
+            
+            if isDirectory.boolValue {
+                handle403_ForbiddenError(path: partialPath)
+                return .next
+            }
 
-                        info[.relativeResourcePathKey] = sfPartialPath
-                        
-                        return .next
-                        
-                        
-                    } else {
-                        
-                        handle403_ForbiddenError(path: partialPath)
-                        
-                        return .next
-                    }
-                }
+            if connection.filemanager.isReadableFile(atPath: alternateFilepathSf) {
+                let partialPathSf = (partialPath as NSString).deletingLastPathComponent + name + ".sf." + ext
+                info[.absoluteResourcePathKey] = alternateFilepathSf
+                info[.relativeResourcePathKey] = partialPathSf
+                return .next
             }
         }
         
 
-        // There is nothing at the resource path
+        // If php is off, then exit now
+        
+        if domain.phpPath == nil {
+            handle404_NotFoundError(path: partialPath)
+            return .next
+        }
+        
+        
+        // If the extension is already php, then exit now
+        
+        if ext.lowercased() == "pnp" {
+            handle404_NotFoundError(path: partialPath)
+            return .next
+        }
+
+        
+        // If php mapping applies, then check for <name>.php and <name>.sf.php
+        
+        if domain.phpPath != nil {
+            
+            if domain.phpMapAll || ((name.lowercased() == "index") && domain.phpMapIndex) {
+                
+                let alternateFilepathPhp = (dirpath as NSString).appendingPathComponent(name + ".php")
+                
+                if connection.filemanager.fileExists(atPath: alternateFilepathPhp, isDirectory: &isDirectory) {
+                    
+                    if isDirectory.boolValue {
+                        handle403_ForbiddenError(path: partialPath)
+                        return .next
+                    }
+                    
+                    if connection.filemanager.isReadableFile(atPath: alternateFilepathPhp) {
+                        let partialPathPhp = (partialPath as NSString).deletingLastPathComponent + name + ".php"
+                        info[.absoluteResourcePathKey] = alternateFilepathPhp
+                        info[.relativeResourcePathKey] = partialPathPhp
+                        return .next
+                    }
+                }
+
+                
+                let alternateFilepathSfPhp = (dirpath as NSString).appendingPathComponent(name + ".sf.php")
+                
+                if connection.filemanager.fileExists(atPath: alternateFilepathSfPhp, isDirectory: &isDirectory) {
+                    
+                    if isDirectory.boolValue {
+                        handle403_ForbiddenError(path: partialPath)
+                        return .next
+                    }
+                    
+                    if connection.filemanager.isReadableFile(atPath: alternateFilepathSfPhp) {
+                        let partialPathSfPhp = (partialPath as NSString).deletingLastPathComponent + name + ".sf.php"
+                        info[.absoluteResourcePathKey] = alternateFilepathSfPhp
+                        info[.relativeResourcePathKey] = partialPathSfPhp
+                        return .next
+                    }
+                }
+
+            }
+        }
+        
+        
+        // Nothing found
         
         handle404_NotFoundError(path: partialPath)
         

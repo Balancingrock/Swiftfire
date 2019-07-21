@@ -187,33 +187,43 @@ final class SFDocument: EstimatedMemoryConsumption {
     ///
     /// - Parameters:
     ///   - path: The path of the file to read.
+    ///   - data: The file content, optional, may be nil.
     ///   - filemanager: The filemanager to use.
     ///
     /// - Returns: nil if the file could not be read.
     
-    private init?(path: String, filemanager: FileManager) {
+    private init?(path: String, data fileContent: Data?, filemanager: FileManager) {
+        
+        
+        if let d = fileContent, let str = String(bytes: d, encoding: .utf8) {
+            
+            self.path = path
+            self.filedata = str
+            self.fileModificationDate = Date().javaDate
+            self.estimatedMemoryConsumption = d.count
+            
+        } else {
 
+            // Tests
         
-        // Tests
-        
-        guard filemanager.isReadableFile(atPath: path) else { return nil }
-        guard let fileattributes = try? filemanager.attributesOfItem(atPath: path) else { return nil }
-        
-        
-        // Retrieve necessary data
-        
-        guard let modificationDate = fileattributes[FileAttributeKey.modificationDate] as? Date else { return nil }
-        guard let filesize = (fileattributes[FileAttributeKey.size] as? NSNumber)?.intValue else { return nil }
-        guard let data = try? String(contentsOfFile: path) else { return nil }
+            guard filemanager.isReadableFile(atPath: path) else { return nil }
+            guard let fileattributes = try? filemanager.attributesOfItem(atPath: path) else { return nil }
         
         
-        // Assignment
+            // Retrieve necessary data
         
-        self.path = path
-        self.filedata = data
-        self.fileModificationDate = modificationDate.javaDate
-        self.estimatedMemoryConsumption = filesize
+            guard let modificationDate = fileattributes[FileAttributeKey.modificationDate] as? Date else { return nil }
+            guard let filesize = (fileattributes[FileAttributeKey.size] as? NSNumber)?.intValue else { return nil }
+            guard let data = try? String(contentsOfFile: path) else { return nil }
+            
         
+            // Assignment
+        
+            self.path = path
+            self.filedata = data
+            self.fileModificationDate = modificationDate.javaDate
+            self.estimatedMemoryConsumption = filesize
+        }
         
         // Parsing of the file
         
@@ -258,21 +268,25 @@ final class SFDocument: EstimatedMemoryConsumption {
     ///
     /// - Parameters:
     ///   - path: The path of the file.
+    ///   - data: The file content, if nil the file will be read. If set, the cache will not be used.
     ///   - filemanager: The filemanager to use.
     ///
     /// - Returns: Nil if the file cannot be read.
     
-    static func factory(path: String, filemanager: FileManager) -> Result<SFDocument> {
+    static func factory(path: String, data: Data? = nil, filemanager: FileManager) -> Result<SFDocument> {
         
         return queue.sync(execute: {
             
-            // Try to retrieve the document from cache
+            if data == nil {
+                
+                // Try to retrieve the document from cache
             
-            if let doc = SFDocument.cache[path] {
-                if let fileattributes = try? filemanager.attributesOfItem(atPath: path) {
-                    if let modificationDate = fileattributes[FileAttributeKey.modificationDate] as? Date  {
-                        if modificationDate.javaDate <= doc.fileModificationDate {
-                            return .success(doc)
+                if let doc = SFDocument.cache[path] {
+                    if let fileattributes = try? filemanager.attributesOfItem(atPath: path) {
+                        if let modificationDate = fileattributes[FileAttributeKey.modificationDate] as? Date  {
+                            if modificationDate.javaDate <= doc.fileModificationDate {
+                                return .success(doc)
+                            }
                         }
                     }
                 }
@@ -281,7 +295,7 @@ final class SFDocument: EstimatedMemoryConsumption {
             
             // Try to create a new document
             
-            guard let doc = SFDocument(path: path, filemanager: filemanager) else {
+            guard let doc = SFDocument(path: path, data: data, filemanager: filemanager) else {
                 
                 // Try to find reason for error
                 
@@ -293,9 +307,11 @@ final class SFDocument: EstimatedMemoryConsumption {
             }
             
             
-            // Add the new document to the cache
+            // Add the new document to the cache if it was created from file
             
-            SFDocument.cache[path] = doc
+            if data == nil {
+                SFDocument.cache[path] = doc
+            }
             
             return .success(doc)
         })

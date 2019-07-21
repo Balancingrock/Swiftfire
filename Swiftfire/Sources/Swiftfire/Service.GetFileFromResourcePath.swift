@@ -145,11 +145,20 @@ func service_getFileAtResourcePath(_ request: Request, _ connection: SFConnectio
     
     let body: Data
     
+    
+    // If the resource is a php file and php is enabled then process the PHP part first
+    
+    var phpData: Data?
+    if (domain.phpPath != nil) && ((resourcePath as NSString).pathExtension.lowercased() == "php") {
+        phpData = loadPhpFile(file: URL(fileURLWithPath: resourcePath), domain: domain)
+    }
+    
+    
     // If the file can contain function calls, then process it. Otherwise return the file as read.
     
     if (resourcePath as NSString).lastPathComponent.contains(".sf.") {
     
-        switch SFDocument.factory(path: resourcePath, filemanager: connection.filemanager) {
+        switch SFDocument.factory(path: resourcePath, data: phpData, filemanager: connection.filemanager) {
             
         case .error(let message):
             
@@ -165,15 +174,21 @@ func service_getFileAtResourcePath(_ request: Request, _ connection: SFConnectio
         }
         
         
-        
     } else {
         
-        guard let data = connection.filemanager.contents(atPath: resourcePath) else {
-            handle500_ServerError(connection: connection, resourcePath: resourcePath, message: "Reading contents of file failed (but file is reported readable), resource: \(resourcePath)", line: #line)
-            return .next
+        if let phpData = phpData {
+            
+            body = phpData
+            
+        } else {
+            
+            guard let data = connection.filemanager.contents(atPath: resourcePath) else {
+                handle500_ServerError(connection: connection, resourcePath: resourcePath, message: "Reading contents of file failed (but file is reported readable), resource: \(resourcePath)", line: #line)
+                return .next
+            }
+
+            body = data
         }
-        
-        body = data
     }
     
     
