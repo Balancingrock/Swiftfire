@@ -1,6 +1,5 @@
 .DS_Store
 *.xcodeproj
-Swiftfire/.build
-Swiftfire/DerivedData
-Swiftfire/Package.pins
-Swiftfire/Package.resolved
+/.build
+Package.resolved
+/DerivedData

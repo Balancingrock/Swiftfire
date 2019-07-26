@@ -4,7 +4,7 @@ This document contains a list of features, how they are tested and in which vers
 
 There are three different test methods: Test, Implicit and Code Inspection.
 
-`Test` means that the server was used as a black box that was triggered by requesting something from it and the response to that reuqets was monitored in the telemetry or subsequent behaviours.
+`Test` means that the server was used as a black box that was triggered by requesting something from it and the response to that requets was monitored in the telemetry or subsequent behaviours.
 
 `Implict` means that a feature can be assumed to work because otherwise the basic functionality of the server would fail.
 

@@ -1,0 +1,5 @@
+module SF_COpenSsl {
+    umbrella header "openssl.h"
+    link "ssl"
+    link "crypto"
+}
