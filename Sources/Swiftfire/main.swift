@@ -50,11 +50,11 @@ import Foundation
 import SwifterLog
 import SecureSockets
 import SwifterSockets
-
-
-// Make the optional loglevel loggers easier accessable
-
-typealias Log = SwifterLog.Logger
+import Core
+import Functions
+import Services
+import Admin
+import Custom
 
 
 /// Stops the startup process.
@@ -64,11 +64,6 @@ fileprivate func emergencyExit(_ message: String) -> Never {
     _ = Darwin.sleep(2) // Give the logger some time to do its work
     fatalError(message)
 }
-
-
-// Every thread that runs for more than a few milliseconds should poll this variable and terminate itself when it finds that this flag is 'true'.
-
-var quitSwiftfire: Bool = false
 
 
 // Set default logging levels to gain some output if anything goes wrong before the log levels are set to the application values
@@ -88,8 +83,6 @@ Log.atNotice?.log("Starting Swiftfire webserver")
 // =======================================
 // Initialize the configuration parameters
 // =======================================
-
-let parameters = ServerParameters()
 
 do {
     guard let parameterDefaultFile = StorageUrls.parameterDefaultsFile else {
@@ -163,8 +156,6 @@ do {
 // Initialize the server level blacklisted clients
 // ===============================================
 
-let serverBlacklist = Blacklist()
-
 do {
     guard let serverBlacklistFile = StorageUrls.serverBlacklistFile else {
         emergencyExit("Could not construct server blacklist file url")
@@ -179,35 +170,13 @@ do {
 }
 
 
-// =========================
-// Initialize the statistics
-// =========================
-
-/*let statistics = Statistics()
-
-do {
-    guard let statisticsFile = StorageUrls.statisticsFile else {
-        emergencyExit("Statistics file could not be constructed")
-    }
-    
-    switch statistics.restore(fromFile: statisticsFile) {
-    case let .error(message): emergencyExit(message)
-    case .success: break
-    }
-    
-    Log.atNotice?.log(message: "Server statistics loaded.", from: Source(id: -1, file: #file, function: #function, line: #line))
-}*/
-
-
 // =================
 // Load the services
 // =================
 
-let services = Service()
-
 do {
     registerServices()
-
+    sfRegisterServices()
     Log.atDebug?.log("Registered services:\n\n\(services)\n")
 }
 
@@ -216,11 +185,9 @@ do {
 // Load the functions
 // ==================
 
-let functions = Function()
-
 do {
     registerFunctions()
-
+    sfRegisterFunctions()
     Log.atDebug?.log("Registered functions:\n\n\(functions)\n")
 }
 
@@ -228,8 +195,6 @@ do {
 // ============================
 // Setup the Http Header Logger
 // ============================
-
-let headerLogger: HttpHeaderLogger
 
 do {
     guard let headersLogDir = StorageUrls.headersLogDir else {
@@ -245,8 +210,6 @@ do {
 // ======================
 // Initialize the domains
 // ======================
-
-let domains = Domains()
 
 do {
     guard let defaultDomainsFile = StorageUrls.domainDefaultsFile else {
@@ -273,8 +236,6 @@ do {
 // =====================================
 // Create the server admin pseudo domain
 // =====================================
-
-let serverAdminDomain: Domain
 
 do {
     guard let serverAdminDomainDir = StorageUrls.serverAdminDir else {
@@ -303,8 +264,6 @@ do {
 // Setup the http connection pool
 // ==============================
 
-let connectionPool = ConnectionPool()
-
 do {
     connectionPool.sorter = { // Sorting makes monitoring easier
         (_ lhs: Connection, _ rhs: Connection) -> Bool in
@@ -315,116 +274,28 @@ do {
 }
 
 
-// ==============================
-// Initialize the serverTelemetry
-// ==============================
-
-let telemetry = ServerTelemetry()
-
-
 // ===================================
 // Prepare for the HTTP & HTTPS server
 // ===================================
 
-let httpServerAcceptQueue = DispatchQueue(
+httpServerAcceptQueue = DispatchQueue(
     label: "HTTP Server Accept queue",
     qos: .userInteractive,
     attributes: [],
     autoreleaseFrequency: DispatchQueue.AutoreleaseFrequency.inherit,
     target: nil)
 
-let httpsServerAcceptQueue = DispatchQueue(
+httpsServerAcceptQueue = DispatchQueue(
     label: "HTTPS Server Accept queue",
     qos: .userInteractive,
     attributes: [],
     autoreleaseFrequency: DispatchQueue.AutoreleaseFrequency.inherit,
     target: nil)
 
-var httpServer: SwifterSockets.TipServer?
-var httpsServer: SecureSockets.SslServer?
-
 telemetry.httpServerStatus.setValue("Stopped")
 telemetry.httpsServerStatus.setValue("Stopped")
 
 
-// =========================================================
-// Make sure certificates are present for the M&C connection
-// =========================================================
-/*
-if (!StorageUrls.exists(url: StorageUrls.sslConsoleServerCertificateFile) || !StorageUrls.exists(url: StorageUrls.sslConsoleServerPrivateKeyFile)) {
-    switch generateKeyAndCertificate(privateKeyLocation: StorageUrls.sslConsoleServerPrivateKeyFile, certificateLocation: StorageUrls.sslConsoleServerCertificateFile) {
-    case .error(let message): emergencyExit(message)
-    case .success: Log.atNotice?.log("Certificate and private key for console connection generated")
-    }
-} else {
-    Log.atNotice?.log("Certificate and private key files for console connection present")
-}
-
-
-// Create the CTX that will be used
-
-guard let macCtx = ServerCtx() else { emergencyExit("Cannot create server context for console connection") }
-
-
-// Set the certificate & private key
-
-if case let .error(message) = macCtx.usePrivateKey(file: EncodedFile(path: StorageUrls.sslConsoleServerPrivateKeyFile!.path, encoding: .pem)) {
-    emergencyExit(message)
-}
-
-if case let .error(message) = macCtx.useCertificate(file: EncodedFile(path: StorageUrls.sslConsoleServerCertificateFile!.path, encoding: .pem)) {
-    emergencyExit(message)
-}
-
-
-// Verify the validity duration of the certificate
-
-guard let macCert: X509 = X509(ctx: macCtx) else { emergencyExit("Could not extract certificate store from console context") }
-
-fileprivate let today = Date().javaDate
-
-if today < macCert.validNotBefore { emergencyExit("Console certificate in \(StorageUrls.sslConsoleServerCertificateFile!.path) is not yet valid") }
-if today > macCert.validNotAfter  { emergencyExit("Console certificate in \(StorageUrls.sslConsoleServerCertificateFile!.path) is no longer valid") }
-
-fileprivate let validForDays = (macCert.validNotAfter - today)/Int64(24 * 60 * 60 * 1000)
-
-Log.atInfo?.log("Server certificate for console interface is valid for \(validForDays) more days")
-
-
-// Check that there is a trusted console certificate
-
-var consoleServerCertificateFound = false
-if let urls = try? FileManager.default.contentsOfDirectory(at: StorageUrls.sslConsoleTrustedClientsDir!, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles, .skipsSubdirectoryDescendants]) {
-    for url in urls {
-        // If a certificate file format is found, then load it and check its validity period
-        if url.pathExtension.compare("pem", options: String.CompareOptions.caseInsensitive, range: nil, locale: nil) == ComparisonResult.orderedSame {
-            // Load the file into a certificate store
-            guard let ctx = ServerCtx() else { emergencyExit("Failed to create context for trusted console certificates check") }
-            if case let .error(message) = ctx.useCertificate(file: EncodedFile(path: url.path, encoding: .pem)) {
-                Log.atWarning?.log("Failed to load trusted console certificate at \(url.path)")
-            } else {
-                if let cert = X509(ctx: ctx) {
-                    if today < cert.validNotBefore {
-                        Log.atWarning?.log("Trusted console certificate in \(url.path) is not yet valid")
-                    } else if today > cert.validNotAfter {
-                        Log.atWarning?.log("Trusted console certificate in \(url.path) is no longer valid")
-                    } else {
-                        let validForDays = (macCert.validNotAfter - today)/Int64(24 * 60 * 60 * 1000)
-                        Log.atInfo?.log("Trusted console certificate in \(url.path) is valid for \(validForDays) more days")
-                        consoleServerCertificateFound = true
-                    }
-                }
-            }
-        }
-    }
-}
-
-if consoleServerCertificateFound {
-    Log.atNotice?.log("Trusted Console Certificate(s) present")
-} else {
-    Log.atError?.log("No Trusted Console Certificate found")
-}
-*/
 
 // ====================================
 // Call out to the custom setup routine
@@ -451,8 +322,6 @@ while !quitSwiftfire { _ = Darwin.sleep(2) }
 // Cleanup
 
 _ = serverAdminDomain.serverShutdown()
-//statistics.save(toFile: StorageUrls.statisticsFile!)
-//Log.atNotice?.log("Saved server statistics")
 
 headerLogger.close()
 Log.atNotice?.log("Closed header logging file")

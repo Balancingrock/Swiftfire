@@ -79,26 +79,40 @@ However: It does work! :-)
 
 ## Installation
 
-Note: First install the openSSL library per direction in [SecureSockets](https:github.com/balancingrock/SecureSockets)
+### Using SPM
 
-- Clone the git repository
-- cd into Swiftfire
-- Run:
+Download the project using git clone:
 
-      $ swift build -Xswiftc -I/__your-path__/openssl/include -Xlinker -L/__your-path__/openssl/lib`
+    $ git clone https://github.com/Balancingrock/Swiftfire.git
 
-Please refer to the [installation instructions](http://swiftfire.nl/pages/manual/02_installation.html) on the [Swiftfire](http://swiftfire.nl) website.
+Then switch to the directory containg the project:
 
+    $ cd Swiftfire
 
-## Building with Xcode
+The build the project, but first make the build script executable:
 
-Note: First install the openSSL library per direction in [SecureSockets](https:github.com/balancingrock/SecureSockets)
+    $ chmod +x sf-build.sh
+    $ ./sf-build
 
-- Clone the git repository
-- Switch to the Swiftfire/Swiftfire directory (i.e. the same directory that holds the `Sources` directory
-- Run $ swift package update
-- Run $ swift package generate-xcodeproj
-Then double click the xcode project file and build the project.
+This should build the project without errors.
+
+However... the project needs openSSL. And while a compiled version of openSSL is provided with the project, you should not trust this. Make sure to download and install openSSL from the original sources at [openSSL.org](https://openssl.org)
+
+The follow the directions as mentioned under the subproject [SecureSockets](https:github.com/balancingrock/SecureSockets).
+
+You will likely enounter some issues with the target release when you have not compiled openSSL for MacOS 10.12, these are however easily fixed by using build options.
+
+### Using Xcode
+
+First follow the steps as per directions above. Perform exactly the same steps, but this time there is no need to build the project. Instead generate the xcode project:
+
+    $ swift package generate-xcodeproj
+
+You will need to update the Search Path settings for some frameworks (libraries): For those targets that complain about not finding openSSL libraries, add the `Library Search Path` with `$(SRCROOT)/openssl/v1_1_0-macos_10_12/lib`. When you have replaced the openSSL libraries and put them somewhere else, change the path accordingly. (Currently this has to be done for the targets `SecureSockets`, `Swiftfire`, `Admin`, `Services` and `Functions`)
+
+## Making changes
+
+You can of course change whatever you want, but the current source code layout was choosen for a reason. While this layout is rather new (and thus may need to change) we hope that you will only need to add to the `Custom`, `Functions` and `Services` targets. Though you should leave their current contents unaffected since the correct functioning of the admin server account depends on them.
 
 ## Version history
 
@@ -116,6 +130,9 @@ Note: Planned releases are for information only and almost always change.
 
 #### HEAD
 
+- Added build script for SPM
+- Added openSSL to the repository for convenience.
+- Reorganized the layout of source files.
 - Compiles unders Swift 5 & seems to work. Some major changes have been made so we will need a prolonged confidence building phase.
 - Added PHP support (i.e. Swifire now will serve wordpress and other PHP based websites)
 - Switched to BRBON for visitor logging
