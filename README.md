@@ -108,7 +108,11 @@ First follow the steps as per directions above. Perform exactly the same steps, 
 
     $ swift package generate-xcodeproj
 
-You will need to update the Search Path settings for some frameworks (libraries): For those targets that complain about not finding openSSL libraries, add the `Library Search Path` with `$(SRCROOT)/openssl/v1_1_0-macos_10_12/lib`. When you have replaced the openSSL libraries and put them somewhere else, change the path accordingly. (Currently this has to be done for the targets `SecureSockets`, `Swiftfire`, `Admin`, `Services` and `Functions`)
+Opening the generated Xcode project update the build settings `Search Paths` for the targets:
+- SecureSockets: Add to the build setting `Search Paths -> Header Search Paths` the value `$(SRCROOT)/openssl/v1_1_0-macos_10_12/include`.
+- SecureSockets & Swiftfire: Add to the build setting `Search Paths -> Library Search Paths` the value `$(SRCROOT)/openssl/v1_1_0-macos_10_12/lib`.
+
+Of course if you have a different paths for the openSSL include and lib paths then modify accordingly.
 
 ## Making changes
 
