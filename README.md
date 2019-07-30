@@ -114,6 +114,16 @@ Opening the generated Xcode project update the build settings `Search Paths` for
 
 Of course if you have a different paths for the openSSL include and lib paths then modify accordingly.
 
+## Configuring
+
+When Swiftfire is started for the first time, some configuration must be done. You may want to prepare for this by moving the `sfadmin` directory included in the repository to a different location, though it can remain inside the project too.
+
+In the default configuration Swiftfire will listen on port 6678 for incoming connections. Any connection attempt without domains being present will result in the return of a primitive page where the administrator ID and password msut be set in addition to the location of the `sfadmin` directory.
+
+Once that is done, Swiftfire can be customized by logging in as admin and using the admin pages.
+
+Note that Swiftfire will store and expect information in the `~/Library/Application Support/Swiftfire` location after it was first started. Some of the logs are in *.txt format, settings are in *.json format (for which we recommend our [proJSON](https://apps.apple.com/app/id1444778157) app) and the visitor statistics are in the *.brbon format. For which there is currently no app available. The BRBON spec however can be found on github including a [BRBON API](https://github.com/Balancingrock/BRBON.git). How to make the visitor statistics available is a subject of discussion.
+
 ## Making changes
 
 You can of course change whatever you want, but the current source code layout was choosen for a reason. While this layout is rather new (and thus may need to change) we hope that you will only need to add to the `Custom`, `Functions` and `Services` targets. Though you should leave their current contents unaffected since the correct functioning of the admin server account depends on them.
