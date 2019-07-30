@@ -248,7 +248,7 @@ public final class Domain {
     
     /// The timeout for a PHP interpreter run in milli seconds
     
-    public var phpTimeout: Int = 100
+    public var phpTimeout: Int = 10000 // 10 seconds, php can be quite slow!
     
     
     /// The session timeout in seconds. A value of <= 0 means that no sessions will be created.
