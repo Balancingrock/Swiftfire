@@ -92,12 +92,9 @@ public final class Account: EstimatedMemoryConsumption {
             
             
             // Save the new values, if the save fails, then undo the change.
-            assertionFailure("The call to saveUserData below this line is wrong!, replace with correct code")
+
             if let error = saveUserData() {
-                Log.atError?.log("Cannot save account \(self), error message = \(error)", type: "Account")
-                
-            } else {
-                
+                Log.atError?.log("Cannot save account \(self), name not changed, error message = \(error)", type: "Account")
                 names.removeFirst()
             }
         }

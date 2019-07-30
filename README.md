@@ -109,8 +109,8 @@ First follow the steps as per directions above. Perform exactly the same steps, 
     $ swift package generate-xcodeproj
 
 Opening the generated Xcode project update the build settings `Search Paths` for the targets:
-- SecureSockets: Add to the build setting `Search Paths -> Header Search Paths` the value `$(SRCROOT)/openssl/v1_1_0-macos_10_12/include`.
-- SecureSockets & Swiftfire: Add to the build setting `Search Paths -> Library Search Paths` the value `$(SRCROOT)/openssl/v1_1_0-macos_10_12/lib`.
+- SecureSockets, Core: Add to the build setting `Search Paths -> Header Search Paths` the value `$(SRCROOT)/openssl/v1_1_0-macos_10_12/include`.
+- SecureSockets, Core & Swiftfire: Add to the build setting `Search Paths -> Library Search Paths` the value `$(SRCROOT)/openssl/v1_1_0-macos_10_12/lib`.
 
 Of course if you have a different paths for the openSSL include and lib paths then modify accordingly.
 
