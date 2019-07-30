@@ -789,6 +789,7 @@ extension Domain {
         domain["PhpOptions"] &= phpOptions ?? ""
         domain["PhpMapIndex"] &= phpMapIndex
         domain["PhpMapAll"] &= phpMapAll
+        domain["PhpTimeout"] &= phpTimeout
         domain["SfResources"] &= sfresources
         domain["Telemetry"] &= telemetry.json
         domain["SupportDirectory"] &= supportDirectory.path
@@ -867,6 +868,9 @@ extension Domain {
         if (json|"PhpMapAll")?.boolValue == nil { json["PhpMapAll"] &= phpMapAll }
         let jphpmapall = (json|"PhpMapAll")!.boolValue!
 
+        if (json|"PhpTimeout")?.intValue == nil { json["PhpTimeout"] &= phpTimeout }
+        let jphptimeout = (json|"PhpTimeout")!.intValue!
+
         
         // Setup
         
@@ -886,6 +890,8 @@ extension Domain {
         self.nofRecentRequestLogs = jnofRecentRequestLogs
         self.phpMapIndex = jphpmapindex
         self.phpMapAll = jphpmapall
+        self.phpTimeout = jphptimeout
+        
         
         // Initialize the properties that may be present
         
