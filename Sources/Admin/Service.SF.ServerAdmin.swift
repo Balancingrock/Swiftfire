@@ -871,13 +871,13 @@ fileprivate func executeReadParameters() {
 
 fileprivate func executeSaveDomains() {
     if let url = StorageUrls.domainDefaultsFile {
-        _ = domains.save(toFile: url)
+        _ = domains.save(to: url)
     }
 }
 
 fileprivate func executeReadDomains() {
     if let url = StorageUrls.domainDefaultsFile {
-        _ = domains.restore(fromFile: url)
+        _ = domains.restore(from: url)
     }
 }
 

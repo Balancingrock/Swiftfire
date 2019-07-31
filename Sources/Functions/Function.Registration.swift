@@ -57,6 +57,7 @@ let TIMESTAMP = "timestamp"
 let POSTING_LINK = "postingLink"
 let POSTING_BUTTON = "postingButton"
 let POSTING_BUTTONED_INPUT = "postingButtonedInput"
+let NOF_PAGE_HITS = "nofPageHits"
 
 
 // ==================================================
@@ -72,4 +73,5 @@ public func registerFunctions() {
     functions.register(name: POSTING_LINK, function: function_postingLink)
     functions.register(name: POSTING_BUTTON, function: function_postingButton)
     functions.register(name: POSTING_BUTTONED_INPUT, function: function_postingButtonedInput)
+    functions.register(name: NOF_PAGE_HITS, function: function_nofPageHits)
 }

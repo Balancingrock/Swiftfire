@@ -55,7 +55,7 @@ public final class Domain {
 
     /// A link back to the domain manager
     
-    unowned var manager: Domains?
+    fileprivate unowned var manager: Domains?
     
     
     /// The domain name plus extension. Use the 'www' prefix if it is necessary to differentiate between two domains: one with and one without the 'www'.
@@ -345,6 +345,17 @@ public final class Domain {
     public var accounts: AccountManager!
     
     
+    // Counter for hits on pages (note that not all pages will be counted, only for those pages for which a hitcounter is requested)
+    // This set of counters is maintained by the function_NofPageHits
+    
+    public var hitCounters: HitCounters = HitCounters()
+    
+    
+    /// True if the hitcounters must be reloaded on startup. False if not.
+    
+    public var loadHitCountersOnStartup: Bool = false
+    
+    
     // The support directories for this domain
     
     public var supportDirectory: URL {
@@ -389,6 +400,20 @@ public final class Domain {
         }
     }()
 
+    
+    /// The directory to store the hitcounters in
+    
+    private lazy var hitCountersDir: URL? = {
+        guard let dir = self.statisticsDir else { return nil }
+        do {
+            let url = dir.appendingPathComponent("hitCounters", isDirectory: true)
+            try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
+            return url
+        } catch {
+            return nil
+        }
+    }()
+    
     
     /// The directory for the settings files.
     
@@ -465,6 +490,14 @@ public final class Domain {
     private lazy var blacklistedClientsUrl: URL? = {
         guard let settingsDir = self.settingsDir else { return nil }
         return settingsDir.appendingPathComponent("blacklistedClients.json", isDirectory: false)
+    }()
+
+    
+    /// The file for the hitcounters
+    
+    lazy var hitCountersUrl: URL? = {
+        guard let dir = self.hitCountersDir else { return nil }
+        return dir.appendingPathComponent("hitCounters.json", isDirectory: false)
     }()
 
     
@@ -576,10 +609,7 @@ extension Domain {
             if let b = Bool.init(lettersOrDigits: value) {
                 wwwIncluded = b
             } else {
-                Log.atError?.log(
-                    "Cannot convert: \(value) to bool",
-                    from: Source(id: -1, file: #file, type: "Domain", function: #function, line: #line)
-                )
+                Log.atError?.log("Cannot convert: \(value) to bool")
             }
             
         case "Root":
@@ -592,40 +622,28 @@ extension Domain {
             if let b = Bool.init(lettersOrDigits: value) {
                 enabled = b
             } else {
-                Log.atError?.log(
-                    "Cannot convert: \(value) to bool",
-                    from: Source(id: -1, file: #file, type: "Domain", function: #function, line: #line)
-                )
+                Log.atError?.log("Cannot convert: \(value) to bool")
             }
             
         case "AccessLogEnabled":
             if let b = Bool.init(lettersOrDigits: value) {
                 accessLogEnabled = b
             } else {
-                Log.atError?.log(
-                    "Cannot convert: \(value) to bool",
-                    from: Source(id: -1, file: #file, type: "Domain", function: #function, line: #line)
-                )
+                Log.atError?.log("Cannot convert: \(value) to bool")
             }
             
         case "404LogEnabled":
             if let b = Bool.init(lettersOrDigits: value) {
                 four04LogEnabled = b
             } else {
-                Log.atError?.log(
-                    "Cannot convert: \(value) to bool",
-                    from: Source(id: -1, file: #file, type: "Domain", function: #function, line: #line)
-                )
+                Log.atError?.log("Cannot convert: \(value) to bool")
             }
 
         case "SessionLogEnabled":
             if let b = Bool.init(lettersOrDigits: value) {
                 sessionLogEnabled = b
             } else {
-                Log.atError?.log(
-                    "Cannot convert: \(value) to bool",
-                    from: Source(id: -1, file: #file, type: "Domain", function: #function, line: #line)
-                )
+                Log.atError?.log("Cannot convert: \(value) to bool")
             }
             
         case "PhpPath":
@@ -635,6 +653,27 @@ extension Domain {
             
         case "PhpOptions":
             phpOptions = value
+            
+        case "PhpMapIndex":
+            if let b = Bool.init(lettersOrDigits: value) {
+                phpMapIndex = b
+            } else {
+                Log.atError?.log("Cannot convert: \(value) to bool")
+            }
+            
+        case "PhpMapAll":
+            if let b = Bool.init(lettersOrDigits: value) {
+                phpMapAll = b
+            } else {
+                Log.atError?.log("Cannot convert: \(value) to bool")
+            }
+            
+        case "PhpTimeout":
+            if let i = Int(value) {
+                phpTimeout = i
+            } else {
+                Log.atError?.log("Cannot convert: \(value) to int")
+            }
             
         case "SfResources":
             sfresources = value
@@ -646,56 +685,38 @@ extension Domain {
             if let i = Int(value) {
                 sessionTimeout = i
             } else {
-                Log.atError?.log(
-                    "Cannot convert: \(value) to Int",
-                    from: Source(id: -1, file: #file, type: "Domain", function: #function, line: #line)
-                )
+                Log.atError?.log("Cannot convert: \(value) to Int")
             }
             
         case "StatisticsRolloverTime":
             if let t = WallclockTime(value) {
                 statisticsRolloverTime = t
             } else {
-                Log.atError?.log(
-                    "Cannot convert: \(value) to WallclockTime",
-                    from: Source(id: -1, file: #file, type: "Domain", function: #function, line: #line)
-                )
+                Log.atError?.log("Cannot convert: \(value) to WallclockTime")
             }
 
         case "VisitsPerStatisticsFile":
             if let i = Int(value) {
                 visitsPerStatisticsFile = i
             } else {
-                Log.atError?.log(
-                    "Cannot convert: \(value) to Int",
-                    from: Source(id: -1, file: #file, type: "Domain", function: #function, line: #line)
-                )
+                Log.atError?.log("Cannot convert: \(value) to Int")
             }
             
         case "NofRecentRequestLogs":
             if let i = Int(value) {
                 nofRecentRequestLogs = i
             } else {
-                Log.atError?.log(
-                    "Cannot convert: \(value) to Int",
-                    from: Source(id: -1, file: #file, type: "Domain", function: #function, line: #line)
-                )
+                Log.atError?.log("Cannot convert: \(value) to Int")
             }
 
         case "NofRecentResponseLogs":
             if let i = Int(value) {
                 nofRecentResponseLogs = i
             } else {
-                Log.atError?.log(
-                    "Cannot convert: \(value) to Int",
-                    from: Source(id: -1, file: #file, type: "Domain", function: #function, line: #line)
-                )
+                Log.atError?.log("Cannot convert: \(value) to Int")
             }
 
-        default: Log.atError?.log(
-            "Unknown item name: \(item)",
-            from: Source(id: -1, file: #file, type: "Domain", function: #function, line: #line)
-            )
+        default: Log.atError?.log("Unknown item name: \(item)")
         }
     }
     
@@ -926,11 +947,21 @@ extension Domain {
         }
         
         
+        // Reload the hitcounters
+        
+        if let url = hitCountersUrl {
+            hitCounters.restore(from: url)
+        }
+        
+        
         // Add the staistics logger
         
-        self.statistics = VisitorStatistics(directory: statisticsDir, timeForDailyLogRestart: WallclockTime.init(hour: 0, minute: 0, second: 0), maxRowCount: 10)
+        self.statistics = VisitorStatistics(
+            directory: statisticsDir,
+            timeForDailyLogRestart: WallclockTime.init(hour: 0, minute: 0, second: 0),
+            maxRowCount: 10
+        )
     }
-
 }
 
 // MARK: - CustomStringConvertible
@@ -953,6 +984,7 @@ extension Domain: CustomStringConvertible {
         str += " PHP Options                = \(phpOptions ?? "")\n"
         str += " PHP Map Index              = \(phpMapIndex)\n"
         str += " PHP Map All                = \(phpMapAll)\n"
+        str += " PHP Timeout                = \(phpTimeout)\n"
         str += " Swiftfire resources        = \(sfresources)\n"
         str += " VisitsPerStatisticsFile    = \(visitsPerStatisticsFile)\n"
         str += " StatisticsFileRolloverTime = \(statisticsRolloverTime)\n"

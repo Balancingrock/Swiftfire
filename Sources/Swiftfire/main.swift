@@ -216,7 +216,7 @@ do {
         emergencyExit("Default domains file could not be constructed")
     }
     
-    switch domains.restore(fromFile: defaultDomainsFile) {
+    switch domains.restore(from: defaultDomainsFile) {
     case let .error(message): emergencyExit(message)
     case let .success(message): Log.atNotice?.log(message)
     }
@@ -336,7 +336,7 @@ case .error(let message): Log.atError?.log("Error while shutting down the domain
 case .success: break;
 }
 
-switch domains.save(toFile: StorageUrls.domainDefaultsFile!) {
+switch domains.save(to: StorageUrls.domainDefaultsFile!) {
 case .error(let message): Log.atError?.log("Error while saving the domains:\n\(message)")
 case .success: Log.atNotice?.log("Saved domains")
 }

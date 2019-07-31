@@ -271,11 +271,17 @@ extension Domains {
     /// - Returns: Either .success(true) or .error(message: String)
     
     @discardableResult
-    public func save(toFile url: URL) -> Result<Bool> {
+    public func save(to file: URL) -> Result<Bool> {
+        
+        domains.forEach {
+            if let url = $0.value.hitCountersUrl {
+                $0.value.hitCounters.save(to: url)
+            }
+        }
         
         let json = VJson()
         json["Domains"] &= self.json
-        if let errorMsg = json.save(to: url) {
+        if let errorMsg = json.save(to: file) {
             return .error(message: "Could not write domains-defaults to file, error: \(errorMsg)")
         } else {
             return .success(true)
@@ -299,26 +305,26 @@ extension Domains {
     /// - Returns: .success(message) if the operation was successful, .error(message) otherwise.
     
     @discardableResult
-    public func restore(fromFile url: URL) -> Result<String> {
+    public func restore(from file: URL) -> Result<String> {
         
         
         // Only if the domain-defaults file exists
         
-        guard FileManager.default.fileExists(atPath: url.path) else {
+        guard FileManager.default.fileExists(atPath: file.path) else {
             return .success("No domains-defaults file available, starting without any domains")
         }
         
         
         // Read domains from file
         
-        guard let newDomains = Domains(file: url) else {
+        guard let newDomains = Domains(file: file) else {
             do {
-                _ = try VJson.parse(file: url)
-                return .error(message: " Could not reconstruct domains from file: \(url.path)")
+                _ = try VJson.parse(file: file)
+                return .error(message: " Could not reconstruct domains from file: \(file.path)")
             } catch let error as VJson.Exception {
                 return .error(message: error.description)
             } catch {
-                return .error(message: "Could not read or locate file: \(url.path)")
+                return .error(message: "Could not read or locate file: \(file.path)")
             }
         }
         
@@ -331,7 +337,7 @@ extension Domains {
         }
         //update(withDomains: newDomains)
         
-        return .success("Domains successfully restored from \(url.path)")
+        return .success("Domains successfully restored from \(file.path)")
     }
 
 }

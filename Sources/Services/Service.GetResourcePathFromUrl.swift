@@ -278,7 +278,7 @@ func service_getResourcePathFromUrl(_ request: Request, _ connection: SFConnecti
             
             // Find a root-index file
             
-            let acceptedIndexNames = ["index.html", "index.sf.html", "index.htm", "index.sf.htm"]
+            let acceptedIndexNames = [ "index.sf.html", "index.html", "index.sf.htm", "index.htm"]
             
             for name in acceptedIndexNames {
                 

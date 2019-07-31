@@ -92,7 +92,7 @@ import Core
 
 public func function_nofPageHits(_ args: Function.Arguments, _ info: inout Function.Info, _ environment: inout Function.Environment) -> Data? {
     
-    let count: Int64 = -1
+    var count: String = "*error*"
     
     var path: String?
     
@@ -105,14 +105,13 @@ public func function_nofPageHits(_ args: Function.Arguments, _ info: inout Funct
     if path == nil {
         path = environment.serviceInfo[.relativeResourcePathKey] as? String
     }
+    
+    if let path = path {
+        count = environment.domain.hitCounters.increment(path) 
+    }
+    
+    Log.atDebug?.log("HitCount for \(path ?? "Unknown") = \(count)", from: Source(id: Int(environment.connection.logId), file: #file, function: #function, line: #line))
 
-//    if let path = path {
-//        count = statistics.foreverCount(domain: environment.domain.name, path: path)
-//    }
-
-    Log.atDebug?.log("ForeverCount for \(path ?? "Unknown") = \(count)", from: Source(id: Int(environment.connection.logId), file: #file, function: #function, line: #line))
-
-    return count.description.data(using: String.Encoding.utf8)
+    return count.data(using: .utf8)
 }
 
-//TODO: Reimplement lookup of page hits
