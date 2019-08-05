@@ -19,7 +19,7 @@ let package = Package(
         .package(url: "https://github.com/Balancingrock/Html", from: "0.1.0")
     ],
     targets: [
-        .target(name: "Custom"),
+        .target(name: "Custom", dependencies: ["BRBON"]),
         .target(name: "Core", dependencies: ["SwifterLog", "COpenSsl", "KeyedCache", "SecureSockets", "BRBON", "Custom", "Html", "Http"]),
         .target(name: "Functions", dependencies: ["SwifterLog", "Http", "Custom", "Core", "COpenSsl"]),
         .target(name: "Services", dependencies: ["SwifterLog", "Http", "Custom", "Core"]),

@@ -57,53 +57,72 @@ public typealias Log = SwifterLog.Logger
 public var quitSwiftfire: Bool = false
 
 
-// ===========================================
-// These variables below are set by main.swift
-// ===========================================
-
-// The Swiftfire server parameters
-
-public let parameters = ServerParameters()
+// =======================================================================================
+// These variables below are set or loaded by main.swift before the server(s) are started.
+// =======================================================================================
 
 
-// The server level blacklist
+// After the creation of the server parameters they still retain their default values.
+
+/// The Swiftfire server parameters
+
+public let serverParameters = ServerParameters()
+
+
+// The server wide blacklist is created here but does not contain any entries yet.
+
+/// The server level blacklist
 
 public let serverBlacklist = Blacklist()
 
 
-// The available services for the domains
+// After creation the services object will be empty. Services must still be registered.
 
-public let services = Service()
+/// The available services for the domains
 
-
-// The available functions
-
-public let functions = Function()
+public let services = Services()
 
 
-// The server header logger (debug purposes only)
+// After creation the functions object will be empty. Functions must still be regietered.
+
+/// The available functions
+
+public let functions = Functions()
+
+
+// The header logger is only defined here, it should be tested for not-nill before a server is started. The application should fail when the headerLogger cannot be created.
+
+/// The server header logger (debug purposes only)
 
 public var headerLogger: HttpHeaderLogger!
 
 
-// All available domains
+// The domains are still empty after creation, they have to be loaded before starting the server(s)
 
-public let domains = Domains()
+/// All available domains
+
+public let domains: Domains! = Domains()
 
 
-// The server admin account
+// The server domain has to exist, a test for non-nil is necessary before starting the server(s)
+
+/// The server admin account
 
 public var serverAdminDomain: Domain!
 
 
-// The connection pool for the server
+// The connection is still empty after creation. Creating connection objects in the pool is done when (re)starting the HTTP(s) server(s).
+
+/// The connection pool for the server
 
 public let connectionPool = ConnectionPool()
 
 
-// The server telemetry
+// The server telemetry is always reset at the start of the server.
 
-public let telemetry = ServerTelemetry()
+/// The server telemetry
+
+public let serverTelemetry = ServerTelemetry()
 
 
 // The HTTP server

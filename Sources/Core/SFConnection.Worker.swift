@@ -65,7 +65,7 @@ extension SFConnection {
         
         // Telemetry update
         
-        telemetry.nofHttp400Replies.increment()
+        serverTelemetry.nofHttp400Replies.increment()
         
         
         // Log update
@@ -94,7 +94,7 @@ extension SFConnection {
         
         // Telemetry update
         
-        telemetry.nofHttp500Replies.increment()
+        serverTelemetry.nofHttp500Replies.increment()
         
         
         // Logging update
@@ -159,9 +159,9 @@ extension SFConnection {
                 
                 // Find the domain, if none is found, then http 1.0 is not supported
                 
-                if domains.domain(forName: parameters.http1_0DomainName.value) != nil {
+                if domains.domain(for: serverParameters.http1_0DomainName.value) != nil {
                     
-                    host = Host(address: parameters.http1_0DomainName.value, port: nil)
+                    host = Host(address: serverParameters.http1_0DomainName.value, port: nil)
                     
                 } else {
                 
@@ -207,14 +207,14 @@ extension SFConnection {
             
             // Get the domain from the host
             
-            if let hostDomain = domains.domain(forName: host.address), hostDomain.enabled {
+            if let hostDomain = domains.domain(for: host.address), hostDomain.enabled {
                 
                 domain = hostDomain
             
             } else {
                 
                 let message: String
-                if domains.domain(forName: host.address) == nil {
+                if domains.domain(for: host.address) == nil {
                     message = "Domain not found for host: \(host.address)"
                 } else {
                     message = "Domain not enabled for host: \(host.address)"
@@ -286,7 +286,7 @@ extension SFConnection {
         // Access logging
         // =============================================================================================================
         
-        domain.recordInAccessLog(
+        domain.accessLog.record(
             time: timeOfAccept,
             ipAddress: remoteAddress,
             url: request.url ?? "",
@@ -305,12 +305,12 @@ extension SFConnection {
         response.contentType = mimeTypeDefault
         
         
-        var serviceInfo = Service.Info()
+        var serviceInfo = Services.Info()
         serviceInfo[.responseStartedKey] = timestampResponseStart
 
         for item in domain.services {
             
-            if parameters.debugMode.value {
+            if serverParameters.debugMode.value {
 
                 Log.atDebug?.log("Service: \(item.name)", id: logId, type: "SFConnection")
             }
@@ -320,7 +320,7 @@ extension SFConnection {
             if item.service(request, self, domain, &serviceInfo, &response) == .abort { break }
             // ********************
             
-            if parameters.debugMode.value {
+            if serverParameters.debugMode.value {
 
                 if serviceInfo.dict.count == 0 {
                     Log.atDebug?.log( "\n\nService info is empty", id: logId, type: "SFConnection")

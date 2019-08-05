@@ -91,7 +91,7 @@ import Core
 ///
 /// - Returns: The value of the requested parameter or "No access rights".
 
-func function_sf_parameterTable(_ args: Function.Arguments, _ info: inout Function.Info, _ environment: inout Function.Environment) -> Data? {
+func function_sf_parameterTable(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: inout Functions.Environment) -> Data? {
 
 
     // Check access rights
@@ -112,7 +112,7 @@ func function_sf_parameterTable(_ args: Function.Arguments, _ info: inout Functi
     // Create the table
     
     var table = Table(klass: ["parameter-table"], header: Thead(titles: "Name", "Value", "Description"))
-    parameters.all.forEach() { if $0.name != parameters.adminSiteRoot.name { table.append($0.tableRow()) }}
+    serverParameters.all.forEach() { if $0.name != serverParameters.adminSiteRoot.name { table.append($0.tableRow()) }}
   
     return table.html.data(using: String.Encoding.utf8)
 }

@@ -94,7 +94,7 @@ import Core
 ///
 /// - Returns: The value of the requested parameter or "No access rights".
 
-func function_sf_domainBlacklistTable(_ args: Function.Arguments, _ info: inout Function.Info, _ environment: inout Function.Environment) -> Data? {
+func function_sf_domainBlacklistTable(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: inout Functions.Environment) -> Data? {
     
     
     // Check access rights
@@ -117,7 +117,7 @@ func function_sf_domainBlacklistTable(_ args: Function.Arguments, _ info: inout 
     guard let postInfo = environment.serviceInfo[.postInfoKey] as? PostInfo,
         let name = postInfo["DomainName"] else { return "Domain name error".data(using: String.Encoding.utf8) }
     
-    guard let domain = domains.domain(forName: name) else { return "No domain error".data(using: String.Encoding.utf8) }
+    guard let domain = domains.domain(for: name) else { return "No domain error".data(using: String.Encoding.utf8) }
 
     
     // Create the table

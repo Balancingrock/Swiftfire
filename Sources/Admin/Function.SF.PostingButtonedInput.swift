@@ -97,7 +97,7 @@ import Functions
 
 /// Creates a (text) link that will post the key/value combination when clicked.
 
-func function_sf_postingButtonedInput(_ args: Function.Arguments, _ info: inout Function.Info, _ environment: inout Function.Environment) -> Data? {
+func function_sf_postingButtonedInput(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: inout Functions.Environment) -> Data? {
     
     
     // Check access rights
@@ -132,7 +132,7 @@ func function_sf_postingButtonedInput(_ args: Function.Arguments, _ info: inout 
     
     var value: String?
     
-    for t in parameters.all {
+    for t in serverParameters.all {
         
         if t.name.caseInsensitiveCompare(arr[1]) == ComparisonResult.orderedSame {
             value = t.stringValue
@@ -146,11 +146,9 @@ func function_sf_postingButtonedInput(_ args: Function.Arguments, _ info: inout 
     if value == nil {
         if let postInfo = environment.serviceInfo[.postInfoKey] as? PostInfo {
             if let name = postInfo["DomainName"] {
-                if let domain = domains.domain(forName: name) {
+                if let domain = domains.domain(for: name) {
                     switch arr[1] {
-                    case "name": value = domain.name
-                    case "wwwincluded": value = domain.wwwIncluded.description
-                    case "root": value = domain.root
+                    case "root": value = domain.webroot
                     case "forewardurl": value = domain.forwardUrl
                     case "enabled": value = domain.enabled.description
                     case "accesslogenabled": value = domain.accessLogEnabled.description

@@ -1,6 +1,6 @@
 // =====================================================================================================================
 //
-//  File:       StorageUrls.swift
+//  File:       Urls.swift
 //  Project:    Swiftfire
 //
 //  Version:    1.0.0
@@ -67,9 +67,20 @@
 import Foundation
 
 
-public final class StorageUrls {
+public final class Urls {
     
     
+    /// Determines if a file exists and is not a directory
+    
+    public static func exists(url: URL?) -> Bool {
+        if url == nil { return false }
+        var isDir: ObjCBool = false
+        let exists = FileManager.default.fileExists(atPath: url!.path, isDirectory: &isDir)
+        if isDir.boolValue { return false }
+        return exists
+    }
+
+
     /// Create a directory url and ensure that the directory exists.
     ///
     /// - Parameters:
@@ -151,6 +162,12 @@ public final class StorageUrls {
     
     public static var serverBlacklistFile: URL? = { fileUrl(settingsDir, "server-blacklist.json") }()
     
+
+    // =================================================================================================================
+    /// The directory for the server telemetry
+    
+    public static var serverTelemetryDir: URL? = { dirUrl(rootDir, "telemetry") }()
+
     
     // =================================================================================================================
     /// The directory containing the logging files
@@ -158,16 +175,18 @@ public final class StorageUrls {
     public static var logsDir: URL? = { dirUrl(rootDir, "logs") }()
 
     
+    // =================================================================================================================
     /// The directory containing the header logging files
     
     public static var headersLogDir: URL? = { dirUrl(logsDir, "headers") }()
 
     
-    /// The directory containing the application log files
+    // =================================================================================================================
+    /// The directory containing the application log files (These are files that are written by SwifterLog)
     
     public static var applicationLogDir: URL? = { dirUrl(logsDir, "application") }()
 
-        
+
     // =================================================================================================================
     /// The directory for the statistics file
     
@@ -175,34 +194,94 @@ public final class StorageUrls {
 
     
     // =================================================================================================================
-    /// The directory for the statistics file
-    
-    public static var statisticsDir: URL? = { dirUrl(rootDir, "statistics") }()
-
-    
-    /// The file with statistics information
-    
-    public static var statisticsFile: URL? = { fileUrl(statisticsDir, "statistics.json") }()
-
-    
-    // =================================================================================================================
-    /// The directory for the domains
+    /// The directory for the domains (and aliasses)
     
     public static var domainsDir: URL? = { dirUrl(rootDir, "domains") }()
     
     
     /// The file with domain defaults
     
-    public static var domainDefaultsFile: URL? = { fileUrl(domainsDir, "domain-defaults.json") }()
+    public static var domainsAndAliasesFile: URL? = { fileUrl(domainsDir, "domainsAndAliases.json") }()
     
     
-    /// Determines if a file exists and is not a directory
+    // =================================================================================================================
+    /// The root directory for a domain
     
-    public static func exists(url: URL?) -> Bool {
-        if url == nil { return false }
-        var isDir: ObjCBool = false
-        let exists = FileManager.default.fileExists(atPath: url!.path, isDirectory: &isDir)
-        if isDir.boolValue { return false }
-        return exists
+    public static func domainDir(for name: String) -> URL? { return dirUrl(domainsDir, name) }
+
+    
+    /// The domain accounts directory
+    
+    public static func domainAccountsDir(for name: String) -> URL? { return dirUrl(domainDir(for: name), "accounts") }
+
+    
+    /// The directory for domain logfiles
+    
+    public static func domainLoggingDir(for name: String) -> URL? { return dirUrl(domainDir(for: name), "logging") }
+
+    
+    /// The directory for 404 logfiles
+    
+    public static func domainFour04LogDir(for name: String) -> URL? { return fileUrl(domainLoggingDir(for: name), "four04Logs")}
+
+    
+    /// The directory for access logfiles
+    
+    public static func domainAccessLogDir(for name: String) -> URL? { return fileUrl(domainLoggingDir(for: name), "accessLogs")}
+
+
+    /// The sessions logging directory
+    
+    public static func domainSessionLogDir(for name: String) -> URL? { return dirUrl(domainLoggingDir(for: name), "sessions") }
+    
+
+    /// The directory for the domain statistics
+    
+    public static func domainStatisticsDir(for name: String) -> URL? { return dirUrl(domainDir(for: name), "statistics") }
+
+    
+    /// The directory for the domain settings
+    
+    public static func domainSettingsDir(for name: String) -> URL? { return dirUrl(domainDir(for: name), "settings") }
+
+    
+    /// The file with the setup information for a domain
+    
+    public static func domainSetupFile(for name: String) -> URL? {
+        return fileUrl(domainSettingsDir(for: name), "setup.json")
     }
+
+    
+    /// The file with the services names for a domain
+    
+    public static func domainServiceNamesFile(for name: String) -> URL? {
+        return fileUrl(domainSettingsDir(for: name), "service-names.json")
+    }
+
+    
+    /// The file for clients blacklisted by the domain
+    
+    public static func domainBlacklistFile(for name: String) -> URL? {
+        return fileUrl(domainSettingsDir(for: name), "blacklist.json")
+    }
+
+
+    /// The directory for the domain SSL certificates and keys
+    
+    public static func domainSslDir(for name: String) -> URL? { return dirUrl(domainDir(for: name), "ssl") }
+
+    
+    /// The directory for the domain PHP messages
+    
+    public static func domainPhpDir(for name: String) -> URL? { return dirUrl(domainDir(for: name), "php") }
+
+    
+    /// The file for the domain hit counters
+    
+    public static func domainHitCountersDir(for name: String) -> URL? { return fileUrl(domainDir(for: name), "hit-counters") }
+
+    
+    /// The file for the domain telemetry
+    
+    public static func domainTelemetryDir(for name: String) -> URL? { return fileUrl(domainDir(for: name), "telemetry") }
 }

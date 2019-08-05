@@ -86,7 +86,7 @@ import Core
 
 /// - Returns: A button with an action to remove a domain.
 
-func function_sf_deleteDomain(_ args: Function.Arguments, _ info: inout Function.Info, _ environment: inout Function.Environment) -> Data? {
+func function_sf_deleteDomain(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: inout Functions.Environment) -> Data? {
     
     
     // Check that a server admin is logged in
@@ -115,7 +115,7 @@ func function_sf_deleteDomain(_ args: Function.Arguments, _ info: inout Function
             return "***Error***".data(using: String.Encoding.utf8)
     }
     
-    guard domains.contains(domainWithName: name) else {
+    guard domains.contains(name) else {
         Log.atError?.log("Domain with name \(name) does not exist", from: Source(id: -1, file: #file, function: #function, line: #line))
         return "***Error***".data(using: String.Encoding.utf8)
     }

@@ -42,28 +42,44 @@
 
 import Foundation
 
+import BRBON
+
 
 /// User Info key's
 
-public enum AccountInfoKey: String {
+public class AccountInfoKey {
+    
+    
+    // ====================
+    // BEGIN: Do not change
+    // ====================
     
     
     /// [Int64] The date the user was created, in msec since begin 1970.
     
-    case created = "Created"
+    let created = NameField("Created")!
     
     
     /// [Int64] The date the user was last logged in, in mSec since begin 1970.
     
-    case lastLogin = "LastLogin"
+    let lastLogin = NameField("LastLogin")!
     
     
     /// [Bool] If 'true' then auto login is enabled.
     
-    case autoLogin = "AutoLogin"
+    let autoLogin = NameField("AutoLogin")!
     
     
-    /// The email address of the user.
+    /// [String] The email address of the user.
     
-    case email = "Email"
+    let email = NameField("Email")!
+    
+    
+    // ==================
+    // END: Do not change
+    // ==================
+    
+    
+    // Add non-framework definitions below
+    
 }

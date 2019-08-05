@@ -101,7 +101,7 @@ import Core
 ///
 /// - Returns: Always .next.
 
-func service_getFileAtResourcePath(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: inout Service.Info, _ response: inout Response) -> Service.Result {
+func service_getFileAtResourcePath(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: inout Services.Info, _ response: inout Response) -> Services.Result {
     
     
 
@@ -170,7 +170,7 @@ func service_getFileAtResourcePath(_ request: Request, _ connection: SFConnectio
             
         case .success(let doc):
 
-            var environment = Function.Environment(request: request, connection: connection, domain: domain, response: &response, serviceInfo: &info)
+            var environment = Functions.Environment(request: request, connection: connection, domain: domain, response: &response, serviceInfo: &info)
             
             body = doc.getContent(with: &environment)
         }

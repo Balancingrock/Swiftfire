@@ -58,7 +58,119 @@ public final class Domains {
     
     /// Create a new Domains object.
     
-    public init() {}
+    init?() {
+        
+        // Make sure the domains directory exists
+        
+        guard Urls.domainsAndAliasesFile != nil else {
+            Log.atEmergency?.log("Cannot create or locate domains directory and/or domains & aliases file")
+            return nil
+        }
+    }
+    
+    
+    /// Loads the domains and aliases file.
+    ///
+    /// - Returns: True if the application can continue, false if not.
+    
+    public func loadDomainsAndAliases() -> Bool {
+        
+        
+        // Make sure the domains directory exists
+        
+        guard let url = Urls.domainsAndAliasesFile else {
+            Log.atEmergency?.log("Cannot create or locate domains directory and/or domains & aliases file")
+            return false
+        }
+        
+
+        // Check if the domains and aliases file exists
+        
+        var isDir: ObjCBool = false
+        guard FileManager.default.fileExists(atPath: url.path, isDirectory: &isDir) else {
+            if isDir.boolValue {
+                Log.atEmergency?.log("Domains and aliases file is nto a file but a directory \(url.path)")
+                return false
+            } else {
+                Log.atNotice?.log("No domains and aliases file exists at \(url.path)")
+                return true
+            }
+        }
+
+        
+        // Check if the file is readable
+        
+        guard FileManager.default.isReadableFile(atPath: url.path) else {
+            Log.atEmergency?.log("Domains and aliases file exists but is not readable at \(url.path)")
+            return false
+        }
+        
+        
+        // Get the list of domains and aliases
+        
+        guard let json = try? VJson.parse(file: url) else {
+            Log.atEmergency?.log("Error parsing domains and aliases file")
+            return false
+        }
+        
+        
+        // Create the domains and make entries for the aliases
+        
+        for item in json {
+            
+            
+            // Get domain name
+            
+            guard let name = item["domain"].stringValue else {
+                Log.atEmergency?.log("Missing value for domain name")
+                return false
+            }
+            
+            
+            // Create and add domain
+            
+            guard let domain = Domain(name) else {
+                Log.atEmergency?.log("Cannot create/load domain with name \(name)")
+                return false
+            }
+            domains[name] = domain
+            
+            
+            // Get alias and point it to the domain
+            
+            let alias = item["alias"].stringValue ?? ""
+            
+            if !alias.isEmpty && (alias != name) {
+                domains[alias] = domain
+            }
+        }
+        
+        return true
+    }
+    
+    
+    // Save the domains& aliases list as well as the domains to file
+    
+    public func storeDomainsAndAliases() {
+        
+        guard let url = Urls.domainsAndAliasesFile else {
+            Log.atEmergency?.log("Cannot retrieve domains and aliases file url, domains list not saved")
+            return
+        }
+        
+        
+        // Create a JSON ARRAY with the domain names and aliases in it and write that to file
+        
+        let json = VJson.array()
+        for (key, value) in domains {
+            let item = VJson.object()
+            item["alias"] &= key
+            item["domain"] &= value.name
+            json.append(item)
+        }
+        
+        json.save(to: url)
+    }
 }
 
 
@@ -96,8 +208,8 @@ extension Domains {
     ///
     /// - Returns: True if the domain is present, false if it is not present.
     
-    public func contains(domainWithName name: String) -> Bool {
-        return domain(forName: name) != nil
+    public func contains(_ name: String) -> Bool {
+        return domains[name] != nil
     }
 
     
@@ -109,75 +221,67 @@ extension Domains {
     ///
     /// - Returns: Either the requested domain or nil.
     
-    public func domain(forName name: String?) -> Domain? {
+    public func domain(for name: String?) -> Domain? {
         
         guard let name = name else { return nil }
         
-        let lname = name.lowercased()
+        return domains[name.lowercased()]
+    }
+    
+    
+    /// Create a domain for the given name and add it to the domains. No action results if the domain already existed.
+    ///
+    /// - Parameter name: The name for the new domain must be created.
+    ///
+    /// - Returns: If a domain was created, the new domain is returned. Otherwise nil is returned. I.e. if the domain already existed, a nil will be returned.
+    
+    public func createDomain(for name: String?) -> Domain? {
         
-        for (_, d) in domains {
-            if d.name == lname { return d }
-            if d.wwwIncluded {
-                if lname == "www." + d.name { return d }
+        guard let name = name else { return nil }
+        
+        if domains[name.lowercased()] == nil {
+            let domain = Domain(name.lowercased())
+            domains[name.lowercased()] = domain
+            return domain
+        } else {
+            return nil
+        }
+    }
+    
+    
+    /// Create an alias for the domain with the given name. If there is no such domain, nothing will be done.
+    
+    public func createAlias(_ alias: String?, forDomainWithName name: String?) {
+    
+        guard let alias = alias, let name = name else { return }
+        
+        if let domain = domains[name.lowercased()] {
+            domains[alias.lowercased()] = domain
+        }
+    }
+    
+    
+    /// Removes the given domain or alias from the managed domains. If a domain is removed, possible aliases will also be removed. If an alias is removed the corresponding domain will be unaffected.
+    ///
+    /// - Parameter name: The name of the domain or alias to be removed.
+    
+    public func remove(_ name: String) {
+        
+        // Remove all entries that point to a domain with the given name
+        
+        for key in domains.keys {
+                    
+            if domains[key]!.name == name.lowercased() {
+                domains.removeValue(forKey: key)
             }
         }
-        
-        return nil
-    }
-    
-    
-    /// Adds the given domain as a new domain. Adds self as the name changed listener.
-    ///
-    /// - Parameter domain: The domain to be added.
-    ///
-    /// - Returns: True if the domain was added, false if there was already a domain with that name.
-    
-    @discardableResult
-    public func add(domain: Domain) -> Bool {
-        
-        if contains(domainWithName: domain.name) { return false }
-        
-        domains[domain.name.lowercased()] = domain
-                
-        return true
-    }
-    
-    
-    /// Removes the given domain from the managed domains.
-    ///
-    /// - Parameter domainWithName: The name of the domain to be removed. Note that this must match the domain name exactly, the "wwwIncluded" property will not be tested.
-    ///
-    /// - Returns: True if the domain was found and removed, false if not.
-    
-    @discardableResult
-    public func remove(domainWithName name: String) -> Bool {
-        
-        let lname = name.lowercased()
-
-        return domains.removeValue(forKey: lname) != nil
     }
     
     
     /// Invokes serverShutdown on each domain.
     
-    public func serverShutdown() -> Result<Bool> {
-        return domains.reduce(Result<Bool>.success(true)) { $0 + $1.value.serverShutdown() }
-    }
-    
-    
-    /// Called from a domain when its name was changed
-    
-    public func domainNameChanged(from oldName: String, to newName: String) {
-        if let d = domains.removeValue(forKey: oldName) {
-            domains[newName] = d
-        }
-    }
-    
-    
-    /// Reset the telemetry of all domains to their default values.
-    
-    public func resetTelemetry() {
-        domains.forEach(){ $0.value.telemetry.reset() }
+    public func serverShutdown() {
+        return domains.forEach { $0.value.serverShutdown() }
     }
 }
 
@@ -192,22 +296,24 @@ extension Domains: Sequence {
         public typealias Element = Domain
         
         // The object for which the generator generates
-        private let source: Domains
+        private var source: Dictionary<String, Domain> = [:]
         
         // The objects already delivered through the generator
         private var sent: Array<Domain> = []
         
         public init(source: Domains) {
-            self.source = source
+            for domain in source.domains.values {
+                self.source[domain.name] = domain
+            }
         }
         
         // The GeneratorType protocol
         public mutating func next() -> Element? {
             
             // Only when the source has values to deliver
-            if source.domains.values.count > 0 {
+            if source.values.count > 0 {
                 
-                let values = source.domains.values
+                let values = source.values
                 let sortedValues = values.sorted(by: {$0.name < $1.name})
                 
                 // Find a value that has not been sent already
@@ -236,110 +342,6 @@ extension Domains: Sequence {
     public func makeIterator() -> DomainGenerator {
         return DomainGenerator(source: self)
     }
-}
-
-
-// MARK: - VJsonConvertible
-
-extension Domains: VJsonConvertible {
-
-    public var json: VJson {
-        let json = VJson()
-        domains.forEach({ json[$0.key] &= $0.value.json })
-        return json
-    }
-    
-    public convenience init?(json: VJson?) {
-        guard let json = json else { return nil }
-        self.init()
-        for jdomain in json {
-            guard let domain = Domain(json: jdomain, manager: self) else { return nil }
-            self.add(domain: domain)
-        }
-    }
-}
-
-
-// MARK: - Storage
-
-extension Domains {
-    
-    /// Saves the settings of the domains to file.
-    ///
-    /// - Parameter toFile: The file to which to save the domains
-    ///
-    /// - Returns: Either .success(true) or .error(message: String)
-    
-    @discardableResult
-    public func save(to file: URL) -> Result<Bool> {
-        
-        domains.forEach {
-            if let url = $0.value.hitCountersUrl {
-                $0.value.hitCounters.save(to: url)
-            }
-        }
-        
-        let json = VJson()
-        json["Domains"] &= self.json
-        if let errorMsg = json.save(to: file) {
-            return .error(message: "Could not write domains-defaults to file, error: \(errorMsg)")
-        } else {
-            return .success(true)
-        }
-    }
-
-    /// Deserialize from JSON file
-    ///
-    /// - Parameter file: The URL of the file to deserialize.
-    
-    public convenience init?(file url: URL) {
-        guard let json = ((try? VJson.parse(file: url)) as VJson??) else { return nil }
-        self.init(json: json|"Domains")
-    }
-    
-    
-    /// Restore a list of domains from the given file.
-    ///
-    /// - Parameter fromFile: The file from which to restore the domains
-    ///
-    /// - Returns: .success(message) if the operation was successful, .error(message) otherwise.
-    
-    @discardableResult
-    public func restore(from file: URL) -> Result<String> {
-        
-        
-        // Only if the domain-defaults file exists
-        
-        guard FileManager.default.fileExists(atPath: file.path) else {
-            return .success("No domains-defaults file available, starting without any domains")
-        }
-        
-        
-        // Read domains from file
-        
-        guard let newDomains = Domains(file: file) else {
-            do {
-                _ = try VJson.parse(file: file)
-                return .error(message: " Could not reconstruct domains from file: \(file.path)")
-            } catch let error as VJson.Exception {
-                return .error(message: error.description)
-            } catch {
-                return .error(message: "Could not read or locate file: \(file.path)")
-            }
-        }
-        
-        
-        // Update all domains
-        
-        domains = [:]
-        for domain in newDomains {
-            domains[domain.name] = domain
-        }
-        //update(withDomains: newDomains)
-        
-        return .success("Domains successfully restored from \(file.path)")
-    }
-
 }
 
 

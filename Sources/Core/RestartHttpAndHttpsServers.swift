@@ -75,7 +75,7 @@ public func restartHttpAndHttpsServers() {
         
         httpServer?.stop()
         
-        telemetry.httpServerStatus.value = "Stopping"
+        serverTelemetry.httpServerStatus.value = "Stopping"
         
         
         // Wait until it is stopped
@@ -88,7 +88,7 @@ public func restartHttpAndHttpsServers() {
         }
         
         if !(httpServer?.isRunning ?? false) {
-            telemetry.httpServerStatus.value = "Not Running"
+            serverTelemetry.httpServerStatus.value = "Not Running"
         }
     }
     
@@ -104,7 +104,7 @@ public func restartHttpAndHttpsServers() {
         
         httpsServer?.stop()
         
-        telemetry.httpsServerStatus.value = "Stopping"
+        serverTelemetry.httpsServerStatus.value = "Stopping"
     
         
         // Wait until it is stopped
@@ -117,7 +117,7 @@ public func restartHttpAndHttpsServers() {
         }
 
         if !(httpsServer?.isRunning ?? false) {
-            telemetry.httpsServerStatus.value = "Not Running"
+            serverTelemetry.httpsServerStatus.value = "Not Running"
         }
     }
     
@@ -129,22 +129,22 @@ public func restartHttpAndHttpsServers() {
         
         // Reset available connections
         
-        connectionPool.create(num: parameters.maxNofAcceptedConnections.value, generator: { return SFConnection() })
+        connectionPool.create(num: serverParameters.maxNofAcceptedConnections.value, generator: { return SFConnection() })
         
-        Log.atNotice?.log("Initialized the connection pool with \(parameters.maxNofAcceptedConnections) http connections")
+        Log.atNotice?.log("Initialized the connection pool with \(serverParameters.maxNofAcceptedConnections) http connections")
         
         
         // Rebuild the available services for the domains
         
-        domains.forEach(){ $0.rebuildServices() }
+        domains.forEach { $0.rebuildServices() }
     }
     
     
     // Restart the HTTP server
     
     httpServer = SwifterSockets.TipServer(
-        .port(parameters.httpServicePortNumber.value),
-        .maxPendingConnectionRequests(Int(parameters.maxNofPendingConnections.value)),
+        .port(serverParameters.httpServicePortNumber.value),
+        .maxPendingConnectionRequests(Int(serverParameters.maxNofPendingConnections.value)),
         .acceptQueue(httpServerAcceptQueue),
         .connectionObjectFactory(httpConnectionFactory),
         .acceptLoopDuration(2),
@@ -155,24 +155,24 @@ public func restartHttpAndHttpsServers() {
     case nil:
         
         Log.atCritical?.log("No HTTP server created")
-        telemetry.httpServerStatus.value = "Cannot"
+        serverTelemetry.httpServerStatus.value = "Cannot"
         
         
     case let .error(message)?:
         
         Log.atError?.log(message)
-        telemetry.httpServerStatus.value = "Error, see log"
+        serverTelemetry.httpServerStatus.value = "Error, see log"
         
         
     case .success?:
         
-        Log.atNotice?.log("HTTP Server started on port \(parameters.httpServicePortNumber)")
+        Log.atNotice?.log("HTTP Server started on port \(serverParameters.httpServicePortNumber)")
         
         // Log the conditions the server is running under
         
         logServerSetup()
         
-        telemetry.httpServerStatus.value = "Running"
+        serverTelemetry.httpServerStatus.value = "Running"
     }
 
     
@@ -192,7 +192,7 @@ public func restartHttpAndHttpsServers() {
         
         Log.atCritical?.log("No certificate or private key (or combo) found, cannot start the HTTPS server")
         
-        telemetry.httpsServerStatus.value = "No Cert|Key"
+        serverTelemetry.httpsServerStatus.value = "No Cert|Key"
         
     } else {
         
@@ -208,8 +208,8 @@ public func restartHttpAndHttpsServers() {
         // Restart the HTTPS server
         
         httpsServer = SecureSockets.SslServer(
-            .port(parameters.httpsServicePortNumber.value),
-            .maxPendingConnectionRequests(Int(parameters.maxNofPendingConnections.value)),
+            .port(serverParameters.httpsServicePortNumber.value),
+            .maxPendingConnectionRequests(Int(serverParameters.maxNofPendingConnections.value)),
             .acceptQueue(httpsServerAcceptQueue),
             .connectionObjectFactory(httpConnectionFactory),
             .acceptLoopDuration(2),
@@ -223,31 +223,31 @@ public func restartHttpAndHttpsServers() {
         case nil:
             
             Log.atCritical?.log("No HTTPS server created")
-            telemetry.httpsServerStatus.value = "Cannot"
+            serverTelemetry.httpsServerStatus.value = "Cannot"
             
             
         case let .error(message)?:
             
             Log.atError?.log(message)
-            telemetry.httpsServerStatus.value = "Error"
+            serverTelemetry.httpsServerStatus.value = "Error"
             
             
         case .success?:
             
-            Log.atNotice?.log("HTTPS Server started on port \(parameters.httpsServicePortNumber)")
+            Log.atNotice?.log("HTTPS Server started on port \(serverParameters.httpsServicePortNumber)")
             
             // Log the conditions the server is running under
             
             logServerSetup()
             
-            telemetry.httpsServerStatus.value = "Running"
+            serverTelemetry.httpsServerStatus.value = "Running"
         }
     }
 }
 
 fileprivate func buildServerCtx() -> ServerCtx? {
     
-    guard let sslServerDir = StorageUrls.sslServerDir else {
+    guard let sslServerDir = Urls.sslServerDir else {
         Log.atError?.log("No sll server directory found")
         return nil
     }

@@ -127,7 +127,7 @@ public func postingButtonedInput(target: String, inputName: String, inputValue: 
 
 /// Creates a (text) link that will post the key/value combination when clicked.
 
-func function_postingButtonedInput(_ args: Function.Arguments, _ info: inout Function.Info, _ environment: inout Function.Environment) -> Data? {
+func function_postingButtonedInput(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: inout Functions.Environment) -> Data? {
     
     // Check for minimum the 4 arguments and an even number of arguments
     

@@ -1,6 +1,6 @@
 // =====================================================================================================================
 //
-//  File:       HttpHeaderLogger.swift
+//  File:       Logfile.HttpHeaderLogger.swift
 //  Project:    Swiftfire
 //
 //  Version:    1.0.0
@@ -57,10 +57,11 @@ public final class HttpHeaderLogger: Logfile {
     
     /// Creates a new logger.
     ///
-    /// - Parameter inDirectory: A URL pointig at the directory in which to create the logger files.
+    /// - Parameter logDir: A URL pointig at the directory in which to create the logger files.
     
-    public init(rootDir: URL) {
-        super.init(name: "HeaderLog", ext: "txt", dir: rootDir, options: .newFileDailyAt(WallclockTime(hour: 0, minute: 0, second: 0)), .maxFileSize(parameters.maxFileSizeForHeaderLogging.value))
+    public init?(logDir: URL?) {
+        guard let logDir = logDir else { return nil }
+        super.init(name: "HeaderLog", ext: "txt", dir: logDir, options: .newFileDailyAt(WallclockTime(hour: 0, minute: 0, second: 0)), .maxFileSize(serverParameters.maxFileSizeForHeaderLogging.value))
     }
 
     
@@ -76,7 +77,7 @@ public final class HttpHeaderLogger: Logfile {
         // Create the message
         
         var message = "--------------------------------------------------------------------------------\n"
-        message += "Time      : \(Logfile.dateFormatter.string(from: Date.fromJavaDate(connection.timeOfAccept)))\n"
+        message += "Time      : \(dateFormatter.string(from: Date.fromJavaDate(connection.timeOfAccept)))\n"
         message += "IP Address: \(connection.remoteAddress)\n"
         message += "Log Id    : \(connection.logId)\n\n"
         message = request.lines.reduce(message) { $0 + $1 + "\n" }
@@ -85,6 +86,6 @@ public final class HttpHeaderLogger: Logfile {
         
         record(message: message)
         
-        if parameters.flushHeaderLogfileAfterEachWrite.value { flush() }
+        if serverParameters.flushHeaderLogfileAfterEachWrite.value { flush() }
     }
 }

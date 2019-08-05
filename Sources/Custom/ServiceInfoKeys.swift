@@ -81,7 +81,7 @@ public enum ServiceInfoKey: String {
     case getInfoKey = "GetInfo"
     
     
-    /// [Dictionary<String, String>] The name/value pairs for a POST request that returns form data x-www-form-urlencoded.
+    /// [Dictionary<String, String>] The name/value pairs for a POST request that returns form data of type x-www-form-urlencoded.
     ///
     /// Set by the service: DecodePostFormUrlEncoded
     

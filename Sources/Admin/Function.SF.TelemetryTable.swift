@@ -91,7 +91,7 @@ import Core
 ///
 /// - Returns: The table with all telemetry values.
 
-func function_sf_telemetryTable(_ args: Function.Arguments, _ info: inout Function.Info, _ environment: inout Function.Environment) -> Data? {
+func function_sf_telemetryTable(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: inout Functions.Environment) -> Data? {
     
     
     // Check access rights
@@ -112,7 +112,7 @@ func function_sf_telemetryTable(_ args: Function.Arguments, _ info: inout Functi
     // Create the table
     
     var table = Table(klass: "telemetry-table", columnTitles: "Name", "Value", "Description")
-    telemetry.all.forEach() { table.append($0.tableRow()) }
+    serverTelemetry.all.forEach() { table.append($0.tableRow()) }
     
     return table.html.data(using: String.Encoding.utf8)
 }

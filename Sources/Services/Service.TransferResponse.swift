@@ -89,7 +89,7 @@ import Core
 ///
 /// - Returns: Always .next.
 
-func service_transferResponse(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: inout Service.Info, _ response: inout Response) -> Service.Result {
+func service_transferResponse(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: inout Services.Info, _ response: inout Response) -> Services.Result {
     
     
     // Log the code (should be present)

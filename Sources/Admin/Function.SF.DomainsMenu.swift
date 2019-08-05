@@ -90,7 +90,7 @@ import Functions
 
 /// - Returns: A menu for the navbar containing all the domains as submenu items.
 
-func function_sf_domainsMenu(_ args: Function.Arguments, _ info: inout Function.Info, _ environment: inout Function.Environment) -> Data? {
+func function_sf_domainsMenu(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: inout Functions.Environment) -> Data? {
     
     func subitem(link: String) -> Div {
         let text = Div(klass:"text", link)

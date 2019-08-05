@@ -349,16 +349,7 @@ public class Session: CustomStringConvertible {
 
 public final class Sessions: CustomStringConvertible {
 
-    
-    /// The time format used for the filenames
-    
-    private static var fileNameFormatter: DateFormatter = {
-        let ltf = DateFormatter()
-        ltf.dateFormat = "yyyy-MM-dd'T'HH.mm.ss.SSSZ"
-        return ltf
-    }()
 
-    
     /// The queue on which all sessions functions run
     
     private static var queue: DispatchQueue = DispatchQueue(
@@ -370,24 +361,27 @@ public final class Sessions: CustomStringConvertible {
     )
     
     
-    /// The directory in which the session information will be stored if it denotes a directory. No session information will be stored if left (or set to) nil.
+    /// Enable or disable the session log
     
-    public var logDirUrl: URL? {
+    public var loggingEnabled: Bool {
         set {
             Sessions.queue.sync {
-                [weak self] in
-                self?._logDirUrl = newValue
+                self._logginEnabled = newValue
             }
         }
         get {
             return Sessions.queue.sync {
-                [weak self] in
-                return self?._logDirUrl
+                return self._logginEnabled
             }
         }
     }
     
-    private var _logDirUrl: URL?
+    private var _logginEnabled: Bool = false
+    
+    
+    /// The directory in which the session information will be stored if it denotes a directory. No session information will be stored if left (or set to) nil.
+    
+    private var logDir: URL
     
     
     /// The total number of active sessions.
@@ -398,7 +392,7 @@ public final class Sessions: CustomStringConvertible {
         return Sessions.queue.sync {
             
             [weak self] in
-            guard let `self` = self else { return 0 }
+            guard let self = self else { return 0 }
             
             self.removeInactiveSessions()
             return self.active.count
@@ -418,10 +412,10 @@ public final class Sessions: CustomStringConvertible {
         return Sessions.queue.sync {
             
             [weak self] in
-            guard let `self` = self else { return "*** nil ***" }
+            guard let self = self else { return "*** nil ***" }
 
             var str = "Sessions:\n"
-            str += " Logging dir:   \(self._logDirUrl?.path ?? "None")\n"
+            str += " Logging dir:   \(self.logDir.path)\n"
             str += " Session count: \(self.active.count)\n"
             
             if self.active.count == 0 {
@@ -438,8 +432,9 @@ public final class Sessions: CustomStringConvertible {
     
     /// Create a new sessions object
     
-    public init(logDirUrl: URL) {
-        _logDirUrl = logDirUrl
+    public init?(loggingDirectory dir: URL?) {
+        guard let dir = dir else { return nil }
+        logDir = dir
         periodicPurge()
     }
     
@@ -526,7 +521,7 @@ public final class Sessions: CustomStringConvertible {
     
     private func removeSession(_ id: UUID) {
         guard let session = active[id] else { return }
-        storeSession(session)
+        if loggingEnabled { storeSession(session) }
         active[id] = nil
         Log.atInfo?.log(
             "Purged inactive session for \(id.uuidString)",
@@ -538,12 +533,11 @@ public final class Sessions: CustomStringConvertible {
     /// Stores the data of a session to disk, if a valid Sessions.storeUrl is specified.
     
     private func storeSession(_ session: Session) {
-        guard let logDirUrl = _logDirUrl else { return }
         let content = session.json.code
         let dateForName = Date(timeIntervalSince1970: TimeInterval(session.started))
         let uuidForName = session.id.uuidString
-        let fileName = "\(Sessions.fileNameFormatter.string(from: dateForName))-\(uuidForName)"
-        let fileUrl = logDirUrl.appendingPathComponent(fileName).appendingPathExtension("json")
+        let fileName = "\(dateFormatter.string(from: dateForName))-\(uuidForName)"
+        let fileUrl = logDir.appendingPathComponent(fileName).appendingPathExtension("json")
         try? content.write(to: fileUrl, atomically: true, encoding: String.Encoding.utf8)
     }
 }

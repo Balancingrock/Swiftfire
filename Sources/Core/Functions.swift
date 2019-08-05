@@ -1,6 +1,6 @@
 // =====================================================================================================================
 //
-//  File:       Function.swift
+//  File:       Functions.swift
 //  Project:    Swiftfire
 //
 //  Version:    1.0.0
@@ -48,7 +48,7 @@ import Http
 import Custom
 
 
-public final class Function {
+public final class Functions {
     
     
     /// Should it be necessary, the environment holds references to the original request as well as the connection object that is used and the response so far.
@@ -80,14 +80,14 @@ public final class Function {
         
         /// The service chain info object.
         
-        public var serviceInfo: Service.Info
+        public var serviceInfo: Services.Info
         
         
         /// Create a new instance
         ///
         /// - Note: the connection must in fact be an SFConnection.
         
-        public init(request: Request, connection: SFConnection, domain: Domain, response: inout Response, serviceInfo: inout Service.Info) {
+        public init(request: Request, connection: SFConnection, domain: Domain, response: inout Response, serviceInfo: inout Services.Info) {
             self.request = request
             self.connection = connection
             self.domain = domain
@@ -143,15 +143,15 @@ public final class Function {
     
     /// The signature of the "Insert Content Here" function calls
     
-    public typealias Signature = (_ args: Function.Arguments, _ info: inout Function.Info, _ environment: inout Function.Environment) -> Data?
+    public typealias Signature = (_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: inout Functions.Environment) -> Data?
 
     
     /// The combo of name and function
     
     public struct Entry {
         let name: String
-        let function: Function.Signature
-        init(_ name: String, _ function: @escaping Function.Signature) {
+        let function: Functions.Signature
+        init(_ name: String, _ function: @escaping Functions.Signature) {
             self.name = name
             self.function = function
         }
@@ -160,7 +160,7 @@ public final class Function {
     
     /// The available functions
     
-    public var registered: Dictionary<String, Function.Entry> = [:]
+    public var registered: Dictionary<String, Functions.Entry> = [:]
     
     
     /// Make this class instantiable
@@ -171,7 +171,7 @@ public final class Function {
 
 // MARK: - Operational
 
-extension Function {
+extension Functions {
     
     
     /// Register a function
@@ -183,7 +183,7 @@ extension Function {
     /// - Returns: True if the function was added, false if it was already present.
     
     @discardableResult
-    public func register(name: String, function: @escaping Function.Signature) -> Bool {
+    public func register(name: String, function: @escaping Functions.Signature) -> Bool {
         if registered[name] == nil {
             registered[name] = Entry(name, function)
             return true
@@ -196,7 +196,7 @@ extension Function {
 
 // MARK: - CustomStringConvertible
 
-extension Function: CustomStringConvertible {
+extension Functions: CustomStringConvertible {
     
     public var description: String {
         var str = "Registered functions:\n"

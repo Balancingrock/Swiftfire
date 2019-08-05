@@ -1,6 +1,6 @@
 // =====================================================================================================================
 //
-//  File:       Service.swift
+//  File:       Services.swift
 //  Project:    Swiftfire
 //
 //  Version:    1.0.0
@@ -58,7 +58,7 @@ public typealias PostInfo = ReferencedDictionary
 ///
 /// To register a service, call the "register" operation in the startup of the main file.
 
-public final class Service {
+public final class Services {
     
 
     /// This type allows services in the chain to communicate downstream: a service in the chain can give information to downstream services.
@@ -105,7 +105,7 @@ public final class Service {
     ///
     /// - Returns: 'true' to continue the service chain, 'false' to abort it. Note: this is designed to abort a service chain in case of errors, but it may be usefull in other situations as well. However normally the service chain is expected to continue from start to finish such that every service gets a chance to perform its intended function. Returning 'false' for non-error cases places conditions on the sequence of services which necessitates proper end user instructions.
 
-    public typealias Signature = (_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: inout Service.Info, _ response: inout Response) -> Service.Result
+    public typealias Signature = (_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: inout Services.Info, _ response: inout Response) -> Services.Result
 
 
     /// The combo of name and service
@@ -113,7 +113,7 @@ public final class Service {
     public struct Entry {
         public let name: String
         public let service: Signature
-        public init(_ name: String, _ service: @escaping Service.Signature) {
+        public init(_ name: String, _ service: @escaping Services.Signature) {
             self.name = name
             self.service = service
         }
@@ -122,7 +122,7 @@ public final class Service {
     
     /// The available services
 
-    public var registered: Dictionary<String, Service.Entry> = [:]
+    public var registered: Dictionary<String, Services.Entry> = [:]
     
     
     /// Make this class instantiable
@@ -133,7 +133,7 @@ public final class Service {
 
 // MARK: - Operational inerface
 
-extension Service {
+extension Services {
     
     /// Register a service
     ///
@@ -144,7 +144,7 @@ extension Service {
     /// - Returns: True if the services was added, false if it was already present.
 
     @discardableResult
-    public func register(name: String, service: @escaping Service.Signature) -> Bool {
+    public func register(name: String, service: @escaping Services.Signature) -> Bool {
         if registered[name] == nil {
             registered[name] = Entry(name, service)
             return true
@@ -157,7 +157,7 @@ extension Service {
 
 // MARK: - CustomStringConvertible
 
-extension Service: CustomStringConvertible {
+extension Services: CustomStringConvertible {
     
     public var description: String {
         var str = "Registered services:\n"

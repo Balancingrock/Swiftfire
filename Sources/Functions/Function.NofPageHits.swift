@@ -90,7 +90,7 @@ import Core
 ///
 /// If the argument does not contain any arguments, it will return the count for the currently requested resource.
 
-public func function_nofPageHits(_ args: Function.Arguments, _ info: inout Function.Info, _ environment: inout Function.Environment) -> Data? {
+public func function_nofPageHits(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: inout Functions.Environment) -> Data? {
     
     var count: String = "*error*"
     

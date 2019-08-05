@@ -143,68 +143,41 @@ public final class DomainTelemetry {
 }
 
 
-// MARK: - Operational
+// MARK: - Functional Interface
 
 extension DomainTelemetry {
     
+    
     /// Reset all telemetry values to their default value.
     
-    func reset() {
-        all.forEach({ $0.reset() })
+    func reset() { all.forEach({ $0.reset() }) }
+    
+    
+    /// Store all telemetry values to file in the JSON format.
+    
+    public func store(to dir: URL?) {
+        
+        guard let file = timestampedFileUrl(dir: dir, name: "telemetry", ext: "json") else { return }
+        
+        Log.atNotice?.log("Storing domain telemetry to \(file.path)")
+        
+        let json = VJson.object()
+        all.forEach { json[$0.name] &= $0.value }
+        _ = json.save(to: file)
     }
 }
 
 
-// MARK: - CustomStringConvertible
+// MARK: - Auxillary
 
-extension DomainTelemetry: CustomStringConvertible {
+extension DomainTelemetry {
+    
+    
+    /// - Returns: A string represenattion of this object.
     
     public var description: String {
         var str = ""
         str += all.map({ " \($0.name): \($0.value)" }).joined(separator: "\n")
         return str
-    }
-}
-
-
-// MARK: - VJsonConvertible
-
-extension DomainTelemetry: VJsonConvertible {
-    
-    
-    /// The VJson hierarchy representation for this object
-    
-    public var json: VJson {
-        let json = VJson()
-        all.forEach({ json[$0.name] &= $0.value })
-        return json
-    }
-    
-    
-    /// The recreation from JSON code
-    
-    public convenience init?(json: VJson?) {
-        
-        guard let json = json else { return nil }
-        
-        self.init()
-        
-        var allCopy = all
-        
-        OUTER: for (name, value) in json.dictionaryValue {
-            for (index, item) in allCopy.enumerated() {
-                if item.name == name {
-                    if let newValue = value.intValue {
-                        item.value = newValue
-                        allCopy.remove(at: index)
-                        continue OUTER
-                    }
-                }
-            }
-        }
-        
-        assert (allCopy.count == 0)
-        
-        guard allCopy.count == 0 else { return nil }
     }
 }

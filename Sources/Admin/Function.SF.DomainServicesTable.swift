@@ -88,7 +88,7 @@ import Core
 
 /// - Returns: A detail of the current domain.
 
-func function_sf_domainServicesTable(_ args: Function.Arguments, _ info: inout Function.Info, _ environment: inout Function.Environment) -> Data? {
+func function_sf_domainServicesTable(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: inout Functions.Environment) -> Data? {
     
     
     // Check that a server admin is logged in
@@ -111,7 +111,7 @@ func function_sf_domainServicesTable(_ args: Function.Arguments, _ info: inout F
     guard let postInfo = environment.serviceInfo[.postInfoKey] as? PostInfo,
         let name = postInfo["DomainName"] else { return "***Error***".data(using: String.Encoding.utf8) }
     
-    guard let domain = domains.domain(forName: name) else { return "***Error***".data(using: String.Encoding.utf8) }
+    guard let domain = domains.domain(for: name) else { return "***Error***".data(using: String.Encoding.utf8) }
     
     
     // Prepare the table data

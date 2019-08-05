@@ -92,7 +92,7 @@ import Functions
 ///
 /// - Returns: The table with all telemetry values.
 
-func function_sf_domainsTable(_ args: Function.Arguments, _ info: inout Function.Info, _ environment: inout Function.Environment) -> Data? {
+func function_sf_domainsTable(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: inout Functions.Environment) -> Data? {
     
     
     // Check access rights

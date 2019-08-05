@@ -73,7 +73,7 @@ public  class SFDocument: EstimatedMemoryConsumption {
     /// This cache contains SFDocuments that have already been processed.
     
     private static var cache: MemoryCache<String, SFDocument> = {
-        let cacheSize = parameters.sfDocumentCacheSize.value * 1024 * 1024
+        let cacheSize = serverParameters.sfDocumentCacheSize.value * 1024 * 1024
         return MemoryCache<String, SFDocument>(limitStrategy: .bySize(cacheSize), purgeStrategy: .leastUsed)
     }()
     
@@ -120,12 +120,12 @@ public  class SFDocument: EstimatedMemoryConsumption {
         
         /// References the function closure
         
-        let function: Function.Signature?
+        let function: Functions.Signature?
         
         
         /// The arguments in the function brackets.
         
-        var arguments: Function.Arguments
+        var arguments: Functions.Arguments
         
 
         /// CustomStringConvertible
@@ -137,7 +137,7 @@ public  class SFDocument: EstimatedMemoryConsumption {
         
         /// Create a new instance
         
-        init(name: String, function: Function.Signature?, arguments: Function.Arguments) {
+        init(name: String, function: Functions.Signature?, arguments: Functions.Arguments) {
             self.name = name
             self.function = function
             self.arguments = arguments
@@ -236,11 +236,11 @@ public  class SFDocument: EstimatedMemoryConsumption {
     
     /// Processes the function calls and merges the original document data with the results.
     
-    public func getContent(with environment: inout Function.Environment) -> Data {
+    public func getContent(with environment: inout Functions.Environment) -> Data {
         
         // Thread safety: All data that is updated and/or returned must reside in local (stack) storage.
         
-        var info = Function.Info()
+        var info = Functions.Info()
         
         var data = Data()
         

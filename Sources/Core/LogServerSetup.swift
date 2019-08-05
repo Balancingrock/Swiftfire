@@ -45,7 +45,7 @@ import SwifterLog
 
 func logServerSetup() {
     
-    Log.atNotice?.log("Configuration parameters values:\n\n\(parameters)\n")
+    Log.atNotice?.log("Configuration parameters values:\n\n\(serverParameters)\n")
     
     Log.atNotice?.log("Server Blacklist:\n\n\(serverBlacklist)\n")
     
@@ -53,7 +53,7 @@ func logServerSetup() {
     
     Log.atNotice?.log("Registered Functions:\n\n\(functions)\n")
     
-    Log.atNotice?.log("Domain settings:\n\n\(domains)\n")
+    Log.atNotice?.log("Domain settings:\n\n\(String(describing: domains))\n")
     
     Log.atNotice?.log("ServerAdminDomain settings:\n\n\(String(describing: serverAdminDomain))\n")
 }

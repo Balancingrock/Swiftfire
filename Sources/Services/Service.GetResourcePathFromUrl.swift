@@ -115,7 +115,7 @@ import Core
 ///
 /// - Returns: Always .next.
 
-func service_getResourcePathFromUrl(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: inout Service.Info, _ response: inout Response) -> Service.Result {
+func service_getResourcePathFromUrl(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: inout Services.Info, _ response: inout Response) -> Services.Result {
     
     
     func handle400_BadRequestError(message: String) {
@@ -152,7 +152,7 @@ func service_getResourcePathFromUrl(_ request: Request, _ connection: SFConnecti
         
         // Conditional recording of all 404 path errors
         
-        domain.recordIn404Log(path)
+        domain.four04Log.record(message: path)
         
 
         // Response
@@ -259,7 +259,7 @@ func service_getResourcePathFromUrl(_ request: Request, _ connection: SFConnecti
     // Add the partial path to the root
     // =============================================================================================================
     
-    let fullPath = (domain.root as NSString).appendingPathComponent(partialPath)
+    let fullPath = (domain.webroot as NSString).appendingPathComponent(partialPath)
 
     
     // =============================================================================================================

@@ -43,9 +43,10 @@
 import Foundation
 
 
-final class AccessLog: Logfile {
+public final class AccessLog: Logfile {
     
-    public init?(logDir: URL) {
+    public init?(logDir: URL?) {
+        guard let logDir = logDir else { return nil }
         super.init(name: "AccessLog", ext: "csv", dir: logDir, options: .maxFileSize(1024), .newFileDailyAt(WallclockTime(hour: 0, minute: 0, second: 0)))
     }
     

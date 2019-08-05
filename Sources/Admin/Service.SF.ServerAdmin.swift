@@ -78,13 +78,6 @@ import Core
 import Services
 
 
-private var dateFormatter: DateFormatter = {
-    let ltf = DateFormatter()
-    ltf.dateFormat = "yyyy-MM-dd HH:mm:ss"
-    return ltf
-}()
-
-
 // These identifiers are the glue between admin creation/login pages and the code in this function.
 
 private let SERVER_ADMIN_CREATE_ACCOUNT_NAME = "ServerAdminCreateAccountName"
@@ -110,7 +103,7 @@ private let SERVER_ADMIN_LOGIN_PWD  = "ServerAdminLoginPwd"
 ///
 /// - Returns: Always .next
 
-func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: inout Service.Info, _ response: inout Response) -> Service.Result {
+func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: inout Services.Info, _ response: inout Response) -> Services.Result {
     
     
     
@@ -155,7 +148,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
         
         var html: String?
         
-        let rootPath = parameters.adminSiteRoot.value
+        let rootPath = serverParameters.adminSiteRoot.value
         
         if !rootPath.isEmpty {
             
@@ -175,7 +168,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
                 
             case .success(let doc):
                 
-                var environment = Function.Environment(request: request, connection: connection, domain: domain, response: &response, serviceInfo: &info)
+                var environment = Functions.Environment(request: request, connection: connection, domain: domain, response: &response, serviceInfo: &info)
                 
                 response.body = doc.getContent(with: &environment)
                 response.code = Response.Code._200_OK
@@ -220,7 +213,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
         
         var rootColor = "black"
         var isDir: ObjCBool = false
-        if FileManager.default.fileExists(atPath: parameters.adminSiteRoot.value, isDirectory: &isDir) {
+        if FileManager.default.fileExists(atPath: serverParameters.adminSiteRoot.value, isDirectory: &isDir) {
             if isDir.boolValue {
                 rootColor = "red"
             }
@@ -237,13 +230,13 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
                <body>
                   <div>
                      <h3>Swiftfire Status at \(dateFormatter.string(from: Date()))</h3>
-                     <p style="margin-bottom:0px;">Swiftfire Version  : \(telemetry.serverVersion.value)</p>
-                     <p style="margin-bottom:0px;">HTTP Server Status : \(telemetry.httpServerStatus.value)</p>
-                     <p style="margin-bottom:0px;">HTTPS Server Status: \(telemetry.httpsServerStatus.value)</p>
+                     <p style="margin-bottom:0px;">Swiftfire Version  : \(serverTelemetry.serverVersion.value)</p>
+                     <p style="margin-bottom:0px;">HTTP Server Status : \(serverTelemetry.httpServerStatus.value)</p>
+                     <p style="margin-bottom:0px;">HTTPS Server Status: \(serverTelemetry.httpsServerStatus.value)</p>
                      <form action="/serveradmin/sfcommand/SetRoot" method="post">
                         <div>
                            <p style="margin-bottom:0px;color:\(rootColor);">\(message)</p>
-                           <input type="text" name="\(SERVER_ADMIN_CREATE_ACCOUNT_ROOT)" value="\(parameters.adminSiteRoot.value)">
+                           <input type="text" name="\(SERVER_ADMIN_CREATE_ACCOUNT_ROOT)" value="\(serverParameters.adminSiteRoot.value)">
                            <input type="submit" value="Submit/Visit">
                          </div>
                       </form>
@@ -296,7 +289,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
     
     // Create the relative resource path.
     
-    url = URL(fileURLWithPath: parameters.adminSiteRoot.value)
+    url = URL(fileURLWithPath: serverParameters.adminSiteRoot.value)
     for comp in pathComponents { url.appendPathComponent(comp) }
     
     var relPath: String = pathComponents.reduce("") { return ($0 + "/\($1)") }
@@ -372,11 +365,9 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
                     
                     Log.atNotice?.log("Created admin account for: '\(name)'", id: connection.logId)
                     
-                    parameters.adminSiteRoot.value = root
+                    serverParameters.adminSiteRoot.value = root
                     
-                    if let url = StorageUrls.parameterDefaultsFile {
-                        parameters.save(toFile: url)
-                    }
+                    serverParameters.store()
                     
                     session[.accountKey] = account
                     
@@ -585,7 +576,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
 
     // If there is no server admin root set, then display the build-in status page where the admin can set a new root.
     
-    if parameters.adminSiteRoot.value.isEmpty {
+    if serverParameters.adminSiteRoot.value.isEmpty {
         adminStatusPage()
         if !relPath.isEmpty {
             session.info[.preLoginUrlKey] = relPath
@@ -593,7 +584,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
         return .next
     }
 
-    var absPath = parameters.adminSiteRoot.value + relPath
+    var absPath = serverParameters.adminSiteRoot.value + relPath
     
     Log.atDebug?.log("Looking for file at path: '\(absPath)'", id: connection.logId)
 
@@ -721,7 +712,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
             
         case .success(let doc):
             
-            var environment = Function.Environment(request: request, connection: connection, domain: domain, response: &response, serviceInfo: &info)
+            var environment = Functions.Environment(request: request, connection: connection, domain: domain, response: &response, serviceInfo: &info)
             
             response.body = doc.getContent(with: &environment)
             response.code = Response.Code._200_OK
@@ -766,7 +757,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
 
 fileprivate func adminSiteRootIsValid(_ filemanager: FileManager) -> Bool {
 
-    let path = parameters.adminSiteRoot.value
+    let path = serverParameters.adminSiteRoot.value
     let url = URL(fileURLWithPath: path)
     
     var isDirectory: ObjCBool = false
@@ -797,7 +788,7 @@ fileprivate enum CommandExecutionResult {
     case nop
 }
 
-fileprivate func executeSfCommand(_ pathComponents: Array<String>, _ postInfo: inout PostInfo?, _ session: Session, _ info: inout Service.Info, _ response: inout Response) -> CommandExecutionResult {
+fileprivate func executeSfCommand(_ pathComponents: Array<String>, _ postInfo: inout PostInfo?, _ session: Session, _ info: inout Services.Info, _ response: inout Response) -> CommandExecutionResult {
     
     Log.atDebug?.log(from: Source(id: -1, file: #file, function: #function, line: #line))
 
@@ -833,10 +824,8 @@ fileprivate func executeSfCommand(_ pathComponents: Array<String>, _ postInfo: i
 
 fileprivate func executeSetRoot(_ postInfo: PostInfo?) {
     guard let root = postInfo?[SERVER_ADMIN_CREATE_ACCOUNT_ROOT] else { return }
-    parameters.adminSiteRoot.value = root
-    if let url = StorageUrls.parameterDefaultsFile {
-        parameters.save(toFile: url)
-    }
+    serverParameters.adminSiteRoot.value = root
+    serverParameters.store()
     Log.atNotice?.log("Set admin root directory to: \(root)")
 }
 
@@ -846,7 +835,7 @@ fileprivate func executeSetParameter(_ postInfo: PostInfo?) {
         return
     }
     OUTER: for (key, value) in postInfo {
-        for p in parameters.all {
+        for p in serverParameters.all {
             if p.name == key {
                 _ = p.setValue(value)
                 Log.atNotice?.log("Setting parameter '\(key)' to '\(value)'")
@@ -857,29 +846,13 @@ fileprivate func executeSetParameter(_ postInfo: PostInfo?) {
     }
 }
 
-fileprivate func executeSaveParameters() {
-    if let url = StorageUrls.parameterDefaultsFile {
-        parameters.save(toFile: url)
-    }
-}
+fileprivate func executeSaveParameters() { _ = serverParameters.store() }
 
-fileprivate func executeReadParameters() {
-    if let url = StorageUrls.parameterDefaultsFile {
-        _ = parameters.restore(fromFile: url)
-    }
-}
+fileprivate func executeReadParameters() { _ = serverParameters.load() }
 
-fileprivate func executeSaveDomains() {
-    if let url = StorageUrls.domainDefaultsFile {
-        _ = domains.save(to: url)
-    }
-}
+fileprivate func executeSaveDomains() { domains.storeDomainsAndAliases() }
 
-fileprivate func executeReadDomains() {
-    if let url = StorageUrls.domainDefaultsFile {
-        _ = domains.restore(from: url)
-    }
-}
+fileprivate func executeReadDomains() { _ = domains.loadDomainsAndAliases() }
 
 fileprivate func executeUpdateBlacklist(_ postInfo: inout PostInfo?) {
     let _ = postInfo?.removeValue(forKey: "submit")
@@ -887,7 +860,7 @@ fileprivate func executeUpdateBlacklist(_ postInfo: inout PostInfo?) {
         Log.atError?.log("Missing address & action")
         return
     }
-    let newAction: BlacklistAction = {
+    let newAction: Blacklist.Action = {
         switch action {
             case "close": return .closeConnection
             case "503": return .send503ServiceUnavailable
@@ -904,7 +877,7 @@ fileprivate func executeAddToBlacklist(_ postInfo: inout PostInfo?) {
     let _ = postInfo?.removeValue(forKey: "submit")
     guard let address = postInfo?["newEntry"], isValidIpAddress(address) else { return }
     guard let action = postInfo?["action"] else { return }
-    let newAction: BlacklistAction = {
+    let newAction: Blacklist.Action = {
         switch action {
         case "close": return .closeConnection
         case "503": return .send503ServiceUnavailable
@@ -925,7 +898,7 @@ fileprivate func executeRemoveFromBlacklist(_ postInfo: inout PostInfo?) {
 fileprivate func executeUpdateDomainBlacklist(_ postInfo: inout PostInfo?) {
     let _ = postInfo?.removeValue(forKey: "submit")
     guard let name = postInfo?.removeValue(forKey: "DomainName"),
-          let domain = domains.domain(forName: name) else {
+        let domain = domains.domain(for: name) else {
             Log.atError?.log("Missing domain name")
             return
     }
@@ -933,7 +906,7 @@ fileprivate func executeUpdateDomainBlacklist(_ postInfo: inout PostInfo?) {
         Log.atError?.log("Missing address & action")
         return
     }
-    let newAction: BlacklistAction = {
+    let newAction: Blacklist.Action = {
         switch action {
         case "close": return .closeConnection
         case "503": return .send503ServiceUnavailable
@@ -949,13 +922,13 @@ fileprivate func executeUpdateDomainBlacklist(_ postInfo: inout PostInfo?) {
 fileprivate func executeAddToDomainBlacklist(_ postInfo: inout PostInfo?) {
     let _ = postInfo?.removeValue(forKey: "submit")
     guard let name = postInfo?.removeValue(forKey: "DomainName"),
-        let domain = domains.domain(forName: name) else {
+        let domain = domains.domain(for: name) else {
             Log.atError?.log("Missing domain name")
             return
     }
     guard let address = postInfo?["newEntry"], isValidIpAddress(address) else { return }
     guard let action = postInfo?["action"] else { return }
-    let newAction: BlacklistAction = {
+    let newAction: Blacklist.Action = {
         switch action {
         case "close": return .closeConnection
         case "503": return .send503ServiceUnavailable
@@ -970,7 +943,7 @@ fileprivate func executeAddToDomainBlacklist(_ postInfo: inout PostInfo?) {
 
 fileprivate func executeRemoveFromDomainBlacklist(_ postInfo: inout PostInfo?) {
     guard let name = postInfo?.removeValue(forKey: "DomainName"),
-        let domain = domains.domain(forName: name) else {
+        let domain = domains.domain(for: name) else {
             Log.atError?.log("Missing domain name")
             return
     }
@@ -989,7 +962,7 @@ fileprivate func executeUpdateDomain(_ postInfo: inout PostInfo?) {
     }
     _ = postInfo?.removeValue(forKey: "DomainName")
     
-    guard let domain = domains.domain(forName: name) else {
+    guard let domain = domains.domain(for: name) else {
         Log.atError?.log("Missing DomainName in postInfo")
         return
     }
@@ -1005,9 +978,7 @@ fileprivate func executeUpdateDomain(_ postInfo: inout PostInfo?) {
     }
     
     switch key {
-    case "name": domain.name = value
-    case "wwwincluded": domain.wwwIncluded = Bool(lettersOrDigits: value) ?? domain.wwwIncluded
-    case "root": domain.root = value
+    case "root": domain.webroot = value
     case "forewardurl": domain.forwardUrl = value
     case "enabled": domain.enabled = Bool(lettersOrDigits: value) ?? domain.enabled
     case "accesslogenabled": domain.accessLogEnabled = Bool(lettersOrDigits: value) ?? domain.accessLogEnabled
@@ -1055,7 +1026,7 @@ fileprivate func executeUpdateDomain(_ postInfo: inout PostInfo?) {
 fileprivate func executeUpdateDomainServices(_ postInfo: inout PostInfo?) {
 
     guard let domainName = postInfo?["DomainName"],
-          let domain = domains.domain(forName: domainName) else { return }
+          let domain = domains.domain(for: domainName) else { return }
     
     struct ServiceItem {
         let index: Int
@@ -1090,7 +1061,7 @@ fileprivate func executeUpdateDomainServices(_ postInfo: inout PostInfo?) {
     
     let serviceNames = serviceArr.map({ $0.name })
     
-    domain.serviceNames = serviceNames
+    domain.serviceNames = ArrayOfStrings(serviceNames)
     
     domain.rebuildServices()
 }
@@ -1105,12 +1076,12 @@ fileprivate func executeDeleteDomain(_ postInfo: inout PostInfo?) {
         return
     }
     
-    guard domains.contains(domainWithName: name) else {
+    guard domains.contains(name) else {
         Log.atError?.log("Domain '\(name)' does not exist")
         return
     }
     
-    domains.remove(domainWithName: name)
+    domains.remove(name)
     
     Log.atNotice?.log("Deleted domain '\(name)')")
 }
@@ -1125,28 +1096,17 @@ fileprivate func executeCreateDomain(_ postInfo: inout PostInfo?) {
         return
     }
     
-    guard !domains.contains(domainWithName: name) else {
+    guard !domains.contains(name) else {
         Log.atError?.log("Domain '\(name)' already exists")
         return
     }
     
-    if let url = StorageUrls.domainsDir {
-        
-        let domainUrl = url.appendingPathComponent(name, isDirectory: true)
-        
-        if let domain = Domain(name: name, manager: domains, root: domainUrl) {
-            domain.serviceNames = defaultServices
-            domains.add(domain: domain)
-            Log.atNotice?.log("Added new domain with \(domain))")
-        } else {
-            Log.atNotice?.log("Failed to domain for \(name))")
-        }
-        
+    if let domain = domains.createDomain(for: name) {
+        domain.serviceNames = ArrayOfStrings(defaultServices)
+        Log.atNotice?.log("Added new domain with \(domain))")
     } else {
-        
-        Log.atError?.log("Failed to retrieve domains directory)")
+        Log.atNotice?.log("Failed to domain for \(name))")
     }
-
 }
 
 

@@ -53,48 +53,16 @@ import Http
 public final class Domain {
     
 
-    /// A link back to the domain manager
-    
-    fileprivate unowned var manager: Domains?
-    
-    
-    /// The domain name plus extension. Use the 'www' prefix if it is necessary to differentiate between two domains: one with and one without the 'www'.
+    /// The domain name plus extension.
     ///
     /// - Note: The name will always be all-lowercase, even when set using uppercase letters.
     
-    public var name: String {
-        // Since the value is forced lowercase, didSet cannot be used.
-        set {
-            if name != newValue.lowercased() {
-    
-                // Update the _name
-                let oldValue = _name
-                self._name = newValue.lowercased()
-                
-                // Change the name of the support directory
-                let olddir = supportDirectory
-                let newdir = olddir.deletingLastPathComponent().appendingPathComponent(newValue.lowercased())
-                try? FileManager.default.moveItem(at: olddir, to: newdir)
-                supportDirectory = newdir
-                
-                manager?.domainNameChanged(from: oldValue, to: newValue)
-            }
-        }
-        get {
-            return self._name
-        }
-    }
-    private var _name: String
+    public let name: String
     
     
-    /// If the domain should map both the name with 'www' and without it to the same root, set this value to 'true'
+    /// The root folder for website for this domain.
     
-    public var wwwIncluded: Bool = true
-    
-    
-    /// The root folder for this domain.
-    
-    public var root: String = "/Library/WebServer/Documents"
+    public var webroot: String = "/Library/WebServer/Documents"
     
     
     /// The Swiftfire resource directory
@@ -170,59 +138,37 @@ public final class Domain {
     
     /// Enables the access log when set to true
     
-    public var accessLogEnabled: Bool = false {
-        didSet {
-            // Exit if nothing changed
-            guard accessLogEnabled != oldValue else { return }
-            
-            if accessLogEnabled {
-                if accessLog == nil {
-                    if let loggingDir = loggingDir {
-                        accessLog = AccessLog(logDir: loggingDir)
-                    }
-                }
-            } else {
-                accessLog?.close()
-                accessLog = nil
-            }
+    public var accessLogEnabled: Bool {
+        set {
+            guard accessLog.enabled != newValue else { return }
+            if !newValue { accessLog.close() }
+            accessLog.enabled = newValue
+        }
+        get {
+            return accessLog.enabled
         }
     }
     
     
     /// Enables the 404 log when set to true
     
-    public var four04LogEnabled: Bool = false {
-        didSet {
-            // Exit if nothing changed
-            guard four04LogEnabled != oldValue else { return }
-            
-            if four04LogEnabled {
-                if four04Log == nil {
-                    if let loggingDir = loggingDir {
-                        four04Log = Four04Log(logDir: loggingDir)
-                    }
-                }
-            } else {
-                four04Log?.close()
-                four04Log = nil
-            }
+    public var four04LogEnabled: Bool {
+        set {
+            guard four04Log.enabled != newValue else { return }
+            if !newValue { four04Log.close() }
+            four04Log.enabled = newValue
+        }
+        get {
+            return four04Log?.enabled ?? false
         }
     }
     
     
     /// Enables the session log when set to true
     
-    public var sessionLogEnabled: Bool = false {
-        didSet {
-            // Exit if nothing changed
-            guard sessionLogEnabled != oldValue else { return }
-            
-            if sessionLogEnabled {
-                sessions.logDirUrl = sessionLogDir
-            } else {
-                sessions.logDirUrl = nil
-            }
-        }
+    public var sessionLogEnabled: Bool {
+        set { sessions.loggingEnabled = newValue }
+        get { return sessions.loggingEnabled }
     }
     
     
@@ -263,7 +209,7 @@ public final class Domain {
     
     /// The names of the services used by this domain.
     
-    public var serviceNames: Array<String> = [] {
+    public var serviceNames = ArrayOfStrings() {
         didSet {
             rebuildServices()
         }
@@ -276,7 +222,7 @@ public final class Domain {
     ///
     /// - Note: The user has to ensure that the values are current and synchronised with serviceNames.
 
-    public var services: Array<Service.Entry> = []
+    public var services: Array<Services.Entry> = []
     
     
     /// The domain telemetry
@@ -286,7 +232,7 @@ public final class Domain {
     
     /// The visitor statistics database
     
-    private var statistics: VisitorStatistics?
+    private var statistics: VisitorStatistics!
     
     
     /// The number of visits per statistics file
@@ -311,28 +257,14 @@ public final class Domain {
     private var nofRecentResponseLogs: Int = 0
     
 
-    // The access log & 404 log
+    // The access log
     
-    private var accessLog: AccessLog?
-    private var four04Log: Four04Log?
-    
-    
-    /// Adding to the access log
-    
-    public func recordInAccessLog(time: Int64, ipAddress: String, url: String, operation: String, version: String) {
-        if accessLogEnabled {
-            accessLog?.record(time: time, ipAddress: ipAddress, url: url, operation: operation, version: version)
-        }
-    }
-    
-    
-    /// Adding to the 404 log
-    
-    public func recordIn404Log(_ resourcePath: String) {
-        if four04LogEnabled {
-            four04Log?.record(message: resourcePath)
-        }
-    }
+    public var accessLog: AccessLog!
+
+
+    // The 404 log
+
+    public var four04Log: Four04Log!
     
     
     /// The sessions for this domain
@@ -351,172 +283,183 @@ public final class Domain {
     public var hitCounters: HitCounters = HitCounters()
     
     
-    /// True if the hitcounters must be reloaded on startup. False if not.
-    
-    public var loadHitCountersOnStartup: Bool = false
-    
-    
-    // The support directories for this domain
-    
-    public var supportDirectory: URL {
-        didSet {
-            // Cycle the logfiles off/on to make sure they are created in the right directory
-            if accessLogEnabled {
-                accessLogEnabled = false
-                accessLogEnabled = true
-            }
-            if four04LogEnabled {
-                four04LogEnabled = false
-                four04LogEnabled = true
-            }
-        }
-    }
-    
-    
-    /// The directory for the access & 404 log files
-    
-    private lazy var loggingDir: URL? = {
-        let dir = self.supportDirectory
-        do {
-            let url = dir.appendingPathComponent("logging", isDirectory: true)
-            try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
-            return url
-        } catch {
-            return nil
-        }
-    }()
-    
-    
-    /// The directory for the statistics files
-    
-    private lazy var statisticsDir: URL? = {
-        let dir = self.supportDirectory
-        do {
-            let url = dir.appendingPathComponent("statistics", isDirectory: true)
-            try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
-            return url
-        } catch {
-            return nil
-        }
-    }()
-
-    
-    /// The directory to store the hitcounters in
-    
-    private lazy var hitCountersDir: URL? = {
-        guard let dir = self.statisticsDir else { return nil }
-        do {
-            let url = dir.appendingPathComponent("hitCounters", isDirectory: true)
-            try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
-            return url
-        } catch {
-            return nil
-        }
-    }()
-    
-    
-    /// The directory for the settings files.
-    
-    private lazy var settingsDir: URL? = {
-        let dir = self.supportDirectory
-        do {
-            let url = dir.appendingPathComponent("settings", isDirectory: true)
-            try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
-            return url
-        } catch {
-            return nil
-        }
-    }()
-    
-    
     /// The directory for the certificate files.
     
-    private lazy var sslDir: URL? = {
-        let dir = self.supportDirectory
-        do {
-            let url = dir.appendingPathComponent("ssl", isDirectory: true)
-            try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
-            return url
-        } catch {
-            return nil
-        }
-    }()
+    private lazy var sslDir: URL? = { Urls.domainSslDir(for: name) }()
 
     
     /// The directory used when processing PHP files.
     
-    lazy var phpDir: URL? = {
-        let dir = self.supportDirectory
-        do {
-            let url = dir.appendingPathComponent("php", isDirectory: true)
-            try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
-            return url
-        } catch {
-            return nil
-        }
-    }()
+    lazy var phpDir: URL? = { Urls.domainPhpDir(for: name) }()
     
-    
-    /// The directory for the session log files.
-    
-    private lazy var sessionLogDir: URL? = {
-        guard let dir = self.loggingDir else { return nil }
-        do {
-            let url = dir.appendingPathComponent("sessions", isDirectory: true)
-            try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
-            return url
-        } catch {
-            return nil
-        }
-    }()
-    
-    
-    /// The directory for the account files.
-    
-    private lazy var accountsDir: URL? = {
-        let dir = self.supportDirectory
-        do {
-            let url = dir.appendingPathComponent("accounts", isDirectory: true)
-            try FileManager.default.createDirectory(at: url, withIntermediateDirectories: true, attributes: nil)
-            return url
-        } catch {
-            return nil
-        }
-    }()
-    
-    
-    /// The file for the blacklisted clients
-    
-    private lazy var blacklistedClientsUrl: URL? = {
-        guard let settingsDir = self.settingsDir else { return nil }
-        return settingsDir.appendingPathComponent("blacklistedClients.json", isDirectory: false)
-    }()
-
-    
-    /// The file for the hitcounters
-    
-    lazy var hitCountersUrl: URL? = {
-        guard let dir = self.hitCountersDir else { return nil }
-        return dir.appendingPathComponent("hitCounters.json", isDirectory: false)
-    }()
-
     
     /// Create a new domain object.
     ///
     /// - Parameters
     ///   - name: The name for the domain.
-    ///   - manager: The domain manager (optional)
-    ///   - root: The root directory for this domain.
     
-    public init?(name: String, manager: Domains? = nil, root: URL) {
-        self.manager = manager
-        self._name = name
-        self.supportDirectory = root
-        if sessionLogDir == nil { return nil }
-        self.sessions = Sessions(logDirUrl: sessionLogDir!)
-        if accountsDir == nil { return nil }
-        self.accounts = AccountManager(root: accountsDir!)
-        self.statistics = VisitorStatistics(directory: statisticsDir, timeForDailyLogRestart: WallclockTime.init(hour: 0, minute: 0, second: 0), maxRowCount: 10)
+    public init?(_ name: String) {
+        
+        
+        // Internally only lowercased names are used.
+        
+        self.name = name.lowercased()
+        
+        
+        // Make sure the domain directory exists
+        
+        guard Urls.domainDir(for: self.name) != nil else { return nil }
+        
+
+        // Load the setup information
+        
+        loadSetup()
+
+
+        // Reload the service names
+        
+        self.serviceNames.load(from: Urls.domainServiceNamesFile(for: self.name))
+
+        
+        // Create the sessions object
+        
+        self.sessions = Sessions(loggingDirectory: Urls.domainSessionLogDir(for: self.name))
+        guard sessions != nil else {
+            Log.atEmergency?.log("Could not create sessions object for domain \(self.name)")
+            return nil
+        }
+        self.sessions.loggingEnabled = sessionLogEnabled
+        
+        
+        // Create the accounts object
+        
+        self.accounts = AccountManager(directory: Urls.domainAccountsDir(for: self.name))
+        guard accounts != nil else {
+            Log.atEmergency?.log("Could not create account manager for domain \(self.name)")
+            return nil
+        }
+
+        
+        // Create the 404 log
+        
+        self.four04Log = Four04Log(logDir: Urls.domainFour04LogDir(for: self.name))
+        guard four04Log != nil else {
+            Log.atEmergency?.log("Could not create 404 log for domain \(self.name)")
+            return nil
+        }
+        self.four04Log.enabled = four04LogEnabled
+
+        
+        // Create the access log
+        
+        self.accessLog = AccessLog(logDir: Urls.domainAccessLogDir(for: self.name))
+        guard accessLog != nil else {
+            Log.atEmergency?.log("Could not create access log for domain \(self.name)")
+            return nil
+        }
+        self.accessLog.enabled = accessLogEnabled
+
+        
+        // Restore the blacklist
+        
+        self.blacklist.load(from: Urls.domainBlacklistFile(for: self.name))
+
+        
+        // Create the statistics object
+        
+        self.statistics = VisitorStatistics(directory: Urls.domainStatisticsDir(for: self.name), timeForDailyLogRestart: WallclockTime.init(hour: 0, minute: 0, second: 0), maxRowCount: 10)
+        guard statistics != nil else {
+            Log.atEmergency?.log("Could not create statistics object for domain \(self.name)")
+            return nil
+        }
+    }
+    
+    
+    /// Read the setup information from file
+    
+    public func loadSetup() {
+    
+        guard let setupFile = Urls.domainSetupFile(for: name) else {
+            Log.atError?.log("Failed to create directory for domain setup file, domain = \(name)")
+            return
+        }
+    
+        guard let json = try? VJson.parse(file: setupFile) else { return }
+        
+        if let j = (json|"Root")?.stringValue { webroot = j }
+        if let j = (json|"ForewardUrl")?.stringValue { forwardUrl = j }
+        if let j = (json|"Enabled")?.boolValue { enabled = j }
+        if let j = (json|"AccessLogEnabled")?.boolValue { accessLogEnabled = j }
+        if let j = (json|"SessionLogEnabled")?.boolValue { sessionLogEnabled = j }
+        if let j = (json|"PhpPath")?.stringValue { phpPath = URL(fileURLWithPath: j) }
+        if let j = (json|"PhpOptions")?.stringValue { phpOptions = j }
+        if let j = (json|"PhpMapIndex")?.boolValue { phpMapIndex = j }
+        if let j = (json|"PhpMapAll")?.boolValue { phpMapAll = j }
+        if let j = (json|"PhpTimeout")?.intValue { phpTimeout = j }
+        if let j = (json|"SfResources")?.stringValue { sfresources = j }
+        if let j = (json|"SessionTimeout")?.intValue { sessionTimeout = j }
+        if let j = (json|"VisitsPerStatisticsFile")?.intValue { visitsPerStatisticsFile = j }
+        if let j = (json|"NofRecentRequestLogs")?.intValue { nofRecentRequestLogs = j }
+        if let j = (json|"NofRecentResponseLogs")?.intValue { nofRecentResponseLogs = j }
+        if let j = (json|"StatisticsRolloverTime")?.stringValue {
+            statisticsRolloverTime = WallclockTime(j) ?? WallclockTime(hour: 0, minute: 0, second: 0)
+        }
+    }
+    
+    
+    /// Prepares for application (server) shutdown
+    
+    public func serverShutdown() {
+        
+        
+        // Save collected data
+        
+        blacklist.store(to: Urls.domainBlacklistFile(for: name))
+        hitCounters.store(to: timestampedFileUrl(dir: Urls.domainHitCountersDir(for: name), name: "hitcounters", ext: "json"))
+        telemetry.store(to: timestampedFileUrl(dir: Urls.domainTelemetryDir(for: name), name: "telemetry", ext: "json"))
+        accessLog?.close()
+        four04Log?.close()
+        statistics?.close()
+        
+        
+        // Store the setup information
+        
+        storeSetup()
+    }
+    
+    
+    /// Store the setup information in the setup file
+    
+    public func storeSetup() {
+        
+        guard let setupFile = Urls.domainSetupFile(for: name) else {
+            Log.atError?.log("Failed to create directory for domain setup file, domain = \(name)")
+            return
+        }
+
+        
+        // Save domain setup
+        
+        let json = VJson.object()
+        json["Root"] &= webroot
+        json["SfResources"] &= sfresources
+        json["ForewardUrl"] &= forwardUrl
+        json["Enabled"] &= enabled
+        json["AccessLogEnabled"] &= accessLogEnabled
+        json["404LogEnabled"] &= four04LogEnabled
+        json["SessionLogEnabled"] &= sessionLogEnabled
+        json["PhpPath"] &= phpPath?.path ?? ""
+        json["PhpOptions"] &= phpOptions ?? ""
+        json["PhpMapIndex"] &= phpMapIndex
+        json["PhpMapAll"] &= phpMapAll
+        json["PhpTimeout"] &= phpTimeout
+        json["SessionTimeout"] &= sessionTimeout
+        json["StatisticsRolloverTime"] &= statisticsRolloverTime.description
+        json["VisitsPerStatisticsFile"] &= visitsPerStatisticsFile
+        json["NofRecentRequestLogs"] &= nofRecentRequestLogs
+        json["NofRecentResponseLogs"] &= nofRecentResponseLogs
+
+        json.save(to: setupFile)
     }
 }
 
@@ -585,35 +528,14 @@ extension Domain {
     }
     
     
-    /// Prepares for application (server) shutdown
-
-    public func serverShutdown() -> Result<Bool> {
-        let result = saveBlacklist()
-        accessLog?.close()
-        four04Log?.close()
-        statistics?.close()
-        return result
-    }
-    
-    
     /// Update the domain parameter with the given name from the given string.
     
     public func update(item: String, to value: String) {
         
         switch item {
             
-        case "Name":
-            name = value
-            
-        case "IncludeWww":
-            if let b = Bool.init(lettersOrDigits: value) {
-                wwwIncluded = b
-            } else {
-                Log.atError?.log("Cannot convert: \(value) to bool")
-            }
-            
         case "Root":
-            root = value
+            webroot = value
             
         case "ForewardUrl":
             forwardUrl = value
@@ -678,8 +600,8 @@ extension Domain {
         case "SfResources":
             sfresources = value
             
-        case "SupportDirectory":
-            supportDirectory = URL(fileURLWithPath: value)
+//        case "SupportDirectory":
+//            supportDirectory = URL(fileURLWithPath: value)
             
         case "SessionTimeout":
             if let i = Int(value) {
@@ -767,202 +689,8 @@ extension Domain {
     public func recordStatistics(_ visit: Visit) {
         statistics?.append(visit)
     }
-    
-    
-    /// Restore the contents of the blacklist from file.
-    
-    public func restoreBlacklist() -> Result<Bool> {
-        if let url = blacklistedClientsUrl {
-            return blacklist.restore(from: url)
-        }
-        return .error(message: "No blacklisted clients URL found")
-    }
-    
-    
-    /// Save the contents of the blacklist to file.
-    
-    public func saveBlacklist() -> Result<Bool> {
-        if let url = blacklistedClientsUrl {
-            return blacklist.save(to: url)
-        }
-        return .error(message: "No blacklisted clients URL found")
-    }
 }
 
-
-// MARK: - VJsonConvertible
-
-extension Domain {
-    
-    /// The JSON representation for this object
-    
-    var json: VJson {
-        let domain = VJson.object()
-        domain["Name"] &= name
-        domain["IncludeWww"] &= wwwIncluded
-        domain["Root"] &= root
-        domain["ForewardUrl"] &= forwardUrl
-        domain["Enabled"] &= enabled
-        domain["AccessLogEnabled"] &= accessLogEnabled
-        domain["404LogEnabled"] &= four04LogEnabled
-        domain["SessionLogEnabled"] &= sessionLogEnabled
-        domain["PhpPath"] &= phpPath?.path ?? ""
-        domain["PhpOptions"] &= phpOptions ?? ""
-        domain["PhpMapIndex"] &= phpMapIndex
-        domain["PhpMapAll"] &= phpMapAll
-        domain["PhpTimeout"] &= phpTimeout
-        domain["SfResources"] &= sfresources
-        domain["Telemetry"] &= telemetry.json
-        domain["SupportDirectory"] &= supportDirectory.path
-        domain["SessionTimeout"] &= sessionTimeout
-        domain["ServiceNames"] &= VJson(serviceNames)
-        domain["StatisticsRolloverTime"] &= statisticsRolloverTime.description
-        domain["VisitsPerStatisticsFile"] &= visitsPerStatisticsFile
-        domain["NofRecentRequestLogs"] &= nofRecentRequestLogs
-        domain["NofRecentResponseLogs"] &= nofRecentResponseLogs
-        return domain
-    }
-
-    
-    /// Recreate a domain object from a VJson hierarchy
-    ///
-    /// - Parameter json: The VJson hierarchy from which to recreate this object.
-    
-    convenience init?(json: VJson?, manager: Domains) {
-        
-        guard let json = json else { return nil }
-        
-        
-        // Create a default object
-        
-        let jsupDir = (json|"SupportDirectory")?.stringValue
-        guard let jname = (json|"Name")?.stringValue else { return nil }
-        
-        if jsupDir != nil, !jsupDir!.isEmpty {
-            let jsupDirUrl = URL(fileURLWithPath: jsupDir!, isDirectory: true)
-            self.init(name: jname, manager: manager, root: jsupDirUrl)
-        } else {
-            return nil
-        }
-        
-        
-        // Initialize the properties that must be present
-        
-        guard let jroot   = (json|"Root")?.stringValue else { return nil }
-        guard let jfurl   = (json|"ForewardUrl")?.stringValue else { return nil }
-        guard let jwww    = (json|"IncludeWww")?.boolValue else { return nil }
-        guard let jenab   = (json|"Enabled")?.boolValue else { return nil }
-        guard let jacc    = (json|"AccessLogEnabled")?.boolValue else { return nil }
-        guard let jfour   = (json|"404LogEnabled")?.boolValue else { return nil }
-        guard let jservicesNames = json|"ServiceNames" else { return nil }
-       
-        let jphppath    = (json|"PhpPath")?.stringValue
-        let jphpoptions = (json|"PhpOptions")?.stringValue
-
-        
-        // Upgrade
-        
-        if (json|"SfResources")?.stringValue == nil { json["SfResources"] &= sfresources }
-        let jsfresources = (json|"SfResources")!.stringValue!
-        
-        if (json|"SessionTimeout")?.intValue == nil { json["SessionTimeout"] &= sessionTimeout }
-        let jsessiontimeout = (json|"SessionTimeout")!.intValue!
-        
-        if (json|"SessionLogEnabled")?.boolValue == nil { json["SessionLogEnabled"] &= sessionLogEnabled }
-        let jsessionlogenabled = (json|"SessionLogEnabled")!.boolValue!
-        
-        if (json|"StatisticsRolloverTime")?.string == nil { json["StatisticsRolloverTime"] &= statisticsRolloverTime.description }
-        let jstatisticsRolloverTime = (json|"StatisticsRolloverTime")!.string!
-        
-        if (json|"VisitsPerStatisticsFile")?.intValue == nil { json["VisitsPerStatisticsFile"] &= visitsPerStatisticsFile }
-        let jvisitsPerStatisticsFile = (json|"VisitsPerStatisticsFile")!.intValue!
-        
-        if (json|"NofRecentRequestLogs")?.intValue == nil { json["NofRecentRequestLogs"] &= nofRecentRequestLogs }
-        let jnofRecentRequestLogs = (json|"NofRecentRequestLogs")!.intValue!
-        
-        if (json|"NofRecentResponseLogs")?.intValue == nil { json["NofRecentResponseLogs"] &= nofRecentResponseLogs }
-        let jnofRecentResponseLogs = (json|"NofRecentResponseLogs")!.intValue!
-        
-        if (json|"PhpMapIndex")?.boolValue == nil { json["PhpMapIndex"] &= phpMapIndex }
-        let jphpmapindex = (json|"PhpMapIndex")!.boolValue!
-
-        if (json|"PhpMapAll")?.boolValue == nil { json["PhpMapAll"] &= phpMapAll }
-        let jphpmapall = (json|"PhpMapAll")!.boolValue!
-
-        if (json|"PhpTimeout")?.intValue == nil { json["PhpTimeout"] &= phpTimeout }
-        let jphptimeout = (json|"PhpTimeout")!.intValue!
-
-        
-        // Setup
-        
-        self.name = jname
-        self.root = jroot
-        self.forwardUrl = jfurl
-        self.wwwIncluded = jwww
-        self.enabled = jenab
-        self.accessLogEnabled = jacc
-        self.four04LogEnabled = jfour
-        self.sessionLogEnabled = jsessionlogenabled
-        self.sfresources = jsfresources
-        self.sessionTimeout = jsessiontimeout
-        self.statisticsRolloverTime = WallclockTime(jstatisticsRolloverTime) ?? WallclockTime(hour: 0, minute: 0, second: 0)
-        self.visitsPerStatisticsFile = jvisitsPerStatisticsFile
-        self.nofRecentResponseLogs = jnofRecentResponseLogs
-        self.nofRecentRequestLogs = jnofRecentRequestLogs
-        self.phpMapIndex = jphpmapindex
-        self.phpMapAll = jphpmapall
-        self.phpTimeout = jphptimeout
-        
-        
-        // Initialize the properties that may be present
-        
-        if let jtelemetry = DomainTelemetry(json: (json|"Telemetry")) { self.telemetry = jtelemetry }
-        if let url = blacklistedClientsUrl {
-            switch blacklist.restore(from: url) {
-            case .error: return nil
-            case .success: break
-            }
-        }
-        
-        if let jphppath = jphppath, jphppath.count > 0 {
-            self.phpPath = URL(fileURLWithPath: jphppath)
-        }
-        self.phpOptions = jphpoptions
-        
-        
-        // Add the service names
-        
-        for jserviceName in jservicesNames {
-            guard let name = jserviceName.stringValue else { return nil }
-            serviceNames.append(name)
-        }
-        
-        
-        // Setup the loggers if they are enabled
-        
-        if let loggingDir = loggingDir {
-            if accessLogEnabled { accessLog = AccessLog(logDir: loggingDir) }
-            if four04LogEnabled { four04Log = Four04Log(logDir: loggingDir) }
-            if sessionLogEnabled { sessions.logDirUrl = sessionLogDir }
-        }
-        
-        
-        // Reload the hitcounters
-        
-        if let url = hitCountersUrl {
-            hitCounters.restore(from: url)
-        }
-        
-        
-        // Add the staistics logger
-        
-        self.statistics = VisitorStatistics(
-            directory: statisticsDir,
-            timeForDailyLogRestart: WallclockTime.init(hour: 0, minute: 0, second: 0),
-            maxRowCount: 10
-        )
-    }
-}
 
 // MARK: - CustomStringConvertible
 
@@ -972,8 +700,7 @@ extension Domain: CustomStringConvertible {
     public var description: String {
         var str = "Domain: \(name)\n"
         str += "--------------------------------------------\n"
-        str += " Include 'www'              = \(wwwIncluded)\n"
-        str += " Root directory             = \(root)\n"
+        str += " Root directory             = \(webroot)\n"
         str += " Enabled                    = \(enabled)\n"
         str += " Forward to                 = \(forwardUrl)\n"
         str += " Enable Access Log          = \(accessLogEnabled)\n"

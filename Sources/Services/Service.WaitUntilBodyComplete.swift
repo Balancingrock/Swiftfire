@@ -100,7 +100,7 @@ import Core
 ///
 /// - Returns: On error .abort, on success .next.
 
-func service_waitUntilBodyComplete(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: inout Service.Info, _ response: inout Response) -> Service.Result {
+func service_waitUntilBodyComplete(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: inout Services.Info, _ response: inout Response) -> Services.Result {
 
     // Note: This function runs on the 'worker' thread of a connection.
     // The incoming data is received on the 'receiver' thread of the same connection.

@@ -89,7 +89,7 @@ import Core
 ///
 /// - Returns: Always nil.
 
-public func function_logout(_ args: Function.Arguments, _ info: inout Function.Info, _ environment: inout Function.Environment) -> Data? {
+public func function_logout(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: inout Functions.Environment) -> Data? {
     
     
     // Find the session

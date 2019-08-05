@@ -85,21 +85,15 @@ Log.atNotice?.log("Starting Swiftfire webserver")
 // =======================================
 
 do {
-    guard let parameterDefaultFile = StorageUrls.parameterDefaultsFile else {
-        emergencyExit("Could not construct parameter defaults filename")
+    // Load the server parameter default values
+    guard serverParameters.load() else {
+        emergencyExit("Could not load server parameters")
     }
     
-    switch parameters.restore(fromFile: parameterDefaultFile) {
-    case let .error(message):   emergencyExit(message)
-    case let .success(message):
-        if !message.isEmpty { Log.atNotice?.log(message) }
-    }
-    
-    parameters.debugMode.value = true
-    
+    // Add update (validation) actions
     setupParametersDidSetActions()
     
-    Log.atDebug?.log("Configuration parameters:\n\n\(parameters)\n")
+    Log.atDebug?.log("Configuration parameters:\n\n\(serverParameters)\n")
 }
 
 
@@ -108,41 +102,41 @@ do {
 // =================
 
 do {
-    guard let applicationLogDir = StorageUrls.applicationLogDir?.path else {
+    guard let applicationLogDir = Urls.applicationLogDir?.path else {
         emergencyExit("Could not construct application log directory")
     }
     Log.logfiles.directoryPath = applicationLogDir
     
-    guard let fileLoglevel = SwifterLog.Level.factory(parameters.fileRecordAtAndAboveLevel.value) else {
+    guard let fileLoglevel = SwifterLog.Level.factory(serverParameters.fileRecordAtAndAboveLevel.value) else {
         emergencyExit("Could not construct file loglevel")
     }
     Log.singleton.fileRecordAtAndAboveLevel = fileLoglevel
     
-    Log.logfiles.maxNumberOfFiles = parameters.logfileMaxNofFiles.value
-    Log.logfiles.maxSizeInBytes = UInt64(parameters.logfileMaxSize.value) * 1024
+    Log.logfiles.maxNumberOfFiles = serverParameters.logfileMaxNofFiles.value
+    Log.logfiles.maxSizeInBytes = UInt64(serverParameters.logfileMaxSize.value) * 1024
     
-    guard let osLogLoglevel = SwifterLog.Level.factory(parameters.osLogRecordAtAndAboveLevel.value) else {
+    guard let osLogLoglevel = SwifterLog.Level.factory(serverParameters.osLogRecordAtAndAboveLevel.value) else {
         emergencyExit("Could not construct asl loglevel")
     }
     Log.singleton.osLogFacilityRecordAtAndAboveLevel = osLogLoglevel
     
-    guard let stdoutLoglevel = SwifterLog.Level.factory(parameters.stdoutPrintAtAndAboveLevel.value) else {
+    guard let stdoutLoglevel = SwifterLog.Level.factory(serverParameters.stdoutPrintAtAndAboveLevel.value) else {
         emergencyExit("Could not construct stdout loglevel")
     }
     Log.singleton.stdoutPrintAtAndAboveLevel = stdoutLoglevel
     
-    guard let callbackLoglevel = SwifterLog.Level.factory(parameters.callbackAtAndAboveLevel.value) else {
+    guard let callbackLoglevel = SwifterLog.Level.factory(serverParameters.callbackAtAndAboveLevel.value) else {
         emergencyExit("Could not construct callout loglevel")
     }
     Log.singleton.callbackAtAndAboveLevel = callbackLoglevel
     
-    guard let networkLoglevel = SwifterLog.Level.factory(parameters.networkTransmitAtAndAboveLevel.value) else {
+    guard let networkLoglevel = SwifterLog.Level.factory(serverParameters.networkTransmitAtAndAboveLevel.value) else {
         emergencyExit("Could not construct network loglevel")
     }
     Log.singleton.networkTransmitAtAndAboveLevel = networkLoglevel
     
-    let address = parameters.networkLogtargetIpAddress.value
-    let port = parameters.networkLogtargetPortNumber.value
+    let address = serverParameters.networkLogtargetIpAddress.value
+    let port = serverParameters.networkLogtargetPortNumber.value
     if !address.isEmpty && !port.isEmpty {
         let target = SwifterLog.Network.NetworkTarget(address: address, port: port)
         Log.network.connectToNetworkTarget(target)
@@ -157,15 +151,10 @@ do {
 // ===============================================
 
 do {
-    guard let serverBlacklistFile = StorageUrls.serverBlacklistFile else {
+    guard let serverBlacklistFile = Urls.serverBlacklistFile else {
         emergencyExit("Could not construct server blacklist file url")
     }
-
-    switch serverBlacklist.restore(from: serverBlacklistFile) {
-    case let .error(message):   emergencyExit(message)
-    case .success: break
-    }
-    
+    serverBlacklist.load(from: serverBlacklistFile)
     Log.atDebug?.log("Server Blacklist:\n\n\(serverBlacklist)\n")
 }
 
@@ -197,29 +186,26 @@ do {
 // ============================
 
 do {
-    guard let headersLogDir = StorageUrls.headersLogDir else {
-        emergencyExit("Headers logging directory could nto be constructed")
+    headerLogger = HttpHeaderLogger(logDir: Urls.headersLogDir)
+    guard headerLogger != nil else {
+        emergencyExit("Header Logger could not be instantiated")
     }
     
-    headerLogger = HttpHeaderLogger(rootDir: headersLogDir)
-    
-    Log.atDebug?.log("Created header logging directory in: \(headersLogDir)")
+    Log.atDebug?.log("Created header logging directory in: \(Urls.headersLogDir!.path)")
 }
 
 
-// ======================
-// Initialize the domains
-// ======================
+// ===================
+// Prepare the domains
+// ===================
 
 do {
-    guard let defaultDomainsFile = StorageUrls.domainDefaultsFile else {
-        emergencyExit("Default domains file could not be constructed")
-    }
+    guard domains != nil else { emergencyExit("Could not create domains") }
     
-    switch domains.restore(from: defaultDomainsFile) {
-    case let .error(message): emergencyExit(message)
-    case let .success(message): Log.atNotice?.log(message)
-    }
+    
+    // Load domains and aliases
+    
+    guard domains.loadDomainsAndAliases() else { emergencyExit("Error loading domains and aliasses") }
     
     
     // Remove unknown services from the domains
@@ -229,7 +215,7 @@ do {
     
     // log the domain settings
     
-    Log.atNotice?.log("Domain settings:\n\n\(domains)\n")
+    Log.atNotice?.log("Domain settings:\n\n\(String(describing: domains))\n")
 }
 
 
@@ -238,11 +224,7 @@ do {
 // =====================================
 
 do {
-    guard let serverAdminDomainDir = StorageUrls.serverAdminDir else {
-        emergencyExit("The Server Admin (Pseudo) Domain directory could not be created")
-    }
-    
-    guard let domain = Domain(name: "serveradmin", root: serverAdminDomainDir) else {
+    guard let domain = Domain("serveradmin") else {
         emergencyExit("The Server Admin (Pseudo) Domain could not be created")
     }
     
@@ -252,7 +234,7 @@ do {
     serverAdminDomain.accessLogEnabled = true
     serverAdminDomain.four04LogEnabled = true
     serverAdminDomain.sessionLogEnabled = true
-    serverAdminDomain.serviceNames = serverAdminServices // Defined in: Services.Registration.swift
+    serverAdminDomain.serviceNames = ArrayOfStrings(serverAdminServices) // Defined in: Services.Registration.swift
     serverAdminDomain.rebuildServices()
     serverAdminDomain.sessionTimeout = 600 // Seconds
 
@@ -260,9 +242,9 @@ do {
 }
 
 
-// ==============================
-// Setup the http connection pool
-// ==============================
+// =================================================
+// Configure the sorter for the http connection pool
+// =================================================
 
 do {
     connectionPool.sorter = { // Sorting makes monitoring easier
@@ -271,6 +253,15 @@ do {
         let rhs = rhs as! SFConnection
         return lhs.objectId < rhs.objectId
     }
+}
+
+
+// ==========================
+// Setup the server telemetry
+// ==========================
+
+do {    
+    Log.atNotice?.log("Server Telemetry object available")
 }
 
 
@@ -292,8 +283,8 @@ httpsServerAcceptQueue = DispatchQueue(
     autoreleaseFrequency: DispatchQueue.AutoreleaseFrequency.inherit,
     target: nil)
 
-telemetry.httpServerStatus.setValue("Stopped")
-telemetry.httpsServerStatus.setValue("Stopped")
+serverTelemetry.httpServerStatus.setValue("Stopped")
+serverTelemetry.httpsServerStatus.setValue("Stopped")
 
 
 
@@ -314,39 +305,61 @@ Log.atNotice?.log("Finished custom setup")
 
 restartHttpAndHttpsServers()
 
+
+// ===========================
 // Wait for the 'quit' command
+// ===========================
 
 while !quitSwiftfire { _ = Darwin.sleep(2) }
 
+httpServer?.stop()
+httpsServer?.stop()
+Log.atNotice?.log("Received quit command, requested the server(s) to stop")
 
-// Cleanup
+
+// ============================================================================================
+// The servers should stop processing requests, give active requests time to terminate normally
+// ============================================================================================
+
+_ = Darwin.sleep(10)
+
+
+// ================================================
+// Save the state, telemetry and logs of the server
+// ================================================
 
 _ = serverAdminDomain.serverShutdown()
+
+
+// =====================
+// Close the server logs
+// =====================
 
 headerLogger.close()
 Log.atNotice?.log("Closed header logging file")
 
-if let url = StorageUrls.serverBlacklistFile {
-    serverBlacklist.save(to: url)
-    Log.atNotice?.log("Saved server blacklist")
-}
 
-switch domains.serverShutdown() {
-case .error(let message): Log.atError?.log("Error while shutting down the domains:\n\(message)")
-case .success: break;
-}
+// ============================
+// Persist the server blacklist
+// ============================
 
-switch domains.save(to: StorageUrls.domainDefaultsFile!) {
-case .error(let message): Log.atError?.log("Error while saving the domains:\n\(message)")
-case .success: Log.atNotice?.log("Saved domains")
-}
+serverBlacklist.store(to: Urls.serverBlacklistFile)
+Log.atNotice?.log("Saved server blacklist")
+
+
+// ================================
+// Persist the state of the domains
+// ================================
+
+domains.serverShutdown()
+domains.storeDomainsAndAliases()
+
+
+// ===============
+// Done
+// ===============
 
 Log.atNotice?.log("Swiftfire terminated normally")
-
-
-// Give other tasks time to complete
-
-_ = Darwin.sleep(10)
 
 exit(EXIT_SUCCESS)
 

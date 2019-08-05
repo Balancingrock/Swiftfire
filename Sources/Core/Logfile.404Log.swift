@@ -45,7 +45,7 @@ import Foundation
 
 /// This class is intended to collect all HTTP 404 replies. It will count each occurence only once.
 
-final class Four04Log: Logfile {
+public final class Four04Log: Logfile {
 
     
     /// This list conatins all 404 error's so far.
@@ -57,7 +57,8 @@ final class Four04Log: Logfile {
     ///
     /// - Parameter logDir: A URL of the directory in which to create the logfile.
     
-    public init?(logDir: URL) {
+    public init?(logDir: URL?) {
+        guard let logDir = logDir else { return nil }
         super.init(name: "404Log", dir: logDir, options: .maxFileSize(1024))
     }
     
@@ -66,7 +67,7 @@ final class Four04Log: Logfile {
     ///
     /// - Parameter message: The URL of the request that caused the 404 reply.
     
-    override func record(message: String) {
+    public override func record(message: String) {
         for str in reported {
             if str == message { return }
         }

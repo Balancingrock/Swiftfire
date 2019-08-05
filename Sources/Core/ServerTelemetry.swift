@@ -46,7 +46,7 @@ import SwifterLog
 
 
 public final class ServerTelemetry {
-    
+
     
     /// The version number of the server & console software
     
@@ -129,23 +129,31 @@ public final class ServerTelemetry {
     public init() {
         all = [serverVersion, httpServerStatus, httpsServerStatus, nofAcceptWaitsForConnectionObject, nofAcceptedHttpRequests, nofHttp400Replies, nofHttp500Replies]
     }
-}
 
-
-// MARK: - Operational interface
-
-extension ServerTelemetry {
     
     /// Reset all Telemetry
     
     public func reset() {
         all.forEach({ $0.reset() })
     }
+    
+    
+    /// Store the server telemetry to file
+    ///
+    /// - Note: This telemetry is saved only, never loaded.
+    
+    public func store() {
+        if let dir = Urls.serverTelemetryDir, let file = timestampedFileUrl(dir: dir, name: "server-telemetry", ext: "json") {
+            let json = VJson()
+            all.forEach({ json[$0.name] &= $0.stringValue })
+            json.save(to: file)
+        }
+    }
 }
 
 
 // MARK: - VJsonConvertible
-
+/*
 extension ServerTelemetry: VJsonConvertible {
     
     
@@ -175,7 +183,7 @@ extension ServerTelemetry: VJsonConvertible {
         all.forEach({ json[$0.name] &= $0.stringValue })
         return json
     }
-}
+}*/
 
 
 // MARK: - CustomStringConvertible

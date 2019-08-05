@@ -84,7 +84,7 @@ import Core
 
 /// - Returns: A detail of the current domain.
 
-func function_sf_domainDetail(_ args: Function.Arguments, _ info: inout Function.Info, _ environment: inout Function.Environment) -> Data? {
+func function_sf_domainDetail(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: inout Functions.Environment) -> Data? {
 
     
     // Check argument validity
@@ -112,7 +112,7 @@ func function_sf_domainDetail(_ args: Function.Arguments, _ info: inout Function
     guard let postInfo = environment.serviceInfo[.postInfoKey] as? PostInfo,
           let name = postInfo["DomainName"] else { return "***Error***".data(using: String.Encoding.utf8) }
     
-    guard let domain = domains.domain(forName: name) else { return "***Error***".data(using: String.Encoding.utf8) }
+    guard let domain = domains.domain(for: name) else { return "***Error***".data(using: String.Encoding.utf8) }
     
     
     // Return the asked for value
@@ -120,9 +120,7 @@ func function_sf_domainDetail(_ args: Function.Arguments, _ info: inout Function
     let parameter = arr[0].lowercased()
     
     switch parameter {
-    case "name": return domain.name.data(using: String.Encoding.utf8)
-    case "wwwincluded": return domain.wwwIncluded.description.data(using: String.Encoding.utf8)
-    case "root": return domain.root.data(using: String.Encoding.utf8)
+    case "root": return domain.webroot.data(using: String.Encoding.utf8)
     case "forewardurl": return domain.forwardUrl.data(using: String.Encoding.utf8)
     case "enabled": return domain.enabled.description.data(using: String.Encoding.utf8)
     case "accesslogenabled": return domain.accessLogEnabled.description.data(using: String.Encoding.utf8)

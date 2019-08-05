@@ -117,18 +117,18 @@ extension SFDocument {
         var name: String = ""     // Characters that may make up the name of a function
         var argument: String = "" // Characters that may make up te argument for an array parameter
         
-        var function: Function.Signature? // The function signature, determined after the name is complete
+        var function: Functions.Signature? // The function signature, determined after the name is complete
         var array: Array<String> = []     // The array arguments for a function
         var json: VJson?                  // The JSON argument for a function
 
         func asJsonFunctionBlock() -> DocumentBlock {
-            let fb = FunctionBlock(name: name, function: function, arguments: Function.Arguments.json(json!))
+            let fb = FunctionBlock(name: name, function: function, arguments: Functions.Arguments.json(json!))
             Log.atDebug?.log("Function block: \(fb)", type: "SFDocument")
             return .functionBlock(fb)
         }
         
         func asArrFunctionBlock() -> DocumentBlock {
-            let fb = FunctionBlock(name: name, function: function, arguments: Function.Arguments.array(array))
+            let fb = FunctionBlock(name: name, function: function, arguments: Functions.Arguments.array(array))
             Log.atDebug?.log("Function block: \(fb)", type: "SFDocument")
             return .functionBlock(fb)
         }

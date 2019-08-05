@@ -1,6 +1,6 @@
 // =====================================================================================================================
 //
-//  File:       Function.Timestamp.swift
+//  File:       DateFormatters.swift
 //  Project:    Swiftfire
 //
 //  Version:    1.0.0
@@ -10,7 +10,7 @@
 //  Website:    http://swiftfire.nl/
 //  Git:        https://github.com/Balancingrock/Swiftfire
 //
-//  Copyright:  (c) 2017-2019 Marinus van der Lugt, All rights reserved.
+//  Copyright:  (c) 2019 Marinus van der Lugt, All rights reserved.
 //
 //  License:    Use or redistribute this code any way you like with the following two provision:
 //
@@ -36,59 +36,44 @@
 //
 // History
 //
-// 1.0.0 Raised to v1.0.0, Removed old change log,
-//
-// =====================================================================================================================
-// Description
-// =====================================================================================================================
-//
-// Returns a timestamp in the format: yyyy-MM-dd HH:mm:ss of the current time in the server timezone.
-//
-//
-// Signature:
-// ----------
-//
-// .timestamp()
-//
-//
-// Parameters:
-// -----------
-//
-// None.
-//
-//
-// Other Input:
-// ------------
-//
-// None.
-//
-//
-// Returns:
-// --------
-//
-// The current time
-//
-//
-// Other Output:
-// -------------
-//
-// None.
-//
+// 1.0.0 - Initial version
 //
 // =====================================================================================================================
 
 import Foundation
 
-import Core
+
+public let dateFormatter: DateFormatter = {
+    let ltf = DateFormatter()
+    ltf.dateFormat = "yyyy-MM-dd'T'HH.mm.ss.SSSZ"
+    return ltf
+}()
 
 
-/// Returns the current time.
+/// Use to create filenames when they have to be time-stamped
+/// The timestamp will have a leading separator '-' and a trailing '.'.
 ///
-/// - Returns: The current time.
+/// - Note: THis formatter is thread safe
 
-public func function_timestamp(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: inout Functions.Environment) -> Data? {
-    
-    let now = dateFormatter.string(from: Date())
-    
-    return now.data(using: String.Encoding.utf8)
+fileprivate let filenameTimestampFormatter: DateFormatter = {
+    let ltf = DateFormatter()
+    ltf.dateFormat = "-yyyy-MM-dd'T'HH.mm.ss.SSSZ."
+    return ltf
+}()
+
+
+/// Create a time stamped filename from the given name and extension combined with the current time.
+///
+/// - Note: The timestamp will have a leading seperator '-'
+
+public func timestampedFilename(name: String, ext: String) -> String {
+    return name + filenameTimestampFormatter.string(from: Date()) + ext
+}
+
+
+/// Create a time stamped URL from the given directory URL plus name/extension.
+
+public func timestampedFileUrl(dir url: URL?, name: String, ext: String) -> URL? {
+    guard let url = url else { return nil }
+    return url.appendingPathComponent(timestampedFilename(name: name, ext: ext))
 }

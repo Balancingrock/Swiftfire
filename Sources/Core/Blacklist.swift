@@ -51,38 +51,38 @@ fileprivate let ADDRESS = "Address"
 fileprivate let ACTION = "Action"
 
 
-/// The kind of actions that can be taken for a client that is refused access.
-
-public enum BlacklistAction: String {
-    
-    
-    /// Simply close the connection without giving any indication of why the connetion was dropped.
-    
-    case closeConnection = "CloseConnection"
-    
-    
-    /// Send a "service unavailable" (Http 503) reply.
-    
-    case send503ServiceUnavailable = "Send503ServiceUnavailable"
-    
-    
-    /// Send a "unauthorized" (Http 401) reply.
-    
-    case send401Unauthorized = "Send401Unauthorized"
-    
-    
-    static var all: Array<BlacklistAction> = [.closeConnection, .send503ServiceUnavailable, .send401Unauthorized]
-}
-
-
 /// This class is intended for address blacklisting. It associates a blacklist action with an address.
 
 public final class Blacklist {
     
     
+    /// The kind of actions that can be taken for a client that is refused access.
+    
+    public enum Action: String {
+        
+        
+        /// Simply close the connection without giving any indication of why the connetion was dropped.
+        
+        case closeConnection = "CloseConnection"
+        
+        
+        /// Send a "service unavailable" (Http 503) reply.
+        
+        case send503ServiceUnavailable = "Send503ServiceUnavailable"
+        
+        
+        /// Send a "unauthorized" (Http 401) reply.
+        
+        case send401Unauthorized = "Send401Unauthorized"
+        
+        
+        static var all: Array<Action> = [.closeConnection, .send503ServiceUnavailable, .send401Unauthorized]
+    }
+
+    
     /// This list associates actions with clients.
     
-    public private(set) var list: Dictionary<String, BlacklistAction> = [:]
+    public private(set) var list: Dictionary<String, Action> = [:]
 
     
     /// The number of clients that are refused access.
@@ -94,55 +94,6 @@ public final class Blacklist {
     
     public init() {}
 }
-
-
-// MARK: _ VJson support
-
-extension Blacklist: VJsonSerializable, VJsonDeserializable {
-    
-    
-    /// Recreate a blacklist from a VJson array.
-    ///
-    /// - Parameter json: The VJson hierarchy from which to recontruct the blacklist. Should be an array.
-    
-    public convenience init?(json: VJson?) {
-        
-        guard let json = json else { return nil }
-        
-        self.init()
-        // Note: Rather than simply using asserts or fatal errors give a reason for a failure since a user might edit a blacklist file by hand.
-        let jlist = json.arrayValue
-        
-        var temp: Dictionary<String, BlacklistAction> = [:]
-        for j in jlist {
-            guard let address = (j|ADDRESS)?.stringValue else {
-                return nil
-            }
-            guard let jactionstr = (j|ACTION)?.stringValue else {
-                return nil
-            }
-            guard let action = BlacklistAction(rawValue: jactionstr) else {
-                return nil
-            }
-            temp[address] = action
-        }
-        list = temp
-    }
-    
-    
-    /// Returns a VJson array representing the content of the list.
-    
-    public var json: VJson {
-        let j = VJson.array()
-        for item in list {
-            let i = VJson.object()
-            i[ADDRESS] &= item.key
-            i[ACTION] &= item.value.rawValue
-            j.append(i)
-        }
-        return j
-    }
-}
     
 
 // MARK: - Storage
@@ -153,30 +104,21 @@ extension Blacklist {
     /// Save's the blacklist content back to the file. If no file exists and no blacklisted data is present it will create an example file.
     ///
     /// - Parameter to: The URL of the file in which to store the blacklist.
-    ///
-    /// - Returns: .success(true) if the operation was sucessfull, .error(message: String) if not.
     
-    @discardableResult
-    public func save(to file: URL) -> Result<Bool> {
+    public func store(to file: URL?) {
         
-        // Special case: If there are no blacklist clients and there is no blacklist file, then create an example blacklist file
-        guard list.count != 0 else {
-            if !FileManager.default.fileExists(atPath: file.path) {
-                let example = Blacklist()
-                example.add("127.1.1.2", action: .closeConnection)
-                example.add("127.1.1.3", action: .send401Unauthorized)
-                example.add("127.1.1.4", action: .send503ServiceUnavailable)
-                if let message = example.json.save(to: file) {
-                    return .error(message: message)
-                }
-            }
-            return .success(true)
+        guard let file = file else { return }
+        
+        let json = VJson.array()
+        for item in list {
+            let i = VJson.object()
+            i[ADDRESS] &= item.key
+            i[ACTION] &= item.value.rawValue
+            json.append(i)
         }
-        
+
         if let message = json.save(to: file) {
-            return .error(message: message)
-        } else {
-            return .success(true)
+            Log.atError?.log("Failed to save blacklist with message: \(message)")
         }
     }
     
@@ -184,49 +126,53 @@ extension Blacklist {
     /// Load the blacklist content from the file.
     ///
     /// - Parameter from: The URL of the file to read the contents from.
-    ///
-    /// - Returns: .success(true) if the operation was sucessfull, .error(message) if not.
 
-    public func restore(from file: URL) -> Result<Bool> {
+    public func load(from file: URL?) {
         
-        if !FileManager.default.isReadableFile(atPath: file.path) {
-            // If there is no readable file, then assume no blacklisted clients
-            return .success(true)
+        guard let file = file else { return }
+        
+        
+        // If there is no readable file, then assume no blacklisted clients
+        
+        guard FileManager.default.isReadableFile(atPath: file.path) else { return }
+        
+        
+        // Read and parse the file
+        
+        guard let json = try? VJson.parse(file: file) else {
+            Log.atError?.log("Could not read & parse blacklist file at: \(file.path)")
+            return
         }
         
-        let json: VJson!
-        do {
-            json = try VJson.parse(file: file)
-            if json == nil { throw NSError() }
-        } catch {
-            return .error(message: "Could not read blacklistedAddresses, message = \(error), file: \(file.path)")
-        }
-        
-        let items = json.arrayValue
 
         // A temporary store. Only swap the current list for the new list if the loading did not fail.
-        var temp: Dictionary<String, BlacklistAction> = [:]
+        var newList: Dictionary<String, Action> = [:]
         
+        let items = json.arrayValue
         for item in items {
             
             guard let address = (item|ADDRESS)?.stringValue, SwifterSockets.isValidIpAddress(address) else {
-                return .error(message: "Missing address from array item: \(item), file: \(file.path)")
+                Log.atError?.log("Missing address from array item: \(item), file: \(file.path)")
+                return
             }
             
             guard let jactionstr = (item|ACTION)?.stringValue else {
-                return .error(message: "Missing action from array item: \(item), file: \(file.path)")
+                Log.atError?.log("Missing action from array item: \(item), file: \(file.path)")
+                return
             }
             
-            guard let action = BlacklistAction(rawValue: jactionstr) else {
-                return .error(message: "Could not create blacklist action for value: \(jactionstr), file: \(file.path)")
+            guard let action = Action(rawValue: jactionstr) else {
+                Log.atError?.log("Could not create blacklist action for value: \(jactionstr), file: \(file.path)")
+                return
             }
             
-            temp[address] = action
+            newList[address] = action
         }
         
-        list = temp
         
-        return .success(true)
+        // Swap the current list for the new one
+
+        list = newList
     }
 }
 
@@ -242,7 +188,7 @@ extension Blacklist {
     ///
     /// - Returns: Either a blacklist action or nil. (Nil means: no action)
     
-    public func action(for address: String) -> BlacklistAction? {
+    public func action(for address: String) -> Action? {
         return list[address]
     }
     
@@ -267,7 +213,7 @@ extension Blacklist {
     ///   - ipAddress: The address to be added.
     ///   - action: The action for the address.
     
-    public func add(_ address: String, action: BlacklistAction) {
+    public func add(_ address: String, action: Action) {
         list[address] = action
     }
     
@@ -281,7 +227,7 @@ extension Blacklist {
     /// - Returns: True if the address occured in the list, false if it was not in the list.
     
     @discardableResult
-    public func update(action: BlacklistAction, for address: String) -> Bool {
+    public func update(action: Action, for address: String) -> Bool {
         if list[address] != nil {
             list[address] = action
             return true

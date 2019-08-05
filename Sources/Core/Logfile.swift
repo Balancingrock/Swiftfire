@@ -75,19 +75,16 @@ public class Logfile {
     }
 
     
+    /// Recordings will be made is this flag is set to true
+    /// - Note: Settings this flag to false will not close or flush an open logfile!
+    
+    public var enabled: Bool = true
+    
+    
     /// The queue on which all file logging activity will take place
     
     private static let queue = DispatchQueue(label: "Logfile Sync Queue", qos: .background, attributes: DispatchQueue.Attributes(), autoreleaseFrequency: DispatchQueue.AutoreleaseFrequency.inherit, target: nil)
     
-    
-    /// The date formatter used to generate filenames
-    
-    static var dateFormatter: DateFormatter = {
-        let ltf = DateFormatter()
-        ltf.dateFormat = "yyyy-MM-dd'T'HH.mm.ss.SSSZ"
-        return ltf
-    }()
-
     
     /// The actual file handle, note that this parameter will be set to nil when a file is closed.
     ///
@@ -241,7 +238,7 @@ extension Logfile {
     /// Create a new filename based on the current time.
     
     private var fullFilename: String {
-        return filename + "_" + Logfile.dateFormatter.string(from: Date()) +  "." + fileExtension
+        return timestampedFilename(name: filename, ext: fileExtension)
     }
     
     
@@ -281,6 +278,7 @@ extension Logfile {
 
 extension Logfile {
     
+    
     /// Close the logfile.
     ///
     /// - Note: This method will block until the file has been closed (it is safe to 'nil' a logger object afterwards)
@@ -306,11 +304,13 @@ extension Logfile {
     @objc
     public func record(message: String) {
         
+        if !enabled { return }
+        
         Logfile.queue.sync(execute: {
             
             [weak self] in
             
-            guard let `self` = self else { return }
+            guard let self = self else { return }
             
             // Implementation detail: Almost everything is done in this operation, from file creation to recording to closing and deleting. And since all invokations are placed on the queue, this guarantees thread safety. An alternative solution would be to use timers for the timed-renewal of the files, that would be slightly more efficient.
             

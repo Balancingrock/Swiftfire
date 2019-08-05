@@ -133,15 +133,9 @@ public func loadPhpFile(file: URL, domain: Domain) -> Data {
             
             Log.atError?.log("PHP process terminations status = \(process.terminationStatus), reason = \(process.terminationReason.rawValue )")
 
-            let now = Date()
-            let dateFormatter: DateFormatter = {
-                let ltf = DateFormatter()
-                ltf.dateFormat = "yyyy-MM-dd'T'HH.mm.ss.SSSZ"
-                return ltf
-            }()
-
+            let now = dateFormatter.string(from: Date())
             
-            Log.atError?.log("PHP process failure, check php domain (\(domain.name)) directory for an error entry with timestamp \(dateFormatter.string(from: now))")
+            Log.atError?.log("PHP process failure, check php domain (\(domain.name)) directory for an error entry with timestamp \(now)")
             
             
             // Error, grab all possible output and create a file with all error info
@@ -174,7 +168,7 @@ public func loadPhpFile(file: URL, domain: Domain) -> Data {
                     (----- End of output -----)
                 """.data(using: .utf8)
             
-            let errorFileName = "php-error-log-" + dateFormatter.string(from: now)
+            let errorFileName = "php-error-log-" + now
             if let errorFileUrl = domain.phpDir?.appendingPathComponent(errorFileName).appendingPathExtension("txt") {
                 try dump?.write(to: errorFileUrl)
             } else {

@@ -79,7 +79,7 @@ public struct HitCounters {
     
     /// Resets all hitcounters to zero.
     
-    mutating func resetToZero() {
+    mutating func reset() {
         counters.forEach { (key: String, _: Int64) in
             counters[key] = 0
         }
@@ -88,7 +88,10 @@ public struct HitCounters {
     
     /// Save the content of the counter values to file.
     
-    func save(to file: URL) {
+    func store(to file: URL?) {
+        
+        guard let file = file else { return }
+        
         let json = VJson.object()
         counters.forEach { (key: String, value: Int64) in
             json[key] &= value
@@ -98,12 +101,18 @@ public struct HitCounters {
     
     
     /// Loads the contents from the file, overwriting existing values (if any).
-    
-    mutating func restore(from file: URL) {
+    /*
+    mutating func load(from file: URL?) {
+        
+        guard let file = file else { return }
+        
         counters = [:]
-        guard let json = VJson.parse(file: file, onError: { (_, _, _, message) in
-            Log.atError?.log("Error reading hitCounter values from \(file.path), message = \(message)")
-            }) else { return }
+        
+        guard let json = try? VJson.parse(file: file) else {
+            Log.atError?.log("Parsing the hitcounter json file failed")
+            return
+        }
+        
         for item in json {
             if let name = item.nameValue, let value = item.int64Value {
                 counters[name] = value
@@ -112,5 +121,5 @@ public struct HitCounters {
                 Log.atError?.log("Error reading a value from the hitcounter file \(file.path)")
             }
         }
-    }
+    }*/
 }

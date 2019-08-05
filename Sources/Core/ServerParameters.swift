@@ -324,6 +324,7 @@ public final class ServerParameters {
 
     public init() {
         
+        
         // Note: No literal array used because of compilation times.
 
         all.append(httpServicePortNumber)
@@ -360,20 +361,33 @@ extension ServerParameters {
     
     /// Updates the parameter values from the parameter-defaults.json file if that file exists. It only updates those values that are found in the defaults file. All other parameters remain at their hard-coded default values. Parameters found in the defaults file that are not (no longer?) used will be flagged as errors in the log.
     
-    public func restore(fromFile url: URL) -> Result<String> {
-                
+    public func load() -> Bool {
+        
+        guard let file = Urls.parameterDefaultsFile else {
+            Log.atEmergency?.log("Could not create the server parameters URL, maybe some directories could not be created?")
+            return false
+        }
+        
         
         // Does the parameter defaults file exist?
         
-        guard url.isFileURL && FileManager.default.fileExists(atPath: url.path) else {
-            return .success("No 'parameter-defaults.json' file present, starting with hard coded defaults.")
+        var isDir: ObjCBool = false
+        guard FileManager.default.fileExists(atPath: file.path, isDirectory: &isDir) else {
+            if isDir.boolValue {
+                Log.atEmergency?.log("Serverparameters file is a directory at \(file.path)")
+                return false
+            } else {
+                Log.atNotice?.log("No server parameters file present, starting with hard coded defaults.")
+                return true
+            }
         }
 
         
         // Parse the parameter defaults file
         
-        guard let j = ((try? VJson.parse(file: url)) as VJson??), let json = j else {
-            return .error(message: "Could not retrieve JSON code from parameter-defaults file.")
+        guard let json = try? VJson.parse(file: file) else {
+            Log.atEmergency?.log("Could not retrieve JSON code from parameter-defaults file.")
+            return false
         }
 
         
@@ -391,26 +405,33 @@ extension ServerParameters {
                 message += "Missing value for \(item.name)\n"
             }
         }
-        if message != "" { return .error(message: message) }
+        if message != "" {
+            Log.atEmergency?.log("Error during loading of server parameters: \(message)")
+            return false
+        }
             
         if json.nofChildren != 0 {
-            return .error(message: "Superfluous items in source: \(json.code)")
+            Log.atWarning?.log("Found extra items in sever parameters file at \(file.path)")
         }
-
         
-        return .success(message)
+        return true
     }
     
     
     /// Save the parameter dictionary contents to the 'domains-default.json' file.
 
-    public func save(toFile url: URL) {
+    public func store() {
         
+        guard let file = Urls.parameterDefaultsFile else {
+            Log.atEmergency?.log("Could not create the server parameters URL, maybe some directories could not be created?")
+            return
+        }
+
         let json = VJson()
         all.forEach({
             json[$0.name] &= $0.stringValue
         })
-        json.save(to: url)
+        json.save(to: file)
     }
 }
 
@@ -429,43 +450,43 @@ extension ServerParameters: CustomStringConvertible {
 
 public func setupParametersDidSetActions() {
     
-    parameters.osLogRecordAtAndAboveLevel.addDidSetAction {
-        if let level = SwifterLog.Level.factory(parameters.osLogRecordAtAndAboveLevel.value) {
+    serverParameters.osLogRecordAtAndAboveLevel.addDidSetAction {
+        if let level = SwifterLog.Level.factory(serverParameters.osLogRecordAtAndAboveLevel.value) {
             Log.singleton.osLogFacilityRecordAtAndAboveLevel = level
         } else {
-            Log.atError?.log("Cannot create loglevel from \(parameters.osLogRecordAtAndAboveLevel.value) for osLogRecordAtAndAboveLevel")
+            Log.atError?.log("Cannot create loglevel from \(serverParameters.osLogRecordAtAndAboveLevel.value) for osLogRecordAtAndAboveLevel")
         }
     }
     
-    parameters.fileRecordAtAndAboveLevel.addDidSetAction {
-        if let level = SwifterLog.Level.factory(parameters.fileRecordAtAndAboveLevel.value) {
+    serverParameters.fileRecordAtAndAboveLevel.addDidSetAction {
+        if let level = SwifterLog.Level.factory(serverParameters.fileRecordAtAndAboveLevel.value) {
             Log.singleton.fileRecordAtAndAboveLevel = level
         } else {
-            Log.atError?.log("Cannot create loglevel from \(parameters.fileRecordAtAndAboveLevel.value) for fileRecordAtAndAboveLevel")
+            Log.atError?.log("Cannot create loglevel from \(serverParameters.fileRecordAtAndAboveLevel.value) for fileRecordAtAndAboveLevel")
         }
     }
     
-    parameters.callbackAtAndAboveLevel.addDidSetAction {
-        if let level = SwifterLog.Level.factory(parameters.callbackAtAndAboveLevel.value) {
+    serverParameters.callbackAtAndAboveLevel.addDidSetAction {
+        if let level = SwifterLog.Level.factory(serverParameters.callbackAtAndAboveLevel.value) {
             Log.singleton.callbackAtAndAboveLevel = level
         } else {
-            Log.atError?.log("Cannot create loglevel from \(parameters.callbackAtAndAboveLevel.value) for callbackAtAndAboveLevel")
+            Log.atError?.log("Cannot create loglevel from \(serverParameters.callbackAtAndAboveLevel.value) for callbackAtAndAboveLevel")
         }
     }
     
-    parameters.stdoutPrintAtAndAboveLevel.addDidSetAction {
-        if let level = SwifterLog.Level.factory(parameters.stdoutPrintAtAndAboveLevel.value) {
+    serverParameters.stdoutPrintAtAndAboveLevel.addDidSetAction {
+        if let level = SwifterLog.Level.factory(serverParameters.stdoutPrintAtAndAboveLevel.value) {
             Log.singleton.stdoutPrintAtAndAboveLevel = level
         } else {
-            Log.atError?.log("Cannot create loglevel from \(parameters.stdoutPrintAtAndAboveLevel.value) for stdoutPrintAtAndAboveLevel")
+            Log.atError?.log("Cannot create loglevel from \(serverParameters.stdoutPrintAtAndAboveLevel.value) for stdoutPrintAtAndAboveLevel")
         }
     }
     
-    parameters.networkTransmitAtAndAboveLevel.addDidSetAction {
-        if let level = SwifterLog.Level.factory(parameters.networkTransmitAtAndAboveLevel.value) {
+    serverParameters.networkTransmitAtAndAboveLevel.addDidSetAction {
+        if let level = SwifterLog.Level.factory(serverParameters.networkTransmitAtAndAboveLevel.value) {
             Log.singleton.networkTransmitAtAndAboveLevel = level
         } else {
-            Log.atError?.log("Cannot create loglevel from \(parameters.networkTransmitAtAndAboveLevel.value) for networkTransmitAtAndAboveLevel")
+            Log.atError?.log("Cannot create loglevel from \(serverParameters.networkTransmitAtAndAboveLevel.value) for networkTransmitAtAndAboveLevel")
         }
     }
 }

@@ -84,9 +84,9 @@ public final class SFConnection: SwifterSockets.Connection {
         
         // In case of inactivity, close the connection.
         var localOptions = options
-        localOptions.append(.receiverBufferSize(parameters.clientMessageBufferSize.value))
-        localOptions.append(.transmitterTimeout(TimeInterval(parameters.httpResponseClientTimeout.value)))
-        localOptions.append(.inactivityDetectionThreshold(Double(parameters.httpKeepAliveInactivityTimeout.value)/1000.0))
+        localOptions.append(.receiverBufferSize(serverParameters.clientMessageBufferSize.value))
+        localOptions.append(.transmitterTimeout(TimeInterval(serverParameters.httpResponseClientTimeout.value)))
+        localOptions.append(.inactivityDetectionThreshold(Double(serverParameters.httpKeepAliveInactivityTimeout.value)/1000.0))
         localOptions.append(.inactivityAction({ (c: Connection) in c.closeConnection()}))
         
         guard super.prepare(for: type, remoteAddress: address, options: localOptions) else { return false }
@@ -243,7 +243,7 @@ public final class SFConnection: SwifterSockets.Connection {
                 
                 // Log the header of the request
                 
-                if parameters.headerLoggingEnabled.value { headerLogger.record(connection: self, request: request) }
+                if serverParameters.headerLoggingEnabled.value { headerLogger.record(connection: self, request: request) }
                 
                 
                 // Check if the body is complete
@@ -431,9 +431,9 @@ func httpConnectionFactory(_ cType: SwifterSockets.InterfaceAccess, _ remoteAddr
     
     // Find a free SFConnection object
     
-    let (count, availableConnection) = connectionPool.allocateOrTimeout(parameters.maxWaitForPendingConnections.value)
+    let (count, availableConnection) = connectionPool.allocateOrTimeout(serverParameters.maxWaitForPendingConnections.value)
     
-    if count > 0 { telemetry.nofAcceptWaitsForConnectionObject.increment() }
+    if count > 0 { serverTelemetry.nofAcceptWaitsForConnectionObject.increment() }
     
     guard let connection = availableConnection as? SFConnection else {
         Log.atEmergency?.log("SF Connection could not be allocated, client at \(remoteAddress) will be rejected", id: -1, type: "SFConnection")
@@ -465,7 +465,7 @@ func httpConnectionFactory(_ cType: SwifterSockets.InterfaceAccess, _ remoteAddr
     
     // Telemetry update
     
-    telemetry.nofAcceptedHttpRequests.increment()
+    serverTelemetry.nofAcceptedHttpRequests.increment()
     
     
     return connection

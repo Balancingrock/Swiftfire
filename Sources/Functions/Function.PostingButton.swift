@@ -106,7 +106,7 @@ func postingButton(target: String, title: String, keyValuePairs: Dictionary<Stri
 
 /// Creates a button that will post the key/value combination when clicked.
 
-public func function_postingButton(_ args: Function.Arguments, _ info: inout Function.Info, _ environment: inout Function.Environment) -> Data? {
+public func function_postingButton(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: inout Functions.Environment) -> Data? {
     
     
     // Check for minimum the 4 arguments and an even number of arguments

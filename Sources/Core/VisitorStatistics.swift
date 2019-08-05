@@ -318,25 +318,22 @@ final class VisitorStatistics {
     
     /// Create a new name for the request recording file.
     
-    private func requestRecordingURL(_ uuid: UUID) -> URL {
-        let name = "Recording_\(Logfile.dateFormatter.string(from: Date()))\(uuid.uuidString).brbon"
-        return requestRecordingDir.appendingPathComponent(name)
+    private func requestRecordingURL(_ uuid: UUID) -> URL? {
+        return timestampedFileUrl(dir: requestRecordingDir, name: "request", ext: "\(uuid.uuidString).brbon")
     }
     
     
     /// Create a new name for the response recording file.
     
-    private func responseRecordingURL(_ uuid: UUID) -> URL {
-        let name = "Response_\(Logfile.dateFormatter.string(from: Date()))\(uuid.uuidString).brbon"
-        return responseRecordingDir.appendingPathComponent(name)
+    private func responseRecordingURL(_ uuid: UUID) -> URL? {
+        return timestampedFileUrl(dir: responseRecordingDir, name: "response", ext: "\(uuid.uuidString).brbon")
     }
 
 
     /// Create a new statistics file URL
     
-    private var visitorStatisticsUrl: URL {
-        let name = "VisitorStatistics_\(Logfile.dateFormatter.string(from: Date())).brbon"
-        return visitorStatisticsDir.appendingPathComponent(name)
+    private var visitorStatisticsUrl: URL? {
+        return timestampedFileUrl(dir: visitorStatisticsDir, name: "visitors", ext: "brbon")
     }
 
     
@@ -366,7 +363,9 @@ final class VisitorStatistics {
     public func close() {
         
         do {
-            try dbase.data.write(to: visitorStatisticsUrl)
+            if let file = visitorStatisticsUrl {
+                try dbase.data.write(to: file)
+            }
         } catch let error {
             Log.atError?.log("Cannot write visitor log to directory: \(directory), error = (\(error.localizedDescription))", type: "VisitorStatistics")
         }
@@ -380,7 +379,9 @@ final class VisitorStatistics {
         // First write the old visitor database to file
         
         do {
-            try dbase.data.write(to: visitorStatisticsUrl)
+            if let file = visitorStatisticsUrl {
+                try dbase.data.write(to: file)
+            }
         } catch let error {
             Log.atError?.log("Cannot write visitor log to directory: \(directory), error = (\(error.localizedDescription))", type: "VisitorStatistics")
         }
@@ -448,7 +449,9 @@ final class VisitorStatistics {
         let dm = ItemManager.createDictionaryManager()
         dm.root!.updateItem(visit.url, withName: "url")
         dm.root!.updateItem(visit.request, withName: "request")
-        try? dm.data.write(to: requestRecordingURL(visit.uuid))
+        if let file = requestRecordingURL(visit.uuid) {
+            try? dm.data.write(to: file)
+        }
     }
     
     
@@ -490,7 +493,9 @@ final class VisitorStatistics {
         let dm = ItemManager.createDictionaryManager()
         dm.root.updateItem(visit.url, withName: "url")
         dm.root.updateItem(visit.responseData, withName: "response")
-        try? dm.data.write(to: responseRecordingURL(visit.uuid))
+        if let file = responseRecordingURL(visit.uuid) {
+            try? dm.data.write(to: file)
+        }
     }
     
     

@@ -93,7 +93,7 @@ import Core
 ///
 /// - Returns: The value of the requested telemetry or "No access rights".
 
-func function_sf_telemetryValue(_ args: Function.Arguments, _ info: inout Function.Info, _ environment: inout Function.Environment) -> Data? {
+func function_sf_telemetryValue(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: inout Functions.Environment) -> Data? {
     
     
     // Check access rights
@@ -125,7 +125,7 @@ func function_sf_telemetryValue(_ args: Function.Arguments, _ info: inout Functi
     
     var value: String?
     
-    for t in telemetry.all {
+    for t in serverTelemetry.all {
         
         if t.name.caseInsensitiveCompare(name) == ComparisonResult.orderedSame {
             value = t.stringValue
