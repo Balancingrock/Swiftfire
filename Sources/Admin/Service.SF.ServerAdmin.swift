@@ -110,7 +110,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
     func createAdminAccountPage(name: String, nameColor: String, pwdColor: String, rootColor: String) {
         
         let html: String = """
-            <!DOCTYPE html>"
+            <!DOCTYPE html>
             <html>
                <head>
                   <title>Swiftfire Admin Setup</title>
@@ -361,21 +361,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
                 
                 // Credentials are considered valid, create account
                 
-                if let account = serverAdminDomain.accounts.newAccount(name: name, password: pwd1) {
-                    
-                    Log.atNotice?.log("Created admin account for: '\(name)'", id: connection.logId)
-                    
-                    serverParameters.adminSiteRoot.value = root
-                    
-                    serverParameters.store()
-                    
-                    session[.accountKey] = account
-                    
-                    relPath = ""
-
-                    /*** FALLTHROUGH ***/
-    
-                } else {
+                guard let account = serverAdminDomain.accounts.newAccount(name: name, password: pwd1) else {
                     
                     Log.atCritical?.log("Failed to create admin account for: \(name)", id: connection.logId)
                     
@@ -383,6 +369,17 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
                     
                     return .next
                 }
+                
+                Log.atNotice?.log("Created admin account for: '\(name)'", id: connection.logId)
+                
+                serverParameters.adminSiteRoot.value = root
+                
+                serverParameters.store()
+                
+                session[.accountKey] = account
+                
+                relPath = ""
+
                 
             } else {
                 
@@ -803,10 +800,12 @@ fileprivate func executeSfCommand(_ pathComponents: Array<String>, _ postInfo: i
     case "Quit": return .newPath("/pages/quit.sf.html")
     case "CancelQuit": return .newPath("")
     case "ConfirmedQuit": executeQuitSwiftfire(); return .newPath("/pages/bye.sf.html")
-    case "UpdateDomain": executeUpdateDomain(&postInfo); return .newPath("/pages/domain-management.sf.html")
+    case "UpdateDomain": executeUpdateDomain(&postInfo); return .newPath("/pages/domain.sf.html")
     case "UpdateDomainServices": executeUpdateDomainServices(&postInfo); return .newPath("/pages/domain-management.sf.html")
     case "DeleteDomain": executeDeleteDomain(&postInfo); return .newPath("/pages/domain-management.sf.html")
     case "CreateDomain": executeCreateDomain(&postInfo); return .newPath("/pages/domain-management.sf.html")
+    case "CreateAlias": executeCreateAlias(&postInfo); return .newPath("/pages/domain-management.sf.html")
+    case "DeleteAlias": executeDeleteAlias(&postInfo); return .newPath("/pages/domain-management.sf.html")
     case "SaveDomains": executeSaveDomains(); return .newPath("/pages/domain-management.sf.html")
     case "ReadDomains": executeReadDomains(); return .newPath("/pages/domain-management.sf.html")
     case "UpdateBlacklist": executeUpdateBlacklist(&postInfo); return .newPath("/pages/blacklist.sf.html")
@@ -977,6 +976,8 @@ fileprivate func executeUpdateDomain(_ postInfo: inout PostInfo?) {
         return
     }
     
+    postInfo!["DomainName"] = name
+    
     switch key {
     case "root": domain.webroot = value
     case "forewardurl": domain.forwardUrl = value
@@ -1072,7 +1073,7 @@ fileprivate func executeUpdateDomainServices(_ postInfo: inout PostInfo?) {
 fileprivate func executeDeleteDomain(_ postInfo: inout PostInfo?) {
     
     guard let name = postInfo?["DomainName"] else {
-        Log.atError?.log("Missing DomainName in postInfo")
+        Log.atError?.log("Missing Domain in postInfo")
         return
     }
     
@@ -1091,7 +1092,7 @@ fileprivate func executeDeleteDomain(_ postInfo: inout PostInfo?) {
 
 fileprivate func executeCreateDomain(_ postInfo: inout PostInfo?) {
     
-    guard let name = postInfo?["DomainName"] else {
+    guard let name = postInfo?["DomainName"], !name.isEmpty else {
         Log.atError?.log("Missing DomainName in postInfo")
         return
     }
@@ -1107,6 +1108,51 @@ fileprivate func executeCreateDomain(_ postInfo: inout PostInfo?) {
     } else {
         Log.atNotice?.log("Failed to domain for \(name))")
     }
+}
+
+
+/// Creates a new alias
+
+fileprivate func executeCreateAlias(_ postInfo: inout PostInfo?) {
+    
+    guard let name = postInfo?["DomainName"] else {
+        Log.atError?.log("Missing Domain in postInfo")
+        return
+    }
+
+    guard let alias = postInfo?["Alias"], !alias.isEmpty else {
+        Log.atError?.log("Missing Alias in postInfo")
+        return
+    }
+
+    guard domains.contains(name) else {
+        Log.atError?.log("Domain '\(name)' does not exist")
+        return
+    }
+
+    domains.createAlias(alias, forDomainWithName: name)
+    
+    Log.atNotice?.log("Create new alias '\(alias)' for domain '\(name)'")
+}
+
+
+/// Remove an alias
+
+fileprivate func executeDeleteAlias(_ postInfo: inout PostInfo?) {
+    
+    guard let alias = postInfo?["Alias"] else {
+        Log.atError?.log("Missing Alias in postInfo")
+        return
+    }
+    
+    guard domains.contains(alias) else {
+        Log.atError?.log("Alias '\(alias)' does not exist")
+        return
+    }
+    
+    domains.remove(alias)
+    
+    Log.atNotice?.log("Deleted alias '\(alias)'")
 }
 
 

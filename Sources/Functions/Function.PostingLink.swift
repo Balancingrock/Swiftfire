@@ -126,7 +126,7 @@ public func postingLink(target: String, text: String, keyValuePairs: Dictionary<
 }
 
 
-extension Int {
+public extension Int {
     var isEven: Bool { return self % 2 == 0 }
     var isUneven: Bool { return self % 2 == 1 }
     func isMultiple(of i: Int) -> Bool { return self % i == 0 }

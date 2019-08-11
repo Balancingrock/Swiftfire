@@ -771,22 +771,22 @@ textarea {
       height: auto; } }
   @media screen and (min-width: 0px) and (max-width: 719px) {
     .banner-area .icon-container .banner-icon {
+      background: none; } }
+  @media screen and (min-width: 720px) and (max-width: 959px) {
+    .banner-area .icon-container .banner-icon {
+      background: none; } }
+  @media screen and (min-width: 960px) {
+    .banner-area .icon-container .banner-icon {
+      background: none; } }
+  @media screen and (min-width: 0px) and (max-width: 719px) {
+    .banner-area .icon-container .banner-icon::after {
       content: url("/classic-jekyll-theme/assets/img/cog-wheels-60x43.png"); } }
   @media screen and (min-width: 720px) and (max-width: 959px) {
-    .banner-area .icon-container .banner-icon {
+    .banner-area .icon-container .banner-icon::after {
       content: url("/classic-jekyll-theme/assets/img/cog-wheels-120x68.png"); } }
   @media screen and (min-width: 960px) {
-    .banner-area .icon-container .banner-icon {
+    .banner-area .icon-container .banner-icon::after {
       content: url("/classic-jekyll-theme/assets/img/cog-wheels-240x135.png"); } }
-  @media screen and (min-width: 0px) and (max-width: 719px) {
-    .banner-area .icon-container .banner-icon {
-      background: none; } }
-  @media screen and (min-width: 720px) and (max-width: 959px) {
-    .banner-area .icon-container .banner-icon {
-      background: none; } }
-  @media screen and (min-width: 960px) {
-    .banner-area .icon-container .banner-icon {
-      background: none; } }
   @media screen and (min-width: 0px) and (max-width: 719px) {
     .banner-area .title-area-container {
       height: 48px; } }
@@ -1342,14 +1342,18 @@ textarea {
     .menubar .menubar-icon {
       width: auto;
       height: auto;
-      content: none;
       padding: 0px; } }
   @media screen and (min-width: 720px) and (min-width: 960px) {
     .menubar .menubar-icon {
       width: auto;
       height: auto;
-      content: none;
       padding: 0px; } }
+  @media screen and (min-width: 720px) and (min-width: 720px) and (max-width: 959px) {
+    .menubar .menubar-icon:after {
+      content: none; } }
+  @media screen and (min-width: 720px) and (min-width: 960px) {
+    .menubar .menubar-icon:after {
+      content: none; } }
   @media screen and (min-width: 720px) and (min-width: 720px) and (max-width: 959px) {
     .menubar .item-separator {
       color: #101010;
@@ -2178,7 +2182,7 @@ textarea {
 footer {
   color: #ffdd11; }
 
-.centered, .default-table, .status-table table, .parameter-table, .telemetry-table, .server-blacklist-table, .domain-blacklist-table, .domains-table, .domain-details-table, .domain-telemetry-table, .domain-service-table, .statistics-domains-table, .statistics-clients-table {
+.centered, .default-table, .status-table table, .parameter-table, .telemetry-table, .server-blacklist-table, .domain-blacklist-table, .domain-details-table, .domain-telemetry-table, .domain-service-table, .statistics-domains-table, .statistics-clients-table {
   margin-left: auto;
   margin-right: auto; }
 
@@ -2189,18 +2193,18 @@ footer {
   margin-left: 0;
   margin-right: 0; }
 
-.outlined-table, .default-table, .status-table table, .parameter-table, .telemetry-table, .server-blacklist-table, .domain-blacklist-table, .domains-table, .domain-details-table, .domain-telemetry-table, .domain-service-table, .statistics-domains-table, .statistics-clients-table {
+.outlined-table, .default-table, .status-table table, .parameter-table, .telemetry-table, .server-blacklist-table, .domain-blacklist-table, .domain-details-table, .domain-telemetry-table, .domain-service-table, .statistics-domains-table, .statistics-clients-table, .domains-table {
   border-collapse: collapse; }
-  .outlined-table td, .default-table td, .status-table table td, .parameter-table td, .telemetry-table td, .server-blacklist-table td, .domain-blacklist-table td, .domains-table td, .domain-details-table td, .domain-telemetry-table td, .domain-service-table td, .statistics-domains-table td, .statistics-clients-table td, .outlined-table th, .default-table th, .status-table table th, .parameter-table th, .telemetry-table th, .server-blacklist-table th, .domain-blacklist-table th, .domains-table th, .domain-details-table th, .domain-telemetry-table th, .domain-service-table th, .statistics-domains-table th, .statistics-clients-table th {
+  .outlined-table td, .default-table td, .status-table table td, .parameter-table td, .telemetry-table td, .server-blacklist-table td, .domain-blacklist-table td, .domain-details-table td, .domain-telemetry-table td, .domain-service-table td, .statistics-domains-table td, .statistics-clients-table td, .domains-table td, .outlined-table th, .default-table th, .status-table table th, .parameter-table th, .telemetry-table th, .server-blacklist-table th, .domain-blacklist-table th, .domain-details-table th, .domain-telemetry-table th, .domain-service-table th, .statistics-domains-table th, .statistics-clients-table th, .domains-table th {
     border: 1px solid #e8e8e8; }
 
-.alternating-table-rows tr:nth-child(even), .default-table tr:nth-child(even), .status-table table tr:nth-child(even), .parameter-table tr:nth-child(even), .telemetry-table tr:nth-child(even), .server-blacklist-table tr:nth-child(even), .domain-blacklist-table tr:nth-child(even), .domains-table tr:nth-child(even), .domain-details-table tr:nth-child(even), .domain-telemetry-table tr:nth-child(even), .domain-service-table tr:nth-child(even), .statistics-domains-table tr:nth-child(even), .statistics-clients-table tr:nth-child(even) {
+.alternating-table-rows tr:nth-child(even), .default-table tr:nth-child(even), .status-table table tr:nth-child(even), .parameter-table tr:nth-child(even), .telemetry-table tr:nth-child(even), .server-blacklist-table tr:nth-child(even), .domain-blacklist-table tr:nth-child(even), .domain-details-table tr:nth-child(even), .domain-telemetry-table tr:nth-child(even), .domain-service-table tr:nth-child(even), .statistics-domains-table tr:nth-child(even), .statistics-clients-table tr:nth-child(even) {
   background-color: #e8e8e8; }
 
-.grey-table-header th, .default-table th, .status-table table th, .parameter-table th, .telemetry-table th, .server-blacklist-table th, .domain-blacklist-table th, .domains-table th, .domain-details-table th, .domain-telemetry-table th, .domain-service-table th, .statistics-domains-table th, .statistics-clients-table th {
+.grey-table-header th, .default-table th, .status-table table th, .parameter-table th, .telemetry-table th, .server-blacklist-table th, .domain-blacklist-table th, .domain-details-table th, .domain-telemetry-table th, .domain-service-table th, .statistics-domains-table th, .statistics-clients-table th, .domains-table th {
   background-color: #e8e8e8; }
 
-.table-cell-margins td, .default-table td, .status-table table td, .parameter-table td, .telemetry-table td, .server-blacklist-table td, .domain-blacklist-table td, .domains-table td, .domain-details-table td, .domain-telemetry-table td, .domain-service-table td, .statistics-domains-table td, .statistics-clients-table td, .table-cell-margins th, .default-table th, .status-table table th, .parameter-table th, .telemetry-table th, .server-blacklist-table th, .domain-blacklist-table th, .domains-table th, .domain-details-table th, .domain-telemetry-table th, .domain-service-table th, .statistics-domains-table th, .statistics-clients-table th {
+.table-cell-margins td, .default-table td, .status-table table td, .parameter-table td, .telemetry-table td, .server-blacklist-table td, .domain-blacklist-table td, .domain-details-table td, .domain-telemetry-table td, .domain-service-table td, .statistics-domains-table td, .statistics-clients-table td, .domains-table td, .table-cell-margins th, .default-table th, .status-table table th, .parameter-table th, .telemetry-table th, .server-blacklist-table th, .domain-blacklist-table th, .domain-details-table th, .domain-telemetry-table th, .domain-service-table th, .statistics-domains-table th, .statistics-clients-table th, .domains-table th {
   padding: 7px 14px; }
 
 .status-table table input {
@@ -2221,6 +2225,35 @@ footer {
   .server-blacklist-create input, .domain-blacklist-create input {
     margin-left: 7px;
     margin-right: 7px; }
+
+.center-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center; }
+
+.align-content-left {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end; }
+
+.align-content-right, .domains-list {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start; }
+
+.domains-list {
+  margin-top: 14px;
+  margin-bottom: 28px; }
+
+.domains-table {
+  margin-top: 14px; }
+  .domains-table div {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-between;
+    align-items: center; }
+  .domains-table td, .domains-table p {
+    margin: 0; }
 
 .domain-details-table input {
   text-align: center; }
@@ -2260,6 +2293,10 @@ footer {
   justify-content: center;
   flex-wrap: wrap; }
   .centered-buttons input {
+    margin-left: 14px;
+    margin-right: 14px; }
+  .centered-buttons button {
+    margin-top: 14px;
     margin-left: 14px;
     margin-right: 14px; }
 

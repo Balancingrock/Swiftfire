@@ -269,7 +269,7 @@ public final class Domain {
     
     /// The sessions for this domain
     
-    public var sessions: Sessions!
+    public var sessions: SessionManager!
 
     
     /// The accounts associated withthis domain
@@ -311,11 +311,6 @@ public final class Domain {
         guard Urls.domainDir(for: self.name) != nil else { return nil }
         
 
-        // Load the setup information
-        
-        loadSetup()
-
-
         // Reload the service names
         
         self.serviceNames.load(from: Urls.domainServiceNamesFile(for: self.name))
@@ -323,7 +318,7 @@ public final class Domain {
         
         // Create the sessions object
         
-        self.sessions = Sessions(loggingDirectory: Urls.domainSessionLogDir(for: self.name))
+        self.sessions = SessionManager(loggingDirectory: Urls.domainSessionLogDir(for: self.name))
         guard sessions != nil else {
             Log.atEmergency?.log("Could not create sessions object for domain \(self.name)")
             return nil
@@ -372,6 +367,11 @@ public final class Domain {
             Log.atEmergency?.log("Could not create statistics object for domain \(self.name)")
             return nil
         }
+        
+        
+        // Load the setup information
+        
+        loadSetup()
     }
     
     

@@ -53,7 +53,7 @@ public final class Domains {
     
     /// The managed domains
     
-    var domains: Dictionary<String, Domain> = [:]
+    public var domains: Dictionary<String, Domain> = [:]
     
     
     /// Create a new Domains object.
@@ -169,7 +169,11 @@ public final class Domains {
             json.append(item)
         }
         
-        json.save(to: url)
+        if let message = json.save(to: url) {
+            Log.atError?.log("Could not save the domains and aliases, message = '\(message)'")
+        } else {
+            Log.atNotice?.log("Saved the domains and aliases to file = '\(url.path)'")
+        }
     }
 }
 
@@ -263,17 +267,29 @@ extension Domains {
     
     /// Removes the given domain or alias from the managed domains. If a domain is removed, possible aliases will also be removed. If an alias is removed the corresponding domain will be unaffected.
     ///
-    /// - Parameter name: The name of the domain or alias to be removed.
+    /// - Parameter name: The name of the domain to be removed.
     
     public func remove(_ name: String) {
         
-        // Remove all entries that point to a domain with the given name
-        
-        for key in domains.keys {
+        if let domain = domains[name] {
+            
+            let domainName = domain.name
+            
+            domains.removeValue(forKey: name)
+            
+            if name == domainName {
+                
+                // The domain itself has to be removed, remove all aliases that point to this domain
+                
+                for key in domains.keys {
                     
-            if domains[key]!.name == name.lowercased() {
-                domains.removeValue(forKey: key)
+                    if domains[key]!.name == name.lowercased() {
+                        domains.removeValue(forKey: key)
+                    }
+                }
             }
+        } else {
+            Log.atWarning?.log("Could not remove alias or domain with the name \(name)")
         }
     }
     

@@ -56,87 +56,6 @@ import SwifterLog
 import Http
 
 
-/// A record with debugging info. Specifically this record allows the developper to associate connections with sessions such that debugging information in the log (which also contains the connection id) can be associated with a session.
-
-private struct DebugInfo: CustomStringConvertible {
-    
-    let connectionId: Int
-    let allocationCount: Int
-    let timestamp: Int64
-    let clientIp: String
-    
-    var json: VJson {
-        let json = VJson()
-        json["ConnectionId"] &= connectionId
-        json["AllocationCount"] &= allocationCount
-        json["Timestamp"] &= timestamp
-        json["ClientIp"] &= clientIp
-        return json
-    }
-    
-    var description: String {
-        var str = "DebugInfo:\n"
-        str += " ConnectionId:    \(connectionId)\n"
-        str += " AllocationCount: \(allocationCount)\n"
-        str += " Timestamp:       \(timestamp)\n"
-        str += " ClientIp:        \(clientIp)"
-        return str
-    }
-}
-
-
-/// The array with debug information
-
-private struct DebugInfoArray: CustomStringConvertible {
-    
-    var arr: Array<DebugInfo> = []
-    
-    var json: VJson {
-        let json = VJson.array()
-        arr.forEach({ json.append($0.json) })
-        return json
-    }
-    
-    var description: String {
-        var str = ""
-        if arr.count == 0 { str += "Empty" }
-        str += arr.map({
-            $0.description.components(separatedBy: "\n").map({ "  \($0)" }).joined(separator: "\n")
-        }).joined(separator: ",\n")
-        return str
-    }
-}
-
-
-/// The session information store
-
-public struct SessionInfo: CustomStringConvertible {
-    
-    public subscript(key: SessionInfoKey) -> CustomStringConvertible? {
-        set { dict[key] = newValue }
-        get { return dict[key] }
-    }
-    
-    public mutating func remove(key: SessionInfoKey) {
-        dict.removeValue(forKey: key)
-    }
-    
-    fileprivate var dict: Dictionary<SessionInfoKey, CustomStringConvertible> = [:]
-    
-    fileprivate var json: VJson {
-        let json = VJson()
-        for (key, value) in dict {
-            json[key.rawValue] &= value.description
-        }
-        return json
-    }
-    
-    public var description: String {
-        return dict.map({ "\($0.key): \($0.value)" }).sorted().joined(separator: ",\n")
-    }
-}
-
-
 /// The session for statefull client experiences.
 
 public class Session: CustomStringConvertible {
@@ -274,7 +193,7 @@ public class Session: CustomStringConvertible {
 
     /// Creates a new session
     
-    fileprivate init(address: String, domainName: String, connectionId: Int, allocationCount: Int, timeout: Int) {
+    init(address: String, domainName: String, connectionId: Int, allocationCount: Int, timeout: Int) {
         self.lastActivity = started
         self.timeout = timeout
         let info = DebugInfo(connectionId: connectionId, allocationCount: allocationCount, timestamp: started, clientIp: address)
@@ -284,7 +203,7 @@ public class Session: CustomStringConvertible {
     
     /// The JSON representation for the session.
     
-    fileprivate var json: VJson {
+    var json: VJson {
         return Session.queue.sync {
             [weak self] in
             guard let `self` = self else { return VJson() }
@@ -347,197 +266,55 @@ public class Session: CustomStringConvertible {
 }
 
 
-public final class Sessions: CustomStringConvertible {
+/// A record with debugging info. Specifically this record allows the developper to associate connections with sessions such that debugging information in the log (which also contains the connection id) can be associated with a session.
 
-
-    /// The queue on which all sessions functions run
+private struct DebugInfo: CustomStringConvertible {
     
-    private static var queue: DispatchQueue = DispatchQueue(
-        label: "Sessions",
-        qos: DispatchQoS.userInitiated,
-        attributes: DispatchQueue.Attributes(),
-        autoreleaseFrequency: DispatchQueue.AutoreleaseFrequency.inherit,
-        target: nil
-    )
+    let connectionId: Int
+    let allocationCount: Int
+    let timestamp: Int64
+    let clientIp: String
     
-    
-    /// Enable or disable the session log
-    
-    public var loggingEnabled: Bool {
-        set {
-            Sessions.queue.sync {
-                self._logginEnabled = newValue
-            }
-        }
-        get {
-            return Sessions.queue.sync {
-                return self._logginEnabled
-            }
-        }
+    var json: VJson {
+        let json = VJson()
+        json["ConnectionId"] &= connectionId
+        json["AllocationCount"] &= allocationCount
+        json["Timestamp"] &= timestamp
+        json["ClientIp"] &= clientIp
+        return json
     }
     
-    private var _logginEnabled: Bool = false
-    
-    
-    /// The directory in which the session information will be stored if it denotes a directory. No session information will be stored if left (or set to) nil.
-    
-    private var logDir: URL
-    
-    
-    /// The total number of active sessions.
-    ///
-    /// - Note: The expired sessions will be removed before the tally is made.
-    
-    public var count: Int {
-        return Sessions.queue.sync {
-            
-            [weak self] in
-            guard let self = self else { return 0 }
-            
-            self.removeInactiveSessions()
-            return self.active.count
-        }
-    }
-    
-    
-    /// The dictionary with active sessions.
-    
-    private var active: Dictionary<UUID, Session> = [:]
-    
-    
-    /// Create a textual representation
-    
-    public var description: String {
-        
-        return Sessions.queue.sync {
-            
-            [weak self] in
-            guard let self = self else { return "*** nil ***" }
-
-            var str = "Sessions:\n"
-            str += " Logging dir:   \(self.logDir.path)\n"
-            str += " Session count: \(self.active.count)\n"
-            
-            if self.active.count == 0 {
-                str += " Sessions: None"
-            } else {
-                str += " Sessions:\n"
-                str += self.active.map({ " \($0.value)"}).joined(separator: "\n")
-            }
-            
-            return str
-        }
-    }
-    
-    
-    /// Create a new sessions object
-    
-    public init?(loggingDirectory dir: URL?) {
-        guard let dir = dir else { return nil }
-        logDir = dir
-        periodicPurge()
-    }
-    
-    
-    /// If there is an active session for the given id, and the session is not already in use, then return that session. If there is no session, it returns .none.
-    ///
-    /// - Note: If a session is no longer active, it will be removed from the session storage.
-    ///
-    /// - Parameters:
-    ///   - id: The UUID that is the session.id.
-    ///   - logId: Any log entry made will use this logId.
-    ///
-    /// - Returns: The requested session or nil.
-    
-    public func getActiveSession(for id: UUID, logId: Int) -> Session? {
-        
-        return Sessions.queue.sync {
-            
-            [weak self] in
-            guard let `self` = self else { return nil }
-
-            
-            // Find the session
-            
-            guard let session = self.active[id] else { return nil }
-                
-            
-            // Verify it it is still active
-            
-            if session.isActiveKeepActive {
-                
-                return session
-                
-            } else {
-                
-                // The session is no longer active
-                
-                self.removeInactiveSessions()
-                
-                return nil
-            }
-        }
-    }
-    
-    
-    /// Creates a new session and adds it to the active sessions.
-    
-    public func newSession(address: String, domainName: String, logId: Int, connectionId: Int, allocationCount: Int, timeout: Int) -> Session? {
-        return Sessions.queue.sync {
-            [weak self] in
-            guard let `self` = self else { return nil }
-            let session = Session(address: address, domainName: domainName, connectionId: connectionId, allocationCount: allocationCount, timeout: timeout)
-            self.active[session.id] = session
-            Log.atInfo?.log(
-                "Created session with id = \(session.id.uuidString)",
-                from: Source(id: logId, file: #file, function: #function, line: #line)
-            )
-            return session
-        }
-    }
-    
-    
-    /// This task will activate periodically to remove inactive sessions.
-    
-    private func periodicPurge() {
-        removeInactiveSessions()
-        Sessions.queue.asyncAfter(deadline: DispatchTime.now() + 3600.0, execute: periodicPurge)
-    }
-    
-    
-    /// Remove all inactive sessions. Sessions are considered inactive when the last activity on that session was longer ago than the timout.
-    
-    private func removeInactiveSessions() {
-        for (key, session) in active {
-            if session.isExclusive { continue }
-            if session.hasExpired {
-                removeSession(key)
-            }
-        }
-    }
-    
-    
-    /// Remove a session from the active sessions list.
-    
-    private func removeSession(_ id: UUID) {
-        guard let session = active[id] else { return }
-        if loggingEnabled { storeSession(session) }
-        active[id] = nil
-        Log.atInfo?.log(
-            "Purged inactive session for \(id.uuidString)",
-            from: Source(id: -1, file: #file, type: "Session", function: #function, line: #line)
-        )
-    }
-    
-    
-    /// Stores the data of a session to disk, if a valid Sessions.storeUrl is specified.
-    
-    private func storeSession(_ session: Session) {
-        let content = session.json.code
-        let dateForName = Date(timeIntervalSince1970: TimeInterval(session.started))
-        let uuidForName = session.id.uuidString
-        let fileName = "\(dateFormatter.string(from: dateForName))-\(uuidForName)"
-        let fileUrl = logDir.appendingPathComponent(fileName).appendingPathExtension("json")
-        try? content.write(to: fileUrl, atomically: true, encoding: String.Encoding.utf8)
+    var description: String {
+        var str = "DebugInfo:\n"
+        str += " ConnectionId:    \(connectionId)\n"
+        str += " AllocationCount: \(allocationCount)\n"
+        str += " Timestamp:       \(timestamp)\n"
+        str += " ClientIp:        \(clientIp)"
+        return str
     }
 }
+
+
+/// The array with debug information
+
+private struct DebugInfoArray: CustomStringConvertible {
+    
+    var arr: Array<DebugInfo> = []
+    
+    var json: VJson {
+        let json = VJson.array()
+        arr.forEach({ json.append($0.json) })
+        return json
+    }
+    
+    var description: String {
+        var str = ""
+        if arr.count == 0 { str += "Empty" }
+        str += arr.map({
+            $0.description.components(separatedBy: "\n").map({ "  \($0)" }).joined(separator: "\n")
+        }).joined(separator: ",\n")
+        return str
+    }
+}
+
+

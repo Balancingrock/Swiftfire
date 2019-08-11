@@ -234,10 +234,12 @@ do {
     serverAdminDomain.accessLogEnabled = true
     serverAdminDomain.four04LogEnabled = true
     serverAdminDomain.sessionLogEnabled = true
-    serverAdminDomain.serviceNames = ArrayOfStrings(serverAdminServices) // Defined in: Services.Registration.swift
+    serverAdminDomain.serviceNames = ArrayOfStrings(serverAdminServices) // Defined in: Services.SF.Registration.swift
     serverAdminDomain.rebuildServices()
     serverAdminDomain.sessionTimeout = 600 // Seconds
 
+    serverAdminDomain.storeSetup()
+    
     Log.atNotice?.log("Created server admin (pseudo) domain")
 }
 

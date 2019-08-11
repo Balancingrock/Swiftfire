@@ -1,6 +1,6 @@
 // =====================================================================================================================
 //
-//  File:       Function.PostingButton.swift
+//  File:       Function.SF.DomainButton.swift
 //  Project:    Swiftfire
 //
 //  Version:    1.0.0
@@ -10,7 +10,7 @@
 //  Website:    http://swiftfire.nl/
 //  Git:        https://github.com/Balancingrock/Swiftfire
 //
-//  Copyright:  (c) 2017-2019 Marinus van der Lugt, All rights reserved.
+//  Copyright:  (c) 2019 Marinus van der Lugt, All rights reserved.
 //
 //  License:    Use or redistribute this code any way you like with the following two provision:
 //
@@ -42,15 +42,16 @@
 // Description
 // =====================================================================================================================
 //
-/// Creates a (text) link that will post the key/value combination when clicked.
+// Creates a button that will post the key/value combinations when clicked. One of the keys is "DomainName" and it will
+// be set to the value of the domain name of the domain currently viewed.
 //
 //
 // Signature:
 // ----------
 //
-// .postingButton(target, title, key, value)
+// .domainButton(target, title)
 //
-// Note: More key/value pairs may be added at the end. i.e. .postingButton(target, title, key1, value1, ke2, value2, etc...)
+// Note: key/value pairs may be added at the end. i.e. .domainButton(target, title, key1, value1, key2, value2, etc...)
 //
 // Parameters:
 // -----------
@@ -86,37 +87,28 @@
 import Foundation
 
 import Core
-
-
-/// Creates a string with the HTML code necessary to create a button that contains a POST-ed key/value pair.
-///
-/// - Parameters:
-///   - target: The target url for the form containing the button.
-///   - title: The button title.
-///   - key: The key of the key/value pair that will be POST-ed.
-///   - value: The value of the key/value pair that will be POST-ed.
-
-public func postingButton(target: String, title: String, keyValuePairs: Dictionary<String, String>) -> String {
-    if keyValuePairs.isEmpty { return "***Error***" }
-    var dict = keyValuePairs
-    let pair = dict.remove(at: dict.startIndex)
-    return "<form method=\"post\" action=\"\(target)\" class=\"posting-button-form\">\(dict.reduce("", { (p, q) in return p.appending("<input type=\"hidden\" name=\"\(q.key)\" value=\"\(q.value)\">") }))<button type=\"submit\" name=\"\(pair.key)\" value=\"\(pair.value)\" class=\"posting-button-button\">\(title)</button></form>"
-}
+import Functions
 
 
 /// Creates a button that will post the key/value combination when clicked.
 
-public func function_postingButton(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: inout Functions.Environment) -> Data? {
+public func function_sf_domainButton(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: inout Functions.Environment) -> Data? {
     
     
-    // Check for minimum the 4 arguments and an even number of arguments
+    // Check for minimum the 2 arguments and an even number of arguments
     
-    guard case .array(let arr) = args, arr.count >= 4, arr.count.isEven else { return "***Error***".data(using: String.Encoding.utf8) }
+    guard case .array(let arr) = args, arr.count >= 2, arr.count.isEven else { return "***Error***".data(using: String.Encoding.utf8) }
+    
+    
+    // Check that a valid domain name was specified
+    
+    guard let postInfo = environment.serviceInfo[.postInfoKey] as? PostInfo,
+        let name = postInfo["DomainName"] else { return "***Error***".data(using: String.Encoding.utf8) }
     
     
     // Create dictionary
     
-    var dict: Dictionary<String, String> = [:]
+    var dict: Dictionary<String, String> = ["DomainName": name]
     var argIndex = 2
     while argIndex < (arr.count - 1) {
         dict[arr[argIndex]] = arr[argIndex + 1]

@@ -110,21 +110,62 @@ func function_sf_domainsTable(_ args: Functions.Arguments, _ info: inout Functio
     }
     
     
-    // The html code to be returned
+    // Create a list of domains and their aliases
     
-    var table = Table(klass: "domains-table", columnTitles: "Domain", "", "")
-    domains.forEach() { table.append($0.tableRow2()) }
+    var domainsAndAliases: Dictionary<String, Array<String>> = [:]
     
-    return table.html.data(using: String.Encoding.utf8)
+    domains.domains.forEach {
+        let alias = $0.key
+        let name = $0.value.name
+        if domainsAndAliases[name] != nil {
+            domainsAndAliases[name]!.append(alias)
+        } else {
+            domainsAndAliases[name] = [alias]
+        }
+    }
+    
+    for key in domainsAndAliases.keys {
+        let arr = domainsAndAliases[key]
+        domainsAndAliases[key] = arr?.sorted(by: { $0 < $1 })
+    }
+    
+    let list = domainsAndAliases.sorted(by: { $0.key < $1.key })
+    
+    
+    var domainTables: Array<Html> = []
+    
+    list.forEach { (domainName: String, aliases: Array<String>) in
+        
+        var table = Table(klass: "domains-table", columnTitles: "Domain:", "\(domainName)")
+        
+        if aliases.count == 0 {
+            table.append(Tr(Td("Aliases:"), Td(
+                postingButtonedInput(target: "/serveradmin/sfcommand/CreateAlias", inputName: "Alias", inputValue: "", buttonTitle: "Create Alias", keyValuePairs: ["DomainName":domainName])
+            )))
+        } else {
+            var firstAlias = true
+            for alias in aliases {
+                if alias != domainName {
+                    table.append(Tr(firstAlias ? Td("Aliases:") : Td(), Td(
+                        Div(
+                            P(alias),
+                            postingButton(target: "/serveradmin/sfcommand/DeleteAlias", title: "Delete Alias", keyValuePairs: ["Alias":alias])
+                        )
+                    )))
+                    firstAlias = false
+                }
+            }
+        }
+        
+        table.append(Tr(Td(), Td(
+            postingButtonedInput(target: "/serveradmin/sfcommand/CreateAlias", inputName: "Alias", inputValue: "", buttonTitle: "Create Alias", keyValuePairs: ["DomainName":domainName])
+        )))
+
+        domainTables.append(table)
+        domainTables.append(postingButton(target: "/serveradmin/pages/deletedomain.sf.html", title: "Delete Domain", keyValuePairs: ["DomainName":domainName]))
+    }
+    
+    return Div(klass: "domains-list", domainTables.reduce("", { $0 + $1.html })).html.data(using: String.Encoding.utf8)
 }
 
-fileprivate extension Domain {
-    
-    func tableRow2() -> Tr {
-        let nameCell = Td(klass: "table-column-name", self.name)
-        let editCell = Td(postingLink(target: "/serveradmin/pages/domain.sf.html", text: "Edit", keyValuePairs: ["DomainName": name]))
-        let deleteCell = Td(postingLink(target: "/serveradmin/pages/deletedomain.sf.html", text: "Delete", keyValuePairs: ["DomainName": name]))
-        return Tr(nameCell, editCell, deleteCell)
-    }
-}
 

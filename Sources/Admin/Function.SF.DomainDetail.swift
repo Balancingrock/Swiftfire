@@ -120,6 +120,7 @@ func function_sf_domainDetail(_ args: Functions.Arguments, _ info: inout Functio
     let parameter = arr[0].lowercased()
     
     switch parameter {
+    case "name": return domain.name.data(using: String.Encoding.utf8)
     case "root": return domain.webroot.data(using: String.Encoding.utf8)
     case "forewardurl": return domain.forwardUrl.data(using: String.Encoding.utf8)
     case "enabled": return domain.enabled.description.data(using: String.Encoding.utf8)

@@ -152,9 +152,7 @@
    <div class="centered-buttons">
 .sf-command(SaveDomains, "Save to File").sf-command(ReadDomains, "Reload from File")
 </div>
-
-<p>.sf-domainsTable()</p>
-
+<div class="center-content">.sf-domainsTable()</div>
 <form action="/serveradmin/sfcommand/CreateDomain" method="post">
 <div style="display:flex; justify-content:center;">
 		<span style="margin-top: 4px;">Add domain with name: </span><input type="text" name="DomainName" value="" style="text-align:center;" />
@@ -163,6 +161,8 @@
 </form>
 
 <p class="text-centered">When adding or removing domains, make sure to “Save to File” to persist the change(s).</p>
+
+<p class="text-centered">Note: Removing a domain will not remove the associated domain data from the Swiftfire Application Support directory. This has to be done manually by an administrator with sufficient access rights. Re-creating a domain of which the associated domain data is still present will cause a re-appearance of the domain as it was when deleted.</p>
 
 <!-- End of page content -->
 </div>

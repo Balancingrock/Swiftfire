@@ -257,7 +257,7 @@ public  class SFDocument: EstimatedMemoryConsumption {
         
         
         // Return the document
-        
+
         return data
     }
 
