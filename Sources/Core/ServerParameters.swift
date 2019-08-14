@@ -200,7 +200,7 @@ public final class ServerParameters {
 
     public let logfileMaxSize = NamedIntValue(
         name: "LogfileMaxSize",
-        about: "The (about) maximum size of a single longfile [KByte].",
+        about: "The (about) maximum size of a single logfile [KByte].",
         value: 1000,
         resetValue: 1000)
     

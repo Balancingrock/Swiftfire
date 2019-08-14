@@ -263,9 +263,28 @@ func service_getResourcePathFromUrl(_ request: Request, _ connection: SFConnecti
 
     
     // =============================================================================================================
-    // Check if there is something at the full path, append index.htm or index.html when necessary
+    // Check if there is something at the full path
     // =============================================================================================================
     
+    let availability = connection.filemanager.readableResourceFileExists(at: fullPath, for: domain)
+    
+    switch availability {
+        
+    case .cannotBeRead: handle403_ForbiddenError(path: partialPath)
+
+    case .doesNotExist: handle404_NotFoundError(path: partialPath)
+        
+    case .isDirectoryWithoutIndex: handle403_ForbiddenError(path: partialPath)
+        
+    case let .exists(path: foundPath):
+        
+        info[.absoluteResourcePathKey] = foundPath
+        info[.relativeResourcePathKey] = foundPath.replacingOccurrences(of: domain.webroot, with: "", range: Range(NSRange(location: 0, length: domain.webroot.count), in: foundPath))
+    }
+    
+    return .next
+    
+    /*
     var isDirectory: ObjCBool = false
     
     if connection.filemanager.fileExists(atPath: fullPath, isDirectory: &isDirectory) {
@@ -286,7 +305,7 @@ func service_getResourcePathFromUrl(_ request: Request, _ connection: SFConnecti
                 
                 if connection.filemanager.isReadableFile(atPath: tpath) {
                     
-                    info[.absoluteResourcePathKey] = tpath as String
+                    info[.absoluteResourcePathKey] = tpath
                     info[.relativeResourcePathKey] = (partialPath as NSString).appendingPathComponent(name)
                     
                     return .next
@@ -447,5 +466,6 @@ func service_getResourcePathFromUrl(_ request: Request, _ connection: SFConnecti
         
         return .next
     }
+ */
 }
 

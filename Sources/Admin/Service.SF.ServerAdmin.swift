@@ -140,29 +140,26 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
         response.version = Version.http1_1
         response.contentType = mimeTypeHtml
         response.body = html.data(using: String.Encoding.utf8)
+        
+        Log.atDebug?.log("Returned Admin Account Creation page")
     }
     
     func loginAdminAccountPage() {
         
         // If there is a custom login page, use that instead of the default.
         
-        var html: String?
-        
         let rootPath = serverParameters.adminSiteRoot.value
-        
-        if !rootPath.isEmpty {
+        let loginUrl = (rootPath as NSString).appendingPathComponent("login.sf.html")
+
+        if case let .exists(path: path) = connection.filemanager.readableResourceFileExists(at: loginUrl, for: domain) {
             
-            let rootUrl = URL(fileURLWithPath: rootPath)
-            let loginUrl = rootUrl.appendingPathComponent("login.sf.html")
+            Log.atDebug?.log("A login page exists, using file: \(path)")
             
-            switch SFDocument.factory(path: loginUrl.path, filemanager: connection.filemanager) {
+            switch SFDocument.factory(path: path, filemanager: connection.filemanager) {
                 
             case .error(let message):
                 
-                Log.atError?.log(
-                    message,
-                    from: Source(id: connection.logId, file: #file, function: #function, line: #line)
-                )
+                Log.atError?.log(message)
                 
                 response.code = Response.Code._500_InternalServerError
                 
@@ -174,39 +171,13 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
                 response.code = Response.Code._200_OK
                 response.contentType = mimeTypeHtml
             }
+            
+        } else {
+            
+            Log.atError?.log("No (readable) login.sf.html file found in the serveradmin root directory")
 
-            return
+            response.code = Response.Code._404_NotFound
         }
-        
-        if html == nil {
-            html = """
-                <!DOCTYPE html>
-                <html>
-                   <head>
-                      <title>Swiftfire Admin Login</title>
-                   </head>
-                   <body>
-                      <div>
-                         <form action="/serveradmin" method="post">
-                            <div>
-                               <h3>Server Admin Login</h3>
-                               <p style="margin-bottom:0px;">Name:</p>
-                               <input type="text" name="ServerAdminLoginName" value="Server Admin"><br>
-                               <p style="margin-bottom:0px;">Password:</p>
-                               <input type="password" name="ServerAdminLoginPwd" value=""><br>
-                               <input type="submit" value="Submit">
-                             </div>
-                          </form>
-                      </div>
-                   </body>
-                </html>
-            """
-        }
-        
-        response.code = Response.Code._200_OK
-        response.version = Version.http1_1
-        response.contentType = mimeTypeHtml
-        response.body = html!.data(using: String.Encoding.utf8)
     }
 
     func adminStatusPage(message: String? = nil) {
@@ -272,11 +243,12 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
         return .next
     }
     
+    Log.atDebug?.log("Raw URL request: \(urlstr)")
+    
     
     // If the url contains '/serveradmin' then remove that part.
     
-    var url = URL(fileURLWithPath: urlstr)
-    var pathComponents = url.pathComponents
+    var pathComponents = (urlstr as NSString).pathComponents
 
     if  pathComponents.count > 1,
         pathComponents[0].caseInsensitiveCompare("/") == ComparisonResult.orderedSame,
@@ -289,10 +261,9 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
     
     // Create the relative resource path.
     
-    url = URL(fileURLWithPath: serverParameters.adminSiteRoot.value)
-    for comp in pathComponents { url.appendPathComponent(comp) }
-    
-    var relPath: String = pathComponents.reduce("") { return ($0 + "/\($1)") }
+    var relPath = pathComponents.joined(separator: "/")
+
+    Log.atDebug?.log("Removed serveradmin from the requested url: \(relPath)")
     
     
     // ======================================================================
@@ -305,100 +276,105 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
         response.code = Response.Code._500_InternalServerError
         return .next
     }
-    
-    
-    // ================================================================================================================
-    // If there are login details available, either login to an account, switch to another account or create an account
-    // ================================================================================================================
-    
-    if let postInfo = info[.postInfoKey] as? PostInfo {
-        
-        if serverAdminDomain.accounts.isEmpty {
-            
-            // There is no server account, only accept account creation.
-            
-            if  let name = postInfo[SERVER_ADMIN_CREATE_ACCOUNT_NAME],
-                let pwd1 = postInfo[SERVER_ADMIN_CREATE_ACCOUNT_PWD1],
-                let pwd2 = postInfo[SERVER_ADMIN_CREATE_ACCOUNT_PWD2],
-                let root = postInfo[SERVER_ADMIN_CREATE_ACCOUNT_ROOT] {
-                
-                // Check the credentials
-                
-                Log.atDebug?.log("Found admin account creation credentials for: \(name)", id: connection.logId)
-                
-                guard !name.isEmpty, name.utf8.count < 30 else {
-                    createAdminAccountPage(name: "", nameColor: "red", pwdColor: "black", rootColor: "black")
-                    return .next
-                }
-                
-                guard !pwd1.isEmpty else {
-                    createAdminAccountPage(name: name, nameColor: "black", pwdColor: "red", rootColor: "black")
-                    return .next
-                }
-                
-                guard pwd2 == pwd1 else {
-                    createAdminAccountPage(name: name, nameColor: "black", pwdColor: "red", rootColor: "black")
-                    return .next
-                }
-                
-                guard !root.isEmpty else {
-                    createAdminAccountPage(name: name, nameColor: "black", pwdColor: "black", rootColor: "red")
-                    return .next
-                }
-                
-                
-                // There must be an index file in the server admin root directory
-                
-                let rootUrl = URL(fileURLWithPath: root, isDirectory: true)
-                let indexUrl = rootUrl.appendingPathComponent("index.sf.html")
-                
-                var isDir: ObjCBool = false
-                guard FileManager.default.fileExists(atPath: indexUrl.path, isDirectory: &isDir), isDir.boolValue == false else {
-                    createAdminAccountPage(name: name, nameColor: "black", pwdColor: "black", rootColor: "red")
-                    return .next
-                }
-                
-                
-                // Credentials are considered valid, create account
-                
-                guard let account = serverAdminDomain.accounts.newAccount(name: name, password: pwd1) else {
-                    
-                    Log.atCritical?.log("Failed to create admin account for: \(name)", id: connection.logId)
-                    
-                    response.code = Response.Code._500_InternalServerError
-                    
-                    return .next
-                }
-                
-                Log.atNotice?.log("Created admin account for: '\(name)'", id: connection.logId)
-                
-                serverParameters.adminSiteRoot.value = root
-                
-                serverParameters.store()
-                
-                session[.accountKey] = account
-                
-                relPath = ""
 
-                
-            } else {
-                
+    
+    // =============================================================================
+    // If there area no admin accounts, only accept the creation of an admin account
+    // =============================================================================
+
+    if serverAdminDomain.accounts.isEmpty {
+        
+        Log.atDebug?.log("No admin account found")
+        
+        guard let postInfo = info[.postInfoKey] as? PostInfo else {
+            createAdminAccountPage(name: "", nameColor: "black", pwdColor: "black", rootColor: "black")
+            return .next
+        }
+        
+        guard  let name = postInfo[SERVER_ADMIN_CREATE_ACCOUNT_NAME],
+            let pwd1 = postInfo[SERVER_ADMIN_CREATE_ACCOUNT_PWD1],
+            let pwd2 = postInfo[SERVER_ADMIN_CREATE_ACCOUNT_PWD2],
+            let root = postInfo[SERVER_ADMIN_CREATE_ACCOUNT_ROOT] else {
+
                 // One or more account creation details missing
                 
                 Log.atDebug?.log("Admin account creation credential(s) missing", id: connection.logId)
-                
                 createAdminAccountPage(name: "", nameColor: "black", pwdColor: "black", rootColor: "black")
-                
                 return .next
-            }
+        }
 
-            
-        } else {
-            
-            // There is a server account, only accept login.
         
-            // Prevent brute force breakin attempts by imposing a 2 second wait since the last login attempt
+        // Check the credentials
+        
+        Log.atDebug?.log("Found admin account creation credentials for: \(name)", id: connection.logId)
+        
+        guard !name.isEmpty, name.utf8.count < 30 else {
+            createAdminAccountPage(name: "", nameColor: "red", pwdColor: "black", rootColor: "black")
+            return .next
+        }
+        
+        guard !pwd1.isEmpty else {
+            createAdminAccountPage(name: name, nameColor: "black", pwdColor: "red", rootColor: "black")
+            return .next
+        }
+        
+        guard pwd2 == pwd1 else {
+            createAdminAccountPage(name: name, nameColor: "black", pwdColor: "red", rootColor: "black")
+            return .next
+        }
+        
+        guard !root.isEmpty else {
+            createAdminAccountPage(name: name, nameColor: "black", pwdColor: "black", rootColor: "red")
+            return .next
+        }
+        
+        
+        // There root must be a directory, and an index file must exist
+        
+        serverParameters.adminSiteRoot.value = root
+        guard adminSiteRootIsValid(connection.filemanager) else {
+            createAdminAccountPage(name: name, nameColor: "black", pwdColor: "black", rootColor: "red")
+            return .next
+        }
+        
+        
+        // Credentials are considered valid, create account
+        
+        guard let account = serverAdminDomain.accounts.newAccount(name: name, password: pwd1) else {
+            Log.atCritical?.log("Failed to create admin account for: \(name)", id: connection.logId)
+            response.code = Response.Code._500_InternalServerError
+            return .next
+        }
+        
+        Log.atNotice?.log("Created admin account for: '\(name)'", id: connection.logId)
+        
+        serverAdminDomain.webroot = root
+        
+        serverParameters.store()
+        
+        session[.accountKey] = account
+        
+        relPath = "/"
+        
+        /*** Fallthrough ***/
+        
+    } else {
 
+        Log.atDebug?.log("Admin account present")
+        
+        // ==============================================================
+        // If login information is available, then login the server admin
+        // ==============================================================
+        
+        if let postInfo = info[.postInfoKey] as? PostInfo,
+            let name = postInfo[SERVER_ADMIN_LOGIN_NAME],
+            let pwd = postInfo[SERVER_ADMIN_LOGIN_PWD] {
+            
+            Log.atDebug?.log("Found login information for admin \(name)")
+            
+            
+            // Prevent brute force breakin attempts by imposing a 2 second wait since the last login attempt
+            
             if let previousAttempt = session[.lastFailedLoginAttemptKey] as? Int64 {
                 let now = Date().javaDate
                 if now - previousAttempt < 2000 {
@@ -409,151 +385,135 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
             }
             
             
-            // Get name/pwd from admin and check if it is known.
+            // Get the account for the login data
             
-            if  let name = postInfo[SERVER_ADMIN_LOGIN_NAME],
-                let pwd = postInfo[SERVER_ADMIN_LOGIN_PWD] {
+            guard let account = serverAdminDomain.accounts.getAccount(for: name, using: pwd) else {
+                
+                // The login attempt failed, no account found.
+                
+                Log.atNotice?.log("Admin login failed for \(name)", id: connection.logId)
                 
                 
-                // Get the account for the login data
+                // Failed login, reset possible account
                 
-                if let account = serverAdminDomain.accounts.getAccount(for: name, using: pwd) {
+                session[.accountKey] = nil
                 
-                    Log.atNotice?.log("Admin \(name) logged in, \(account.uuid)", id: connection.logId)
-                    
-                    
-                    // Associate the account with the session. This allows access for subsequent admin pages.
-                    
-                    session[.accountKey] = account
-                    
-                    
-                    // If an admin tried to access an protected page while not logged-in, then the URL of that page is stored in the session.
-                    // Restore the original URL such that the admin is taken to the page he wanted to access.
-                    
-                    if let url = session[.preLoginUrlKey] as? String {
-                        
-                        // If the admin went directly for the login page, then redirect the URL to the status page (empty path).
-                        // Not doing so would cause the login page to be displayed again.
-                        
-                        if url == "/login.html" {
-                            relPath = ""
-                        } else {
-                            relPath = url
-                        }
-                        
-                    } else {
-                        relPath = ""
-                    }
-                    
-                    
-                    // Remove the previous access url from the session.
-                    
-                    session[.preLoginUrlKey] = nil
-                    
-                    
-                    /*** Fallthrough ***/
-                    
-                    
-                } else {
-                    
-                    // The login attempt failed, no account found.
-                    
-                    Log.atNotice?.log("Admin login failed for \(name)", id: connection.logId)
-                    
-                    
-                    // Failed login, reset possible account
-                    
-                    session[.accountKey] = nil
-                    
-                    
-                    // Set the timestamp for the failed attempt
-                    
-                    session[.lastFailedLoginAttemptKey] = Date().javaDate
-                    
-                    
-                    loginAdminAccountPage()
-                    
-                    return .next
-                }
+                
+                // Set the timestamp for the failed attempt
+                
+                session[.lastFailedLoginAttemptKey] = Date().javaDate
+                
+                
+                loginAdminAccountPage()
+                
+                return .next
             }
+
+            
+            Log.atNotice?.log("Admin \(name) logged in, \(account.uuid)", id: connection.logId)
+                
+                
+            // Associate the account with the session. This allows access for subsequent admin pages.
+                
+            session[.accountKey] = account
+                
+                
+            // If an admin tried to access an protected page while not logged-in, then the URL of that page is stored in the session.
+            // Restore the original URL such that the admin is taken to the page he wanted to access.
+                
+            if let path = session[.preLoginUrlKey] as? String {
+                Log.atDebug?.log("Replacing relPath value \(relPath) with \(path)")
+                relPath = path
+            } else {
+                Log.atDebug?.log("Replacing relPath value \(relPath) with \"\\\"")
+                relPath = "/"
+            }
+    
+                
+            // Remove the previous access url from the session.
+                
+            session[.preLoginUrlKey] = nil
+                
+                
+            /*** Fallthrough ***/
         }
     }
     
     
-    // ==================================================================================================
-    // If this is not a request for a CSS file, there should be an active server admin account to proceed
-    // ==================================================================================================
+    // Catch the possibility where the admin has manually changed the configuration files and made an error
     
-    if let fileExtension = relPath.components(separatedBy: ".").last,
-        fileExtension.caseInsensitiveCompare("css") == ComparisonResult.orderedSame {
+    if !adminSiteRootIsValid(connection.filemanager) {
+        adminStatusPage()
+        return .next
+    }
+
+    
+    // ======================================
+    // Find the page which has to be returned
+    // ======================================
+
+    let testPath = (serverAdminDomain.webroot as NSString).appendingPathComponent(relPath)
+    var absPath: String = ""
+    if !testPath.contains("sfcommand") {
         
-        // It is an css file, let it go through. This is necessary because some pages will be returned while there is no active admin account. These pages can only render successfully if the formatting is allowed through.
-        
-    } else {
+        switch connection.filemanager.readableResourceFileExists(at: testPath, for: serverAdminDomain) {
             
-        guard let account = session.info[.accountKey] as? Account, serverAdminDomain.accounts.contains(account.uuid) else {
+        case let .exists(path: path):
+            absPath = path
             
-            // A server admin should login first
+        case .cannotBeRead:
+            adminStatusPage(message: "Requested page at \(testPath) is not readable")
+            return .next
             
-            if serverAdminDomain.accounts.isEmpty {
-                
-                Log.atDebug?.log("An admin account must be created first", id: connection.logId)
-                
-                
-                // Return the account creation page
-                
-                createAdminAccountPage(name: "", nameColor: "black", pwdColor: "black", rootColor: "black")
-                
-            } else {
-                
-                Log.atDebug?.log("An admin should login first", id: connection.logId)
-                
-                
-                // Return the account login page
-                
-                loginAdminAccountPage()
-            }
+        case .doesNotExist:
+            adminStatusPage(message: "Requested page at \(testPath) does not exist")
+            return .next
             
-            
-            // If the user tried to access a specific admin page, but was not yet logged in, then remember the url that was the target.
-            
-            if !relPath.isEmpty {
-                session.info[.preLoginUrlKey] = relPath
-            }
-            
+        case .isDirectoryWithoutIndex:
+            adminStatusPage(message: "Directory without index page at \(testPath)")
             return .next
         }
     }
     
+    Log.atDebug?.log("relPath \(relPath) resolved to absPath \(absPath)")
     
-    // *****************************************
-    // There is a server administrator logged in
-    // *****************************************
-
     
-    // =================================================================================================================
-    // Special case 1: Changing the root page
-    // =================================================================================================================
-
-    if relPath == "/adminstatusroot" {
-        adminStatusPage()
-        return .next
+    // ===============================================================
+    // An administrator has to be logged in for html, htm or php pages
+    // ===============================================================
+    
+    // Note: Other pages are allowed in order to facilitate the formatting and layout of the login page
+    
+    let fileExtension = (absPath as NSString).pathExtension.lowercased()
+    if (fileExtension == "htm" || fileExtension == "html" || fileExtension == "php" || relPath.contains("sfcommand")) {
+        
+        Log.atDebug?.log("A protected page is requested")
+        
+        
+        // An admin must be logged in
+        
+        guard let account = session[.accountKey] as? Account, serverAdminDomain.accounts.contains(account.uuid) else {
+            
+            Log.atDebug?.log("No admin logged in")
+            
+            
+            // Save the current request url, it will be used when the admin logs in (unless the login page was requested)
+            
+            if (session.info[.preLoginUrlKey] == nil) && !relPath.contains("login") {
+                Log.atDebug?.log("Setting the session preLoginUrl to \(relPath)")
+                session.info[.preLoginUrlKey] = relPath
+            }
+            
+            loginAdminAccountPage()
+            return .next
+        }
+        
+        Log.atDebug?.log("Admin \(account.name) logged in")
     }
-    
-    
-    // =================================================================================================================
-    // Special case 2: Logout
-    // =================================================================================================================
-    
-    if relPath == "/logout.html" {
-        session[.accountKey] = nil
-        session[.preLoginUrlKey] = nil
-        // Note that we are past the point where the access rights are tested, hence the current page will be returned correctly.
-    }
 
     
     // =================================================================================================================
-    // Special case 3: execute server commands
+    // Special case: execute server commands
     // =================================================================================================================
 
     if pathComponents.count >= 2 && pathComponents[0] == "sfcommand" {
@@ -561,129 +521,31 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
         var postInfo = info[.postInfoKey] as? PostInfo
         switch executeSfCommand(pathComponents, &postInfo, session, &info, &response) {
         case .next: return .next
-        case .newPath(let path): relPath = path
+        case .newPath(let path):
+            relPath = path
+            let testPath = (serverAdminDomain.webroot as NSString).appendingPathComponent(relPath)
+            
+            switch connection.filemanager.readableResourceFileExists(at: testPath, for: serverAdminDomain) {
+                
+            case let .exists(path: path):
+                absPath = path
+                
+            case .cannotBeRead:
+                adminStatusPage(message: "Requested page at \(testPath) is not readable")
+                return .next
+                
+            case .doesNotExist:
+                adminStatusPage(message: "Requested page at \(testPath) does not exist")
+                return .next
+                
+            case .isDirectoryWithoutIndex:
+                adminStatusPage(message: "Directory without index page at \(testPath)")
+                return .next
+            }
         case .nop: break
         }
     }
     
-
-    // =================================================================================================================
-    // Test if the resource exists
-    // =================================================================================================================
-
-    // If there is no server admin root set, then display the build-in status page where the admin can set a new root.
-    
-    if serverParameters.adminSiteRoot.value.isEmpty {
-        adminStatusPage()
-        if !relPath.isEmpty {
-            session.info[.preLoginUrlKey] = relPath
-        }
-        return .next
-    }
-
-    var absPath = serverParameters.adminSiteRoot.value + relPath
-    
-    Log.atDebug?.log("Looking for file at path: '\(absPath)'", id: connection.logId)
-
-    
-    // Check for the request file, build a new path if necessary
-    
-    var isDirectory: ObjCBool = false
-    
-    if connection.filemanager.fileExists(atPath: absPath, isDirectory: &isDirectory) {
-        
-        
-        // There is something, if it is a directory, check for index.html or index.htm
-        
-        if isDirectory.boolValue {
-            
-            
-            // Find a root-index file
-            
-            let acceptedIndexNames = ["index.html", "index.sf.html", "index.htm", "index.sf.htm"]
-            
-            var success = false
-            
-            for name in acceptedIndexNames {
-                
-                
-                // Check for an 'index.html' file
-                
-                let tpath = (absPath as NSString).appendingPathComponent(name)
-                
-                if connection.filemanager.isReadableFile(atPath: tpath) {
-                    
-                    absPath = tpath as String
-                    
-                    success = true
-                    
-                    break
-                }
-            }
-            
-            
-            if !success {
-
-                // None of the files exists, or directory access is not allowed
-
-                // Error recovery: Make sure the adminSiteRoot is valid
-                
-                if adminSiteRootIsValid(connection.filemanager) {
-                
-                    response.code = Response.Code._404_NotFound
-                    
-                } else {
-                
-                    adminStatusPage()
-                }
-                
-                return .next
-            }
-            
-        } else {
-            
-            // Check if the resource is readable
-            
-            if !connection.filemanager.isReadableFile(atPath: absPath) {
-                
-                // Not readable
-                
-                // Error recovery: Make sure the adminSiteRoot is valid
-                
-                if adminSiteRootIsValid(connection.filemanager) {
-
-                    response.code = Response.Code._403_Forbidden
-                    
-                } else {
-                    
-                    adminStatusPage()
-                }
-                
-                return .next
-            }
-        }
-        
-    } else {
-        
-        // The resource is not found
-        
-        // Error recovery: Make sure the adminSiteRoot is valid
-        
-        if !adminSiteRootIsValid(connection.filemanager) {
-
-            response.code = Response.Code._404_NotFound
-            
-        } else {
-            
-            adminStatusPage()
-        }
-        
-        return .next
-    }
-    
-    
-    Log.atDebug?.log("Reading file at path: \(absPath)", id: connection.logId)
-
     
     // =================================================================================================================
     // Fetch the requested resource
@@ -697,10 +559,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
             
         case .error(let message):
             
-            Log.atError?.log(
-                message,
-                from: Source(id: connection.logId, file: #file, function: #function, line: #line)
-            )
+            Log.atError?.log(message, id: connection.logId)
 
             response.code = Response.Code._500_InternalServerError
             
@@ -814,6 +673,7 @@ fileprivate func executeSfCommand(_ pathComponents: Array<String>, _ postInfo: i
     case "UpdateDomainBlacklist": executeUpdateDomainBlacklist(&postInfo); return .newPath("/pages/domain-management.sf.html")
     case "AddToDomainBlacklist": executeAddToDomainBlacklist(&postInfo); return .newPath("/pages/domain-management.sf.html")
     case "RemoveFromDomainBlacklist": executeRemoveFromDomainBlacklist(&postInfo); return .newPath("/pages/domain-management.sf.html")
+    case "Logout": return executeLogout(session);
         
     default:
         Log.atError?.log("Unknown sfcommand: \(commandName)")
@@ -1186,4 +1046,9 @@ fileprivate func executeQuitSwiftfire() {
     }
     
     Log.atNotice?.log()
+}
+
+fileprivate func executeLogout(_ session: Session) -> CommandExecutionResult {
+    session[.accountKey] = nil
+    return .newPath("login.sf.html")
 }

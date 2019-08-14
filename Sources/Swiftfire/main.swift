@@ -230,6 +230,7 @@ do {
     
     serverAdminDomain = domain
 
+    serverAdminDomain.webroot = serverParameters.adminSiteRoot.value
     serverAdminDomain.enabled = true
     serverAdminDomain.accessLogEnabled = true
     serverAdminDomain.four04LogEnabled = true

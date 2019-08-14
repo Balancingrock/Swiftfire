@@ -52,7 +52,6 @@ import Core
 
 /// Example: .nofPageHits() will have the name "nofPageHits"
 
-let LOGOUT = "logout"
 let TIMESTAMP = "timestamp"
 let POSTING_LINK = "postingLink"
 let POSTING_BUTTON = "postingButton"
@@ -68,7 +67,6 @@ let NOF_PAGE_HITS = "nofPageHits"
 /// Register the functions
 
 public func registerFunctions() {
-    functions.register(name: LOGOUT, function: function_logout)
     functions.register(name: TIMESTAMP, function: function_timestamp)
     functions.register(name: POSTING_LINK, function: function_postingLink)
     functions.register(name: POSTING_BUTTON, function: function_postingButton)

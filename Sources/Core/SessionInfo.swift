@@ -43,6 +43,7 @@
 import Foundation
 
 import VJson
+import Custom
 
 
 /// The session information store
