@@ -110,7 +110,7 @@ public func function_nofPageHits(_ args: Functions.Arguments, _ info: inout Func
         count = environment.domain.hitCounters.increment(path) 
     }
     
-    Log.atDebug?.log("HitCount for \(path ?? "Unknown") = \(count)", from: Source(id: Int(environment.connection.logId), file: #file, function: #function, line: #line))
+    Log.atDebug?.log("HitCount for \(path ?? "Unknown") = \(count)", from: Source(id: Int(environment.connection.logId)))
 
     return count.data(using: .utf8)
 }

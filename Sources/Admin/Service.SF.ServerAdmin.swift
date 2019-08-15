@@ -90,7 +90,7 @@ private let SERVER_ADMIN_LOGIN_PWD  = "ServerAdminLoginPwd"
 
 
 /// Intercepts access to the URL path: /serveradmin and redirects them to the adminSiteRoot. In effect making the server
-// admin website available under any domain that has this service installed.
+/// admin website available under any domain that has this service installed.
 ///
 /// - Note: For a full description of all effects of this operation see the file: Service.ServerAdmin.swift
 ///
@@ -920,9 +920,9 @@ fileprivate func executeUpdateDomainServices(_ postInfo: inout PostInfo?) {
     
     serviceArr.sort(by: { $0.index < $1.index })
     
-    let serviceNames = serviceArr.map({ $0.name })
+    //let serviceNames = serviceArr.map({ $0.name })
     
-    domain.serviceNames = ArrayOfStrings(serviceNames)
+    domain.serviceNames = serviceArr.map({ $0.name }) //ArrayOfStrings(serviceNames)
     
     domain.rebuildServices()
 }
@@ -963,7 +963,7 @@ fileprivate func executeCreateDomain(_ postInfo: inout PostInfo?) {
     }
     
     if let domain = domains.createDomain(for: name) {
-        domain.serviceNames = ArrayOfStrings(defaultServices)
+        domain.serviceNames = defaultServices
         Log.atNotice?.log("Added new domain with \(domain))")
     } else {
         Log.atNotice?.log("Failed to domain for \(name))")

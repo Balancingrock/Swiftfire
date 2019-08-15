@@ -47,6 +47,7 @@ import Foundation
 
 public enum ServiceInfoKey: String {
     
+    // The first definitions are needed by the core Swiftfire framework.
     
     /// [String] set by the service that determines the URL of the resource to be fetched. (DomainService.GetResourcePathFromUrl)
     ///
@@ -86,5 +87,11 @@ public enum ServiceInfoKey: String {
     /// Set by the service: DecodePostFormUrlEncoded
     
     case postInfoKey = "PostInfo"
+    
+    
+    // =================================================================
+    // Don't make any changes above this line, add new definitions below
+    // =================================================================
+
 }
 

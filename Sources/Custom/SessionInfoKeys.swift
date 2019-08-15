@@ -47,6 +47,7 @@ import Foundation
 
 public enum SessionInfoKey: String {
     
+    // The following definitions are needed by the core Swiftfire framework
     
     /// [Account] The account associated with this session.
     ///
@@ -63,4 +64,11 @@ public enum SessionInfoKey: String {
     /// [Int64] To prevent login attempts in rapid succession use this key to enfore a minimum delay between attempts.
     
     case lastFailedLoginAttemptKey = "LastFailedLoginAttempt"
+    
+    
+    // =================================================================
+    // Don't make any changes above this line, add new definitions below
+    // =================================================================
+    
+    
 }

@@ -58,11 +58,6 @@
 // .command("form-action", "button-title")
 //
 //
-// Option 3: (Input field + button)
-//
-// .command("form-action", "text-input-name", "button-title")
-//
-//
 // Parameters:
 // -----------
 //
@@ -72,12 +67,6 @@
 // 2 parameters:
 //   - form-action: is the value for the from action.
 //   - button-title: is the value (i.e. title) of the button.
-//
-// 3 parameters: (not used)
-//   - form-action: the name that is used as the form name.
-//   - text-input-name, the name to be used as the input name.
-//     If the name is a parameter name, then the current value of the parameter will be displayed in the input field.
-//   - button-title, the title used for the button.
 //
 //
 // Other Input:
@@ -129,22 +118,7 @@ func function_sf_command(_ args: Functions.Arguments, _ info: inout Functions.In
     case 2:
         
         form = Form(method: .post, action: "/serveradmin/sfcommand/\(array[0])", Input.submit(title: array[1])).html
-    
-/*    case 3:
-        
-        // 2 arguments = input field + button
-        
-        let name = array[1]
-        var value = ""
-        for p in parameters.all {
-            if p.name == name {
-                value = p.stringValue
-            }
-        }
-        
-        form = "<form style=\"display:inline;\" action=\"/serveradmin/sfcommand/\(array[0])\" method=\"post\"><input type=\"text\" name=\"\(array[1])\" value=\"\(value)\"><input type=\"submit\" value=\"\(array[2])\"></form>"
-*/
-        
+            
     default:
         
         form = "***error***"

@@ -47,17 +47,11 @@ import SwifterLog
 
 
 fileprivate func httpServerErrorHandler(message: String) {
-    Log.atError?.log(
-        message,
-        from: Source(id: -1, file: #file, function: #function, line: #line)
-    )
+    Log.atError?.log(message, id: -1)
 }
 
 fileprivate func httpsServerErrorHandler(message: String) {
-    Log.atError?.log(
-        message,
-        from: Source(id: -1, file: #file, function: #function, line: #line)
-    )
+    Log.atError?.log(message, id: -1)
 }
 
 
@@ -68,10 +62,7 @@ public func restartHttpAndHttpsServers() {
     
     if httpServer?.isRunning ?? false {
         
-        Log.atNotice?.log(
-            "Stopping HTTP server",
-            from: Source(id: -1, file: #file, function: #function, line: #line)
-        )
+        Log.atNotice?.log("Stopping HTTP server")
         
         httpServer?.stop()
         
@@ -97,10 +88,7 @@ public func restartHttpAndHttpsServers() {
     
     if httpsServer?.isRunning ?? false {
         
-        Log.atNotice?.log(
-            "Stopping HTTPS server",
-            from: Source(id: -1, file: #file, function: #function, line: #line)
-        )
+        Log.atNotice?.log("Stopping HTTPS server")
         
         httpsServer?.stop()
         
@@ -362,10 +350,9 @@ fileprivate func checkDomainCtxs() -> [ServerCtx] {
         
         switch domain.ctx {
             
-        case let .error(message): Log.atWarning?.log(
-            message,
-            from: Source(id: -1, file: #file, function: #function, line: #line)
-            )
+        case let .error(message):
+            
+            Log.atWarning?.log(message)
             
         case let .success(ctx):
             

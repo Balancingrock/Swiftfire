@@ -46,5 +46,8 @@ import Foundation
 /// The keys for the info dictionary
 
 public enum FunctionInfoKey: String {
-    case none = "None" // Note: Remove when first key is defined.
+    
+    // There are no definitions needed by the Swiftfire core framework.
+    
+    case none = "None" // Note: This can be remove when the first key is defined.
 }

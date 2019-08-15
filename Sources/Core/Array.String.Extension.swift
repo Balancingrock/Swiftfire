@@ -1,6 +1,6 @@
 // =====================================================================================================================
 //
-//  File:       NamedValueProtocol.swift
+//  File:       Array.String.Extension.swift
 //  Project:    Swiftfire
 //
 //  Version:    1.0.0
@@ -41,48 +41,24 @@
 // =====================================================================================================================
 
 import Foundation
+
 import VJson
-import SwifterLog
-import BRUtils
 
-
-/// For the action to be performed when an update is successful
-
-public typealias DidSetActionSignature = () -> Void
-
-
-/// This contains the operations that have no default implementation.
-
-public protocol NamedValueProtocol {
+extension Array where Iterator.Element == String {
     
-    /// The name of the item
+    func store(to file: URL?) {
+        guard let file = file else { return }
+        let json = VJson.array()
+        self.forEach { (str) in
+            json.append(str)
+        }
+        json.save(to: file)
+    }
     
-    var name: String { get }
-    
-    
-    /// A description of what the value is for (can be used in GUIs)
-    
-    var about: String { get }
-    
-    
-    /// The value as string
-    
-    var stringValue: String { get }
-    
-    
-    /// Set the value to the value contained in the given string.
-    ///
-    /// - Returns: True if the operation was successful
-    
-    func setValue(_ value: String) -> Bool
-    
-    
-    /// Reset the contained value to its initial value.
-    
-    func reset()
-    
-    
-    /// Adds an action to be executed after an update
-    
-    func addDidSetAction(_ action: @escaping DidSetActionSignature)
+    public mutating func load(from file: URL?) {
+        guard let file = file else { return }
+        guard let json = try? VJson.parse(file: file) else { return }
+        self = []
+        json.forEach { if let str = $0.stringValue { self.append(str) } }
+    }
 }

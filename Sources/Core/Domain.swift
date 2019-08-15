@@ -209,7 +209,7 @@ public final class Domain {
     
     /// The names of the services used by this domain.
     
-    public var serviceNames = ArrayOfStrings() {
+    public var serviceNames: Array<String> = [] {
         didSet {
             rebuildServices()
         }
@@ -409,7 +409,7 @@ public final class Domain {
     
     /// Prepares for application (server) shutdown
     
-    public func serverShutdown() {
+    public func shutdown() {
         
         
         // Save collected data
@@ -599,10 +599,7 @@ extension Domain {
             
         case "SfResources":
             sfresources = value
-            
-//        case "SupportDirectory":
-//            supportDirectory = URL(fileURLWithPath: value)
-            
+                        
         case "SessionTimeout":
             if let i = Int(value) {
                 sessionTimeout = i

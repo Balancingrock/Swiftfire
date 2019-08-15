@@ -235,7 +235,7 @@ do {
     serverAdminDomain.accessLogEnabled = true
     serverAdminDomain.four04LogEnabled = true
     serverAdminDomain.sessionLogEnabled = true
-    serverAdminDomain.serviceNames = ArrayOfStrings(serverAdminServices) // Defined in: Services.SF.Registration.swift
+    serverAdminDomain.serviceNames = serverAdminServices // Defined in: Services.SF.Registration.swift
     serverAdminDomain.rebuildServices()
     serverAdminDomain.sessionTimeout = 600 // Seconds
 
@@ -331,7 +331,7 @@ _ = Darwin.sleep(10)
 // Save the state, telemetry and logs of the server
 // ================================================
 
-_ = serverAdminDomain.serverShutdown()
+_ = serverAdminDomain.shutdown()
 
 
 // =====================
@@ -354,7 +354,7 @@ Log.atNotice?.log("Saved server blacklist")
 // Persist the state of the domains
 // ================================
 
-domains.serverShutdown()
+domains.shutdown()
 domains.storeDomainsAndAliases()
 
 

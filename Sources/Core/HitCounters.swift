@@ -98,28 +98,4 @@ public struct HitCounters {
         }
         json.save(to: file)
     }
-    
-    
-    /// Loads the contents from the file, overwriting existing values (if any).
-    /*
-    mutating func load(from file: URL?) {
-        
-        guard let file = file else { return }
-        
-        counters = [:]
-        
-        guard let json = try? VJson.parse(file: file) else {
-            Log.atError?.log("Parsing the hitcounter json file failed")
-            return
-        }
-        
-        for item in json {
-            if let name = item.nameValue, let value = item.int64Value {
-                counters[name] = value
-                Log.atDebug?.log("Hitcounter for \(name) set to \(value)")
-            } else {
-                Log.atError?.log("Error reading a value from the hitcounter file \(file.path)")
-            }
-        }
-    }*/
 }

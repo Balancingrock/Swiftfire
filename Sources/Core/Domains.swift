@@ -294,10 +294,10 @@ extension Domains {
     }
     
     
-    /// Invokes serverShutdown on each domain.
+    /// Invokes shutdown on each domain.
     
-    public func serverShutdown() {
-        return domains.forEach { $0.value.serverShutdown() }
+    public func shutdown() {
+        return domains.forEach { $0.value.shutdown() }
     }
 }
 

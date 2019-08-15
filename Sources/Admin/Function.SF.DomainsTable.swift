@@ -88,7 +88,7 @@ import Core
 import Functions
 
 
-// Returns a table with all telemetry values.
+/// Returns a table with all telemetry values.
 ///
 /// - Returns: The table with all telemetry values.
 

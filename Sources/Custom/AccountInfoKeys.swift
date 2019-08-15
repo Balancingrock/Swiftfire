@@ -49,11 +49,7 @@ import BRBON
 
 public class AccountInfoKey {
     
-    
-    // ====================
-    // BEGIN: Do not change
-    // ====================
-    
+    // The Swiftfire core needs these definitions
     
     /// [Int64] The date the user was created, in msec since begin 1970.
     
@@ -75,9 +71,9 @@ public class AccountInfoKey {
     let email = NameField("Email")!
     
     
-    // ==================
-    // END: Do not change
-    // ==================
+    // =================================================================
+    // Don't make any changes above this line, add new definitions below
+    // =================================================================
     
     
     // Add non-framework definitions below

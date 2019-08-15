@@ -70,7 +70,7 @@ extension SFConnection {
         
         // Log update
         
-        Log.atDebug?.log(message, id: logId, type: "SFConnection")
+        Log.atDebug?.log(message, id: logId)
         
         
         // Reply to client
@@ -82,7 +82,7 @@ extension SFConnection {
         if let data = response.data {
             transfer(data)
         } else {
-            Log.atError?.log("Failed to create HTTP reply with message = '\(message)'", id: logId, type: "SFConnection")
+            Log.atError?.log("Failed to create HTTP reply with message = '\(message)'", id: logId)
         }
     }
     
@@ -99,7 +99,7 @@ extension SFConnection {
         
         // Logging update
         
-        Log.atDebug?.log(message, id: logId, type: "SFConnection")
+        Log.atDebug?.log(message, id: logId)
         
         
         // Reply to client
@@ -111,7 +111,7 @@ extension SFConnection {
         if let data = response.data {
             transfer(data)
         } else {
-            Log.atError?.log("Failed to create HTTP reply with message = '\(message)'", id: logId, type: "SFConnection")
+            Log.atError?.log("Failed to create HTTP reply with message = '\(message)'", id: logId)
         }
     }
     
@@ -226,7 +226,7 @@ extension SFConnection {
             }
         }
 
-        Log.atDebug?.log("Request for domain: \(domain.name)", id: logId, type: "SFConnection")
+        Log.atDebug?.log("Request for domain: \(domain.name)", id: logId)
         
         
         // =============================================================================================================
@@ -241,7 +241,7 @@ extension SFConnection {
                 let result = SwifterSockets.connectToTipServer(atAddress: domain.forwardHost!.address, atPort: (domain.forwardHost!.port ?? "80"), connectionObjectFactory: forwardingConnectionFactory)
                 
                 if case let .error(message) = result {
-                    Log.atError?.log(message, id: logId, type: "SFConnection")
+                    Log.atError?.log(message, id: logId)
                 }
                 if case let .success(conn) = result {
                     forwarder = conn as? Forwarder
@@ -256,20 +256,6 @@ extension SFConnection {
             }
             
             // The forwarding connection will be closed when the forwarding target closes its connection. Until then all data received from the forwarding target will be routed to the client.
-
-            // Statistics update
-            /*let mutation = Mutation.createAddClientRecord(from: self)
-            mutation.domain = domain.name
-            mutation.httpResponseCode = "Unavailable"
-            mutation.responseDetails = "Forwarding of domain '\(host.address)'"
-            mutation.requestReceived = timestampResponseStart
-            statistics.submit(mutation: mutation) {
-                [unowned self] (message: String) in
-                Log.atError?.log(
-                    message: message,
-                    from: Source(id: self.logId, file: #file, type: "SFConnection", function: #function, line: #line)
-                )
-            }*/
 
             return
         }
@@ -291,14 +277,15 @@ extension SFConnection {
             ipAddress: remoteAddress,
             url: request.url ?? "",
             operation: request.method?.rawValue ?? "",
-            version: request.version?.rawValue ?? "")
+            version: request.version?.rawValue ?? ""
+        )
 
         
         // =============================================================================================================
         // Execute the service chain
         // =============================================================================================================
 
-        Log.atDebug?.log("Starting domain services", id: logId, type: "SFConnection")
+        Log.atDebug?.log("Starting domain services", id: logId)
 
         var response = Response()
         response.version = httpVersion
@@ -312,7 +299,7 @@ extension SFConnection {
             
             if serverParameters.debugMode.value {
 
-                Log.atDebug?.log("Service: \(item.name)", id: logId, type: "SFConnection")
+                Log.atDebug?.log("Service: \(item.name)", id: logId)
             }
 
             
@@ -323,14 +310,14 @@ extension SFConnection {
             if serverParameters.debugMode.value {
 
                 if serviceInfo.dict.count == 0 {
-                    Log.atDebug?.log( "\n\nService info is empty", id: logId, type: "SFConnection")
+                    Log.atDebug?.log( "\n\nService info is empty", id: logId)
                 } else {
                     var str = ""
                     str += serviceInfo.dict.map({ key, value in "Key: \(key), Value: \(value)" }).joined(separator: "\n")
-                    Log.atDebug?.log("\n\nService info:\n\(str)\n", id: logId, type: "SFConnection")
+                    Log.atDebug?.log("\n\nService info:\n\(str)\n", id: logId)
                 }
                 
-                Log.atDebug?.log("\n\n\(response)\n", id: logId, type: "SFConnection")
+                Log.atDebug?.log("\n\n\(response)\n", id: logId)
             }
         }
         
@@ -355,7 +342,7 @@ extension SFConnection {
         domain.recordStatistics(visit)
  
         
-        Log.atInfo?.log("Response took \(completed - timestampResponseStart) milli seconds", id: logId, type: "SFConnection")
+        Log.atInfo?.log("Response took \(completed - timestampResponseStart) milli seconds", id: logId)
     }
 }
 

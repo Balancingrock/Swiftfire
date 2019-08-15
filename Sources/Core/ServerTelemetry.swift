@@ -152,40 +152,6 @@ public final class ServerTelemetry {
 }
 
 
-// MARK: - VJsonConvertible
-/*
-extension ServerTelemetry: VJsonConvertible {
-    
-    
-    public convenience init?(json: VJson?) {
-        guard let json = json else { return nil }
-        self.init()
-        for item in all {
-            if let strval = (json|item.name)?.stringValue {
-                if item.setValue(strval) {
-                    _ = json.removeChild((json|item.name)!)
-                } else {
-                    Log.atError?.log("Failed to set value for \(item.name) to \(strval)")
-                }
-            } else {
-                Log.atError?.log("Missing value for \(item.name)")
-            }
-        }
-        if json.nofChildren != 0 {
-            Log.atError?.log("Superfluous items in source: \(json.code)")
-            return nil
-        }
-    }
-
-    
-    public var json: VJson {
-        let json = VJson()
-        all.forEach({ json[$0.name] &= $0.stringValue })
-        return json
-    }
-}*/
-
-
 // MARK: - CustomStringConvertible
 
 extension ServerTelemetry: CustomStringConvertible {
