@@ -1,0 +1,11 @@
+# Swiftfire document generator jazzy settings
+
+copyright: Copyright 2016-2017 Rien van der Lugt
+author: Rien van der Lugt
+module: Swiftfire, Core, Admin, Custom, Functions, Services
+hide_documentation_coverage: true
+xcodebuild_arguments: [-target, Admin, -target, Custom, -target, Core, -target, Functions, -target, Services, -target, Swiftfire]
+github_url: https://github.com/Balancingrock/Swiftfire
+output: ~/Documents/Websites/swiftfire.nl/website/projects/swiftfire/reference
+clean: true
+theme: fullwidth

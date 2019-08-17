@@ -103,7 +103,7 @@ import Core
 func function_sf_command(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: inout Functions.Environment) -> Data? {
     
     
-    guard case Functions.Arguments.array(let array) = args else {
+    guard case Functions.Arguments.arrayOfString(let array) = args else {
         return "Unknown command".data(using: String.Encoding.utf8)
     }
     

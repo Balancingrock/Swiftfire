@@ -128,7 +128,7 @@ extension SFDocument {
         }
         
         func asArrFunctionBlock() -> DocumentBlock {
-            let fb = FunctionBlock(name: name, function: function, arguments: Functions.Arguments.array(array))
+            let fb = FunctionBlock(name: name, function: function, arguments: Functions.Arguments.arrayOfString(array))
             Log.atDebug?.log("Function block: \(fb)", type: "SFDocument")
             return .functionBlock(fb)
         }

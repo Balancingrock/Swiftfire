@@ -88,6 +88,7 @@ import Foundation
 
 import Core
 import Functions
+import BRUtils
 
 
 /// Creates a button that will post the key/value combination when clicked.
@@ -96,8 +97,8 @@ public func function_sf_domainButton(_ args: Functions.Arguments, _ info: inout 
     
     
     // Check for minimum the 2 arguments and an even number of arguments
-    
-    guard case .array(let arr) = args, arr.count >= 2, arr.count.isEven else { return "***Error***".data(using: String.Encoding.utf8) }
+
+    guard case let .arrayOfString(arr) = args, arr.count >= 2, arr.count.isEven else { return "***Error***".data(using: String.Encoding.utf8) }
     
     
     // Check that a valid domain name was specified

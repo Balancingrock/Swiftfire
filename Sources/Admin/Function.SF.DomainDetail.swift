@@ -89,7 +89,7 @@ func function_sf_domainDetail(_ args: Functions.Arguments, _ info: inout Functio
     
     // Check argument validity
     
-    guard case .array(let arr) = args, arr.count == 1 else { return "***Error***".data(using: String.Encoding.utf8) }
+    guard case .arrayOfString(let arr) = args, arr.count == 1 else { return "***Error***".data(using: String.Encoding.utf8) }
     
     
     // Check that a server admin is logged in

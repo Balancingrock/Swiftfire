@@ -77,7 +77,7 @@ public final class HttpHeaderLogger: Logfile {
         // Create the message
         
         var message = "--------------------------------------------------------------------------------\n"
-        message += "Time      : \(dateFormatter.string(from: Date.fromJavaDate(connection.timeOfAccept)))\n"
+        message += "Time      : \(dateFormatter.string(from: Date(javaDate: connection.timeOfAccept)))\n"
         message += "IP Address: \(connection.remoteAddress)\n"
         message += "Log Id    : \(connection.logId)\n\n"
         message = request.lines.reduce(message) { $0 + $1 + "\n" }

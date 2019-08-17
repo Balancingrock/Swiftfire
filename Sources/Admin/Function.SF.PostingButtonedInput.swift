@@ -117,7 +117,7 @@ func function_sf_postingButtonedInput(_ args: Functions.Arguments, _ info: inout
     
     // Check for minimum the 4 arguments and an even number of arguments
     
-    guard case .array(let arr) = args, arr.count >= 4, (arr.count % 2 == 0) else { return "***Error***".data(using: String.Encoding.utf8) }
+    guard case .arrayOfString(let arr) = args, arr.count >= 4, (arr.count % 2 == 0) else { return "***Error***".data(using: String.Encoding.utf8) }
     
     
     // Create dictionary

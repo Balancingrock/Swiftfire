@@ -2,6 +2,10 @@
 
 ___Note: The Swiftfire [homepage](http://swiftfire.nl) usually lags the developments in HEAD.___
 
+_We have bit the bullet, and handed out the tag 1.0.0._
+
+_Our initial testing shows that Swiftfire does work, but the combinations ot be tested are near endless. Hence we have decided to up the version to 1.0.0, and handle any issues that might arise later asap._
+
 The Swiftfire webserver can be extended with functions and services written in Swift. This makes it possible to create entire websites written in nothing else but HTML, CSS and Swift. No other languages, frameworks or external services necessary, with a minor exception for openSSL.
 
 To use Swiftfire as an end-user you need a MacOS computer capable of running at least MacOS 10.12.
@@ -132,39 +136,12 @@ You can of course change whatever you want, but the current source code layout w
 
 Note: Planned releases are for information only and almost always change.
 
-#### 2.0.0 (Thought about)
+#### 1.1.0 (Open)
 
 - Add URL redirection list
 
-#### 1.0.0 (Planned)
+#### 1.0.0 (Current)
 
-- Bugfixes
-- Small feature improvements (if necessary)
-- Code improvements
-
-#### HEAD
-
-- Added build script for SPM
-- Added openSSL to the repository for convenience.
-- Reorganized the layout of source files.
-- Compiles unders Swift 5 & seems to work. Some major changes have been made so we will need a prolonged confidence building phase.
-- Added PHP support (i.e. Swifire now will serve wordpress and other PHP based websites)
-- Switched to BRBON for visitor logging
-- A major shortcoming of the experimental versions up until now was that visitor logging was done in-memory. Resulting in an ever increasing memory footprint. This has now been rectified and visitor logging is written to file regulary.
-
-#### 0.11.1 (Current)
-
-- Restored compilability (Still, do not use this release)
-
-#### 0.11.0
-
-- Temporary release for code consolidation purposes while migrating to Swift 4 and SPM 4.
-- Do not use this release, it does not compile!
-
-#### 0.10.11
-
-- Bugfix: fixed hanger on URLs containing an 'and' (&) sign
-- Bugfix: added header logging back in
-- Upgraded SwifterJSON to VJson
+- Upped to 1.0.0
 
 _Removed older history entries_

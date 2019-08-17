@@ -113,7 +113,7 @@ func function_sf_parameterValue(_ args: Functions.Arguments, _ info: inout Funct
     
     // Check parameter name
     
-    guard case .array(let arr) = args else {
+    guard case .arrayOfString(let arr) = args else {
         return "Argument type error".data(using: String.Encoding.utf8)
     }
     

@@ -71,7 +71,7 @@ public final class NamedIntValue: NamedValue {
         set {
             NamedValue.queue.async {
                 [weak self] in
-                self?._value = gf_clippedValue(lowLimit: 0, value: newValue, highLimit: 999_999)
+                self?._value = limit(lowLimit: 0, newValue, highLimit: 999_999)
             }
         }
     }

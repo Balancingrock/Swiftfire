@@ -126,13 +126,6 @@ public func postingLink(target: String, text: String, keyValuePairs: Dictionary<
 }
 
 
-public extension Int {
-    var isEven: Bool { return self % 2 == 0 }
-    var isUneven: Bool { return self % 2 == 1 }
-    func isMultiple(of i: Int) -> Bool { return self % i == 0 }
-}
-
-
 /// Creates a (text) link that will post the key/value combination when clicked.
 
 public func function_postingLink(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: inout Functions.Environment) -> Data? {
@@ -140,7 +133,7 @@ public func function_postingLink(_ args: Functions.Arguments, _ info: inout Func
     
     // Check for minimum the 4 arguments and an even number of arguments
     
-    guard case .array(let arr) = args, arr.count > 4, arr.count.isEven else { return "***Error***".data(using: String.Encoding.utf8) }
+    guard case .arrayOfString(let arr) = args, arr.count > 4, arr.count.isEven else { return "***Error***".data(using: String.Encoding.utf8) }
     
     
     // Create dictionary

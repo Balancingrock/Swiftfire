@@ -96,7 +96,7 @@ public func function_nofPageHits(_ args: Functions.Arguments, _ info: inout Func
     
     var path: String?
     
-    if case .array(let arr) = args {
+    if case .arrayOfString(let arr) = args {
         if arr.count > 0 {
             path = arr[0]
         }
