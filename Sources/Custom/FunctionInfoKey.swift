@@ -3,7 +3,7 @@
 //  File:       FunctionInfoKey.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.0.1
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,18 +36,23 @@
 //
 // History
 //
-// 1.0.0 Raised to v1.0.0, Removed old change log,
+// 1.0.1 - Documentation update
+// 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 
 import Foundation
 
 
-/// The keys for the info dictionary
+/// The keys for the function info dictionary. The function info directory is passed into each function call and can be used to communicate from higher priority functions to lower priority functions.
+///
+/// Each key that is defined should also define the type of information, and its intended use.
 
 public enum FunctionInfoKey: String {
     
     // There are no definitions needed by the Swiftfire core framework.
     
-    case none = "None" // Note: This can be remove when the first key is defined.
+    /// There are no function info keys defined yet.
+    
+    case none = "None"
 }

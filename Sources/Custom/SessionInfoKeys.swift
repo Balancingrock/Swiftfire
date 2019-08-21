@@ -3,7 +3,7 @@
 //  File:       SessionInfoKeys.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.0.1
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,33 +36,57 @@
 //
 // History
 //
-// 1.0.0 Raised to v1.0.0, Removed old change log,
+// 1.0.1 - Documentation update
+// 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 
 import Foundation
 
 
-/// Session Info key's
+/// Keys for the Session Info dictionary. The session info directory can be found in the serviceInfo dictionary using the `sessionKey`.
+///
+/// Every key defined here should be documented as to the type of information and the purpose of that information.
 
 public enum SessionInfoKey: String {
     
     // The following definitions are needed by the core Swiftfire framework
     
-    /// [Account] The account associated with this session.
+    
+    /// The account associated with this session. It is only present if a user has logged-in.
     ///
-    /// Only present if a user has "logged in".
+    /// Note: It is currently only used for server-admin accounts. But will be used in the future for domain admins and user accounts as well.
+    ///
+    /// __Type__: Account
+    ///
+    /// __Set by__: Service.ServerAdmin (for server admin accounts only)
+    ///
+    /// __Used by__: Services.ServerAdmin (for server admin accounts only)
     
     case accountKey = "Account"
     
     
-    /// [String] The url that was requested but discarded because a user needed to login first.
-    
+    /// The URL that was requested, but discarded because a user needed to login first. This key can be used to immediately redirect the user to the requested page after he has logged-in.
+    ///
+    /// Note: It is currently only used for server-admin accounts. But will be used in the future for domain admins and user accounts as well.
+    ///
+    /// __Type__: String
+    ///
+    /// __Set by__: Service.ServerAdmin (for server admin accounts only)
+    ///
+    /// __Used by__: Services.ServerAdmin (for server admin accounts only)
+
     case preLoginUrlKey = "PreLoginUrl"
     
     
-    /// [Int64] To prevent login attempts in rapid succession use this key to enfore a minimum delay between attempts.
-    
+    /// Time of last login attempt. This is used to enforce a minimum delay between login attempts. This helps in preventing brute force attacks.
+    ///
+    /// __Type__: Int64, intepreted as a javaDate, in milli seconds since 1 jan 1970.
+    ///
+    /// __Set by__: Service.ServerAdmin (for server admin accounts only)
+    ///
+    /// __Used by__: Services.ServerAdmin (for server admin accounts only)
+
     case lastFailedLoginAttemptKey = "LastFailedLoginAttempt"
     
     

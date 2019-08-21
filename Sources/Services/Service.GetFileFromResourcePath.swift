@@ -3,7 +3,7 @@
 //  File:       Service.GetFileAtResourcePath.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.0.1
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,47 +36,8 @@
 //
 // History
 //
-// 1.0.0 Raised to v1.0.0, Removed old change log,
-//
-// =====================================================================================================================
-// Description
-// =====================================================================================================================
-//
-// Retrieves the file at the path from info[ResourcePathKey] and places it in the response.payload.
-//
-//
-// Input:
-// ------
-//
-// info[.absoluteResourcePathKey]: A string with the full path for the file to be read.
-//
-//
-// On success:
-// -----------
-//
-// response.payload: Set with contents of file at chainInfo[.absoluteResourcePathKey]
-// response.contentType: Set to the mime type for the file extension
-// response.code: Set to code 200 (OK)
-//
-// domain.telemetry.nof200: Incremented
-//
-// return: .next
-//
-//
-// On error:
-// ---------
-//
-// response.code: Set to code 500 (Internal Server Error)
-//
-// domain.telemetry.nof500: Incremented
-//
-// statistics: Updated with new ClientRecord
-//
-// return: .next
-//
-// Possible error causes:
-// - No resource path found in chainInfo
-// - Resource path in serviceInfo points to a resource that cannot be retrieved
+// 1.0.1 - Documentation update
+// 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 
@@ -88,18 +49,20 @@ import Http
 import Core
 
 
-/// Retrieve the file content from the resource path and put it in the response payload.
+/// Retrieve the requested file content, process it (if necessary) and puts the result in the response payload. Processing depends on the file type and can invoke PHP or SF file processing.
 ///
-/// - Note: For a full description of all effects of this operation see the file: DomainService.GetFileAtResourcePath.swift
+/// _Input_:
+///    - info[.absoluteResourcePathKey]: A string with the path of the source file to fetch.
+///    - domain.php...: These variables determine if and how the PHP interpreter will be used.
 ///
-/// - Parameters:
-///   - header: The header of the HTTP request.
-///   - connection: The SFConnection object that is used for this connection.
-///   - domain: The domain that is serviced for this request.
-///   - info: A dictionary for communication between services.
-///   - response: An object that can receive information to be returned in response to the request.
+/// _Output_:
+///    - response.payload: Set with the (processed) content of the file.
+///    - response.code: Set to OK on success, or a corresponding code if an error occured.
+///    - response.contentType: Set to the mime-type corresponding to the source file extension.
+///    - domain.telemetry: Corresponding to the result, some parameters will be updated.
 ///
-/// - Returns: Always .next.
+/// _Sequence_:
+///    - The Service.GetResourcePathFromUrl has to be called first.
 
 func service_getFileAtResourcePath(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: inout Services.Info, _ response: inout Response) -> Services.Result {
     

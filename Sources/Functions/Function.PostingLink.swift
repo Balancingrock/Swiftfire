@@ -3,7 +3,7 @@
 //  File:       Function.PostingLink.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.0.1
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -37,71 +37,8 @@
 //
 // History
 //
-// 1.0.0 Raised to v1.0.0, Removed old change log,
-//
-// =====================================================================================================================
-// Description
-// =====================================================================================================================
-//
-// Creates a (text) link that will post the key/value combination when clicked. Note the appearance of the link depends
-// on the presence of the CSS in the given example.
-//
-//
-// Signature:
-// ----------
-//
-// .postingLink(target, text, key, value)
-//
-// Note: More key/value pairs may be added at the end. i.e. .postingLink(target, text, key1, value1, ke2, value2, etc...)
-//
-// Parameters:
-// -----------
-//
-// target: The target page for the link.
-// text: The text that is shown to click on.
-// key: The key of the key/value pair that will be POST-ed.
-// value: The value of the key/value pair that will be POST-ed
-//
-//
-// Other Input:
-// ------------
-//
-// CSS:
-//    - class for form: posting-link-form
-//    - class for input: posting-link-button
-//
-//
-// SCSS example:
-//
-// .posting-link-form {
-//    display: inline;
-// }
-// .posting-link-button {
-//    background: none;
-//    border: none;
-//    color: blue;
-//    text-decoration: underline;
-//    cursor: pointer;
-// }
-// .posting-link-button:focus {
-//    outline: none;
-// }
-// .posting-link-button:active {
-//    color: black;
-// }
-//
-//
-// Returns:
-// --------
-//
-// On success: The HTML code (a form) that constitutes the link.
-// On error: ***Error***
-//
-//
-// Other Output:
-// -------------
-//
-// None.
+// 1.0.1 - Documentation updates
+// 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 
@@ -117,6 +54,8 @@ import Core
 ///   - text: The text that can be clicked.
 ///   - key: The key of the key/value pair that will be POST-ed.
 ///   - value: The value of the key/value pair that will be POST-ed.
+///
+/// - Returns: HTML code or ***Error*** if the HTML code could not be constructed.
 
 public func postingLink(target: String, text: String, keyValuePairs: Dictionary<String, String>) -> String {
     if keyValuePairs.isEmpty { return "***Error***" }
@@ -126,7 +65,25 @@ public func postingLink(target: String, text: String, keyValuePairs: Dictionary<
 }
 
 
-/// Creates a (text) link that will post the key/value combination when clicked.
+/// Returns the HTML code for a text link with one or more key/value pairs. If the link is clicked a POST HTML request will be made of the type x-www-form-urlencoded that includes the key/value pairs. Once the POST request is processed by Service.DecodePostFormUrlEncoded the postInfo dictionary will contain the key/value pairs.
+///
+/// __Webpage Use__:
+///
+/// _Signature_: .postingButtonedInput(target, text, key-N, value-N, ...)
+///
+/// _Number of arguments_: 4 + (2 x N) where N is an integer >= 0
+///
+/// _Type of argument_:
+///    - __target__: Link to be invoked when clicked
+///    - __text__: Text for the link
+///    - __key-N__: The key N to include in a POST request of type x-www-form-urlencoded
+///    - __value-N__: The value for key N to include in a POST request of type x-www-form-urlencoded
+///
+/// _Other input used_:
+///    - the css class of the form is `posting-link-form`
+///    - the css class of the button (as text link) is `posting-link-input`
+///
+/// _Return_: The HTML code for the requested button. `***Error***` if less than 4 or an uneven number of arguments is present.
 
 public func function_postingLink(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: inout Functions.Environment) -> Data? {
     

@@ -3,7 +3,7 @@
 //  File:       Function.NofPageHits.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.0.1
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,45 +36,8 @@
 //
 // History
 //
-// 1.0.0 Raised to v1.0.0, Removed old change log,
-//
-// =====================================================================================================================
-// Description
-// =====================================================================================================================
-//
-/// Returns the number of hits for a resource.
-//
-//
-// Signature:
-// ----------
-//
-// .nofPageHits(path: String)
-//
-//
-// Parameters:
-// -----------
-//
-// path: An optional string representing the path for which to retrieve the page hits. This string should be a relative
-// path from the root of the domain. If no path is present the path at '.relativeResourcePathKey' from the
-// 'environment.serviceInfo' will be used.
-//
-//
-// Other Input:
-// ------------
-//
-// None.
-//
-//
-// Returns:
-// --------
-//
-// The number of page hits.
-//
-//
-// Other Output:
-// -------------
-//
-// None.
+// 1.0.1 - Documentation update
+// 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 
@@ -84,11 +47,21 @@ import SwifterLog
 import Core
 
 
-/// Returns the number of hits for a relative resource path. The path should be relative to the root directory of the domain.
+/// Returns the number of times this functions was called with the same argument.
 ///
-/// If the arguments contains a String, then the string will be used as the relative resource path and the count for that resource will be returned.
+/// __Webpage Use__:
 ///
-/// If the argument does not contain any arguments, it will return the count for the currently requested resource.
+/// _Signature_: .nofPageHits() _or_ .nofPageHits(String)
+///
+/// _Number of arguments_: 0 or 1
+///
+/// _Type of argument_: String
+///
+/// _Return_: The number of times this function was called with the same string. Returns `*error*` if there are too many arguments.
+///
+/// Note: If there is no argument, the function will use the serviceInfo dictionary value for `relativeResourcePathKey`.
+///
+/// After a server start (or reset) the value will start at 0.
 
 public func function_nofPageHits(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: inout Functions.Environment) -> Data? {
     

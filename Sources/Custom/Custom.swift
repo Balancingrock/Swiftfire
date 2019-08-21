@@ -3,7 +3,7 @@
 //  File:       Custom.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.0.1
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,19 +36,17 @@
 //
 // History
 //
-// 1.0.0 Raised to v1.0.0, Removed old change log,
-//
-//
-// =====================================================================================================================
-// Description
-// =====================================================================================================================
-//
-// Use this file to call out to project specific setup code that must be run before the servers become active.
+// 1.0.1 - Documentation update
+// 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 
 import Foundation
 
+
+/// Use this function to add initialization code for any Function or Service that must be executed before the HTTP(S) Server is started.
+///
+/// If the code results in an error and this error should prevent the server from starting, then set the global variable `quitSwiftfire` to true. Note that it will take a few seconds before the server will terminate.
 
 public func customSetup() {
     

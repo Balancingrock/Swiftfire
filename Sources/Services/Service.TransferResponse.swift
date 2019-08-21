@@ -3,7 +3,7 @@
 //  File:       Service.TransferResponse.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.0.1
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,36 +36,8 @@
 //
 // History
 //
-// 1.0.0 Raised to v1.0.0, Removed old change log,
-//
-// =====================================================================================================================
-// Description
-// =====================================================================================================================
-//
-// Transfer the response. If necesary first create an error response body.
-//
-// If no response body is present, first try to build a custom error for the domain involved. If there is none, then
-// build a default body.
-//
-// Once a response body is present, transfer it to the client.
-//
-// Input:
-// ------
-//
-// response.code: Must be present
-// response.body: Must be nil
-//
-//
-// Output:
-// -------
-//
-// response.body: A default response body has been created.
-//
-//
-// Return:
-// -------
-//
-// .next
+// 1.0.1 - Documentation update
+// 1.0.0 - Raised to v1.0.0, Removed old change log
 //
 // =====================================================================================================================
 
@@ -76,18 +48,17 @@ import SwifterLog
 import Core
 
 
-/// If the body of the response is empty, but a response code is present, then add the body for the response code.
+/// Transfers a response to the client. If necessary it will first create the error message to be returned.
 ///
-/// - Note: For a full description of all effects of this operation see the file: Service.AddResponseBodyIfEmpty.swift
+/// _Input_:
+///    - response.code: If set to an error, ths routine will create the error message.
+///    - response.body: If nil, then an error message will be created. Otherwise the content will be sent.
 ///
-/// - Parameters:
-///   - request: The HTTP request.
-///   - connection: The SFConnection object that is used for this connection.
-///   - domain: The domain that is serviced for this request.
-///   - info: A dictionary for communication between services.
-///   - response: An object that can receive information to be returned in response to the request.
+/// _Output_:
+///    - A response will have been sent to the client.
 ///
-/// - Returns: Always .next.
+/// _Sequence_:
+///    - In general this should be the last service in the sequence.
 
 func service_transferResponse(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: inout Services.Info, _ response: inout Response) -> Services.Result {
     

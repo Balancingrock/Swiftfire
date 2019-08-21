@@ -3,7 +3,7 @@
 //  File:       Function.Timestamp.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.0.1
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,44 +36,8 @@
 //
 // History
 //
-// 1.0.0 Raised to v1.0.0, Removed old change log,
-//
-// =====================================================================================================================
-// Description
-// =====================================================================================================================
-//
-// Returns a timestamp in the format: yyyy-MM-dd HH:mm:ss of the current time in the server timezone.
-//
-//
-// Signature:
-// ----------
-//
-// .timestamp()
-//
-//
-// Parameters:
-// -----------
-//
-// None.
-//
-//
-// Other Input:
-// ------------
-//
-// None.
-//
-//
-// Returns:
-// --------
-//
-// The current time
-//
-//
-// Other Output:
-// -------------
-//
-// None.
-//
+// 1.0.1 - Documentation update
+// 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 
@@ -82,9 +46,15 @@ import Foundation
 import Core
 
 
-/// Returns the current time.
+/// Returns the current time in the format "yyyy-MM-dd'T'HH.mm.ss.SSSZ".
 ///
-/// - Returns: The current time.
+/// __Webpage Use__:
+///
+/// _Signature_: .timestamp()
+///
+/// _Number of arguments_: 0
+///
+/// _Returns_: The current time.
 
 public func function_timestamp(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: inout Functions.Environment) -> Data? {
     

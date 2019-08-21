@@ -3,7 +3,7 @@
 //  File:       Service.Blacklist.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.0.1
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,44 +36,8 @@
 //
 // History
 //
-// 1.0.0 Raised to v1.0.0, Removed old change log,
-//
-// =====================================================================================================================
-// Description
-// =====================================================================================================================
-//
-// Determines if the client's IP address is contained in the blacklist file for the domain. If it is in the blacklist
-// it will trigger the action specified in it.
-//
-//
-// Input:
-// ------
-//
-// connection.remoteAddress: The IP address of the client.
-// domain.blacklist: The list of blacklisted IP addresses for the domain.
-//
-//
-// On success (IP is not contained in the blacklist)
-// -------------------------------------------------
-//
-// response.code: nil
-//
-// return: .next
-//
-//
-// On error (IP address is contained in the blacklist)
-// ---------------------------------------------------
-//
-// response.code:
-// - nil: if the connection must be terminated immediately.
-// - code 401: if the "not authorized" response has to be send.
-// - code 503: if the "service unavailable" response has to be send.
-//
-// domain.telemetry.nofBlacklistedAccesses: Incremented.
-//
-// return:
-// - .abort: If the IP address is blacklisted and the connection must be terminated immediately
-// - .next: If a 401 or 503 is required.
+// 1.0.1 - Documentation update
+// 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 
@@ -84,18 +48,18 @@ import Http
 import Core
 
 
-/// Checks if the client IP address is in the domain.blacklist.
+/// If the client address is contained in the blacklist of the domain, this service will take the action as specified for that client address.
 ///
-/// - Note: For a full description of all effects of this operation see the file: DomainService.GetFileAtResourcePath.swift
+/// _Input_:
+///    - connection.remoteAddress: The IP address of the client.
+///    - domain.blacklist: The list of blacklisted IP addresses for the domain.
 ///
-/// - Parameters:
-///   - request: The HTTP request.
-///   - connection: The SFConnection object that is used for this connection.
-///   - domain: The domain that is serviced for this request.
-///   - info: A dictionary for communication between services.
-///   - response: An object that can receive information to be returned in response to the request.
+/// _Output_:
+///    - When there is no hit in the blacklist: response.code = nil
+///    - When there is a hit: Either the services are aborted, or response.code is set to the corresponding error code. Also the domain.telemetry.nofBlacklistAccesses will be incremented.
 ///
-/// - Returns: On error .abort, on success .next.
+/// _Sequence_:
+///    - This service should be the first in order to lower the server load.
 
 func service_blacklist(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: inout Services.Info, _ response: inout Response) -> Services.Result {
     

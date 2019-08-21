@@ -3,7 +3,7 @@
 //  File:       Service.GetSession.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.0.1
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,34 +36,8 @@
 //
 // History
 //
-// 1.0.0 Raised to v1.0.0, Removed old change log,
-//
-// =====================================================================================================================
-// Description
-// =====================================================================================================================
-//
-// Retrieves the session for the HTTP request (via a cookie) if it has any and if the session is still active. If no
-// active session is found, it will create a new session.
-//
-//
-// Input:
-// ------
-//
-// request: The HTTP request. Will be tested for the existence of a cookie with the session ID.
-// domain.sessions: The active session list. If a session ID cookie was found, it will be tested for an active session.
-// domain.sessionTimeout: If < 1, then session support is disabled.
-//
-//
-// Output:
-// -------
-//
-// info[.sessionKey] = Active session.
-//
-//
-// Return:
-// -------
-//
-// .next
+// 1.0.1 - Documentation update
+// 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 
@@ -74,18 +48,18 @@ import Http
 import Core
 
 
-/// Ensures that a session exists if the sessionTimeout for the given domain is > 0.
+/// Retrieves or creates a session for this request. The session will be extracted from a cookie, or if there is no cookie a new session will be created.
 ///
-/// - Note: For a full description of all effects of this operation see the file: Service.GetSession.swift
+/// _Input_:
+///    - request.cookies: Will be checked for an existing session cookie.
+///    - domain.sessions: Will be checked for an existing session, or a new session.
+///    - domain.sessionTimeout: If the timeout < 1, then no session will be created.
 ///
-/// - Parameters:
-///   - request: The HTTP request.
-///   - connection: The SFConnection object that is used for this connection.
-///   - domain: The domain that is serviced for this request.
-///   - info: A dictionary for communication between services.
-///   - response: An object that can receive information to be returned in response to the request.
+/// _Output_:
+///    - info[.sessionKey]: Session, if a session is needed. Nil if no session is needed.
 ///
-/// - Returns: Always .next.
+/// _Sequence_:
+///   - Can be one of the first services, does not need any predecessors.
 
 func service_getSession(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: inout Services.Info, _ response: inout Response) -> Services.Result {
 

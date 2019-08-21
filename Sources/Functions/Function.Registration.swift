@@ -3,7 +3,7 @@
 //  File:       Functions.Registration.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.0.1
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,7 +36,9 @@
 //
 // History
 //
-// 1.0.0 Raised to v1.0.0, Removed old change log,
+// 1.0.1 - Documentation update
+//       - Replaced name definitions with direct text
+// 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 
@@ -45,31 +47,19 @@ import Foundation
 import Core
 
 
-// =================================
-// Names for the available functions
-// =================================
-
-
-/// Example: .nofPageHits() will have the name "nofPageHits"
-
-let TIMESTAMP = "timestamp"
-let POSTING_LINK = "postingLink"
-let POSTING_BUTTON = "postingButton"
-let POSTING_BUTTONED_INPUT = "postingButtonedInput"
-let NOF_PAGE_HITS = "nofPageHits"
-
-
 // ==================================================
 // Add to the next function to register new functions
 // ==================================================
 // The sequence is not important
 
-/// Register the functions
+/// Registers the functions availble for html/css/? code injection
+///
+/// Update this operation when new functions have been implemented.
 
 public func registerFunctions() {
-    functions.register(name: TIMESTAMP, function: function_timestamp)
-    functions.register(name: POSTING_LINK, function: function_postingLink)
-    functions.register(name: POSTING_BUTTON, function: function_postingButton)
-    functions.register(name: POSTING_BUTTONED_INPUT, function: function_postingButtonedInput)
-    functions.register(name: NOF_PAGE_HITS, function: function_nofPageHits)
+    functions.register(name: "timestamp", function: function_timestamp)
+    functions.register(name: "postingLink", function: function_postingLink)
+    functions.register(name: "postingButton", function: function_postingButton)
+    functions.register(name: "postingButtonedInput", function: function_postingButtonedInput)
+    functions.register(name: "nofPageHits", function: function_nofPageHits)
 }

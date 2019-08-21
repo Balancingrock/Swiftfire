@@ -3,7 +3,7 @@
 //  File:       Service.OnlyHttp10or11.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.0.1
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,47 +36,8 @@
 //
 // History
 //
-// 1.0.0 Raised to v1.0.0, Removed old change log,
-//
-// =====================================================================================================================
-// Description
-// =====================================================================================================================
-//
-// Examines the request header and create an error code if the header is neither a HTTP 1.0 or HTTP 1.1 verion.
-//
-// If a response.code is set, this operation exists immediately with .next.
-//
-//
-// Input:
-// ------
-//
-// header.httpVersion: The version of the http request header.
-// response.code: If set, this service will exit immediately with .next'.
-//
-//
-// On success:
-// -----------
-//
-// return: .next
-//
-//
-// On error: Missing http version
-// -----------------------------------------
-// response.code: code 400 (Bad Request) if the HTTP request contains no operation.
-// domain.telemetry.nof400: incremented
-// statistics: Updated with a ClientRecord.
-//
-// return: .next
-//
-//
-// On error: Wrong http version
-// ----------------------------------------------------
-//
-// response.code: code 505 (HTTP Version Not Supported) if the HTTP request was neither 1.0 or 1.1.
-// domain.telemetry.nof505: incremented
-// statistics: Updated with a ClientRecord.
-//
-// return: .next
+// 1.0.1 - Documentation updates
+// 1.0.0 - Raised to v1.0.0, Removed old change log
 //
 // =====================================================================================================================
 
@@ -88,18 +49,16 @@ import Http
 import Core
 
 
-/// Generate an error code if the request is not version HTTP 1.0 or HTTP 1.1.
+/// Creates an error code if the HTTP request is not version 1.0 or 1.1.
 ///
-/// - Note: For a full description of all effects of this operation see the file: Service.OnlyHttp10or11.swift
+/// _Input_:
+///    - request.version
 ///
-/// - Parameters:
-///   - request: The HTTP request.
-///   - connection: The SFConnection object that is used for this connection.
-///   - domain: The domain that is serviced for this request.
-///   - info: A dictionary for communication between services.
-///   - response: An object that can receive information to be returned in response to the request.
+/// _Output_:
+///    - response.code: Set to a an error code if the version is not a 1.0 or 1.1. Otherwise set to nil.
 ///
-/// - Returns: Always .next.
+/// _Sequence_:
+///    - Can be one of the first services, does not need any predecessors.
 
 func service_onlyHttp10or11(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: inout Services.Info, _ response: inout Response) -> Services.Result {
     

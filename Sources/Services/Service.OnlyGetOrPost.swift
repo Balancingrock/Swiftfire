@@ -3,7 +3,7 @@
 //  File:       Service.OnlyGetOrPost.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.0.1
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,46 +36,8 @@
 //
 // History
 //
-// 1.0.0 Raised to v1.0.0, Removed old change log,
-//
-// =====================================================================================================================
-// Description
-// =====================================================================================================================
-//
-// Examines the request header and create an error code if the header contains neither GET or POST operation.
-//
-// If a response.code is set, this operation exists immediately with .next.
-//
-//
-// Input:
-// ------
-//
-// header.httpVersion: The version of the http request header.
-// response.code: If set, this service will exit immediately with .next'.
-//
-//
-// On success:
-// -----------
-//
-// return: .next
-//
-//
-// On error: Missing operation specification
-// -----------------------------------------
-// response.code: code 400 (Bad Request) if the HTTP request contains no operation.
-// domain.telemetry.nof400: incremented
-// statistics: Updated with a ClientRecord.
-//
-// return: .next
-//
-//
-// On error: Neither a GET nor POST operation
-// ------------------------------------------
-// - code 501 (Not Supported) if the HTTP request contains neither GET nor POST operation
-// - domain.telemetry.nof501: incremented
-// - statistics: Updated with a ClientRecord.
-//
-// return: .next
+// 1.0.1 - Documentation updates.
+// 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 
@@ -86,18 +48,16 @@ import Http
 import Core
 
 
-/// Generate an error code if the request is not GET or POST operation.
+/// Creates an error code if the HTTP request is not a GET or POST request.
 ///
-/// - Note: For a full description of all effects of this operation see the file: Service.OnlyGetOrPost.swift
+/// _Input_:
+///    - request.method
 ///
-/// - Parameters:
-///   - request: The HTTP request.
-///   - connection: The SFConnection object that is used for this connection.
-///   - domain: The domain that is serviced for this request.
-///   - info: A dictionary for communication between services.
-///   - response: An object that can receive information to be returned in response to the request.
+/// _Output_:
+///    - response.code: Set to a an error code if the method is not a GET or POST. Otherwise set to nil.
 ///
-/// - Returns: Always .next.
+/// _Sequence_:
+///    - Can be one of the first services, does not need any predecessors.
 
 func service_onlyGetOrPost(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: inout Services.Info, _ response: inout Response) -> Services.Result {
     

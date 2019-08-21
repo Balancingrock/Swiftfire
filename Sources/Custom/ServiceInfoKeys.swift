@@ -3,7 +3,7 @@
 //  File:       ServiceInfoKeys.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.0.1
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,56 +36,86 @@
 //
 // History
 //
-// 1.0.0 Raised to v1.0.0, Removed old change log,
+// 1.0.1 - Documentation update
+//       - Changed the sessionKey identifier to `Session` from `SessionId`
+// 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 
 import Foundation
 
 
-/// Service Info key's
+/// Keys for the Service Info dictionary. The service info directory is passed to each service and can be used to communicate from the earlier to the later services.
+///
+/// Every key defined here should be documented as to the type of information and the purpose of that information.
 
 public enum ServiceInfoKey: String {
     
     // The first definitions are needed by the core Swiftfire framework.
     
-    /// [String] set by the service that determines the URL of the resource to be fetched. (DomainService.GetResourcePathFromUrl)
+    /// This is the path to the resource requested by the URL that was received. The path is absolute, i.e. starts at the root of the file system.
     ///
-    /// This path is relative to the root of the file system. It is used to fetch the requested resource.
+    /// __Type__: String
+    ///
+    /// __Set by__: Service.GetResourcePathFromUrl
+    ///
+    /// __Used by__: Service.GetFileFromResourcePath
     
     case absoluteResourcePathKey = "AbsoluteResourcePath"
     
     
-    /// [String] set by the service that determines the URL of the resource to be fetched. (DomainService.GetResourcePathFromUrl)
+    /// This is the path to the requested resource. The path is relative to the root of the domain. Note that this may be different from the URL that was requested
     ///
-    /// This path is relative to the root of the domain. It is used for statistics purposes.
-    
+    /// __Type__: String
+    ///
+    /// __Set by__: Service.GetResourcePathFromUrl
+    ///
+    /// __Used by__: For logging purposes
+
     case relativeResourcePathKey = "RelativeResourcePath"
     
     
-    /// [Int64] set by HttpConnection.Worker before first domain service call.
+    /// The time stamp at the start of the HTTP request processing.
     ///
-    /// It is the time stamp at the start of the HTTP request processing. It is used for statistics purposes.
+    /// __Type__: Int64, interpreted as javaDate, milliseconds from 1 Jan 1970.
+    ///
+    /// __Set by__: SFConnection.Worker before first domain service call.
+    ///
+    /// __Used by__: Statistics purposes.
     
     case responseStartedKey = "ResponseStarted"
     
     
-    /// [Session] set by the service that determines the session for this request.
-    
-    case sessionKey = "SessionId"
-    
-    
-    /// [Dictionary<String, String>] The name/value pairs for a GET request that returns form data.
+    /// The session that belongs to the request that is beiing processed. A session is a series of requestst all from the same user within the session-timeout threshold.
     ///
-    /// Set by the service: GetResourcePathFromUrl
+    /// __Type__: Session
+    ///
+    /// __Set by__: Service.GetSession
+    ///
+    /// __Used by__: Multiple, general purpose.
     
+    case sessionKey = "Session"
+    
+    
+    /// A dictionary with the name/value pairs from a GET request.
+    ///
+    /// __Type__: Dictionary<String, String>
+    ///
+    /// __Set by__: Service.GetResourcePathFromUrl
+    ///
+    /// __Used by__: Multiple, general purpose.
+
     case getInfoKey = "GetInfo"
     
     
-    /// [Dictionary<String, String>] The name/value pairs for a POST request that returns form data of type x-www-form-urlencoded.
+    /// A dictionary with the name/value pairs from a POST request that returns form data of type x-www-form-urlencoded.
     ///
-    /// Set by the service: DecodePostFormUrlEncoded
-    
+    /// __Type__: Dictionary<String, String>
+    ///
+    /// __Set by__: Service.DecodePostFormUrlEncoded
+    ///
+    /// __Used by__: Multiple, general purpose.
+
     case postInfoKey = "PostInfo"
     
     

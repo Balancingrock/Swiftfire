@@ -3,7 +3,7 @@
 //  File:       DomainServices.Registration.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.0.1
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,13 +36,8 @@
 //
 // History
 //
-// 1.0.0 Raised to v1.0.0, Removed old change log,
-//
-// =====================================================================================================================
-// Description
-// =====================================================================================================================
-//
-// Contains the registration of domain services and a default service list for new domains.
+// 1.0.1 - Documentation update
+// 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 
@@ -62,10 +57,30 @@ private let onlyHttp10OrHttp11 = "Only HTTP 1.0 / 1.1 requests"
 private let onlyGetOrPost = "Only GET / POST requests"
 private let getResourcePathFromUrl = "Get resource path from request URL"
 private let getFileAtResourcePath = "Get file at resource path"
+
+
+/// The name by which service_getSession is known.
+
 public let getSession = "Get Active Session"
+
+
+/// The name by which service_decodePostFormUrlEncoded is known.
+
 public let decodePostFormUrlEncoded = "Decode post form urlencoded"
+
+
+/// The name by which service_waitUntilBodyComplete is known.
+
 public let waitUntilBodyComplete = "Wait until body is received"
+
+
+/// The name by which service_transferResponse is known.
+
 public let transferResponse = "Transfer Response"
+
+
+/// The name by which service_restartSessionTimeout is known.
+
 public let restartSessionTimeout = "Restart Session Timeout"
 
 
@@ -74,7 +89,10 @@ public let restartSessionTimeout = "Restart Session Timeout"
 // =================================================
 // Notice that the sequence itself is not important
 
-/// Register the domain services
+
+/// Registers services.
+///
+/// Add any newly defined services to this operation.
 
 public func registerServices() {
     
@@ -96,7 +114,10 @@ public func registerServices() {
 // ========================================================================
 // Notice that the sequence is very important
 
-/// Default services for newly created domains (implements a static webserver)
+
+/// Default services for newly created domains.
+///
+/// This service stack implements a default webserver.
 
 public var defaultServices: Array<String> {
     return [

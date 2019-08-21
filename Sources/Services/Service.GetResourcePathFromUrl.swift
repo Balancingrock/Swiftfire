@@ -3,7 +3,7 @@
 //  File:       Service.GetResourcePathFromUrl.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.0.1
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,61 +36,8 @@
 //
 // History
 //
-// 1.0.0 Raised to v1.0.0, Removed old change log,
-//
-// =====================================================================================================================
-// Description
-// =====================================================================================================================
-//
-// Builds the resource path from the requested URL, the domain root directory and the presence of file candidates.
-//
-// If the root/url points at a directory, that directory will be tested for the presence of an index.htm or index.html
-// file. If found, the resource path will be set to that file.
-//
-// If a response.code is set, this operation exists immediately with '.next'.
-//
-//
-// Input:
-// ------
-//
-// response.code: If set, this service will exit immediately with '.next'.
-// header.url: The string representing the URL of the resource to be found.
-// domain.root: The string for the root directory of the domain.
-// connection.filemanager: used.
-//
-//
-// On success:
-// -----------
-//
-// info[.absoluteResourcePathKey] = A String value with the full path to the requested resource
-// info[.relativeResourcePathKey] = A String value
-//
-// return: .next
-//
-//
-// On error:
-// ---------
-//
-// response.code:
-//
-// - code 400 (Bad Request) if the HTTP request header did not contain a url.
-//   & domain.telemetry.nof400: incremented
-//   & statistics: Updated with a ClientRecord.
-//
-// - code 404 (Not Found) if no resource (file) was present at the resource path.
-//   & domain.telemetry.nof404: incremented
-//   & statistics: Updated with a ClientRecord.
-//
-// - code 403 (Forbidden) if the file at the resource path is not readable.
-//   & domain.telemetry.nof403: incremented
-//   & statistics: Updated with a ClientRecord.
-//
-// return: .next
-//
-// =====================================================================================================================
-//
-// Implementation note: This routine could be written with fewer lines of code, however I want optimal speed for
-// static html and .sf.html which is why the implementation was "unrolled".
+// 1.0.1 - Documentation update
+// 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 
@@ -102,18 +49,21 @@ import Http
 import Core
 
 
-/// Takes the URL from the request header and transforms it into a path that points at an existing resource
+/// Determines which resource (file) is requested by a HTTP request. Note that the path itself can be different from the URL itself because of several factors (not listed here).
 ///
-/// - Note: For a full description of all effects of this operation see the file: Service.GetResourcePathFromUrl.swift
+/// _Input_:
+///   - request.url: The string representing the URL of the resource to be found.
+///   - domain.root: The string for the root directory of the domain.
+///   - connection.filemanager: used.
 ///
-/// - Parameters:
-///   - request: The HTTP request.
-///   - connection: The SFConnection object that is used for this connection.
-///   - domain: The domain that is serviced for this request.
-///   - info: A dictionary for communication between services.
-///   - response: An object that can receive information to be returned in response to the request.
+/// _Output_:
+///   - info[.absoluteResourcePathKey]: A file Path with the full path to the requested resource.
+///   - info[.relativeResourcePathKey]: A file Path relative to the root of the domain.
+///   - domain.telemetry: Updated in accordance with the processing results
+///   - response.code: Only if an error occured.
 ///
-/// - Returns: Always .next.
+/// _Sequence_:
+///   - Can be one of the first services, does not need any predecessors.
 
 func service_getResourcePathFromUrl(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: inout Services.Info, _ response: inout Response) -> Services.Result {
     

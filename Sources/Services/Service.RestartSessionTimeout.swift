@@ -3,7 +3,7 @@
 //  File:       Service.RestartSessionTimeout.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.0.1
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,34 +36,8 @@
 //
 // History
 //
-// 1.0.0 Raised to v1.0.0, Removed old change log,
-//
-// =====================================================================================================================
-// Description
-// =====================================================================================================================
-//
-// If a session is active (i.e. present in the 'info') then it will add a session cookie to restart the timeout for
-// the session.
-//
-// This service should appear after "getSession". There should be no time consuming services after this one.
-//
-// Input:
-// ------
-//
-// domain.sessionTimeout: If < 1, then session support is disabled.
-// info[.sessionKey] = Active session.
-//
-//
-// Output:
-// -------
-//
-// response.cookies: A new cookie has been added for the session timeout.
-//
-//
-// Return:
-// -------
-//
-// .next
+// 1.0.1 - Documentation update.
+// 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 
@@ -74,18 +48,17 @@ import SwifterLog
 import Core
 
 
-/// Ensures that a session exists if the sessionTimeout for the given domain is > 0.
+/// Creates a session cookie with a (new) timeout. Only if sessions are enabled for the domain.
 ///
-/// - Note: For a full description of all effects of this operation see the file: Service.RestartSessionTimeout.swift
+/// _Input_:
+///    - domain.sessionTimeout: A session(-timeout) is requested when this value is > 1.
+///    - info[.sessionKey]: The session ID for the cookie.
 ///
-/// - Parameters:
-///   - request: The HTTP request.
-///   - connection: The SFConnection object that is used for this connection.
-///   - domain: The domain that is serviced for this request.
-///   - info: A dictionary for communication between services.
-///   - response: An object that can receive information to be returned in response to the request.
+/// _Output_:
+///    - response.cookies: A cookie will be added when necessary.
 ///
-/// - Returns: Always .next.
+/// _Sequence_:
+///    - Should come after Service.GetSession. However it should come close to the end of all services to ensure that possible errors have had their chances to prevent continuation of a session.
 
 func service_restartSessionTimeout(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: inout Services.Info, _ response: inout Response) -> Services.Result {
     

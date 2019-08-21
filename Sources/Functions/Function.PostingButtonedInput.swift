@@ -39,54 +39,6 @@
 // 1.0.0 Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
-// Description
-// =====================================================================================================================
-//
-/// Creates an input field with associated button that will post a URL plus key/value combination(s) when clicked.
-//
-//
-// Signature:
-// ----------
-//
-// .postingButtonedInput(target, inputName, inputValue, buttonTitle)
-//
-// Note: More key/value pairs may be added at the end. i.e.:
-// .postingButtonedInput(target, inputName, inputValue, buttonTitle, key1, value1, key2, value2, etc...)
-//
-//
-// Parameters:
-// -----------
-//
-// target: The target page for the link.
-// inputName: The name of the input field, this name will be returned in the posted key/value pairs.
-// inputValue: The initial value displayed in the input field.
-// buttonTitle: The title for the button.
-// key: (optional) The key of the key/value pair that will be POST-ed.
-// value: (optional) The value of the key/value pair that will be POST-ed
-//
-//
-// Other Input:
-// ------------
-//
-// CSS:
-//    - class for form: posting-buttoned-input-form
-//    - class for input: posting-buttoned-input-input
-//    - class for button: posting-buttoned-input-button
-//
-//
-// Returns:
-// --------
-//
-// On success: The HTML code (a form).
-// On error: ***Error***
-//
-//
-// Other Output:
-// -------------
-//
-// None.
-//
-// =====================================================================================================================
 
 import Foundation
 
@@ -125,7 +77,28 @@ public func postingButtonedInput(target: String, inputName: String, inputValue: 
 }
 
 
-/// Creates a (text) link that will post the key/value combination when clicked.
+/// Returns the HTML code for an input field with associated button on the right hand side embedded in a form including a number of key/value pairs among which the inputName/inputValue pair. If the button is clicked a POST HTML request will be made of the type x-www-form-urlencoded that includes the key/value pairs. Once the POST request is processed by Service.DecodePostFormUrlEncoded the postInfo dictionary will contain the key/value pairs.
+///
+/// __Webpage Use__:
+///
+/// _Signature_: .postingButtonedInput(target, inputName, inputValue, buttonTitle, key-N, value-N, ...)
+///
+/// _Number of arguments_: 4 + (2 x N) where N is an integer >= 0
+///
+/// _Type of argument_:
+///    - __target__: link to be invoked when the input (button) is clicked
+///    - __inputName__: The name for the inputName/inputValue pair
+///    - __inputValue__: The initial value for the input field
+///    - __buttonTitle__: Title of the input (button)
+///    - __key-N__: The key N to include in a POST request of type x-www-form-urlencoded
+///    - __value-N__: The value for key N to include in a POST request of type x-www-form-urlencoded
+///
+/// _Other input used_:
+///    - the css class of the form is `posting-buttoned-input-form`
+///    - the css class of the input is `posting-buttoned-input-input`
+///    - the css class of the button is `posting-buttoned-input-button`
+///
+/// _Return_: The HTML code for the requested button. `***Error***` if less than 4 or an uneven number of arguments is present.
 
 func function_postingButtonedInput(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: inout Functions.Environment) -> Data? {
     

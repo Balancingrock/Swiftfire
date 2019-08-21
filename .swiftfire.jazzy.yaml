@@ -1,0 +1,14 @@
+# Swiftfire Swiftfire module document generator jazzy settings
+
+copyright: Copyright 2016-2019 rien@balancingrock.nl
+author: Balancingrock
+module: Swiftfire
+min_acl: public
+readme: docs/Purpose.md
+documentation: docs/*.md
+hide_documentation_coverage: false
+xcodebuild_arguments: [-target, Swiftfire]
+github_url: https://github.com/Balancingrock/Swiftfire
+output: ~/Documents/Websites/swiftfire.nl/projects/swiftfire/reference
+clean: true
+theme: fullwidth

@@ -3,7 +3,7 @@
 //  File:       AccountInfoKeys.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.0.1
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,7 +36,9 @@
 //
 // History
 //
-// 1.0.0 Raised to v1.0.0, Removed old change log,
+// 1.0.1 - Added more comments
+//       - Made all keys public static
+// 1.0.0 - Removed old change log,
 //
 // =====================================================================================================================
 
@@ -45,30 +47,48 @@ import Foundation
 import BRBON
 
 
-/// User Info key's
+/// Keys to be used in the AccountInfo [BRBON](http://swiftfire.nl/projects/brbon/brbon.html) object.
+///
+/// Every account has an associated AccountInfo BRBON object that contains the information that belongs to that account. While there are some predefined items, any website developper can create additional items. The keys to this information as well as the type of information (and possibly its uses) should be defined in this class.
 
 public class AccountInfoKey {
     
-    // The Swiftfire core needs these definitions
+    // The Swiftfire core needs the following definitions
     
-    /// [Int64] The date the user was created, in msec since begin 1970.
+    /// The date the user was created, in msec since begin 1970.
+    ///
+    /// Type: Int64, interpreted as a javaDate
+    ///
+    /// _not supported yet_
     
-    let created = NameField("Created")!
-    
-    
-    /// [Int64] The date the user was last logged in, in mSec since begin 1970.
-    
-    let lastLogin = NameField("LastLogin")!
-    
-    
-    /// [Bool] If 'true' then auto login is enabled.
-    
-    let autoLogin = NameField("AutoLogin")!
+    public static let created = NameField("Created")!
     
     
-    /// [String] The email address of the user.
+    /// The date the user was last logged in, in mSec since begin 1970.
+    ///
+    /// Type: Int64, interpreted as a javaDate
+    ///
+    /// _not supported yet_
+
+    public static let lastLogin = NameField("LastLogin")!
     
-    let email = NameField("Email")!
+    
+    /// If 'true' then auto login is enabled and a cookie will be used to retrieve the password. Otherwise the user will need to log in explicitly.
+    ///
+    /// Type: Bool
+    ///
+    /// _not supported yet_
+
+    public static let autoLogin = NameField("AutoLogin")!
+    
+    
+    /// The email address of the user.
+    ///
+    /// Type: String
+    ///
+    /// _not supported yet_
+
+    public static let email = NameField("Email")!
     
     
     // =================================================================

@@ -3,7 +3,7 @@
 //  File:       Service.WaitUntilBodyComplete.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.0.1
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,47 +36,8 @@
 //
 // History
 //
-// 1.0.0 Raised to v1.0.0, Removed old change log,
-//
-// =====================================================================================================================
-// Description
-// =====================================================================================================================
-//
-// Ensures that the body has been completely received before continueing servicing the request.
-//
-//
-// Input:
-// ------
-//
-// request: If the payload is non nil, the body is already complete and no delay will occur before returning with .next.
-// connection: If the request payload is nil, the connection object will be used to retrieve all the body data before continueing with .next. The data that is received will be stored in request.payload.
-//
-//
-// On success:
-// -----------
-//
-// request.payload: non-nil (but the Data may be empty)
-// return: .next
-//
-//
-// On error:
-// ---------
-//
-// response.code:
-//
-// - code 400 (Bad Request) if the HTTP request header did not contain a url.
-//   & domain.telemetry.nof400: incremented
-//   & statistics: Updated with a ClientRecord.
-//
-// - code 404 (Not Found) if no resource (file) was present at the resource path.
-//   & domain.telemetry.nof404: incremented
-//   & statistics: Updated with a ClientRecord.
-//
-// - code 403 (Forbidden) if the file at the resource path is not readable.
-//   & domain.telemetry.nof403: incremented
-//   & statistics: Updated with a ClientRecord.
-//
-// return: .next
+// 1.0.1 - Documentation update
+// 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 
@@ -87,18 +48,17 @@ import Http
 import Core
 
 
-/// Ensures that the body has been completely received before continueing servicing the request.
+/// This service waits until the request body has been completely received before continuing.
 ///
-/// - Note: For a full description of all effects of this operation see the file: Service.WaitUntilBodyComplete.swift
+/// _Input_:
+///    - connection: The connection on which to wait for receipt of all data.
 ///
-/// - Parameters:
-///   - request: The HTTP request.
-///   - connection: The SFConnection object that is used for this connection.
-///   - domain: The domain that is serviced for this request.
-///   - info: A dictionary for communication between services.
-///   - response: An object that can receive information to be returned in response to the request.
+/// _Output_:
+///    - request.payload: The data that was received.
 ///
-/// - Returns: On error .abort, on success .next.
+/// _Sequence_:
+///    - This service should come before any service that needs access to the payload. Specifically this includes the service DecodePostFormUrlEncoded.
+
 
 func service_waitUntilBodyComplete(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: inout Services.Info, _ response: inout Response) -> Services.Result {
 

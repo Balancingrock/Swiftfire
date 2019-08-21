@@ -1,12 +1,8 @@
 # Build websites in Swift.
 
-___Note: The Swiftfire [homepage](http://swiftfire.nl) usually lags the developments in HEAD.___
+Swiftfire is a webserver that allows the injection of HTML code from a routine written in Swift.
 
-_We have bit the bullet, and handed out the tag 1.0.0._
-
-_Our initial testing shows that Swiftfire does work, but the combinations ot be tested are near endless. Hence we have decided to up the version to 1.0.0, and handle any issues that might arise later asap._
-
-The Swiftfire webserver can be extended with functions and services written in Swift. This makes it possible to create entire websites written in nothing else but HTML, CSS and Swift. No other languages, frameworks or external services necessary, with a minor exception for openSSL.
+The Swiftfire webserver can be extended with functions and services written in Swift. The services are used to process a HTTP request, and the functions are used to prepare a response by processing the requested page or file.  This makes it possible to create entire websites written in nothing else but HTML, CSS and Swift. No other languages, frameworks or external services necessary, with a minor exception for openSSL.
 
 To use Swiftfire as an end-user you need a MacOS computer capable of running at least MacOS 10.12.
 
@@ -102,9 +98,9 @@ This should build the project without errors.
 
 However... the project needs openSSL. And while a compiled version of openSSL is provided with the project, you should not trust this. Make sure to download and install openSSL from the original sources at [openSSL.org](https://openssl.org)
 
-The follow the directions as mentioned under the subproject [SecureSockets](https:github.com/balancingrock/SecureSockets).
+Directions for the installation of openSSL are in the subproject [SecureSockets](https:github.com/balancingrock/SecureSockets). Note that you cannot use an existing installation of openSSL due to some necessary glue code.
 
-You will likely enounter some issues with the target release when you have not compiled openSSL for MacOS 10.12, these are however easily fixed by using build options.
+You will likely enounter some issues with the target release when you have not compiled openSSL for MacOS 10.12, these are easily fixed by setting the corresponding build options.
 
 ### Using Xcode
 
@@ -122,7 +118,7 @@ Of course if you have a different paths for the openSSL include and lib paths th
 
 When Swiftfire is started for the first time, some configuration must be done. You may want to prepare for this by moving the `sfadmin` directory included in the repository to a different location, though it can remain inside the project too.
 
-In the default configuration Swiftfire will listen on port 6678 for incoming connections. Any connection attempt without domains being present will result in the return of a primitive page where the administrator ID and password msut be set in addition to the location of the `sfadmin` directory.
+In the default configuration Swiftfire will listen on port 6678 for incoming connections. Any connection attempt without domains being present will result in the return of a primitive page where the administrator ID and password must be set in addition to the location of the `sfadmin` directory.
 
 Once that is done, Swiftfire can be customized by logging in as admin and using the admin pages.
 
@@ -132,6 +128,30 @@ Note that Swiftfire will store and expect information in the `~/Library/Applicat
 
 You can of course change whatever you want, but the current source code layout was choosen for a reason. While this layout is rather new (and thus may need to change) we hope that you will only need to add to the `Custom`, `Functions` and `Services` targets. Though you should leave their current contents unaffected since the correct functioning of the admin server account depends on them.
 
+## Useful links
+
+[Swiftfire projects Overview](http://swiftfire.nl/projects/projects.html)
+
+| Name | Purpose | Github | Reference
+|---|---|:-:|:-:|
+| Ascii | Ascii character definitions | [link](https://github.com/Balancingrock/Ascii) | [link](http://swiftfire.nl/projects/ascii/reference/index.html)
+| BRBON | In-memory storage manager, fast access and load/store | [link](https://github.com/Balancingrock/BRBON) | [link](http://swiftfire.nl/projects/brbon/reference/index.html)
+| BRUtils | General purpose definitions | [link](https://github.com/Balancingrock/BRUtils) | [link](http://swiftfire.nl/projects/brutils/reference/index.html)
+| Html | Makes creating HTML code easier | [link](https://github.com/Balancingrock/Html) | [link](http://swiftfire.nl/projects/html/reference/index.html)
+| Http | An API for HTTP messages | [link](https://github.com/Balancingrock/Http) | [link](http://swiftfire.nl/projects/http/reference/index.html)
+| KeyedCache | General purpose dictionary like cache | [link](https://github.com/Balancingrock/KeyedCache) | [link](http://swiftfire.nl/projects/keyedcache/reference/index.html)
+| SecureSockets | Networking utilities that implement SSL (includes COpenSSL) | [link](https://github.com/Balancingrock/SecureSockets) | [link](http://swiftfire.nl/projects/securesockets/reference/index.html)
+| SwifterLog | General purpose logging utility | [link](https://github.com/Balancingrock/SwifterLog) | [link](http://swiftfire.nl/projects/swifterlog/reference/index.html)
+| SwifterSockets | POSIX based networking interface | [link](https://github.com/Balancingrock/SwifterSockets) | [link](http://swiftfire.nl/projects/swiftersockets/reference/index.html)
+| VJson | JSON interpreter/generator | [link](https://github.com/Balancingrock/VJson) | [link](http://swiftfire.nl/projects/vjson/reference/index.html)
+| Custom | Common definitions within Swiftfire | [link](https://github.com/Balancingrock/Swiftfire) | [link](http://swiftfire.nl/projects/custom/reference/index.html)
+| Admin | Administrator code within Swiftfire | [link](https://github.com/Balancingrock/Swiftfire) | [link](http://swiftfire.nl/projects/admin/reference/index.html)
+| Core | Core code within Swiftfire | [link](https://github.com/Balancingrock/Swiftfire) | [link](http://swiftfire.nl/projects/core/reference/index.html)
+| Functions | Predefined functions in Swiftfire | [link](https://github.com/Balancingrock/Swiftfire) | [link](http://swiftfire.nl/projects/functions/reference/index.html)
+| Services | Predefined services in Swiftfire | [link](https://github.com/Balancingrock/Swiftfire) | [link](http://swiftfire.nl/projects/services/reference/index.html)
+| Swiftfire | Swiftfire main operation | [link](https://github.com/Balancingrock/Swiftfire) | [link](http://swiftfire.nl/projects/swiftfire/reference/index.html)
+
+
 ## Version history
 
 Note: Planned releases are for information only and almost always change.
@@ -140,7 +160,13 @@ Note: Planned releases are for information only and almost always change.
 
 - Add URL redirection list
 
-#### 1.0.0 (Current)
+#### 1.0.1 (Current)
+
+- Documentation changes
+- Visibility of keys (not needed yet but will be eventually)
+- Removed name definitions for functions and replaced with strings in the place where the vars were used
+
+#### 1.0.0
 
 - Upped to 1.0.0
 

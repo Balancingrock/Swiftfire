@@ -3,7 +3,7 @@
 //  File:       Service.DecodePostFormUrlEncoded.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.0.1
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,34 +36,8 @@
 //
 // History
 //
-// 1.0.0 Raised to v1.0.0, Removed old change log,
-//
-// =====================================================================================================================
-// Description
-// =====================================================================================================================
-//
-// Decodes the name/value pairs in the body of a post if the content type is set to 'application/x-www-form-urlencoding'
-//
-//
-// Input:
-// ------
-//
-// request.contentType: Only if set to 'application/x-www-form-urlencoding'.
-// request.payload: As UTF-8 data.
-//
-//
-// On success:
-// -----------
-//
-// info[.postInfo] = [Dictionary<String, String>] with the name/value pairs.
-//
-// return: .next
-//
-//
-// On error:
-// ---------
-//
-// return: .next
+// 1.0.1 - Documentation updates
+// 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 
@@ -74,18 +48,18 @@ import Http
 import Core
 
 
-/// Takes the data (utf-8 ncoded) from the request body and transforms it into a series of name/value pairs.
+/// Decodes the name/value pairs in the body of a post if the content type is set to 'application/x-www-form-urlencoding'. The name/value pairs are available afterwards in the postInfo directory.
 ///
-/// - Note: For a full description of all effects of this operation see the file: Service.DecodePostFormUrlEncoded.swift
+/// _Input_:
+///    - request.contentType: Only if set to 'application/x-www-form-urlencoding' (not checked!)
+///    - request.payload: Should contain UTF8 encoded data.
 ///
-/// - Parameters:
-///   - request: The HTTP request.
-///   - connection: The SFConnection object that is used for this connection.
-///   - domain: The domain that is serviced for this request.
-///   - info: A dictionary for communication between services.
-///   - response: An object that can receive information to be returned in response to the request.
+/// _Output_:
+///    - info[.postInfoKey] = Dictionary\<key, value\> with key = PostInfoKey and value = String. Containing all the name/value pairs found in the data part of the request. If no name/value pairs are available info[.postInfoKey] will be nil or an empty directory.
 ///
-/// - Returns: Always .next.
+/// _Sequence_:
+///    - The entire body of the request must be available, hence this service should come after the Service.WaitUntilBodyComplete.
+///    - All services that need the postInfo dictionary should come after this service.
 
 func service_decodePostFormUrlEncoded(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: inout Services.Info, _ response: inout Response) -> Services.Result {
     

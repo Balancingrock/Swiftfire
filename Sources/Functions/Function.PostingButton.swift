@@ -39,62 +39,20 @@
 // 1.0.0 Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
-// Description
-// =====================================================================================================================
-//
-/// Creates a (text) link that will post the key/value combination when clicked.
-//
-//
-// Signature:
-// ----------
-//
-// .postingButton(target, title, key, value)
-//
-// Note: More key/value pairs may be added at the end. i.e. .postingButton(target, title, key1, value1, ke2, value2, etc...)
-//
-// Parameters:
-// -----------
-//
-// target: The target url for the form containing the button.
-// title: The button title.
-// key: The key of the key/value pair that will be POST-ed.
-// value: The value of the key/value pair that will be POST-ed
-//
-//
-// Other Input:
-// ------------
-//
-// CSS:
-//    - class of form: posting-button-form
-//    - class of input: posting-button-button
-//
-//
-// Returns:
-// --------
-//
-// On success: The HTML code (a form) that constitutes the button.
-// On error: ***Error***
-//
-//
-// Other Output:
-// -------------
-//
-// None.
-//
-// =====================================================================================================================
 
 import Foundation
 
 import Core
 
 
-/// Creates a string with the HTML code necessary to create a button that contains a POST-ed key/value pair.
+/// Creates a string with the HTML code necessary to create an input (button) that contains a POST-ed key/value pair.
 ///
 /// - Parameters:
 ///   - target: The target url for the form containing the button.
 ///   - title: The button title.
 ///   - key: The key of the key/value pair that will be POST-ed.
 ///   - value: The value of the key/value pair that will be POST-ed.
+
 
 public func postingButton(target: String, title: String, keyValuePairs: Dictionary<String, String>) -> String {
     if keyValuePairs.isEmpty { return "***Error***" }
@@ -104,7 +62,25 @@ public func postingButton(target: String, title: String, keyValuePairs: Dictiona
 }
 
 
-/// Creates a button that will post the key/value combination when clicked.
+/// Returns the HTML code for an input (button) field embedded in a form including a number of key/value pairs. If the button is clicked a POST HTML request will be made of the type x-www-form-urlencoded that includes the given key/value pairs. Once the POST request is processed by Service.DecodePostFormUrlEncoded the postInfo dictionary will contain the key/value pairs.
+///
+/// __Webpage Use__:
+///
+/// _Signature_: .postingButton(target, title, key-N, value-N, ...)
+///
+/// _Number of arguments_: 4 + (2 x N) where N is an integer >= 0
+///
+/// _Type of argument_:
+///    - __target__: link to be invoked when the input (button) is clicked
+///    - __title__: Title of the input (button)
+///    - __key-N__: The key N to include in a POST request of type x-www-form-urlencoded
+///    - __value-N__: The value for key N to include in a POST request of type x-www-form-urlencoded
+///
+/// _Other input used_:
+///    - the css class of the form is `posting-button-form`
+///    - the css class of the input is `posting-button-button`
+///
+/// _Return_: The HTML code for the requested button. `***Error***` if less than 4 or an uneven number of arguments is present.
 
 public func function_postingButton(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: inout Functions.Environment) -> Data? {
     
