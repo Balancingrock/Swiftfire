@@ -12,5 +12,6 @@ The following steps should be followed to release a new version of Swiftfire.
 1. Add & Commit all changes in the git _master_ branch
 1. Add the new git tag
 1. Push the repository to github
-1. Push the swiftfire.nl website
+1. Build the swiftfire.nl website
+1. rsync the swiftfire.nl website
 1. Test clone the githib project, it should build flawless

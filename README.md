@@ -28,11 +28,13 @@ Functions can be used to inject HTML code into otherwise "static" web pages. Giv
 
 One of the services in the stack retrieves the requested page from disk and verifies if it must be parsed. If it must be parsed it scans the page for 'functions'. Any function that is found is executed, and the result of the execution is injected into the page at the exact spot of the function. The function itself is removed.
 
-An example:
+An example for the function ".nofPageHits()".
+
+In the HTML code we would _call_ the function as follows:
 
     <p>This page has been accessed .nofPageHits() times</p>
 
-is translated to:
+which would then be translated by Swiftfire to:
 
     <p>This page has been accessed 59440 times</p>
 
@@ -52,12 +54,6 @@ Swiftfire is a faceless webserver application. However it comes with a website t
 
 Once set up, any access to the port that has as its URL: '/serveradmin' will end up on the login page of the server administrator website. Note that the login is only as secure as the protocol. Use HTTP only when accessing from within a private LAN.
   
-## Note
-
-This is an early public beta release. 
-
-However: It does work! :-)
-
 ## Features
 
 - Allows code injection (HTML and CSS) from functions written in Swift
