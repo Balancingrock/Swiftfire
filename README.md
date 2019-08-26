@@ -94,7 +94,7 @@ This should build the project without errors.
 
 However... the project needs openSSL. And while a compiled version of openSSL is provided with the project, you should not trust this. Make sure to download and install openSSL from the original sources at [openSSL.org](https://openssl.org)
 
-Directions for the installation of openSSL are in the subproject [SecureSockets](https:github.com/balancingrock/SecureSockets). Note that you cannot use an existing installation of openSSL due to some necessary glue code.
+Directions for the installation of openSSL are in the subproject [SecureSockets](https://github.com/balancingrock/SecureSockets). Note that you cannot use an existing installation of openSSL due to some necessary glue code.
 
 You will likely enounter some issues with the target release when you have not compiled openSSL for MacOS 10.12, these are easily fixed by setting the corresponding build options.
 
