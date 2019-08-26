@@ -3,7 +3,7 @@
 //  File:       Function.SF.Blacklist.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.1.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,7 +36,8 @@
 //
 // History
 //
-// 1.0.0 Raised to v1.0.0, Removed old change log,
+// 1.1.0 - Changed server blacklist location
+// 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 // Description
@@ -111,7 +112,7 @@ func function_sf_blacklistTable(_ args: Functions.Arguments, _ info: inout Funct
     // Create the table
     
     var table = Table(klass: ["server-blacklist-table"], columnTitles: "Address", "Action", "")
-    serverBlacklist.list.forEach { (address, action) in
+    serverAdminDomain.blacklist.list.forEach { (address, action) in
 
         let addressCell = Td(address)
 

@@ -3,7 +3,7 @@
 //  File:       Urls.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.1.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,7 +36,8 @@
 //
 // History
 //
-// 1.0.0 Raised to v1.0.0, Removed old change log,
+// 1.1.0 - Replaced server blacklist with serverAdminDomain blacklist
+// 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 // Description
@@ -158,11 +159,6 @@ public final class Urls {
     public static var parameterDefaultsFile: URL? = { fileUrl(settingsDir, "parameter-defaults.json") }()
     
     
-    /// The file with blacklisted addresses
-    
-    public static var serverBlacklistFile: URL? = { fileUrl(settingsDir, "server-blacklist.json") }()
-    
-
     // =================================================================================================================
     /// The directory for the server telemetry
     

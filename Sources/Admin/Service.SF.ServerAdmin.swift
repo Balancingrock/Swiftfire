@@ -3,7 +3,7 @@
 //  File:       Service.SF.ServerAdmin.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.1.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,7 +36,8 @@
 //
 // History
 //
-// 1.0.0 Raised to v1.0.0, Removed old change log,
+// 1.1.0 - Changed server blacklist location
+// 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 // Description
@@ -729,7 +730,7 @@ fileprivate func executeUpdateBlacklist(_ postInfo: inout PostInfo?) {
             return .closeConnection
         }
     }()
-    serverBlacklist.update(action: newAction, for: address)
+    serverAdminDomain.blacklist.update(action: newAction, for: address)
 }
 
 fileprivate func executeAddToBlacklist(_ postInfo: inout PostInfo?) {
@@ -746,12 +747,12 @@ fileprivate func executeAddToBlacklist(_ postInfo: inout PostInfo?) {
             return .closeConnection
         }
     }()
-    serverBlacklist.add(address, action: newAction)
+    serverAdminDomain.blacklist.add(address, action: newAction)
 }
 
 fileprivate func executeRemoveFromBlacklist(_ postInfo: inout PostInfo?) {
     guard let (address, _) = postInfo?.popFirst() else { return }
-    serverBlacklist.remove(address)
+    serverAdminDomain.blacklist.remove(address)
 }
 
 fileprivate func executeUpdateDomainBlacklist(_ postInfo: inout PostInfo?) {

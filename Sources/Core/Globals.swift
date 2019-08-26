@@ -37,6 +37,7 @@
 // History
 //
 // 1.1.0 - Fixed loading & storing of domain service names
+//       - Removed server blacklist (now located in the serveradmin domain
 // 1.0.0 - Initial version
 //
 // =====================================================================================================================
@@ -68,13 +69,6 @@ public var quitSwiftfire: Bool = false
 /// The Swiftfire server parameters
 
 public let serverParameters = ServerParameters()
-
-
-// The server wide blacklist is created here but does not contain any entries yet.
-
-/// The server level blacklist
-
-public let serverBlacklist = Blacklist()
 
 
 // After creation the services object will be empty. Services must still be registered.

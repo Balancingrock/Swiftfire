@@ -3,7 +3,7 @@
 //  File:       LogServerSetup.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.1.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,7 +36,8 @@
 //
 // History
 //
-// 1.0.0 Raised to v1.0.0, Removed old change log,
+// 1.1.0 - Changed server blacklist location
+// 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 
@@ -46,9 +47,7 @@ import SwifterLog
 func logServerSetup() {
     
     Log.atNotice?.log("Configuration parameters values:\n\n\(serverParameters)\n")
-    
-    Log.atNotice?.log("Server Blacklist:\n\n\(serverBlacklist)\n")
-    
+        
     Log.atNotice?.log("Registered Services:\n\n\(services)\n")
     
     Log.atNotice?.log("Registered Functions:\n\n\(functions)\n")

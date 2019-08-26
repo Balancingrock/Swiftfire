@@ -37,7 +37,8 @@
 // History
 //
 // 1.1.0 - Fixed loading & storing of domain service names
-// 1.0.0 Raised to v1.0.0, Removed old change log,
+//       - Moved server blacklist to serverAdminDomain
+// 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 // Description
@@ -144,19 +145,6 @@ do {
     }
     
     Log.atNotice?.log("Logging configured")
-}
-
-
-// ===============================================
-// Initialize the server level blacklisted clients
-// ===============================================
-
-do {
-    guard let serverBlacklistFile = Urls.serverBlacklistFile else {
-        emergencyExit("Could not construct server blacklist file url")
-    }
-    serverBlacklist.load(from: serverBlacklistFile)
-    Log.atDebug?.log("Server Blacklist:\n\n\(serverBlacklist)\n")
 }
 
 
@@ -359,14 +347,6 @@ _ = serverAdminDomain.shutdown()
 
 headerLogger.close()
 Log.atNotice?.log("Closed header logging file")
-
-
-// ============================
-// Persist the server blacklist
-// ============================
-
-serverBlacklist.store(to: Urls.serverBlacklistFile)
-Log.atNotice?.log("Saved server blacklist")
 
 
 // ================================

@@ -3,7 +3,7 @@
 //  File:       SFConnection.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.1.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,7 +36,8 @@
 //
 // History
 //
-// 1.0.0 Raised to v1.0.0, Removed old change log,
+// 1.1.0 - Changed server blacklist location
+// 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 // Description
@@ -426,7 +427,7 @@ func httpConnectionFactory(_ cType: SwifterSockets.InterfaceAccess, _ remoteAddr
     
     // Exclude access for blacklisted clients (Server level blacklisting rejects the connection request before data is received, hence no HTML message will be sent as the client is -quite likely- not ready for it)
     
-    if serverBlacklist.action(for: remoteAddress) != nil { return nil }
+    if serverAdminDomain.blacklist.action(for: remoteAddress) != nil { return nil }
     
     
     // Find a free SFConnection object
