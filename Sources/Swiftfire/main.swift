@@ -3,7 +3,7 @@
 //  File:       main.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.1.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.1.0 - Fixed loading & storing of domain service names
 // 1.0.0 Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
@@ -167,6 +168,24 @@ do {
     registerServices()
     sfRegisterServices()
     Log.atDebug?.log("Registered services:\n\n\(services)\n")
+    
+    
+    /// Default services for newly created domains.
+    ///
+    /// This service stack implements a default webserver.
+    
+    defaultServices = [
+        serviceName_Blacklist,
+        serviceName_OnlyHttp10OrHttp11,
+        serviceName_OnlyGetOrPost,
+        serviceName_GetSession,
+        serviceName_WaitUntilBodyComplete,
+        serviceName_DecodePostFormUrlEncoded,
+        serviceName_GetResourcePathFromUrl,
+        serviceName_GetFileAtResourcePath,
+        serviceName_RestartSessionTimeout,
+        serviceName_TransferResponse
+    ]
 }
 
 

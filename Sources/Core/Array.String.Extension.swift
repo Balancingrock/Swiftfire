@@ -3,7 +3,7 @@
 //  File:       Array.String.Extension.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.1.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,7 +36,8 @@
 //
 // History
 //
-// 1.0.0 Raised to v1.0.0, Removed old change log,
+// 1.1.0 - Added status return to load function
+// 1.0.0 - Raised to v1.0.0, Removed old change log
 //
 // =====================================================================================================================
 
@@ -55,10 +56,12 @@ extension Array where Iterator.Element == String {
         json.save(to: file)
     }
     
-    public mutating func load(from file: URL?) {
-        guard let file = file else { return }
-        guard let json = try? VJson.parse(file: file) else { return }
+    @discardableResult
+    public mutating func load(from file: URL?) -> Bool {
+        guard let file = file else { return false }
+        guard let json = try? VJson.parse(file: file) else { return false }
         self = []
         json.forEach { if let str = $0.stringValue { self.append(str) } }
+        return true
     }
 }

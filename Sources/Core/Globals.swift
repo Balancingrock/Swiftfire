@@ -3,7 +3,7 @@
 //  File:       Globals.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.1.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.1.0 - Fixed loading & storing of domain service names
 // 1.0.0 - Initial version
 //
 // =====================================================================================================================
@@ -143,3 +144,8 @@ public var httpServerAcceptQueue: DispatchQueue!
 // The HTTPS dispatch queue
 
 public var httpsServerAcceptQueue: DispatchQueue!
+
+
+// The default webserver service stack
+
+public var defaultServices: Array<String> = []

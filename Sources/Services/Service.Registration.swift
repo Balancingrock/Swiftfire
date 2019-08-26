@@ -3,7 +3,7 @@
 //  File:       DomainServices.Registration.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.1
+//  Version:    1.1.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.1.0 - Fixed loading & storing of domain service names
 // 1.0.1 - Documentation update
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
@@ -52,36 +53,55 @@ import Core
 
 // Note: If any of these texts are changed it will be necessary to re-assign new services for existing domains.
 
-private let blacklist = "Abort if client IP is in blacklist"
-private let onlyHttp10OrHttp11 = "Only HTTP 1.0 / 1.1 requests"
-private let onlyGetOrPost = "Only GET / POST requests"
-private let getResourcePathFromUrl = "Get resource path from request URL"
-private let getFileAtResourcePath = "Get file at resource path"
+
+/// The service name for the blacklist service
+
+public let serviceName_Blacklist = "Abort if client IP is in blacklist"
+
+
+/// The service name for the http1.0/1.1 filter service
+
+public let serviceName_OnlyHttp10OrHttp11 = "Only HTTP 1.0 / 1.1 requests"
+
+
+/// The service name for the GET/POST filter service
+
+public let serviceName_OnlyGetOrPost = "Only GET / POST requests"
+
+
+/// The service name to determine the resource path from the URL service
+
+public let serviceName_GetResourcePathFromUrl = "Get resource path from request URL"
+
+
+/// The service name for the file content fetch/process service.
+
+public let serviceName_GetFileAtResourcePath = "Get file at resource path"
 
 
 /// The name by which service_getSession is known.
 
-public let getSession = "Get Active Session"
+public let serviceName_GetSession = "Get Active Session"
 
 
 /// The name by which service_decodePostFormUrlEncoded is known.
 
-public let decodePostFormUrlEncoded = "Decode post form urlencoded"
+public let serviceName_DecodePostFormUrlEncoded = "Decode post form urlencoded"
 
 
 /// The name by which service_waitUntilBodyComplete is known.
 
-public let waitUntilBodyComplete = "Wait until body is received"
+public let serviceName_WaitUntilBodyComplete = "Wait until body is received"
 
 
 /// The name by which service_transferResponse is known.
 
-public let transferResponse = "Transfer Response"
+public let serviceName_TransferResponse = "Transfer Response"
 
 
 /// The name by which service_restartSessionTimeout is known.
 
-public let restartSessionTimeout = "Restart Session Timeout"
+public let serviceName_RestartSessionTimeout = "Restart Session Timeout"
 
 
 // =================================================
@@ -96,40 +116,15 @@ public let restartSessionTimeout = "Restart Session Timeout"
 
 public func registerServices() {
     
-    services.register(name: blacklist, service: service_blacklist)
-    services.register(name: onlyHttp10OrHttp11, service: service_onlyHttp10or11)
-    services.register(name: onlyGetOrPost, service: service_onlyGetOrPost)
-    services.register(name: getResourcePathFromUrl, service: service_getResourcePathFromUrl)
-    services.register(name: getFileAtResourcePath, service: service_getFileAtResourcePath)
-    services.register(name: getSession, service: service_getSession)
-    services.register(name: decodePostFormUrlEncoded, service: service_decodePostFormUrlEncoded)
-    services.register(name: waitUntilBodyComplete, service: service_waitUntilBodyComplete)
-    services.register(name: transferResponse, service: service_transferResponse)
-    services.register(name: restartSessionTimeout, service: service_restartSessionTimeout)
+    services.register(name: serviceName_Blacklist, service: service_blacklist)
+    services.register(name: serviceName_OnlyHttp10OrHttp11, service: service_onlyHttp10or11)
+    services.register(name: serviceName_OnlyGetOrPost, service: service_onlyGetOrPost)
+    services.register(name: serviceName_GetResourcePathFromUrl, service: service_getResourcePathFromUrl)
+    services.register(name: serviceName_GetFileAtResourcePath, service: service_getFileAtResourcePath)
+    services.register(name: serviceName_GetSession, service: service_getSession)
+    services.register(name: serviceName_DecodePostFormUrlEncoded, service: service_decodePostFormUrlEncoded)
+    services.register(name: serviceName_WaitUntilBodyComplete, service: service_waitUntilBodyComplete)
+    services.register(name: serviceName_TransferResponse, service: service_transferResponse)
+    services.register(name: serviceName_RestartSessionTimeout, service: service_restartSessionTimeout)
 }
 
-
-// ========================================================================
-// Add to the next array to provide a default service chain for NEW domains
-// ========================================================================
-// Notice that the sequence is very important
-
-
-/// Default services for newly created domains.
-///
-/// This service stack implements a default webserver.
-
-public var defaultServices: Array<String> {
-    return [
-        blacklist,
-        onlyHttp10OrHttp11,
-        onlyGetOrPost,
-        getSession,
-        waitUntilBodyComplete,
-        decodePostFormUrlEncoded,
-        getResourcePathFromUrl,
-        getFileAtResourcePath,
-        restartSessionTimeout,
-        transferResponse
-    ]
-}

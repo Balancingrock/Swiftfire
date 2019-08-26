@@ -3,7 +3,7 @@
 //  File:       Services.SF.Registration.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.1.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.1.0 - Fixed loading & storing of domain service names
 // 1.0.0 - Initial version
 //
 // =====================================================================================================================
@@ -71,11 +72,11 @@ public func sfRegisterServices() {
 
 public var serverAdminServices: Array<String> {
     return [
-        getSession,
-        waitUntilBodyComplete,
-        decodePostFormUrlEncoded,
+        serviceName_GetSession,
+        serviceName_WaitUntilBodyComplete,
+        serviceName_DecodePostFormUrlEncoded,
         serverAdmin,
-        restartSessionTimeout,
-        transferResponse
+        serviceName_RestartSessionTimeout,
+        serviceName_TransferResponse
     ]
  }

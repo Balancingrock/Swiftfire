@@ -3,7 +3,7 @@
 //  File:       Domain.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.1.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,7 +36,8 @@
 //
 // History
 //
-// 1.0.0 Raised to v1.0.0, Removed old change log,
+// 1.1.0 - Fixed loading & storing of domain service names
+// 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 
@@ -313,7 +314,11 @@ public final class Domain {
 
         // Reload the service names
         
-        self.serviceNames.load(from: Urls.domainServiceNamesFile(for: self.name))
+        if !self.serviceNames.load(from: Urls.domainServiceNamesFile(for: self.name)) {
+            Log.atNotice?.log("Service names not found or failed to load for domain \(name), using default")
+            self.serviceNames = defaultServices
+            self.serviceNames.store(to: Urls.domainServiceNamesFile(for: self.name))
+        }
 
         
         // Create the sessions object
@@ -417,6 +422,7 @@ public final class Domain {
         blacklist.store(to: Urls.domainBlacklistFile(for: name))
         hitCounters.store(to: timestampedFileUrl(dir: Urls.domainHitCountersDir(for: name), name: "hitcounters", ext: "json"))
         telemetry.store(to: timestampedFileUrl(dir: Urls.domainTelemetryDir(for: name), name: "telemetry", ext: "json"))
+        serviceNames.store(to: Urls.domainServiceNamesFile(for: name))
         accessLog?.close()
         four04Log?.close()
         statistics?.close()
