@@ -3,7 +3,7 @@
 //  File:       Domains.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.1.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,7 +36,8 @@
 //
 // History
 //
-// 1.0.0 Raised to v1.0.0, Removed old change log,
+// 1.1.0 #3: Fixed
+// 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 
@@ -127,13 +128,17 @@ public final class Domains {
             }
             
             
-            // Create and add domain
+            // Get the domain, create it if it does not exist
             
-            guard let domain = Domain(name) else {
-                Log.atEmergency?.log("Cannot create/load domain with name \(name)")
-                return false
+            var domain: Domain? = domains[name]
+            if domain == nil {
+                guard let newDomain = Domain(name) else {
+                    Log.atEmergency?.log("Cannot create/load domain with name \(name)")
+                    return false
+                }
+                domains[name] = newDomain
+                domain = newDomain
             }
-            domains[name] = domain
             
             
             // Get alias and point it to the domain

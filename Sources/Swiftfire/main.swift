@@ -36,8 +36,9 @@
 //
 // History
 //
-// 1.1.0 - Fixed loading & storing of domain service names
-//       - Moved server blacklist to serverAdminDomain
+// 1.1.0 #1: Fixed loading & storing of domain service names
+//       #2: Moved server blacklist to serverAdminDomain
+//       #4: Rebuild domain services after loading the domains
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
@@ -219,6 +220,11 @@ do {
     
     domains.forEach() { $0.removeUnknownServices() }
     
+    
+    // Rebuild the available services for the domains
+    
+    domains.forEach { $0.rebuildServices() }
+
     
     // log the domain settings
     
