@@ -3,7 +3,7 @@
 //  File:       Function.SF.PostingButtonedInput.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.1.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,7 +36,8 @@
 //
 // History
 //
-// 1.0.0 Raised to v1.0.0, Removed old change log,
+// 1.1.0 #5: Set PHP message to disabled if disabled
+// 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 // Description
@@ -153,11 +154,11 @@ func function_sf_postingButtonedInput(_ args: Functions.Arguments, _ info: inout
                     case "enabled": value = domain.enabled.description
                     case "accesslogenabled": value = domain.accessLogEnabled.description
                     case "404logenabled": value = domain.four04LogEnabled.description
-                    case "phppath": value = (domain.phpPath?.path ?? "").description
-                    case "phpoptions": value = domain.phpPath == nil ? "" : (domain.phpOptions ?? "").description
-                    case "phpmapindex": value = domain.phpPath == nil ? "" : domain.phpMapIndex.description
-                    case "phpmapall": value = domain.phpPath == nil ? "" : domain.phpMapAll.description
-                    case "phptimeout": value = domain.phpTimeout.description
+                    case "phppath": value = (domain.phpPath?.path ?? "PHP Disabled").description
+                    case "phpoptions": value = domain.phpPath == nil ? "PHP Disabled" : (domain.phpOptions ?? "").description
+                    case "phpmapindex": value = domain.phpPath == nil ? "PHP Disabled" : domain.phpMapIndex.description
+                    case "phpmapall": value = domain.phpPath == nil ? "PHP Disabled" : domain.phpMapAll.description
+                    case "phptimeout": value = domain.phpPath == nil ? "PHP Disabled" : domain.phpTimeout.description
                     case "sessionlogenabled": value = domain.sessionLogEnabled.description
                     case "sfresources": value = domain.sfresources
                     case "sessiontimeout": value = domain.sessionTimeout.description

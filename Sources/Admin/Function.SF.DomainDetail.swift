@@ -3,7 +3,7 @@
 //  File:       Function.SF.DomainDetail.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.1.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.1.0 #5 Return empty string if PHP not enabled
 // 1.0.0 Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
@@ -128,10 +129,30 @@ func function_sf_domainDetail(_ args: Functions.Arguments, _ info: inout Functio
     case "404logenabled": return domain.four04LogEnabled.description.data(using: String.Encoding.utf8)
     case "sessionlogenabled": return domain.sessionLogEnabled.description.data(using: String.Encoding.utf8)
     case "phppath": return (domain.phpPath?.path ?? "").data(using: String.Encoding.utf8)
-    case "phpoptions": return (domain.phpOptions ?? "").data(using: String.Encoding.utf8)
-    case "phpmapindex": return domain.phpMapIndex.description.data(using: String.Encoding.utf8)
-    case "phpmapall": return domain.phpMapAll.description.data(using: String.Encoding.utf8)
-    case "phptimeout": return domain.phpTimeout.description.data(using: String.Encoding.utf8)
+    case "phpoptions":
+        if domain.phpPath != nil {
+            return (domain.phpOptions ?? "").data(using: String.Encoding.utf8)
+        } else {
+            return "PHP Disabled".data(using: .utf8)
+        }
+    case "phpmapindex":
+        if domain.phpPath != nil {
+            return domain.phpMapIndex.description.data(using: String.Encoding.utf8)
+        } else {
+            return "PHP Disabled".data(using: .utf8)
+        }
+    case "phpmapall":
+        if domain.phpPath != nil {
+            return domain.phpMapAll.description.data(using: String.Encoding.utf8)
+        } else {
+            return "PHP Disabled".data(using: .utf8)
+        }
+    case "phptimeout":
+        if domain.phpPath != nil {
+            return domain.phpTimeout.description.data(using: String.Encoding.utf8)
+        } else {
+            return "PHP Disabled".data(using: .utf8)
+        }
     case "sfresources": return domain.sfresources.data(using: String.Encoding.utf8)
     case "sessiontimeout": return domain.sessionTimeout.description.data(using: String.Encoding.utf8)
     default: return "***Error***".data(using: String.Encoding.utf8)

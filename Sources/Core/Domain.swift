@@ -36,7 +36,8 @@
 //
 // History
 //
-// 1.1.0 - Fixed loading & storing of domain service names
+// 1.1.0 #3 Fixed loading & storing of domain service names
+//       #6 Fixed setting, load & store of phpPath
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
@@ -396,7 +397,15 @@ public final class Domain {
         if let j = (json|"Enabled")?.boolValue { enabled = j }
         if let j = (json|"AccessLogEnabled")?.boolValue { accessLogEnabled = j }
         if let j = (json|"SessionLogEnabled")?.boolValue { sessionLogEnabled = j }
-        if let j = (json|"PhpPath")?.stringValue { phpPath = URL(fileURLWithPath: j) }
+        
+        if let j = (json|"PhpPath")?.stringValue {
+            if !j.isEmpty {
+                phpPath = URL(fileURLWithPath: j)
+            } else {
+                phpPath = nil
+            }
+        }
+        
         if let j = (json|"PhpOptions")?.stringValue { phpOptions = j }
         if let j = (json|"PhpMapIndex")?.boolValue { phpMapIndex = j }
         if let j = (json|"PhpMapAll")?.boolValue { phpMapAll = j }
@@ -576,7 +585,11 @@ extension Domain {
             
         case "PhpPath":
             if FileManager.default.isExecutableFile(atPath: value) {
-                phpPath = URL(fileURLWithPath: value)
+                if !value.isEmpty {
+                    phpPath = URL(fileURLWithPath: value)
+                } else {
+                    phpPath = nil
+                }
             }
             
         case "PhpOptions":
