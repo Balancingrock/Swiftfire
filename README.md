@@ -152,11 +152,11 @@ You can of course change whatever you want, but the current source code layout w
 
 Note: Planned releases are for information only and almost always change.
 
-#### 1.1.0 (Open)
+#### 1.1.0
 
-- Add URL redirection list
+- Fixed issues 1 through 6
 
-#### 1.0.1 (Current)
+#### 1.0.1
 
 - Documentation changes
 - Visibility of keys (not needed yet but will be eventually)
