@@ -664,6 +664,7 @@ fileprivate func executeSfCommand(_ pathComponents: Array<String>, _ postInfo: i
     case "UpdateDomainServices": executeUpdateDomainServices(&postInfo); return .newPath("/pages/domain-management.sf.html")
     case "DeleteDomain": executeDeleteDomain(&postInfo); return .newPath("/pages/domain-management.sf.html")
     case "CreateDomain": executeCreateDomain(&postInfo); return .newPath("/pages/domain-management.sf.html")
+    case "CreateAdmin": executeCreateAdmin(postInfo); return .newPath("/pages/admin-management.sf.html")
     case "CreateAlias": executeCreateAlias(&postInfo); return .newPath("/pages/domain-management.sf.html")
     case "DeleteAlias": executeDeleteAlias(&postInfo); return .newPath("/pages/domain-management.sf.html")
     case "SaveDomains": executeSaveDomains(); return .newPath("/pages/domain-management.sf.html")
@@ -1052,4 +1053,23 @@ fileprivate func executeQuitSwiftfire() {
 fileprivate func executeLogout(_ session: Session) -> CommandExecutionResult {
     session[.accountKey] = nil
     return .newPath("login.sf.html")
+}
+
+fileprivate func executeCreateAdmin(_ postInfo: PostInfo?) {
+    
+    guard let id = postInfo?["ID"] else {
+        Log.atError?.log("No ID given")
+        return
+    }
+    
+    guard let password = postInfo?["Password"] else {
+        Log.atError?.log("No password given")
+        return
+    }
+    
+    if serverAdminDomain.accounts.newAccount(name: id, password: password) == nil {
+        Log.atCritical?.log("Failed to create admin account for: \(id)")
+    }
+    
+    Log.atNotice?.log("Created new admin account with ID = \(id)")
 }

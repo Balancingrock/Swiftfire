@@ -15,12 +15,12 @@
 	<meta name="msapplication-config" content="/serveradmin/icons/browserconfig.xml">
 	<meta name="theme-color" content="#ffffff">
 
-	<title>Server Admin Login</title>
+	<title>Server Admin Management</title>
 
 	<meta name="description" content="Swiftfire Server Admin">
 
 	<link rel="stylesheet" href="/serveradmin/assets/main.css">
-	<link rel="canonical" href="/serveradmin/login.sf.html">
+	<link rel="canonical" href="/serveradmin/pages/admin-management.sf.html">
 	<link rel="alternate" type="application/rss+xml" title="Swiftfire Server Admin" href="/serveradmin/feed.xml">
 </head>
 <!-- end of include head.html -->
@@ -80,7 +80,7 @@
 		</div>
 		<div class="dropdown">
 			<div class="subitem-separator"><p></p></div>
-			<div class="subitem">
+			<div class="subitem isActiveSelection">
 				<input type="checkbox" id="Management-checkbox">
 				<div class="title">
 					<label class="symbol" for="Management-checkbox">
@@ -104,7 +104,7 @@
 				</div>
 			</div>
 			<div class="subitem-separator"><p></p></div>
-			<div class="subitem isActiveSelection">
+			<div class="subitem">
 				<input type="checkbox" id="Login-checkbox">
 				<div class="title">
 					<label class="symbol" for="Login-checkbox">
@@ -170,21 +170,41 @@
 <!-- Start of main content -->
 <article class="page" itemscope itemtype="http://schema.org/Article">
 	<header class="page-header">
-		<h1 class="page-title" itemprop="name headline">Server Admin Login</h1>
+		<h1 class="page-title" itemprop="name headline">Server Admin Management</h1>
 		<p class="page-meta"></p>
 	</header>
 	<div class="page-content" itemprop="articleBody">
 <!-- Page content -->
-   <form action="/serveradmin" method="post">
-<div style="display:flex; justify-content:center; margin-bottom:50px;">
-	<div style="margin-left:auto; margin-right:auto;">
-		<p style="margin-bottom:0px">Name:</p>
-		<input type="text" name="ServerAdminLoginName" value="" autofocus="" /><br />
-		<p style="margin-bottom:0px">Password:</p>
-		<input type="password" name="ServerAdminLoginPwd" value="" /><br /><br />
-		<input style="width:100%" type="submit" value="Login" />
+   <div class="center-content">.sf-adminTable()</div>
+<form action="/serveradmin/sfcommand/CreateAdmin" method="post">
+	<div style="display:flex; justify-content:center;">
+		<div style="display:flex; flex-direction: column;">
+			<h2 class="text-centered">Create New Admin Account</h2>
+			<table>
+				<tr>
+					<td>
+						<span style="margin-top: 4px; margin-right: 4px">Admin ID: </span>
+					</td>
+					<td>
+						<input type="text" name="ID" value="" style="text-align:center;" />
+					</td>
+				</tr>
+				<tr>
+					<td>
+						<span style="margin-top: 4px; margin-right: 4px">Password: </span>
+					</td>
+					<td>
+						<input type="text" name="Password" value="" style="text-align:center;" />
+					</td>
+				</tr>
+			</table>
+			<div class="center-content">
+				<div style="margin-top: 4px">
+					<input type="submit" value="Create New Admin" />
+				</div>
+			</div>
+		</div>
 	</div>
-</div>
 </form>
 
 <!-- End of page content -->

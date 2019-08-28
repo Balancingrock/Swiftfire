@@ -68,26 +68,52 @@
 		</div>
 	</div>
 	<div class="item-separator"><p><!-- empty but necessary --></p></div>
-	<div class="item">
-		<input type="checkbox" id="Login-checkbox">
+	<div class="item isActiveSelection">
+		<input type="checkbox" id="Admin-checkbox">
 		<div class="title">
-			<label class="symbol" for="Login-checkbox">
-				<p></p>
+			<label class="symbol" for="Admin-checkbox">
+				<p class="code"><!-- will be filled by disclosure indicator --></p>
 			</label>
 			<div class="text">
-				<a href="/serveradmin/login.sf.html"><p>Login</p></a>
+				<a href="/serveradmin/pages/admin-management.sf.html"><p>Admin</p></a>
 			</div>
 		</div>
-	</div>
-	<div class="item-separator"><p><!-- empty but necessary --></p></div>
-	<div class="item isActiveSelection">
-		<input type="checkbox" id="Logout-checkbox">
-		<div class="title">
-			<label class="symbol" for="Logout-checkbox">
-				<p></p>
-			</label>
-			<div class="text">
-				<a href="/serveradmin/logout.sf.html"><p>Logout</p></a>
+		<div class="dropdown">
+			<div class="subitem-separator"><p></p></div>
+			<div class="subitem">
+				<input type="checkbox" id="Management-checkbox">
+				<div class="title">
+					<label class="symbol" for="Management-checkbox">
+						<p></p>
+					</label>
+					<div class="text">
+						<a href="/serveradmin/pages/admin-management.sf.html"><p>Management</p></a>
+					</div>
+				</div>
+			</div>
+			<div class="subitem-separator"><p></p></div>
+			<div class="subitem isActiveSelection">
+				<input type="checkbox" id="Logout-checkbox">
+				<div class="title">
+					<label class="symbol" for="Logout-checkbox">
+						<p></p>
+					</label>
+					<div class="text">
+						<a href="/serveradmin/logout.sf.html"><p>Logout</p></a>
+					</div>
+				</div>
+			</div>
+			<div class="subitem-separator"><p></p></div>
+			<div class="subitem">
+				<input type="checkbox" id="Login-checkbox">
+				<div class="title">
+					<label class="symbol" for="Login-checkbox">
+						<p></p>
+					</label>
+					<div class="text">
+						<a href="/serveradmin/login.sf.html"><p>Login</p></a>
+					</div>
+				</div>
 			</div>
 		</div>
 	</div>

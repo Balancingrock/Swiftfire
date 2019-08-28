@@ -3,7 +3,7 @@
 //  File:       Functions.SF.Registration.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.2.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.2.0 - Added sf_adminTable
 // 1.0.0 - Initial version
 //
 // =====================================================================================================================
@@ -65,6 +66,7 @@ let SF_DOMAIN_SERVICES_TABLE = "sf-domainServicesTable"
 let SF_DOMAIN_BLACKLIST_TABLE = "sf-domainBlacklistTable"
 let SF_STATISTICS_PAGE = "sf-statisticsPage"
 let SF_DOMAIN_BUTTON = "sf-domainButton"
+let SF_ADMIN_TABLE = "sf-adminTable"
 
 
 // ==================================================
@@ -90,4 +92,5 @@ public func sfRegisterFunctions() {
     functions.register(name: SF_DOMAIN_BLACKLIST_TABLE, function: function_sf_domainBlacklistTable)
     functions.register(name: SF_POSTING_BUTTONED_INPUT, function: function_sf_postingButtonedInput)
     functions.register(name: SF_DOMAIN_BUTTON, function: function_sf_domainButton)
+    functions.register(name: SF_ADMIN_TABLE, function: function_sf_adminTable)
 }
