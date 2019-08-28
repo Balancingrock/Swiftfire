@@ -434,3 +434,59 @@ extension AccountManager {
     }
 }
 
+
+/// Allows itterating over all the account names
+
+extension AccountManager: Sequence {
+
+    public struct AccountNameGenerator: IteratorProtocol {
+        
+        public typealias Element = String
+        
+        // The object for which the generator generates
+        private var source: Array<String> = []
+        
+        // The objects already delivered through the generator
+        private var sent: Array<String> = []
+        
+        public init(source: AccountManager) {
+            self.source = source.nameLut.compactMap({$0.key})
+        }
+        
+        // The GeneratorType protocol
+        public mutating func next() -> Element? {
+            
+            // Only when the source has values to deliver
+            if source.count > 0 {
+                
+                let values = source
+                let sortedValues = values.sorted(by: {$0 < $1})
+                
+                // Find a value that has not been sent already
+                OUTER: for i in sortedValues {
+                    
+                    // Check if the value has not been sent already
+                    for s in sent {
+                        
+                        // If it was sent, then try the next value
+                        if i == s { continue OUTER }
+                    }
+                    // Found a value that was not sent yet
+                    // Remember that it will be sent
+                    sent.append(i)
+                    
+                    // Send it
+                    return i
+                }
+            }
+            // Nothing left to send
+            return nil
+        }
+    }
+    
+    
+    public func makeIterator() -> AccountNameGenerator {
+        return AccountNameGenerator(source: self)
+    }
+
+}

@@ -42,7 +42,7 @@
 // Description
 // =====================================================================================================================
 //
-// Returns a table with all domains.
+// Returns a table with all admin account.
 //
 //
 // Signature:
@@ -112,60 +112,22 @@ func function_sf_adminTable(_ args: Functions.Arguments, _ info: inout Functions
     
     // Create a list of domains and their aliases
     
-    var domainsAndAliases: Dictionary<String, Array<String>> = [:]
-    
-    domains.domains.forEach {
-        let alias = $0.key
-        let name = $0.value.name
-        if domainsAndAliases[name] != nil {
-            domainsAndAliases[name]!.append(alias)
-        } else {
-            domainsAndAliases[name] = [alias]
-        }
-    }
-    
-    for key in domainsAndAliases.keys {
-        let arr = domainsAndAliases[key]
-        domainsAndAliases[key] = arr?.sorted(by: { $0 < $1 })
-    }
-    
-    let list = domainsAndAliases.sorted(by: { $0.key < $1.key })
-    
-    
-    var domainTables: Array<Html> = []
-    
-    list.forEach { (domainName: String, aliases: Array<String>) in
-        
-        var table = Table(klass: "domains-table", columnTitles: "Domain:", "\(domainName)")
-        
-        if aliases.count == 0 {
-            table.append(Tr(Td("Aliases:"), Td(
-                postingButtonedInput(target: "/serveradmin/sfcommand/CreateAlias", inputName: "Alias", inputValue: "", buttonTitle: "Create Alias", keyValuePairs: ["DomainName":domainName])
+    var table = Table(klass: "accounts-table", columnTitles: "Account ID")
+    for accountName in environment.domain.accounts {
+
+        if accountName != account.name {
+            table.append(Tr(Td(
+                Div( 
+                    P(accountName),
+                    postingButton(target: "/serveradmin/sfcommand/DeleteAccount", title: "Delete", keyValuePairs: ["ID":accountName])
+                )
             )))
         } else {
-            var firstAlias = true
-            for alias in aliases {
-                if alias != domainName {
-                    table.append(Tr(firstAlias ? Td("Aliases:") : Td(), Td(
-                        Div(
-                            P(alias),
-                            postingButton(target: "/serveradmin/sfcommand/DeleteAlias", title: "Delete Alias", keyValuePairs: ["Alias":alias])
-                        )
-                    )))
-                    firstAlias = false
-                }
-            }
+            table.append(Tr(Td(Div(P(accountName)))))
         }
-        
-        table.append(Tr(Td(), Td(
-            postingButtonedInput(target: "/serveradmin/sfcommand/CreateAlias", inputName: "Alias", inputValue: "", buttonTitle: "Create Alias", keyValuePairs: ["DomainName":domainName])
-        )))
-        
-        domainTables.append(table)
-        domainTables.append(postingButton(target: "/serveradmin/pages/deletedomain.sf.html", title: "Delete Domain", keyValuePairs: ["DomainName":domainName]))
     }
     
-    return Div(klass: "domains-list", domainTables.reduce("", { $0 + $1.html })).html.data(using: String.Encoding.utf8)
+    return table.html.data(using: String.Encoding.utf8)
 }
 
 
