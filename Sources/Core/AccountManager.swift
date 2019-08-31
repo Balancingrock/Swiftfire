@@ -3,7 +3,7 @@
 //  File:       AccountManager.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.2.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,7 +36,8 @@
 //
 // History
 //
-// 1.0.0 Raised to v1.0.0, Removed old change log,
+// 1.2.0 - Added ability to remove accounts
+// 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 
@@ -67,6 +68,8 @@ public class AccountManager {
     /// Example 1: id 2345 will result in: root/45/23/_Account/
     ///
     /// Example 2: id 12345 will result in: root/45/23/01/_Account/
+    ///
+    /// - Note: No directory will be created, just the url/path
     
     private static func createDirUrl(in accountsRoot: URL, for id: Int) -> URL {
         
@@ -100,9 +103,7 @@ public class AccountManager {
         var url = accountsRoot
         centiFractionsStr.forEach({ url.appendPathComponent($0) })
         url.appendPathComponent("_Account") // The underscore is for reasons of sorting in the finder
-        
-        try? FileManager.default.createDirectory(atPath: url.path, withIntermediateDirectories: true, attributes: nil)
-        
+                
         return url
     }
 
@@ -110,13 +111,6 @@ public class AccountManager {
     /// The root folder for all accounts
     
     private var root: URL!
-    
-    
-    /// The file for the lookup table that associates an account name with an account id
-    
-    private var lutFile: URL {
-        return root.appendingPathComponent("AccountsLut").appendingPathExtension("json")
-    }
     
     
     /// The lookup table that associates an account name with an account id
@@ -154,14 +148,7 @@ public class AccountManager {
     public init?(directory: URL?) {
         guard let directory = directory else { return nil }
         self.root = directory
-        var isDir: ObjCBool = false
-        if FileManager.default.fileExists(atPath: lutFile.path, isDirectory: &isDir) && !isDir.boolValue {
-            loadLuts()
-        } else {
-            if regenerateLuts() {
-                storeLuts()
-            }
-        }
+        guard regenerateLuts() else { return nil }
     }
     
 }
@@ -174,62 +161,7 @@ extension AccountManager {
     
     /// Save the accounts
     
-    public func store() { storeLuts() }
-    
-    
-    /// Load the lookup tables from file
-    
-    private func loadLuts() {
-        
-        if let json = VJson.parse(file: lutFile, onError: { (_, _, _, mess) in
-            Log.atCritical?.log("Failed to load accounts lookup table from \(self.lutFile.path), error message = \(mess)", type: "Accounts")
-        }) {
-            
-            for item in json {
-                if  let name = (item|"Name")?.stringValue,
-                    let uuid = (item|"Uuid")?.stringValue,
-                    let id = (item|"Id")?.intValue {
-                    nameLut[name] = id
-                    uuidLut[uuid] = name
-                    if id > lastAccountId { lastAccountId = id }
-                } else {
-                    Log.atCritical?.log("Failed to load accounts lookup table from \(lutFile.path), error message = Cannot read name, uuid or id from entry \(item)")
-                    return
-                }
-            }
-        }
-    }
-    
-    
-    /// Save the lookup tables to file
-    
-    private func storeLuts() {
-        
-        var once = true // Prevents repeated entries in the log
-        
-        let json = VJson.array()
-        
-        uuidLut.forEach {
-            (uuid, name) in
-            if let id = nameLut[name] {
-                let child = VJson()
-                child["Name"] &= name
-                child["Uuid"] &= uuid
-                child["Id"] &= id
-                json.append(child)
-            } else {
-                if once {
-                    once = false
-                    Log.atCritical?.log("Account lookup tables are damaged, possible account loss. Regenerate the luts to recover the accounts")
-                }
-            }
-        }
-        
-        // Prevent saving of empty LUTs to avoid situations where an empty LUT prevents regeneration of LUT.
-        // (This is a potential problem for admin accounts which would cause repeated requesting of admin credentials)
-        
-        if uuidLut.count > 0 { json.save(to: lutFile) }
-    }
+    public func store() {}
     
     
     /// Regenerates the lookup table from the contents on disk
@@ -258,6 +190,7 @@ extension AccountManager {
                             if let account = Account(withContentOfDirectory: url) {
                                 nameLut[account.name] = account.id
                                 uuidLut[account.uuid] = account.name
+                                if account.id > lastAccountId { lastAccountId = account.id }
                             } else {
                                 Log.atCritical?.log("Failed to read account from \(url.path)")
                                 return false
@@ -304,6 +237,45 @@ extension AccountManager {
 
 extension AccountManager {
     
+    
+    /// Returns the account for the given name without using a password. First it will try to read the account from the cache. If the cache does not contain the account it will try to find it in the lookup table and if found, load it from file.
+    ///
+    /// - Parameters:
+    ///   - for: The name of the account to find. May not be empty.
+    ///
+    /// - Returns: On success the account, otherwise nil.
+    
+    public func getAccountWithoutPassword(for name: String) -> Account? {
+        
+        
+        // Only valid parameters
+        
+        if name.isEmpty { return nil }
+        
+        return AccountManager.queue.sync {
+            
+            
+            // Try to extract it from the cache
+            
+            var account = accountCache[name]
+            
+            if account == nil {
+                
+                // Check the lookup table
+                
+                if let id = nameLut[name] {
+                    let dir = AccountManager.createDirUrl(in: root, for: id)
+                    if let a = Account(withContentOfDirectory: dir) {
+                        accountCache[name] = a
+                        account = a
+                    }
+                }
+            }
+            
+            return account
+        }
+    }
+
     
     /// Returns the account for the given name and password. First it will try to read the account from the cache. If the cache does not contain the account it will try to find it in the lookup table and if found, load it from file. The password hash must matches the account hash.
     ///
@@ -384,8 +356,8 @@ extension AccountManager {
             // Create the new account
             
             lastAccountId += 1
-            let adir = AccountManager.createDirUrl(in: root, for: lastAccountId)
-            if let account = Account(id: lastAccountId, name: name, password: password, accountDir: adir) {
+            let dir = AccountManager.createDirUrl(in: root, for: lastAccountId)
+            if let account = Account(id: lastAccountId, name: name, password: password, accountDir: dir) {
                 
                 
                 // Add it to the lookup's and the cache
@@ -394,10 +366,6 @@ extension AccountManager {
                 nameLut[name] = lastAccountId
                 accountCache[name] = account
                 
-                
-                // Save the lut
-                
-                storeLuts()
                 
                 return account
                 
@@ -430,6 +398,62 @@ extension AccountManager {
     public func available(name: String) -> Bool {
         return AccountManager.queue.sync {
             return nameLut[name] == nil
+        }
+    }
+    
+    
+    /// Removes an account.
+    ///
+    /// - Note: Make sure the user removing the account has sufficient privelidges!
+    ///
+    /// - Parameter name: The name of the account to remove.
+    ///
+    /// - Returns: True if the account was deleted, false if the account did not exist.
+
+    public func remove(name: String) -> Bool {
+        
+        return AccountManager.queue.sync {
+            
+            
+            // Get the id for the account, and remove it from the name LUT
+            
+            guard let id = nameLut.removeValue(forKey: name) else {
+                Log.atError?.log("No LUT entry found for account with name \(name)")
+                return false
+            }
+            
+            
+            // Get the path to the account directory
+            
+            let dir = AccountManager.createDirUrl(in: root, for: id)
+            
+            
+            // Get the account itself
+            
+            guard let account = Account(withContentOfDirectory: dir) else {
+                Log.atError?.log("No account found for name: \(name), and path: \(dir.path)")
+                return false
+            }
+            
+            
+            // Remove the account from the cache
+            
+            _ = accountCache.remove(name)
+
+            
+            // Remove the entry form the UUID LUT
+            
+            uuidLut.removeValue(forKey: account.uuid)
+            
+            do {
+                try FileManager.default.removeItem(at: dir)
+            } catch let error {
+                Log.atError?.log("Error trying to remove account directory for: \(name), at path: \(dir.path), with error message: \(error.localizedDescription)")
+            }
+
+            Log.atNotice?.log("Removed the account for: \(name)")
+            
+            return true
         }
     }
 }
@@ -486,7 +510,8 @@ extension AccountManager: Sequence {
     
     
     public func makeIterator() -> AccountNameGenerator {
-        return AccountNameGenerator(source: self)
+        return AccountManager.queue.sync {
+            return AccountNameGenerator(source: self)
+        }
     }
-
 }

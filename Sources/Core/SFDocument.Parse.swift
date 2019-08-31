@@ -3,7 +3,7 @@
 //  File:       SFDocument.Parse.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.2.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,7 +36,8 @@
 //
 // History
 //
-// 1.0.0 Raised to v1.0.0, Removed old change log,
+// 1.2.0 - Allowed the dot in the string of an argument to support the $<source>.<property> notation
+// 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 //
@@ -270,12 +271,6 @@ extension SFDocument {
                 // --
                 self.blocks.append(asArrFunctionBlock())
                 return .waitForLeadingSign
-                
-            } else if char == "." { // Potential start of a new function block
-                charBuf.append(evalBuf)
-                name = ""
-                evalBuf = "."
-                return .readName
                 
             } else {
                 evalBuf.append(char)

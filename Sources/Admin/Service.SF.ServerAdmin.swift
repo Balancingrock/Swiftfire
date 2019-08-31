@@ -3,7 +3,7 @@
 //  File:       Service.SF.ServerAdmin.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.1.0
+//  Version:    1.2.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,8 +36,9 @@
 //
 // History
 //
+// 1.2.0 - Added admin account creation and removal
 // 1.1.0 - Changed server blacklist location
-// 1.0.0 - Raised to v1.0.0, Removed old change log,
+// 1.0.0 - Raised to v1.0.0, Removed old change log
 //
 // =====================================================================================================================
 // Description
@@ -518,11 +519,16 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
     // =================================================================================================================
 
     if pathComponents.count >= 2 && pathComponents[0] == "sfcommand" {
+        
         pathComponents.removeFirst()
         var postInfo = info[.postInfoKey] as? PostInfo
+        
         switch executeSfCommand(pathComponents, &postInfo, session, &info, &response) {
+        
         case .next: return .next
+            
         case .newPath(let path):
+
             relPath = path
             let testPath = (serverAdminDomain.webroot as NSString).appendingPathComponent(relPath)
             
@@ -543,6 +549,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
                 adminStatusPage(message: "Directory without index page at \(testPath)")
                 return .next
             }
+
         case .nop: break
         }
     }
@@ -667,6 +674,9 @@ fileprivate func executeSfCommand(_ pathComponents: Array<String>, _ postInfo: i
     case "CreateAdmin": executeCreateAdmin(postInfo); return .newPath("/pages/admin-management.sf.html")
     case "CreateAlias": executeCreateAlias(&postInfo); return .newPath("/pages/domain-management.sf.html")
     case "DeleteAlias": executeDeleteAlias(&postInfo); return .newPath("/pages/domain-management.sf.html")
+    case "DeleteAccount": executeDeleteAccount(postInfo); return .newPath("/pages/admin-management.sf.html")
+    case "ConfirmDeleteAccount": return executeConfirmDeleteAccount(postInfo)
+    case "SetNewPassword": executeSetNewPassword(postInfo); return .newPath("/pages/admin-management.sf.html")
     case "SaveDomains": executeSaveDomains(); return .newPath("/pages/domain-management.sf.html")
     case "ReadDomains": executeReadDomains(); return .newPath("/pages/domain-management.sf.html")
     case "UpdateBlacklist": executeUpdateBlacklist(&postInfo); return .newPath("/pages/blacklist.sf.html")
@@ -1072,4 +1082,53 @@ fileprivate func executeCreateAdmin(_ postInfo: PostInfo?) {
     }
     
     Log.atNotice?.log("Created new admin account with ID = \(id)")
+}
+
+fileprivate func executeConfirmDeleteAccount(_ postInfo: PostInfo?) -> CommandExecutionResult {
+    
+    guard (postInfo?["ID"]) != nil else {
+        Log.atError?.log("No ID given")
+        return .newPath("/pages/admin-management.sf.html")
+    }
+    
+    return .newPath("/pages/admin-confirm-delete.sf.html")
+}
+
+fileprivate func executeDeleteAccount(_ postInfo: PostInfo?) {
+    
+    guard let name = postInfo?["ID"] else {
+        Log.atError?.log("No ID given")
+        return
+    }
+
+    guard serverAdminDomain.accounts.remove(name: name) else {
+        Log.atError?.log("No account for name \(name) found")
+        return
+    }
+    
+    Log.atNotice?.log("Server Admin Account \(name) removed.")
+}
+
+fileprivate func executeSetNewPassword(_ postInfo: PostInfo?) {
+    
+    guard let name = postInfo?["ID"], !name.isEmpty else {
+        Log.atError?.log("No ID given")
+        return
+    }
+
+    guard let password = postInfo?["Password"], !password.isEmpty else {
+        Log.atError?.log("No new password given for \(name)")
+        return
+    }
+    
+    guard let accountToBeChanged = serverAdminDomain.accounts.getAccountWithoutPassword(for: name) else {
+        Log.atError?.log("No account found for: \(name)")
+        return
+    }
+    
+    if accountToBeChanged.updatePassword(password) {
+        Log.atNotice?.log("Password was changed for: \(name)")
+    } else {
+        Log.atError?.log("Password could not be changed for: \(name)")
+    }
 }

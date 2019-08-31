@@ -2182,7 +2182,7 @@ textarea {
 footer {
   color: #ffdd11; }
 
-.centered, .default-table, .status-table table, .parameter-table, .telemetry-table, .server-blacklist-table, .domain-blacklist-table, .domain-details-table, .domain-telemetry-table, .domain-service-table, .statistics-domains-table, .statistics-clients-table {
+.centered, .centered-flex-column-fill, .default-table, .status-table table, .parameter-table, .telemetry-table, .server-blacklist-table, .domain-blacklist-table, .domain-details-table, .domain-telemetry-table, .domain-service-table, .statistics-domains-table, .statistics-clients-table {
   margin-left: auto;
   margin-right: auto; }
 
@@ -2207,6 +2207,27 @@ footer {
 .table-cell-margins td, .default-table td, .status-table table td, .parameter-table td, .telemetry-table td, .server-blacklist-table td, .domain-blacklist-table td, .domain-details-table td, .domain-telemetry-table td, .domain-service-table td, .statistics-domains-table td, .statistics-clients-table td, .domains-table td, .table-cell-margins th, .default-table th, .status-table table th, .parameter-table th, .telemetry-table th, .server-blacklist-table th, .domain-blacklist-table th, .domain-details-table th, .domain-telemetry-table th, .domain-service-table th, .statistics-domains-table th, .statistics-clients-table th, .domains-table th {
   padding: 7px 14px; }
 
+.flex-row, .flex-row-vcenter, .server-blacklist-create, .domain-blacklist-create, .domains-table div, .statistics-domains-table div, .statistics-clients-table div, .statistics-switch-div, .centered-buttons {
+  display: flex;
+  flex-direction: row; }
+
+.flex-row-vcenter {
+  align-items: center; }
+
+.half-margins-no-padding {
+  padding: 0;
+  margin: 7px 7px; }
+
+.flex-column, .flex-column-hcenter, .centered-flex-column-fill, .center-content, .align-content-left, .align-content-right, .domains-list {
+  display: flex;
+  flex-direction: column; }
+
+.flex-column-hcenter {
+  justify-content: center; }
+
+.centered-flex-column-fill {
+  justify-content: space-between; }
+
 .status-table table input {
   width: 100%; }
 
@@ -2219,26 +2240,18 @@ footer {
   text-align: center; }
 
 .server-blacklist-create, .domain-blacklist-create {
-  display: flex;
-  flex-direction: row;
   justify-content: center; }
   .server-blacklist-create input, .domain-blacklist-create input {
     margin-left: 7px;
     margin-right: 7px; }
 
 .center-content {
-  display: flex;
-  flex-direction: column;
   align-items: center; }
 
 .align-content-left {
-  display: flex;
-  flex-direction: column;
   align-items: flex-end; }
 
 .align-content-right, .domains-list {
-  display: flex;
-  flex-direction: column;
   align-items: flex-start; }
 
 .domains-list {
@@ -2248,8 +2261,6 @@ footer {
 .domains-table {
   margin-top: 14px; }
   .domains-table div {
-    display: flex;
-    flex-direction: row;
     justify-content: space-between;
     align-items: center; }
   .domains-table td, .domains-table p {
@@ -2268,8 +2279,6 @@ footer {
   margin: 1em auto 1em auto; }
 
 .statistics-domains-table div, .statistics-clients-table div {
-  display: flex;
-  flex-direction: row;
   align-items: center;
   justify-content: space-between; }
   .statistics-domains-table div input, .statistics-clients-table div input {
@@ -2280,16 +2289,12 @@ footer {
   text-align: center; }
 
 .statistics-switch-div {
-  display: flex;
-  flex-direction: row;
   justify-content: center; }
   .statistics-switch-div input {
     margin-top: 14px;
     margin-bottom: 14px; }
 
 .centered-buttons {
-  display: flex;
-  flex-direction: row;
   justify-content: center;
   flex-wrap: wrap; }
   .centered-buttons input {

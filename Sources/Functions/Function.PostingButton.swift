@@ -3,7 +3,7 @@
 //  File:       Function.PostingButton.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.2.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,7 +36,8 @@
 //
 // History
 //
-// 1.0.0 Raised to v1.0.0, Removed old change log,
+// 1.2.0 - Allow usage of keyed arguments for value arguments.
+// 1.0.0 - Raised to v1.0.0, Removed old change log
 //
 // =====================================================================================================================
 
@@ -73,8 +74,8 @@ public func postingButton(target: String, title: String, keyValuePairs: Dictiona
 /// _Type of argument_:
 ///    - __target__: link to be invoked when the input (button) is clicked
 ///    - __title__: Title of the input (button)
-///    - __key-N__: The key N to include in a POST request of type x-www-form-urlencoded
-///    - __value-N__: The value for key N to include in a POST request of type x-www-form-urlencoded
+///    - __key-N__: The key N to include in a POST request of type x-www-form-urlencoded.
+///    - __value-N__: The value for key N to include in a POST request of type x-www-form-urlencoded. This may be a keyed argument, see Functions.md and/or the operation evaluateKeyArgument.
 ///
 /// _Other input used_:
 ///    - the css class of the form is `posting-button-form`
@@ -97,6 +98,13 @@ public func function_postingButton(_ args: Functions.Arguments, _ info: inout Fu
     while argIndex < (arr.count - 1) {
         dict[arr[argIndex]] = arr[argIndex + 1]
         argIndex += 1
+    }
+    
+    
+    // Parse for key argument values
+    
+    for (key, value) in dict {
+        dict[key] = evaluateKeyArgument(value, using: info, in: environment)
     }
     
     

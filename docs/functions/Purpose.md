@@ -21,10 +21,10 @@ The Extended-BNF notation of a function call is as follows:
 
 <arguments>             ::= "("[<argument>[{<argument-separator><argument>}]]")"|<json-object>
 <json-object>           ::= "{"<json-code>"}"
-<argument>              ::= <string>|<quoted-string>
+<argument>              ::= <non-quoted-string>|<quoted-string>
 <arguments-separator>   ::= ","
-<string>                ::= {[" "]}<name>{[" "]}
-<quoted-string>         ::= {[" "]}"""{<printable>}"""{[" "]}
+<non-quoted-string>     ::= {[" "]}<string>{[" "]}
+<quoted-string>         ::= {[" "]}"""{<string>}"""{[" "]}
 ~~~~
 
 Examples:
@@ -37,6 +37,27 @@ Note: Only a function that does have a corresponding entry in the registered fun
 
 Function calls must be registered before they can be used. The registration maps a name to a function. It is customary to name functions as follows: `function_nofPageHits()`. During registration this can be mapped as follows: `functions.register(name: "nofPageHits", function: function_nofPageHits)`. After this the function is available as `.nofPageHits()`.
 
-A function can have any number of parameters. The parameters in the function call are passed to the actual swift function as an array of strings  or as a JSON object.
+A function can have any number of parameters. The parameters in the function call are passed to the actual swift function as an array of strings or as a JSON object, which one is used depends on the definition of the function.
 
 The signature of a function is given by `Function.Signature` and can be found in the file `Core.Functions.Swift`
+
+## Arguments
+
+Arguments can be either a String or a QuotedString. Quotes are only necessary if the argument contains special characters (including whitespaces).
+
+Swiftfire makes it easy for functions to support argument key's through a leading character ('$') in the arguments. For this purpose a supporting operation is provided ("evaluateKeyArgument") that will take an argument, decode the source and return the asked for information. Functions can use this operation to support key arguments for any parameter. An example syntax:
+
+    .show($account.name)
+
+More formal, the syntax is as follows:
+
+~~~~
+<key_argument> ::= <dollar-sign><source-name><dot><key>
+
+<dollar-sign> ::= "$"
+<source-name> ::= "postInfo"|"getInfo"|"serviceInfo"|"functionInfo"|"account"
+<dot> ::= "."
+<key> ::= <letter>|<digit>
+~~~~
+
+See the definition of the operation "evaluateKeyArgument" for more on which information is available from which source.

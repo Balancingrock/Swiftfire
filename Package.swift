@@ -13,7 +13,7 @@ let package = Package(
     dependencies: [
         .package(url: "https://github.com/Balancingrock/SwifterLog", from: "2.0.0"),
         .package(url: "https://github.com/Balancingrock/SecureSockets", from: "1.0.0"),
-        .package(url: "https://github.com/Balancingrock/KeyedCache", from: "1.0.0"),
+        .package(url: "https://github.com/Balancingrock/KeyedCache", from: "1.1.0"),
         .package(url: "https://github.com/Balancingrock/BRBON", from: "1.0.0"),
         .package(url: "https://github.com/Balancingrock/Http", from: "1.0.0"),
         .package(url: "https://github.com/Balancingrock/Html", from: "1.0.0")

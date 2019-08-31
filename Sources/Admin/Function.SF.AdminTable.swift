@@ -112,18 +112,31 @@ func function_sf_adminTable(_ args: Functions.Arguments, _ info: inout Functions
     
     // Create a list of domains and their aliases
     
-    var table = Table(klass: "accounts-table", columnTitles: "Account ID")
+    var table = Table(klass: "default-table", columnTitles: ["Account ID", "", ""])
     for accountName in environment.domain.accounts {
 
         if accountName != account.name {
-            table.append(Tr(Td(
-                Div( 
-                    P(accountName),
-                    postingButton(target: "/serveradmin/sfcommand/DeleteAccount", title: "Delete", keyValuePairs: ["ID":accountName])
+            table.append(Tr(
+                Td(
+                    P(klass: "half-margins-no-padding", accountName)
+                ),
+                Td(
+                    postingButton(target: "/serveradmin/sfcommand/ConfirmDeleteAccount", title: "Delete", keyValuePairs: ["ID":accountName])
+                ),
+                Td(
+                    postingButtonedInput(target: "/serveradmin/sfcommand/SetNewPassword", inputName: "Password", inputValue: "", buttonTitle: "Set New Password", keyValuePairs: ["ID": accountName])
                 )
-            )))
+            ))
         } else {
-            table.append(Tr(Td(Div(P(accountName)))))
+            table.append(Tr(
+                Td(
+                    P(klass: "half-margins-no-padding", accountName)
+                ),
+                Td(),
+                Td(
+                    postingButtonedInput(target: "/serveradmin/sfcommand/SetNewPassword", inputName: "Password", inputValue: "", buttonTitle: "Set New Password", keyValuePairs: ["ID": accountName])
+                )
+            ))
         }
     }
     

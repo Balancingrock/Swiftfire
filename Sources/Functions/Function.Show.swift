@@ -1,6 +1,6 @@
 // =====================================================================================================================
 //
-//  File:       Functions.Registration.swift
+//  File:       Function.Show.swift
 //  Project:    Swiftfire
 //
 //  Version:    1.2.0
@@ -10,7 +10,7 @@
 //  Website:    http://swiftfire.nl/
 //  Git:        https://github.com/Balancingrock/Swiftfire
 //
-//  Copyright:  (c) 2017-2019 Marinus van der Lugt, All rights reserved.
+//  Copyright:  (c) 2019 Marinus van der Lugt, All rights reserved.
 //
 //  License:    Use or redistribute this code any way you like with the following two provision:
 //
@@ -36,10 +36,7 @@
 //
 // History
 //
-// 1.2.0 - Added function 'show'
-// 1.0.1 - Documentation update
-//       - Replaced name definitions with direct text
-// 1.0.0 - Raised to v1.0.0, Removed old change log,
+// 1.2.0 - Initial version
 //
 // =====================================================================================================================
 
@@ -48,20 +45,21 @@ import Foundation
 import Core
 
 
-// ==================================================
-// Add to the next function to register new functions
-// ==================================================
-// The sequence is not important
-
-/// Registers the functions availble for html/css/? code injection
+/// Returns the value of the parameter
 ///
-/// Update this operation when new functions have been implemented.
+/// __Webpage Use__:
+///
+/// _Signature_: .show(key)
+///
+/// _Number of arguments_: 1
+///
+/// _Type of argument_: String
+///
+/// _Returns_: The value in postInfo for the key. If the key does not exist, it returns ***error***.
 
-public func registerFunctions() {
-    functions.register(name: "timestamp", function: function_timestamp)
-    functions.register(name: "postingLink", function: function_postingLink)
-    functions.register(name: "postingButton", function: function_postingButton)
-    functions.register(name: "postingButtonedInput", function: function_postingButtonedInput)
-    functions.register(name: "nofPageHits", function: function_nofPageHits)
-    functions.register(name: "show", function: function_show)
+public func function_show(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: inout Functions.Environment) -> Data? {
+    
+    guard case .arrayOfString(let arr) = args, arr.count == 1 else { return "***error***".data(using: .utf8) }
+
+    return evaluateKeyArgument(arr[0], using: info, in: environment).data(using: .utf8)
 }

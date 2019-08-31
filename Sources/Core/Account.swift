@@ -3,7 +3,7 @@
 //  File:       Account.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.2.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,7 +36,8 @@
 //
 // History
 //
-// 1.0.0 Raised to v1.0.0, Removed old change log, 
+// 1.2.0 - Changed the way the account directory is handled
+// 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 
@@ -144,7 +145,7 @@ public final class Account: EstimatedMemoryConsumption {
     ///   - id: A unique integer
     ///   - name: String, should be unique for this account.
     ///   - password: An integer that must be matched to allow somebody to use this account.
-    ///   - accountDir: A URL pointing to the directory for the account.
+    ///   - accountDir: A URL pointing to the directory for the account. The directory will be created if it does not exist. No attempt will be made to initialize the account from the content of the directory (if any).
     
     init?(id: Int, name: String, password: String, accountDir: URL) {
         
@@ -153,6 +154,13 @@ public final class Account: EstimatedMemoryConsumption {
         self.names.insert(name, at: 0)
         self.dir = accountDir
         
+        do {
+            try FileManager.default.createDirectory(atPath: dir.path, withIntermediateDirectories: true, attributes: nil)
+        } catch let error {
+            Log.atError?.log("Cannot create account directory for \(name) at \(dir.path) with message: \(error.localizedDescription)")
+            return nil
+        }
+
         let salt = createSalt()
         guard let digest = createDigest(for: password, with: salt) else { return nil }
         
@@ -171,6 +179,9 @@ public final class Account: EstimatedMemoryConsumption {
     init?(withContentOfDirectory dir: URL) {
         
         self.dir = dir
+        
+        var isDir: ObjCBool = false
+        guard FileManager.default.fileExists(atPath: dir.path, isDirectory: &isDir), isDir.boolValue else { return nil }
         
         let file = dir.appendingPathComponent("account").appendingPathExtension("json")
         
@@ -238,9 +249,11 @@ public final class Account: EstimatedMemoryConsumption {
     
     func loadInfo() {
         let file = dir.appendingPathComponent("info").appendingPathExtension("brbon")
-        info = ItemManager.init(from: file)
-        if info == nil {
-            Log.atError?.log("Failed to load info for account \(name), file = \(file.path)")
+        if FileManager.default.isReadableFile(atPath: file.path) {
+            info = ItemManager.init(from: file)
+            if info == nil {
+                Log.atError?.log("Failed to load info for account \(name), file = \(file.path)")
+            }
         }
     }
 }
@@ -258,7 +271,6 @@ extension Account: CustomStringConvertible {
         str += " Id: \(id)\n"
         str += " Uuid: \(uuid)\n"
         str += " Name: \(name)\n"
-        //str += " fileUrl: \(fileUrl.path)\n"
         str += " Digest: \(String(describing: digest))"
         if serverParameters.debugMode.value {
             str += "\n Salt: \(String(describing: salt))\n"

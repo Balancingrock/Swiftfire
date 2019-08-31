@@ -15,12 +15,12 @@
 	<meta name="msapplication-config" content="/serveradmin/icons/browserconfig.xml">
 	<meta name="theme-color" content="#ffffff">
 
-	<title>Confirm Server Admin Logout</title>
+	<title>Confirm Server Admin Deletion</title>
 
 	<meta name="description" content="Swiftfire Server Admin">
 
 	<link rel="stylesheet" href="/serveradmin/assets/main.css">
-	<link rel="canonical" href="/serveradmin/logout.sf.html">
+	<link rel="canonical" href="/serveradmin/pages/admin-confirm-delete.sf.html">
 	<link rel="alternate" type="application/rss+xml" title="Swiftfire Server Admin" href="/serveradmin/feed.xml">
 </head>
 <!-- end of include head.html -->
@@ -68,7 +68,7 @@
 		</div>
 	</div>
 	<div class="item-separator"><p><!-- empty but necessary --></p></div>
-	<div class="item isActiveSelection">
+	<div class="item">
 		<input type="checkbox" id="Admin-checkbox">
 		<div class="title">
 			<label class="symbol" for="Admin-checkbox">
@@ -92,7 +92,7 @@
 				</div>
 			</div>
 			<div class="subitem-separator"><p></p></div>
-			<div class="subitem isActiveSelection">
+			<div class="subitem">
 				<input type="checkbox" id="Logout-checkbox">
 				<div class="title">
 					<label class="symbol" for="Logout-checkbox">
@@ -170,13 +170,24 @@
 <!-- Start of main content -->
 <article class="page" itemscope itemtype="http://schema.org/Article">
 	<header class="page-header">
-		<h1 class="page-title" itemprop="name headline">Confirm Server Admin Logout</h1>
+		<h1 class="page-title" itemprop="name headline">Confirm Server Admin Deletion</h1>
 		<p class="page-meta"></p>
 	</header>
 	<div class="page-content" itemprop="articleBody">
 <!-- Page content -->
-   <div class="centered-buttons" style="margin-top:1em">
-.postingButton("/serveradmin/sfcommand/Logout", Logout, "", "")
+   <div class="center-content">
+	<div class="flex-column-hcenter">
+		<div class="center-content" style="margin: 50px 0px 0px 0px;">
+			Confirm removal of admin account:
+		</div>
+		<div class="center-content" style="margin: 30px 0px 40px 0px; background-color: yellow;">
+			.show($postInfo.ID)
+		</div>
+		<div class="flex-row-vcenter" style="justify-content: space-between;">
+			.postingButton("/serveradmin/sfcommand/DeleteAccount", "Confirmed", ID, $postInfo.ID)
+			.postingButton("/serveradmin/pages/admin-management.sf.html", Cancel, "", "")
+		</div>
+	</div>
 </div>
 
 <!-- End of page content -->
