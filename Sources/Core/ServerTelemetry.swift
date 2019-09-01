@@ -3,7 +3,7 @@
 //  File:       Telemetry.swift
 //  Project:    Swiftfire
 //
-private let version = "1.2.0b"
+private let version = "1.2.0b2"
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl

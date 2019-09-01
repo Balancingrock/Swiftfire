@@ -37,6 +37,7 @@
 // History
 //
 // 1.2.0 - Changed the way the account directory is handled
+//       - Added the isAdmin member
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
@@ -139,6 +140,11 @@ public final class Account: EstimatedMemoryConsumption {
     public var info: ItemManager!
     
     
+    /// Controls access to admin features of a domain. Note that the serveradmin is its own group, not covered by this member.
+    
+    public var isAdmin: Bool = false
+    
+    
     /// Create a new instance
     ///
     /// - Paramaters:
@@ -187,6 +193,9 @@ public final class Account: EstimatedMemoryConsumption {
         
         guard let json = ((try? VJson.parse(file: file)) as VJson??) else { return nil }
         
+        
+        // Initial members
+        
         guard let jjnames = (json|"Names")?.arrayValue else { return nil }
         guard jjnames.count > 0 else { return nil }
         var jnames: Array<String> = []
@@ -198,12 +207,20 @@ public final class Account: EstimatedMemoryConsumption {
         guard let juuid = (json|"Uuid")?.stringValue else { return nil }
         guard let jdigest = (json|"Digest")?.stringValue else { return nil }
         guard let jsalt = (json|"Salt")?.stringValue else { return nil }
-        
+
         self.names = jnames
         self.id = jid
         self.uuid = juuid
         self.digest = jdigest
         self.salt = jsalt
+
+        
+        // Members added later (with default values)
+        
+        if let j = (json|"IsAdmin")?.boolValue { self.isAdmin = j }
+        
+        
+        // The info part
         
         loadInfo()
     }
@@ -220,6 +237,7 @@ public final class Account: EstimatedMemoryConsumption {
         json["Uuid"] &= uuid
         json["Digest"] &= digest
         json["Salt"] &= salt
+        json["IsAdmin"] &= isAdmin
         
         return json
     }

@@ -3,7 +3,7 @@
 //  File:       Domain.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.1.0
+//  Version:    1.2.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.2.0 - Added admin keyword
 // 1.1.0 #3 Fixed loading & storing of domain service names
 //       #6 Fixed setting, load & store of phpPath
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
@@ -293,6 +294,15 @@ public final class Domain {
     /// The directory used when processing PHP files.
     
     lazy var phpDir: URL? = { Urls.domainPhpDir(for: name) }()
+    
+    
+    /// This keyword is used to access the setup default webpage
+    ///
+    /// Access the setup page like: http://domain-name.domain-extension/<setupKeyword>
+    ///
+    /// The setupKeyword is used by Service.domainSetup. To permanently disable this, remove this service form the service stack for this domain. Alternatively change the default value to something more cryptic to increase the site's security through obfuscation.
+    
+    public var setupKeyword: String? = "setup"
     
     
     /// Create a new domain object.
