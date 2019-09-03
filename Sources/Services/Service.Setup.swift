@@ -52,7 +52,7 @@ import Functions
 func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: inout Services.Info, _ response: inout Response) -> Services.Result {
     
     func domainCommand(_ cmd: String) -> String {
-        return "\(domain.webroot)/\(domain.setupKeyword!)/\(cmd)"
+        return "\(domain.setupKeyword!)/command/\(cmd)"
     }
     
     func loginDomainAdminPage() {
@@ -72,11 +72,13 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
             <body>
                 <div style="display:flex; justify-content:center; margin-bottom:50px;">
                     <div style="margin-left:auto; margin-right:auto;">
-                        <p style="margin-bottom:0px">ID:</p>
-                        <input type="text" name="ID" value="name" autofocus><br>
-                        <p style="margin-bottom:0px">Password:</p>
-                        <input type="password" name="Password" value="****"><br><br>
-                        <input style="width:100%" type="submit" value="Login">
+                        <form action="/setup" method="post">
+                            <p style="margin-bottom:0px">ID:</p>
+                            <input type="text" name="ID" value="name" autofocus><br>
+                            <p style="margin-bottom:0px">Password:</p>
+                            <input type="password" name="Password" value="****"><br><br>
+                            <input type="submit" value="Login">
+                        </form>
                     </div>
                 </div>
             </body>
@@ -94,15 +96,16 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
             
             let table = """
                 <table>
-                    <th>
-                        <td>Parameter</td><td>Value</td><td>Description</td>
-                    </th>
+                    <tr>
+                        <th>Parameter</th><th>Value</th><th>Description</th>
+                    </tr>
                     <tr>
                         <td>Enabled</td>
                         <td>
-                            <form method="post" action="\(domainCommand("UpdateDomain"))">
-                                <input type="text" name="enabled" value="\(domain.enabled)">
-                                <input type="submit" name="UpdateN" value="UpdateV">
+                            <form method="post" action="\(domainCommand("UpdateParameter"))">
+                                <input type="hidden" name="Parameter" value="enabled">
+                                <input type="text" name="Value" value="\(domain.enabled)">
+                                <input type="submit" value="Update">
                             </form>
                         </td>
                         <td>The domain is enabled when set to 'true', disabled otherwise</td>
@@ -110,8 +113,9 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
                     <tr>
                         <td>Access Log</td>
                         <td>
-                            <form method="post" action="\(domainCommand("UpdateDomain"))">
-                                <input type="text" name="accessLogEnabled" value="\(domain.accessLogEnabled)">
+                            <form method="post" action="\(domainCommand("UpdateParameter"))">
+                                <input type="hidden" name="Parameter" value="accessLogEnabled">
+                                <input type="text" name="Value" value="\(domain.accessLogEnabled)">
                                 <input type="submit" value="Update">
                             </form>
                         </td>
@@ -120,8 +124,9 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
                     <tr>
                         <td>404 Log</td>
                         <td>
-                            <form method="post" action="\(domainCommand("UpdateDomain"))">
-                                <input type="text" name="four04LogEnabled" value="\(domain.four04LogEnabled)">
+                            <form method="post" action="\(domainCommand("UpdateParameter"))">
+                                <input type="hidden" name="Parameter" value="four04LogEnabled">
+                                <input type="text" name="Value" value="\(domain.four04LogEnabled)">
                                 <input type="submit" value="Update">
                             </form>
                         </td>
@@ -130,8 +135,9 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
                     <tr>
                         <td>Session Log</td>
                         <td>
-                            <form method="post" action="\(domainCommand("UpdateDomain"))">
-                                <input type="text" name="sessionLogEnabled" value="\(domain.sessionLogEnabled)">
+                            <form method="post" action="\(domainCommand("UpdateParameter"))">
+                                <input type="hidden" name="Parameter" value="sessionLogEnabled">
+                                <input type="text" name="Value" value="\(domain.sessionLogEnabled)">
                                 <input type="submit" value="Update">
                             </form>
                         </td>
@@ -140,8 +146,9 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
                     <tr>
                         <td>Session Timeout</td>
                         <td>
-                            <form method="post" action="\(domainCommand("UpdateDomain"))">
-                                <input type="text" name="sessionTimeout" value="\(domain.sessionTimeout)">
+                            <form method="post" action="\(domainCommand("UpdateParameter"))">
+                                <input type="hidden" name="Parameter" value="sessionTimeout">
+                                <input type="text" name="Value" value="\(domain.sessionTimeout)">
                                 <input type="submit" value="Update">
                             </form>
                         </td>
@@ -150,8 +157,9 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
                     <tr>
                         <td>PHP Map Index</td>
                         <td>
-                            <form method="post" action="\(domainCommand("UpdateDomain"))">
-                                <input type="text" name="phpMapIndex" value="\(domain.phpMapIndex)">
+                            <form method="post" action="\(domainCommand("UpdateParameter"))">
+                                <input type="hidden" name="Parameter" value="phpMapIndex">
+                                <input type="text" name="Value" value="\(domain.phpMapIndex)">
                                 <input type="submit" value="Update">
                             </form>
                         </td>
@@ -160,8 +168,9 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
                     <tr>
                         <td>PHP Map All</td>
                         <td>
-                            <form method="post" action="\(domainCommand("UpdateDomain"))">
-                                <input type="text" name="phpMapAll" value="\(domain.phpMapAll)">
+                            <form method="post" action="\(domainCommand("UpdateParameter"))">
+                                <input type="hidden" name="Parameter" value="phpMapAll">
+                                <input type="text" name="Value" value="\(domain.phpMapAll)">
                                 <input type="submit" value="Update">
                             </form>
                         </td>
@@ -170,8 +179,9 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
                     <tr>
                         <td>PHP Timeout</td>
                         <td>
-                            <form method="post" action="\(domainCommand("UpdateDomain"))">
-                                <input type="text" name="phpTimeout" value="\(domain.phpTimeout)">
+                            <form method="post" action="\(domainCommand("UpdateParameter"))">
+                                <input type="hidden" name="Parameter" value="phpTimeout">
+                                <input type="text" name="Value" value="\(domain.phpTimeout)">
                                 <input type="submit" value="Update">
                             </form>
                         </td>
@@ -180,8 +190,9 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
                     <tr>
                         <td>Foreward URL</td>
                         <td>
-                            <form method="post" action="\(domainCommand("UpdateDomain"))">
-                                <input type="text" name="forwardUrl" value="\(domain.forwardUrl)">
+                            <form method="post" action="\(domainCommand("UpdateParameter"))">
+                                <input type="hidden" name="Parameter" value="forwardUrl">
+                                <input type="text" name="Value" value="\(domain.forwardUrl)">
                                 <input type="submit" value="Update">
                             </form>
                         </td>
@@ -197,9 +208,9 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
             
             var table: String = """
                 <table>
-                    <th>
-                        <td>Name</td><td>Value</td><td>Description</td>
-                    </th>
+                    <tr>
+                        <th>Name</th><th>Value</th><th>Description</th>
+                    </tr>
             """
             
             domain.telemetry.all.forEach() {
@@ -221,7 +232,7 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
             
             var table: String = """
                 <table>
-                    <th><td>Address</td><td>Action</td><td></td></th>
+                    <tr><th>Address</th><th>Action</th><th></th></tr>
             """
             
             domain.blacklist.list.forEach { (address, action) in
@@ -230,18 +241,26 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
                     <tr>
                         <td>\(address)</td>
                         <td>
-                            <form method="post" action="/\(domain.webroot)/command/UpdateBlacklist">
-                                <input type="radio" name="\(address)" value="close" checked="\(action == .closeConnection)">
-                                <p> Close Connection, <p>
-                                <input type="radio" name="\(address)" value="503" checked="\(action == .send503ServiceUnavailable)">
-                                <p> 503 Service Unavailable, <p>
-                                <input type="radio" name="\(address)" value="401" checked="\(action == .send401Unauthorized)">
-                                <p> 401 Unauthorized </p>
-                                <input type="submit" title="Update">
+                            <form method="post" action="/\(domainCommand("UpdateBlacklist"))>
+                                <div style="display:flex; flex-direction:column justify-content:start">
+                                    <div style="display:flex; flex-direction:row align-items:center">
+                                        <input type="radio" name="\(address)" value="close" checked="\(action == .closeConnection)">
+                                        <span> Close Connection, <span>
+                                    </div>
+                                    <div style="display:flex; flex-direction:row align-items:center">
+                                        <input type="radio" name="\(address)" value="503" checked="\(action == .send503ServiceUnavailable)">
+                                        <span> 503 Service Unavailable, <span>
+                                    </div>
+                                    <div style="display:flex; flex-direction:row align-items:center">
+                                        <input type="radio" name="\(address)" value="401" checked="\(action == .send401Unauthorized)">
+                                        <span> 401 Unauthorized </span>
+                                    </div>
+                                    <input type="submit" title="Update">
+                                </div>
                             </form>
                         </td>
                         <td>
-                            <form method="post" action="/\(domain.webroot)/command/RemoveFromBlacklist">
+                            <form method="post" action="/\(domainCommand("RemoveFromBlacklist"))>
                                 <input type="submit" name="\(address)" value="Remove">
                             </form>
                         </td>
@@ -256,19 +275,22 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
             """
             
             let createEntry: String = """
-                <form method="post" action="/\(domain.webroot)/command/AddToBlacklist">
-                    <div>
-                        <p>Address:</p>
-                        <input type="text" name="newEntry", value="">
-                    </div>
-                    <div>
-                        <input type="radio" name="action" value="close" checked="true"><p> Close Connection</p><br>
-                        <input type="radio" name="action" value="503" checked="false"><p> 503 Services Unavailable</p><br>
-                        <input type="radio" name="action" value="401" checked="false"><p> 401 Unauhorized</p><br>
-                    </div>
-                    <div>
-                        <input type="submit" value="Add to Blacklist">
-                    </div>
+                <h3>Add address to blacklist</h3>
+                <form method="post" action="/\(domainCommand("AddToBlacklist"))>
+                    <table>
+                        <tr>
+                            <td>Address:</td>
+                            <td><input type="text" name="newEntry", value=""></td>
+                            <td>
+                                <div style="display:flex; flex-direction:column; justify-content:start;">
+                                    <div><input type="radio" name="action" value="close" checked="true"><span> Close Connection</span></div>
+                                    <div><input type="radio" name="action" value="503" checked="false"><span> 503 Services Unavailable</span></div>
+                                    <div><input type="radio" name="action" value="401" checked="false"><span> 401 Unauhorized</span></div>
+                                </div>
+                            </td>
+                            <td><input type="submit" value="Add to Blacklist"></td>
+                        </tr>
+                    </table>
                 </form>
             """
             
@@ -289,43 +311,49 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
             var tableRows: Array<TableRow> = []
             
             var index: Int = 0
-            for service in domain.serviceNames {
-                tableRows.append(TableRow(rowIndex: index, name: service, usedByDomain: true))
+            for service in domain.services {
+                tableRows.append(TableRow(rowIndex: index, name: service.name, usedByDomain: true))
                 index += 1
             }
             
             OUTER: for service in services.registered {
                 for row in tableRows {
-                    if row.name == service.key { continue OUTER }
+                    if row.name == service.value.name { continue OUTER }
                 }
-                tableRows.append(TableRow(rowIndex: tableRows.count, name: service.key, usedByDomain: false))
+                tableRows.append(TableRow(rowIndex: tableRows.count, name: service.value.name, usedByDomain: false))
             }
             
             
             // Create the table
             
-            let hidden = Input.hidden(name: "DomainName", value: domain.name)
-            var table = Table(klass: ["domain-service-table"], columnTitles: "Index", "Seq.", "Service Name", "Used")
+            var table: String = """
+                <form method="post" target="\(domainCommand("UpdateServices"))">
+                    <table>
+                        <tr>
+                            <th>Index</th><th>Seq.</th><th>Service Name</th><th>Used</th>
+                        </tr>
+            """
             
             for row in tableRows {
                 
-                let seqName = "seqName\(row.rowIndex)"
-                let nameName = "nameName\(row.rowIndex)"
-                let usedName = "usedName\(row.rowIndex)"
-                
-                let serviceNameHidden = Input.hidden(name: nameName, value: row.name)
-                let sequenceEntry = Input.text(klass: ["seq-column"], name: seqName, value: row.rowIndex.description)
-                var serviceName = Input.text(klass: ["name-column"], name: nameName, value: row.name)
-                serviceName.disabled = true
-                let usedCheckbox = Input.checkbox(klass: ["used-column"], name: usedName, value: usedName, checked: row.usedByDomain)
-                
-                table.appendRow(Td(row.rowIndex.description), Td(sequenceEntry), Td(serviceName, serviceNameHidden), Td(usedCheckbox))
+                let entry: String = """
+                    <tr>
+                        <td>\(row.rowIndex)</td>
+                        <td style="width: auto"><input type="text" name="seqName\(row.rowIndex)" value="\(row.rowIndex)"></td>
+                        <td><input type="text" name="nameName\(row.rowIndex)" value="\(row.name)" disabled></td>
+                        <td><input type="checkbox" name="usedName\(row.rowIndex)" value="usedName\(row.rowIndex)" \(row.usedByDomain ? "checked" : "")></td>
+                    </tr>
+                """
+                table += entry
             }
             
-            let submitButton = Input.submit(klass: "service-submit-form", name: "Submit", title: "Update Services")
-            let form = Form(method: .post, action: "/serveradmin/sfcommand/UpdateDomainServices", hidden, table, submitButton)
-
-            return form.html
+            table += """
+                    </table>
+                    <input type="submit" name="Submit" value="Update Services">
+                </form>
+            """
+            
+            return table
         }
         
         let body: String = """
@@ -349,6 +377,8 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
                             \(domainTelemetryTable())
                             <h2>Blacklist</h2>
                             \(domainBlacklistTable())
+                            <h2>Domain Services</h2>
+                            \(domainServicesTable())
                         </div>
                     </div>
                 </body>
@@ -378,7 +408,7 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
     
     let urlComponents = urlstr.split(separator: "/")
     
-    guard urlComponents.count > 0 && urlComponents.count <= 2 else { return .next }
+    guard urlComponents.count > 0 && urlComponents.count <= 3 else { return .next }
     
     
     // If the first component contains '<setupKeyword>' then continue.
@@ -477,11 +507,35 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
     // Try to execute a command if it is given
     // =======================================
     
-    if urlComponents.count == 2 {
+    if urlComponents.count > 1 {
         switch urlComponents[1] {
+        case "command":
+        
+            if urlComponents.count == 3 {
+                
+                if let postInfo = info[.postInfoKey] as? PostInfo {
+
+                    switch urlComponents[2] {
+                    
+                    case "UpdateParameter": executeUpdateParameter(postInfo, domain)
+                    case "UpdateBlacklist": break
+                    case "RemoveFromBlacklist": break
+                    case "AddToBlacklist": break
+                    case "UpdateServices": break
+
+                    default:
+                        Log.atError?.log("No command with name \(urlComponents[2])")
+                        break
+                    }
+                } else {
+                    Log.atError?.log("PostInfo not present")
+                }
+            } else {
+                Log.atError?.log("Too many parts in command")
+            }
+            
         default:
-            Log.atError?.log("")
-            break
+            Log.atWarning?.log("No option with name \(urlComponents[1])")
         }
     }
     
@@ -492,4 +546,47 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
     return .next
 }
     
+fileprivate func executeUpdateParameter(_ postInfo: PostInfo, _ domain: Domain) {
+    
+    guard let parameter = postInfo["Parameter"] else {
+        Log.atError?.log("Missing parameter name in postInfo")
+        return
+    }
+    
+    guard let value = postInfo["Value"] else {
+        Log.atError?.log("Missing parameter value in postInfo")
+        return
+    }
+
+    
+    switch parameter {
+    case "forewardurl": domain.forwardUrl = value
+    case "enabled": domain.enabled = Bool(lettersOrDigits: value) ?? domain.enabled
+    case "accesslogenabled": domain.accessLogEnabled = Bool(lettersOrDigits: value) ?? domain.accessLogEnabled
+    case "four04logenabled": domain.four04LogEnabled = Bool(lettersOrDigits: value) ?? domain.four04LogEnabled
+    case "sessionlogenabled": domain.sessionLogEnabled = Bool(lettersOrDigits: value) ?? domain.sessionLogEnabled
+    case "phpmapindex":
+        if domain.phpPath != nil {
+            domain.phpMapIndex = Bool(lettersOrDigits: value) ?? domain.phpMapIndex
+        }
+    case "phpmapall":
+        if domain.phpPath != nil {
+            if Bool(lettersOrDigits: value) ?? domain.phpMapAll {
+                domain.phpMapAll = true
+                domain.phpMapIndex = true
+            } else {
+                domain.phpMapAll = false
+            }
+        }
+    case "phptimeout":
+        if domain.phpPath != nil {
+            domain.phpTimeout = Int(value) ?? domain.phpTimeout
+        }
+    case "sessiontimeout": domain.sessionTimeout = Int(value) ?? domain.sessionTimeout
+    default:
+        Log.atError?.log("Unknown key '\(parameter)' with value '\(value)'")
+    }
+    
+    domain.storeSetup()
+}
 

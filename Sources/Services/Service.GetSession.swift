@@ -66,7 +66,10 @@ func service_getSession(_ request: Request, _ connection: SFConnection, _ domain
     
     // Check if session support is enabled
     
-    if domain.sessionTimeout < 1 { return .next }
+    if domain.sessionTimeout < 1 {
+        Log.atDebug?.log("Sessiontimeout set to zero", id: connection.logId)
+        return .next
+    }
     
     
     // Find all session cookies (there should be only 1)

@@ -142,7 +142,13 @@ public final class Account: EstimatedMemoryConsumption {
     
     /// Controls access to admin features of a domain. Note that the serveradmin is its own group, not covered by this member.
     
-    public var isAdmin: Bool = false
+    public var isAdmin: Bool = false {
+        didSet {
+            if let error = store() {
+                Log.atError?.log("Failed to save account update\n\n\(self),\n\n Error message = \(error)\n")
+            }
+        }
+    }
     
     
     /// Create a new instance
@@ -174,7 +180,7 @@ public final class Account: EstimatedMemoryConsumption {
         self.digest = digest
         
         if let error = store() {
-            Log.atError?.log("Cannot save account\n\n\(self),\n\n Error message = \(error)\n", type: "Account")
+            Log.atError?.log("Cannot save account\n\n\(self),\n\n Error message = \(error)\n")
             return nil
         }
     }
@@ -289,6 +295,7 @@ extension Account: CustomStringConvertible {
         str += " Id: \(id)\n"
         str += " Uuid: \(uuid)\n"
         str += " Name: \(name)\n"
+        str += " isAdmin: \(isAdmin)\n"
         str += " Digest: \(String(describing: digest))"
         if serverParameters.debugMode.value {
             str += "\n Salt: \(String(describing: salt))\n"

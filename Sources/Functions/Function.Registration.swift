@@ -36,7 +36,7 @@
 //
 // History
 //
-// 1.2.0 - Added function 'show'
+// 1.2.0 - Added function 'show' and 'assign'
 // 1.0.1 - Documentation update
 //       - Replaced name definitions with direct text
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
@@ -64,4 +64,5 @@ public func registerFunctions() {
     functions.register(name: "postingButtonedInput", function: function_postingButtonedInput)
     functions.register(name: "nofPageHits", function: function_nofPageHits)
     functions.register(name: "show", function: function_show)
+    functions.register(name: "assign", function: function_assign)
 }

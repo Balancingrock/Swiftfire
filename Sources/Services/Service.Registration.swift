@@ -104,6 +104,11 @@ public let serviceName_TransferResponse = "Transfer Response"
 public let serviceName_RestartSessionTimeout = "Restart Session Timeout"
 
 
+/// The name by which the service_setup is known.
+
+public let serviceName_Setup = "Setup"
+
+
 // =================================================
 // Add to the next function to register new services
 // =================================================
@@ -126,5 +131,6 @@ public func registerServices() {
     services.register(name: serviceName_WaitUntilBodyComplete, service: service_waitUntilBodyComplete)
     services.register(name: serviceName_TransferResponse, service: service_transferResponse)
     services.register(name: serviceName_RestartSessionTimeout, service: service_restartSessionTimeout)
+    services.register(name: serviceName_Setup, service: service_setup)
 }
 

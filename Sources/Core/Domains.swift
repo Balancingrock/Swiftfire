@@ -3,7 +3,7 @@
 //  File:       Domains.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.1.0
+//  Version:    1.2.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,8 @@
 //
 // History
 //
+// 1.2.0 - Fixed typo in error message
+//       - When loading domains&aliases, now removes domains that have no associated directory.
 // 1.1.0 #3: Fixed
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
@@ -90,7 +92,7 @@ public final class Domains {
         var isDir: ObjCBool = false
         guard FileManager.default.fileExists(atPath: url.path, isDirectory: &isDir) else {
             if isDir.boolValue {
-                Log.atEmergency?.log("Domains and aliases file is nto a file but a directory \(url.path)")
+                Log.atEmergency?.log("Domains and aliases file is not a file but a directory \(url.path)")
                 return false
             } else {
                 Log.atNotice?.log("No domains and aliases file exists at \(url.path)")
@@ -132,20 +134,35 @@ public final class Domains {
             
             var domain: Domain? = domains[name]
             if domain == nil {
-                guard let newDomain = Domain(name) else {
-                    Log.atEmergency?.log("Cannot create/load domain with name \(name)")
-                    return false
+                
+                let domainUrl = Urls.domainsDir!.appendingPathComponent(name)
+                
+                var isDir: ObjCBool = false
+                if FileManager.default.fileExists(atPath: domainUrl.path, isDirectory: &isDir) {
+                
+                    if isDir.boolValue {
+
+                        guard let newDomain = Domain(name) else {
+                            Log.atEmergency?.log("Cannot create/load domain with name \(name)")
+                            return false
+                        }
+                        
+                        domains[name] = newDomain
+                        domain = newDomain
+                        
+                    } else {
+                        Log.atError?.log("No directory for \(name) found")
+                    }
+
+                } else {
+                    Log.atError?.log("No directory for \(name) found")
                 }
-                domains[name] = newDomain
-                domain = newDomain
             }
             
             
             // Get alias and point it to the domain
             
-            let alias = item["alias"].stringValue ?? ""
-            
-            if !alias.isEmpty && (alias != name) {
+            if let domain = domain, let alias = item["alias"].stringValue, !alias.isEmpty, alias != name {
                 domains[alias] = domain
             }
         }

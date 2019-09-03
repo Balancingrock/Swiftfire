@@ -15,7 +15,7 @@
 	<meta name="msapplication-config" content="/serveradmin/icons/browserconfig.xml">
 	<meta name="theme-color" content="#ffffff">
 
-	<title>Domain - .sf-domainDetail(name)</title>
+	<title>Domain - .show($postInfo.DomainName)</title>
 
 	<meta name="description" content="Swiftfire Server Admin">
 
@@ -74,8 +74,7 @@
 			<label class="symbol" for="Admin-checkbox">
 				<p class="code"><!-- will be filled by disclosure indicator --></p>
 			</label>
-			<div class="text">
-				<a href="/serveradmin/pages/admin-management.sf.html"><p>Admin</p></a>
+			<div class="text"><a href="/serveradmin/pages/admin-management.sf.html"><p>Admin</p></a>
 			</div>
 		</div>
 		<div class="dropdown">
@@ -86,9 +85,7 @@
 					<label class="symbol" for="Management-checkbox">
 						<p></p>
 					</label>
-					<div class="text">
-						<a href="/serveradmin/pages/admin-management.sf.html"><p>Management</p></a>
-					</div>
+					<div class="text"><a href="/serveradmin/pages/admin-management.sf.html"><p>Management</p></a></div>
 				</div>
 			</div>
 			<div class="subitem-separator"><p></p></div>
@@ -98,9 +95,7 @@
 					<label class="symbol" for="Logout-checkbox">
 						<p></p>
 					</label>
-					<div class="text">
-						<a href="/serveradmin/logout.sf.html"><p>Logout</p></a>
-					</div>
+					<div class="text"><a href="/serveradmin/logout.sf.html"><p>Logout</p></a></div>
 				</div>
 			</div>
 			<div class="subitem-separator"><p></p></div>
@@ -110,9 +105,7 @@
 					<label class="symbol" for="Login-checkbox">
 						<p></p>
 					</label>
-					<div class="text">
-						<a href="/serveradmin/login.sf.html"><p>Login</p></a>
-					</div>
+					<div class="text"><a href="/serveradmin/login.sf.html"><p>Login</p></a></div>
 				</div>
 			</div>
 		</div>
@@ -124,8 +117,7 @@
 			<label class="symbol" for="Parameters-checkbox">
 				<p></p>
 			</label>
-			<div class="text">
-				<a href="/serveradmin/pages/parameters.sf.html"><p>Parameters</p></a>
+			<div class="text"><a href="/serveradmin/pages/parameters.sf.html"><p>Parameters</p></a>
 			</div>
 		</div>
 	</div>
@@ -136,8 +128,7 @@
 			<label class="symbol" for="Telemetry-checkbox">
 				<p></p>
 			</label>
-			<div class="text">
-				<a href="/serveradmin/pages/telemetry.sf.html"><p>Telemetry</p></a>
+			<div class="text"><a href="/serveradmin/pages/telemetry.sf.html"><p>Telemetry</p></a>
 			</div>
 		</div>
 	</div>
@@ -148,8 +139,7 @@
 			<label class="symbol" for="Blacklist-checkbox">
 				<p></p>
 			</label>
-			<div class="text">
-				<a href="/serveradmin/pages/blacklist.sf.html"><p>Blacklist</p></a>
+			<div class="text"><a href="/serveradmin/pages/blacklist.sf.html"><p>Blacklist</p></a>
 			</div>
 		</div>
 	</div><!-- Domains menu -->
@@ -170,12 +160,34 @@
 <!-- Start of main content -->
 <article class="page" itemscope itemtype="http://schema.org/Article">
 	<header class="page-header">
-		<h1 class="page-title" itemprop="name headline">Domain - .sf-domainDetail(name)</h1>
+		<h1 class="page-title" itemprop="name headline">Domain - .show($postInfo.DomainName)</h1>
 		<p class="page-meta"></p>
 	</header>
 	<div class="page-content" itemprop="articleBody">
 <!-- Page content -->
-   <h2 class="text-centered" id="parameters">Parameters</h2>
+   <h2 class="text-centered" id="administrator">Administrator</h2>
+
+<div style="display:flex">
+	<div style="background-color:#f0f0f0; border: 2px solid lightgray; margin-left:auto; margin-right:auto;">
+		<form action="/serveradmin/sfcommand/SetDomainAdminPassword" method="post">
+			<input type="hidden" name="Domain" value=".show($postInfo.DomainName)" />
+			<table>
+				<tr>
+					<td>For domain admin:</td>
+					<td><input type="text" name="ID" value="" /></td>
+					<td></td>
+				</tr>
+				<tr>
+					<td>New password:</td>
+					<td><input type="text" name="Password" value="" /></td>
+					<td><input type="submit" value="Change Password" /></td>
+				</tr>
+			</table>
+		</form>
+	</div>
+</div>
+
+<h2 class="text-centered" id="parameters">Parameters</h2>
 
 <table class="domain-details-table">
   <thead>

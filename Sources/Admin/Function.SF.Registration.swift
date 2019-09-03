@@ -58,7 +58,6 @@ let SF_TELEMETRY_TABLE = "sf-telemetryTable"
 let SF_BLACKLIST_TABLE = "sf-blacklistTable"
 let SF_DOMAINS_MENU = "sf-domainsMenu"
 let SF_DOMAINS_TABLE = "sf-domainsTable"
-let SF_DOMAIN_DETAIL = "sf-domainDetail"
 let SF_DELETE_DOMAIN = "sf-deleteDomain"
 let SF_DOMAIN_TELEMETRY_TABLE = "sf-domainTelemetryTable"
 let SF_POSTING_BUTTONED_INPUT = "sf-postingButtonedInput"
@@ -85,7 +84,6 @@ public func sfRegisterFunctions() {
     functions.register(name: SF_BLACKLIST_TABLE, function: function_sf_blacklistTable)
     functions.register(name: SF_DOMAINS_MENU, function: function_sf_domainsMenu)
     functions.register(name: SF_DOMAINS_TABLE, function: function_sf_domainsTable)
-    functions.register(name: SF_DOMAIN_DETAIL, function: function_sf_domainDetail)
     functions.register(name: SF_DELETE_DOMAIN, function: function_sf_deleteDomain)
     functions.register(name: SF_DOMAIN_TELEMETRY_TABLE, function: function_sf_domainTelemetryTable)
     functions.register(name: SF_DOMAIN_SERVICES_TABLE, function: function_sf_domainServicesTable)

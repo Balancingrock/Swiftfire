@@ -37,6 +37,7 @@
 // History
 //
 // 1.2.0 - Added admin keyword
+//       - Set session timeout to 600 (seconds)
 // 1.1.0 #3 Fixed loading & storing of domain service names
 //       #6 Fixed setting, load & store of phpPath
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
@@ -201,8 +202,10 @@ public final class Domain {
     
     
     /// The session timeout in seconds. A value of <= 0 means that no sessions will be created.
+    ///
+    /// - Note: Sessions are necessary for domain setup. When the domain admin sets the session to 0 it is no longer possible to use the domain admin account. (But it can still be done by a server adminstrator)
     
-    public var sessionTimeout: Int = 0
+    public var sessionTimeout: Int = 600
     
     
     /// The domain specific blacklist

@@ -3,7 +3,7 @@
 //  File:       Function.SF.PostingButtonedInput.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.1.0
+//  Version:    1.2.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.2.0 - Fixed index problem when creating dictionary
 // 1.1.0 #5: Set PHP message to disabled if disabled
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
@@ -124,8 +125,10 @@ func function_sf_postingButtonedInput(_ args: Functions.Arguments, _ info: inout
     // Create dictionary
     
     var dict: Dictionary<String, String> = [:]
-    for i in 4 ..< arr.count {
+    var i = 3
+    while i < (arr.count - 1) {
         dict[arr[i]] = arr[i+1]
+        i += 2
     }
     
     

@@ -685,6 +685,7 @@ fileprivate func executeSfCommand(_ pathComponents: Array<String>, _ postInfo: i
     case "UpdateDomainBlacklist": executeUpdateDomainBlacklist(&postInfo); return .newPath("/pages/domain-management.sf.html")
     case "AddToDomainBlacklist": executeAddToDomainBlacklist(&postInfo); return .newPath("/pages/domain-management.sf.html")
     case "RemoveFromDomainBlacklist": executeRemoveFromDomainBlacklist(&postInfo); return .newPath("/pages/domain-management.sf.html")
+    case "SetDomainAdminPassword": executeSetDomainAdminPassword(postInfo); return .newPath("/pages/domain-management.sf.html")
     case "Logout": return executeLogout(session);
         
     default:
@@ -974,8 +975,28 @@ fileprivate func executeCreateDomain(_ postInfo: inout PostInfo?) {
         return
     }
     
+    guard let adminId = postInfo?["ID"], !adminId.isEmpty else {
+        Log.atError?.log("Missing Domain Admin ID in postInfo")
+        return
+    }
+    
+    guard let adminPwd = postInfo?["Password"], !adminPwd.isEmpty else {
+        Log.atError?.log("Missing Domain Admin PWD in postInfo")
+        return
+    }
+
     if let domain = domains.createDomain(for: name) {
         domain.serviceNames = defaultServices
+        if let account = domain.accounts.getAccount(for: adminId, using: adminPwd) {
+            account.isAdmin = true
+        } else {
+            guard let account = domain.accounts.newAccount(name: adminId, password: adminPwd) else {
+                domains.remove(name)
+                Log.atError?.log("Could not create admin account")
+                return
+            }
+            account.isAdmin = true
+        }
         Log.atNotice?.log("Added new domain with \(domain))")
     } else {
         Log.atNotice?.log("Failed to domain for \(name))")
@@ -1130,5 +1151,43 @@ fileprivate func executeSetNewPassword(_ postInfo: PostInfo?) {
         Log.atNotice?.log("Password was changed for: \(name)")
     } else {
         Log.atError?.log("Password could not be changed for: \(name)")
+    }
+}
+
+fileprivate func executeSetDomainAdminPassword(_ postInfo: PostInfo?) {
+    
+    guard let domainName = postInfo?["Domain"], !domainName.isEmpty else {
+        Log.atError?.log("No domain given")
+        return
+    }
+
+    guard let adminName = postInfo?["ID"], !adminName.isEmpty else {
+        Log.atError?.log("No ID given")
+        return
+    }
+
+    guard let newPassword = postInfo?["Password"], !newPassword.isEmpty else {
+        Log.atError?.log("No password given")
+        return
+    }
+
+    guard let domain = domains.domain(for: domainName) else {
+        Log.atError?.log("No domain known for \(domainName)")
+        return
+    }
+    
+    guard let account = domain.accounts.getAccountWithoutPassword(for: adminName) else {
+        Log.atError?.log("No account known for \(adminName)")
+        return
+    }
+    
+    guard account.isAdmin else {
+        Log.atError?.log("Account with name \(adminName) is no admin")
+        return
+    }
+    
+    guard account.updatePassword(newPassword) else {
+        Log.atError?.log("Failed to update password for admin \(adminName)")
+        return
     }
 }

@@ -1,16 +1,16 @@
 // =====================================================================================================================
 //
-//  File:       FunctionInfoKey.swift
+//  File:       Function.Assign.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.1
+//  Version:    1.2.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
 //  Website:    http://swiftfire.nl/
 //  Git:        https://github.com/Balancingrock/Swiftfire
 //
-//  Copyright:  (c) 2017-2019 Marinus van der Lugt, All rights reserved.
+//  Copyright:  (c) 2019 Marinus van der Lugt, All rights reserved.
 //
 //  License:    Use or redistribute this code any way you like with the following two provision:
 //
@@ -36,23 +36,38 @@
 //
 // History
 //
-// 1.0.1 - Documentation update
-// 1.0.0 - Raised to v1.0.0, Removed old change log,
+// 1.2.0 - Initial version
 //
 // =====================================================================================================================
 
 import Foundation
 
+import Core
 
-/// The keys for the function info dictionary. The function info directory is passed into each function call and can be used to communicate from higher priority functions to lower priority functions.
+
+/// Returns the value of the parameter
 ///
-/// Each key that is defined should also define the type of information, and its intended use.
+/// __Webpage Use__:
+///
+/// _Signature_: .assign(key, value)
+///
+/// _Number of arguments_: 2
+///
+/// _Type of argument_:
+///   - value: String, the parameter value to assign to the functionInfo dictionary
+///   - key: String, the key for the value in the functionInfo dictionary
+///
+/// _Returns_: The value in postInfo for the key. If the key does not exist, it returns ***error***.
 
-public enum FunctionInfoKey: String {
+public func function_assign(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: inout Functions.Environment) -> Data? {
     
-    // There are no definitions needed by the Swiftfire core framework.
+    guard case .arrayOfString(let arr) = args, arr.count == 2 else { return "***error***".data(using: .utf8) }
     
-    /// There are no function info keys defined yet.
+    let value = evaluateKeyArgument(arr[0], using: info, in: environment)
     
-    case none = "None"
+    let key = arr[1]
+    
+    info[key] = value
+    
+    return Data()
 }

@@ -3,7 +3,7 @@
 //  File:       Functions.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.2.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,7 +36,8 @@
 //
 // History
 //
-// 1.0.0 Raised to v1.0.0, Removed old change log,
+// 1.2.0 - Changed key of functionInfo to string
+// 1.0.0 - Raised to v1.0.0, Removed old change log
 //
 // =====================================================================================================================
 
@@ -138,7 +139,7 @@ public final class Functions {
     
     /// The type used to transfer data between function calls.
     
-    public typealias Info = Dictionary<FunctionInfoKey, Any>
+    public typealias Info = Dictionary<String, Any>
     
     
     /// The signature of the "Insert Content Here" function calls

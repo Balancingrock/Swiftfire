@@ -193,6 +193,64 @@ public func evaluateKeyArgument(_ arg: String, using functionsInfo: Functions.In
         }
         
         
+    case "$domain":
+        
+        switch args[1].lowercased() {
+            
+        case "name": return environment.domain.name
+        
+        case "root": return environment.domain.webroot
+            
+        case "forewardurl": return environment.domain.forwardUrl
+            
+        case "enabled": return environment.domain.enabled.description
+            
+        case "accesslogenabled": return environment.domain.accessLogEnabled.description
+            
+        case "404logenabled": return environment.domain.four04LogEnabled.description
+            
+        case "sessionlogenabled": return environment.domain.sessionLogEnabled.description
+            
+        case "phppath": return (environment.domain.phpPath?.path ?? "")
+            
+        case "phpoptions":
+            if environment.domain.phpPath != nil {
+                return (environment.domain.phpOptions ?? "")
+            } else {
+                return "PHP Disabled"
+            }
+            
+        case "phpmapindex":
+            if environment.domain.phpPath != nil {
+                return environment.domain.phpMapIndex.description
+            } else {
+                return "PHP Disabled"
+            }
+            
+        case "phpmapall":
+            if environment.domain.phpPath != nil {
+                return environment.domain.phpMapAll.description
+            } else {
+                return "PHP Disabled"
+            }
+            
+        case "phptimeout":
+            if environment.domain.phpPath != nil {
+                return environment.domain.phpTimeout.description
+            } else {
+                return "PHP Disabled"
+            }
+            
+        case "sfresources": return environment.domain.sfresources
+            
+        case "sessiontimeout": return environment.domain.sessionTimeout.description
+
+        default:
+            Log.atError?.log("No access to Domain mapped for key: \(args[1].lowercased())")
+            return "***error***"
+        }
+        
+        
     default:
         Log.atError?.log("Unknown source for key argument: '\(args[0])'")
         return "***error***"

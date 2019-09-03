@@ -74,8 +74,7 @@
 			<label class="symbol" for="Admin-checkbox">
 				<p class="code"><!-- will be filled by disclosure indicator --></p>
 			</label>
-			<div class="text">
-				<a href="/serveradmin/pages/admin-management.sf.html"><p>Admin</p></a>
+			<div class="text"><a href="/serveradmin/pages/admin-management.sf.html"><p>Admin</p></a>
 			</div>
 		</div>
 		<div class="dropdown">
@@ -86,9 +85,7 @@
 					<label class="symbol" for="Management-checkbox">
 						<p></p>
 					</label>
-					<div class="text">
-						<a href="/serveradmin/pages/admin-management.sf.html"><p>Management</p></a>
-					</div>
+					<div class="text"><a href="/serveradmin/pages/admin-management.sf.html"><p>Management</p></a></div>
 				</div>
 			</div>
 			<div class="subitem-separator"><p></p></div>
@@ -98,9 +95,7 @@
 					<label class="symbol" for="Logout-checkbox">
 						<p></p>
 					</label>
-					<div class="text">
-						<a href="/serveradmin/logout.sf.html"><p>Logout</p></a>
-					</div>
+					<div class="text"><a href="/serveradmin/logout.sf.html"><p>Logout</p></a></div>
 				</div>
 			</div>
 			<div class="subitem-separator"><p></p></div>
@@ -110,9 +105,7 @@
 					<label class="symbol" for="Login-checkbox">
 						<p></p>
 					</label>
-					<div class="text">
-						<a href="/serveradmin/login.sf.html"><p>Login</p></a>
-					</div>
+					<div class="text"><a href="/serveradmin/login.sf.html"><p>Login</p></a></div>
 				</div>
 			</div>
 		</div>
@@ -124,8 +117,7 @@
 			<label class="symbol" for="Parameters-checkbox">
 				<p></p>
 			</label>
-			<div class="text">
-				<a href="/serveradmin/pages/parameters.sf.html"><p>Parameters</p></a>
+			<div class="text"><a href="/serveradmin/pages/parameters.sf.html"><p>Parameters</p></a>
 			</div>
 		</div>
 	</div>
@@ -136,8 +128,7 @@
 			<label class="symbol" for="Telemetry-checkbox">
 				<p></p>
 			</label>
-			<div class="text">
-				<a href="/serveradmin/pages/telemetry.sf.html"><p>Telemetry</p></a>
+			<div class="text"><a href="/serveradmin/pages/telemetry.sf.html"><p>Telemetry</p></a>
 			</div>
 		</div>
 	</div>
@@ -148,8 +139,7 @@
 			<label class="symbol" for="Blacklist-checkbox">
 				<p></p>
 			</label>
-			<div class="text">
-				<a href="/serveradmin/pages/blacklist.sf.html"><p>Blacklist</p></a>
+			<div class="text"><a href="/serveradmin/pages/blacklist.sf.html"><p>Blacklist</p></a>
 			</div>
 		</div>
 	</div><!-- Domains menu -->
@@ -176,32 +166,30 @@
 	<div class="page-content" itemprop="articleBody">
 <!-- Page content -->
    <div class="center-content">.sf-adminTable()</div>
+<h1 style="text-align: center;">Create New Admin Account</h1>
 <form action="/serveradmin/sfcommand/CreateAdmin" method="post">
-	<div style="display:flex; justify-content:center;">
-		<div style="display:flex; flex-direction: column;">
-			<h1 class="text-centered">Create New Admin Account</h1>
-			<table>
-				<tr>
-					<td>
-						<span style="margin-top: 4px; margin-right: 4px">Admin ID: </span>
-					</td>
-					<td>
-						<input type="text" name="ID" value="" style="text-align:center;" />
-					</td>
-				</tr>
-				<tr>
-					<td>
-						<span style="margin-top: 4px; margin-right: 4px">Password: </span>
-					</td>
-					<td>
-						<input type="text" name="Password" value="" style="text-align:center;" />
-					</td>
-				</tr>
-			</table>
-			<div class="center-content">
-				<div style="margin-top: 4px">
-					<input type="submit" value="Create New Admin" />
-				</div>
+	<div style="display:flex; flex-direction:column; justify-content:center;">
+		<table class="centered outlined-table table-cell-margins">
+			<tr>
+				<td>
+					<span style="margin-top: 4px; margin-right: 4px">Admin ID: </span>
+				</td>
+				<td>
+					<input type="text" name="ID" value="" style="text-align:center;" />
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<span style="margin-top: 4px; margin-right: 4px">Password: </span>
+				</td>
+				<td>
+					<input type="text" name="Password" value="" style="text-align:center;" />
+				</td>
+			</tr>
+		</table>
+		<div class="center-content">
+			<div style="margin-top: 4px;">
+				<input type="submit" value="Create New Admin" />
 			</div>
 		</div>
 	</div>

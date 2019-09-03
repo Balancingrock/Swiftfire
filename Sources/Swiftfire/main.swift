@@ -170,6 +170,7 @@ do {
         serviceName_GetSession,
         serviceName_WaitUntilBodyComplete,
         serviceName_DecodePostFormUrlEncoded,
+        serviceName_Setup,
         serviceName_GetResourcePathFromUrl,
         serviceName_GetFileAtResourcePath,
         serviceName_RestartSessionTimeout,
