@@ -3,7 +3,7 @@
 //  File:       HttpConnection.HttpWorker.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.2.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,7 +36,8 @@
 //
 // History
 //
-// 1.0.0 Raised to v1.0.0, Removed old change log,
+// 1.2.0 - Added domain admin to access setup page even when the domain is disabled
+// 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 // Description
@@ -202,30 +203,45 @@ extension SFConnection {
         
         // If the domain is not set, retrieve the domain from the request
         
+        var errorMessage: String?
         if domain == nil {
         
             
             // Get the domain from the host
             
-            if let hostDomain = domains.domain(for: host.address), hostDomain.enabled {
+            if let hostDomain = domains.domain(for: host.address) {
                 
-                domain = hostDomain
+                
+                // Make sure the domain is enabled
+                
+                if hostDomain.enabled {
+                    
+                    domain = hostDomain
+                
+                } else {
+                
+                    
+                    // The domain is disabled, but allow domain admin accesses
+                    
+                    if let setupKeyword = hostDomain.setupKeyword, let urlStr = request.url, urlStr.hasPrefix("/\(setupKeyword)") {
+                         
+                        domain = hostDomain
+                        
+                    } else {
+                        errorMessage = "Domain not enabled for host: \(host.address)"
+                    }
+                }
             
             } else {
-                
-                let message: String
-                if domains.domain(for: host.address) == nil {
-                    message = "Domain not found for host: \(host.address)"
-                } else {
-                    message = "Domain not enabled for host: \(host.address)"
-                }
-                
-                send400BadRequestResponse(message, processingStartedAt: timestampResponseStart)
-                
-                return
+                errorMessage = "Domain not found for host: \(host.address)"
             }
         }
 
+        if let errorMessage = errorMessage {
+            send400BadRequestResponse(errorMessage, processingStartedAt: timestampResponseStart)
+            return
+        }
+        
         Log.atDebug?.log("Request for domain: \(domain.name)", id: logId)
         
         
