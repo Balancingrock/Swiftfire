@@ -37,6 +37,7 @@
 // History
 //
 // 1.2.0 - Added admin account creation and removal
+//       - Added creation of domain admin
 // 1.1.0 - Changed server blacklist location
 // 1.0.0 - Raised to v1.0.0, Removed old change log
 //
@@ -1166,28 +1167,73 @@ fileprivate func executeSetDomainAdminPassword(_ postInfo: PostInfo?) {
         return
     }
 
-    guard let newPassword = postInfo?["Password"], !newPassword.isEmpty else {
-        Log.atError?.log("No password given")
-        return
-    }
-
     guard let domain = domains.domain(for: domainName) else {
         Log.atError?.log("No domain known for \(domainName)")
         return
     }
     
-    guard let account = domain.accounts.getAccountWithoutPassword(for: adminName) else {
-        Log.atError?.log("No account known for \(adminName)")
-        return
-    }
     
-    guard account.isAdmin else {
-        Log.atError?.log("Account with name \(adminName) is no admin")
-        return
-    }
+    // Check if the account exists
     
-    guard account.updatePassword(newPassword) else {
-        Log.atError?.log("Failed to update password for admin \(adminName)")
-        return
+    if let account = domain.accounts.getAccountWithoutPassword(for: adminName) {
+
+        
+        // If it is an admin account, then update the password
+        
+        if account.isAdmin {
+            
+            guard let newPassword = postInfo?["Password"], !newPassword.isEmpty else {
+                Log.atError?.log("No password given")
+                return
+            }
+
+            if account.updatePassword(newPassword) {
+                Log.atNotice?.log("Updated the password for account \(account.name) in domain \(domain.name)")
+            } else {
+                Log.atError?.log("Could not update password for account \(account.name) in domain \(domain.name)")
+            }
+            
+        } else {
+            
+            // Make this account an admin
+            
+            account.isAdmin = true
+            
+            Log.atNotice?.log("Added account \(account.name) in domain \(domain.name) to the domain admins")
+
+            
+            // If there is a password, then also update the password
+            
+            if let newPassword = postInfo?["Password"], !newPassword.isEmpty {
+                
+                if account.updatePassword(newPassword) {
+                    Log.atNotice?.log("Updated the password for account \(account.name) in domain \(domain.name)")
+                } else {
+                    Log.atError?.log("Could not update password for account \(account.name) in domain \(domain.name)")
+                }
+            }
+        }
+
+    } else {
+        
+        // Create a new admin account if the password is also given
+        
+        if let newPassword = postInfo?["Password"], !newPassword.isEmpty {
+            
+            if let account = domain.accounts.newAccount(name: adminName, password: newPassword) {
+                
+                account.isAdmin = true
+
+                Log.atNotice?.log("Created domain admin account for \(account.name) in domain \(domain.name)")
+
+            } else {
+                
+                Log.atError?.log("Failed to create account for account \(adminName) in domain \(domain.name)")
+            }
+
+        } else {
+            
+            Log.atError?.log("Cannot create account for account \(adminName) in domain \(domain.name) without a password")
+        }
     }
 }

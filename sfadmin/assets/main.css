@@ -1310,7 +1310,9 @@ textarea {
             .menubar .item-narrow-only .dropdown-narrow .subitem .sub-dropdown-narrow .subsubitem .title p {
               padding-left: 56px; }
     .menubar .isActiveSelection {
-      background: #3090ff; } }
+      background: #3090ff; }
+      .menubar .isActiveSelection .title .text p {
+        color: #101010; } }
 @media screen and (min-width: 720px) {
   .menubar {
     flex-direction: row; } }
@@ -1632,6 +1634,14 @@ textarea {
             .menubar .item .dropdown .subitem .sub-dropdown .isActiveSelection,
             .menubar .item .dropdown-narrow .subitem .sub-dropdown .isActiveSelection {
               background: #96c7ff; } }
+          @media screen and (min-width: 720px) and (min-width: 720px) and (max-width: 959px) {
+            .menubar .item .dropdown .subitem .sub-dropdown .isActiveSelection p,
+            .menubar .item .dropdown-narrow .subitem .sub-dropdown .isActiveSelection p {
+              color: #101010; } }
+          @media screen and (min-width: 720px) and (min-width: 960px) {
+            .menubar .item .dropdown .subitem .sub-dropdown .isActiveSelection p,
+            .menubar .item .dropdown-narrow .subitem .sub-dropdown .isActiveSelection p {
+              color: #101010; } }
       @media screen and (min-width: 720px) and (min-width: 720px) and (max-width: 959px) {
         .menubar .item .dropdown .isActiveSelection,
         .menubar .item .dropdown-narrow .isActiveSelection {
@@ -1640,12 +1650,26 @@ textarea {
         .menubar .item .dropdown .isActiveSelection,
         .menubar .item .dropdown-narrow .isActiveSelection {
           background: #96c7ff; } }
+      @media screen and (min-width: 720px) and (min-width: 720px) and (max-width: 959px) {
+        .menubar .item .dropdown .isActiveSelection p,
+        .menubar .item .dropdown-narrow .isActiveSelection p {
+          color: #101010; } }
+      @media screen and (min-width: 720px) and (min-width: 960px) {
+        .menubar .item .dropdown .isActiveSelection p,
+        .menubar .item .dropdown-narrow .isActiveSelection p {
+          color: #101010; } }
   @media screen and (min-width: 720px) and (min-width: 720px) and (max-width: 959px) {
     .menubar .isActiveSelection {
       background: #3090ff; } }
   @media screen and (min-width: 720px) and (min-width: 960px) {
     .menubar .isActiveSelection {
       background: #3090ff; } }
+  @media screen and (min-width: 720px) and (min-width: 720px) and (max-width: 959px) {
+    .menubar .isActiveSelection p {
+      color: #101010; } }
+  @media screen and (min-width: 720px) and (min-width: 960px) {
+    .menubar .isActiveSelection p {
+      color: #101010; } }
 
 @media screen and (min-width: 0px) and (max-width: 719px) {
   .secondary-column {
