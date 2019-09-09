@@ -52,10 +52,10 @@ import Functions
 func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: inout Services.Info, _ response: inout Response) -> Services.Result {
     
     func domainCommand(_ cmd: String) -> String {
-        return "\(domain.setupKeyword!)/command/\(cmd)"
+        return "/\(domain.setupKeyword!)/command/\(cmd)"
     }
     
-    func loginDomainAdminPage() {
+    func domainAdminLoginPage() {
         
         let page: String =
         """
@@ -74,9 +74,9 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
                     <div style="margin-left:auto; margin-right:auto;">
                         <form action="/setup" method="post">
                             <p style="margin-bottom:0px">ID:</p>
-                            <input type="text" name="ID" value="name" autofocus><br>
+                            <input type="text" name="LoginID" value="name" autofocus><br>
                             <p style="margin-bottom:0px">Password:</p>
-                            <input type="password" name="Password" value="****"><br><br>
+                            <input type="password" name="LoginPassword" value="****"><br><br>
                             <input type="submit" value="Login">
                         </form>
                     </div>
@@ -90,15 +90,20 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
         response.contentType = mimeTypeHtml
     }
     
-    func domainAdminPage() {
+    func domainAdminPage(_ account: Account) {
         
         func domainParameterTable() -> String {
             
-            let table = """
+            let html = """
+            <div class="center-content">
+            <div class="table-container">
                 <table>
+                <thead>
                     <tr>
                         <th>Parameter</th><th>Value</th><th>Description</th>
                     </tr>
+                </thead>
+                <tbody>
                     <tr>
                         <td>Enabled</td>
                         <td>
@@ -198,103 +203,131 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
                         </td>
                         <td>(Optional) Forwards all incoming traffic to this url</td>
                     </tr>
+                </tbody>
                 </table>
+            </div>
+            </div>
             """
             
-            return table
+            return html
         }
         
         func domainTelemetryTable() -> String {
             
-            var table: String = """
-                <table>
-                    <tr>
-                        <th>Name</th><th>Value</th><th>Description</th>
-                    </tr>
+            var html: String = """
+                <div class="center-content">
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Name</th><th>Value</th><th>Description</th>
+                                </tr>
+                            </thead>
+                            <tbody>
             """
             
             domain.telemetry.all.forEach() {
-                table += """
+                html += """
                     <tr>
                         <td>\($0.name)</td><td>\($0.stringValue)</td><td>\($0.about)</td>
                     </tr>
                 """
             }
         
-            table += """
-                </table>
+            html += """
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
             """
             
-            return table
+            return html
         }
 
         func domainBlacklistTable() -> String {
             
-            var table: String = """
-                <table>
-                    <tr><th>Address</th><th>Action</th><th></th></tr>
+            var html: String = """
+                <div class="center-content">
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr><th>Address</th><th>Action</th><th></th></tr>
+                            </thead>
+                            <tbody>
             """
             
-            domain.blacklist.list.forEach { (address, action) in
+            domain.blacklist.list.sorted(by: { (one: (key: String, value: Blacklist.Action), two: (key: String, value: Blacklist.Action)) -> Bool in
+                one.key < two.key
+            }) .forEach { (address, action) in
                 
                 let row = """
                     <tr>
                         <td>\(address)</td>
                         <td>
-                            <form method="post" action="/\(domainCommand("UpdateBlacklist"))>
-                                <div style="display:flex; flex-direction:column justify-content:start">
-                                    <div style="display:flex; flex-direction:row align-items:center">
-                                        <input type="radio" name="\(address)" value="close" checked="\(action == .closeConnection)">
-                                        <span> Close Connection, <span>
-                                    </div>
-                                    <div style="display:flex; flex-direction:row align-items:center">
-                                        <input type="radio" name="\(address)" value="503" checked="\(action == .send503ServiceUnavailable)">
-                                        <span> 503 Service Unavailable, <span>
-                                    </div>
-                                    <div style="display:flex; flex-direction:row align-items:center">
-                                        <input type="radio" name="\(address)" value="401" checked="\(action == .send401Unauthorized)">
-                                        <span> 401 Unauthorized </span>
-                                    </div>
-                                    <input type="submit" title="Update">
+                            <form method="post" action="\(domainCommand("UpdateBlacklist"))">
+                                <div style="display:flex; flex-direction:row; align-items:center;">
+                                    <input type="hidden" name="Address" value="\(address)">
+                                    <input type="radio" name="Action" value="close" \(action == .closeConnection ? "checked" : "")>
+                                    <span> Close Connection, <span>
+                                    <input type="hidden" name="Address" value="\(address)">
+                                    <input type="radio" name="Action" value="503" \(action == .send503ServiceUnavailable ? "checked" : "")>
+                                    <span> 503 Service Unavailable, <span>
+                                    <input type="hidden" name="Address" value="\(address)">
+                                    <input type="radio" name="Action" value="401" \(action == .send401Unauthorized ? "checked" : "")>
+                                    <span> 401 Unauthorized </span>
+                                    <input type="submit" value="Update Action">
                                 </div>
                             </form>
                         </td>
                         <td>
-                            <form method="post" action="/\(domainCommand("RemoveFromBlacklist"))>
-                                <input type="submit" name="\(address)" value="Remove">
+                            <form method="post" action="\(domainCommand("RemoveFromBlacklist"))">
+                                <input type="hidden" name="Address" value="\(address)">
+                                <input type="submit" value="Remove">
                             </form>
                         </td>
                     </tr>
                 """
                 
-                table += row
+                html += row
             }
             
-            table += """
-                </table>
-            """
-            
-            let createEntry: String = """
+            html += """
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
                 <h3>Add address to blacklist</h3>
-                <form method="post" action="/\(domainCommand("AddToBlacklist"))>
-                    <table>
-                        <tr>
-                            <td>Address:</td>
-                            <td><input type="text" name="newEntry", value=""></td>
-                            <td>
-                                <div style="display:flex; flex-direction:column; justify-content:start;">
-                                    <div><input type="radio" name="action" value="close" checked="true"><span> Close Connection</span></div>
-                                    <div><input type="radio" name="action" value="503" checked="false"><span> 503 Services Unavailable</span></div>
-                                    <div><input type="radio" name="action" value="401" checked="false"><span> 401 Unauhorized</span></div>
-                                </div>
-                            </td>
-                            <td><input type="submit" value="Add to Blacklist"></td>
-                        </tr>
-                    </table>
-                </form>
+                <div class="center-content">
+                    <div class="table-container">
+                        <form method="post" action="\(domainCommand("AddToBlacklist"))")>
+                            <table>
+                                <tbody>
+                                    <tr>
+                                        <td>Address:</td>
+                                        <td><input type="text" name="Address" value=""></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Action:</td>
+                                        <td>
+                                            <div style="display:flex; flex-direction:row; align-items:center;">
+                                                <input type="radio" name="Action" value="close" checked><span> Close Connection</span>
+                                                <input type="radio" name="Action" value="503"><span> 503 Services Unavailable</span>
+                                                <input type="radio" name="Action" value="401"><span> 401 Unauhorized</span>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    <tr>
+                                        <td></td>
+                                        <td><input type="submit" value="Add to Blacklist"></td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </form>
+                    </div>
+                </div>
             """
             
-            return table + "<br>" + createEntry
+            return html
         }
         
         func domainServicesTable() -> String {
@@ -326,12 +359,21 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
             
             // Create the table
             
-            var table: String = """
-                <form method="post" target="\(domainCommand("UpdateServices"))">
-                    <table>
-                        <tr>
-                            <th>Index</th><th>Seq.</th><th>Service Name</th><th>Used</th>
-                        </tr>
+            var html: String = """
+                <div class="center-content">
+                    <div class="table-container">
+                        <form method="post" action="\(domainCommand("UpdateServices"))">
+                            <table>
+                                <thead>
+                                    <tr>
+                                        <th>Index</th>
+                                        <th>Seq.</th>
+                                        <th>Service Name</th>
+                                        <th>Used</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+            
             """
             
             for row in tableRows {
@@ -339,24 +381,147 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
                 let entry: String = """
                     <tr>
                         <td>\(row.rowIndex)</td>
-                        <td style="width: auto"><input type="text" name="seqName\(row.rowIndex)" value="\(row.rowIndex)"></td>
+                        <td><input type="text" name="seqName\(row.rowIndex)" value="\(row.rowIndex)"></td>
                         <td><input type="text" name="nameName\(row.rowIndex)" value="\(row.name)" disabled></td>
+                        <td><input type="hidden" name="nameName\(row.rowIndex)" value="\(row.name)"></td>
                         <td><input type="checkbox" name="usedName\(row.rowIndex)" value="usedName\(row.rowIndex)" \(row.usedByDomain ? "checked" : "")></td>
                     </tr>
+                
                 """
-                table += entry
+                html += entry
             }
             
-            table += """
-                    </table>
-                    <input type="submit" name="Submit" value="Update Services">
-                </form>
+            html += """
+                                </tbody>
+                            </table>
+                            <div class="center-content">
+                                <div class="center-self submit-offset">
+                                    <input type="submit" value="Update Services">
+                                </div>
+                            </div>
+                        </form>
+                    </div>
+                </div>
             """
             
-            return table
+            return html
         }
         
-        let body: String = """
+        func domainAdminList() -> String {
+            
+            var html: String = """
+                <div class="center-content">
+                    <div class="table-container">
+                        <table>
+                            <thead>
+                                <tr>
+                                    <th>Account ID</th>
+                                    <th></th>
+                                    <th></th>
+                                </tr>
+                            </thead>
+                            <tbody>
+            """
+            
+            for accountName in domain.accounts {
+                
+                if accountName != account.name {
+                    
+                    let row = """
+                        <tr>
+                            <td>\(accountName)</td>
+                            <td>
+                                <form action="\(domainCommand("ConfirmDeleteAccount"))" method="post">
+                                    <input type="hidden" name="AdminID" value="\(accountName)">
+                                    <input type="submit" value="Remove">
+                                </form>
+                            </td>
+                            <td>
+                                <form action="\(domainCommand("AddAdminChangePassword"))" method="post">
+                                    <input type="hidden" name="AdminID" value="\(accountName)">
+                                    <input type="text" name="AdminPassword" value="">
+                                    <input type="submit" value="Set New Password">
+                                </form>
+                            </td>
+                        </tr>
+                    """
+                    
+                    html += row
+                    
+                } else {
+                    
+                    let row = """
+                        <tr>
+                            <td>\(accountName)</td>
+                            <td></td>
+                            <td>
+                                <form action="\(domainCommand("AddAdminChangePassword"))" method="post">
+                                    <input type="hidden" name="AdminID" value="\(accountName)">
+                                    <input type="text" name="AdminPassword" value="">
+                                    <input type="submit" value="Set New Password">
+                                </form>
+                            </td>
+                        </tr>
+                    """
+                    
+                    html += row
+                }
+            }
+            
+            html += """
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            """
+
+            
+            return html
+        }
+        
+        func addDomainAdmin() -> String {
+            
+            let html: String = """
+                <div class="center-content">
+                    <div class="table-container">
+                        <form method="post" action="\(domainCommand("AddAdminChangePassword"))">
+                            <input type="hidden" name="Domain" value=".show($postInfo.DomainName)">
+                            <table>
+                                <tr>
+                                    <td>Domain admin:</td>
+                                    <td><input type="text" name="AdminID" value=""></td>
+                                    <td></td>
+                                </tr>
+                                <tr>
+                                    <td>Password:</td>
+                                    <td><input type="text" name="AdminPassword" value=""></td>
+                                    <td><input type="submit" value="Add Admin / Change Password"></td>
+                                </tr>
+                            </table>
+                        </form>
+                    </div>
+                </div>
+            """
+            
+            return html
+        }
+        
+        func logoff() -> String {
+            
+            let html: String = """
+                <div class="center-content">
+                    <div class="table-container">
+                        <form method="post" action="\(domainCommand("Logoff"))">
+                            <input type="submit" value="Logoff">
+                        </form>
+                    </div>
+                </div>
+            """
+            
+            return html
+        }
+
+        let html: String = """
             <!DOCTYPE html>
             <html>
                 <head>
@@ -366,11 +531,21 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
                     <meta name="theme-color" content="#ffffff">
                     <title>\(domain.name.capitalized) Admin Login</title>
                     <meta name="description" content="\(domain.name.capitalized) Admin">
+                    <style>
+                        h1 { text-align: center; }
+                        h2 { text-align: center; }
+                        h3 { text-align: center; }
+                        .center-content { display:flex; flex-direction:column; justify-content:center }
+                        .center-self { margin-left:auto; margin-right:auto; }
+                        .bottom-offset { margin-bottom: 100px }
+                        .table-container { background-color:#f0f0f0; border: 1px solid lightgray; margin-left:auto; margin-right:auto; }
+                        .submit-offset { margin-top:5px; margin-bottom: 2px; }
+                    </style>
                 </head>
                 <body>
-                    <div style="display:flex; justify-content:center; margin-bottom:50px;">
-                        <div style="margin-left:auto; margin-right:auto;">
-                            <h1>\(domain.name.capitalized)</h1>
+                    <div class="bottom-offset">
+                        <div>
+                            <h1>\(domain.name.uppercased())</h1>
                             <h2>Parameters</h2>
                             \(domainParameterTable())
                             <h2>Telemetry</h2>
@@ -379,17 +554,58 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
                             \(domainBlacklistTable())
                             <h2>Domain Services</h2>
                             \(domainServicesTable())
+                            <h2>Domain admin list</h2>
+                            \(domainAdminList())
+                            <h2>Add Admin or change Password</h2>
+                            \(addDomainAdmin())
+                            <h2>Logoff</h2>
+                            \(logoff())
                         </div>
                     </div>
                 </body>
             </html>
         """
 
-        response.body = body.data(using: .utf8)
+        response.body = html.data(using: .utf8)
         response.code = Response.Code._200_OK
         response.contentType = mimeTypeHtml
     }
     
+    func domainConfirmRemoveAccountPage(_ postInfo: PostInfo, _ domain: Domain) {
+        
+        let adminId = postInfo["AdminID"]!
+
+        let html: String =
+        """
+            <!DOCTYPE html>
+            <html>
+                <head>
+                    <meta charset="utf-8">
+                    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+                    <meta name="viewport" content="width=device-width, initial-scale=1">
+                    <meta name="theme-color" content="#ffffff">
+                    <title>Confirm Account Removal</title>
+                    <meta name="description" content="Remove account">
+                </head>
+                <body>
+                    <div style="display:flex; justify-content:center; margin-bottom:50px;">
+                        <div style="margin-left:auto; margin-right:auto;">
+                            <h1>Confirm removal of account with name: \(adminId)</h1>
+                            <form method="post">
+                                <input type="hidden" name="RemoveAccountId" value="\(adminId)">
+                                <input type="submit" value="Confirmed" formaction="\(domainCommand("RemoveAccount"))">
+                                <input type="submit" value="Don't remove" formaction="/\(domain.setupKeyword!)">
+                            </form>
+                        </div>
+                    </div>
+                </body>
+            </html>
+        """
+        
+        response.body = html.data(using: .utf8)
+        response.code = Response.Code._200_OK
+        response.contentType = mimeTypeHtml
+    }
     
     // Exit if there is a code already
     
@@ -433,8 +649,8 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
     // ===========================================================================
         
     if let postInfo = info[.postInfoKey] as? PostInfo,
-        let name = postInfo["ID"],
-        let pwd = postInfo["Password"] {
+        let name = postInfo["LoginID"],
+        let pwd = postInfo["LoginPassword"] {
             
         Log.atDebug?.log("Found login information for admin \(name)")
             
@@ -445,7 +661,7 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
             let now = Date().javaDate
             if now - previousAttempt < 2000 {
                 session[.lastFailedLoginAttemptKey] = now
-                loginDomainAdminPage()
+                domainAdminLoginPage()
                 return .next
             }
         }
@@ -470,7 +686,7 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
             session[.lastFailedLoginAttemptKey] = Date().javaDate
                 
                 
-            loginDomainAdminPage()
+            domainAdminLoginPage()
                 
             return .next
         }
@@ -487,18 +703,18 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
     
     // Check if an admin is logged in
     
-    guard let account = session[.accountKey] as? Account, account.isAdmin else {
-        Log.atAlert?.log("No account present", id: connection.logId)
-        loginDomainAdminPage()
+    guard let account = session[.accountKey] as? Account else {
+        Log.atDebug?.log("No account present", id: connection.logId)
+        domainAdminLoginPage()
         return .next
     }
 
     guard account.isAdmin else {
-        Log.atAlert?.log("Not an admin for domain: \(domain.name) using ID: \(account.name)", id: connection.logId)
-        loginDomainAdminPage()
+        Log.atDebug?.log("Not an admin for domain: \(domain.name) using ID: \(account.name)", id: connection.logId)
+        domainAdminLoginPage()
         return .next
     }
-
+    
     
     // A domain administrator is logged in
     
@@ -518,18 +734,38 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
                     switch urlComponents[2] {
                     
                     case "UpdateParameter": executeUpdateParameter(postInfo, domain)
-                    case "UpdateBlacklist": break
-                    case "RemoveFromBlacklist": break
-                    case "AddToBlacklist": break
-                    case "UpdateServices": break
-
+                    case "UpdateBlacklist": executeUpdateBlacklist(postInfo, domain)
+                    case "RemoveFromBlacklist": executeRemoveFromBlacklist(postInfo, domain)
+                    case "AddToBlacklist": executeAddToBlacklist(postInfo, domain)
+                    case "UpdateServices": executeUpdateServices(postInfo, domain)
+                    case "ConfirmDeleteAccount":
+                        if executeConfirmDeleteAccount(postInfo, domain) {
+                            domainConfirmRemoveAccountPage(postInfo, domain)
+                            return .next
+                        }
+                        
+                    case "RemoveAccount": executeRemoveAccount(postInfo, domain)
+                    case "AddAdminChangePassword": executeAddAdminChangePassword(postInfo, domain)
+                        
                     default:
-                        Log.atError?.log("No command with name \(urlComponents[2])")
+                        Log.atError?.log("No command with name \(urlComponents[2]) or command does not need postInfo")
                         break
                     }
+                    
                 } else {
-                    Log.atError?.log("PostInfo not present")
+                    
+                    switch urlComponents[2] {
+                        
+                    case "Logoff":
+                        session.info.remove(key: .accountKey)
+                        Log.atNotice?.log("Admin logged out")
+                        
+                    default:
+                        Log.atError?.log("No command with name \(urlComponents[2]) or missing postInfo")
+                        break
+                    }
                 }
+
             } else {
                 Log.atError?.log("Too many parts in command")
             }
@@ -542,7 +778,11 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
     
     // Return the domain admin page again
     
-    domainAdminPage()
+    if let account = session[.accountKey] as? Account, account.isAdmin {
+        domainAdminPage(account)
+    } else {
+        domainAdminLoginPage()
+    }
     return .next
 }
     
@@ -559,34 +799,233 @@ fileprivate func executeUpdateParameter(_ postInfo: PostInfo, _ domain: Domain) 
     }
 
     
-    switch parameter {
+    switch parameter.lowercased() {
     case "forewardurl": domain.forwardUrl = value
     case "enabled": domain.enabled = Bool(lettersOrDigits: value) ?? domain.enabled
     case "accesslogenabled": domain.accessLogEnabled = Bool(lettersOrDigits: value) ?? domain.accessLogEnabled
     case "four04logenabled": domain.four04LogEnabled = Bool(lettersOrDigits: value) ?? domain.four04LogEnabled
     case "sessionlogenabled": domain.sessionLogEnabled = Bool(lettersOrDigits: value) ?? domain.sessionLogEnabled
-    case "phpmapindex":
-        if domain.phpPath != nil {
-            domain.phpMapIndex = Bool(lettersOrDigits: value) ?? domain.phpMapIndex
-        }
+    case "phpmapindex": domain.phpMapIndex = Bool(lettersOrDigits: value) ?? domain.phpMapIndex
     case "phpmapall":
-        if domain.phpPath != nil {
-            if Bool(lettersOrDigits: value) ?? domain.phpMapAll {
-                domain.phpMapAll = true
-                domain.phpMapIndex = true
-            } else {
-                domain.phpMapAll = false
-            }
+        if Bool(lettersOrDigits: value) ?? domain.phpMapAll {
+            domain.phpMapAll = true
+            domain.phpMapIndex = true
+        } else {
+            domain.phpMapAll = false
         }
-    case "phptimeout":
-        if domain.phpPath != nil {
-            domain.phpTimeout = Int(value) ?? domain.phpTimeout
-        }
+    case "phptimeout": domain.phpTimeout = Int(value) ?? domain.phpTimeout
     case "sessiontimeout": domain.sessionTimeout = Int(value) ?? domain.sessionTimeout
-    default:
-        Log.atError?.log("Unknown key '\(parameter)' with value '\(value)'")
+    default: Log.atError?.log("Unknown key '\(parameter)' with value '\(value)'")
     }
     
     domain.storeSetup()
 }
 
+fileprivate func executeUpdateBlacklist(_ postInfo: PostInfo, _ domain: Domain) {
+    
+    guard let address = postInfo["Address"] else {
+        Log.atError?.log("Missing address")
+        return
+    }
+    
+    guard let actionStr = postInfo["Action"] else {
+        Log.atError?.log("Missing address")
+        return
+    }
+
+    let action: Blacklist.Action = {
+        switch actionStr {
+        case "close": return .closeConnection
+        case "503": return .send503ServiceUnavailable
+        case "401": return .send401Unauthorized
+        default:
+            Log.atError?.log("Unknown action \(actionStr)")
+            return .closeConnection
+        }
+    }()
+    
+    if domain.blacklist.update(action: action, for: address) {
+        Log.atNotice?.log("Updated blacklist action for \(address) to \(action) in domain \(domain.name)")
+    } else {
+        Log.atNotice?.log("Failed to update blacklist action for \(address) to \(action) in domain \(domain.name)")
+    }
+    
+    domain.blacklist.store(to: Urls.domainBlacklistFile(for: domain.name))
+
+}
+
+fileprivate func executeRemoveFromBlacklist(_ postInfo: PostInfo, _ domain: Domain) {
+    
+    guard let address = postInfo["Address"] else {
+        Log.atError?.log("Missing address")
+        return
+    }
+
+    if domain.blacklist.remove(address) {
+        Log.atNotice?.log("Removed address \(address) from the blacklist for domain \(domain.name)")
+    } else {
+        Log.atNotice?.log("Files to removed address \(address) from the blacklist for domain \(domain.name)")
+    }
+    
+    domain.blacklist.store(to: Urls.domainBlacklistFile(for: domain.name))
+}
+
+fileprivate func executeAddToBlacklist(_ postInfo: PostInfo, _ domain: Domain) {
+    
+    guard let address = postInfo["Address"] else {
+        Log.atError?.log("Missing address")
+        return
+    }
+    
+    guard let actionStr = postInfo["Action"] else {
+        Log.atError?.log("Missing address")
+        return
+    }
+    
+    let action: Blacklist.Action = {
+        switch actionStr {
+        case "close": return .closeConnection
+        case "503": return .send503ServiceUnavailable
+        case "401": return .send401Unauthorized
+        default:
+            Log.atError?.log("Unknown action \(actionStr)")
+            return .closeConnection
+        }
+    }()
+    
+    domain.blacklist.add(address, action: action)
+    
+    domain.blacklist.store(to: Urls.domainBlacklistFile(for: domain.name))
+    
+    Log.atNotice?.log("Added address \(address) to blacklist with action \(action) in domain \(domain.name)")
+}
+
+fileprivate func executeUpdateServices(_ postInfo: PostInfo, _ domain: Domain) {
+    
+    struct ServiceItem {
+        let index: Int
+        let name: String
+    }
+    
+    var serviceArr: Array<ServiceItem> = []
+    
+    var index = 0
+    
+    var error = false;
+    
+    while let _ = postInfo["seqName\(index)"] {
+        
+        if let _ = postInfo["usedName\(index)"] {
+            
+            if  let newIndexStr = postInfo["seqName\(index)"],
+                let newIndex = Int(newIndexStr) {
+                
+                if let newName = postInfo["nameName\(index)"] {
+                    serviceArr.append(ServiceItem(index: newIndex, name: newName))
+                } else {
+                    error = true
+                    Log.atError?.log("Missing nameName for index \(index)")
+                }
+                
+            } else {
+                error = true
+                Log.atError?.log("Missing seqName for index \(index)")
+            }
+        }
+        index += 1
+    }
+    
+    guard error == false else { return }
+    
+    serviceArr.sort(by: { $0.index < $1.index })
+    
+    domain.serviceNames = serviceArr.map({ $0.name })
+    
+    domain.rebuildServices()
+    
+    domain.storeSetup()
+    
+    var str = ""
+    if domain.serviceNames.count == 0 {
+        str += "\nDomain Service Names:\n None\n"
+    } else {
+        str += "\nDomain Service Names:\n"
+        domain.serviceNames.forEach() { str += " service name = \($0)\n" }
+    }
+
+    Log.atNotice?.log("Updated services for domain \(domain.name) to/n\(str)")
+}
+
+fileprivate func executeConfirmDeleteAccount(_ postInfo: PostInfo, _ domain: Domain) -> Bool {
+    
+    guard let adminId = postInfo["AdminID"] else {
+        Log.atError?.log("Missing admin ID")
+        return false
+    }
+    
+    return domain.accounts.getAccountWithoutPassword(for: adminId) != nil
+}
+
+fileprivate func executeRemoveAccount(_ postInfo: PostInfo, _ domain: Domain) {
+    
+    guard let accountId = postInfo["RemoveAccountId"] else {
+        Log.atError?.log("Missing RemoveAccountId")
+        return
+    }
+
+    if domain.accounts.remove(name: accountId) {
+        Log.atNotice?.log("Account \(accountId) removed from domain \(domain.name)")
+    } else {
+        Log.atError?.log("Account not found for \(accountId) in domain \(domain.name)")
+    }
+}
+
+fileprivate func executeAddAdminChangePassword(_ postInfo: PostInfo, _ domain: Domain) {
+    
+    guard let adminId = postInfo["AdminID"] else {
+        Log.atError?.log("Missing admin ID")
+        return
+    }
+
+    guard let adminPwd = postInfo["AdminPassword"] else {
+        Log.atError?.log("Missing admin password")
+        return
+    }
+
+    if let account = domain.accounts.getAccountWithoutPassword(for: adminId) {
+        
+        
+        // Grant admin rights to this account
+        
+        if !account.isAdmin {
+            account.isAdmin = true
+            Log.atNotice?.log("Enabled admin rights for account \(adminId)")
+        }
+        
+        
+        // Change the password
+        
+        if account.updatePassword(adminPwd) {
+            Log.atNotice?.log("Updated the password for domain admin \(adminId)")
+        } else {
+            Log.atError?.log("Failed to update the password for domain admin \(adminId)")
+        }
+        
+        
+    } else {
+        
+        
+        // Add an admin
+        
+        if let account = domain.accounts.newAccount(name: adminId, password: adminPwd) {
+
+            account.isAdmin = true
+            
+            Log.atNotice?.log("Added domain admin account with id: \(adminId)")
+
+        } else {
+            
+            Log.atError?.log("Failed to add domain admin for id: \(adminId)")
+        }
+    }
+}

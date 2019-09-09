@@ -110,7 +110,7 @@ func function_sf_adminTable(_ args: Functions.Arguments, _ info: inout Functions
     }
     
     
-    // Create a list of domains and their aliases
+    // Create a list of admins
     
     var table = Table(klass: "default-table", columnTitles: ["Account ID", "", ""])
     for accountName in environment.domain.accounts {
