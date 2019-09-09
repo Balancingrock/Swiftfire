@@ -152,6 +152,11 @@ You can of course change whatever you want, but the current source code layout w
 
 Note: Planned releases are for information only and almost always change.
 
+#### 1.2.0
+
+- Separated server admin and domain admin functions (added Domain Admin accounts)
+- Added support of multiple server admin accounts
+
 #### 1.1.0
 
 - Fixed issues 1 through 6
