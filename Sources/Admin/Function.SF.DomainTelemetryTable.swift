@@ -3,7 +3,7 @@
 //  File:       Function.SF.DomainTelemetryTable.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.2.1
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,7 +36,8 @@
 //
 // History
 //
-// 1.0.0 Raised to v1.0.0, Removed old change log,
+// 1.2.1 - Removed dependency on Html
+// 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 // Description
@@ -82,7 +83,6 @@
 
 import Foundation
 
-import Html
 import Core
 
 
@@ -115,13 +115,40 @@ func function_sf_domainTelemetryTable(_ args: Functions.Arguments, _ info: inout
     
     
     // Create the table
-    
+    /*
     var table = Table(klass: "domain-telemetry-table", columnTitles: "Name", "Value", "Description")
     domain.telemetry.all.forEach() { table.append($0.tableRow()) }
     
-    return table.html.data(using: String.Encoding.utf8)
+    return table.html.data(using: String.Encoding.utf8)*/
+    
+    var html: String = """
+        <table class="domain-telemetry-table">
+            <thead>
+                <tr>
+                    <th>Name</th><th>Value</th><th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+    """
+    
+    domain.telemetry.all.forEach { (row) in
+        html += """
+            <tr>
+                <td class="table-column-name">\(row.name)</td>
+                <td class="table-column-value">\(row.stringValue)</td>
+                <td class="table-column-description">\(row.about)</td>
+            <tr>
+        """
+    }
+    
+    html += """
+            </tbody>
+        </table>
+    """
+    
+    return html.data(using: .utf8)
 }
-
+/*
 fileprivate extension NamedValueProtocol {
     
     func tableRow() -> Tr {
@@ -130,5 +157,5 @@ fileprivate extension NamedValueProtocol {
         let aboutCell = Td(klass: "table-column-description", self.about)
         return Tr(nameCell, valueCell, aboutCell)
     }
-}
+}*/
 

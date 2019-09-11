@@ -3,7 +3,7 @@
 //  File:       Function.SF.Command.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.2.1
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,7 +36,8 @@
 //
 // History
 //
-// 1.0.0 Raised to v1.0.0, Removed old change log,
+// 1.2.1 - Removed Html dependency
+// 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 // Description
@@ -92,7 +93,6 @@
 
 import Foundation
 
-import Html
 import Core
 
 
@@ -107,22 +107,36 @@ func function_sf_command(_ args: Functions.Arguments, _ info: inout Functions.In
         return "Unknown command".data(using: String.Encoding.utf8)
     }
     
-    var form: String
+    //var form: String
     
     switch array.count {
         
     case 1: // 1 argument = button only
         
-        form = Form(method: .post, action: "/serveradmin/sfcommand/\(array[0])", Input.submit(title: array[0])).html
+        //form = Form(method: .post, action: "/serveradmin/sfcommand/\(array[0])", Input.submit(title: array[0])).html
+        
+        return """
+            <form method="post" action="/serveradmin/sfcommand/\(array[0])">
+                <input type="submit" value="\(array[0])">
+            </form>
+        """.data(using: .utf8)
         
     case 2:
         
-        form = Form(method: .post, action: "/serveradmin/sfcommand/\(array[0])", Input.submit(title: array[1])).html
-            
+        //form = Form(method: .post, action: "/serveradmin/sfcommand/\(array[0])", Input.submit(title: array[1])).html
+        
+        return """
+            <form method="post" action="/serveradmin/sfcommand/\(array[0])">
+                <input type="submit" value="\(array[1])">
+            </form>
+        """.data(using: .utf8)
+
     default:
         
-        form = "***error***"
+        //form = "***error***"
+        
+        return "***error***".data(using: .utf8)
     }
-
-    return form.data(using: String.Encoding.utf8)
+    
+    //return form.data(using: String.Encoding.utf8)
 }

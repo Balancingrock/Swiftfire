@@ -3,7 +3,7 @@
 //  File:       Service.Setup.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.2.0
+//  Version:    1.2.1
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.2.1 - Removed dependency on Html
 // 1.2.0 - Initial version
 //
 // =====================================================================================================================
@@ -43,7 +44,7 @@
 import Foundation
 
 import Http
-import Html
+//import Html
 import SwifterLog
 import Core
 import Functions

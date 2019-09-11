@@ -3,7 +3,7 @@
 //  File:       Function.SF.AdminTable.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.2.0
+//  Version:    1.2.1
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.2.1 - Removed dependency on Html
 // 1.2.0 - Initial version
 //
 // =====================================================================================================================
@@ -83,7 +84,6 @@
 
 import Foundation
 
-import Html
 import Core
 import Functions
 
@@ -111,36 +111,60 @@ func function_sf_adminTable(_ args: Functions.Arguments, _ info: inout Functions
     
     
     // Create a list of admins
-    
-    var table = Table(klass: "default-table", columnTitles: ["Account ID", "", ""])
+
+    var table: String = """
+        <table class="default-table">
+            <thead>
+                <tr>
+                    <th>Account ID</th>
+                    <th></th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+    """
     for accountName in environment.domain.accounts {
 
         if accountName != account.name {
-            table.append(Tr(
-                Td(
-                    P(klass: "half-margins-no-padding", accountName)
-                ),
-                Td(
-                    postingButton(target: "/serveradmin/sfcommand/ConfirmDeleteAccount", title: "Delete", keyValuePairs: ["ID":accountName])
-                ),
-                Td(
-                    postingButtonedInput(target: "/serveradmin/sfcommand/SetNewPassword", inputName: "Password", inputValue: "", buttonTitle: "Set New Password", keyValuePairs: ["ID": accountName])
-                )
-            ))
+            
+            table += """
+                <tr>
+                    <td><p class="half-margins-no-padding">\(accountName)</p></td>
+                    <td>
+                        <form method="post" action="/serveradmin/sfcommand/SetNewPassword" class="posting-button-form">
+                            <button type="submit" name="ID" value="\(accountName)" class="posting-button-button">Delete</button>
+                        </form>
+                    </td>
+                    <td>
+                        <form method="post" action="/serveradmin/sfcommand/SetNewPassword">
+                            <input type="hidden" name="ID" value="\(accountName)">"
+                            <input type="text" name="Password" value="">
+                            <input type="submit" value="Set New Password">
+                        </form>
+                    </td>
+                </tr>
+            """
+            
         } else {
-            table.append(Tr(
-                Td(
-                    P(klass: "half-margins-no-padding", accountName)
-                ),
-                Td(),
-                Td(
-                    postingButtonedInput(target: "/serveradmin/sfcommand/SetNewPassword", inputName: "Password", inputValue: "", buttonTitle: "Set New Password", keyValuePairs: ["ID": accountName])
-                )
-            ))
+            
+            table += """
+                <tr>
+                    <td><p class="half-margins-no-padding">\(accountName)</p></td>
+                    <td></td>
+                    <td>
+                        <form method="post" action="/serveradmin/sfcommand/SetNewPassword">
+                            <input type="hidden" name="ID" value="\(accountName)">"
+                            <input type="text" name="Password" value="">
+                            <input type="submit" value="Set New Password">
+                        </form>
+                    </td>
+                </tr>
+            """
+
         }
     }
     
-    return table.html.data(using: String.Encoding.utf8)
+    return table.data(using: String.Encoding.utf8)
 }
 
 

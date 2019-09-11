@@ -3,7 +3,7 @@
 //  File:       Function.SF.DomainsTable.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.2.1
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,7 +36,8 @@
 //
 // History
 //
-// 1.0.0 Raised to v1.0.0, Removed old change log,
+// 1.2.1 - Removed dependency on Html
+// 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 // Description
@@ -83,7 +84,6 @@
 
 import Foundation
 
-import Html
 import Core
 import Functions
 
@@ -131,7 +131,7 @@ func function_sf_domainsTable(_ args: Functions.Arguments, _ info: inout Functio
     
     let list = domainsAndAliases.sorted(by: { $0.key < $1.key })
     
-    
+    /*
     var domainTables: Array<Html> = []
     
     list.forEach { (domainName: String, aliases: Array<String>) in
@@ -166,6 +166,82 @@ func function_sf_domainsTable(_ args: Functions.Arguments, _ info: inout Functio
     }
     
     return Div(klass: "domains-list", domainTables.reduce("", { $0 + $1.html })).html.data(using: String.Encoding.utf8)
+    */
+    
+    var html: String = """
+        <div class="domains-list">
+    """
+    
+    list.forEach { (domainName: String, aliases: Array<String>) in
+        
+        html += """
+            <table class="domains-table">
+                <thead><tr><th>Domain:</th><th>\(domainName)</th></tr></thead>
+                <tbody>
+        """
+        
+        if aliases.count == 0 {
+            
+            html += """
+                <tr>
+                    <td>Aliases:</td>
+                    <td>
+                        <form method="post" action="/serveradmin/sfcommand/CreateAlias" class="posting-buttoned-input-form">
+                            <input type="hidden" name="DomainName" value="\(domainName)">
+                            <input class="posting-buttoned-input-input" type="text" name="Alias" value=""</input>
+                            <button type="submit" class="posting-buttoned-input-button">Create Alias</button>
+                        </form>
+                    </td>
+                </tr>
+            """
+            
+        } else {
+            
+            var firstAlias = true
+            for alias in aliases {
+                if alias != domainName {
+
+                    html += """
+                        <tr>
+                            <td>\(firstAlias ? "Aliases:" : "")</td>
+                            <td>
+                                <form method="post" action="/serveradmin/sfcommand/DeleteAlias" class="posting-button-form">
+                                    <button type="submit" name="Alias" value="\(alias)" class="posting-button-button">Delete Alias</button>
+                                </form>
+                            </td>
+                        </tr>
+                    """
+
+                    firstAlias = false
+                }
+            }
+        }
+        
+        html += """
+                    <tr>
+                        <td>Aliases:</td>
+                        <td>
+                            <form method="post" action="/serveradmin/sfcommand/CreateAlias" class="posting-buttoned-input-form">
+                                <input type="hidden" name="DomainName" value="\(domainName)">
+                                <input class="posting-buttoned-input-input" type="text" name="Alias" value=""</input>
+                                <button type="submit" class="posting-buttoned-input-button">Create Alias</button>
+                            </form>
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
+            <form method="post" action="/serveradmin/pages/deletedomain.sf.html" class="posting-button-form">
+                <button type="submit" name="DomainName" value="\(domainName)" class="posting-button-button">Delete Domain</button>
+            </form>
+        """
+
+    }
+    
+    html += """
+        </div>
+    """
+    
+    return html.data(using: .utf8)
 }
 
 

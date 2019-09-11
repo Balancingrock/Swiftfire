@@ -3,7 +3,7 @@
 //  File:       Function.SF.DomainsMenu.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.2.1
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,7 +36,8 @@
 //
 // History
 //
-// 1.0.0 Raised to v1.0.0, Removed old change log,
+// 1.2.1 - Removed dependency on Html
+// 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 // Description
@@ -83,7 +84,6 @@
 
 import Foundation
 
-import Html
 import Core
 import Functions
 
@@ -92,42 +92,83 @@ import Functions
 
 func function_sf_domainsMenu(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: inout Functions.Environment) -> Data? {
     
-    func subitem(link: String) -> Div {
-        let text = Div(klass:"text", link)
-        let symbol = Div(klass: "symbol")
-        let title = Div(klass: "title", symbol, text)
-        return Div(klass: "subitem", title)
-    }
+    //func subitem(link: String) -> Div {
+    //    let text = Div(klass:"text", link)
+    //    let symbol = Div(klass: "symbol")
+    //    let title = Div(klass: "title", symbol, text)
+    //    return Div(klass: "subitem", title)
+    //}
     
 
-    let checkbox = Input(.checkbox, [], "domain-checkbox")
+    //let checkbox = Input(.checkbox, [], "domain-checkbox")
 
-    let label = Label(klass: "symbol", forId: "domain-checkbox", P(klass: "code"))
+    //let label = Label(klass: "symbol", forId: "domain-checkbox", P(klass: "code"))
     
-    let text = Div(klass: "text", P(klass: "paddingAsLInk", "Domains"))
+    //let text = Div(klass: "text", P(klass: "paddingAsLInk", "Domains"))
 
-    let title = Div(klass: "title", label, text)
+    //let title = Div(klass: "title", label, text)
     
-    var dropdown = Div(klass: "dropdown")
+    //var dropdown = Div(klass: "dropdown")
 
-    dropdown.append(Div(klass: "subitem-separator", P("<!-- empty but necessary! -->")))
+    //dropdown.append(Div(klass: "subitem-separator", P("<!-- empty but necessary! -->")))
     
-    let link = A(href: "/serveradmin/pages/domain-management.sf.html", P("Manage Domains"))
+    //let link = A(href: "/serveradmin/pages/domain-management.sf.html", P("Manage Domains"))
 
-    dropdown.append(subitem(link: link.html))
+    //dropdown.append(subitem(link: link.html))
     
-    for domain in domains {
-        dropdown.append(Div(klass: "subitem-separator", P("<!-- empty but necessary! -->")))
-        dropdown.append(subitem(link: postingLink(target: "/serveradmin/pages/domain.sf.html", text: domain.name, keyValuePairs: ["DomainName": domain.name])))
-    }
+    //for domain in domains {
+    //    dropdown.append(Div(klass: "subitem-separator", P("<!-- empty but necessary! -->")))
+    //    dropdown.append(subitem(link: postingLink(target: "/serveradmin/pages/domain.sf.html", text: domain.name, keyValuePairs: ["DomainName": //domain.name])))
+    //}
 
-    let item = Div(klass: "item", checkbox, title, dropdown)
+    //let item = Div(klass: "item", checkbox, title, dropdown)
     
-    let item_separator = Div(klass: "item-separator", P("<!-- empty but necessary! -->"))
+    //let item_separator = Div(klass: "item-separator", P("<!-- empty but necessary! -->"))
     
     
     // If the next expression fails, it will be noticable during tests
     
-    return (item_separator.html + item.html).data(using: String.Encoding.utf8)!
+    //return (item_separator.html + item.html).data(using: String.Encoding.utf8)!
+    
+    var html: String = """
+        <div class="item-separator"><p><!-- empty but necessary! --></p></div>
+        <div class="item">
+            <input id="domain-checkbox" type="checkbox">
+            <div class="title">
+                <label class="symbol" for="domain-checkbox"><p class="code"></p></label>
+                <div class="text"><p class="paddingAsLink">Domains</p></div>
+                <div class="dropdown">
+                    <div class="subitem-separator"><p><!-- empty but necessary! --></p></div>
+                    <div class="subitem">
+                        <div class="title">
+                            <div class="symbol"></div>
+                            <div class="text"><a href="/serveradmin/pages/domain-management.sf.html"><p>Manage Domains</p></div>
+                        </div>
+                    </div>
+    """
+
+    for domain in domains {
+        html += """
+            <div class="subitem-separator"><p><!-- empty but necessary! --></p></div>
+            <div class="subitem">
+                <div class="title">
+                    <div class="symbol"></div>
+                    <div class="text"><a href="/serveradmin/pages/domain-management.sf.html">
+                        <form class="posting-link-form" method="post" action="/serveradmin/pages/domain.sf.html">
+                            <button type="submit" name="DomainName" value="\(domain.name)" class="posting-link-button">\(domain.name)</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        """
+    }
+    
+    html += """
+                </div>
+            </div>
+        </div>
+    """
+    
+    return html.data(using: .utf8)
 }
 

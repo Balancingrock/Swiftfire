@@ -3,7 +3,7 @@
 //  File:       Function.SF.DomainBlacklistTable.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.2.1
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,7 +36,8 @@
 //
 // History
 //
-// 1.0.0 Raised to v1.0.0, Removed old change log,
+// 1.2.1 - Removed dependency on Html
+// 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 // Description
@@ -86,7 +87,7 @@
 
 import Foundation
 
-import Html
+//import Html
 import Core
 
 
@@ -121,7 +122,7 @@ func function_sf_domainBlacklistTable(_ args: Functions.Arguments, _ info: inout
 
     
     // Create the table
-    
+    /*
     var table = Table(klass: ["server-blacklist-table"], columnTitles: "Address", "Action", "")
     domain.blacklist.list.forEach { (address, action) in
         
@@ -161,4 +162,69 @@ func function_sf_domainBlacklistTable(_ args: Functions.Arguments, _ info: inout
     let createForm = Form(klass: ["server-blacklist-create"], method: .post, action: "/serveradmin/sfcommand/AddToDomainBlacklist", textDiv, radioDiv, createHidden, submitDiv)
     
     return (table.html + Br().html + createForm.html).data(using: String.Encoding.utf8)
+    */
+    
+    var html: String = """
+        <table class="server-blacklist-table">
+            <thead>
+                <tr>
+                    <th>Address</th>
+                    <th>Action</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+    """
+    
+    domain.blacklist.list.forEach { (address, action) in
+        html += """
+            <tr>
+                <td>\(address)</td>
+                <td>
+                    <form method="post" action="/serveradmin/sfcommand/UpdateDomainBlacklist">
+                        <input type="radio" name="\(address)" value="close" \(action == .closeConnection ? "checked" : "")>
+                        <span> Close Connection, </span>
+                        <input type="radio" name="\(address)" value="503" \(action == .send503ServiceUnavailable ? "checked" : "")>
+                        <span> 503 Service Unavailable, </span>
+                        <input type="radio" name="\(address)" value="401" \(action == .send401Unauthorized ? "checked" : "")>
+                        <span> 401 Unauthorized </span>
+                        <input type="hidden" name="DomainName" value="\(domain.name)">
+                        <input type="submit" value="Update">
+                    </form>
+                </td>
+                <td>
+                    <form method="post" action="/serveradmin/sfcommand/RemoveFromDomainBlacklist">
+                        <input type="hidden" name="DomainName" value="\(domain.name)">
+                        <input type="submit" value="Delete">
+                    </form>
+                </td>
+            </tr>
+        """
+    }
+    
+    html += """
+            </tbody>
+        </table>
+        <br>
+        <form class="server-blacklist-create" method="post" action="/serveradmin/sfcommand/AddToDomainBlacklist">
+            <div>
+                <span>Address: </span>
+                <input type="text" name="NewEntry" value="">
+            </div>
+            <div>
+                <input type="radio" name="action" value="close">
+                <span> Close Connection, </span>
+                <input type="radio" name="action" value="503">
+                <span> 503 Service Unavailable, </span>
+                <input type="radio" name="action" value="401">
+                <span> 401 Unauthorized </span>
+            </div>
+            <input type="hidden" name="DomainName" value="\(domain.name)">"
+            <div>
+                <input type="submit" value="Add to Blacklist">
+            </div>
+        </form>
+    """
+    
+    return html.data(using: .utf8)
 }

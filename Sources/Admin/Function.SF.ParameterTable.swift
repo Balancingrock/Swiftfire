@@ -3,7 +3,7 @@
 //  File:       Function.SF.ParameterTable.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.2.1
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,7 +36,8 @@
 //
 // History
 //
-// 1.0.0 Raised to v1.0.0, Removed old change log,
+// 1.2.1 - Removed dependency on Html
+// 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 // Description
@@ -83,7 +84,6 @@
 
 import Foundation
 
-import Html
 import Core
 
 
@@ -111,12 +111,49 @@ func function_sf_parameterTable(_ args: Functions.Arguments, _ info: inout Funct
     
     // Create the table
     
-    var table = Table(klass: ["parameter-table"], header: Thead(titles: "Name", "Value", "Description"))
-    serverParameters.all.forEach() { if $0.name != serverParameters.adminSiteRoot.name { table.append($0.tableRow()) }}
+    //var table = Table(klass: ["parameter-table"], header: Thead(titles: "Name", "Value", "Description"))
+    //serverParameters.all.forEach() { if $0.name != serverParameters.adminSiteRoot.name { table.append($0.tableRow()) }}
   
-    return table.html.data(using: String.Encoding.utf8)
+    //return table.html.data(using: String.Encoding.utf8)
+    
+    var html: String = """
+        <table class="parameter-table">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>Value</th>
+                    <th>Description</th>
+                </tr>
+            </thead>
+            <tbody>
+    """
+    
+    serverParameters.all.forEach {
+        if $0.name != serverParameters.adminSiteRoot.name {
+            
+            html += """
+                <tr>
+                    <td>\($0.name)</td>
+                    <td>
+                        <form method="post" action="/serveradmin/sfcommand/SetParameter">
+                            <input type="text name="\($0.name)" value="\($0.stringValue)">
+                            <input type="submit" value="Update"
+                        </form>
+                    </td>
+                    <td>\($0.about)</td>
+                </tr>
+            """
+        }
+    }
+    
+    html += """
+            </tbody>
+        </table>
+    """
+    
+    return html.data(using: .utf8)
 }
-
+/*
 fileprivate extension NamedValueProtocol {
     
     func tableRow() -> Tr {
@@ -132,4 +169,4 @@ fileprivate extension NamedValueProtocol {
         return Tr(nameCell, valueCell, aboutCell)
     }
 }
-
+*/

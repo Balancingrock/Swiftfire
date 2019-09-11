@@ -3,7 +3,7 @@
 //  File:       Function.SF.TelemetryTable.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.2.1
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,7 +36,8 @@
 //
 // History
 //
-// 1.0.0 Raised to v1.0.0, Removed old change log,
+// 1.2.1 - Removed dependecy on Html
+// 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 // Description
@@ -83,7 +84,6 @@
 
 import Foundation
 
-import Html
 import Core
 
 
@@ -111,16 +111,42 @@ func function_sf_telemetryTable(_ args: Functions.Arguments, _ info: inout Funct
     
     // Create the table
     
-    var table = Table(klass: "telemetry-table", columnTitles: "Name", "Value", "Description")
-    serverTelemetry.all.forEach() { table.append($0.tableRow()) }
+    //var table = Table(klass: "telemetry-table", columnTitles: "Name", "Value", "Description")
+    //serverTelemetry.all.forEach() { table.append($0.tableRow()) }
     
-    return table.html.data(using: String.Encoding.utf8)
-}
+    //return table.html.data(using: String.Encoding.utf8)
+    
+    var html: String = """
+        <table class="telemetry-table">
+            <thead>
+                <tr><th>Name</th><th>Value</th><th>Description</th></tr>
+            </thead>
+            <tbody>
+    """
+    
+    serverTelemetry.all.forEach {
 
+        html += """
+            <tr>
+                <td class="table-column-name">\($0.name)</td>
+                <td class="table-column-value">\($0.stringValue)</td>
+                <td class="table-column-description">\($0.about)</td>
+            </tr>
+        """
+    }
+
+    html += """
+            </tbody>
+        </table>
+    """
+    
+    return html.data(using: .utf8)
+}
+/*
 fileprivate extension NamedValueProtocol {
     
     func tableRow() -> Tr {
         return Tr(Td(klass: "table-column-name", self.name), Td(klass: "table-column-value", self.stringValue), Td(klass: "table-column-description", self.about))
     }
 }
-
+*/

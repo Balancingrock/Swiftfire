@@ -3,7 +3,7 @@
 //  File:       Function.SF.DomainServicesTable.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.2.1
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,7 +36,8 @@
 //
 // History
 //
-// 1.0.0 Raised to v1.0.0, Removed old change log,
+// 1.2.1 - Removed dependency on Html
+// 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 // Description
@@ -82,7 +83,6 @@
 
 import Foundation
 
-import Html
 import Core
 
 
@@ -139,7 +139,7 @@ func function_sf_domainServicesTable(_ args: Functions.Arguments, _ info: inout 
     
     
     // Create the table
-    
+    /*
     let hidden = Input.hidden(name: "DomainName", value: domain.name)
     var table = Table(klass: ["domain-service-table"], columnTitles: "Index", "Seq.", "Service Name", "Used")
 
@@ -162,6 +162,49 @@ func function_sf_domainServicesTable(_ args: Functions.Arguments, _ info: inout 
     let form = Form(method: .post, action: "/serveradmin/sfcommand/UpdateDomainServices", hidden, table, submitButton)
     
     return form.html.data(using: String.Encoding.utf8)
+    */
+    
+    var html: String = """
+        <form method="post" action="/serveradmin/sfcommand/UpdateDomainServices">
+            <input type="hidden" name="DomainName" value="\(domain.name)">
+            <table class="domain-service-table">
+                <thead>
+                    <tr>
+                        <th>Index</th><th>Seq.</th><th>Service Name</th><th>Used</th>
+                    </tr>
+                </thead>
+                <tbody>
+    """
+    
+    for row in tableRows {
+        
+        html += """
+            <tr>
+                <td>
+                    <span>\(row.rowIndex.description)</span>
+                </td>
+                <td>
+                    <input type="hidden" name="nameName\(row.rowIndex)" value="\(row.name)">
+                    <input class="seq-column" type="text" name="seqName\(row.rowIndex)" value="\(row.rowIndex.description)">
+                </td>
+                <td>
+                    <input class="name-column" type="text" name="nameName\(row.rowIndex)" value="\(row.name)" disabled>
+                </td>
+                <td>
+                    <input class="used-column" type="checkbox" name="usedName\(row.rowIndex)" value="usedName\(row.rowIndex)" \(row.usedByDomain ? "checked" : "")>
+                </td>
+            </tr>
+        """
+    }
+    
+    html += """
+                </tbody>
+            </table>
+            <input class="service-submit-form" type="submit" name="Submit" value="Update Services">
+        </form>
+    """
+    
+    return html.data(using: .utf8)
 }
 
 

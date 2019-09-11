@@ -3,7 +3,7 @@
 //  File:       Function.PostingButton.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.2.0
+//  Version:    1.2.1
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.2.1 - Restructured
 // 1.2.0 - Allow usage of keyed arguments for value arguments.
 // 1.0.0 - Raised to v1.0.0, Removed old change log
 //
@@ -56,10 +57,23 @@ import Core
 
 
 public func postingButton(target: String, title: String, keyValuePairs: Dictionary<String, String>) -> String {
+    
     if keyValuePairs.isEmpty { return "***Error***" }
+    
     var dict = keyValuePairs
+    
     let pair = dict.remove(at: dict.startIndex)
-    return "<form method=\"post\" action=\"\(target)\" class=\"posting-button-form\">\(dict.reduce("", { (p, q) in return p.appending("<input type=\"hidden\" name=\"\(q.key)\" value=\"\(q.value)\">") }))<button type=\"submit\" name=\"\(pair.key)\" value=\"\(pair.value)\" class=\"posting-button-button\">\(title)</button></form>"
+    
+    let html: String = """
+        <form method="post" action="\(target)" class="posting-button-form">
+            \(dict.reduce("", { (p, q) in return p.appending("""
+                <input type="hidden" name="\(q.key)" value="\(q.value)">
+            """)}))
+            <button type="submit" name="\(pair.key)" value="\(pair.value)" class="posting-button-button">\(title)</button>
+        </form>
+    """
+    
+    return html
 }
 
 

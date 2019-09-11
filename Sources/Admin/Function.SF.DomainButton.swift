@@ -119,5 +119,13 @@ public func function_sf_domainButton(_ args: Functions.Arguments, _ info: inout 
     
     // Create html code
     
-    return postingButton(target: arr[0], title: arr[1], keyValuePairs: dict).data(using: String.Encoding.utf8)
+    let html: String = """
+        <form method="post" action="\(arr[0])" class="posting-button-form">
+            <button type="submit" name="ID" value="\(name)" class="posting-button-button">\(arr[1])</button>
+        </form>
+    """
+    
+    return html.data(using: .utf8)
+
+    //return postingButton(target: arr[0], title: arr[1], keyValuePairs: dict).data(using: String.Encoding.utf8)
 }
