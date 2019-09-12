@@ -131,42 +131,6 @@ func function_sf_domainsTable(_ args: Functions.Arguments, _ info: inout Functio
     
     let list = domainsAndAliases.sorted(by: { $0.key < $1.key })
     
-    /*
-    var domainTables: Array<Html> = []
-    
-    list.forEach { (domainName: String, aliases: Array<String>) in
-        
-        var table = Table(klass: "domains-table", columnTitles: "Domain:", "\(domainName)")
-        
-        if aliases.count == 0 {
-            table.append(Tr(Td("Aliases:"), Td(
-                postingButtonedInput(target: "/serveradmin/sfcommand/CreateAlias", inputName: "Alias", inputValue: "", buttonTitle: "Create Alias", keyValuePairs: ["DomainName":domainName])
-            )))
-        } else {
-            var firstAlias = true
-            for alias in aliases {
-                if alias != domainName {
-                    table.append(Tr(firstAlias ? Td("Aliases:") : Td(), Td(
-                        Div(
-                            P(alias),
-                            postingButton(target: "/serveradmin/sfcommand/DeleteAlias", title: "Delete Alias", keyValuePairs: ["Alias":alias])
-                        )
-                    )))
-                    firstAlias = false
-                }
-            }
-        }
-        
-        table.append(Tr(Td(), Td(
-            postingButtonedInput(target: "/serveradmin/sfcommand/CreateAlias", inputName: "Alias", inputValue: "", buttonTitle: "Create Alias", keyValuePairs: ["DomainName":domainName])
-        )))
-
-        domainTables.append(table)
-        domainTables.append(postingButton(target: "/serveradmin/pages/deletedomain.sf.html", title: "Delete Domain", keyValuePairs: ["DomainName":domainName]))
-    }
-    
-    return Div(klass: "domains-list", domainTables.reduce("", { $0 + $1.html })).html.data(using: String.Encoding.utf8)
-    */
     
     var html: String = """
         <div class="domains-list">
@@ -205,9 +169,12 @@ func function_sf_domainsTable(_ args: Functions.Arguments, _ info: inout Functio
                         <tr>
                             <td>\(firstAlias ? "Aliases:" : "")</td>
                             <td>
-                                <form method="post" action="/serveradmin/sfcommand/DeleteAlias" class="posting-button-form">
-                                    <button type="submit" name="Alias" value="\(alias)" class="posting-button-button">Delete Alias</button>
-                                </form>
+                                <div>
+                                    <p>\(alias)</p>
+                                    <form method="post" action="/serveradmin/sfcommand/DeleteAlias" class="posting-button-form">
+                                        <button type="submit" name="Alias" value="\(alias)" class="posting-button-button">Delete Alias</button>
+                                    </form>
+                                </div>
                             </td>
                         </tr>
                     """
@@ -219,7 +186,7 @@ func function_sf_domainsTable(_ args: Functions.Arguments, _ info: inout Functio
         
         html += """
                     <tr>
-                        <td>Aliases:</td>
+                        <td></td>
                         <td>
                             <form method="post" action="/serveradmin/sfcommand/CreateAlias" class="posting-buttoned-input-form">
                                 <input type="hidden" name="DomainName" value="\(domainName)">

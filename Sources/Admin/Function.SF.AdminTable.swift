@@ -112,7 +112,7 @@ func function_sf_adminTable(_ args: Functions.Arguments, _ info: inout Functions
     
     // Create a list of admins
 
-    var table: String = """
+    var html: String = """
         <table class="default-table">
             <thead>
                 <tr>
@@ -127,17 +127,17 @@ func function_sf_adminTable(_ args: Functions.Arguments, _ info: inout Functions
 
         if accountName != account.name {
             
-            table += """
+            html += """
                 <tr>
                     <td><p class="half-margins-no-padding">\(accountName)</p></td>
                     <td>
-                        <form method="post" action="/serveradmin/sfcommand/SetNewPassword" class="posting-button-form">
+                        <form method="post" action="/serveradmin/sfcommand/DeleteAccount" class="posting-button-form">
                             <button type="submit" name="ID" value="\(accountName)" class="posting-button-button">Delete</button>
                         </form>
                     </td>
                     <td>
                         <form method="post" action="/serveradmin/sfcommand/SetNewPassword">
-                            <input type="hidden" name="ID" value="\(accountName)">"
+                            <input type="hidden" name="ID" value="\(accountName)">
                             <input type="text" name="Password" value="">
                             <input type="submit" value="Set New Password">
                         </form>
@@ -147,13 +147,13 @@ func function_sf_adminTable(_ args: Functions.Arguments, _ info: inout Functions
             
         } else {
             
-            table += """
+            html += """
                 <tr>
                     <td><p class="half-margins-no-padding">\(accountName)</p></td>
                     <td></td>
                     <td>
                         <form method="post" action="/serveradmin/sfcommand/SetNewPassword">
-                            <input type="hidden" name="ID" value="\(accountName)">"
+                            <input type="hidden" name="ID" value="\(accountName)">
                             <input type="text" name="Password" value="">
                             <input type="submit" value="Set New Password">
                         </form>
@@ -164,7 +164,12 @@ func function_sf_adminTable(_ args: Functions.Arguments, _ info: inout Functions
         }
     }
     
-    return table.data(using: String.Encoding.utf8)
+    html += """
+            </tbody>
+        </table>
+    """
+    
+    return html.data(using: String.Encoding.utf8)
 }
 
 

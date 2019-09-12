@@ -3,7 +3,7 @@
 //  File:       Service.SF.ServerAdmin.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.2.0
+//  Version:    1.2.1
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,8 @@
 //
 // History
 //
+// 1.2.1 - Fixed bug that failed to update the root directory for the sfadmin
+//         Added more debug entries as well as a couple of notification logentries
 // 1.2.0 - Added admin account creation and removal
 //       - Added creation of domain admin
 // 1.1.0 - Changed server blacklist location
@@ -443,9 +445,34 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
     }
     
     
+    // Special case: The root site for the serveradmin must be updated
+    
+    if relPath.contains("sfcommand/SetRoot") {
+        
+        Log.atDebug?.log("Found set root command")
+        
+        if let postInfo = info[.postInfoKey] as? PostInfo {
+            if let newRootPath = postInfo[SERVER_ADMIN_CREATE_ACCOUNT_ROOT], !newRootPath.isEmpty {
+        
+                Log.atDebug?.log("Setting root path to: \(newRootPath)")
+                
+                serverParameters.adminSiteRoot.value = newRootPath
+                serverAdminDomain.webroot = newRootPath
+                
+                serverParameters.store()
+                
+                relPath = "/index.sf.html"
+            }
+        }
+    }
+    
+    
     // Catch the possibility where the admin has manually changed the configuration files and made an error
     
     if !adminSiteRootIsValid(connection.filemanager) {
+        
+        Log.atError?.log("Admin site root is invalid at: \(serverParameters.adminSiteRoot.value)")
+        
         adminStatusPage()
         return .next
     }
@@ -655,10 +682,13 @@ fileprivate enum CommandExecutionResult {
 
 fileprivate func executeSfCommand(_ pathComponents: Array<String>, _ postInfo: inout PostInfo?, _ session: Session, _ info: inout Services.Info, _ response: inout Response) -> CommandExecutionResult {
     
-    Log.atDebug?.log(from: Source(id: -1, file: #file, function: #function, line: #line))
+    guard let commandName = pathComponents.first else {
+        Log.atError?.log("No command name found")
+        return .nop
+    }
 
-    guard let commandName = pathComponents.first else { return .nop }
-        
+    Log.atDebug?.log("Executing command: \(commandName)")
+
     switch commandName {
     case "SetRoot": executeSetRoot(postInfo); return .newPath("")
     case "SetParameter": executeSetParameter(postInfo); return .newPath("/pages/parameters.sf.html")
@@ -669,7 +699,7 @@ fileprivate func executeSfCommand(_ pathComponents: Array<String>, _ postInfo: i
     case "CancelQuit": return .newPath("")
     case "ConfirmedQuit": executeQuitSwiftfire(); return .newPath("/pages/bye.sf.html")
     case "UpdateDomain": executeUpdateDomain(&postInfo); return .newPath("/pages/domain.sf.html")
-    case "UpdateDomainServices": executeUpdateDomainServices(&postInfo); return .newPath("/pages/domain-management.sf.html")
+    case "UpdateDomainServices": executeUpdateDomainServices(&postInfo); return .newPath("/pages/domain.sf.html")
     case "DeleteDomain": executeDeleteDomain(&postInfo); return .newPath("/pages/domain-management.sf.html")
     case "CreateDomain": executeCreateDomain(&postInfo); return .newPath("/pages/domain-management.sf.html")
     case "CreateAdmin": executeCreateAdmin(postInfo); return .newPath("/pages/admin-management.sf.html")
@@ -683,10 +713,10 @@ fileprivate func executeSfCommand(_ pathComponents: Array<String>, _ postInfo: i
     case "UpdateBlacklist": executeUpdateBlacklist(&postInfo); return .newPath("/pages/blacklist.sf.html")
     case "AddToBlacklist": executeAddToBlacklist(&postInfo); return .newPath("/pages/blacklist.sf.html")
     case "RemoveFromBlacklist": executeRemoveFromBlacklist(&postInfo); return .newPath("/pages/blacklist.sf.html")
-    case "UpdateDomainBlacklist": executeUpdateDomainBlacklist(&postInfo); return .newPath("/pages/domain-management.sf.html")
-    case "AddToDomainBlacklist": executeAddToDomainBlacklist(&postInfo); return .newPath("/pages/domain-management.sf.html")
-    case "RemoveFromDomainBlacklist": executeRemoveFromDomainBlacklist(&postInfo); return .newPath("/pages/domain-management.sf.html")
-    case "SetDomainAdminPassword": executeSetDomainAdminPassword(postInfo); return .newPath("/pages/domain-management.sf.html")
+    case "UpdateDomainBlacklist": executeUpdateDomainBlacklist(&postInfo); return .newPath("/pages/domain.sf.html")
+    case "AddToDomainBlacklist": executeAddToDomainBlacklist(&postInfo); return .newPath("/pages/domain.sf.html")
+    case "RemoveFromDomainBlacklist": executeRemoveFromDomainBlacklist(&postInfo); return .newPath("/pages/domain.sf.html")
+    case "SetDomainAdminPassword": executeSetDomainAdminPassword(postInfo); return .newPath("/pages/domain.sf.html")
     case "Logout": return executeLogout(session);
         
     default:
@@ -747,9 +777,20 @@ fileprivate func executeUpdateBlacklist(_ postInfo: inout PostInfo?) {
 }
 
 fileprivate func executeAddToBlacklist(_ postInfo: inout PostInfo?) {
-    let _ = postInfo?.removeValue(forKey: "submit")
-    guard let address = postInfo?["newEntry"], isValidIpAddress(address) else { return }
-    guard let action = postInfo?["action"] else { return }
+    
+    guard
+        let address = postInfo?["NewEntry"],
+        isValidIpAddress(address)
+    else {
+        Log.atError?.log("Unknown address for key NewEntry")
+        return
+    }
+
+    guard let action = postInfo?["Action"] else {
+        Log.atError?.log("Unknown action for key Action")
+        return
+    }
+
     let newAction: Blacklist.Action = {
         switch action {
         case "close": return .closeConnection
@@ -760,25 +801,44 @@ fileprivate func executeAddToBlacklist(_ postInfo: inout PostInfo?) {
             return .closeConnection
         }
     }()
+    
     serverAdminDomain.blacklist.add(address, action: newAction)
+    
+    Log.atNotice?.log("Added address \(address) to server blacklist")
 }
 
 fileprivate func executeRemoveFromBlacklist(_ postInfo: inout PostInfo?) {
-    guard let (address, _) = postInfo?.popFirst() else { return }
+    
+    guard let address = postInfo?["Address"] else {
+        Log.atError?.log("Missing address for key Address")
+        return
+    }
+    
     serverAdminDomain.blacklist.remove(address)
+    
+    Log.atNotice?.log("Removed address \(address) from server blacklist")
 }
 
 fileprivate func executeUpdateDomainBlacklist(_ postInfo: inout PostInfo?) {
-    let _ = postInfo?.removeValue(forKey: "submit")
-    guard let name = postInfo?.removeValue(forKey: "DomainName"),
-        let domain = domains.domain(for: name) else {
-            Log.atError?.log("Missing domain name")
+    
+    guard
+        let name = postInfo?["DomainName"],
+        let domain = domains.domain(for: name)
+        else {
+            Log.atError?.log("Missing or wrong domain name")
             return
     }
-    guard let (address, action) = postInfo?.popFirst() else {
-        Log.atError?.log("Missing address & action")
+    
+    guard let address = postInfo?["Address"] else {
+        Log.atError?.log("Missing address")
         return
     }
+    
+    guard let action = postInfo?["Action"] else {
+        Log.atError?.log("Missing action")
+        return
+    }
+
     let newAction: Blacklist.Action = {
         switch action {
         case "close": return .closeConnection
@@ -789,18 +849,35 @@ fileprivate func executeUpdateDomainBlacklist(_ postInfo: inout PostInfo?) {
             return .closeConnection
         }
     }()
+    
     domain.blacklist.update(action: newAction, for: address)
+    
+    Log.atNotice?.log("Updated action of address \(address) to \(action) in domain \(domain.name) blacklist")
 }
 
 fileprivate func executeAddToDomainBlacklist(_ postInfo: inout PostInfo?) {
-    let _ = postInfo?.removeValue(forKey: "submit")
-    guard let name = postInfo?.removeValue(forKey: "DomainName"),
-        let domain = domains.domain(for: name) else {
+    
+    guard
+        let name = postInfo?["DomainName"],
+        let domain = domains.domain(for: name)
+        else {
             Log.atError?.log("Missing domain name")
             return
     }
-    guard let address = postInfo?["newEntry"], isValidIpAddress(address) else { return }
-    guard let action = postInfo?["action"] else { return }
+    
+    guard
+        let address = postInfo?["NewEntry"],
+        isValidIpAddress(address)
+        else {
+        Log.atError?.log("No 'NewEntry' key found in postInfo dictionary")
+        return
+    }
+    
+    guard let action = postInfo?["Action"] else {
+        Log.atError?.log("No 'Action' key found in postInfo dictionary")
+        return
+    }
+    
     let newAction: Blacklist.Action = {
         switch action {
         case "close": return .closeConnection
@@ -811,17 +888,30 @@ fileprivate func executeAddToDomainBlacklist(_ postInfo: inout PostInfo?) {
             return .closeConnection
         }
     }()
+    
     domain.blacklist.add(address, action: newAction)
+    
+    Log.atNotice?.log("Added address \(address) with action \(action) to domain \(domain.name) blacklist")
 }
 
 fileprivate func executeRemoveFromDomainBlacklist(_ postInfo: inout PostInfo?) {
-    guard let name = postInfo?.removeValue(forKey: "DomainName"),
-        let domain = domains.domain(for: name) else {
+    
+    guard
+        let name = postInfo?["DomainName"],
+        let domain = domains.domain(for: name)
+        else {
             Log.atError?.log("Missing domain name")
             return
     }
-    guard let (address, _) = postInfo?.popFirst() else { return }
+    
+    guard let address = postInfo?["Address"] else {
+        Log.atError?.log("Missing address for key Address")
+        return
+    }
+    
     domain.blacklist.remove(address)
+    
+    Log.atNotice?.log("Removed address \(address) from domain \(domain.name) blacklist")
 }
 
 
@@ -833,15 +923,11 @@ fileprivate func executeUpdateDomain(_ postInfo: inout PostInfo?) {
         Log.atError?.log("Missing postInfo")
         return
     }
-    _ = postInfo?.removeValue(forKey: "DomainName")
+    
+    _ = postInfo!.removeValue(forKey: "DomainName")
     
     guard let domain = domains.domain(for: name) else {
         Log.atError?.log("Missing DomainName in postInfo")
-        return
-    }
-    
-    guard postInfo?.count ?? 0 == 1 else {
-        Log.atError?.log("Too many key/value pairs postInfo \(String(describing:postInfo))")
         return
     }
     

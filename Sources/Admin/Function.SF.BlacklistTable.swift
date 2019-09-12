@@ -110,43 +110,6 @@ func function_sf_blacklistTable(_ args: Functions.Arguments, _ info: inout Funct
     
     
     // Create the table
-    /*
-    var table = Table(klass: ["server-blacklist-table"], columnTitles: "Address", "Action", "")
-    serverAdminDomain.blacklist.list.forEach { (address, action) in
-
-        let addressCell = Td(address)
-
-        let radioButtonClose = Input.radio(name: address, value: "close", checked: (action == .closeConnection))
-        let radioButton503 = Input.radio(name: address, value: "503", checked: (action == .send503ServiceUnavailable))
-        let radioButton401 = Input.radio(name: address, value: "401", checked: (action == .send401Unauthorized))
-        let updateButton = Input.submit(title: "Update")
-        let updateForm = Form(method: .post, action: "/serveradmin/sfcommand/UpdateBlacklist", radioButtonClose, " Close Connection, ", radioButton503, " 503 Service Unavailable, ", radioButton401, " 401 Unauthorized ", updateButton)
-        let updateCell = Td(updateForm)
-        
-        let deleteButton = Input.submit(name: address, title: "Delete")
-        let deleteForm = Form(method: .post, action: "/serveradmin/sfcommand/RemoveFromBlacklist", deleteButton)
-        let deleteCell = Td(deleteForm)
-        
-        table.appendRow(addressCell, updateCell, deleteCell)
-    }
-    
-    let textField = Input.text(name: "newEntry", value: "")
-    let textDiv = Div("Address: ", textField)
-
-    let radioButtonClose = Input.radio(name: "action", value: "close", checked: true)
-    let radioButton503 = Input.radio(name: "action", value: "503", checked: false)
-    let radioButton401 = Input.radio(name: "action", value: "401", checked: false)
-    let radioDiv = Div(radioButtonClose, " Close Connection", Br(),
-                       radioButton503, " 503 Service Unavailable", Br(),
-                       radioButton401, " 401 Unauthorized")
-    
-    let submitButton = Input.submit(title: "Add to Blacklist")
-    let submitDiv = Div(submitButton)
-
-    let createForm = Form(klass: ["server-blacklist-create"], method: .post, action: "/serveradmin/sfcommand/AddToBlacklist", textDiv, radioDiv, submitDiv)
-    
-    return (table.html + Br().html + createForm.html).data(using: String.Encoding.utf8)
-    */
     
     var html: String = """
         <table class="server-blacklist-table">
@@ -160,25 +123,32 @@ func function_sf_blacklistTable(_ args: Functions.Arguments, _ info: inout Funct
             <tbody>
     """
     
-    serverAdminDomain.blacklist.list.forEach { (address, action) in
+    let list = serverAdminDomain.blacklist.list.keys.sorted(by: { $0 < $1 })
+    
+    list.forEach { address in
+        
+        let action = serverAdminDomain.blacklist.action(for: address)
+        
         html += """
             <tr>
                 <td>\(address)</td>
                 <td>
                     <form method="post" action="/serveradmin/sfcommand/UpdateBlacklist">
-                        <input type="radio" name="\(address)" value="close" \(action == .closeConnection ? "checked" : "")>
+                        <input type="hidden" name="Address" value="\(address)">
+                        <input type="radio" name="Action" value="close" \(action == .closeConnection ? "checked" : "")>
                         <span> Close Connection, </span>
-                        <input type="radio" name="\(address)" value="503" \(action == .send503ServiceUnavailable ? "checked" : "")>
+                        <input type="radio" name="Action" value="503" \(action == .send503ServiceUnavailable ? "checked" : "")>
                         <span> 503 Service Unavailable, </span>
-                        <input type="radio" name="\(address)" value="401" \(action == .send401Unauthorized ? "checked" : "")>
+                        <input type="radio" name="Action" value="401" \(action == .send401Unauthorized ? "checked" : "")>
                         <span> 401 Unauthorized </span>
-                        <input type="submit" value="Update"
+                        <input type="submit" value="Update">
                     </form>
                 </td>
-                    <form method="post" action="/serveradmin/sfcommand/RemoveFromBlacklist">
-                        <input type="submit" name="\(address)" value="Delete">
-                    </form>
                 <td>
+                    <form method="post" action="/serveradmin/sfcommand/RemoveFromBlacklist">
+                        <input type="hidden" name="Address" value="\(address)">
+                        <input type="submit" value="Delete">
+                    </form>
                 </td>
             </tr>
         """
@@ -187,15 +157,19 @@ func function_sf_blacklistTable(_ args: Functions.Arguments, _ info: inout Funct
     html += """
             </tbody>
         </table>
+        <br>
         <form class="server-blacklist-create" method="post" action="/serveradmin/sfcommand/AddToBlacklist">
             <div>
                 <span>Address: </span>
-                <input type="text" name="newEntry" value="">
+                <input type="text" name="NewEntry" value="">
             </div>
             <div>
-                <input type="radio" name="action" value="close" checked>
-                <input type="radio" name="action" value="503">
-                <input type="radio" name="action" value="401">
+                <input type="radio" name="Action" value="close" checked>
+                <span> Close, </span>
+                <input type="radio" name="Action" value="503">
+                <span> 503 Service Unavailable, </span>
+                <input type="radio" name="Action" value="401">
+                <span> 401 Unauthorized</span>
             </div>
             <div>
                 <input type="submit" value="Add to Blacklist">

@@ -91,69 +91,40 @@ import Functions
 /// - Returns: A menu for the navbar containing all the domains as submenu items.
 
 func function_sf_domainsMenu(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: inout Functions.Environment) -> Data? {
-    
-    //func subitem(link: String) -> Div {
-    //    let text = Div(klass:"text", link)
-    //    let symbol = Div(klass: "symbol")
-    //    let title = Div(klass: "title", symbol, text)
-    //    return Div(klass: "subitem", title)
-    //}
-    
-
-    //let checkbox = Input(.checkbox, [], "domain-checkbox")
-
-    //let label = Label(klass: "symbol", forId: "domain-checkbox", P(klass: "code"))
-    
-    //let text = Div(klass: "text", P(klass: "paddingAsLInk", "Domains"))
-
-    //let title = Div(klass: "title", label, text)
-    
-    //var dropdown = Div(klass: "dropdown")
-
-    //dropdown.append(Div(klass: "subitem-separator", P("<!-- empty but necessary! -->")))
-    
-    //let link = A(href: "/serveradmin/pages/domain-management.sf.html", P("Manage Domains"))
-
-    //dropdown.append(subitem(link: link.html))
-    
-    //for domain in domains {
-    //    dropdown.append(Div(klass: "subitem-separator", P("<!-- empty but necessary! -->")))
-    //    dropdown.append(subitem(link: postingLink(target: "/serveradmin/pages/domain.sf.html", text: domain.name, keyValuePairs: ["DomainName": //domain.name])))
-    //}
-
-    //let item = Div(klass: "item", checkbox, title, dropdown)
-    
-    //let item_separator = Div(klass: "item-separator", P("<!-- empty but necessary! -->"))
-    
-    
-    // If the next expression fails, it will be noticable during tests
-    
-    //return (item_separator.html + item.html).data(using: String.Encoding.utf8)!
-    
+        
     var html: String = """
         <div class="item-separator"><p><!-- empty but necessary! --></p></div>
         <div class="item">
             <input id="domain-checkbox" type="checkbox">
             <div class="title">
-                <label class="symbol" for="domain-checkbox"><p class="code"></p></label>
-                <div class="text"><p class="paddingAsLink">Domains</p></div>
-                <div class="dropdown">
-                    <div class="subitem-separator"><p><!-- empty but necessary! --></p></div>
-                    <div class="subitem">
-                        <div class="title">
-                            <div class="symbol"></div>
-                            <div class="text"><a href="/serveradmin/pages/domain-management.sf.html"><p>Manage Domains</p></div>
-                        </div>
+                <label class="symbol" for="domain-checkbox">
+                    <p class="code"><!-- will be filled by disclosure indicator --></p>
+                </label>
+                <div class="text"><a href="/serveradmin/pages/domain-management.sf.html"><p>Domains</p></a></div>
+            </div>
+            <div class="dropdown">
+                <div class="subitem-separator"><p><!-- empty but necessary! --></p></div>
+                <div class="subitem">
+                    <input type="checkbox" id="DomainManagement-checkbox">
+                    <div class="title">
+                        <label class="symbol" for="DomainManagement-checkbox">
+                            <p></p>
+                        </label>
+                        <div class="text"><a href="/serveradmin/pages/domain-management.sf.html"><p>Manage Domains</p></a></div>
                     </div>
+                </div>
     """
 
     for domain in domains {
         html += """
             <div class="subitem-separator"><p><!-- empty but necessary! --></p></div>
             <div class="subitem">
+                <input type="checkbox" id="\(domain.name)-checkbox">
                 <div class="title">
-                    <div class="symbol"></div>
-                    <div class="text"><a href="/serveradmin/pages/domain-management.sf.html">
+                    <label class="symbol" for="\(domain.name)-checkbox">
+                        <p></p>
+                    </label>
+                    <div class="text">
                         <form class="posting-link-form" method="post" action="/serveradmin/pages/domain.sf.html">
                             <button type="submit" name="DomainName" value="\(domain.name)" class="posting-link-button">\(domain.name)</button>
                         </form>
@@ -164,7 +135,6 @@ func function_sf_domainsMenu(_ args: Functions.Arguments, _ info: inout Function
     }
     
     html += """
-                </div>
             </div>
         </div>
     """

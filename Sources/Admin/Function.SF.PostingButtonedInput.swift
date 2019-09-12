@@ -177,5 +177,19 @@ func function_sf_postingButtonedInput(_ args: Functions.Arguments, _ info: inout
     
     // Create html code
     
-    return postingButtonedInput(target: arr[0], inputName: arr[1], inputValue: (value ?? arr[2]), buttonTitle: arr[3], keyValuePairs: dict).data(using: String.Encoding.utf8)
+    //return postingButtonedInput(target: arr[0], inputName: arr[1], inputValue: (value ?? arr[2]), buttonTitle: arr[3], keyValuePairs: dict).data(using: String.Encoding.utf8)
+    
+    let html = """
+        <form method="post" action="\(arr[0])" class="posting-buttoned-input-form">
+            \(dict.reduce("", {
+                (p, q) in return p.appending("""
+                    <input type="hidden" name="\(q.key)" value="\(q.value)">
+                """)
+            }))
+            <input class="posting-buttoned-input-input" type="text" name="\(arr[1])" value="\((value ?? arr[2]))"</input>
+            <button type="submit" class="posting-buttoned-input-button">\(arr[3])</button>
+        </form>
+    """
+    
+    return html.data(using: .utf8)
 }
