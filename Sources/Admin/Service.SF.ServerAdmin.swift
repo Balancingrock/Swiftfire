@@ -758,11 +758,17 @@ fileprivate func executeSaveDomains() { domains.storeDomainsAndAliases() }
 fileprivate func executeReadDomains() { _ = domains.loadDomainsAndAliases() }
 
 fileprivate func executeUpdateBlacklist(_ postInfo: inout PostInfo?) {
-    let _ = postInfo?.removeValue(forKey: "submit")
-    guard let (address, action) = postInfo?.popFirst() else {
-        Log.atError?.log("Missing address & action")
+    
+    guard let address = postInfo?["Address"] else {
+        Log.atError?.log("Missing address")
         return
     }
+    
+    guard let action = postInfo?["Action"] else {
+        Log.atError?.log("Missing action")
+        return
+    }
+
     let newAction: Blacklist.Action = {
         switch action {
             case "close": return .closeConnection
@@ -773,7 +779,10 @@ fileprivate func executeUpdateBlacklist(_ postInfo: inout PostInfo?) {
             return .closeConnection
         }
     }()
+    
     serverAdminDomain.blacklist.update(action: newAction, for: address)
+    
+    Log.atNotice?.log("Changed the action to \(action) for address \(address) in server blacklist")
 }
 
 fileprivate func executeAddToBlacklist(_ postInfo: inout PostInfo?) {
