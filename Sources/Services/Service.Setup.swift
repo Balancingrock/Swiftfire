@@ -44,11 +44,23 @@
 import Foundation
 
 import Http
-//import Html
 import SwifterLog
 import Core
 import Functions
 
+
+/// Allows a domain admin to configure the domain. Only active if the URL that was requested started with the domain setup keyword.
+///
+/// _Input_:
+///    - request.cookies: Will be checked for an existing session cookie.
+///    - domain.sessions: Will be checked for an existing session, or a new session.
+///    - domain.sessionTimeout: If the timeout < 1, then no session will be created.
+///
+/// _Output_:
+///    - response
+///
+/// _Sequence_:
+///   - Should be called after DecodePostFormUrlEncoded.
 
 func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: inout Services.Info, _ response: inout Response) -> Services.Result {
     
@@ -607,6 +619,7 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
         response.code = Response.Code._200_OK
         response.contentType = mimeTypeHtml
     }
+    
     
     // Exit if there is a code already
     

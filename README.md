@@ -150,7 +150,9 @@ You can of course change whatever you want, but the current source code layout w
 
 ## Version history
 
-Note: Planned releases are for information only and almost always change.
+#### HEAD
+
+- Removed dependency on Html library package
 
 #### 1.2.0
 
