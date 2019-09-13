@@ -72,6 +72,8 @@ Once set up, any access to the port that has as its URL: '/serveradmin' will end
 - Logging of received headers possible
 - Logging of missing pages (404)
 - Supports PHP
+- Multiple server administrators
+- Multiple domain administrators
 
 ## Installation
 
@@ -92,7 +94,7 @@ The build the project, but first make the build script executable:
 
 This should build the project without errors.
 
-However... the project needs openSSL. And while a compiled version of openSSL is provided with the project, you should not trust this. Make sure to download and install openSSL from the original sources at [openSSL.org](https://openssl.org)
+We could stop here, but... the project needs openSSL. And while a compiled version of openSSL is provided with the project, you should not trust this. Make sure to download and install openSSL from the original sources at [openSSL.org](https://openssl.org)
 
 Directions for the installation of openSSL are in the subproject [SecureSockets](https://github.com/balancingrock/SecureSockets). Note that you cannot use an existing installation of openSSL due to some necessary glue code.
 

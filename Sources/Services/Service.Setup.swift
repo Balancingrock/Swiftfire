@@ -46,7 +46,6 @@ import Foundation
 import Http
 import SwifterLog
 import Core
-import Functions
 
 
 /// Allows a domain admin to configure the domain. Only active if the URL that was requested started with the domain setup keyword.
