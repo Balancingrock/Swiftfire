@@ -155,6 +155,8 @@ You can of course change whatever you want, but the current source code layout w
 #### HEAD
 
 - Removed dependency on Html library package
+- Removed the need to save & load setup parameters
+- Added additional logging to capture all changes in server parameters
 
 #### 1.2.0
 

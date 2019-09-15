@@ -236,6 +236,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
     // Only service the serverAdminPseudoDomain
     
     guard domain === serverAdminDomain else {
+        Log.atDebug?.log("Not a Server Domain")
         return .next
     }
     
@@ -692,8 +693,6 @@ fileprivate func executeSfCommand(_ pathComponents: Array<String>, _ postInfo: i
     switch commandName {
     case "SetRoot": executeSetRoot(postInfo); return .newPath("")
     case "SetParameter": executeSetParameter(postInfo); return .newPath("/pages/parameters.sf.html")
-    case "SaveParameters": executeSaveParameters(); return .newPath("/pages/parameters.sf.html")
-    case "ReadParameters": executeReadParameters(); return .newPath("/pages/parameters.sf.html")
     case "Restart": executeRestart(); return .newPath("/pages/restart.sf.html")
     case "Quit": return .newPath("/pages/quit.sf.html")
     case "CancelQuit": return .newPath("")
@@ -708,8 +707,6 @@ fileprivate func executeSfCommand(_ pathComponents: Array<String>, _ postInfo: i
     case "DeleteAccount": executeDeleteAccount(postInfo); return .newPath("/pages/admin-management.sf.html")
     case "ConfirmDeleteAccount": return executeConfirmDeleteAccount(postInfo)
     case "SetNewPassword": executeSetNewPassword(postInfo); return .newPath("/pages/admin-management.sf.html")
-    case "SaveDomains": executeSaveDomains(); return .newPath("/pages/domain-management.sf.html")
-    case "ReadDomains": executeReadDomains(); return .newPath("/pages/domain-management.sf.html")
     case "UpdateBlacklist": executeUpdateBlacklist(&postInfo); return .newPath("/pages/blacklist.sf.html")
     case "AddToBlacklist": executeAddToBlacklist(&postInfo); return .newPath("/pages/blacklist.sf.html")
     case "RemoveFromBlacklist": executeRemoveFromBlacklist(&postInfo); return .newPath("/pages/blacklist.sf.html")
@@ -726,36 +723,49 @@ fileprivate func executeSfCommand(_ pathComponents: Array<String>, _ postInfo: i
 }
 
 fileprivate func executeSetRoot(_ postInfo: PostInfo?) {
-    guard let root = postInfo?[SERVER_ADMIN_CREATE_ACCOUNT_ROOT] else { return }
+    
+    guard let root = postInfo?[SERVER_ADMIN_CREATE_ACCOUNT_ROOT] else {
+        Log.atDebug?.log("Missing key for the admin server set root command")
+        return
+    }
+    
+    Log.atNotice?.log("Set admin root directory from: \(serverParameters.adminSiteRoot.value)")
+
     serverParameters.adminSiteRoot.value = root
+    
     serverParameters.store()
+    
     Log.atNotice?.log("Set admin root directory to: \(root)")
 }
 
 fileprivate func executeSetParameter(_ postInfo: PostInfo?) {
+    
     guard let postInfo = postInfo else {
         Log.atError?.log("Missing postInfo")
         return
     }
+    
     OUTER: for (key, value) in postInfo {
+    
         for p in serverParameters.all {
+        
             if p.name == key {
+                
+                Log.atNotice?.log("Setting parameter '\(key)' from '\(p.stringValue)'")
+                
                 _ = p.setValue(value)
+                
+                serverParameters.store()
+                
                 Log.atNotice?.log("Setting parameter '\(key)' to '\(value)'")
+                
                 continue OUTER
             }
         }
+        
         Log.atError?.log("Unknown parameter name \(key)")
     }
 }
-
-fileprivate func executeSaveParameters() { _ = serverParameters.store() }
-
-fileprivate func executeReadParameters() { _ = serverParameters.load() }
-
-fileprivate func executeSaveDomains() { domains.storeDomainsAndAliases() }
-
-fileprivate func executeReadDomains() { _ = domains.loadDomainsAndAliases() }
 
 fileprivate func executeUpdateBlacklist(_ postInfo: inout PostInfo?) {
     
@@ -780,7 +790,16 @@ fileprivate func executeUpdateBlacklist(_ postInfo: inout PostInfo?) {
         }
     }()
     
+    guard let oldAction = serverAdminDomain.blacklist.action(for: address) else {
+        Log.atError?.log("Address \(address) not found in server blacklist")
+        return
+    }
+
+    Log.atNotice?.log("Changed the action from \(oldAction) for address \(address) in server blacklist")
+
     serverAdminDomain.blacklist.update(action: newAction, for: address)
+    
+    serverAdminDomain.blacklist.store(to: Urls.domainBlacklistFile(for: "serveradmin"))
     
     Log.atNotice?.log("Changed the action to \(action) for address \(address) in server blacklist")
 }
@@ -811,7 +830,14 @@ fileprivate func executeAddToBlacklist(_ postInfo: inout PostInfo?) {
         }
     }()
     
+    if serverAdminDomain.blacklist.action(for: address) != nil {
+        Log.atError?.log("Address \(address) already exists")
+        return
+    }
+    
     serverAdminDomain.blacklist.add(address, action: newAction)
+    
+    serverAdminDomain.blacklist.store(to: Urls.domainBlacklistFile(for: "serveradmin"))
     
     Log.atNotice?.log("Added address \(address) to server blacklist")
 }
@@ -823,9 +849,14 @@ fileprivate func executeRemoveFromBlacklist(_ postInfo: inout PostInfo?) {
         return
     }
     
+    guard let action = serverAdminDomain.blacklist.action(for: address) else {
+        Log.atError?.log("Address does not exist in serveradmin domain blacklist")
+        return
+    }
+    
     serverAdminDomain.blacklist.remove(address)
     
-    Log.atNotice?.log("Removed address \(address) from server blacklist")
+    Log.atNotice?.log("Removed address \(address) with action \(action) from server blacklist")
 }
 
 fileprivate func executeUpdateDomainBlacklist(_ postInfo: inout PostInfo?) {
@@ -858,6 +889,13 @@ fileprivate func executeUpdateDomainBlacklist(_ postInfo: inout PostInfo?) {
             return .closeConnection
         }
     }()
+    
+    guard let oldAction = domain.blacklist.action(for: address) else {
+        Log.atError?.log("Address \(address) not present in blacklist of domain \(domain.name)")
+        return
+    }
+    
+    Log.atNotice?.log("Updated action of address \(address) from \(oldAction) in domain \(domain.name) blacklist")
     
     domain.blacklist.update(action: newAction, for: address)
     
@@ -898,6 +936,11 @@ fileprivate func executeAddToDomainBlacklist(_ postInfo: inout PostInfo?) {
         }
     }()
     
+    if domain.blacklist.action(for: address) != nil {
+        Log.atError?.log("Address \(address) is already present in blacklist of domain \(domain.name)")
+        return
+    }
+
     domain.blacklist.add(address, action: newAction)
     
     Log.atNotice?.log("Added address \(address) with action \(action) to domain \(domain.name) blacklist")
@@ -918,9 +961,14 @@ fileprivate func executeRemoveFromDomainBlacklist(_ postInfo: inout PostInfo?) {
         return
     }
     
+    guard let oldAction = domain.blacklist.action(for: address) else {
+        Log.atError?.log("Address \(address) not present in blacklist of domain \(domain.name)")
+        return
+    }
+
     domain.blacklist.remove(address)
     
-    Log.atNotice?.log("Removed address \(address) from domain \(domain.name) blacklist")
+    Log.atNotice?.log("Removed address \(address) with action \(oldAction) from domain \(domain.name) blacklist")
 }
 
 
@@ -948,13 +996,64 @@ fileprivate func executeUpdateDomain(_ postInfo: inout PostInfo?) {
     postInfo!["DomainName"] = name
     
     switch key {
-    case "root": domain.webroot = value
-    case "forewardurl": domain.forwardUrl = value
-    case "enabled": domain.enabled = Bool(lettersOrDigits: value) ?? domain.enabled
-    case "accesslogenabled": domain.accessLogEnabled = Bool(lettersOrDigits: value) ?? domain.accessLogEnabled
-    case "404logenabled": domain.four04LogEnabled = Bool(lettersOrDigits: value) ?? domain.four04LogEnabled
-    case "sessionlogenabled": domain.sessionLogEnabled = Bool(lettersOrDigits: value) ?? domain.sessionLogEnabled
+    case "root":
+        
+        Log.atNotice?.log("Old value for domain \(domain.name) webroot = \(domain.webroot)")
+        
+        domain.webroot = value
+    
+        Log.atNotice?.log("New value for domain \(domain.name) webroot = \(domain.webroot)")
+        
+        
+    case "forewardurl":
+
+        Log.atNotice?.log("Old value for domain \(domain.name) forewardUrl = \(domain.forwardUrl)")
+
+        domain.forwardUrl = value
+
+        Log.atNotice?.log("New value for domain \(domain.name) forewardUrl = \(domain.forwardUrl)")
+
+        
+    case "enabled":
+        
+        Log.atNotice?.log("Old value for domain \(domain.name) enabled = \(domain.enabled)")
+
+        domain.enabled = Bool(lettersOrDigits: value) ?? domain.enabled
+    
+        Log.atNotice?.log("New value for domain \(domain.name) enabled = \(domain.enabled)")
+
+    
+    case "accesslogenabled":
+        
+        Log.atNotice?.log("Old value for domain \(domain.name) accessLogEnabled = \(domain.accessLogEnabled)")
+
+        domain.accessLogEnabled = Bool(lettersOrDigits: value) ?? domain.accessLogEnabled
+
+        Log.atNotice?.log("New value for domain \(domain.name) accessLogEnabled = \(domain.accessLogEnabled)")
+
+        
+    case "404logenabled":
+        
+        Log.atNotice?.log("Old value for domain \(domain.name) 404log-enabled = \(domain.four04LogEnabled)")
+
+        domain.four04LogEnabled = Bool(lettersOrDigits: value) ?? domain.four04LogEnabled
+
+        Log.atNotice?.log("New value for domain \(domain.name) 404log-enabled = \(domain.four04LogEnabled)")
+
+        
+    case "sessionlogenabled":
+        
+        Log.atNotice?.log("Old value for domain \(domain.name) sessionLogEnabled = \(domain.sessionLogEnabled)")
+
+        domain.sessionLogEnabled = Bool(lettersOrDigits: value) ?? domain.sessionLogEnabled
+    
+        Log.atNotice?.log("New value for domain \(domain.name) sessionLogEnabled = \(domain.sessionLogEnabled)")
+
+    
     case "phppath":
+        
+        Log.atNotice?.log("Old value for domain \(domain.name) phpPath = \(domain.phpPath?.path ?? "nil")")
+
         domain.phpPath = nil
         if FileManager.default.isExecutableFile(atPath: value) {
             let url = URL(fileURLWithPath: value)
@@ -962,32 +1061,88 @@ fileprivate func executeUpdateDomain(_ postInfo: inout PostInfo?) {
                 domain.phpPath = URL(fileURLWithPath: value)
             }
         }
+        
+        Log.atNotice?.log("New value for domain \(domain.name) phpPath = \(domain.phpPath?.path ?? "nil")")
+
+        
     case "phpoptions":
+        
         if domain.phpPath != nil {
+            
+            Log.atNotice?.log("Old value for domain \(domain.name) phpOptions = \(domain.phpOptions ?? "nil")")
+
             domain.phpOptions = value
+
+            Log.atNotice?.log("New value for domain \(domain.name) phpOptions = \(domain.phpOptions ?? "nil")")
         }
+        
+        
     case "phpmapindex":
+        
         if domain.phpPath != nil {
+            
+            Log.atNotice?.log("Old value for domain \(domain.name) phpMapIndex = \(domain.phpMapIndex)")
+
             domain.phpMapIndex = Bool(lettersOrDigits: value) ?? domain.phpMapIndex
+
+            Log.atNotice?.log("New value for domain \(domain.name) phpMapIndex = \(domain.phpMapIndex)")
         }
+        
+        
     case "phpmapall":
+        
         if domain.phpPath != nil {
+            
+            Log.atNotice?.log("Old value for domain \(domain.name) phpMapAll = \(domain.phpMapAll)")
+            Log.atNotice?.log("Old value for domain \(domain.name) phpMapIndex = \(domain.phpMapIndex)")
+
             if Bool(lettersOrDigits: value) ?? domain.phpMapAll {
                 domain.phpMapAll = true
                 domain.phpMapIndex = true
             } else {
                 domain.phpMapAll = false
             }
+
+            Log.atNotice?.log("New value for domain \(domain.name) phpMapAll = \(domain.phpMapAll)")
+            Log.atNotice?.log("New value for domain \(domain.name) phpMapIndex = \(domain.phpMapIndex)")
         }
+        
+        
     case "phptimeout":
+
         if domain.phpPath != nil {
+            
+            Log.atNotice?.log("Old value for domain \(domain.name) phpTimeout = \(domain.phpTimeout)")
+
             domain.phpTimeout = Int(value) ?? domain.phpTimeout
+
+            Log.atNotice?.log("New value for domain \(domain.name) phpTimeout = \(domain.phpTimeout)")
         }
-    case "sfresources": domain.sfresources = value
-    case "sessiontimeout": domain.sessionTimeout = Int(value) ?? domain.sessionTimeout
+
+        
+    case "sfresources":
+        
+        Log.atNotice?.log("Old value for domain \(domain.name) sfresources = \(domain.sfresources)")
+
+        domain.sfresources = value
+
+        Log.atNotice?.log("New value for domain \(domain.name) sfresources = \(domain.sfresources)")
+
+        
+    case "sessiontimeout":
+        
+        Log.atNotice?.log("Old value for domain \(domain.name) sessionTimeout = \(domain.sessionTimeout)")
+
+        domain.sessionTimeout = Int(value) ?? domain.sessionTimeout
+    
+        Log.atNotice?.log("New value for domain \(domain.name) sessionTimeout = \(domain.sessionTimeout)")
+
+        
     default:
         Log.atError?.log("Unknown key '\(key)' with value '\(value)'")
     }
+    
+    domain.storeSetup()
 }
 
 
@@ -997,6 +1152,8 @@ fileprivate func executeUpdateDomainServices(_ postInfo: inout PostInfo?) {
 
     guard let domainName = postInfo?["DomainName"],
           let domain = domains.domain(for: domainName) else { return }
+    
+    Log.atNotice?.log("Pre-update services for domain \(domain.name):\n\(domain.serviceNames)")
     
     struct ServiceItem {
         let index: Int
@@ -1028,12 +1185,14 @@ fileprivate func executeUpdateDomainServices(_ postInfo: inout PostInfo?) {
     }
     
     serviceArr.sort(by: { $0.index < $1.index })
-    
-    //let serviceNames = serviceArr.map({ $0.name })
-    
+        
     domain.serviceNames = serviceArr.map({ $0.name }) //ArrayOfStrings(serviceNames)
     
     domain.rebuildServices()
+    
+    domain.serviceNames.store(to: Urls.domainServiceNamesFile(for: domain.name))
+    
+    Log.atNotice?.log("Post-update services for domain \(domain.name):\n\(domain.serviceNames)")
 }
 
 
@@ -1095,7 +1254,7 @@ fileprivate func executeCreateDomain(_ postInfo: inout PostInfo?) {
         }
         Log.atNotice?.log("Added new domain with \(domain))")
     } else {
-        Log.atNotice?.log("Failed to domain for \(name))")
+        Log.atNotice?.log("Failed to create domain for \(name))")
     }
 }
 
@@ -1121,7 +1280,7 @@ fileprivate func executeCreateAlias(_ postInfo: inout PostInfo?) {
 
     domains.createAlias(alias, forDomainWithName: name)
     
-    Log.atNotice?.log("Create new alias '\(alias)' for domain '\(name)'")
+    Log.atNotice?.log("Created new alias '\(alias)' for domain '\(name)'")
 }
 
 
@@ -1178,7 +1337,13 @@ fileprivate func executeQuitSwiftfire() {
 }
 
 fileprivate func executeLogout(_ session: Session) -> CommandExecutionResult {
+    
+    if let account = session[.accountKey] as? Account {
+        Log.atNotice?.log("Serveradmin \(account.name) logged out")
+    }
+    
     session[.accountKey] = nil
+    
     return .newPath("login.sf.html")
 }
 

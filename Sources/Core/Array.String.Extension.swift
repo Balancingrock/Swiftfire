@@ -3,7 +3,7 @@
 //  File:       Array.String.Extension.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.1.0
+//  Version:    1.2.1
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.2.1 - Made the store function public
 // 1.1.0 - Added status return to load function
 // 1.0.0 - Raised to v1.0.0, Removed old change log
 //
@@ -47,7 +48,7 @@ import VJson
 
 extension Array where Iterator.Element == String {
     
-    func store(to file: URL?) {
+    public func store(to file: URL?) {
         guard let file = file else { return }
         let json = VJson.array()
         self.forEach { (str) in

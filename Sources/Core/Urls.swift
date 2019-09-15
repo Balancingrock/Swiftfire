@@ -3,7 +3,7 @@
 //  File:       Urls.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.1.0
+//  Version:    1.2.1
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,8 @@
 //
 // History
 //
+// 1.2.1 - Removed incorrect info
+//       - Removed serveradmin directory (was unused)
 // 1.1.0 - Replaced server blacklist with serverAdminDomain blacklist
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
@@ -58,8 +60,6 @@
 //   - headers
 //   - application
 //     - ... logfiles from SwifterLog
-// - serveradmin
-//   - ... as for domains
 // - statistics
 //   - statistics.json
 //
@@ -183,12 +183,6 @@ public final class Urls {
     public static var applicationLogDir: URL? = { dirUrl(logsDir, "application") }()
 
 
-    // =================================================================================================================
-    /// The directory for the statistics file
-    
-    public static var serverAdminDir: URL? = { dirUrl(rootDir, "serveradmin") }()
-
-    
     // =================================================================================================================
     /// The directory for the domains (and aliasses)
     
