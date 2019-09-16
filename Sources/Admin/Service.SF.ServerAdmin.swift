@@ -154,7 +154,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
         // If there is a custom login page, use that instead of the default.
         
         let rootPath = serverParameters.adminSiteRoot.value
-        let loginUrl = (rootPath as NSString).appendingPathComponent("login.sf.html")
+        let loginUrl = ((rootPath as NSString).appendingPathComponent("pages") as NSString).appendingPathComponent("/login.sf.html")
 
         if case let .exists(path: path) = connection.filemanager.readableResourceFileExists(at: loginUrl, for: domain) {
             
@@ -179,7 +179,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
             
         } else {
             
-            Log.atError?.log("No (readable) login.sf.html file found in the serveradmin root directory")
+            Log.atError?.log("No (readable) login.sf.html file found in the serveradmin-root-directory/pages")
 
             response.code = Response.Code._404_NotFound
         }
@@ -1344,7 +1344,7 @@ fileprivate func executeLogout(_ session: Session) -> CommandExecutionResult {
     
     session[.accountKey] = nil
     
-    return .newPath("login.sf.html")
+    return .newPath("/pages/login.sf.html")
 }
 
 fileprivate func executeCreateAdmin(_ postInfo: PostInfo?) {

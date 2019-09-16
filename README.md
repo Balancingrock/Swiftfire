@@ -126,6 +126,10 @@ Note that Swiftfire will store and expect information in the `~/Library/Applicat
 
 You can of course change whatever you want, but the current source code layout was choosen for a reason. While this layout is rather new (and thus may need to change) we hope that you will only need to add to the `Custom`, `Functions` and `Services` targets. Though you should leave their current contents unaffected since the correct functioning of the admin server account depends on them.
 
+### Jekyll
+
+The sources for the server admin site are generated using Jekyll. If changes must be made, you will need to install Jekyll and the theme Classic-Jekyll-Theme. For more information on Jekyll see [jekyllrb.com/](https://jekyllrb.com/) for more information on Classic-Jekyll-Theme see [balancingrock.github.io/classic-jekyll-theme](https://balancingrock.github.io/classic-jekyll-theme/index.html)
+
 ## Useful links
 
 [Swiftfire projects Overview](http://swiftfire.nl/projects/projects.html)
@@ -154,9 +158,12 @@ You can of course change whatever you want, but the current source code layout w
 
 #### HEAD
 
+#### 1.2.1
+
 - Removed dependency on Html library package
 - Removed the need to save & load setup parameters
 - Added additional logging to capture all changes in server parameters
+- Added sfadmin sources (jekyll based)
 
 #### 1.2.0
 

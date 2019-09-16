@@ -15,12 +15,12 @@
 	<meta name="msapplication-config" content="/serveradmin/icons/browserconfig.xml">
 	<meta name="theme-color" content="#ffffff">
 
-	<title>Domain Management</title>
+	<title>Delete .sf-domainDetail(name)</title>
 
 	<meta name="description" content="Swiftfire Server Admin">
 
 	<link rel="stylesheet" href="/serveradmin/assets/main.css">
-	<link rel="canonical" href="/serveradmin/pages/domain-management.sf.html">
+	<link rel="canonical" href="/serveradmin/pages/deletedomain.sf.html">
 	<link rel="alternate" type="application/rss+xml" title="Swiftfire Server Admin" href="/serveradmin/feed.xml">
 </head>
 <!-- end of include head.html -->
@@ -95,7 +95,7 @@
 					<label class="symbol" for="Logout-checkbox">
 						<p></p>
 					</label>
-					<div class="text"><a href="/serveradmin/logout.sf.html"><p>Logout</p></a></div>
+					<div class="text"><a href="/serveradmin/pages/logout.sf.html"><p>Logout</p></a></div>
 				</div>
 			</div>
 			<div class="subitem-separator"><p></p></div>
@@ -105,7 +105,7 @@
 					<label class="symbol" for="Login-checkbox">
 						<p></p>
 					</label>
-					<div class="text"><a href="/serveradmin/login.sf.html"><p>Login</p></a></div>
+					<div class="text"><a href="/serveradmin/pages/login.sf.html"><p>Login</p></a></div>
 				</div>
 			</div>
 		</div>
@@ -160,41 +160,18 @@
 <!-- Start of main content -->
 <article class="page" itemscope itemtype="http://schema.org/Article">
 	<header class="page-header">
-		<h1 class="page-title" itemprop="name headline">Domain Management</h1>
+		<h1 class="page-title" itemprop="name headline">Delete .sf-domainDetail(name)</h1>
 		<p class="page-meta"></p>
 	</header>
 	<div class="page-content" itemprop="articleBody">
 <!-- Page content -->
-   <div class="center-content">.sf-domainsTable()</div>
-<form action="/serveradmin/sfcommand/CreateDomain" method="post">
-	<div class="center-content">
-		<div style="display:flex; flex-direction:column; justify-content:center;">
-			<div style="display:flex; flex-direction:column; align-items:flex-end">
-				<table class="centered outlined-table table-cell-margins">
-					<tr>
-						<td><span>Add domain with name:</span></td>
-						<td><input type="text" name="DomainName" value="" /></td>
-					</tr>
-					<tr>
-						<td><span>Domain Admin ID:</span></td>
-						<td><input type="text" name="ID" value="" /></td>
-					</tr>
-					<tr>
-						<td><span>Domain Admin Password:</span></td>
-						<td><input type="text" name="Password" value="" /></td>
-					</tr>
-				</table>
-				<div>
-					<div>
-						<input type="submit" value="Create Domain" />
-					</div>
-				</div>
-			</div>
-		</div>
-	</div>
-</form>
+   <div class="centered-buttons">
+.sf-deleteDomain()
+</div>
 
-<p class="text-centered">Note: Removing a domain will not remove the associated domain data from the Swiftfire Application Support directory. This has to be done manually by an administrator with sufficient access rights. Re-creating a domain of which the associated domain data is still present will cause a re-appearance of the domain as it was when deleted.</p>
+<div class="centered-buttons" style="margin-top:1em">
+.postingButton("/serveradmin/pages/domain-management.sf.html", Cancel, "", "")
+</div>
 
 <!-- End of page content -->
 </div>

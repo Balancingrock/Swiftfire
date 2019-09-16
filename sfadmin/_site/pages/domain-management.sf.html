@@ -15,12 +15,12 @@
 	<meta name="msapplication-config" content="/serveradmin/icons/browserconfig.xml">
 	<meta name="theme-color" content="#ffffff">
 
-	<title>Swiftfire Server Admin</title>
+	<title>Domain Management</title>
 
 	<meta name="description" content="Swiftfire Server Admin">
 
 	<link rel="stylesheet" href="/serveradmin/assets/main.css">
-	<link rel="canonical" href="/serveradmin/index.sf.html">
+	<link rel="canonical" href="/serveradmin/pages/domain-management.sf.html">
 	<link rel="alternate" type="application/rss+xml" title="Swiftfire Server Admin" href="/serveradmin/feed.xml">
 </head>
 <!-- end of include head.html -->
@@ -95,7 +95,7 @@
 					<label class="symbol" for="Logout-checkbox">
 						<p></p>
 					</label>
-					<div class="text"><a href="/serveradmin/logout.sf.html"><p>Logout</p></a></div>
+					<div class="text"><a href="/serveradmin/pages/logout.sf.html"><p>Logout</p></a></div>
 				</div>
 			</div>
 			<div class="subitem-separator"><p></p></div>
@@ -105,7 +105,7 @@
 					<label class="symbol" for="Login-checkbox">
 						<p></p>
 					</label>
-					<div class="text"><a href="/serveradmin/login.sf.html"><p>Login</p></a></div>
+					<div class="text"><a href="/serveradmin/pages/login.sf.html"><p>Login</p></a></div>
 				</div>
 			</div>
 		</div>
@@ -158,48 +158,47 @@
 				<main>
 
 <!-- Start of main content -->
-<h3 class="text-centered" id="swiftfire-status-as-of-timestamp">Swiftfire status as of: .timestamp()</h3>
+<article class="page" itemscope itemtype="http://schema.org/Article">
+	<header class="page-header">
+		<h1 class="page-title" itemprop="name headline">Domain Management</h1>
+		<p class="page-meta"></p>
+	</header>
+	<div class="page-content" itemprop="articleBody">
+<!-- Page content -->
+   <div class="center-content">.sf-domainsTable()</div>
+<form action="/serveradmin/sfcommand/CreateDomain" method="post">
+	<div class="center-content">
+		<div style="display:flex; flex-direction:column; justify-content:center;">
+			<div style="display:flex; flex-direction:column; align-items:flex-end">
+				<table class="centered outlined-table table-cell-margins">
+					<tr>
+						<td><span>Add domain with name:</span></td>
+						<td><input type="text" name="DomainName" value="" /></td>
+					</tr>
+					<tr>
+						<td><span>Domain Admin ID:</span></td>
+						<td><input type="text" name="ID" value="" /></td>
+					</tr>
+					<tr>
+						<td><span>Domain Admin Password:</span></td>
+						<td><input type="text" name="Password" value="" /></td>
+					</tr>
+				</table>
+				<div>
+					<div>
+						<input type="submit" value="Create Domain" />
+					</div>
+				</div>
+			</div>
+		</div>
+	</div>
+</form>
 
-<div class="status-table" style="overflow-x:auto;">
+<p class="text-centered">Note: Removing a domain will not remove the associated domain data from the Swiftfire Application Support directory. This has to be done manually by an administrator with sufficient access rights. Re-creating a domain of which the associated domain data is still present will cause a re-appearance of the domain as it was when deleted.</p>
 
-  <table>
-    <thead>
-      <tr>
-        <th style="text-align: left">Item</th>
-        <th style="text-align: center">Value</th>
-        <th style="text-align: center">Status</th>
-        <th> </th>
-        <th> </th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td style="text-align: left">Swiftfire Version:</td>
-        <td style="text-align: center">.sf-telemetryValue(“ServerVersion”)</td>
-        <td style="text-align: center"> </td>
-        <td>.sf-command(Restart)</td>
-        <td>.sf-command(Quit)</td>
-      </tr>
-      <tr>
-        <td style="text-align: left">HTTP Portnumber:</td>
-        <td style="text-align: center">.sf-parameterValue(“HttpServicePortNumber”)</td>
-        <td style="text-align: center">.sf-telemetryValue(“HttpServerStatus”)</td>
-        <td> </td>
-        <td> </td>
-      </tr>
-      <tr>
-        <td style="text-align: left">HTTPS Portnumber:</td>
-        <td style="text-align: center">.sf-parameterValue(“HttpsServicePortNumber”)</td>
-        <td style="text-align: center">.sf-telemetryValue(“HttpsServerStatus”)</td>
-        <td> </td>
-        <td> </td>
-      </tr>
-    </tbody>
-  </table>
-
+<!-- End of page content -->
 </div>
-
-<p class="text-centered">Server admin site root: .sf-parameterValue(ServerAdminSiteRoot)</p>
+</article>
 
 <!-- End of main content -->
 

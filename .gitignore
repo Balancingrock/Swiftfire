@@ -4,3 +4,7 @@
 /.build
 Package.resolved
 /DerivedData
+sfadmin/.jekyll-cache
+sfadmin/.sass-cache
+sfadmin/Gemfile.lock
+sfadmin/.DS_Store

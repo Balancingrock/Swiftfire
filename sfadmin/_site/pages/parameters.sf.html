@@ -15,12 +15,12 @@
 	<meta name="msapplication-config" content="/serveradmin/icons/browserconfig.xml">
 	<meta name="theme-color" content="#ffffff">
 
-	<title>Server Admin Management</title>
+	<title>Parameters</title>
 
 	<meta name="description" content="Swiftfire Server Admin">
 
 	<link rel="stylesheet" href="/serveradmin/assets/main.css">
-	<link rel="canonical" href="/serveradmin/pages/admin-management.sf.html">
+	<link rel="canonical" href="/serveradmin/pages/parameters.sf.html">
 	<link rel="alternate" type="application/rss+xml" title="Swiftfire Server Admin" href="/serveradmin/feed.xml">
 </head>
 <!-- end of include head.html -->
@@ -68,7 +68,7 @@
 		</div>
 	</div>
 	<div class="item-separator"><p><!-- empty but necessary --></p></div>
-	<div class="item isActiveSelection">
+	<div class="item">
 		<input type="checkbox" id="Admin-checkbox">
 		<div class="title">
 			<label class="symbol" for="Admin-checkbox">
@@ -79,7 +79,7 @@
 		</div>
 		<div class="dropdown">
 			<div class="subitem-separator"><p></p></div>
-			<div class="subitem isActiveSelection">
+			<div class="subitem">
 				<input type="checkbox" id="Management-checkbox">
 				<div class="title">
 					<label class="symbol" for="Management-checkbox">
@@ -95,7 +95,7 @@
 					<label class="symbol" for="Logout-checkbox">
 						<p></p>
 					</label>
-					<div class="text"><a href="/serveradmin/logout.sf.html"><p>Logout</p></a></div>
+					<div class="text"><a href="/serveradmin/pages/logout.sf.html"><p>Logout</p></a></div>
 				</div>
 			</div>
 			<div class="subitem-separator"><p></p></div>
@@ -105,13 +105,13 @@
 					<label class="symbol" for="Login-checkbox">
 						<p></p>
 					</label>
-					<div class="text"><a href="/serveradmin/login.sf.html"><p>Login</p></a></div>
+					<div class="text"><a href="/serveradmin/pages/login.sf.html"><p>Login</p></a></div>
 				</div>
 			</div>
 		</div>
 	</div>
 	<div class="item-separator"><p><!-- empty but necessary --></p></div>
-	<div class="item">
+	<div class="item isActiveSelection">
 		<input type="checkbox" id="Parameters-checkbox">
 		<div class="title">
 			<label class="symbol" for="Parameters-checkbox">
@@ -160,40 +160,12 @@
 <!-- Start of main content -->
 <article class="page" itemscope itemtype="http://schema.org/Article">
 	<header class="page-header">
-		<h1 class="page-title" itemprop="name headline">Server Admin Management</h1>
+		<h1 class="page-title" itemprop="name headline">Parameters</h1>
 		<p class="page-meta"></p>
 	</header>
 	<div class="page-content" itemprop="articleBody">
 <!-- Page content -->
-   <div class="center-content">.sf-adminTable()</div>
-<h1 style="text-align: center;">Create New Admin Account</h1>
-<form action="/serveradmin/sfcommand/CreateAdmin" method="post">
-	<div style="display:flex; flex-direction:column; justify-content:center;">
-		<table class="centered outlined-table table-cell-margins">
-			<tr>
-				<td>
-					<span style="margin-top: 4px; margin-right: 4px">Admin ID: </span>
-				</td>
-				<td>
-					<input type="text" name="ID" value="" style="text-align:center;" />
-				</td>
-			</tr>
-			<tr>
-				<td>
-					<span style="margin-top: 4px; margin-right: 4px">Password: </span>
-				</td>
-				<td>
-					<input type="text" name="Password" value="" style="text-align:center;" />
-				</td>
-			</tr>
-		</table>
-		<div class="center-content">
-			<div style="margin-top: 4px;">
-				<input type="submit" value="Create New Admin" />
-			</div>
-		</div>
-	</div>
-</form>
+   <p>.sf-parameterTable()</p>
 
 <!-- End of page content -->
 </div>

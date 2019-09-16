@@ -15,12 +15,12 @@
 	<meta name="msapplication-config" content="/serveradmin/icons/browserconfig.xml">
 	<meta name="theme-color" content="#ffffff">
 
-	<title>Telemetry</title>
+	<title>Confirm Server Admin Logout</title>
 
 	<meta name="description" content="Swiftfire Server Admin">
 
 	<link rel="stylesheet" href="/serveradmin/assets/main.css">
-	<link rel="canonical" href="/serveradmin/pages/telemetry.sf.html">
+	<link rel="canonical" href="/serveradmin/pages/logout.sf.html">
 	<link rel="alternate" type="application/rss+xml" title="Swiftfire Server Admin" href="/serveradmin/feed.xml">
 </head>
 <!-- end of include head.html -->
@@ -68,7 +68,7 @@
 		</div>
 	</div>
 	<div class="item-separator"><p><!-- empty but necessary --></p></div>
-	<div class="item">
+	<div class="item isActiveSelection">
 		<input type="checkbox" id="Admin-checkbox">
 		<div class="title">
 			<label class="symbol" for="Admin-checkbox">
@@ -89,13 +89,13 @@
 				</div>
 			</div>
 			<div class="subitem-separator"><p></p></div>
-			<div class="subitem">
+			<div class="subitem isActiveSelection">
 				<input type="checkbox" id="Logout-checkbox">
 				<div class="title">
 					<label class="symbol" for="Logout-checkbox">
 						<p></p>
 					</label>
-					<div class="text"><a href="/serveradmin/logout.sf.html"><p>Logout</p></a></div>
+					<div class="text"><a href="/serveradmin/pages/logout.sf.html"><p>Logout</p></a></div>
 				</div>
 			</div>
 			<div class="subitem-separator"><p></p></div>
@@ -105,7 +105,7 @@
 					<label class="symbol" for="Login-checkbox">
 						<p></p>
 					</label>
-					<div class="text"><a href="/serveradmin/login.sf.html"><p>Login</p></a></div>
+					<div class="text"><a href="/serveradmin/pages/login.sf.html"><p>Login</p></a></div>
 				</div>
 			</div>
 		</div>
@@ -122,7 +122,7 @@
 		</div>
 	</div>
 	<div class="item-separator"><p><!-- empty but necessary --></p></div>
-	<div class="item isActiveSelection">
+	<div class="item">
 		<input type="checkbox" id="Telemetry-checkbox">
 		<div class="title">
 			<label class="symbol" for="Telemetry-checkbox">
@@ -160,13 +160,13 @@
 <!-- Start of main content -->
 <article class="page" itemscope itemtype="http://schema.org/Article">
 	<header class="page-header">
-		<h1 class="page-title" itemprop="name headline">Telemetry</h1>
+		<h1 class="page-title" itemprop="name headline">Confirm Server Admin Logout</h1>
 		<p class="page-meta"></p>
 	</header>
 	<div class="page-content" itemprop="articleBody">
 <!-- Page content -->
-   <div class="telemetry-table">
-.sf-telemetryTable()
+   <div class="centered-buttons" style="margin-top:1em">
+.postingButton("/serveradmin/sfcommand/Logout", Logout, "", "")
 </div>
 
 <!-- End of page content -->
