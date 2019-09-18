@@ -11,7 +11,6 @@
 | Ascii | Ascii character definitions | [link](https://github.com/Balancingrock/Ascii) | [link](http://swiftfire.nl/projects/ascii/reference/index.html)
 | BRBON | In-memory storage manager, fast access and load/store | [link](https://github.com/Balancingrock/BRBON) | [link](http://swiftfire.nl/projects/brbon/reference/index.html)
 | BRUtils | General purpose definitions | [link](https://github.com/Balancingrock/BRUtils) | [link](http://swiftfire.nl/projects/brutils/reference/index.html)
-| Html | Makes creating HTML code easier | [link](https://github.com/Balancingrock/Html) | [link](http://swiftfire.nl/projects/html/reference/index.html)
 | Http | An API for HTTP messages | [link](https://github.com/Balancingrock/Http) | [link](http://swiftfire.nl/projects/http/reference/index.html)
 | KeyedCache | General purpose dictionary like cache | [link](https://github.com/Balancingrock/KeyedCache) | [link](http://swiftfire.nl/projects/keyedcache/reference/index.html)
 | SecureSockets | Networking utilities that implement SSL (includes COpenSSL) | [link](https://github.com/Balancingrock/SecureSockets) | [link](http://swiftfire.nl/projects/securesockets/reference/index.html)
