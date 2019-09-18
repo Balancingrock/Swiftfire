@@ -94,7 +94,7 @@ The build the project, but first make the build script executable:
 
 This should build the project without errors.
 
-If the target macOS is before 10.14.3 then it is also necessary to install the [Swift 5 Runtime Support for Command Line Tools](https://support.apple.com/kb/DL1998). This will install a set of libraries into `/usr/lib/swift` among which `libswiftCoreFoundation.dyLib`. When you get an error message on starting Swiftfire complaining about that this library is missing, install the Swift 5 runtime.
+If the target macOS is before 10.14.4 then it is also necessary to install the [Swift 5 Runtime Support for Command Line Tools](https://support.apple.com/kb/DL1998). This will install a set of libraries into `/usr/lib/swift` among which `libswiftCoreFoundation.dyLib`. When you get an error message on starting Swiftfire complaining about that this library is missing, install the Swift 5 runtime.
 
 We could stop here, but... the project needs openSSL. And while a compiled version of openSSL is provided with the project, you should not trust this. Make sure to download and install openSSL from the original sources at [openSSL.org](https://openssl.org)
 
