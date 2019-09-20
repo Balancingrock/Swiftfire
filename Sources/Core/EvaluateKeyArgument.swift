@@ -108,10 +108,7 @@ public func evaluateKeyArgument(_ arg: String, using functionsInfo: Functions.In
         
     case "$getinfo":
         
-        guard let getInfo = environment.serviceInfo[.getInfoKey] as? Dictionary<String, String> else {
-            Log.atError?.log("No GetInfo found")
-            return "***error***"
-        }
+        let getInfo = environment.request.getInfo
         
         guard let result = getInfo[String(args[1])] else {
             Log.atError?.log("GetInfo does not contain key: \(args[1])")

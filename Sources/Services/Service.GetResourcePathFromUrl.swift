@@ -3,7 +3,7 @@
 //  File:       Service.GetResourcePathFromUrl.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.1
+//  Version:    1.3.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.3.0 - Partly rewritten, retrieval of URL and name/value pairs has moved to library Http
 // 1.0.1 - Documentation update
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
@@ -125,84 +126,25 @@ func service_getResourcePathFromUrl(_ request: Request, _ connection: SFConnecti
     }
 
     
-    // Extracts the name value pairs if they are present and removes all characters starting from the first question mark encountered.
-    
-    func extractAndRemoveNameValuePairs(path: String) -> String {
-        
-        
-        // Only for get operations
-        
-        if request.method != .get { return path }
-        
-        
-        // There must be a questionmark in the path
-        
-        if !path.contains("?") { return path }
-        
-        
-        // Split the path into two parts, before and after the questionmark
-        
-        let parts = path.components(separatedBy: "?")
-        
-        if parts.count != 2 { return path } // Some kind of error or a special case by the website designer?
-        
-        
-        // The second part contains the name/value pairs
-        
-        let getDict = ReferencedDictionary()
-        
-        var nameValuePairs = parts[1].components(separatedBy: "&")
-        
-        while nameValuePairs.count > 0 {
-            var nameValue = nameValuePairs.removeFirst().components(separatedBy: "=")
-            switch nameValue.count {
-            case 0: break // error, don't do anything
-            case 1: getDict[nameValue[0]] = ""
-            case 2: getDict[nameValue[0]] = nameValue[1]
-            default:
-                let name = nameValue.removeFirst()
-                getDict[name] = nameValue.joined(separator: "=")
-            }
-        }
-        
-        
-        // Add the get dictionary to the service info
-        
-        if getDict.count > 0 { info[.getInfoKey] = getDict }
-        
-        
-        // Return the "before questionmark' part of the original path
-        
-        return parts[0]
-    }
-    
-    
     // Abort immediately if there is already a response code
     
     if response.code != nil { return .next }
 
     
-    // If there is a path already, skip (This allows o.a. serveradmin domain access)
+    // Abort if the partial path and relative path are already set
     
-    if info[.absoluteResourcePathKey] != nil { return .next }
-    if info[.relativeResourcePathKey] != nil { return .next }
-        
-        
+    if info[.relativeResourcePathKey] == nil { return .next }
+    if info[.absoluteResourcePathKey] == nil { return .next }
+    
+    
     // =============================================================================================================
     // Determine the resource path
     // =============================================================================================================
     
-    guard let originalPartialPath = request.url else {
+    guard let partialPath = request.resourcePath else {
         handle400_BadRequestError(message: "No URL in request")
         return .next
     }
-    
-    
-    // =============================================================================================================
-    // Extract possible name/value pairs from the partial path
-    // =============================================================================================================
-    
-    let partialPath = extractAndRemoveNameValuePairs(path: originalPartialPath)
     
     
     // =============================================================================================================

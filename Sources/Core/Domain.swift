@@ -50,6 +50,7 @@ import SwifterLog
 import SecureSockets
 import BRUtils
 import Http
+import BRBON
 
 
 /// Represents an internet domain.
@@ -283,6 +284,11 @@ public final class Domain {
     public var accounts: AccountManager!
     
     
+    /// A list of account names to be verified
+    
+    public var accountNamesWaitingForVerification: ItemManager!
+    
+    
     // Counter for hits on pages (note that not all pages will be counted, only for those pages for which a hitcounter is requested)
     // This set of counters is maintained by the function_NofPageHits
     
@@ -431,6 +437,13 @@ public final class Domain {
         if let j = (json|"StatisticsRolloverTime")?.stringValue {
             statisticsRolloverTime = WallclockTime(j) ?? WallclockTime(hour: 0, minute: 0, second: 0)
         }
+        
+        if let url = Urls.domainAccountNamesWaitingForVerificationFile(for: name) {
+            accountNamesWaitingForVerification = ItemManager(from: url)
+        } else {
+            Log.atCritical?.log("Failed to retrieve name for accountNamesWaitingForVerification")
+            accountNamesWaitingForVerification = ItemManager.createArrayManager(values: Array<String>())
+        }
     }
     
     
@@ -488,6 +501,10 @@ public final class Domain {
         json["NofRecentResponseLogs"] &= nofRecentResponseLogs
 
         json.save(to: setupFile)
+        
+        if let url = Urls.domainAccountNamesWaitingForVerificationFile(for: name) {
+            try? accountNamesWaitingForVerification.data.write(to: url)
+        }
     }
 }
 
@@ -499,7 +516,7 @@ extension Domain {
     
     /// Return a new SSL context with the private key/certificate combination for the domain
     
-    var ctx: Result<ServerCtx> {
+    var ctx: BRUtils.Result<ServerCtx> {
         
         guard let sslDir = sslDir else { return .error(message: "No sll directory found for domain: \(name)") }
         

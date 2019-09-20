@@ -183,6 +183,8 @@ public final class Account: EstimatedMemoryConsumption {
             Log.atError?.log("Cannot save account\n\n\(self),\n\n Error message = \(error)\n")
             return nil
         }
+        
+        infoSetup()
     }
     
     
@@ -260,26 +262,27 @@ public final class Account: EstimatedMemoryConsumption {
     }
     
     
-    func storeInfo() {
-        let file = dir.appendingPathComponent("info").appendingPathExtension("brbon")
-        do {
-            if let info = info {
-                try info.data.write(to: file)
-            }
-        } catch let error {
-            Log.atError?.log("Failed to store info for account \(name), message = \(error.localizedDescription)")
-        }
-    }
+    // Definitions for the info contents
     
-    func loadInfo() {
-        let file = dir.appendingPathComponent("info").appendingPathExtension("brbon")
-        if FileManager.default.isReadableFile(atPath: file.path) {
-            info = ItemManager.init(from: file)
-            if info == nil {
-                Log.atError?.log("Failed to load info for account \(name), file = \(file.path)")
-            }
-        }
-    }
+    fileprivate lazy var isEnabledPortal: Portal = {
+        return info.root["enabled"].portal ?? Portal.nullPortal
+    }()
+    
+    fileprivate lazy var emailPortal: Portal = {
+        return info.root["email"].portal ?? Portal.nullPortal
+    }()
+
+    fileprivate lazy var emailWasVerifiedPortal: Portal = {
+        return info.root["emailWasVerified"].portal ?? Portal.nullPortal
+    }()
+
+    fileprivate lazy var emailVerificationCodePortal: Portal = {
+        return info.root["emailVerificationCode"].portal ?? Portal.nullPortal
+    }()
+
+    fileprivate lazy var creationDatePortal: Portal = {
+        return info.root["creationDate"].portal ?? Portal.nullPortal
+    }()
 }
 
 
@@ -498,3 +501,102 @@ extension Account {
     }
 }
 
+
+// MARK: - Info interface
+
+extension Account {
+    
+    fileprivate var infoUrl: URL {
+        return dir.appendingPathComponent("info").appendingPathExtension("brbon")
+    }
+    
+    public func storeInfo() {
+        do {
+            if let info = info {
+                try info.data.write(to: infoUrl)
+            }
+        } catch let error {
+            Log.atError?.log("Failed to store info for account \(name), message = \(error.localizedDescription)")
+        }
+    }
+    
+    public func loadInfo() {
+        if FileManager.default.isReadableFile(atPath: infoUrl.path) {
+            info = ItemManager.init(from: infoUrl)
+            if info == nil {
+                Log.atError?.log("Failed to load info for account \(name), file = \(infoUrl.path)")
+            }
+            infoSetup()
+        } else {
+            infoSetup()
+        }
+    }
+
+    fileprivate func infoSetup() {
+        info = ItemManager.createDictionaryManager()
+        info.root["enabled"].bool = false
+        info.root["email"].string = ""
+        info.root["emailWasVerified"].bool = false
+        info.root["emailVerificationCode"].string = ""
+        info.root["creationDate"].int64 = Date().unixTime
+        storeInfo()
+    }
+    
+    
+    /// True if the account is usable and enabled, false otherwise.
+    ///
+    /// For the account to be considered usable, the email address must have been verified.
+    
+    public var isEnabled: Bool {
+        get {
+            if emailWasVerified {
+                return isEnabledPortal.bool ?? false
+            } else {
+                return false
+            }
+        }
+        set {
+            isEnabledPortal.bool = newValue
+            storeInfo()
+        }
+    }
+    
+    
+    /// The account email address
+    
+    public var email: String {
+        get {
+            return emailPortal.string ?? ""
+        }
+        set {
+            emailPortal.string = newValue
+            storeInfo()
+        }
+    }
+    
+    
+    /// True if the account email address was verified
+    
+    public var emailWasVerified: Bool {
+        get {
+            return emailWasVerifiedPortal.bool ?? false
+        }
+        set {
+            isEnabledPortal.bool = newValue
+            storeInfo()
+        }
+    }
+
+    
+    /// The email verification code
+    
+    public var emailVerificationCode: String {
+        get {
+            return emailVerificationCodePortal.string ?? ""
+        }
+        set {
+            emailVerificationCodePortal.string = newValue
+            storeInfo()
+        }
+    }
+}

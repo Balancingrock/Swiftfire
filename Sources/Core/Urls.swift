@@ -266,6 +266,11 @@ public final class Urls {
     public static func domainPhpDir(for name: String) -> URL? { return dirUrl(domainDir(for: name), "php") }
 
     
+    /// The directory for the domain comments section
+    
+    public static func domainCommentsRootDir(for name: String) -> URL? { return dirUrl(domainDir(for: name), "comments") }
+    
+    
     /// The file for the domain hit counters
     
     public static func domainHitCountersDir(for name: String) -> URL? { return fileUrl(domainDir(for: name), "hit-counters") }
@@ -274,4 +279,9 @@ public final class Urls {
     /// The file for the domain telemetry
     
     public static func domainTelemetryDir(for name: String) -> URL? { return fileUrl(domainDir(for: name), "telemetry") }
+    
+    
+    /// The file with account names waiting for verification
+    
+    public static func domainAccountNamesWaitingForVerificationFile(for name: String) -> URL? { return fileUrl(domainDir(for: name), "accountNamesWaitingForVerification") }
 }

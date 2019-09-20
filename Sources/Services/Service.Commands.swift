@@ -1,0 +1,235 @@
+// =====================================================================================================================
+//
+//  File:       Service.Commands.swift
+//  Project:    Swiftfire
+//
+//  Version:    1.3.0
+//
+//  Author:     Marinus van der Lugt
+//  Company:    http://balancingrock.nl
+//  Website:    http://swiftfire.nl/
+//  Git:        https://github.com/Balancingrock/Swiftfire
+//
+//  Copyright:  (c) 2019 Marinus van der Lugt, All rights reserved.
+//
+//  License:    Use or redistribute this code any way you like with the following two provision:
+//
+//  1) You ACCEPT this source code AS IS without any guarantees that it will work as intended. Any liability from its
+//  use is YOURS.
+//
+//  2) You WILL NOT seek damages from the author or balancingrock.nl.
+//
+//  I also ask you to please leave this header with the source code.
+//
+//  Like you, I need to make a living:
+//
+//   - You can send payment (you choose the amount) via paypal to: sales@balancingrock.nl
+//   - Or wire bitcoins to: 1GacSREBxPy1yskLMc9de2nofNv2SNdwqH
+//
+//  If you like to pay in another way, please contact me at rien@balancingrock.nl
+//
+//  Prices/Quotes for support, modifications or enhancements can be obtained from: rien@balancingrock.nl
+//
+// =====================================================================================================================
+// PLEASE let me know about bugs, improvements and feature requests. (again: rien@balancingrock.nl)
+// =====================================================================================================================
+//
+// History
+//
+// 1.3.0 - Initial version
+//
+// =====================================================================================================================
+
+import Foundation
+
+import Http
+import SwifterLog
+import Core
+
+
+// Commands and their templates
+
+// Email verification. This command is received when a new user clicks the link in the confirmation email.
+
+fileprivate let COMMAND_EMAIL_VERIFICATION = "emailverification"
+
+fileprivate let TEMPLATE_EMAIL_VERIFICATION_SUCCESS = "templates/emailVerificationSuccess.sf.html"
+fileprivate let TEMPLATE_EMAIL_VERIFICATION_FAILED = "templates/emailVerificationFailed.sf.html"
+
+
+// This creates a new account and sends a verification email
+
+fileprivate let COMMAND_CREATE_ACCOUNT = "createaccount"
+
+fileprivate let TEMPLATE_CREATE_ACCOUNT_SUCCESS = "templates/createAccountSuccess.sf.html"
+fileprivate let TEMPLATE_CREATE_ACCOUNT_FAILED = "templates/createAccountFailed.sf.html"
+
+fileprivate let CA_ACCOUNT_NAME_KEY = "AccountName" // Necessary, unique, non-empty
+fileprivate let CA_PASSWORD_KEY = "Password" // Necessary, non-empty
+fileprivate let CA_EMAIL_KEY = "Email" // Necessary, email-pattern (*@*.*)
+fileprivate let CA_OPTIONAL_FROM = "FromAddress" // Optional, unchecked
+fileprivate let CA_OPTIONAL_BUBJECT = "Subject" // Optional, unchecked
+
+
+
+/// Allows a domain admin to configure the domain. Only active if the URL that was requested started with the domain setup keyword.
+///
+/// _Input_:
+///    - request.cookies: Will be checked for an existing session cookie.
+///    - domain.sessions: Will be checked for an existing session, or a new session.
+///    - domain.sessionTimeout: If the timeout < 1, then no session will be created.
+///
+/// _Output_:
+///    - response
+///
+/// _Sequence_:
+///   - Should be called after WaitUntilBodyComplete.
+
+func service_commands(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: inout Services.Info, _ response: inout Response) -> Services.Result {
+    
+    
+    // Exit if there is a code already
+    
+    if response.code != nil { return .next }
+    
+    
+    // Exit if the first path part is not a 'command'
+    
+    guard
+        request.resourcePathParts.count > 2,
+        request.resourcePathParts[0].lowercased() == "command"
+        
+        else {
+        Log.atInfo?.log("Request is not a command")
+        return .next
+    }
+
+    
+    // The command that must be executed
+    //
+    // Note that the parameters for the command must be present in the GET info or POST info of the request.
+    
+    let command = request.resourcePathParts[1].lowercased()
+
+    
+    // The redirected path
+    
+    var relativePath: String?
+    
+    
+    // Get the command and execute it
+    
+    switch command {
+        
+    case COMMAND_EMAIL_VERIFICATION: relativePath = executeEmailVerification(request, response, domain, info)
+        
+    case COMMAND_CREATE_ACCOUNT: relativePath = executeCreateAccount(request, response, domain)
+        
+    default:
+        
+        Log.atError?.log("Unknown command with name: \(request.resourcePathParts[1])")
+        response.code = ._501_NotImplemented
+        return .next
+    }
+
+    
+    // Redirect the request
+    
+    guard relativePath != nil else {
+        if response.code == nil {
+            Log.atError?.log("The relative path is still empty!")
+            response.code = ._500_InternalServerError
+        }
+        return .next
+    }
+    
+    
+    // Note: For request URLs there should be a test for resource availability, however this is unnecessary for internal generated resource paths.
+    
+    info[.relativeResourcePathKey] = relativePath!
+    info[.absoluteResourcePathKey] = domain.webroot.appending("/\(relativePath!)")
+    
+    return .next
+}
+
+fileprivate func executeEmailVerification(_ request: Request, _ response: Response, _ domain: Domain, _ info: Services.Info) -> String? {
+    
+    guard let method = request.method, method == .get else {
+        Log.atInfo?.log("Wrong method, should be GET")
+        response.code = ._400_BadRequest
+        return nil
+    }
+    
+    guard let verificationCode = request.getInfo["VerificationCode"] else {
+        Log.atInfo?.log("Missing verifcation code in command")
+        response.code = ._400_BadRequest
+        return nil
+    }
+    
+    guard let waitingAccounts = domain.accountNamesWaitingForVerification?.root?.arrayOfString else {
+        Log.atCritical?.log("Warning, an attempt was made to verify an account while there are no accounts waiting for verification")
+        response.code = ._400_BadRequest
+        return nil
+    }
+    
+    var success = false
+    for (index, accountName) in waitingAccounts.enumerated() {
+        
+        guard let account = domain.accounts.getAccountWithoutPassword(for: accountName) else {
+            Log.atError?.log("Could not find account with name \(accountName) in domain")
+            response.code = ._500_InternalServerError
+            return nil
+        }
+        
+        if account.emailVerificationCode == verificationCode {
+            
+            // Mark the account as verified
+            account.emailWasVerified = true
+            
+            // Keep track in the log
+            Log.atNotice?.log("Account with name \(accountName) has been verified")
+            
+            // Remove the account from the waiting list
+            domain.accountNamesWaitingForVerification!.root!.removeElement(atIndex: index)
+            
+            // Assign the account to the session
+            (info[.sessionKey] as? Session)?.info[.accountKey] = account
+            
+            Log.atDebug?.log("Account with name \(accountName) verified and logged-in")
+            
+            // Successful account verification
+            success = true
+            
+            break
+        }
+    }
+    
+    if success {
+        return TEMPLATE_EMAIL_VERIFICATION_SUCCESS
+    } else {
+        Log.atDebug?.log("Account verification failed for code: \(verificationCode)")
+        return TEMPLATE_EMAIL_VERIFICATION_FAILED
+    }
+}
+
+fileprivate func executeCreateAccount(_ request: Request, _ response: Response, _ domain: Domain) -> String? {
+
+    guard let accountName = request.info[CA_ACCOUNT_NAME_KEY] else {
+        Log.atError?.log("No '\(CA_ACCOUNT_NAME_KEY)' found")
+        return TEMPLATE_CREATE_ACCOUNT_FAILED
+    }
+
+    guard let password = request.info[CA_PASSWORD_KEY] else {
+        Log.atError?.log("No '\(CA_PASSWORD_KEY)' found")
+        return TEMPLATE_CREATE_ACCOUNT_FAILED
+    }
+    
+    guard let email = request.info[CA_EMAIL_KEY] else {
+        Log.atError?.log("No '\(CA_EMAIL_KEY)' found")
+        return TEMPLATE_CREATE_ACCOUNT_FAILED
+    }
+    
+    let fromAddress = request.info["FromAddress"] ?? "accountVerification@\(domain.name)"
+    
+    let message = request.info["Message"]
+}
