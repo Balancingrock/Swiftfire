@@ -66,7 +66,7 @@ import Core
 /// _Sequence_:
 ///   - Can be one of the first services, does not need any predecessors.
 
-func service_getResourcePathFromUrl(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: inout Services.Info, _ response: inout Response) -> Services.Result {
+func service_getResourcePathFromUrl(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: Services.Info, _ response: Response) -> Services.Result {
     
     
     func handle400_BadRequestError(message: String) {
@@ -158,7 +158,7 @@ func service_getResourcePathFromUrl(_ request: Request, _ connection: SFConnecti
     // Check if there is something at the full path
     // =============================================================================================================
         
-    switch connection.filemanager.readableResourceFileExists(at: fullPath, for: domain) {
+    switch FileManager.default.readableResourceFileExists(at: fullPath, for: domain) {
         
     case .cannotBeRead: handle403_ForbiddenError(path: partialPath)
 

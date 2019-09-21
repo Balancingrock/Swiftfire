@@ -60,7 +60,7 @@ import Core
 /// _Sequence_:
 ///    - Should come after Service.GetSession. However it should come close to the end of all services to ensure that possible errors have had their chances to prevent continuation of a session.
 
-func service_restartSessionTimeout(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: inout Services.Info, _ response: inout Response) -> Services.Result {
+func service_restartSessionTimeout(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: Services.Info, _ response: Response) -> Services.Result {
     
     
     // Check if session support is enabled

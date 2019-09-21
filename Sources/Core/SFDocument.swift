@@ -192,7 +192,7 @@ public  class SFDocument: EstimatedMemoryConsumption {
     ///
     /// - Returns: nil if the file could not be read.
     
-    private init?(path: String, data fileContent: Data?, filemanager: FileManager) {
+    private init?(path: String, data fileContent: Data?) {
         
         
         if let d = fileContent, let str = String(bytes: d, encoding: .utf8) {
@@ -206,8 +206,8 @@ public  class SFDocument: EstimatedMemoryConsumption {
 
             // Tests
         
-            guard filemanager.isReadableFile(atPath: path) else { return nil }
-            guard let fileattributes = try? filemanager.attributesOfItem(atPath: path) else { return nil }
+            guard FileManager.default.isReadableFile(atPath: path) else { return nil }
+            guard let fileattributes = try? FileManager.default.attributesOfItem(atPath: path) else { return nil }
         
         
             // Retrieve necessary data
@@ -237,6 +237,7 @@ public  class SFDocument: EstimatedMemoryConsumption {
     /// Processes the function calls and merges the original document data with the results.
     
     public func getContent(with environment: inout Functions.Environment) -> Data {
+        
         
         // Thread safety: All data that is updated and/or returned must reside in local (stack) storage.
         
@@ -269,11 +270,10 @@ public  class SFDocument: EstimatedMemoryConsumption {
     /// - Parameters:
     ///   - path: The path of the file.
     ///   - data: The file content, if nil the file will be read. If set, the cache will not be used.
-    ///   - filemanager: The filemanager to use.
     ///
     /// - Returns: Nil if the file cannot be read.
     
-    public static func factory(path: String, data: Data? = nil, filemanager: FileManager) -> Result<SFDocument> {
+    public static func factory(path: String, data: Data? = nil) -> Result<SFDocument> {
         
         return queue.sync(execute: {
             
@@ -282,7 +282,7 @@ public  class SFDocument: EstimatedMemoryConsumption {
                 // Try to retrieve the document from cache
             
                 if let doc = SFDocument.cache[path] {
-                    if let fileattributes = try? filemanager.attributesOfItem(atPath: path) {
+                    if let fileattributes = try? FileManager.default.attributesOfItem(atPath: path) {
                         if let modificationDate = fileattributes[FileAttributeKey.modificationDate] as? Date  {
                             if modificationDate.javaDate <= doc.fileModificationDate {
                                 return .success(doc)
@@ -295,12 +295,12 @@ public  class SFDocument: EstimatedMemoryConsumption {
             
             // Try to create a new document
             
-            guard let doc = SFDocument(path: path, data: data, filemanager: filemanager) else {
+            guard let doc = SFDocument(path: path, data: data) else {
                 
                 // Try to find reason for error
                 
-                guard filemanager.isReadableFile(atPath: path) else { return .error(message: "File not readable at \(path)") }
-                guard let fileattributes = try? filemanager.attributesOfItem(atPath: path) else { return .error(message: "Cannot read file attributes at \(path)") }
+                guard FileManager.default.isReadableFile(atPath: path) else { return .error(message: "File not readable at \(path)") }
+                guard let fileattributes = try? FileManager.default.attributesOfItem(atPath: path) else { return .error(message: "Cannot read file attributes at \(path)") }
                 guard let _ = fileattributes[FileAttributeKey.modificationDate] as? Date else { return .error(message: "Cannot extract modification date from file attributes at \(path)") }
                 
                 return .error(message: "Cannot read file content at \(path)")

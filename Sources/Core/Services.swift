@@ -105,7 +105,7 @@ public final class Services {
     ///
     /// - Returns: 'true' to continue the service chain, 'false' to abort it. Note: this is designed to abort a service chain in case of errors, but it may be usefull in other situations as well. However normally the service chain is expected to continue from start to finish such that every service gets a chance to perform its intended function. Returning 'false' for non-error cases places conditions on the sequence of services which necessitates proper end user instructions.
 
-    public typealias Signature = (_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: inout Services.Info, _ response: inout Response) -> Services.Result
+    public typealias Signature = (_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: Services.Info, _ response: Response) -> Services.Result
 
 
     /// The combo of name and service

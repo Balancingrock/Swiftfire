@@ -186,7 +186,8 @@ func function_sf_postingButtonedInput(_ args: Functions.Arguments, _ info: inout
                     <input type="hidden" name="\(q.key)" value="\(q.value)">
                 """)
             }))
-            <input class="posting-buttoned-input-input" type="text" name="\(arr[1])" value="\((value ?? arr[2]))"</input>
+            <input type="hidden" name="Name" value="\(arr[1])"</input>
+            <input class="posting-buttoned-input-input" type="text" name="Value" value="\((value ?? arr[2]))"</input>
             <button type="submit" class="posting-buttoned-input-button">\(arr[3])</button>
         </form>
     """

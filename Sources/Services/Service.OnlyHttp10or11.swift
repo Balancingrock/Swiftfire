@@ -60,7 +60,7 @@ import Core
 /// _Sequence_:
 ///    - Can be one of the first services, does not need any predecessors.
 
-func service_onlyHttp10or11(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: inout Services.Info, _ response: inout Response) -> Services.Result {
+func service_onlyHttp10or11(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: Services.Info, _ response: Response) -> Services.Result {
     
     
     // Abort immediately if there is already a response code

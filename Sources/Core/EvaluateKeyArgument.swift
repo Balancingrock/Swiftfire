@@ -73,7 +73,6 @@ import Foundation
 ///   - in: The environment the function is executing in.
 ///
 /// - Returns:
-///
 ///   - The argument if the argument does not start with '$'
 ///   - "***error*** If there the request is invalid or of an non-existing source/key
 ///   - The requested value
@@ -120,12 +119,12 @@ public func evaluateKeyArgument(_ arg: String, using functionsInfo: Functions.In
         
     case "$functionsinfo":
         
-        switch args[1].lowercased() {
-            
-        default:
-            Log.atError?.log("No access to FunctionInfo mapped for key: \(args[1].lowercased())")
+        guard let result = functionsInfo[String(args[1])] as? String else {
+            Log.atError?.log("FunctionInfo does not contain key: \(args[1])")
             return "***error***"
         }
+        
+        return result
 
         
     case "$serviceinfo":

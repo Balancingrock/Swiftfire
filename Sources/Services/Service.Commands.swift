@@ -56,6 +56,8 @@ fileprivate let COMMAND_EMAIL_VERIFICATION = "emailverification"
 fileprivate let TEMPLATE_EMAIL_VERIFICATION_SUCCESS = "templates/emailVerificationSuccess.sf.html"
 fileprivate let TEMPLATE_EMAIL_VERIFICATION_FAILED = "templates/emailVerificationFailed.sf.html"
 
+fileprivate let CEV_VERIFICATION_CODE = "VerificationCode"
+
 
 // This creates a new account and sends a verification email
 
@@ -63,6 +65,7 @@ fileprivate let COMMAND_CREATE_ACCOUNT = "createaccount"
 
 fileprivate let TEMPLATE_CREATE_ACCOUNT_SUCCESS = "templates/createAccountSuccess.sf.html"
 fileprivate let TEMPLATE_CREATE_ACCOUNT_FAILED = "templates/createAccountFailed.sf.html"
+fileprivate let TEMPLATE_VERIFICATION_EMAIL_TEXT = "templates/verificationEmailText.sf.txt"
 
 fileprivate let CA_ACCOUNT_NAME_KEY = "AccountName" // Necessary, unique, non-empty
 fileprivate let CA_PASSWORD_KEY = "Password" // Necessary, non-empty
@@ -85,7 +88,7 @@ fileprivate let CA_OPTIONAL_BUBJECT = "Subject" // Optional, unchecked
 /// _Sequence_:
 ///   - Should be called after WaitUntilBodyComplete.
 
-func service_commands(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: inout Services.Info, _ response: inout Response) -> Services.Result {
+func service_commands(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: Services.Info, _ response: Response) -> Services.Result {
     
     
     // Exit if there is a code already
@@ -123,7 +126,7 @@ func service_commands(_ request: Request, _ connection: SFConnection, _ domain: 
         
     case COMMAND_EMAIL_VERIFICATION: relativePath = executeEmailVerification(request, response, domain, info)
         
-    case COMMAND_CREATE_ACCOUNT: relativePath = executeCreateAccount(request, response, domain)
+    case COMMAND_CREATE_ACCOUNT: relativePath = executeCreateAccount(request, connection, domain, response, info)
         
     default:
         
@@ -160,7 +163,7 @@ fileprivate func executeEmailVerification(_ request: Request, _ response: Respon
         return nil
     }
     
-    guard let verificationCode = request.getInfo["VerificationCode"] else {
+    guard let verificationCode = request.getInfo[CEV_VERIFICATION_CODE] else {
         Log.atInfo?.log("Missing verifcation code in command")
         response.code = ._400_BadRequest
         return nil
@@ -212,10 +215,15 @@ fileprivate func executeEmailVerification(_ request: Request, _ response: Respon
     }
 }
 
-fileprivate func executeCreateAccount(_ request: Request, _ response: Response, _ domain: Domain) -> String? {
+fileprivate func executeCreateAccount(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ response: Response, _ info: Services.Info) -> String? {
 
     guard let accountName = request.info[CA_ACCOUNT_NAME_KEY] else {
         Log.atError?.log("No '\(CA_ACCOUNT_NAME_KEY)' found")
+        return TEMPLATE_CREATE_ACCOUNT_FAILED
+    }
+
+    guard !accountName.isEmpty else {
+        Log.atDebug?.log("Account name is empty")
         return TEMPLATE_CREATE_ACCOUNT_FAILED
     }
 
@@ -224,12 +232,61 @@ fileprivate func executeCreateAccount(_ request: Request, _ response: Response, 
         return TEMPLATE_CREATE_ACCOUNT_FAILED
     }
     
-    guard let email = request.info[CA_EMAIL_KEY] else {
+    guard !password.isEmpty else {
+        Log.atDebug?.log("Password is empty")
+        return TEMPLATE_CREATE_ACCOUNT_FAILED
+    }
+
+    guard let emailAddress = request.info[CA_EMAIL_KEY] else {
         Log.atError?.log("No '\(CA_EMAIL_KEY)' found")
         return TEMPLATE_CREATE_ACCOUNT_FAILED
     }
     
-    let fromAddress = request.info["FromAddress"] ?? "accountVerification@\(domain.name)"
+    let regex = try? NSRegularExpression(pattern: "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}", options: .init())
     
-    let message = request.info["Message"]
+    guard let count = regex?.numberOfMatches(in: emailAddress, options: .init(), range: NSRange(location: 0, length: emailAddress.count)), count > 0 else {
+        Log.atDebug?.log("Given email address seems to be incorrect: \(emailAddress)")
+        return TEMPLATE_CREATE_ACCOUNT_FAILED
+    }
+    
+    guard !domain.accounts.available(name: accountName) else {
+        Log.atDebug?.log("An account with this name already exists")
+        return TEMPLATE_CREATE_ACCOUNT_FAILED
+    }
+    
+    guard let account = domain.accounts.newAccount(name: accountName, password: password) else {
+        Log.atError?.log("Could not create a new account with name '\(accountName)' and password '\(password)'")
+        return TEMPLATE_CREATE_ACCOUNT_FAILED
+    }
+    
+    account.email = emailAddress
+    account.emailVerificationCode = UUID().uuidString
+    
+    let verificationLink = "http://\(domain.name):\(serverParameters.httpServicePortNumber)/command/\(COMMAND_EMAIL_VERIFICATION)?\(CEV_VERIFICATION_CODE)=\(account.emailVerificationCode)"
+
+    
+    var message: String = ""
+    
+    if case .success(let messageTemplate) = SFDocument.factory(path: (domain.webroot + "/" + TEMPLATE_VERIFICATION_EMAIL_TEXT)) {
+
+        var env = Functions.Environment(request: request, connection: connection, domain: domain, response: response, serviceInfo: info)
+        request.info["Link"] = verificationLink
+        message = String(data: messageTemplate.getContent(with: &env), encoding: .utf8) ?? "Click the following link (or copy it into the url field of a browser) to confirm your account at \(domain.name).\r\n Link = \(verificationLink)"
+
+    } else {
+        
+        message = "Click the following link (or copy it into the url field of a browser) to confirm your account at \(domain.name).\r\n Link = \(verificationLink)"
+    }
+    
+    let fromAddress = request.info["FromAddress"] ?? "accountVerification@\(domain.name)"
+
+    let email: String = """
+        To: \(emailAddress)\n
+        From: \(fromAddress)\n
+        Content-Type: text/html;\n
+        Subject: Confirm Account Creation at \(domain.name)\n\n
+        \(message)
+    """
+    
+    return TEMPLATE_CREATE_ACCOUNT_SUCCESS
 }

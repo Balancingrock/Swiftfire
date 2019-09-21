@@ -74,7 +74,6 @@ public var serverAdminServices: Array<String> {
     return [
         serviceName_GetSession,
         serviceName_WaitUntilBodyComplete,
-        serviceName_DecodePostFormUrlEncoded,
         serverAdmin,
         serviceName_RestartSessionTimeout,
         serviceName_TransferResponse

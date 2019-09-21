@@ -1,6 +1,6 @@
 # Build websites in Swift.
 
-Swiftfire is a webserver that allows the injection of HTML code from a routine written in Swift.
+Swiftfire is a webserver that allows the injection of HTML code from routines written in Swift.
 
 The Swiftfire webserver can be extended with functions and services written in Swift. The services are used to process a HTTP request, and the functions are used to prepare a response by processing the requested page or file.  This makes it possible to create entire websites written in nothing else but HTML, CSS and Swift. No other languages, frameworks or external services necessary, with a minor exception for openSSL.
 

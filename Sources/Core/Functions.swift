@@ -88,7 +88,7 @@ public final class Functions {
         ///
         /// - Note: the connection must in fact be an SFConnection.
         
-        public init(request: Request, connection: SFConnection, domain: Domain, response: inout Response, serviceInfo: inout Services.Info) {
+        public init(request: Request, connection: SFConnection, domain: Domain, response: Response, serviceInfo: Services.Info) {
             self.request = request
             self.connection = connection
             self.domain = domain

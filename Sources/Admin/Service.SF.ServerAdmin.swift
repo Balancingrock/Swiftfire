@@ -108,7 +108,7 @@ private let SERVER_ADMIN_LOGIN_PWD  = "ServerAdminLoginPwd"
 ///
 /// - Returns: Always .next
 
-func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: inout Services.Info, _ response: inout Response) -> Services.Result {
+func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: Services.Info, _ response: Response) -> Services.Result {
     
     
     
@@ -156,11 +156,11 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
         let rootPath = serverParameters.adminSiteRoot.value
         let loginUrl = ((rootPath as NSString).appendingPathComponent("pages") as NSString).appendingPathComponent("/login.sf.html")
 
-        if case let .exists(path: path) = connection.filemanager.readableResourceFileExists(at: loginUrl, for: domain) {
+        if case let .exists(path: path) = FileManager.default.readableResourceFileExists(at: loginUrl, for: domain) {
             
             Log.atDebug?.log("A login page exists, using file: \(path)")
             
-            switch SFDocument.factory(path: path, filemanager: connection.filemanager) {
+            switch SFDocument.factory(path: path) {
                 
             case .error(let message):
                 
@@ -170,7 +170,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
                 
             case .success(let doc):
                 
-                var environment = Functions.Environment(request: request, connection: connection, domain: domain, response: &response, serviceInfo: &info)
+                var environment = Functions.Environment(request: request, connection: connection, domain: domain, response: response, serviceInfo: info)
                 
                 response.body = doc.getContent(with: &environment)
                 response.code = Response.Code._200_OK
@@ -338,7 +338,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
         // There root must be a directory, and an index file must exist
         
         serverParameters.adminSiteRoot.value = root
-        guard adminSiteRootIsValid(connection.filemanager) else {
+        guard adminSiteRootIsValid() else {
             createAdminAccountPage(name: name, nameColor: "black", pwdColor: "black", rootColor: "red")
             return .next
         }
@@ -470,7 +470,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
     
     // Catch the possibility where the admin has manually changed the configuration files and made an error
     
-    if !adminSiteRootIsValid(connection.filemanager) {
+    if !adminSiteRootIsValid() {
         
         Log.atError?.log("Admin site root is invalid at: \(serverParameters.adminSiteRoot.value)")
         
@@ -487,7 +487,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
     var absPath: String = ""
     if !testPath.contains("sfcommand") {
         
-        switch connection.filemanager.readableResourceFileExists(at: testPath, for: serverAdminDomain) {
+        switch FileManager.default.readableResourceFileExists(at: testPath, for: serverAdminDomain) {
             
         case let .exists(path: path):
             absPath = path
@@ -550,9 +550,8 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
     if pathComponents.count >= 2 && pathComponents[0] == "sfcommand" {
         
         pathComponents.removeFirst()
-        var postInfo = info[.postInfoKey] as? PostInfo
         
-        switch executeSfCommand(pathComponents, &postInfo, session, &info, &response) {
+        switch executeSfCommand(pathComponents, request, session, info, response) {
         
         case .next: return .next
             
@@ -561,7 +560,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
             relPath = path
             let testPath = (serverAdminDomain.webroot as NSString).appendingPathComponent(relPath)
             
-            switch connection.filemanager.readableResourceFileExists(at: testPath, for: serverAdminDomain) {
+            switch FileManager.default.readableResourceFileExists(at: testPath, for: serverAdminDomain) {
                 
             case let .exists(path: path):
                 absPath = path
@@ -592,7 +591,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
     
     if (absPath as NSString).lastPathComponent.contains(".sf.") {
         
-        switch SFDocument.factory(path: absPath, filemanager: connection.filemanager) {
+        switch SFDocument.factory(path: absPath) {
             
         case .error(let message):
             
@@ -605,7 +604,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
             
         case .success(let doc):
             
-            var environment = Functions.Environment(request: request, connection: connection, domain: domain, response: &response, serviceInfo: &info)
+            var environment = Functions.Environment(request: request, connection: connection, domain: domain, response: response, serviceInfo: info)
             
             response.body = doc.getContent(with: &environment)
             response.code = Response.Code._200_OK
@@ -615,7 +614,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
         
     } else {
         
-        guard let data = connection.filemanager.contents(atPath: absPath) else {
+        guard let data = FileManager.default.contents(atPath: absPath) else {
             
             Log.atError?.log("Reading contents of file failed (but file is reported readable), resource: \(absPath)", id: connection.logId)
 
@@ -648,14 +647,14 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
     return .next
 }
 
-fileprivate func adminSiteRootIsValid(_ filemanager: FileManager) -> Bool {
+fileprivate func adminSiteRootIsValid() -> Bool {
 
     let path = serverParameters.adminSiteRoot.value
     let url = URL(fileURLWithPath: path)
     
     var isDirectory: ObjCBool = false
     
-    if !filemanager.fileExists(atPath: path, isDirectory: &isDirectory) { return false }
+    if !FileManager.default.fileExists(atPath: path, isDirectory: &isDirectory) { return false }
         
         
     // There is something, it must be a directory, check for index.html or index.htm
@@ -669,7 +668,7 @@ fileprivate func adminSiteRootIsValid(_ filemanager: FileManager) -> Bool {
         
         let turl = url.appendingPathComponent(name)
                 
-        if filemanager.isReadableFile(atPath: turl.path) { return true }
+        if FileManager.default.isReadableFile(atPath: turl.path) { return true }
     }
 
     return false
@@ -681,7 +680,7 @@ fileprivate enum CommandExecutionResult {
     case nop
 }
 
-fileprivate func executeSfCommand(_ pathComponents: Array<String>, _ postInfo: inout PostInfo?, _ session: Session, _ info: inout Services.Info, _ response: inout Response) -> CommandExecutionResult {
+fileprivate func executeSfCommand(_ pathComponents: Array<String>, _ request: Request, _ session: Session, _ info: Services.Info, _ response: Response) -> CommandExecutionResult {
     
     guard let commandName = pathComponents.first else {
         Log.atError?.log("No command name found")
@@ -691,29 +690,29 @@ fileprivate func executeSfCommand(_ pathComponents: Array<String>, _ postInfo: i
     Log.atDebug?.log("Executing command: \(commandName)")
 
     switch commandName {
-    case "SetRoot": executeSetRoot(postInfo); return .newPath("")
-    case "SetParameter": executeSetParameter(postInfo); return .newPath("/pages/parameters.sf.html")
+    case "SetRoot": executeSetRoot(request.info); return .newPath("")
+    case "SetParameter": executeSetParameter(request.info); return .newPath("/pages/parameters.sf.html")
     case "Restart": executeRestart(); return .newPath("/pages/restart.sf.html")
     case "Quit": return .newPath("/pages/quit.sf.html")
     case "CancelQuit": return .newPath("")
     case "ConfirmedQuit": executeQuitSwiftfire(); return .newPath("/pages/bye.sf.html")
-    case "UpdateDomain": executeUpdateDomain(&postInfo); return .newPath("/pages/domain.sf.html")
-    case "UpdateDomainServices": executeUpdateDomainServices(&postInfo); return .newPath("/pages/domain.sf.html")
-    case "DeleteDomain": executeDeleteDomain(&postInfo); return .newPath("/pages/domain-management.sf.html")
-    case "CreateDomain": executeCreateDomain(&postInfo); return .newPath("/pages/domain-management.sf.html")
-    case "CreateAdmin": executeCreateAdmin(postInfo); return .newPath("/pages/admin-management.sf.html")
-    case "CreateAlias": executeCreateAlias(&postInfo); return .newPath("/pages/domain-management.sf.html")
-    case "DeleteAlias": executeDeleteAlias(&postInfo); return .newPath("/pages/domain-management.sf.html")
-    case "DeleteAccount": executeDeleteAccount(postInfo); return .newPath("/pages/admin-management.sf.html")
-    case "ConfirmDeleteAccount": return executeConfirmDeleteAccount(postInfo)
-    case "SetNewPassword": executeSetNewPassword(postInfo); return .newPath("/pages/admin-management.sf.html")
-    case "UpdateBlacklist": executeUpdateBlacklist(&postInfo); return .newPath("/pages/blacklist.sf.html")
-    case "AddToBlacklist": executeAddToBlacklist(&postInfo); return .newPath("/pages/blacklist.sf.html")
-    case "RemoveFromBlacklist": executeRemoveFromBlacklist(&postInfo); return .newPath("/pages/blacklist.sf.html")
-    case "UpdateDomainBlacklist": executeUpdateDomainBlacklist(&postInfo); return .newPath("/pages/domain.sf.html")
-    case "AddToDomainBlacklist": executeAddToDomainBlacklist(&postInfo); return .newPath("/pages/domain.sf.html")
-    case "RemoveFromDomainBlacklist": executeRemoveFromDomainBlacklist(&postInfo); return .newPath("/pages/domain.sf.html")
-    case "SetDomainAdminPassword": executeSetDomainAdminPassword(postInfo); return .newPath("/pages/domain.sf.html")
+    case "UpdateDomain": executeUpdateDomain(request.info); return .newPath("/pages/domain.sf.html")
+    case "UpdateDomainServices": executeUpdateDomainServices(request.info); return .newPath("/pages/domain.sf.html")
+    case "DeleteDomain": executeDeleteDomain(request.info); return .newPath("/pages/domain-management.sf.html")
+    case "CreateDomain": executeCreateDomain(request.info); return .newPath("/pages/domain-management.sf.html")
+    case "CreateAdmin": executeCreateAdmin(request.info); return .newPath("/pages/admin-management.sf.html")
+    case "CreateAlias": executeCreateAlias(request.info); return .newPath("/pages/domain-management.sf.html")
+    case "DeleteAlias": executeDeleteAlias(request.info); return .newPath("/pages/domain-management.sf.html")
+    case "DeleteAccount": executeDeleteAccount(request.info); return .newPath("/pages/admin-management.sf.html")
+    case "ConfirmDeleteAccount": return executeConfirmDeleteAccount(request.info)
+    case "SetNewPassword": executeSetNewPassword(request.info); return .newPath("/pages/admin-management.sf.html")
+    case "UpdateBlacklist": executeUpdateBlacklist(request.info); return .newPath("/pages/blacklist.sf.html")
+    case "AddToBlacklist": executeAddToBlacklist(request.info); return .newPath("/pages/blacklist.sf.html")
+    case "RemoveFromBlacklist": executeRemoveFromBlacklist(request.info); return .newPath("/pages/blacklist.sf.html")
+    case "UpdateDomainBlacklist": executeUpdateDomainBlacklist(request.info); return .newPath("/pages/domain.sf.html")
+    case "AddToDomainBlacklist": executeAddToDomainBlacklist(request.info); return .newPath("/pages/domain.sf.html")
+    case "RemoveFromDomainBlacklist": executeRemoveFromDomainBlacklist(request.info); return .newPath("/pages/domain.sf.html")
+    case "SetDomainAdminPassword": executeSetDomainAdminPassword(request.info); return .newPath("/pages/domain.sf.html")
     case "Logout": return executeLogout(session);
         
     default:
@@ -722,9 +721,9 @@ fileprivate func executeSfCommand(_ pathComponents: Array<String>, _ postInfo: i
     }
 }
 
-fileprivate func executeSetRoot(_ postInfo: PostInfo?) {
+fileprivate func executeSetRoot(_ info: Dictionary<String, String>) {
     
-    guard let root = postInfo?[SERVER_ADMIN_CREATE_ACCOUNT_ROOT] else {
+    guard let root = info[SERVER_ADMIN_CREATE_ACCOUNT_ROOT] else {
         Log.atDebug?.log("Missing key for the admin server set root command")
         return
     }
@@ -738,14 +737,9 @@ fileprivate func executeSetRoot(_ postInfo: PostInfo?) {
     Log.atNotice?.log("Set admin root directory to: \(root)")
 }
 
-fileprivate func executeSetParameter(_ postInfo: PostInfo?) {
+fileprivate func executeSetParameter(_ info: Dictionary<String, String>) {
     
-    guard let postInfo = postInfo else {
-        Log.atError?.log("Missing postInfo")
-        return
-    }
-    
-    OUTER: for (key, value) in postInfo {
+    OUTER: for (key, value) in info {
     
         for p in serverParameters.all {
         
@@ -767,14 +761,14 @@ fileprivate func executeSetParameter(_ postInfo: PostInfo?) {
     }
 }
 
-fileprivate func executeUpdateBlacklist(_ postInfo: inout PostInfo?) {
+fileprivate func executeUpdateBlacklist(_ info: Dictionary<String, String>) {
     
-    guard let address = postInfo?["Address"] else {
+    guard let address = info["Address"] else {
         Log.atError?.log("Missing address")
         return
     }
     
-    guard let action = postInfo?["Action"] else {
+    guard let action = info["Action"] else {
         Log.atError?.log("Missing action")
         return
     }
@@ -804,17 +798,17 @@ fileprivate func executeUpdateBlacklist(_ postInfo: inout PostInfo?) {
     Log.atNotice?.log("Changed the action to \(action) for address \(address) in server blacklist")
 }
 
-fileprivate func executeAddToBlacklist(_ postInfo: inout PostInfo?) {
+fileprivate func executeAddToBlacklist(_ info: Dictionary<String, String>) {
     
     guard
-        let address = postInfo?["NewEntry"],
+        let address = info["NewEntry"],
         isValidIpAddress(address)
     else {
         Log.atError?.log("Unknown address for key NewEntry")
         return
     }
 
-    guard let action = postInfo?["Action"] else {
+    guard let action = info["Action"] else {
         Log.atError?.log("Unknown action for key Action")
         return
     }
@@ -842,9 +836,9 @@ fileprivate func executeAddToBlacklist(_ postInfo: inout PostInfo?) {
     Log.atNotice?.log("Added address \(address) to server blacklist")
 }
 
-fileprivate func executeRemoveFromBlacklist(_ postInfo: inout PostInfo?) {
+fileprivate func executeRemoveFromBlacklist(_ info: Dictionary<String, String>) {
     
-    guard let address = postInfo?["Address"] else {
+    guard let address = info["Address"] else {
         Log.atError?.log("Missing address for key Address")
         return
     }
@@ -859,22 +853,22 @@ fileprivate func executeRemoveFromBlacklist(_ postInfo: inout PostInfo?) {
     Log.atNotice?.log("Removed address \(address) with action \(action) from server blacklist")
 }
 
-fileprivate func executeUpdateDomainBlacklist(_ postInfo: inout PostInfo?) {
+fileprivate func executeUpdateDomainBlacklist(_ info: Dictionary<String, String>) {
     
     guard
-        let name = postInfo?["DomainName"],
+        let name = info["DomainName"],
         let domain = domains.domain(for: name)
         else {
             Log.atError?.log("Missing or wrong domain name")
             return
     }
     
-    guard let address = postInfo?["Address"] else {
+    guard let address = info["Address"] else {
         Log.atError?.log("Missing address")
         return
     }
     
-    guard let action = postInfo?["Action"] else {
+    guard let action = info["Action"] else {
         Log.atError?.log("Missing action")
         return
     }
@@ -902,10 +896,10 @@ fileprivate func executeUpdateDomainBlacklist(_ postInfo: inout PostInfo?) {
     Log.atNotice?.log("Updated action of address \(address) to \(action) in domain \(domain.name) blacklist")
 }
 
-fileprivate func executeAddToDomainBlacklist(_ postInfo: inout PostInfo?) {
+fileprivate func executeAddToDomainBlacklist(_ info: Dictionary<String, String>) {
     
     guard
-        let name = postInfo?["DomainName"],
+        let name = info["DomainName"],
         let domain = domains.domain(for: name)
         else {
             Log.atError?.log("Missing domain name")
@@ -913,14 +907,14 @@ fileprivate func executeAddToDomainBlacklist(_ postInfo: inout PostInfo?) {
     }
     
     guard
-        let address = postInfo?["NewEntry"],
+        let address = info["NewEntry"],
         isValidIpAddress(address)
         else {
         Log.atError?.log("No 'NewEntry' key found in postInfo dictionary")
         return
     }
     
-    guard let action = postInfo?["Action"] else {
+    guard let action = info["Action"] else {
         Log.atError?.log("No 'Action' key found in postInfo dictionary")
         return
     }
@@ -946,17 +940,17 @@ fileprivate func executeAddToDomainBlacklist(_ postInfo: inout PostInfo?) {
     Log.atNotice?.log("Added address \(address) with action \(action) to domain \(domain.name) blacklist")
 }
 
-fileprivate func executeRemoveFromDomainBlacklist(_ postInfo: inout PostInfo?) {
+fileprivate func executeRemoveFromDomainBlacklist(_ info: Dictionary<String, String>) {
     
     guard
-        let name = postInfo?["DomainName"],
+        let name = info["DomainName"],
         let domain = domains.domain(for: name)
         else {
             Log.atError?.log("Missing domain name")
             return
     }
     
-    guard let address = postInfo?["Address"] else {
+    guard let address = info["Address"] else {
         Log.atError?.log("Missing address for key Address")
         return
     }
@@ -974,28 +968,29 @@ fileprivate func executeRemoveFromDomainBlacklist(_ postInfo: inout PostInfo?) {
 
 /// Update a parameter in a domain.
 
-fileprivate func executeUpdateDomain(_ postInfo: inout PostInfo?) {
+fileprivate func executeUpdateDomain(_ info: Dictionary<String, String>) {
     
-    guard let name = postInfo?["DomainName"] else {
+    guard let name = info["DomainName"] else {
         Log.atError?.log("Missing postInfo")
         return
     }
-    
-    _ = postInfo!.removeValue(forKey: "DomainName")
     
     guard let domain = domains.domain(for: name) else {
         Log.atError?.log("Missing DomainName in postInfo")
         return
     }
     
-    guard let (key, value) = postInfo?.popFirst() else {
-        Log.atError?.log("Missing parameter name and value in postInfo")
+    guard let parameterName = info["Name"] else {
+        Log.atError?.log("Missing parameter name in postInfo")
         return
     }
-    
-    postInfo!["DomainName"] = name
-    
-    switch key {
+
+    guard let value = info["Value"] else {
+        Log.atError?.log("Missing parameter value in postInfo")
+        return
+    }
+
+    switch parameterName {
     case "root":
         
         Log.atNotice?.log("Old value for domain \(domain.name) webroot = \(domain.webroot)")
@@ -1139,7 +1134,7 @@ fileprivate func executeUpdateDomain(_ postInfo: inout PostInfo?) {
 
         
     default:
-        Log.atError?.log("Unknown key '\(key)' with value '\(value)'")
+        Log.atError?.log("Unknown key '\(parameterName)' with value '\(value)'")
     }
     
     domain.storeSetup()
@@ -1148,9 +1143,9 @@ fileprivate func executeUpdateDomain(_ postInfo: inout PostInfo?) {
 
 /// Update the sequence of services in a domain.
 
-fileprivate func executeUpdateDomainServices(_ postInfo: inout PostInfo?) {
+fileprivate func executeUpdateDomainServices(_ info: Dictionary<String, String>) {
 
-    guard let domainName = postInfo?["DomainName"],
+    guard let domainName = info["DomainName"],
           let domain = domains.domain(for: domainName) else { return }
     
     Log.atNotice?.log("Pre-update services for domain \(domain.name):\n\(domain.serviceNames)")
@@ -1164,14 +1159,14 @@ fileprivate func executeUpdateDomainServices(_ postInfo: inout PostInfo?) {
     
     var index = 0
     
-    while let _ = postInfo?["seqName\(index)"] {
+    while let _ = info["seqName\(index)"] {
         
-        if let _ = postInfo?["usedName\(index)"] {
+        if let _ = info["usedName\(index)"] {
 
-            if  let newIndexStr = postInfo?["seqName\(index)"],
+            if  let newIndexStr = info["seqName\(index)"],
                 let newIndex = Int(newIndexStr) {
             
-                if let newName = postInfo?["nameName\(index)"] {
+                if let newName = info["nameName\(index)"] {
                     serviceArr.append(ServiceItem(index: newIndex, name: newName))
                 } else {
                     Log.atError?.log("Missing nameName for index \(index)")
@@ -1198,9 +1193,9 @@ fileprivate func executeUpdateDomainServices(_ postInfo: inout PostInfo?) {
 
 /// Deletes the domain.
 
-fileprivate func executeDeleteDomain(_ postInfo: inout PostInfo?) {
+fileprivate func executeDeleteDomain(_ info: Dictionary<String, String>) {
     
-    guard let name = postInfo?["DomainName"] else {
+    guard let name = info["DomainName"] else {
         Log.atError?.log("Missing Domain in postInfo")
         return
     }
@@ -1218,9 +1213,9 @@ fileprivate func executeDeleteDomain(_ postInfo: inout PostInfo?) {
 
 /// Creates a new domain
 
-fileprivate func executeCreateDomain(_ postInfo: inout PostInfo?) {
+fileprivate func executeCreateDomain(_ info: Dictionary<String, String>) {
     
-    guard let name = postInfo?["DomainName"], !name.isEmpty else {
+    guard let name = info["DomainName"], !name.isEmpty else {
         Log.atError?.log("Missing DomainName in postInfo")
         return
     }
@@ -1230,12 +1225,12 @@ fileprivate func executeCreateDomain(_ postInfo: inout PostInfo?) {
         return
     }
     
-    guard let adminId = postInfo?["ID"], !adminId.isEmpty else {
+    guard let adminId = info["ID"], !adminId.isEmpty else {
         Log.atError?.log("Missing Domain Admin ID in postInfo")
         return
     }
     
-    guard let adminPwd = postInfo?["Password"], !adminPwd.isEmpty else {
+    guard let adminPwd = info["Password"], !adminPwd.isEmpty else {
         Log.atError?.log("Missing Domain Admin PWD in postInfo")
         return
     }
@@ -1261,14 +1256,14 @@ fileprivate func executeCreateDomain(_ postInfo: inout PostInfo?) {
 
 /// Creates a new alias
 
-fileprivate func executeCreateAlias(_ postInfo: inout PostInfo?) {
+fileprivate func executeCreateAlias(_ info: Dictionary<String, String>) {
     
-    guard let name = postInfo?["DomainName"] else {
+    guard let name = info["DomainName"] else {
         Log.atError?.log("Missing Domain in postInfo")
         return
     }
 
-    guard let alias = postInfo?["Alias"], !alias.isEmpty else {
+    guard let alias = info["Alias"], !alias.isEmpty else {
         Log.atError?.log("Missing Alias in postInfo")
         return
     }
@@ -1286,9 +1281,9 @@ fileprivate func executeCreateAlias(_ postInfo: inout PostInfo?) {
 
 /// Remove an alias
 
-fileprivate func executeDeleteAlias(_ postInfo: inout PostInfo?) {
+fileprivate func executeDeleteAlias(_ info: Dictionary<String, String>) {
     
-    guard let alias = postInfo?["Alias"] else {
+    guard let alias = info["Alias"] else {
         Log.atError?.log("Missing Alias in postInfo")
         return
     }
@@ -1347,14 +1342,14 @@ fileprivate func executeLogout(_ session: Session) -> CommandExecutionResult {
     return .newPath("/pages/login.sf.html")
 }
 
-fileprivate func executeCreateAdmin(_ postInfo: PostInfo?) {
+fileprivate func executeCreateAdmin(_ info: Dictionary<String, String>) {
     
-    guard let id = postInfo?["ID"] else {
+    guard let id = info["ID"] else {
         Log.atError?.log("No ID given")
         return
     }
     
-    guard let password = postInfo?["Password"] else {
+    guard let password = info["Password"] else {
         Log.atError?.log("No password given")
         return
     }
@@ -1366,9 +1361,9 @@ fileprivate func executeCreateAdmin(_ postInfo: PostInfo?) {
     Log.atNotice?.log("Created new admin account with ID = \(id)")
 }
 
-fileprivate func executeConfirmDeleteAccount(_ postInfo: PostInfo?) -> CommandExecutionResult {
+fileprivate func executeConfirmDeleteAccount(_ info: Dictionary<String, String>) -> CommandExecutionResult {
     
-    guard (postInfo?["ID"]) != nil else {
+    guard info["ID"] != nil else {
         Log.atError?.log("No ID given")
         return .newPath("/pages/admin-management.sf.html")
     }
@@ -1376,9 +1371,9 @@ fileprivate func executeConfirmDeleteAccount(_ postInfo: PostInfo?) -> CommandEx
     return .newPath("/pages/admin-confirm-delete.sf.html")
 }
 
-fileprivate func executeDeleteAccount(_ postInfo: PostInfo?) {
+fileprivate func executeDeleteAccount(_ info: Dictionary<String, String>) {
     
-    guard let name = postInfo?["ID"] else {
+    guard let name = info["ID"] else {
         Log.atError?.log("No ID given")
         return
     }
@@ -1391,14 +1386,14 @@ fileprivate func executeDeleteAccount(_ postInfo: PostInfo?) {
     Log.atNotice?.log("Server Admin Account \(name) removed.")
 }
 
-fileprivate func executeSetNewPassword(_ postInfo: PostInfo?) {
+fileprivate func executeSetNewPassword(_ info: Dictionary<String, String>) {
     
-    guard let name = postInfo?["ID"], !name.isEmpty else {
+    guard let name = info["ID"], !name.isEmpty else {
         Log.atError?.log("No ID given")
         return
     }
 
-    guard let password = postInfo?["Password"], !password.isEmpty else {
+    guard let password = info["Password"], !password.isEmpty else {
         Log.atError?.log("No new password given for \(name)")
         return
     }
@@ -1415,14 +1410,14 @@ fileprivate func executeSetNewPassword(_ postInfo: PostInfo?) {
     }
 }
 
-fileprivate func executeSetDomainAdminPassword(_ postInfo: PostInfo?) {
+fileprivate func executeSetDomainAdminPassword(_ info: Dictionary<String, String>) {
     
-    guard let domainName = postInfo?["Domain"], !domainName.isEmpty else {
+    guard let domainName = info["Domain"], !domainName.isEmpty else {
         Log.atError?.log("No domain given")
         return
     }
 
-    guard let adminName = postInfo?["ID"], !adminName.isEmpty else {
+    guard let adminName = info["ID"], !adminName.isEmpty else {
         Log.atError?.log("No ID given")
         return
     }
@@ -1442,7 +1437,7 @@ fileprivate func executeSetDomainAdminPassword(_ postInfo: PostInfo?) {
         
         if account.isAdmin {
             
-            guard let newPassword = postInfo?["Password"], !newPassword.isEmpty else {
+            guard let newPassword = info["Password"], !newPassword.isEmpty else {
                 Log.atError?.log("No password given")
                 return
             }
@@ -1464,7 +1459,7 @@ fileprivate func executeSetDomainAdminPassword(_ postInfo: PostInfo?) {
             
             // If there is a password, then also update the password
             
-            if let newPassword = postInfo?["Password"], !newPassword.isEmpty {
+            if let newPassword = info["Password"], !newPassword.isEmpty {
                 
                 if account.updatePassword(newPassword) {
                     Log.atNotice?.log("Updated the password for account \(account.name) in domain \(domain.name)")
@@ -1478,7 +1473,7 @@ fileprivate func executeSetDomainAdminPassword(_ postInfo: PostInfo?) {
         
         // Create a new admin account if the password is also given
         
-        if let newPassword = postInfo?["Password"], !newPassword.isEmpty {
+        if let newPassword = info["Password"], !newPassword.isEmpty {
             
             if let account = domain.accounts.newAccount(name: adminName, password: newPassword) {
                 

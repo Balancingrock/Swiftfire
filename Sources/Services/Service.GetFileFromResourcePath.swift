@@ -64,7 +64,7 @@ import Core
 /// _Sequence_:
 ///    - The Service.GetResourcePathFromUrl has to be called first.
 
-func service_getFileAtResourcePath(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: inout Services.Info, _ response: inout Response) -> Services.Result {
+func service_getFileAtResourcePath(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: Services.Info, _ response: Response) -> Services.Result {
     
     
 
@@ -123,7 +123,7 @@ func service_getFileAtResourcePath(_ request: Request, _ connection: SFConnectio
     
     if (resourcePath as NSString).lastPathComponent.contains(".sf.") {
     
-        switch SFDocument.factory(path: resourcePath, data: phpData, filemanager: connection.filemanager) {
+        switch SFDocument.factory(path: resourcePath, data: phpData) {
             
         case .error(let message):
             
@@ -133,7 +133,7 @@ func service_getFileAtResourcePath(_ request: Request, _ connection: SFConnectio
             
         case .success(let doc):
 
-            var environment = Functions.Environment(request: request, connection: connection, domain: domain, response: &response, serviceInfo: &info)
+            var environment = Functions.Environment(request: request, connection: connection, domain: domain, response: response, serviceInfo: info)
             
             body = doc.getContent(with: &environment)
         }
@@ -147,7 +147,7 @@ func service_getFileAtResourcePath(_ request: Request, _ connection: SFConnectio
             
         } else {
             
-            guard let data = connection.filemanager.contents(atPath: resourcePath) else {
+            guard let data = FileManager.default.contents(atPath: resourcePath) else {
                 handle500_ServerError(connection: connection, resourcePath: resourcePath, message: "Reading contents of file failed (but file is reported readable), resource: \(resourcePath)", line: #line)
                 return .next
             }

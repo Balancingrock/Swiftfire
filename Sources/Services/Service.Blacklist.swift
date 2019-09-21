@@ -61,7 +61,7 @@ import Core
 /// _Sequence_:
 ///    - This service should be the first in order to lower the server load.
 
-func service_blacklist(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: inout Services.Info, _ response: inout Response) -> Services.Result {
+func service_blacklist(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: Services.Info, _ response: Response) -> Services.Result {
     
     
     // Abort immediately if there is already a response code

@@ -60,7 +60,7 @@ import Core
 /// _Sequence_:
 ///    - In general this should be the last service in the sequence.
 
-func service_transferResponse(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: inout Services.Info, _ response: inout Response) -> Services.Result {
+func service_transferResponse(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: Services.Info, _ response: Response) -> Services.Result {
     
     
     // Log the code (should be present)

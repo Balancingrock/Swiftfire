@@ -303,12 +303,12 @@ extension SFConnection {
 
         Log.atDebug?.log("Starting domain services", id: logId)
 
-        var response = Response()
+        let response = Response()
         response.version = httpVersion
         response.contentType = mimeTypeDefault
         
         
-        var serviceInfo = Services.Info()
+        let serviceInfo = Services.Info()
         serviceInfo[.responseStartedKey] = timestampResponseStart
 
         for item in domain.services {
@@ -320,7 +320,7 @@ extension SFConnection {
 
             
             // ******************** SERVICE CALL
-            if item.service(request, self, domain, &serviceInfo, &response) == .abort { break }
+            if item.service(request, self, domain, serviceInfo, response) == .abort { break }
             // ********************
             
             if serverParameters.debugMode.value {

@@ -3,7 +3,7 @@
 //  File:       SFConnection.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.1.0
+//  Version:    1.3.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.3.0 - Removed local instance of the filemanager
 // 1.1.0 - Changed server blacklist location
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
@@ -142,11 +143,6 @@ public final class SFConnection: SwifterSockets.Connection {
     /// The body receipt queue
     
     public let bodyQueue = DispatchQueue(label: "Http Request Body Queue")
-    
-    
-    /// The file manager to be used for this connection object
-    
-    public let filemanager = FileManager()
     
     
     /// The size of the send buffer at OS level, set during socket accept
