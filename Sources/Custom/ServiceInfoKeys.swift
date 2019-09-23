@@ -36,7 +36,7 @@
 //
 // History
 //
-// 1.3.0 - Removed getInfo key. This information is now part of the request itself.
+// 1.3.0 - Removed getInfo and postInfo keys. This information is now part of the request itself.
 // 1.0.1 - Documentation update
 //       - Changed the sessionKey identifier to `Session` from `SessionId`
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
@@ -96,17 +96,6 @@ public enum ServiceInfoKey: String {
     /// __Used by__: Multiple, general purpose.
     
     case sessionKey = "Session"
-    
-    
-    /// A dictionary with the name/value pairs from a POST request that returns form data of type x-www-form-urlencoded.
-    ///
-    /// __Type__: Dictionary<String, String>
-    ///
-    /// __Set by__: Service.DecodePostFormUrlEncoded
-    ///
-    /// __Used by__: Multiple, general purpose.
-
-    case postInfoKey = "PostInfo"
     
     
     // =================================================================

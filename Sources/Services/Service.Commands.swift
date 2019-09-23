@@ -49,33 +49,45 @@ import Core
 
 // Commands and their templates
 
+
+// Login. This command is used to login to an existing account. It needs the LoginName and LoginPassword.
+
+fileprivate let LOGIN_COMMAND = "login"
+
+fileprivate let LOGIN_NAME_KEY = "LoginName"
+fileprivate let LOGIN_PASSWORD_KEY = "LoginPassword"
+
+fileprivate let LOGIN_TEMPLATE = "templates/login.sf.html"
+
+
 // Email verification. This command is received when a new user clicks the link in the confirmation email.
 
-fileprivate let COMMAND_EMAIL_VERIFICATION = "emailverification"
+fileprivate let EMAIL_VERIFICATION_COMMAND = "emailverification"
 
-fileprivate let TEMPLATE_EMAIL_VERIFICATION_SUCCESS = "templates/emailVerificationSuccess.sf.html"
-fileprivate let TEMPLATE_EMAIL_VERIFICATION_FAILED = "templates/emailVerificationFailed.sf.html"
+fileprivate let EMAIL_VERIFICATION_SUCCESS_TEMPLATE = "templates/emailVerificationSuccess.sf.html"
+fileprivate let EMAIL_VERIFICATION_FAILED_TEMPLATE = "templates/emailVerificationFailed.sf.html"
 
-fileprivate let CEV_VERIFICATION_CODE = "VerificationCode"
+fileprivate let EMAIL_VERIFICATION_CODE_KEY = "VerificationCode"
 
 
 // This creates a new account and sends a verification email
 
-fileprivate let COMMAND_CREATE_ACCOUNT = "createaccount"
+fileprivate let REGISTER_COMMAND = "register"
 
-fileprivate let TEMPLATE_CREATE_ACCOUNT_SUCCESS = "templates/createAccountSuccess.sf.html"
-fileprivate let TEMPLATE_CREATE_ACCOUNT_FAILED = "templates/createAccountFailed.sf.html"
-fileprivate let TEMPLATE_VERIFICATION_EMAIL_TEXT = "templates/verificationEmailText.sf.txt"
+fileprivate let REGISTER_SUCCESS_TEMPLATE = "templates/registerSuccess.sf.html"
+fileprivate let REGISTER_FAILED_TEMPLATE = "templates/registerFailed.sf.html"
 
-fileprivate let CA_ACCOUNT_NAME_KEY = "AccountName" // Necessary, unique, non-empty
-fileprivate let CA_PASSWORD_KEY = "Password" // Necessary, non-empty
-fileprivate let CA_EMAIL_KEY = "Email" // Necessary, email-pattern (*@*.*)
-fileprivate let CA_OPTIONAL_FROM = "FromAddress" // Optional, unchecked
-fileprivate let CA_OPTIONAL_BUBJECT = "Subject" // Optional, unchecked
+fileprivate let REGISTER_VERIFICATION_EMAIL_TEXT_TEMPLATE = "templates/verificationEmailText.sf.txt"
+
+fileprivate let REGISTER_NAME_KEY = "AccountName" // Necessary, unique, non-empty
+fileprivate let REGISTER_PASSWORD_KEY = "Password" // Necessary, non-empty
+fileprivate let REGISTER_EMAIL_KEY = "Email" // Necessary, email-pattern (*@*.*)
+fileprivate let REGISTER_FROM_KEY_OPTIONAL = "FromAddress" // Optional, unchecked
+fileprivate let REGISTER_SUBJECT_KEY_OPTIONAL = "Subject" // Optional, unchecked
 
 
 
-/// Allows a domain admin to configure the domain. Only active if the URL that was requested started with the domain setup keyword.
+/// Executes commands given in the URL. Only active if the URL started with the command keyword followed by a command identifier.
 ///
 /// _Input_:
 ///    - request.cookies: Will be checked for an existing session cookie.
@@ -124,9 +136,20 @@ func service_commands(_ request: Request, _ connection: SFConnection, _ domain: 
     
     switch command {
         
-    case COMMAND_EMAIL_VERIFICATION: relativePath = executeEmailVerification(request, response, domain, info)
+    case LOGIN_COMMAND:
         
-    case COMMAND_CREATE_ACCOUNT: relativePath = executeCreateAccount(request, connection, domain, response, info)
+        relativePath = executeLogin(request, domain, info)
+        
+        
+    case EMAIL_VERIFICATION_COMMAND:
+        
+        relativePath = executeEmailVerification(request, response, domain, info)
+        
+        
+    case REGISTER_COMMAND:
+        
+        relativePath = executeRegister(request, connection, domain, response, info)
+        
         
     default:
         
@@ -155,6 +178,74 @@ func service_commands(_ request: Request, _ connection: SFConnection, _ domain: 
     return .next
 }
 
+
+// MARK: Command execution
+
+
+fileprivate func executeLogin(_ request: Request, _ domain: Domain, _ info: Services.Info) -> String? {
+    
+    
+    // A session should be present
+    
+    guard let session = info[.sessionKey] as? Session else {
+        Log.atError?.log("Missing session")
+        return LOGIN_TEMPLATE
+    }
+
+    
+    // Prevent brute force breakin attempts by imposing a 2 second wait since the last login attempt
+    
+    if let previousAttempt = session[.lastFailedLoginAttemptKey] as? Int64 {
+        let now = Date().javaDate
+        if now - previousAttempt < 2000 {
+            session[.lastFailedLoginAttemptKey] = now
+            request.info["PreviousAttemptMessage"] = "Too quick, wait a few seconds before trying again"
+            return LOGIN_TEMPLATE
+        }
+    }
+
+    
+    // The request info should contain a LoginName key for the login name
+    
+    guard let loginName = request.info[LOGIN_NAME_KEY] else {
+        Log.atError?.log("Missing '\(LOGIN_NAME_KEY)' in request.info")
+        return LOGIN_TEMPLATE
+    }
+    
+    guard !loginName.isEmpty else {
+        request.info["PreviousAttemptMessage"] = "The Name field cannot be empty"
+        return LOGIN_TEMPLATE
+    }
+    
+    
+    // The request info should contain a LoginName key for the login name
+
+    guard let loginPassword = request.info[LOGIN_PASSWORD_KEY] else {
+        Log.atError?.log("Missing '\(LOGIN_PASSWORD_KEY)' in request.info")
+        return LOGIN_TEMPLATE
+    }
+    
+    guard loginPassword.count > 4 else {
+        request.info["PreviousAttemptMessage"] = "The password should contain more than 4 characters"
+        return LOGIN_TEMPLATE
+    }
+        
+    
+    // Get the account (if it exists)
+    
+    guard let account = domain.accounts.getAccount(for: loginName, using: loginPassword) else {
+        request.info["PreviousAttemptMessage"] = "Unknown name - password combination"
+        return LOGIN_TEMPLATE
+    }
+    
+    
+    // Success
+    
+    session.info[.accountKey] = account
+    
+    return (session.info[.preLoginUrlKey] as? String) ?? "index.sf.html"
+}
+
 fileprivate func executeEmailVerification(_ request: Request, _ response: Response, _ domain: Domain, _ info: Services.Info) -> String? {
     
     guard let method = request.method, method == .get else {
@@ -163,7 +254,7 @@ fileprivate func executeEmailVerification(_ request: Request, _ response: Respon
         return nil
     }
     
-    guard let verificationCode = request.getInfo[CEV_VERIFICATION_CODE] else {
+    guard let verificationCode = request.getInfo[EMAIL_VERIFICATION_CODE_KEY] else {
         Log.atInfo?.log("Missing verifcation code in command")
         response.code = ._400_BadRequest
         return nil
@@ -208,66 +299,81 @@ fileprivate func executeEmailVerification(_ request: Request, _ response: Respon
     }
     
     if success {
-        return TEMPLATE_EMAIL_VERIFICATION_SUCCESS
+        return EMAIL_VERIFICATION_SUCCESS_TEMPLATE
     } else {
         Log.atDebug?.log("Account verification failed for code: \(verificationCode)")
-        return TEMPLATE_EMAIL_VERIFICATION_FAILED
+        return EMAIL_VERIFICATION_FAILED_TEMPLATE
     }
 }
 
-fileprivate func executeCreateAccount(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ response: Response, _ info: Services.Info) -> String? {
+fileprivate func executeRegister(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ response: Response, _ info: Services.Info) -> String? {
 
-    guard let accountName = request.info[CA_ACCOUNT_NAME_KEY] else {
-        Log.atError?.log("No '\(CA_ACCOUNT_NAME_KEY)' found")
-        return TEMPLATE_CREATE_ACCOUNT_FAILED
+    
+    // The request info should contain a Register Name key
+
+    guard let accountName = request.info[REGISTER_NAME_KEY] else {
+        Log.atError?.log("No '\(REGISTER_NAME_KEY)' found")
+        return REGISTER_FAILED_TEMPLATE
     }
 
     guard !accountName.isEmpty else {
         Log.atDebug?.log("Account name is empty")
-        return TEMPLATE_CREATE_ACCOUNT_FAILED
+        return REGISTER_FAILED_TEMPLATE
     }
 
-    guard let password = request.info[CA_PASSWORD_KEY] else {
-        Log.atError?.log("No '\(CA_PASSWORD_KEY)' found")
-        return TEMPLATE_CREATE_ACCOUNT_FAILED
+    guard !domain.accounts.available(name: accountName) else {
+        Log.atDebug?.log("An account with this name already exists")
+        return REGISTER_FAILED_TEMPLATE
+    }
+
+    
+    // The request info should contain a Register Password key
+
+    guard let password = request.info[REGISTER_PASSWORD_KEY] else {
+        Log.atError?.log("No '\(REGISTER_PASSWORD_KEY)' found")
+        return REGISTER_FAILED_TEMPLATE
     }
     
     guard !password.isEmpty else {
         Log.atDebug?.log("Password is empty")
-        return TEMPLATE_CREATE_ACCOUNT_FAILED
+        return REGISTER_FAILED_TEMPLATE
     }
 
-    guard let emailAddress = request.info[CA_EMAIL_KEY] else {
-        Log.atError?.log("No '\(CA_EMAIL_KEY)' found")
-        return TEMPLATE_CREATE_ACCOUNT_FAILED
+    
+    // The request info should contain a Register Email key
+
+    guard let emailAddress = request.info[REGISTER_EMAIL_KEY] else {
+        Log.atError?.log("No '\(REGISTER_EMAIL_KEY)' found")
+        return REGISTER_FAILED_TEMPLATE
     }
     
     let regex = try? NSRegularExpression(pattern: "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}", options: .init())
     
     guard let count = regex?.numberOfMatches(in: emailAddress, options: .init(), range: NSRange(location: 0, length: emailAddress.count)), count > 0 else {
         Log.atDebug?.log("Given email address seems to be incorrect: \(emailAddress)")
-        return TEMPLATE_CREATE_ACCOUNT_FAILED
+        return REGISTER_FAILED_TEMPLATE
     }
     
-    guard !domain.accounts.available(name: accountName) else {
-        Log.atDebug?.log("An account with this name already exists")
-        return TEMPLATE_CREATE_ACCOUNT_FAILED
-    }
+    
+    // Create new account
     
     guard let account = domain.accounts.newAccount(name: accountName, password: password) else {
         Log.atError?.log("Could not create a new account with name '\(accountName)' and password '\(password)'")
-        return TEMPLATE_CREATE_ACCOUNT_FAILED
+        return REGISTER_FAILED_TEMPLATE
     }
     
     account.email = emailAddress
     account.emailVerificationCode = UUID().uuidString
     
-    let verificationLink = "http://\(domain.name):\(serverParameters.httpServicePortNumber)/command/\(COMMAND_EMAIL_VERIFICATION)?\(CEV_VERIFICATION_CODE)=\(account.emailVerificationCode)"
+    
+    // Send email verification mail
+    
+    let verificationLink = "http://\(domain.name):\(serverParameters.httpServicePortNumber)/command/\(EMAIL_VERIFICATION_COMMAND)?\(EMAIL_VERIFICATION_CODE_KEY)=\(account.emailVerificationCode)"
 
     
     var message: String = ""
     
-    if case .success(let messageTemplate) = SFDocument.factory(path: (domain.webroot + "/" + TEMPLATE_VERIFICATION_EMAIL_TEXT)) {
+    if case .success(let messageTemplate) = SFDocument.factory(path: (domain.webroot + "/" + REGISTER_VERIFICATION_EMAIL_TEXT_TEMPLATE)) {
 
         var env = Functions.Environment(request: request, connection: connection, domain: domain, response: response, serviceInfo: info)
         request.info["Link"] = verificationLink
@@ -288,5 +394,8 @@ fileprivate func executeCreateAccount(_ request: Request, _ connection: SFConnec
         \(message)
     """
     
-    return TEMPLATE_CREATE_ACCOUNT_SUCCESS
+    sendEmail(email, domainName: domain.name)
+    
+    return REGISTER_SUCCESS_TEMPLATE
 }
+

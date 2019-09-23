@@ -3,7 +3,7 @@
 //  File:       Domain.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.2.0
+//  Version:    1.3.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.3.0 - Changed var to let due to xcode 11
 // 1.2.0 - Added admin keyword
 //       - Set session timeout to 600 (seconds)
 // 1.1.0 #3 Fixed loading & storing of domain service names
@@ -98,7 +99,7 @@ public final class Domain {
             
             // Split at ':' character
                 
-            var strs = value.components(separatedBy: ":")
+            let strs = value.components(separatedBy: ":")
                 
                 
             // If there is one item, then there is no ':' in the string, the new value is then the address

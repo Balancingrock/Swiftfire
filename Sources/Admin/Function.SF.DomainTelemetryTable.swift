@@ -3,7 +3,7 @@
 //  File:       Function.SF.DomainTelemetryTable.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.2.1
+//  Version:    1.3.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.3.0 - Removed old comments, replaced postInfo with request.info
 // 1.2.1 - Removed dependency on Html
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
@@ -108,18 +109,12 @@ func function_sf_domainTelemetryTable(_ args: Functions.Arguments, _ info: inout
     
     // Check that a valid domain name was specified
     
-    guard let postInfo = environment.serviceInfo[.postInfoKey] as? PostInfo,
-        let name = postInfo["DomainName"] else { return "***Error***".data(using: String.Encoding.utf8) }
+    guard let name = environment.request.info["DomainName"] else { return "***Error***".data(using: String.Encoding.utf8) }
     
     guard let domain = domains.domain(for: name) else { return "***Error***".data(using: String.Encoding.utf8) }
     
     
     // Create the table
-    /*
-    var table = Table(klass: "domain-telemetry-table", columnTitles: "Name", "Value", "Description")
-    domain.telemetry.all.forEach() { table.append($0.tableRow()) }
-    
-    return table.html.data(using: String.Encoding.utf8)*/
     
     var html: String = """
         <table class="domain-telemetry-table">
@@ -148,14 +143,4 @@ func function_sf_domainTelemetryTable(_ args: Functions.Arguments, _ info: inout
     
     return html.data(using: .utf8)
 }
-/*
-fileprivate extension NamedValueProtocol {
-    
-    func tableRow() -> Tr {
-        let nameCell = Td(klass: "table-column-name", self.name)
-        let valueCell = Td(klass: "table-column-value", self.stringValue)
-        let aboutCell = Td(klass: "table-column-description", self.about)
-        return Tr(nameCell, valueCell, aboutCell)
-    }
-}*/
 

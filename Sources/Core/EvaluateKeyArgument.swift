@@ -3,7 +3,7 @@
 //  File:       EvaluateKeyArgument.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.2.0
+//  Version:    1.3.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.3.0 - Merged getinfo and postinfo into registerinfo. Added registerinfo! which does not generate errors.
 // 1.2.0 - Initial version
 //
 // =====================================================================================================================
@@ -90,31 +91,19 @@ public func evaluateKeyArgument(_ arg: String, using functionsInfo: Functions.In
     
     switch args[0].lowercased() {
     
-    case "$postinfo":
-        
-        guard let postInfo = environment.serviceInfo[.postInfoKey] as? PostInfo else {
-            Log.atError?.log("No PostInfo found")
-            return "***error***"
-        }
-        
-        guard let result = postInfo[String(args[1])] else {
-            Log.atError?.log("PostInfo does not contain key: \(args[1])")
+    case "$requestinfo":
+                
+        guard let result = environment.request.info[String(args[1])] else {
+            Log.atError?.log("The request info does not contain key: \(args[1])")
             return "***error***"
         }
         
         return result
-        
-        
-    case "$getinfo":
-        
-        let getInfo = environment.request.getInfo
-        
-        guard let result = getInfo[String(args[1])] else {
-            Log.atError?.log("GetInfo does not contain key: \(args[1])")
-            return "***error***"
-        }
-        
-        return result
+
+    
+    case "$requestinfo!":
+                    
+        return environment.request.info[String(args[1])] ?? ""
 
         
     case "$functionsinfo":

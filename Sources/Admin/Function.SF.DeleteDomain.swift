@@ -3,7 +3,7 @@
 //  File:       Function.SF.DeleteDomain.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.2.1
+//  Version:    1.3.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.3.0 - Removed old comments, replaced postInfo with request.info
 // 1.2.1 - Removed dependency on Html
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
@@ -109,8 +110,7 @@ func function_sf_deleteDomain(_ args: Functions.Arguments, _ info: inout Functio
     
     // Check that a valid domain name was specified
     
-    guard let postInfo = environment.serviceInfo[.postInfoKey] as? PostInfo,
-        let name = postInfo["DomainName"] else {
+    guard let name = environment.request.info["DomainName"] else {
             Log.atError?.log("Missing DomainName", from: Source(id: -1, file: #file, function: #function, line: #line))
             return "***Error***".data(using: String.Encoding.utf8)
     }
@@ -122,14 +122,9 @@ func function_sf_deleteDomain(_ args: Functions.Arguments, _ info: inout Functio
     
     
     // Return the button code
-    /*
-    let button = Button.submit(klass: ["posting-button-button"], name: "DomainName", value: name, title: "Delete Domain \(name)")
-    let form = Form(klass: ["posting-button-form"], method: .post, action: "/serveradmin/sfcommand/DeleteDomain", button)
-    */
     return """
         <form class="posting-button-form" method="post" action="/serveradmin/sfcommand/DeleteDomain">
             <button class="posting-button-button" type="submit" name="DomainName" value="\(name)">Delete Domain \(name)</button>
         </form>
     """.data(using: .utf8)
-    //return form.html.data(using: .utf8)
 }

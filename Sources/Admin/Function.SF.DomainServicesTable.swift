@@ -3,7 +3,7 @@
 //  File:       Function.SF.DomainServicesTable.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.2.1
+//  Version:    1.3.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.3.0 - Removed old comments, replaced postInfo with request.info
 // 1.2.1 - Removed dependency on Html
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
@@ -108,8 +109,7 @@ func function_sf_domainServicesTable(_ args: Functions.Arguments, _ info: inout 
     
     // Check that a valid domain name was specified
     
-    guard let postInfo = environment.serviceInfo[.postInfoKey] as? PostInfo,
-        let name = postInfo["DomainName"] else { return "***Error***".data(using: String.Encoding.utf8) }
+    guard let name = environment.request.info["DomainName"] else { return "***Error***".data(using: String.Encoding.utf8) }
     
     guard let domain = domains.domain(for: name) else { return "***Error***".data(using: String.Encoding.utf8) }
     
@@ -139,30 +139,6 @@ func function_sf_domainServicesTable(_ args: Functions.Arguments, _ info: inout 
     
     
     // Create the table
-    /*
-    let hidden = Input.hidden(name: "DomainName", value: domain.name)
-    var table = Table(klass: ["domain-service-table"], columnTitles: "Index", "Seq.", "Service Name", "Used")
-
-    for row in tableRows {
-        
-        let seqName = "seqName\(row.rowIndex)"
-        let nameName = "nameName\(row.rowIndex)"
-        let usedName = "usedName\(row.rowIndex)"
-        
-        let serviceNameHidden = Input.hidden(name: nameName, value: row.name)
-        let sequenceEntry = Input.text(klass: ["seq-column"], name: seqName, value: row.rowIndex.description)
-        var serviceName = Input.text(klass: ["name-column"], name: nameName, value: row.name)
-        serviceName.disabled = true
-        let usedCheckbox = Input.checkbox(klass: ["used-column"], name: usedName, value: usedName, checked: row.usedByDomain)
-        
-        table.appendRow(Td(row.rowIndex.description), Td(sequenceEntry), Td(serviceName, serviceNameHidden), Td(usedCheckbox))
-    }
-    
-    let submitButton = Input.submit(klass: "service-submit-form", name: "Submit", title: "Update Services")
-    let form = Form(method: .post, action: "/serveradmin/sfcommand/UpdateDomainServices", hidden, table, submitButton)
-    
-    return form.html.data(using: String.Encoding.utf8)
-    */
     
     var html: String = """
         <form method="post" action="/serveradmin/sfcommand/UpdateDomainServices">

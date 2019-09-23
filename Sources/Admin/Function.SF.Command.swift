@@ -3,7 +3,7 @@
 //  File:       Function.SF.Command.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.2.1
+//  Version:    1.3.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.3.0 - Removed old comments
 // 1.2.1 - Removed Html dependency
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
@@ -107,14 +108,11 @@ func function_sf_command(_ args: Functions.Arguments, _ info: inout Functions.In
         return "Unknown command".data(using: String.Encoding.utf8)
     }
     
-    //var form: String
     
     switch array.count {
         
     case 1: // 1 argument = button only
-        
-        //form = Form(method: .post, action: "/serveradmin/sfcommand/\(array[0])", Input.submit(title: array[0])).html
-        
+                
         return """
             <form method="post" action="/serveradmin/sfcommand/\(array[0])">
                 <input type="submit" value="\(array[0])">
@@ -122,9 +120,7 @@ func function_sf_command(_ args: Functions.Arguments, _ info: inout Functions.In
         """.data(using: .utf8)
         
     case 2:
-        
-        //form = Form(method: .post, action: "/serveradmin/sfcommand/\(array[0])", Input.submit(title: array[1])).html
-        
+                
         return """
             <form method="post" action="/serveradmin/sfcommand/\(array[0])">
                 <input type="submit" value="\(array[1])">
@@ -132,11 +128,7 @@ func function_sf_command(_ args: Functions.Arguments, _ info: inout Functions.In
         """.data(using: .utf8)
 
     default:
-        
-        //form = "***error***"
-        
+                
         return "***error***".data(using: .utf8)
     }
-    
-    //return form.data(using: String.Encoding.utf8)
 }

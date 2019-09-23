@@ -3,7 +3,7 @@
 //  File:       Service.SF.ServerAdmin.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.2.1
+//  Version:    1.3.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.3.0 - Replaced postInfo with request.info
 // 1.2.1 - Fixed bug that failed to update the root directory for the sfadmin
 //         Added more debug entries as well as a couple of notification logentries
 // 1.2.0 - Added admin account creation and removal
@@ -291,16 +292,11 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
     if serverAdminDomain.accounts.isEmpty {
         
         Log.atDebug?.log("No admin account found")
-        
-        guard let postInfo = info[.postInfoKey] as? PostInfo else {
-            createAdminAccountPage(name: "", nameColor: "black", pwdColor: "black", rootColor: "black")
-            return .next
-        }
-        
-        guard  let name = postInfo[SERVER_ADMIN_CREATE_ACCOUNT_NAME],
-            let pwd1 = postInfo[SERVER_ADMIN_CREATE_ACCOUNT_PWD1],
-            let pwd2 = postInfo[SERVER_ADMIN_CREATE_ACCOUNT_PWD2],
-            let root = postInfo[SERVER_ADMIN_CREATE_ACCOUNT_ROOT] else {
+                
+        guard  let name = request.info[SERVER_ADMIN_CREATE_ACCOUNT_NAME],
+            let pwd1 = request.info[SERVER_ADMIN_CREATE_ACCOUNT_PWD1],
+            let pwd2 = request.info[SERVER_ADMIN_CREATE_ACCOUNT_PWD2],
+            let root = request.info[SERVER_ADMIN_CREATE_ACCOUNT_ROOT] else {
 
                 // One or more account creation details missing
                 
@@ -372,9 +368,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
         // If login information is available, then login the server admin
         // ==============================================================
         
-        if let postInfo = info[.postInfoKey] as? PostInfo,
-            let name = postInfo[SERVER_ADMIN_LOGIN_NAME],
-            let pwd = postInfo[SERVER_ADMIN_LOGIN_PWD] {
+        if let name = request.info[SERVER_ADMIN_LOGIN_NAME], let pwd = request.info[SERVER_ADMIN_LOGIN_PWD] {
             
             Log.atDebug?.log("Found login information for admin \(name)")
             
@@ -452,18 +446,16 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
         
         Log.atDebug?.log("Found set root command")
         
-        if let postInfo = info[.postInfoKey] as? PostInfo {
-            if let newRootPath = postInfo[SERVER_ADMIN_CREATE_ACCOUNT_ROOT], !newRootPath.isEmpty {
+        if let newRootPath = request.info[SERVER_ADMIN_CREATE_ACCOUNT_ROOT], !newRootPath.isEmpty {
         
-                Log.atDebug?.log("Setting root path to: \(newRootPath)")
+            Log.atDebug?.log("Setting root path to: \(newRootPath)")
                 
-                serverParameters.adminSiteRoot.value = newRootPath
-                serverAdminDomain.webroot = newRootPath
+            serverParameters.adminSiteRoot.value = newRootPath
+            serverAdminDomain.webroot = newRootPath
                 
-                serverParameters.store()
+            serverParameters.store()
                 
-                relPath = "/index.sf.html"
-            }
+            relPath = "/index.sf.html"
         }
     }
     

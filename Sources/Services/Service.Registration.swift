@@ -37,6 +37,7 @@
 // History
 //
 // 1.3.0 - Removed decodePostFormUrlEncoded
+//       - Added service_Commands and service_StorePreLoginUrl
 // 1.1.0 - Fixed loading & storing of domain service names
 // 1.0.1 - Documentation update
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
@@ -105,6 +106,16 @@ public let serviceName_RestartSessionTimeout = "Restart Session Timeout"
 public let serviceName_Setup = "Setup"
 
 
+/// The name by which the service_storePreLoginUrl is known
+
+public let serviceName_StorePreLoginUrl = "StorePreLoginUrl"
+
+
+/// The name by which the service_commands is known
+
+public let serviceName_Commands = "Commands"
+
+
 // =================================================
 // Add to the next function to register new services
 // =================================================
@@ -127,5 +138,7 @@ public func registerServices() {
     services.register(name: serviceName_TransferResponse, service: service_transferResponse)
     services.register(name: serviceName_RestartSessionTimeout, service: service_restartSessionTimeout)
     services.register(name: serviceName_Setup, service: service_setup)
+    services.register(name: serviceName_Commands, service: service_commands)
+    services.register(name: serviceName_StorePreLoginUrl, service: service_storePreLoginUrl)
 }
 

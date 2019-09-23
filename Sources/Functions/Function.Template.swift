@@ -92,17 +92,9 @@ public func function_template(_ args: Functions.Arguments, _ info: inout Functio
     }
     
     
-    // Get the POST info dictionary
-    
-    guard let postInfo = environment.serviceInfo[.postInfoKey] as? PostInfo else {
-        Log.atError?.log("Could not retrieve the POST info dictionary")
-        return "***error***".data(using: .utf8)
-    }
-    
-    
     // Get the start offset
     
-    guard let startOffsetStr = postInfo["CommentsStartOffset"], let startOffset = Int(startOffsetStr) else {
+    guard let startOffsetStr = environment.request.info["CommentsStartOffset"], let startOffset = Int(startOffsetStr) else {
         Log.atError?.log("Could not retrieve the CommentsStartOffset from the postInfo dictionary")
         return "***error***".data(using: .utf8)
     }
@@ -110,7 +102,7 @@ public func function_template(_ args: Functions.Arguments, _ info: inout Functio
     
     // Get the number of comments
     
-    guard let commentsCountStr = postInfo["CommentsCount"], let commentsCount = Int(commentsCountStr) else {
+    guard let commentsCountStr = environment.request.info["CommentsCount"], let commentsCount = Int(commentsCountStr) else {
         Log.atError?.log("Could not retrieve the CommentsCount from the postInfo dictionary")
         return "***error***".data(using: .utf8)
     }

@@ -3,7 +3,7 @@
 //  File:       Function.SF.DomainButton.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.3.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,7 +36,8 @@
 //
 // History
 //
-// 1.0.0 Raised to v1.0.0, Removed old change log,
+// 1.3.0 - Removed old comments, replaced postInfo with request.info
+// 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 // Description
@@ -103,8 +104,7 @@ public func function_sf_domainButton(_ args: Functions.Arguments, _ info: inout 
     
     // Check that a valid domain name was specified
     
-    guard let postInfo = environment.serviceInfo[.postInfoKey] as? PostInfo,
-        let name = postInfo["DomainName"] else { return "***Error***".data(using: String.Encoding.utf8) }
+    guard let name = environment.request.info["DomainName"] else { return "***Error***".data(using: String.Encoding.utf8) }
     
     
     // Create dictionary
@@ -126,6 +126,4 @@ public func function_sf_domainButton(_ args: Functions.Arguments, _ info: inout 
     """
     
     return html.data(using: .utf8)
-
-    //return postingButton(target: arr[0], title: arr[1], keyValuePairs: dict).data(using: String.Encoding.utf8)
 }

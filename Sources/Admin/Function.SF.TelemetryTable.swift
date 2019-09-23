@@ -3,7 +3,7 @@
 //  File:       Function.SF.TelemetryTable.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.2.1
+//  Version:    1.3.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.3.0 - Removed old comments
 // 1.2.1 - Removed dependecy on Html
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
@@ -110,12 +111,7 @@ func function_sf_telemetryTable(_ args: Functions.Arguments, _ info: inout Funct
     
     
     // Create the table
-    
-    //var table = Table(klass: "telemetry-table", columnTitles: "Name", "Value", "Description")
-    //serverTelemetry.all.forEach() { table.append($0.tableRow()) }
-    
-    //return table.html.data(using: String.Encoding.utf8)
-    
+        
     var html: String = """
         <table class="telemetry-table">
             <thead>
@@ -142,11 +138,3 @@ func function_sf_telemetryTable(_ args: Functions.Arguments, _ info: inout Funct
     
     return html.data(using: .utf8)
 }
-/*
-fileprivate extension NamedValueProtocol {
-    
-    func tableRow() -> Tr {
-        return Tr(Td(klass: "table-column-name", self.name), Td(klass: "table-column-value", self.stringValue), Td(klass: "table-column-description", self.about))
-    }
-}
-*/

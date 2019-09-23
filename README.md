@@ -160,6 +160,16 @@ The sources for the server admin site are generated using Jekyll. If changes mus
 
 #### HEAD
 
+- Added functions for account creation by users with auto-email verification
+- Added `demo` site to showcase some features (both site and Jekyll sources)
+- Upgraded Http and consolidated the `getInfo`, `postInfo` and `info` dictionaries into the `Request`
+- Removed the service to decode the POST info
+- Removed the code to decode the GET info
+- Removed 
+- Added routine `sendEmail`
+- Added service `Commands` for the demo site and as example on how to create a specific commands on the server
+- Several smaller issues
+
 #### 1.2.1
 
 - Removed dependency on Html library package

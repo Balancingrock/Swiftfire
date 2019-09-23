@@ -3,7 +3,7 @@
 //  File:       Service.Setup.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.2.1
+//  Version:    1.3.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.3.0 - Merged getInfo and postInfo into register.info
 // 1.2.1 - Removed dependency on Html
 // 1.2.0 - Initial version
 //
@@ -583,9 +584,9 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
         response.contentType = mimeTypeHtml
     }
     
-    func domainConfirmRemoveAccountPage(_ postInfo: PostInfo, _ domain: Domain) {
+    func domainConfirmRemoveAccountPage(_ requestInfo: Dictionary<String, String>, _ domain: Domain) {
         
-        let adminId = postInfo["AdminID"]!
+        let adminId = requestInfo["AdminID"]!
 
         let html: String =
         """
@@ -661,9 +662,7 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
     // If login information is available, then verify if it is from a domain admin
     // ===========================================================================
         
-    if let postInfo = info[.postInfoKey] as? PostInfo,
-        let name = postInfo["LoginID"],
-        let pwd = postInfo["LoginPassword"] {
+    if let name = request.info["LoginID"], let pwd = request.info["LoginPassword"] {
             
         Log.atDebug?.log("Found login information for admin \(name)")
             
@@ -737,46 +736,35 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
     // =======================================
     
     if urlComponents.count > 1 {
+        
         switch urlComponents[1] {
         case "command":
         
             if urlComponents.count == 3 {
                 
-                if let postInfo = info[.postInfoKey] as? PostInfo {
-
-                    switch urlComponents[2] {
+                switch urlComponents[2] {
                     
-                    case "UpdateParameter": executeUpdateParameter(postInfo, domain)
-                    case "UpdateBlacklist": executeUpdateBlacklist(postInfo, domain)
-                    case "RemoveFromBlacklist": executeRemoveFromBlacklist(postInfo, domain)
-                    case "AddToBlacklist": executeAddToBlacklist(postInfo, domain)
-                    case "UpdateServices": executeUpdateServices(postInfo, domain)
-                    case "ConfirmDeleteAccount":
-                        if executeConfirmDeleteAccount(postInfo, domain) {
-                            domainConfirmRemoveAccountPage(postInfo, domain)
-                            return .next
-                        }
-                        
-                    case "RemoveAccount": executeRemoveAccount(postInfo, domain)
-                    case "AddAdminChangePassword": executeAddAdminChangePassword(postInfo, domain)
-                        
-                    default:
-                        Log.atError?.log("No command with name \(urlComponents[2]) or command does not need postInfo")
-                        break
+                case "UpdateParameter": executeUpdateParameter(request.info, domain)
+                case "UpdateBlacklist": executeUpdateBlacklist(request.info, domain)
+                case "RemoveFromBlacklist": executeRemoveFromBlacklist(request.info, domain)
+                case "AddToBlacklist": executeAddToBlacklist(request.info, domain)
+                case "UpdateServices": executeUpdateServices(request.info, domain)
+                case "ConfirmDeleteAccount":
+                    if executeConfirmDeleteAccount(request.info, domain) {
+                        domainConfirmRemoveAccountPage(request.info, domain)
+                        return .next
                     }
-                    
-                } else {
-                    
-                    switch urlComponents[2] {
                         
-                    case "Logoff":
-                        session.info.remove(key: .accountKey)
-                        Log.atNotice?.log("Admin logged out")
+                case "RemoveAccount": executeRemoveAccount(request.info, domain)
+                case "AddAdminChangePassword": executeAddAdminChangePassword(request.info, domain)
                         
-                    default:
-                        Log.atError?.log("No command with name \(urlComponents[2]) or missing postInfo")
-                        break
-                    }
+                case "Logoff":
+                    session.info.remove(key: .accountKey)
+                    Log.atNotice?.log("Admin logged out")
+                        
+                default:
+                    Log.atError?.log("No command with name \(urlComponents[2])")
+                    break
                 }
 
             } else {
@@ -799,14 +787,14 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
     return .next
 }
     
-fileprivate func executeUpdateParameter(_ postInfo: PostInfo, _ domain: Domain) {
+fileprivate func executeUpdateParameter(_ requestInfo: Dictionary<String, String>, _ domain: Domain) {
     
-    guard let parameter = postInfo["Parameter"] else {
+    guard let parameter = requestInfo["Parameter"] else {
         Log.atError?.log("Missing parameter name in postInfo")
         return
     }
     
-    guard let value = postInfo["Value"] else {
+    guard let value = requestInfo["Value"] else {
         Log.atError?.log("Missing parameter value in postInfo")
         return
     }
@@ -834,14 +822,14 @@ fileprivate func executeUpdateParameter(_ postInfo: PostInfo, _ domain: Domain) 
     domain.storeSetup()
 }
 
-fileprivate func executeUpdateBlacklist(_ postInfo: PostInfo, _ domain: Domain) {
+fileprivate func executeUpdateBlacklist(_ requestInfo: Dictionary<String, String>, _ domain: Domain) {
     
-    guard let address = postInfo["Address"] else {
+    guard let address = requestInfo["Address"] else {
         Log.atError?.log("Missing address")
         return
     }
     
-    guard let actionStr = postInfo["Action"] else {
+    guard let actionStr = requestInfo["Action"] else {
         Log.atError?.log("Missing address")
         return
     }
@@ -867,9 +855,9 @@ fileprivate func executeUpdateBlacklist(_ postInfo: PostInfo, _ domain: Domain) 
 
 }
 
-fileprivate func executeRemoveFromBlacklist(_ postInfo: PostInfo, _ domain: Domain) {
+fileprivate func executeRemoveFromBlacklist(_ requestInfo: Dictionary<String, String>, _ domain: Domain) {
     
-    guard let address = postInfo["Address"] else {
+    guard let address = requestInfo["Address"] else {
         Log.atError?.log("Missing address")
         return
     }
@@ -883,14 +871,14 @@ fileprivate func executeRemoveFromBlacklist(_ postInfo: PostInfo, _ domain: Doma
     domain.blacklist.store(to: Urls.domainBlacklistFile(for: domain.name))
 }
 
-fileprivate func executeAddToBlacklist(_ postInfo: PostInfo, _ domain: Domain) {
+fileprivate func executeAddToBlacklist(_ requestInfo: Dictionary<String, String>, _ domain: Domain) {
     
-    guard let address = postInfo["Address"] else {
+    guard let address = requestInfo["Address"] else {
         Log.atError?.log("Missing address")
         return
     }
     
-    guard let actionStr = postInfo["Action"] else {
+    guard let actionStr = requestInfo["Action"] else {
         Log.atError?.log("Missing address")
         return
     }
@@ -913,7 +901,7 @@ fileprivate func executeAddToBlacklist(_ postInfo: PostInfo, _ domain: Domain) {
     Log.atNotice?.log("Added address \(address) to blacklist with action \(action) in domain \(domain.name)")
 }
 
-fileprivate func executeUpdateServices(_ postInfo: PostInfo, _ domain: Domain) {
+fileprivate func executeUpdateServices(_ requestInfo: Dictionary<String, String>, _ domain: Domain) {
     
     struct ServiceItem {
         let index: Int
@@ -926,14 +914,14 @@ fileprivate func executeUpdateServices(_ postInfo: PostInfo, _ domain: Domain) {
     
     var error = false;
     
-    while let _ = postInfo["seqName\(index)"] {
+    while let _ = requestInfo["seqName\(index)"] {
         
-        if let _ = postInfo["usedName\(index)"] {
+        if let _ = requestInfo["usedName\(index)"] {
             
-            if  let newIndexStr = postInfo["seqName\(index)"],
+            if  let newIndexStr = requestInfo["seqName\(index)"],
                 let newIndex = Int(newIndexStr) {
                 
-                if let newName = postInfo["nameName\(index)"] {
+                if let newName = requestInfo["nameName\(index)"] {
                     serviceArr.append(ServiceItem(index: newIndex, name: newName))
                 } else {
                     error = true
@@ -969,9 +957,9 @@ fileprivate func executeUpdateServices(_ postInfo: PostInfo, _ domain: Domain) {
     Log.atNotice?.log("Updated services for domain \(domain.name) to/n\(str)")
 }
 
-fileprivate func executeConfirmDeleteAccount(_ postInfo: PostInfo, _ domain: Domain) -> Bool {
+fileprivate func executeConfirmDeleteAccount(_ requestInfo: Dictionary<String, String>, _ domain: Domain) -> Bool {
     
-    guard let adminId = postInfo["AdminID"] else {
+    guard let adminId = requestInfo["AdminID"] else {
         Log.atError?.log("Missing admin ID")
         return false
     }
@@ -979,9 +967,9 @@ fileprivate func executeConfirmDeleteAccount(_ postInfo: PostInfo, _ domain: Dom
     return domain.accounts.getAccountWithoutPassword(for: adminId) != nil
 }
 
-fileprivate func executeRemoveAccount(_ postInfo: PostInfo, _ domain: Domain) {
+fileprivate func executeRemoveAccount(_ requestInfo: Dictionary<String, String>, _ domain: Domain) {
     
-    guard let accountId = postInfo["RemoveAccountId"] else {
+    guard let accountId = requestInfo["RemoveAccountId"] else {
         Log.atError?.log("Missing RemoveAccountId")
         return
     }
@@ -993,14 +981,14 @@ fileprivate func executeRemoveAccount(_ postInfo: PostInfo, _ domain: Domain) {
     }
 }
 
-fileprivate func executeAddAdminChangePassword(_ postInfo: PostInfo, _ domain: Domain) {
+fileprivate func executeAddAdminChangePassword(_ requestInfo: Dictionary<String, String>, _ domain: Domain) {
     
-    guard let adminId = postInfo["AdminID"] else {
+    guard let adminId = requestInfo["AdminID"] else {
         Log.atError?.log("Missing admin ID")
         return
     }
 
-    guard let adminPwd = postInfo["AdminPassword"] else {
+    guard let adminPwd = requestInfo["AdminPassword"] else {
         Log.atError?.log("Missing admin password")
         return
     }
