@@ -50,9 +50,7 @@ import Foundation
 ///
 /// Allowable identifiers
 ///
-/// _source postInfo_: All possible strings.
-///
-/// _source getInfo_: All possible strings.
+/// _source requestInfo_: All possible strings.
 ///
 /// _source functionsInfo_: None yet
 ///
@@ -75,7 +73,7 @@ import Foundation
 ///
 /// - Returns:
 ///   - The argument if the argument does not start with '$'
-///   - "***error*** If there the request is invalid or of an non-existing source/key
+///   - ***error*** If there the request is invalid or of an non-existing source/key
 ///   - The requested value
 
 public func evaluateKeyArgument(_ arg: String, using functionsInfo: Functions.Info, in environment: Functions.Environment) -> String {

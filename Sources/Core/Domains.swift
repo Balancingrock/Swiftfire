@@ -3,7 +3,7 @@
 //  File:       Domains.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.2.0
+//  Version:    1.3.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.3.0 - Every change to the domains and aliases now gets stored immediately.
 // 1.2.0 - Fixed typo in error message
 //       - When loading domains&aliases, now removes domains that have no associated directory.
 // 1.1.0 #3: Fixed
@@ -56,7 +57,11 @@ public final class Domains {
     
     /// The managed domains
     
-    public var domains: Dictionary<String, Domain> = [:]
+    public var domains: Dictionary<String, Domain> = [:] {
+        didSet {
+            storeDomainsAndAliases()
+        }
+    }
     
     
     /// Create a new Domains object.
@@ -69,6 +74,8 @@ public final class Domains {
             Log.atEmergency?.log("Cannot create or locate domains directory and/or domains & aliases file")
             return nil
         }
+        
+        _ = loadDomainsAndAliases() // Note that errors must be ignored during initialization
     }
     
     
@@ -76,7 +83,7 @@ public final class Domains {
     ///
     /// - Returns: True if the application can continue, false if not.
     
-    public func loadDomainsAndAliases() -> Bool {
+    private func loadDomainsAndAliases() -> Bool {
         
         
         // Make sure the domains directory exists

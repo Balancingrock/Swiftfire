@@ -37,6 +37,7 @@
 // History
 //
 // 1.3.0 - Changed var to let due to xcode 11
+//       - Store updates to the domain names immediately
 // 1.2.0 - Added admin keyword
 //       - Set session timeout to 600 (seconds)
 // 1.1.0 #3 Fixed loading & storing of domain service names
@@ -219,6 +220,7 @@ public final class Domain {
     
     public var serviceNames: Array<String> = [] {
         didSet {
+            serviceNames.store(to: Urls.domainServiceNamesFile(for: name))
             rebuildServices()
         }
     }
@@ -458,7 +460,6 @@ public final class Domain {
         blacklist.store(to: Urls.domainBlacklistFile(for: name))
         hitCounters.store(to: timestampedFileUrl(dir: Urls.domainHitCountersDir(for: name), name: "hitcounters", ext: "json"))
         telemetry.store(to: timestampedFileUrl(dir: Urls.domainTelemetryDir(for: name), name: "telemetry", ext: "json"))
-        serviceNames.store(to: Urls.domainServiceNamesFile(for: name))
         accessLog?.close()
         four04Log?.close()
         statistics?.close()
@@ -504,7 +505,9 @@ public final class Domain {
         json.save(to: setupFile)
         
         if let url = Urls.domainAccountNamesWaitingForVerificationFile(for: name) {
-            try? accountNamesWaitingForVerification.data.write(to: url)
+            if accountNamesWaitingForVerification != nil {
+                try? accountNamesWaitingForVerification.data.write(to: url)
+            }
         }
     }
 }

@@ -65,4 +65,5 @@ public func registerFunctions() {
     functions.register(name: "nofPageHits", function: function_nofPageHits)
     functions.register(name: "show", function: function_show)
     functions.register(name: "assign", function: function_assign)
+    functions.register(name: "loginLogout", function: function_loginLogout)
 }

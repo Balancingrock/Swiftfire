@@ -15,19 +15,19 @@
 	<meta name="msapplication-config" content="/icons/browserconfig.xml">
 	<meta name="theme-color" content="#ffffff">
 
-	<title>Swiftfire Demo Site</title>
+	<title>Email verification completed</title>
 
 	<meta name="description" content="Write an awesome description for your new site here. You can edit this line in _config.yml. It will appear in your document head meta (for Google search resu...">
 
 	<link rel="stylesheet" href="/assets/main.css">
-	<link rel="canonical" href="http://localhost:4000/">
+	<link rel="canonical" href="/templates/emailVerificationSuccess.sf.html">
 	<link rel="alternate" type="application/rss+xml" title="Swiftfire Demo Site" href="/feed.xml">
 </head>
 <!-- end of include head.html -->
 
 	
   	<body class="body-panel">
-<!-- include banner-area.html -->.welcomeOrLogin()
+<!-- include banner-area.html -->.loginLogout()
 <input type="checkbox" id="banner-menu-symbol">
 <div class="banner-area banner-area-in-dom">
 	<div class="banner"></div>
@@ -61,10 +61,10 @@
 <div class="menubar-icon"></div>
 <!-- end of include menubar-icon.html -->
 
-	<div class="item isActiveSelection">
+	<div class="item">
 		<div class="title">
 			<label class="symbol"><p></p></label>
-			<div class="text"><a href="http://localhost:4000/index.html"><p>Home</p></a></div>
+			<div class="text"><a href="/index.html"><p>Home</p></a></div>
 		</div>
 	</div>
 </nav>
@@ -204,23 +204,20 @@
 				<main>
 
 <!-- Start of main content -->
-<div><h1>Posts</h1>
-	
-<!--	
- --><h2><a href="/swiftfire/jekyll/update/2019/09/22/welcome-to-jekyll.html">Welcome to Swiftfire &amp; Jekyll!</a></h2>
-    <span class="post-meta">2019-09-22</span>
-    
-    <div><p>Welcome to Swiftfire and Jekyll.</p>
+<article class="page" itemscope itemtype="http://schema.org/Article">
+	<header class="page-header">
+		<h1 class="page-title" itemprop="name headline">Email verification completed</h1>
+		<p class="page-meta"></p>
+	</header>
+	<div class="page-content" itemprop="articleBody">
+<!-- Page content -->
+   <p>Thanks for completing the registration process.</p>
 
-<p>Jekyll is a static site generator for blog posting, personal sites or small business sites. We use it for our websites and it is a perfect companion to Swiftfire. Jekyll takes care of the basic site layout, and Swiftfire provides the dynamic aspects.</p>
+<p>Your account can now be used, you are logged-in as .show($account.name).</p>
 
-<p>This demo site shows how one could use Swiftfire to create an interactive website. Even when using static site generators. While you won’t see any PHP here, this is not because it cannot be done, but rather because we created Swiftfire to replace PHP. However, Swiftfire plays nice with PHP and you can use Swiftfire and PHP together.</p>
-
-<p>This demo site uses our Classic-Jekyll-Theme, in the future we hope to enhance this theme with Swiftfire functions and issue a Swiftfire-Jekyll-Theme.</p>
-
-<p>For more information on Jekyll, check out the <a href="https://jekyllrb.com/docs/home">Jekyll docs</a>.</p>
-
-</div></div>
+<!-- End of page content -->
+</div>
+</article>
 
 <!-- End of main content -->
 

@@ -1,6 +1,6 @@
 ---
 layout: page
-title: Domain - .show($postInfo.DomainName)
+title: Domain - .show($requestInfo.DomainName)
 ---
 ## Administrator
 {: .text-centered}

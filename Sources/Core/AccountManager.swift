@@ -3,7 +3,7 @@
 //  File:       AccountManager.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.2.0
+//  Version:    1.3.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.3.0 - Prevented same-names with different capitalizations
 // 1.2.0 - Added ability to remove accounts
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
@@ -188,8 +189,9 @@ extension AccountManager {
                         if url.lastPathComponent == "_Account" {
                             
                             if let account = Account(withContentOfDirectory: url) {
-                                nameLut[account.name] = account.id
-                                uuidLut[account.uuid] = account.name
+                                let lname = account.name
+                                nameLut[lname] = account.id
+                                uuidLut[account.uuid] = lname
                                 if account.id > lastAccountId { lastAccountId = account.id }
                             } else {
                                 Log.atCritical?.log("Failed to read account from \(url.path)")
@@ -251,22 +253,23 @@ extension AccountManager {
         // Only valid parameters
         
         if name.isEmpty { return nil }
+        let lname = name.lowercased()
         
         return AccountManager.queue.sync {
             
             
             // Try to extract it from the cache
             
-            var account = accountCache[name]
+            var account = accountCache[lname]
             
             if account == nil {
                 
                 // Check the lookup table
                 
-                if let id = nameLut[name] {
+                if let id = nameLut[lname] {
                     let dir = AccountManager.createDirUrl(in: root, for: id)
                     if let a = Account(withContentOfDirectory: dir) {
-                        accountCache[name] = a
+                        accountCache[lname] = a
                         account = a
                     }
                 }
@@ -292,22 +295,23 @@ extension AccountManager {
         
         if password.isEmpty { return nil }
         if name.isEmpty { return nil }
-        
+        let lname = name.lowercased()
+
         return AccountManager.queue.sync {
             
             
             // Try to extract it from the cache
             
-            var account = accountCache[name]
+            var account = accountCache[lname]
             
             if account == nil {
                 
                 // Check the lookup table
                 
-                if let id = nameLut[name] {
+                if let id = nameLut[lname] {
                     let dir = AccountManager.createDirUrl(in: root, for: id)
                     if let a = Account(withContentOfDirectory: dir) {
-                        accountCache[name] = a
+                        accountCache[lname] = a
                         account = a
                     }
                 }
@@ -346,11 +350,12 @@ extension AccountManager {
             
             guard !password.isEmpty else { return nil }
             guard !name.isEmpty else { return nil }
-            
+            let lname = name.lowercased()
+
             
             // Check if the account already exists
             
-            if nameLut[name] != nil { return nil }
+            if nameLut[lname] != nil { return nil }
             
             
             // Create the new account
@@ -362,9 +367,9 @@ extension AccountManager {
                 
                 // Add it to the lookup's and the cache
                 
-                uuidLut[account.uuid] = name
-                nameLut[name] = lastAccountId
-                accountCache[name] = account
+                uuidLut[account.uuid] = lname
+                nameLut[lname] = lastAccountId
+                accountCache[lname] = account
                 
                 
                 return account
@@ -397,7 +402,7 @@ extension AccountManager {
     
     public func available(name: String) -> Bool {
         return AccountManager.queue.sync {
-            return nameLut[name] == nil
+            return nameLut[name.lowercased()] == nil
         }
     }
     
@@ -417,7 +422,7 @@ extension AccountManager {
             
             // Get the id for the account, and remove it from the name LUT
             
-            guard let id = nameLut.removeValue(forKey: name) else {
+            guard let id = nameLut.removeValue(forKey: name.lowercased()) else {
                 Log.atError?.log("No LUT entry found for account with name \(name)")
                 return false
             }
@@ -438,7 +443,7 @@ extension AccountManager {
             
             // Remove the account from the cache
             
-            _ = accountCache.remove(name)
+            _ = accountCache.remove(name.lowercased())
 
             
             // Remove the entry form the UUID LUT

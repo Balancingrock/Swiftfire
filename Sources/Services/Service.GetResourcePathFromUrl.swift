@@ -134,8 +134,8 @@ func service_getResourcePathFromUrl(_ request: Request, _ connection: SFConnecti
     
     // Abort if the partial path and relative path are already set
     
-    if info[.relativeResourcePathKey] == nil { return .next }
-    if info[.absoluteResourcePathKey] == nil { return .next }
+    if info[.relativeResourcePathKey] != nil { return .next }
+    if info[.absoluteResourcePathKey] != nil { return .next }
     
     
     // =============================================================================================================

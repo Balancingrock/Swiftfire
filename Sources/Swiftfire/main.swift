@@ -360,7 +360,6 @@ Log.atNotice?.log("Closed header logging file")
 // ================================
 
 domains.shutdown()
-domains.storeDomainsAndAliases()
 
 
 // ===============

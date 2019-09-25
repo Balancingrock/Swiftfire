@@ -49,6 +49,8 @@ import Core
 
 // Commands and their templates
 
+fileprivate let PREVIOUS_ATTEMPT_MESSAGE = "PreviousAttemptMessage"
+public let ORIGINATING_PAGE_URL = "OriginatingPageUrl"
 
 // Login. This command is used to login to an existing account. It needs the LoginName and LoginPassword.
 
@@ -58,6 +60,11 @@ fileprivate let LOGIN_NAME_KEY = "LoginName"
 fileprivate let LOGIN_PASSWORD_KEY = "LoginPassword"
 
 fileprivate let LOGIN_TEMPLATE = "templates/login.sf.html"
+
+
+// Logout. Disassociate an account with the session.
+
+fileprivate let LOGOUT_COMMAND = "logout"
 
 
 // Email verification. This command is received when a new user clicks the link in the confirmation email.
@@ -74,14 +81,14 @@ fileprivate let EMAIL_VERIFICATION_CODE_KEY = "VerificationCode"
 
 fileprivate let REGISTER_COMMAND = "register"
 
-fileprivate let REGISTER_SUCCESS_TEMPLATE = "templates/registerSuccess.sf.html"
-fileprivate let REGISTER_FAILED_TEMPLATE = "templates/registerFailed.sf.html"
-
+fileprivate let REGISTER_TEMPLATE = "templates/register.sf.html"
+fileprivate let REGISTER_CONTINUE_TEMPLATE = "templates/registerContinue.sf.html"
 fileprivate let REGISTER_VERIFICATION_EMAIL_TEXT_TEMPLATE = "templates/verificationEmailText.sf.txt"
 
-fileprivate let REGISTER_NAME_KEY = "AccountName" // Necessary, unique, non-empty
-fileprivate let REGISTER_PASSWORD_KEY = "Password" // Necessary, non-empty
-fileprivate let REGISTER_EMAIL_KEY = "Email" // Necessary, email-pattern (*@*.*)
+fileprivate let REGISTER_NAME_KEY = "RegisterName" // Necessary, unique, non-empty
+fileprivate let REGISTER_PASSWORD1_KEY = "RegisterPassword1" // Necessary, non-empty
+fileprivate let REGISTER_PASSWORD2_KEY = "RegisterPassword2" // Necessary, non-empty
+fileprivate let REGISTER_EMAIL_KEY = "RegisterEmail" // Necessary, email-pattern (*@*.*)
 fileprivate let REGISTER_FROM_KEY_OPTIONAL = "FromAddress" // Optional, unchecked
 fileprivate let REGISTER_SUBJECT_KEY_OPTIONAL = "Subject" // Optional, unchecked
 
@@ -111,11 +118,11 @@ func service_commands(_ request: Request, _ connection: SFConnection, _ domain: 
     // Exit if the first path part is not a 'command'
     
     guard
-        request.resourcePathParts.count > 2,
+        request.resourcePathParts.count > 1,
         request.resourcePathParts[0].lowercased() == "command"
         
         else {
-        Log.atInfo?.log("Request is not a command")
+        Log.atInfo?.log("The request does not contain a command")
         return .next
     }
 
@@ -140,6 +147,11 @@ func service_commands(_ request: Request, _ connection: SFConnection, _ domain: 
         
         relativePath = executeLogin(request, domain, info)
         
+        
+    case LOGOUT_COMMAND:
+            
+        relativePath = executeLogout(request, info)
+
         
     case EMAIL_VERIFICATION_COMMAND:
         
@@ -246,120 +258,120 @@ fileprivate func executeLogin(_ request: Request, _ domain: Domain, _ info: Serv
     return (session.info[.preLoginUrlKey] as? String) ?? "index.sf.html"
 }
 
-fileprivate func executeEmailVerification(_ request: Request, _ response: Response, _ domain: Domain, _ info: Services.Info) -> String? {
+
+fileprivate func executeLogout(_ request: Request, _ info: Services.Info) -> String? {
     
-    guard let method = request.method, method == .get else {
-        Log.atInfo?.log("Wrong method, should be GET")
-        response.code = ._400_BadRequest
-        return nil
-    }
     
-    guard let verificationCode = request.getInfo[EMAIL_VERIFICATION_CODE_KEY] else {
-        Log.atInfo?.log("Missing verifcation code in command")
-        response.code = ._400_BadRequest
-        return nil
-    }
+    // A session should be present
     
-    guard let waitingAccounts = domain.accountNamesWaitingForVerification?.root?.arrayOfString else {
-        Log.atCritical?.log("Warning, an attempt was made to verify an account while there are no accounts waiting for verification")
-        response.code = ._400_BadRequest
-        return nil
+    guard let session = info[.sessionKey] as? Session else {
+        Log.atError?.log("Missing session")
+        return LOGIN_TEMPLATE
     }
+
+    session.info.remove(key: .accountKey)
     
-    var success = false
-    for (index, accountName) in waitingAccounts.enumerated() {
-        
-        guard let account = domain.accounts.getAccountWithoutPassword(for: accountName) else {
-            Log.atError?.log("Could not find account with name \(accountName) in domain")
-            response.code = ._500_InternalServerError
-            return nil
-        }
-        
-        if account.emailVerificationCode == verificationCode {
-            
-            // Mark the account as verified
-            account.emailWasVerified = true
-            
-            // Keep track in the log
-            Log.atNotice?.log("Account with name \(accountName) has been verified")
-            
-            // Remove the account from the waiting list
-            domain.accountNamesWaitingForVerification!.root!.removeElement(atIndex: index)
-            
-            // Assign the account to the session
-            (info[.sessionKey] as? Session)?.info[.accountKey] = account
-            
-            Log.atDebug?.log("Account with name \(accountName) verified and logged-in")
-            
-            // Successful account verification
-            success = true
-            
-            break
-        }
-    }
-    
-    if success {
-        return EMAIL_VERIFICATION_SUCCESS_TEMPLATE
-    } else {
-        Log.atDebug?.log("Account verification failed for code: \(verificationCode)")
-        return EMAIL_VERIFICATION_FAILED_TEMPLATE
-    }
+    return request.info[ORIGINATING_PAGE_URL] ?? "index.sf.html"
 }
+
 
 fileprivate func executeRegister(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ response: Response, _ info: Services.Info) -> String? {
 
+    
+    // A session should be present
+    
+    guard let session = info[.sessionKey] as? Session else {
+        Log.atError?.log("Missing session")
+        return LOGIN_TEMPLATE
+    }
+
+    // This guards against attempts to store too many account (which could lead to out-of-memory or out-of-disk errors)
+    // Note that the address is logged, the admin can decide to block this address
+    
+    guard session.nofRegistrationAttempts < 10 else {
+        Log.atCritical?.log("Too many registration attempts from IP address: \(connection.remoteAddress)")
+        request.info[PREVIOUS_ATTEMPT_MESSAGE] = "Too many registration attempts, try again later"
+        return REGISTER_TEMPLATE
+    }
+    
+    session.nofRegistrationAttempts += 1
+    
     
     // The request info should contain a Register Name key
 
     guard let accountName = request.info[REGISTER_NAME_KEY] else {
         Log.atError?.log("No '\(REGISTER_NAME_KEY)' found")
-        return REGISTER_FAILED_TEMPLATE
+        return REGISTER_TEMPLATE
     }
 
     guard !accountName.isEmpty else {
         Log.atDebug?.log("Account name is empty")
-        return REGISTER_FAILED_TEMPLATE
+        request.info[PREVIOUS_ATTEMPT_MESSAGE] = "Missing account name"
+        return REGISTER_TEMPLATE
     }
 
     guard !domain.accounts.available(name: accountName) else {
         Log.atDebug?.log("An account with this name already exists")
-        return REGISTER_FAILED_TEMPLATE
+        request.info[PREVIOUS_ATTEMPT_MESSAGE] = "Account name not available"
+        return REGISTER_TEMPLATE
     }
 
     
-    // The request info should contain a Register Password key
+    // The request info should contain a Register Password1 key
 
-    guard let password = request.info[REGISTER_PASSWORD_KEY] else {
-        Log.atError?.log("No '\(REGISTER_PASSWORD_KEY)' found")
-        return REGISTER_FAILED_TEMPLATE
+    guard let password1 = request.info[REGISTER_PASSWORD1_KEY] else {
+        Log.atError?.log("No '\(REGISTER_PASSWORD1_KEY)' found")
+        return REGISTER_TEMPLATE
     }
     
-    guard !password.isEmpty else {
+    guard !password1.isEmpty else {
         Log.atDebug?.log("Password is empty")
-        return REGISTER_FAILED_TEMPLATE
+        request.info[PREVIOUS_ATTEMPT_MESSAGE] = "First password cannot be empty"
+        return REGISTER_TEMPLATE
     }
 
+    
+    // The request info should contain a Register Password2 key
+
+    guard let password2 = request.info[REGISTER_PASSWORD2_KEY] else {
+        Log.atError?.log("No '\(REGISTER_PASSWORD2_KEY)' found")
+        return REGISTER_TEMPLATE
+    }
+    
+    guard !password2.isEmpty else {
+        Log.atDebug?.log("Password is empty")
+        request.info[PREVIOUS_ATTEMPT_MESSAGE] = "Second password cannot be empty"
+        return REGISTER_TEMPLATE
+    }
+
+    guard password1 == password2 else {
+        Log.atDebug?.log("Password1 and password2 are not the same")
+        request.info[PREVIOUS_ATTEMPT_MESSAGE] = "First and second password must be equal"
+        return REGISTER_TEMPLATE
+    }
+    
     
     // The request info should contain a Register Email key
 
     guard let emailAddress = request.info[REGISTER_EMAIL_KEY] else {
         Log.atError?.log("No '\(REGISTER_EMAIL_KEY)' found")
-        return REGISTER_FAILED_TEMPLATE
+        return REGISTER_TEMPLATE
     }
     
     let regex = try? NSRegularExpression(pattern: "[A-Z0-9a-z._%+-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,64}", options: .init())
     
     guard let count = regex?.numberOfMatches(in: emailAddress, options: .init(), range: NSRange(location: 0, length: emailAddress.count)), count > 0 else {
         Log.atDebug?.log("Given email address seems to be incorrect: \(emailAddress)")
-        return REGISTER_FAILED_TEMPLATE
+        request.info[PREVIOUS_ATTEMPT_MESSAGE] = "The email address looks incorrect and cannot be used"
+        return REGISTER_TEMPLATE
     }
     
     
     // Create new account
     
-    guard let account = domain.accounts.newAccount(name: accountName, password: password) else {
-        Log.atError?.log("Could not create a new account with name '\(accountName)' and password '\(password)'")
-        return REGISTER_FAILED_TEMPLATE
+    guard let account = domain.accounts.newAccount(name: accountName, password: password1) else {
+        Log.atError?.log("Could not create a new account with name '\(accountName)' and password '\(password1)'")
+        return REGISTER_TEMPLATE
     }
     
     account.email = emailAddress
@@ -396,6 +408,59 @@ fileprivate func executeRegister(_ request: Request, _ connection: SFConnection,
     
     sendEmail(email, domainName: domain.name)
     
-    return REGISTER_SUCCESS_TEMPLATE
+    return REGISTER_CONTINUE_TEMPLATE
 }
+
+fileprivate func executeEmailVerification(_ request: Request, _ response: Response, _ domain: Domain, _ info: Services.Info) -> String? {
+        
+    guard let verificationCode = request.info[EMAIL_VERIFICATION_CODE_KEY] else {
+        Log.atInfo?.log("Missing verifcation code in command")
+        response.code = ._400_BadRequest
+        return nil
+    }
+    
+    guard let waitingAccounts = domain.accountNamesWaitingForVerification?.root?.arrayOfString else {
+        Log.atNotice?.log("Warning, an attempt was made to verify an account while there are no accounts waiting for verification")
+        return EMAIL_VERIFICATION_FAILED_TEMPLATE
+    }
+    
+    var success = false
+    for (index, accountName) in waitingAccounts.enumerated() {
+        
+        guard let account = domain.accounts.getAccountWithoutPassword(for: accountName) else {
+            Log.atNotice?.log("Could not find account with name \(accountName) in domain")
+            return EMAIL_VERIFICATION_FAILED_TEMPLATE
+        }
+        
+        if account.emailVerificationCode == verificationCode {
+            
+            // Mark the account as verified
+            account.emailWasVerified = true
+            
+            // Keep track in the log
+            Log.atNotice?.log("Account with name \(accountName) has been verified")
+            
+            // Remove the account from the waiting list
+            domain.accountNamesWaitingForVerification!.root!.removeElement(atIndex: index)
+            
+            // Assign the account to the session
+            (info[.sessionKey] as? Session)?.info[.accountKey] = account
+            
+            Log.atDebug?.log("Account with name \(accountName) verified and logged-in")
+            
+            // Successful account verification
+            success = true
+            
+            break
+        }
+    }
+    
+    if success {
+        return EMAIL_VERIFICATION_SUCCESS_TEMPLATE
+    } else {
+        Log.atNotice?.log("Account verification failed for code: \(verificationCode)")
+        return EMAIL_VERIFICATION_FAILED_TEMPLATE
+    }
+}
+
 

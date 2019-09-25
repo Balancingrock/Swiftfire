@@ -43,6 +43,7 @@
 import Foundation
 
 import Core
+import Services
 
 
 /// Returns either a message with account name (and logout), or presents login/register links
@@ -101,8 +102,13 @@ public func function_loginLogout(_ args: Functions.Arguments, _ info: inout Func
                 
         html = """
             <div class="sf-loginlogout">
-                <p>\(loggedInMessage)\(account.name) - </p>
-                <a href="/command/logout">\(logoutMessage)</a>
+                <div class="sf-loginlogout-firstoption">\(loggedInMessage)\(account.name)</div>
+                <p> - </p>
+                <div class="sf-loginlogout-secondoption">
+                    <form method="post" action="/command/logout">
+                        <button type="submit" name="\(ORIGINATING_PAGE_URL)" value=".show($serviceinfo.relativeresourcepath)" style="border:none; background:none; cursor:pointer; margin:0 0 0 0; padding: 0 0 0 0;">\(logoutMessage)</button>
+                    </form>
+                </div>
             </div>
         """
     
@@ -110,9 +116,13 @@ public func function_loginLogout(_ args: Functions.Arguments, _ info: inout Func
         
         html = """
             <div class="sf-loginlogout">
-                <a href="/template/login.sf.html">\(loginMessage)</a>
+                <div class="sf-loginlogout-firstoption">
+                    <a href="/templates/login.sf.html">\(loginMessage)</a>
+                </div>
                 <p> - </p>
-                <a href="/template/register.sf.html">\(registerMessage)</a>
+                <div class="sf-loginlogout-secondoption">
+                    <a href="/templates/register.sf.html">\(registerMessage)</a>
+                </div>
             </div>
         """
     }

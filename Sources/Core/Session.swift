@@ -3,7 +3,7 @@
 //  File:       Session.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.3.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,7 +36,8 @@
 //
 // History
 //
-// 1.0.0 Raised to v1.0.0, Removed old change log,
+// 1.3.0 - Added nofRegistrationAttempts
+// 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 //
@@ -102,6 +103,11 @@ public class Session: CustomStringConvertible {
     /// The time this session was active for the last time.
     
     fileprivate(set) var lastActivity: Int64
+    
+    
+    /// The number of registration attempts
+    
+    public var nofRegistrationAttempts: Int = 0
     
     
     /// A custom dictionary for information that must be associated with the session.
