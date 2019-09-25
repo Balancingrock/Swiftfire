@@ -160,6 +160,8 @@ The sources for the server admin site are generated using Jekyll. If changes mus
 
 #### HEAD
 
+- Fixed (removed) warning when using xcode 11
+
 #### 1.2.1
 
 - Removed dependency on Html library package
