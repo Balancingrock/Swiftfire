@@ -211,11 +211,6 @@ do {
     guard domains != nil else { emergencyExit("Could not create domains") }
     
     
-    // Load domains and aliases
-    
-    guard domains.loadDomainsAndAliases() else { emergencyExit("Error loading domains and aliasses") }
-    
-    
     // Remove unknown services from the domains
     
     domains.forEach() { $0.removeUnknownServices() }
