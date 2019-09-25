@@ -3,7 +3,7 @@
 //  File:       Service.WaitUntilBodyComplete.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.1
+//  Version:    1.3.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.3.0 - Removed inout from the service signature
 // 1.0.1 - Documentation update
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
@@ -60,7 +61,7 @@ import Core
 ///    - This service should come before any service that needs access to the payload. Specifically this includes the service DecodePostFormUrlEncoded.
 
 
-func service_waitUntilBodyComplete(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: inout Services.Info, _ response: inout Response) -> Services.Result {
+func service_waitUntilBodyComplete(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: Services.Info, _ response: Response) -> Services.Result {
 
     // Note: This function runs on the 'worker' thread of a connection.
     // The incoming data is received on the 'receiver' thread of the same connection.

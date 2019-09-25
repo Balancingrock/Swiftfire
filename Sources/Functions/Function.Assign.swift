@@ -37,6 +37,7 @@
 // History
 //
 // 1.3.0 - Comments updated
+//       - Removed inout from the function.environment signature
 // 1.2.0 - Initial version
 //
 // =====================================================================================================================
@@ -60,7 +61,7 @@ import Core
 ///
 /// _Returns_: Nothing. If ***error*** if the number of arguments is wrong.
 
-public func function_assign(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: inout Functions.Environment) -> Data? {
+public func function_assign(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: Functions.Environment) -> Data? {
     
     guard case .arrayOfString(let arr) = args, arr.count == 2 else { return "***error***".data(using: .utf8) }
     

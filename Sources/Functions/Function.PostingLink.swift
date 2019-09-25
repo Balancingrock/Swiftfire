@@ -38,6 +38,7 @@
 // History
 //
 // 1.3.0 - Updated comments
+//       - Removed inout from the function.environment signature
 // 1.0.1 - Documentation updates
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
@@ -86,7 +87,7 @@ public func postingLink(target: String, text: String, keyValuePairs: Dictionary<
 ///
 /// _Return_: The HTML code for the requested button. `***Error***` if less than 4 or an uneven number of arguments is present.
 
-public func function_postingLink(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: inout Functions.Environment) -> Data? {
+public func function_postingLink(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: Functions.Environment) -> Data? {
     
     
     // Check for minimum the 4 arguments and an even number of arguments

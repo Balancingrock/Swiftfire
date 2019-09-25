@@ -3,7 +3,7 @@
 //  File:       Service.OnlyGetOrPost.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.1
+//  Version:    1.3.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.3.0 - Removed inout from the service signature
 // 1.0.1 - Documentation updates.
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
@@ -59,7 +60,7 @@ import Core
 /// _Sequence_:
 ///    - Can be one of the first services, does not need any predecessors.
 
-func service_onlyGetOrPost(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: inout Services.Info, _ response: inout Response) -> Services.Result {
+func service_onlyGetOrPost(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: Services.Info, _ response: Response) -> Services.Result {
     
     
     // Abort immediately if there is already a response code

@@ -37,6 +37,7 @@
 // History
 //
 // 1.3.0 - Updated comments
+//       - Removed inout from the function.environment signature
 // 1.2.0 - Initial version
 //
 // =====================================================================================================================
@@ -60,7 +61,7 @@ import Core
 ///
 /// _Returns_: The value for the key. If the key does not exist, it returns ***error***.
 
-public func function_show(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: inout Functions.Environment) -> Data? {
+public func function_show(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: Functions.Environment) -> Data? {
     
     guard case .arrayOfString(let arr) = args, arr.count == 1 else { return "***error***".data(using: .utf8) }
 

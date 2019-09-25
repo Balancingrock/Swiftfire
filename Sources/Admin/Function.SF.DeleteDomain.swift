@@ -38,6 +38,7 @@
 //
 // 1.3.0 - Replaced postInfo with request.info
 //       - Removed old comments
+//       - Removed inout from the function.environment signature
 // 1.2.1 - Removed dependency on Html
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
@@ -88,7 +89,7 @@ import Core
 
 /// - Returns: A button with an action to remove a domain.
 
-func function_sf_deleteDomain(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: inout Functions.Environment) -> Data? {
+func function_sf_deleteDomain(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: Functions.Environment) -> Data? {
     
     
     // Check that a server admin is logged in

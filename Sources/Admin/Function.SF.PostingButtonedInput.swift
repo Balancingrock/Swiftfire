@@ -39,6 +39,7 @@
 // 1.3.0 - Replaced postInfo with request.info
 //       - Removed old comments
 //       - Updated html code to use distinct names for the values: ParameterName and Value
+//       - Removed inout from the function.environment signature
 // 1.2.0 - Fixed index problem when creating dictionary
 // 1.1.0 #5: Set PHP message to disabled if disabled
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
@@ -102,7 +103,7 @@ import Functions
 
 /// Creates a (text) link that will post the key/value combination when clicked.
 
-func function_sf_postingButtonedInput(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: inout Functions.Environment) -> Data? {
+func function_sf_postingButtonedInput(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: Functions.Environment) -> Data? {
     
     
     // Check access rights

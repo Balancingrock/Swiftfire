@@ -37,6 +37,8 @@
 // History
 //
 // 1.3.0 #7 Removed local filemanager
+//       - Removed inout from the service signature
+//       - Removed inout from the function.environment signature
 // 1.0.1 - Documentation update
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
@@ -65,7 +67,7 @@ import Core
 /// _Sequence_:
 ///    - The Service.GetResourcePathFromUrl has to be called first.
 
-func service_getFileAtResourcePath(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: inout Services.Info, _ response: inout Response) -> Services.Result {
+func service_getFileAtResourcePath(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: Services.Info, _ response: Response) -> Services.Result {
     
     
 
@@ -134,9 +136,9 @@ func service_getFileAtResourcePath(_ request: Request, _ connection: SFConnectio
             
         case .success(let doc):
 
-            var environment = Functions.Environment(request: request, connection: connection, domain: domain, response: &response, serviceInfo: &info)
+            let environment = Functions.Environment(request: request, connection: connection, domain: domain, response: response, serviceInfo: info)
             
-            body = doc.getContent(with: &environment)
+            body = doc.getContent(with: environment)
         }
         
         

@@ -37,6 +37,7 @@
 // History
 //
 // 1.3.0 - Replaced postInfo with request.info
+//       - Removed inout from the function.environment signature
 // 1.2.1 - Removed dependency on Html
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
@@ -96,7 +97,7 @@ import Core
 ///
 /// - Returns: The value of the requested parameter or "No access rights".
 
-func function_sf_domainBlacklistTable(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: inout Functions.Environment) -> Data? {
+func function_sf_domainBlacklistTable(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: Functions.Environment) -> Data? {
     
     
     // Check access rights

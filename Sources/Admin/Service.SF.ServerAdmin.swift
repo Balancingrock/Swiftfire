@@ -38,6 +38,8 @@
 //
 // 1.3.0 #7 Removed local filemanager
 //       - Replaced postInfo with request.info
+//       - Removed inout from the service signature
+//       - Removed inout from the function.environment signature
 // 1.2.1 - Fixed bug that failed to update the root directory for the sfadmin
 //         Added more debug entries as well as a couple of notification logentries
 // 1.2.0 - Added admin account creation and removal
@@ -110,7 +112,7 @@ private let SERVER_ADMIN_LOGIN_PWD  = "ServerAdminLoginPwd"
 ///
 /// - Returns: Always .next
 
-func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: inout Services.Info, _ response: inout Response) -> Services.Result {
+func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: Services.Info, _ response: Response) -> Services.Result {
     
     
     
@@ -172,9 +174,9 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
                 
             case .success(let doc):
                 
-                var environment = Functions.Environment(request: request, connection: connection, domain: domain, response: &response, serviceInfo: &info)
+                let environment = Functions.Environment(request: request, connection: connection, domain: domain, response: response, serviceInfo: info)
                 
-                response.body = doc.getContent(with: &environment)
+                response.body = doc.getContent(with: environment)
                 response.code = Response.Code._200_OK
                 response.contentType = mimeTypeHtml
             }
@@ -544,7 +546,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
         
         pathComponents.removeFirst()
         
-        switch executeSfCommand(pathComponents, request, session, &info, &response) {
+        switch executeSfCommand(pathComponents, request, session, info, response) {
         
         case .next: return .next
             
@@ -597,9 +599,9 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
             
         case .success(let doc):
             
-            var environment = Functions.Environment(request: request, connection: connection, domain: domain, response: &response, serviceInfo: &info)
+            let environment = Functions.Environment(request: request, connection: connection, domain: domain, response: response, serviceInfo: info)
             
-            response.body = doc.getContent(with: &environment)
+            response.body = doc.getContent(with: environment)
             response.code = Response.Code._200_OK
             response.contentType = mimeType(forPath: absPath) ?? mimeTypeHtml
         }
@@ -673,7 +675,7 @@ fileprivate enum CommandExecutionResult {
     case nop
 }
 
-fileprivate func executeSfCommand(_ pathComponents: Array<String>, _ request: Request, _ session: Session, _ info: inout Services.Info, _ response: inout Response) -> CommandExecutionResult {
+fileprivate func executeSfCommand(_ pathComponents: Array<String>, _ request: Request, _ session: Session, _ info: Services.Info, _ response: Response) -> CommandExecutionResult {
     
     guard let commandName = pathComponents.first else {
         Log.atError?.log("No command name found")

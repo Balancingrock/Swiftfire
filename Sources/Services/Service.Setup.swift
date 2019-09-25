@@ -37,6 +37,7 @@
 // History
 //
 // 1.3.0 - Replaced postInfo with request.info
+//       - Removed inout from the service signature
 // 1.2.1 - Removed dependency on Html
 // 1.2.0 - Initial version
 //
@@ -62,7 +63,7 @@ import Core
 /// _Sequence_:
 ///   - Should be called after DecodePostFormUrlEncoded.
 
-func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: inout Services.Info, _ response: inout Response) -> Services.Result {
+func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: Services.Info, _ response: Response) -> Services.Result {
     
     func domainCommand(_ cmd: String) -> String {
         return "/\(domain.setupKeyword!)/command/\(cmd)"

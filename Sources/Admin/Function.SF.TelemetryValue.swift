@@ -3,7 +3,7 @@
 //  File:       Function.SF.TelemetryValue.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.3.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,7 +36,8 @@
 //
 // History
 //
-// 1.0.0 Raised to v1.0.0, Removed old change log,
+// 1.3.0 - Removed inout from the function.environment signature
+// 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 // Description
@@ -93,7 +94,7 @@ import Core
 ///
 /// - Returns: The value of the requested telemetry or "No access rights".
 
-func function_sf_telemetryValue(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: inout Functions.Environment) -> Data? {
+func function_sf_telemetryValue(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: Functions.Environment) -> Data? {
     
     
     // Check access rights

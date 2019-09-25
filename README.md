@@ -163,6 +163,7 @@ The sources for the server admin site are generated using Jekyll. If changes mus
 - Fixed (removed) warning when using xcode 11
 - Fixed issue #7 (removed local FileManager instances)
 - Moved getInfo and postInfo from the services.info to Request.info (in the Http library) & deleted Service.DecodePostFromUrlEncoded.swift
+- Removed inout declarations for class parameters
 
 #### 1.2.1
 

@@ -38,6 +38,7 @@
 //
 // 1.3.0 #7 Removed local filemanager
 //       - Removed code that decoded the 'getInfo'
+//       - Removed inout from the service signature
 // 1.0.1 - Documentation update
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
@@ -67,7 +68,7 @@ import Core
 /// _Sequence_:
 ///   - Can be one of the first services, does not need any predecessors.
 
-func service_getResourcePathFromUrl(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: inout Services.Info, _ response: inout Response) -> Services.Result {
+func service_getResourcePathFromUrl(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: Services.Info, _ response: Response) -> Services.Result {
     
     
     func handle400_BadRequestError(message: String) {

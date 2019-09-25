@@ -3,7 +3,7 @@
 //  File:       Function.SF.Command.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.2.1
+//  Version:    1.3.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.3.0 - Removed inout from the function.environment signature
 // 1.2.1 - Removed Html dependency
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
@@ -100,7 +101,7 @@ import Core
 ///
 /// - Returns: The value of the requested parameter or "No access rights".
 
-func function_sf_command(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: inout Functions.Environment) -> Data? {
+func function_sf_command(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: Functions.Environment) -> Data? {
     
     
     guard case Functions.Arguments.arrayOfString(let array) = args else {

@@ -3,7 +3,7 @@
 //  File:       HttpConnection.HttpWorker.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.2.0
+//  Version:    1.3.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.3.0 - Removed inout from the service signature
 // 1.2.0 - Added domain admin to access setup page even when the domain is disabled
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
@@ -303,12 +304,12 @@ extension SFConnection {
 
         Log.atDebug?.log("Starting domain services", id: logId)
 
-        var response = Response()
+        let response = Response()
         response.version = httpVersion
         response.contentType = mimeTypeDefault
         
         
-        var serviceInfo = Services.Info()
+        let serviceInfo = Services.Info()
         serviceInfo[.responseStartedKey] = timestampResponseStart
 
         for item in domain.services {
@@ -320,7 +321,7 @@ extension SFConnection {
 
             
             // ******************** SERVICE CALL
-            if item.service(request, self, domain, &serviceInfo, &response) == .abort { break }
+            if item.service(request, self, domain, serviceInfo, response) == .abort { break }
             // ********************
             
             if serverParameters.debugMode.value {
