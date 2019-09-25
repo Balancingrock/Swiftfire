@@ -3,7 +3,7 @@
 //  File:       Service.SF.ServerAdmin.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.2.1
+//  Version:    1.3.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.3.0 #7 Removed local filemanager
 // 1.2.1 - Fixed bug that failed to update the root directory for the sfadmin
 //         Added more debug entries as well as a couple of notification logentries
 // 1.2.0 - Added admin account creation and removal
@@ -156,11 +157,11 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
         let rootPath = serverParameters.adminSiteRoot.value
         let loginUrl = ((rootPath as NSString).appendingPathComponent("pages") as NSString).appendingPathComponent("/login.sf.html")
 
-        if case let .exists(path: path) = connection.filemanager.readableResourceFileExists(at: loginUrl, for: domain) {
+        if case let .exists(path: path) = FileManager.default.readableResourceFileExists(at: loginUrl, for: domain) {
             
             Log.atDebug?.log("A login page exists, using file: \(path)")
             
-            switch SFDocument.factory(path: path, filemanager: connection.filemanager) {
+            switch SFDocument.factory(path: path) {
                 
             case .error(let message):
                 
@@ -338,7 +339,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
         // There root must be a directory, and an index file must exist
         
         serverParameters.adminSiteRoot.value = root
-        guard adminSiteRootIsValid(connection.filemanager) else {
+        guard adminSiteRootIsValid() else {
             createAdminAccountPage(name: name, nameColor: "black", pwdColor: "black", rootColor: "red")
             return .next
         }
@@ -470,7 +471,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
     
     // Catch the possibility where the admin has manually changed the configuration files and made an error
     
-    if !adminSiteRootIsValid(connection.filemanager) {
+    if !adminSiteRootIsValid() {
         
         Log.atError?.log("Admin site root is invalid at: \(serverParameters.adminSiteRoot.value)")
         
@@ -487,7 +488,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
     var absPath: String = ""
     if !testPath.contains("sfcommand") {
         
-        switch connection.filemanager.readableResourceFileExists(at: testPath, for: serverAdminDomain) {
+        switch FileManager.default.readableResourceFileExists(at: testPath, for: serverAdminDomain) {
             
         case let .exists(path: path):
             absPath = path
@@ -561,7 +562,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
             relPath = path
             let testPath = (serverAdminDomain.webroot as NSString).appendingPathComponent(relPath)
             
-            switch connection.filemanager.readableResourceFileExists(at: testPath, for: serverAdminDomain) {
+            switch FileManager.default.readableResourceFileExists(at: testPath, for: serverAdminDomain) {
                 
             case let .exists(path: path):
                 absPath = path
@@ -592,7 +593,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
     
     if (absPath as NSString).lastPathComponent.contains(".sf.") {
         
-        switch SFDocument.factory(path: absPath, filemanager: connection.filemanager) {
+        switch SFDocument.factory(path: absPath) {
             
         case .error(let message):
             
@@ -615,7 +616,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
         
     } else {
         
-        guard let data = connection.filemanager.contents(atPath: absPath) else {
+        guard let data = FileManager.default.contents(atPath: absPath) else {
             
             Log.atError?.log("Reading contents of file failed (but file is reported readable), resource: \(absPath)", id: connection.logId)
 
@@ -648,14 +649,14 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
     return .next
 }
 
-fileprivate func adminSiteRootIsValid(_ filemanager: FileManager) -> Bool {
+fileprivate func adminSiteRootIsValid() -> Bool {
 
     let path = serverParameters.adminSiteRoot.value
     let url = URL(fileURLWithPath: path)
     
     var isDirectory: ObjCBool = false
     
-    if !filemanager.fileExists(atPath: path, isDirectory: &isDirectory) { return false }
+    if !FileManager.default.fileExists(atPath: path, isDirectory: &isDirectory) { return false }
         
         
     // There is something, it must be a directory, check for index.html or index.htm
@@ -669,7 +670,7 @@ fileprivate func adminSiteRootIsValid(_ filemanager: FileManager) -> Bool {
         
         let turl = url.appendingPathComponent(name)
                 
-        if filemanager.isReadableFile(atPath: turl.path) { return true }
+        if FileManager.default.isReadableFile(atPath: turl.path) { return true }
     }
 
     return false

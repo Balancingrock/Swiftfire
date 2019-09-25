@@ -3,7 +3,7 @@
 //  File:       Service.GetResourcePathFromUrl.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.1
+//  Version:    1.3.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.3.0 #7 Removed local filemanager
 // 1.0.1 - Documentation update
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
@@ -216,7 +217,7 @@ func service_getResourcePathFromUrl(_ request: Request, _ connection: SFConnecti
     // Check if there is something at the full path
     // =============================================================================================================
         
-    switch connection.filemanager.readableResourceFileExists(at: fullPath, for: domain) {
+    switch FileManager.default.readableResourceFileExists(at: fullPath, for: domain) {
         
     case .cannotBeRead: handle403_ForbiddenError(path: partialPath)
 

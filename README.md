@@ -161,6 +161,7 @@ The sources for the server admin site are generated using Jekyll. If changes mus
 #### HEAD
 
 - Fixed (removed) warning when using xcode 11
+- Fixed issue #7 (removed local FileManager instances)
 
 #### 1.2.1
 

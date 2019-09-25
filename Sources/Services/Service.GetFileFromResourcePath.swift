@@ -3,7 +3,7 @@
 //  File:       Service.GetFileAtResourcePath.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.1
+//  Version:    1.3.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.3.0 #7 Removed local filemanager
 // 1.0.1 - Documentation update
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
@@ -123,7 +124,7 @@ func service_getFileAtResourcePath(_ request: Request, _ connection: SFConnectio
     
     if (resourcePath as NSString).lastPathComponent.contains(".sf.") {
     
-        switch SFDocument.factory(path: resourcePath, data: phpData, filemanager: connection.filemanager) {
+        switch SFDocument.factory(path: resourcePath, data: phpData) {
             
         case .error(let message):
             
@@ -147,7 +148,7 @@ func service_getFileAtResourcePath(_ request: Request, _ connection: SFConnectio
             
         } else {
             
-            guard let data = connection.filemanager.contents(atPath: resourcePath) else {
+            guard let data = FileManager.default.contents(atPath: resourcePath) else {
                 handle500_ServerError(connection: connection, resourcePath: resourcePath, message: "Reading contents of file failed (but file is reported readable), resource: \(resourcePath)", line: #line)
                 return .next
             }
