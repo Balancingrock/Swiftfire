@@ -37,6 +37,7 @@
 // History
 //
 // 1.3.0 - Removed DecodePostFormUrlEncoded
+//       #8: Auto oading of domain & aliases list
 // 1.1.0 #1: Fixed loading & storing of domain service names
 //       #2: Moved server blacklist to serverAdminDomain
 //       #4: Rebuild domain services after loading the domains
@@ -210,12 +211,7 @@ do {
 
 do {
     guard domains != nil else { emergencyExit("Could not create domains") }
-    
-    
-    // Load domains and aliases
-    
-    guard domains.loadDomainsAndAliases() else { emergencyExit("Error loading domains and aliasses") }
-    
+
     
     // Remove unknown services from the domains
     
@@ -361,7 +357,6 @@ Log.atNotice?.log("Closed header logging file")
 // ================================
 
 domains.shutdown()
-domains.storeDomainsAndAliases()
 
 
 // ===============

@@ -164,6 +164,7 @@ The sources for the server admin site are generated using Jekyll. If changes mus
 - Fixed issue #7 (removed local FileManager instances)
 - Moved getInfo and postInfo from the services.info to Request.info (in the Http library) & deleted Service.DecodePostFromUrlEncoded.swift
 - Removed inout declarations for class parameters
+- Fixed issue #8 (no auto saving of changes to domain and alias list & servicenames)
 
 #### 1.2.1
 
