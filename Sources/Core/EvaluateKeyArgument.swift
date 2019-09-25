@@ -3,7 +3,7 @@
 //  File:       EvaluateKeyArgument.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.2.0
+//  Version:    1.3.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,8 @@
 //
 // History
 //
+// 1.3.0 - Moved getInfo and postInfo into requestinfo
+//       - Added a requestinfo! to return an empty string if the requested parameter does not exist
 // 1.2.0 - Initial version
 //
 // =====================================================================================================================
@@ -45,13 +47,13 @@ import Foundation
 
 /// Parse the given argument and return the requested value if it is a keyed argument.
 ///
-/// Example: $postinfo.name will return the value of the dictionary entry under postInfo["name"]
+/// Example: $requestinfo.name will return the value of the dictionary entry under request.info["name"]
 ///
 /// Allowable identifiers
 ///
-/// _source postInfo_: All possible strings.
+/// _source requestInfo_: All possible strings. Returns an error message if the parameter does not exist
 ///
-/// _source getInfo_: All possible strings.
+/// _source requestInfo!_: All possible strings. Will not retrun an error, but an empty string if the parameter does ot exist
 ///
 /// _source functionsInfo_: None yet
 ///
@@ -73,7 +75,6 @@ import Foundation
 ///   - in: The environment the function is executing in.
 ///
 /// - Returns:
-///
 ///   - The argument if the argument does not start with '$'
 ///   - "***error*** If there the request is invalid or of an non-existing source/key
 ///   - The requested value
@@ -91,34 +92,19 @@ public func evaluateKeyArgument(_ arg: String, using functionsInfo: Functions.In
     
     switch args[0].lowercased() {
     
-    case "$postinfo":
-        
-        guard let postInfo = environment.serviceInfo[.postInfoKey] as? PostInfo else {
-            Log.atError?.log("No PostInfo found")
-            return "***error***"
-        }
-        
-        guard let result = postInfo[String(args[1])] else {
-            Log.atError?.log("PostInfo does not contain key: \(args[1])")
+    case "$requestinfo":
+                
+        guard let result = environment.request.info[String(args[1])] else {
+            Log.atError?.log("Request.info does not contain key: \(args[1])")
             return "***error***"
         }
         
         return result
         
         
-    case "$getinfo":
-        
-        guard let getInfo = environment.serviceInfo[.getInfoKey] as? Dictionary<String, String> else {
-            Log.atError?.log("No GetInfo found")
-            return "***error***"
-        }
-        
-        guard let result = getInfo[String(args[1])] else {
-            Log.atError?.log("GetInfo does not contain key: \(args[1])")
-            return "***error***"
-        }
-        
-        return result
+    case "$requestinfo!":
+                
+        return environment.request.info[String(args[1])] ?? ""
 
         
     case "$functionsinfo":

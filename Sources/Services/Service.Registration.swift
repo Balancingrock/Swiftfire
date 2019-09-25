@@ -3,7 +3,7 @@
 //  File:       DomainServices.Registration.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.1.0
+//  Version:    1.3.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.3.0 - Removed Service.DecodePostFormUrlEncoded
 // 1.1.0 - Fixed loading & storing of domain service names
 // 1.0.1 - Documentation update
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
@@ -84,11 +85,6 @@ public let serviceName_GetFileAtResourcePath = "Get file at resource path"
 public let serviceName_GetSession = "Get Active Session"
 
 
-/// The name by which service_decodePostFormUrlEncoded is known.
-
-public let serviceName_DecodePostFormUrlEncoded = "Decode post form urlencoded"
-
-
 /// The name by which service_waitUntilBodyComplete is known.
 
 public let serviceName_WaitUntilBodyComplete = "Wait until body is received"
@@ -127,7 +123,6 @@ public func registerServices() {
     services.register(name: serviceName_GetResourcePathFromUrl, service: service_getResourcePathFromUrl)
     services.register(name: serviceName_GetFileAtResourcePath, service: service_getFileAtResourcePath)
     services.register(name: serviceName_GetSession, service: service_getSession)
-    services.register(name: serviceName_DecodePostFormUrlEncoded, service: service_decodePostFormUrlEncoded)
     services.register(name: serviceName_WaitUntilBodyComplete, service: service_waitUntilBodyComplete)
     services.register(name: serviceName_TransferResponse, service: service_transferResponse)
     services.register(name: serviceName_RestartSessionTimeout, service: service_restartSessionTimeout)

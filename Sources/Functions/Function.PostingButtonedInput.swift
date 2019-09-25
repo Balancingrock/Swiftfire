@@ -3,7 +3,7 @@
 //  File:       Function.PostingButtonedInput.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.3.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,7 +36,8 @@
 //
 // History
 //
-// 1.0.0 Raised to v1.0.0, Removed old change log,
+// 1.3.0 - Comments updated
+// 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 
@@ -77,7 +78,7 @@ public func postingButtonedInput(target: String, inputName: String, inputValue: 
 }
 
 
-/// Returns the HTML code for an input field with associated button on the right hand side embedded in a form including a number of key/value pairs among which the inputName/inputValue pair. If the button is clicked a POST HTML request will be made of the type x-www-form-urlencoded that includes the key/value pairs. Once the POST request is processed by Service.DecodePostFormUrlEncoded the postInfo dictionary will contain the key/value pairs.
+/// Returns the HTML code for an input field with associated button on the right hand side embedded in a form including a number of key/value pairs among which the inputName/inputValue pair. If the button is clicked a POST HTML request will be made of the type x-www-form-urlencoded that includes the key/value pairs.
 ///
 /// __Webpage Use__:
 ///

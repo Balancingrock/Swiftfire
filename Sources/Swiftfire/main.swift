@@ -3,7 +3,7 @@
 //  File:       main.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.1.0
+//  Version:    1.3.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.3.0 - Removed DecodePostFormUrlEncoded
 // 1.1.0 #1: Fixed loading & storing of domain service names
 //       #2: Moved server blacklist to serverAdminDomain
 //       #4: Rebuild domain services after loading the domains
@@ -169,7 +170,6 @@ do {
         serviceName_OnlyGetOrPost,
         serviceName_GetSession,
         serviceName_WaitUntilBodyComplete,
-        serviceName_DecodePostFormUrlEncoded,
         serviceName_Setup,
         serviceName_GetResourcePathFromUrl,
         serviceName_GetFileAtResourcePath,

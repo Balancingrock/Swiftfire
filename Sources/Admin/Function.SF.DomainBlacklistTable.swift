@@ -3,7 +3,7 @@
 //  File:       Function.SF.DomainBlacklistTable.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.2.1
+//  Version:    1.3.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.3.0 - Replaced postInfo with request.info
 // 1.2.1 - Removed dependency on Html
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
@@ -61,7 +62,7 @@
 // Other Input:
 // ------------
 //
-// environment.serviceInfo[.postInfoKey]["DomainName"] // must contain the name of an existing domain.
+// environment.request.info["DomainName"] // must contain the name of an existing domain.
 // session = environment.serviceInfo[.sessionKey] // Must be a non-expired session.
 // session[.accountKey] must contain an admin account
 //
@@ -115,8 +116,7 @@ func function_sf_domainBlacklistTable(_ args: Functions.Arguments, _ info: inout
     
     // Check that a valid domain name was specified
     
-    guard let postInfo = environment.serviceInfo[.postInfoKey] as? PostInfo,
-        let name = postInfo["DomainName"] else { return "Domain name error".data(using: String.Encoding.utf8) }
+    guard let name = environment.request.info["DomainName"] else { return "Domain name error".data(using: String.Encoding.utf8) }
     
     guard let domain = domains.domain(for: name) else { return "No domain error".data(using: String.Encoding.utf8) }
 
