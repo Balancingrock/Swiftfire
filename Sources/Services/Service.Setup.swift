@@ -36,7 +36,8 @@
 //
 // History
 //
-// 1.3.0 - Merged getInfo and postInfo into register.info
+// 1.3.0 - Replaced postInfo with request.info
+//       - Removed inout from the service signature
 // 1.2.1 - Removed dependency on Html
 // 1.2.0 - Initial version
 //
@@ -498,7 +499,7 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
                 <div class="center-content">
                     <div class="table-container">
                         <form method="post" action="\(domainCommand("AddAdminChangePassword"))">
-                            <input type="hidden" name="Domain" value=".show($postInfo.DomainName)">
+                            <input type="hidden" name="Domain" value=".show($requestinfo.DomainName)">
                             <table>
                                 <tr>
                                     <td>Domain admin:</td>
@@ -584,9 +585,9 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
         response.contentType = mimeTypeHtml
     }
     
-    func domainConfirmRemoveAccountPage(_ requestInfo: Dictionary<String, String>, _ domain: Domain) {
+    func domainConfirmRemoveAccountPage(_ request: Request, _ domain: Domain) {
         
-        let adminId = requestInfo["AdminID"]!
+        let adminId = request.info["AdminID"]!
 
         let html: String =
         """
@@ -744,20 +745,19 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
                 
                 switch urlComponents[2] {
                     
-                case "UpdateParameter": executeUpdateParameter(request.info, domain)
-                case "UpdateBlacklist": executeUpdateBlacklist(request.info, domain)
-                case "RemoveFromBlacklist": executeRemoveFromBlacklist(request.info, domain)
-                case "AddToBlacklist": executeAddToBlacklist(request.info, domain)
-                case "UpdateServices": executeUpdateServices(request.info, domain)
+                case "UpdateParameter": executeUpdateParameter(request, domain)
+                case "UpdateBlacklist": executeUpdateBlacklist(request, domain)
+                case "RemoveFromBlacklist": executeRemoveFromBlacklist(request, domain)
+                case "AddToBlacklist": executeAddToBlacklist(request, domain)
+                case "UpdateServices": executeUpdateServices(request, domain)
                 case "ConfirmDeleteAccount":
-                    if executeConfirmDeleteAccount(request.info, domain) {
-                        domainConfirmRemoveAccountPage(request.info, domain)
+                    if executeConfirmDeleteAccount(request, domain) {
+                        domainConfirmRemoveAccountPage(request, domain)
                         return .next
                     }
                         
-                case "RemoveAccount": executeRemoveAccount(request.info, domain)
-                case "AddAdminChangePassword": executeAddAdminChangePassword(request.info, domain)
-                        
+                case "RemoveAccount": executeRemoveAccount(request, domain)
+                case "AddAdminChangePassword": executeAddAdminChangePassword(request, domain)
                 case "Logoff":
                     session.info.remove(key: .accountKey)
                     Log.atNotice?.log("Admin logged out")
@@ -787,15 +787,15 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
     return .next
 }
     
-fileprivate func executeUpdateParameter(_ requestInfo: Dictionary<String, String>, _ domain: Domain) {
+fileprivate func executeUpdateParameter(_ request: Request, _ domain: Domain) {
     
-    guard let parameter = requestInfo["Parameter"] else {
-        Log.atError?.log("Missing parameter name in postInfo")
+    guard let parameter = request.info["Parameter"] else {
+        Log.atError?.log("Missing parameter name in request.info")
         return
     }
     
-    guard let value = requestInfo["Value"] else {
-        Log.atError?.log("Missing parameter value in postInfo")
+    guard let value = request.info["Value"] else {
+        Log.atError?.log("Missing parameter value in request.info")
         return
     }
 
@@ -822,14 +822,14 @@ fileprivate func executeUpdateParameter(_ requestInfo: Dictionary<String, String
     domain.storeSetup()
 }
 
-fileprivate func executeUpdateBlacklist(_ requestInfo: Dictionary<String, String>, _ domain: Domain) {
+fileprivate func executeUpdateBlacklist(_ request: Request, _ domain: Domain) {
     
-    guard let address = requestInfo["Address"] else {
+    guard let address = request.info["Address"] else {
         Log.atError?.log("Missing address")
         return
     }
     
-    guard let actionStr = requestInfo["Action"] else {
+    guard let actionStr = request.info["Action"] else {
         Log.atError?.log("Missing address")
         return
     }
@@ -855,9 +855,9 @@ fileprivate func executeUpdateBlacklist(_ requestInfo: Dictionary<String, String
 
 }
 
-fileprivate func executeRemoveFromBlacklist(_ requestInfo: Dictionary<String, String>, _ domain: Domain) {
+fileprivate func executeRemoveFromBlacklist(_ request: Request, _ domain: Domain) {
     
-    guard let address = requestInfo["Address"] else {
+    guard let address = request.info["Address"] else {
         Log.atError?.log("Missing address")
         return
     }
@@ -871,14 +871,14 @@ fileprivate func executeRemoveFromBlacklist(_ requestInfo: Dictionary<String, St
     domain.blacklist.store(to: Urls.domainBlacklistFile(for: domain.name))
 }
 
-fileprivate func executeAddToBlacklist(_ requestInfo: Dictionary<String, String>, _ domain: Domain) {
+fileprivate func executeAddToBlacklist(_ request: Request, _ domain: Domain) {
     
-    guard let address = requestInfo["Address"] else {
+    guard let address = request.info["Address"] else {
         Log.atError?.log("Missing address")
         return
     }
     
-    guard let actionStr = requestInfo["Action"] else {
+    guard let actionStr = request.info["Action"] else {
         Log.atError?.log("Missing address")
         return
     }
@@ -901,7 +901,7 @@ fileprivate func executeAddToBlacklist(_ requestInfo: Dictionary<String, String>
     Log.atNotice?.log("Added address \(address) to blacklist with action \(action) in domain \(domain.name)")
 }
 
-fileprivate func executeUpdateServices(_ requestInfo: Dictionary<String, String>, _ domain: Domain) {
+fileprivate func executeUpdateServices(_ request: Request, _ domain: Domain) {
     
     struct ServiceItem {
         let index: Int
@@ -914,14 +914,14 @@ fileprivate func executeUpdateServices(_ requestInfo: Dictionary<String, String>
     
     var error = false;
     
-    while let _ = requestInfo["seqName\(index)"] {
+    while let _ = request.info["seqName\(index)"] {
         
-        if let _ = requestInfo["usedName\(index)"] {
+        if let _ = request.info["usedName\(index)"] {
             
-            if  let newIndexStr = requestInfo["seqName\(index)"],
+            if  let newIndexStr = request.info["seqName\(index)"],
                 let newIndex = Int(newIndexStr) {
                 
-                if let newName = requestInfo["nameName\(index)"] {
+                if let newName = request.info["nameName\(index)"] {
                     serviceArr.append(ServiceItem(index: newIndex, name: newName))
                 } else {
                     error = true
@@ -957,9 +957,9 @@ fileprivate func executeUpdateServices(_ requestInfo: Dictionary<String, String>
     Log.atNotice?.log("Updated services for domain \(domain.name) to/n\(str)")
 }
 
-fileprivate func executeConfirmDeleteAccount(_ requestInfo: Dictionary<String, String>, _ domain: Domain) -> Bool {
+fileprivate func executeConfirmDeleteAccount(_ request: Request, _ domain: Domain) -> Bool {
     
-    guard let adminId = requestInfo["AdminID"] else {
+    guard let adminId = request.info["AdminID"] else {
         Log.atError?.log("Missing admin ID")
         return false
     }
@@ -967,9 +967,9 @@ fileprivate func executeConfirmDeleteAccount(_ requestInfo: Dictionary<String, S
     return domain.accounts.getAccountWithoutPassword(for: adminId) != nil
 }
 
-fileprivate func executeRemoveAccount(_ requestInfo: Dictionary<String, String>, _ domain: Domain) {
+fileprivate func executeRemoveAccount(_ request: Request, _ domain: Domain) {
     
-    guard let accountId = requestInfo["RemoveAccountId"] else {
+    guard let accountId = request.info["RemoveAccountId"] else {
         Log.atError?.log("Missing RemoveAccountId")
         return
     }
@@ -981,14 +981,14 @@ fileprivate func executeRemoveAccount(_ requestInfo: Dictionary<String, String>,
     }
 }
 
-fileprivate func executeAddAdminChangePassword(_ requestInfo: Dictionary<String, String>, _ domain: Domain) {
+fileprivate func executeAddAdminChangePassword(_ request: Request, _ domain: Domain) {
     
-    guard let adminId = requestInfo["AdminID"] else {
+    guard let adminId = request.info["AdminID"] else {
         Log.atError?.log("Missing admin ID")
         return
     }
 
-    guard let adminPwd = requestInfo["AdminPassword"] else {
+    guard let adminPwd = request.info["AdminPassword"] else {
         Log.atError?.log("Missing admin password")
         return
     }

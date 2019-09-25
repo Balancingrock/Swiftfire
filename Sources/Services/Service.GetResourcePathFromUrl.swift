@@ -36,7 +36,9 @@
 //
 // History
 //
-// 1.3.0 - Partly rewritten, retrieval of URL and name/value pairs has moved to library Http
+// 1.3.0 #7 Removed local filemanager
+//       - Removed code that decoded the 'getInfo'
+//       - Removed inout from the service signature
 //       - Tests for presence of the resourcepath keys before attempting to update them
 // 1.0.1 - Documentation update
 // 1.0.0 - Raised to v1.0.0, Removed old change log,

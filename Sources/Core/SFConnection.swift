@@ -36,7 +36,7 @@
 //
 // History
 //
-// 1.3.0 - Removed local instance of the filemanager
+// 1.3.0 #7 Removed local filemanager
 // 1.1.0 - Changed server blacklist location
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
 //

@@ -3,7 +3,7 @@
 //  File:       SFDocument.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.3.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,8 @@
 //
 // History
 //
+// 1.3.0 #7 Removed local filemanager
+//       - Removed inout from the function.environment signature
 // 1.0.0 Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
@@ -236,7 +238,7 @@ public  class SFDocument: EstimatedMemoryConsumption {
     
     /// Processes the function calls and merges the original document data with the results.
     
-    public func getContent(with environment: inout Functions.Environment) -> Data {
+    public func getContent(with environment: Functions.Environment) -> Data {
         
         
         // Thread safety: All data that is updated and/or returned must reside in local (stack) storage.
@@ -250,7 +252,7 @@ public  class SFDocument: EstimatedMemoryConsumption {
             switch $0 {
             case .characterBlock(let cb): data.append(cb.data)
             case .functionBlock(let fb):
-                if let fbData = fb.function?(fb.arguments, &info, &environment) {
+                if let fbData = fb.function?(fb.arguments, &info, environment) {
                     data.append(fbData)
                 }
             }

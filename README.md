@@ -160,15 +160,14 @@ The sources for the server admin site are generated using Jekyll. If changes mus
 
 #### HEAD
 
+- Fixed (removed) warning when using xcode 11
+- Fixed issue #7 (removed local FileManager instances)
+- Moved getInfo and postInfo from the services.info to Request.info (in the Http library) & deleted Service.DecodePostFromUrlEncoded.swift
+- Removed inout declarations for class parameters
+- Fixed issue #8 (no auto saving of changes to domain and alias list & servicenames)
+- Fixed issue #9 (account names with differ in case only are no longer allowed)
 - Added functions for account creation by users with auto-email verification
-- Added `demo` site to showcase some features (both site and Jekyll sources)
-- Upgraded Http and consolidated the `getInfo`, `postInfo` and `info` dictionaries into the `Request`
-- Removed the service to decode the POST info
-- Removed the code to decode the GET info
-- Removed 
-- Added routine `sendEmail`
-- Added service `Commands` for the demo site and as example on how to create a specific commands on the server
-- Several smaller issues
+- Added `demo` site to showcase features and serve as a user website template
 
 #### 1.2.1
 

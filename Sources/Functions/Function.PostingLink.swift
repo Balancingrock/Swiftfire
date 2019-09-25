@@ -3,7 +3,7 @@
 //  File:       Function.PostingLink.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.1
+//  Version:    1.3.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -37,6 +37,8 @@
 //
 // History
 //
+// 1.3.0 - Updated comments
+//       - Removed inout from the function.environment signature
 // 1.0.1 - Documentation updates
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
@@ -65,7 +67,7 @@ public func postingLink(target: String, text: String, keyValuePairs: Dictionary<
 }
 
 
-/// Returns the HTML code for a text link with one or more key/value pairs. If the link is clicked a POST HTML request will be made of the type x-www-form-urlencoded that includes the key/value pairs. Once the POST request is processed by Service.DecodePostFormUrlEncoded the postInfo dictionary will contain the key/value pairs.
+/// Returns the HTML code for a text link with one or more key/value pairs. If the link is clicked a POST HTML request will be made of the type x-www-form-urlencoded that includes the key/value pairs.
 ///
 /// __Webpage Use__:
 ///
@@ -85,7 +87,7 @@ public func postingLink(target: String, text: String, keyValuePairs: Dictionary<
 ///
 /// _Return_: The HTML code for the requested button. `***Error***` if less than 4 or an uneven number of arguments is present.
 
-public func function_postingLink(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: inout Functions.Environment) -> Data? {
+public func function_postingLink(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: Functions.Environment) -> Data? {
     
     
     // Check for minimum the 4 arguments and an even number of arguments

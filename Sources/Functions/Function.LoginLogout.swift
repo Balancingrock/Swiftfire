@@ -65,7 +65,7 @@ import Services
 ///
 /// _Returns_: The HTML code for the login field.
 
-public func function_loginLogout(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: inout Functions.Environment) -> Data? {
+public func function_loginLogout(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: Functions.Environment) -> Data? {
     
     
     // There should be no arguments

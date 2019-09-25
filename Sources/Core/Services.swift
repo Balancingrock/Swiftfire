@@ -3,7 +3,7 @@
 //  File:       Services.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.3.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,7 +36,9 @@
 //
 // History
 //
-// 1.0.0 Raised to v1.0.0, Removed old change log,
+// 1.3.0 - Removed postInfo
+//       - Removed inout from the service signature
+// 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 
@@ -45,11 +47,6 @@ import SwifterSockets
 import SwifterLog
 import Http
 import Custom
-
-
-/// The container for the post info.
-
-public typealias PostInfo = ReferencedDictionary
 
 
 /// Services are processes that generate an output and/or side effects from the given input. A domain can have multiple services but they all run sequentially. Each of the services also receives the output of the services that went before it.

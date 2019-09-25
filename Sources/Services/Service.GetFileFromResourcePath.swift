@@ -3,7 +3,7 @@
 //  File:       Service.GetFileAtResourcePath.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.1
+//  Version:    1.3.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,9 @@
 //
 // History
 //
+// 1.3.0 #7 Removed local filemanager
+//       - Removed inout from the service signature
+//       - Removed inout from the function.environment signature
 // 1.0.1 - Documentation update
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
@@ -133,9 +136,9 @@ func service_getFileAtResourcePath(_ request: Request, _ connection: SFConnectio
             
         case .success(let doc):
 
-            var environment = Functions.Environment(request: request, connection: connection, domain: domain, response: response, serviceInfo: info)
+            let environment = Functions.Environment(request: request, connection: connection, domain: domain, response: response, serviceInfo: info)
             
-            body = doc.getContent(with: &environment)
+            body = doc.getContent(with: environment)
         }
         
         

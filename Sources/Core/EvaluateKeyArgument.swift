@@ -36,7 +36,8 @@
 //
 // History
 //
-// 1.3.0 - Merged getinfo and postinfo into registerinfo. Added registerinfo! which does not generate errors.
+// 1.3.0 - Moved getInfo and postInfo into requestinfo
+//       - Added a requestinfo! to return an empty string if the requested parameter does not exist
 // 1.2.0 - Initial version
 //
 // =====================================================================================================================
@@ -46,11 +47,13 @@ import Foundation
 
 /// Parse the given argument and return the requested value if it is a keyed argument.
 ///
-/// Example: $postinfo.name will return the value of the dictionary entry under postInfo["name"]
+/// Example: $requestinfo.name will return the value of the dictionary entry under request.info["name"]
 ///
 /// Allowable identifiers
 ///
-/// _source requestInfo_: All possible strings.
+/// _source requestInfo_: All possible strings. Returns an error message if the parameter does not exist
+///
+/// _source requestInfo!_: All possible strings. Will not retrun an error, but an empty string if the parameter does ot exist
 ///
 /// _source functionsInfo_: None yet
 ///
@@ -92,15 +95,15 @@ public func evaluateKeyArgument(_ arg: String, using functionsInfo: Functions.In
     case "$requestinfo":
                 
         guard let result = environment.request.info[String(args[1])] else {
-            Log.atError?.log("The request info does not contain key: \(args[1])")
+            Log.atError?.log("Request.info does not contain key: \(args[1])")
             return "***error***"
         }
         
         return result
-
-    
+        
+        
     case "$requestinfo!":
-                    
+
         return environment.request.info[String(args[1])] ?? ""
 
         

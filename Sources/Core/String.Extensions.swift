@@ -3,7 +3,7 @@
 //  File:       String.Extensions.swift
 //  Project:    Swiftfire
 //
-//  Version:    0.12.0
+//  Version:    1.0.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl

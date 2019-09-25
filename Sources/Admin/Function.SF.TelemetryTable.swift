@@ -36,7 +36,8 @@
 //
 // History
 //
-// 1.3.0 - Removed old comments
+// 1.3.0 - Removed inout from the function.environment signature
+//       - Removed old comments
 // 1.2.1 - Removed dependecy on Html
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
@@ -92,7 +93,7 @@ import Core
 ///
 /// - Returns: The table with all telemetry values.
 
-func function_sf_telemetryTable(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: inout Functions.Environment) -> Data? {
+func function_sf_telemetryTable(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: Functions.Environment) -> Data? {
     
     
     // Check access rights

@@ -36,7 +36,7 @@
 //
 // History
 //
-// 1.3.0 - Removed getInfo and postInfo keys. This information is now part of the request itself.
+// 1.3.0 - Removed getInfo and postInfo keys
 // 1.0.1 - Documentation update
 //       - Changed the sessionKey identifier to `Session` from `SessionId`
 // 1.0.0 - Raised to v1.0.0, Removed old change log,

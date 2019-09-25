@@ -3,7 +3,7 @@
 //  File:       HttpConnection.HttpWorker.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.2.0
+//  Version:    1.3.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.3.0 - Removed inout from the service signature
 // 1.2.0 - Added domain admin to access setup page even when the domain is disabled
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
 //

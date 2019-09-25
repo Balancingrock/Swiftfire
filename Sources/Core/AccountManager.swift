@@ -36,7 +36,7 @@
 //
 // History
 //
-// 1.3.0 - Prevented same-names with different capitalizations
+// 1.3.0 #9: Prevented same-names with different capitalizations
 // 1.2.0 - Added ability to remove accounts
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
 //

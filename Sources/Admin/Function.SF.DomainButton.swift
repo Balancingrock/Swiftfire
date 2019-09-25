@@ -36,7 +36,9 @@
 //
 // History
 //
-// 1.3.0 - Removed old comments, replaced postInfo with request.info
+// 1.3.0 - Replaced postInfo with request.info
+//       - Removed old comments
+//       - Removed inout from the function.environment signature
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
@@ -94,7 +96,7 @@ import BRUtils
 
 /// Creates a button that will post the key/value combination when clicked.
 
-public func function_sf_domainButton(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: inout Functions.Environment) -> Data? {
+public func function_sf_domainButton(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: Functions.Environment) -> Data? {
     
     
     // Check for minimum the 2 arguments and an even number of arguments
@@ -104,7 +106,9 @@ public func function_sf_domainButton(_ args: Functions.Arguments, _ info: inout 
     
     // Check that a valid domain name was specified
     
-    guard let name = environment.request.info["DomainName"] else { return "***Error***".data(using: String.Encoding.utf8) }
+    guard let name = environment.request.info["DomainName"] else {
+        return "***Error***".data(using: String.Encoding.utf8)
+    }
     
     
     // Create dictionary

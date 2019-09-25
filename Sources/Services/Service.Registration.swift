@@ -36,7 +36,7 @@
 //
 // History
 //
-// 1.3.0 - Removed decodePostFormUrlEncoded
+// 1.3.0 - Removed Service.DecodePostFormUrlEncoded
 //       - Added service_Commands and service_StorePreLoginUrl
 // 1.1.0 - Fixed loading & storing of domain service names
 // 1.0.1 - Documentation update

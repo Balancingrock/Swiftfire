@@ -37,6 +37,9 @@
 // History
 //
 // 1.3.0 - Replaced postInfo with request.info
+//       - Removed old comments
+//       - Updated html code to use distinct names for the values: ParameterName and Value
+//       - Removed inout from the function.environment signature
 // 1.2.0 - Fixed index problem when creating dictionary
 // 1.1.0 #5: Set PHP message to disabled if disabled
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
@@ -62,7 +65,7 @@
 // -----------
 //
 // target: The target page for the link.
-// inputName: The name of the input field, this name will be returned in the posted key/value pairs. If this is the name of a server parameter, the value of that server parameter will be used as the default value. Overriding the given default value. If the inputName is not a server parameter name, but a domain parameter name AND a postInfo["DomainName"] is present with the name of a valid domain, then the value of that domain parameter will be used as the default value. Overriding the given default value. Note that when a postInfo["DomainName"] was used, this will also be set as part of the posted info for the form.
+// inputName: The name of the input field, this name will be returned in the posted key/value pairs. If this is the name of a server parameter, the value of that server parameter will be used as the default value. Overriding the given default value. If the inputName is not a server parameter name, but a domain parameter name AND a request.info["DomainName"] is present with the name of a valid domain, then the value of that domain parameter will be used as the default value. Overriding the given default value. Note that when a request.info["DomainName"] was used, this will also be set as part of the posted info for the form.
 // inputValue: The initial value displayed in the input field.
 // buttonTitle: The title for the button.
 // key: (optional) The key of the key/value pair that will be POST-ed.
@@ -100,7 +103,7 @@ import Functions
 
 /// Creates a (text) link that will post the key/value combination when clicked.
 
-func function_sf_postingButtonedInput(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: inout Functions.Environment) -> Data? {
+func function_sf_postingButtonedInput(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: Functions.Environment) -> Data? {
     
     
     // Check access rights

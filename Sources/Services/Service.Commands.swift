@@ -387,9 +387,9 @@ fileprivate func executeRegister(_ request: Request, _ connection: SFConnection,
     
     if case .success(let messageTemplate) = SFDocument.factory(path: (domain.webroot + "/" + REGISTER_VERIFICATION_EMAIL_TEXT_TEMPLATE)) {
 
-        var env = Functions.Environment(request: request, connection: connection, domain: domain, response: response, serviceInfo: info)
+        let env = Functions.Environment(request: request, connection: connection, domain: domain, response: response, serviceInfo: info)
         request.info["Link"] = verificationLink
-        message = String(data: messageTemplate.getContent(with: &env), encoding: .utf8) ?? "Click the following link (or copy it into the url field of a browser) to confirm your account at \(domain.name).\r\n Link = \(verificationLink)"
+        message = String(data: messageTemplate.getContent(with: env), encoding: .utf8) ?? "Click the following link (or copy it into the url field of a browser) to confirm your account at \(domain.name).\r\n Link = \(verificationLink)"
 
     } else {
         

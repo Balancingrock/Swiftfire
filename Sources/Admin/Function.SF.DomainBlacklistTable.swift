@@ -36,7 +36,8 @@
 //
 // History
 //
-// 1.3.0 - Removed old comments, replaced postInfo with request.info
+// 1.3.0 - Replaced postInfo with request.info
+//       - Removed inout from the function.environment signature
 // 1.2.1 - Removed dependency on Html
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
@@ -62,7 +63,7 @@
 // Other Input:
 // ------------
 //
-// environment.serviceInfo[.postInfoKey]["DomainName"] // must contain the name of an existing domain.
+// environment.request.info["DomainName"] // must contain the name of an existing domain.
 // session = environment.serviceInfo[.sessionKey] // Must be a non-expired session.
 // session[.accountKey] must contain an admin account
 //
@@ -96,7 +97,7 @@ import Core
 ///
 /// - Returns: The value of the requested parameter or "No access rights".
 
-func function_sf_domainBlacklistTable(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: inout Functions.Environment) -> Data? {
+func function_sf_domainBlacklistTable(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: Functions.Environment) -> Data? {
     
     
     // Check access rights

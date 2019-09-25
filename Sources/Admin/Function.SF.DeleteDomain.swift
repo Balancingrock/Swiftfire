@@ -36,7 +36,9 @@
 //
 // History
 //
-// 1.3.0 - Removed old comments, replaced postInfo with request.info
+// 1.3.0 - Replaced postInfo with request.info
+//       - Removed old comments
+//       - Removed inout from the function.environment signature
 // 1.2.1 - Removed dependency on Html
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
@@ -62,7 +64,7 @@
 // Other Input:
 // ------------
 //
-// service[.postInfoKey]["DomainName"] must contain the name of an existing domain.
+// request.info["DomainName"] must contain the name of an existing domain.
 //
 //
 // Returns:
@@ -87,7 +89,7 @@ import Core
 
 /// - Returns: A button with an action to remove a domain.
 
-func function_sf_deleteDomain(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: inout Functions.Environment) -> Data? {
+func function_sf_deleteDomain(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: Functions.Environment) -> Data? {
     
     
     // Check that a server admin is logged in
@@ -122,6 +124,7 @@ func function_sf_deleteDomain(_ args: Functions.Arguments, _ info: inout Functio
     
     
     // Return the button code
+
     return """
         <form class="posting-button-form" method="post" action="/serveradmin/sfcommand/DeleteDomain">
             <button class="posting-button-button" type="submit" name="DomainName" value="\(name)">Delete Domain \(name)</button>

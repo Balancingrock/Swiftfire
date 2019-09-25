@@ -36,8 +36,8 @@
 //
 // History
 //
-// 1.3.0 - Changed var to let due to xcode 11
-//       - Store updates to the domain names immediately
+// 1.3.0 - Replaced var with let due to Xcode 11
+//       #8 Fixed storing of all changes to the service names
 // 1.2.0 - Added admin keyword
 //       - Set session timeout to 600 (seconds)
 // 1.1.0 #3 Fixed loading & storing of domain service names

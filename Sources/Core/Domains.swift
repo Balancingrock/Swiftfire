@@ -36,10 +36,10 @@
 //
 // History
 //
-// 1.3.0 - Every change to the domains and aliases now gets stored immediately.
+// 1.3.0 #8 Fixed: Added immediate storage of changes to the domains & aliases list
 // 1.2.0 - Fixed typo in error message
 //       - When loading domains&aliases, now removes domains that have no associated directory.
-// 1.1.0 #3: Fixed
+// 1.1.0 #3 Fixed
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
@@ -75,7 +75,7 @@ public final class Domains {
             return nil
         }
         
-        _ = loadDomainsAndAliases() // Note that errors must be ignored during initialization
+        _ = loadDomainsAndAliases() // Errors must be ignored during init
     }
     
     

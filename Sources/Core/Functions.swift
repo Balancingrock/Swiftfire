@@ -3,7 +3,7 @@
 //  File:       Functions.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.2.0
+//  Version:    1.3.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.3.0 - Removed inout from the service and function signature
 // 1.2.0 - Changed key of functionInfo to string
 // 1.0.0 - Raised to v1.0.0, Removed old change log
 //
@@ -144,7 +145,7 @@ public final class Functions {
     
     /// The signature of the "Insert Content Here" function calls
     
-    public typealias Signature = (_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: inout Functions.Environment) -> Data?
+    public typealias Signature = (_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: Functions.Environment) -> Data?
 
     
     /// The combo of name and function
