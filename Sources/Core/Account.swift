@@ -3,7 +3,7 @@
 //  File:       Account.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.2.0
+//  Version:    1.3.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.3.0 - Redesigned for easier & faster handling of accounts
 // 1.2.0 - Changed the way the account directory is handled
 //       - Added the isAdmin member
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
@@ -54,99 +55,154 @@ import BRBON
 
 public final class Account: EstimatedMemoryConsumption {
     
-    // Note: It uses the default EstimatedMemoryConsumption implementation.
+    // Note: This class uses the default EstimatedMemoryConsumption implementation.
     
     
-    /// A public unique identifier that can be used to reference this account
+    // MARK:- Public interface
     
-    public private(set) var uuid: String
+    /// The path of the file containing this account
+        
+    public let dir: URL
 
     
-    /// The name for this account. When the name is updated, it is automatically persisted. If persistence fails, the name is not updated. Protected against empty names, too long names (max 32 char) and too many name changes (max 19).
+    /// True if the account is active.
     ///
-    /// - Note: Updates are not thread safe, make sure that the session is 'exclusive' before updating.
+    /// An account is active if the email address has been verified and the account is enabled.
     
-    public var name: String {
+    public var isActive: Bool {
+        return isEnabled && emailVerificationCode.isEmpty
+    }
+    
+    
+    /// True if the account is enabled.
+    
+    public var isEnabled: Bool {
         get {
-            if names.count > 0 {
-                return names[0]
-            } else {
-                Log.atError?.log("Array with names is empty", type: "Account")
-                return ""
-            }
+            if let v = db.root["enabled"].bool { return v }
+            Log.atError?.log("Error retrieving enabled from account store")
+            return false
         }
         set {
-            
-            // Protection
-            
-            if newValue.isEmpty { return }
-            if newValue.utf8.count > 32 { return }
-            if names.count > 20 { return }
-            
-            
-            // Do not add if the name did not change.
-            
-            if names.count > 0, newValue == names[0] { return }
-            
-            
-            // Add the new name
-            
-            names.insert(newValue, at: 0)
-            
-            
-            // Save the new values, if the save fails, then undo the change.
-
-            if let error = store() {
-                Log.atError?.log("Cannot save account \(self), name not changed, error message = \(error)", type: "Account")
-                names.removeFirst()
-            }
+            //db.root["enabled"].bool = newValue
+            db.root.updateItem(newValue, withName: "enabled")
+            store()
         }
     }
 
     
-    /// A unique id for this account, used for storage purposes only.
+    /// The name for this account.
     
-    private(set) var id: Int = 0
+    public var name: String {
+        get {
+            if let v = db.root["name"].string { return v }
+            Log.atError?.log("Error retrieving name from account store")
+            return "***error***"
+        }
+        set {
+            //db.root["name"].string = newValue
+            db.root.updateItem(newValue, withName: "name")
+            store()
+        }
+    }
     
     
-    /// The names that have been associated with this account, the name at index 0 is the used name. Other names are historical.
+    /// The email address for this account.
     
-    private var names: Array<String> = []
+    public var emailAddress: String {
+        get {
+            if let v = db.root["emailAddress"].string { return v }
+            Log.atError?.log("Error retrieving emailAddress from account store")
+            return "***error***"
+        }
+        set {
+            //db.root["emailAddress"].string = newValue
+            db.root.updateItem(newValue, withName: "emailAddress")
+            store()
+        }
+    }
+
     
+    /// The email verification code for this account.
+    ///
+    /// Should be empty for verified email addresses, should be a UUID-string when a verification email has been sent.
+    
+    public var emailVerificationCode: String {
+        get {
+            if let v = db.root["emailVerificationCode"].string { return v }
+            Log.atError?.log("Error retrieving emailVerificationCode from account store")
+            return "***error***"
+        }
+        set {
+            //db.root["emailVerificationCode"].string = newValue
+            db.root.updateItem(newValue, withName: "emailVerificationCode")
+            store()
+        }
+    }
+    
+    
+    /// Controls if this user has access to domain administrator functions.
+    ///
+    /// Note that this does not control access to domain specific user functions, like forum administrator etc.
+    
+    public var isDomainAdmin: Bool {
+        get {
+            if let v = db.root["isAdmin"].bool { return v }
+            Log.atError?.log("Error retrieving isAdmin from account store")
+            return false
+        }
+        set {
+            //db.root["isAdmin"].bool = newValue
+            db.root.updateItem(newValue, withName: "isAdmin")
+            store()
+        }
+    }
+    
+    
+    // MARK:- Private from here
+    
+    
+    /// The internal ID
+    
+    /// Path to the database that contains the data for this account
+    
+    private lazy var dbUrl: URL = {
+        return dir.appendingPathComponent("account").appendingPathExtension("brbon")
+    }()
+    
+    
+    /// Data storage for the account.
+    
+    private var db: ItemManager!
+
     
     /// The digest for the user password.
     
-    private var digest: String!
+    private var digest: String {
+        get {
+            if let v = db.root["digest"].string { return v }
+            Log.atError?.log("Error retrieving digest from account store")
+            return "***error***"
+        }
+        set {
+            //db.root["digest"].string = newValue
+            db.root.updateItem(newValue, withName: "digest")
+            // Note: No 'store' operation here, see 'updatePassword' for that
+        }
+    }
     
     
     /// The password salt
     
-    private var salt: String!
-    
-    
-    /// The path of the file containing this account
-    
-    fileprivate var dir: URL
-    
-    
-    /// Convenience data storage for data that needs to be associated with the account. Use for small amounts only. Not thread save.
-    ///
-    /// - Note: Updates are __not__ stored automatically. You must call _storeInfo_ to ensure persistence of the data.
-    ///
-    /// - Note: Updates are not thread safe, make sure that the session is 'exclusive' before updating.
-    ///
-    /// - Note: Be carefull: attackers may try to bring a site down by storing illegal or too much data. Never store data untested for validity and size.
-    
-    public var info: ItemManager!
-    
-    
-    /// Controls access to admin features of a domain. Note that the serveradmin is its own group, not covered by this member.
-    
-    public var isAdmin: Bool = false {
-        didSet {
-            if let error = store() {
-                Log.atError?.log("Failed to save account update\n\n\(self),\n\n Error message = \(error)\n")
-            }
+    private var salt: String {
+        get {
+            if let v = db.root["salt"].string { return v }
+            Log.atError?.log("Error retrieving salt from account store")
+            return "***error***"
+        }
+        set {
+            //db.root["salt"].string = newValue
+            db.root.updateItem(newValue, withName: "salt")
+            // Note: No 'store' operation here, see 'updatePassword' for that
         }
     }
     
@@ -159,134 +215,72 @@ public final class Account: EstimatedMemoryConsumption {
     ///   - password: An integer that must be matched to allow somebody to use this account.
     ///   - accountDir: A URL pointing to the directory for the account. The directory will be created if it does not exist. No attempt will be made to initialize the account from the content of the directory (if any).
     
-    init?(id: Int, name: String, password: String, accountDir: URL) {
-        
-        self.id = id
-        self.uuid = UUID().uuidString
-        self.names.insert(name, at: 0)
-        self.dir = accountDir
+    init?(name: String, password: String, accountDir: URL) {
         
         do {
-            try FileManager.default.createDirectory(atPath: dir.path, withIntermediateDirectories: true, attributes: nil)
+            try FileManager.default.createDirectory(atPath: accountDir.path, withIntermediateDirectories: true, attributes: nil)
         } catch let error {
-            Log.atError?.log("Cannot create account directory for \(name) at \(dir.path) with message: \(error.localizedDescription)")
+            Log.atError?.log("Cannot create account directory for \(name) at \(accountDir.path) with message: \(error.localizedDescription)")
             return nil
         }
 
-        let salt = createSalt()
-        guard let digest = createDigest(for: password, with: salt) else { return nil }
+        self.dir = accountDir
+        self.db = ItemManager.createDictionaryManager()
         
-        self.salt = salt
-        self.digest = digest
+        self.salt = createSalt()
+        guard let pwdDigest = createDigest(for: password, with: self.salt) else { return nil }
+        self.digest = pwdDigest
         
-        if let error = store() {
-            Log.atError?.log("Cannot save account\n\n\(self),\n\n Error message = \(error)\n")
-            return nil
-        }
-        
-        infoSetup()
+        self.name = name
+
+        self.emailAddress = ""
+        self.emailVerificationCode = ""
+        self.isEnabled = false
+
+        store()
     }
     
     
     /// Read the account parameters from a directory.
     
-    init?(withContentOfDirectory dir: URL) {
+    init?(withContentOfDirectory accountDir: URL?) {
         
-        self.dir = dir
+        guard let accountDir = accountDir else { return nil }
         
         var isDir: ObjCBool = false
-        guard FileManager.default.fileExists(atPath: dir.path, isDirectory: &isDir), isDir.boolValue else { return nil }
-        
-        let file = dir.appendingPathComponent("account").appendingPathExtension("json")
-        
-        guard let json = ((try? VJson.parse(file: file)) as VJson??) else { return nil }
-        
-        
-        // Initial members
-        
-        guard let jjnames = (json|"Names")?.arrayValue else { return nil }
-        guard jjnames.count > 0 else { return nil }
-        var jnames: Array<String> = []
-        for jname in jjnames {
-            guard let name = jname.stringValue else { return nil }
-            jnames.append(name)
+        guard FileManager.default.fileExists(atPath: accountDir.path, isDirectory: &isDir), isDir.boolValue else {
+            Log.atError?.log("The account directory at \(accountDir.path) does not exist")
+            return nil
         }
-        guard let jid = (json|"Id")?.intValue else { return nil }
-        guard let juuid = (json|"Uuid")?.stringValue else { return nil }
-        guard let jdigest = (json|"Digest")?.stringValue else { return nil }
-        guard let jsalt = (json|"Salt")?.stringValue else { return nil }
 
-        self.names = jnames
-        self.id = jid
-        self.uuid = juuid
-        self.digest = jdigest
-        self.salt = jsalt
+        self.dir = accountDir
 
-        
-        // Members added later (with default values)
-        
-        if let j = (json|"IsAdmin")?.boolValue { self.isAdmin = j }
-        
-        
-        // The info part
-        
-        loadInfo()
-    }
-
-
-    /// Serialize to VJson
-    
-    private var json: VJson {
-        let json = VJson()
-        for (index, name) in names.enumerated() {
-            json["Names"][index] &= name
+        guard let im = ItemManager.init(from: dbUrl) else {
+            Log.atError?.log("The account db file at \(dbUrl.path) failed to load")
+            return nil
         }
-        json["Id"] &= id
-        json["Uuid"] &= uuid
-        json["Digest"] &= digest
-        json["Salt"] &= salt
-        json["IsAdmin"] &= isAdmin
         
-        return json
+        self.db = im
     }
 
     
-    /// Save the user data to file.
-    ///
-    /// - Returns: On success nil, on failure a description of the error that occured.
+    /// Save the account data to file.
     
-    func store() -> String? {
-        let file = dir.appendingPathComponent("account").appendingPathExtension("json")
-        storeInfo()
-        return self.json.save(to: file)
+    @discardableResult
+    private func store() -> Bool {
+        do {
+            try db.data.write(to: dbUrl)
+        }
+        catch let error {
+            Log.atError?.log("An error occured when saving the account database: \(error.localizedDescription)")
+            return false
+        }
+        return true
     }
-    
-    
-    // Definitions for the info contents
-    
-    fileprivate lazy var isEnabledPortal: Portal = {
-        return info.root["enabled"].portal ?? Portal.nullPortal
-    }()
-    
-    fileprivate lazy var emailPortal: Portal = {
-        return info.root["email"].portal ?? Portal.nullPortal
-    }()
-
-    fileprivate lazy var emailWasVerifiedPortal: Portal = {
-        return info.root["emailWasVerified"].portal ?? Portal.nullPortal
-    }()
-
-    fileprivate lazy var emailVerificationCodePortal: Portal = {
-        return info.root["emailVerificationCode"].portal ?? Portal.nullPortal
-    }()
-
-    fileprivate lazy var creationDatePortal: Portal = {
-        return info.root["creationDate"].portal ?? Portal.nullPortal
-    }()
 }
 
 
-// MARK:- JSON
+// MARK:- CustomStringConvertible
 
 extension Account: CustomStringConvertible {
     
@@ -295,19 +289,11 @@ extension Account: CustomStringConvertible {
     
     public var description: String {
         var str = "Account\n"
-        str += " Id: \(id)\n"
-        str += " Uuid: \(uuid)\n"
         str += " Name: \(name)\n"
-        str += " isAdmin: \(isAdmin)\n"
+        str += " isDomainAdmin: \(isDomainAdmin)\n"
         str += " Digest: \(String(describing: digest))"
         if serverParameters.debugMode.value {
             str += "\n Salt: \(String(describing: salt))\n"
-            if historicalNames.count == 0 {
-                str += " No old names\n"
-            } else {
-                str += " Old names:\n"
-                historicalNames.forEach({ str += "  \($0)\n"})
-            }
         }
         return str
     }
@@ -318,16 +304,7 @@ extension Account: CustomStringConvertible {
 
 extension Account {
     
-
-    /// A list of all the old names this account has had.
     
-    public var historicalNames: Array<String> {
-        var old = names
-        if old.count > 0 { old.removeFirst() }
-        return old
-    }
-    
-
     /// Update password (digest). A new salt is created also. If the operation fails, the values of the salt and the digest will remain as they are.
     ///
     /// - Note: Updates are not thread safe, make sure that the session is 'exclusive' before updating.
@@ -355,16 +332,13 @@ extension Account {
         
         // Save the new values, if the save fails, then restore the old values.
         
-        if let error = store() {
-            Log.atError?.log("Cannot save account \(self), error message = \(error)", type: "Account")
+        guard store() else {
             self.salt = oldSalt
             self.digest = oldDigest
             return false
-            
-        } else {
-            
-            return true
         }
+        
+        return true
     }
     
     
@@ -501,102 +475,3 @@ extension Account {
     }
 }
 
-
-// MARK: - Info interface
-
-extension Account {
-    
-    fileprivate var infoUrl: URL {
-        return dir.appendingPathComponent("info").appendingPathExtension("brbon")
-    }
-    
-    public func storeInfo() {
-        do {
-            if let info = info {
-                try info.data.write(to: infoUrl)
-            }
-        } catch let error {
-            Log.atError?.log("Failed to store info for account \(name), message = \(error.localizedDescription)")
-        }
-    }
-    
-    public func loadInfo() {
-        if FileManager.default.isReadableFile(atPath: infoUrl.path) {
-            info = ItemManager.init(from: infoUrl)
-            if info == nil {
-                Log.atError?.log("Failed to load info for account \(name), file = \(infoUrl.path)")
-            }
-            infoSetup()
-        } else {
-            infoSetup()
-        }
-    }
-
-    fileprivate func infoSetup() {
-        info = ItemManager.createDictionaryManager()
-        info.root["enabled"].bool = false
-        info.root["email"].string = ""
-        info.root["emailWasVerified"].bool = false
-        info.root["emailVerificationCode"].string = ""
-        info.root["creationDate"].int64 = Date().unixTime
-        storeInfo()
-    }
-    
-    
-    /// True if the account is usable and enabled, false otherwise.
-    ///
-    /// For the account to be considered usable, the email address must have been verified.
-    
-    public var isEnabled: Bool {
-        get {
-            if emailWasVerified {
-                return isEnabledPortal.bool ?? false
-            } else {
-                return false
-            }
-        }
-        set {
-            isEnabledPortal.bool = newValue
-            storeInfo()
-        }
-    }
-    
-    
-    /// The account email address
-    
-    public var email: String {
-        get {
-            return emailPortal.string ?? ""
-        }
-        set {
-            emailPortal.string = newValue
-            storeInfo()
-        }
-    }
-    
-    
-    /// True if the account email address was verified
-    
-    public var emailWasVerified: Bool {
-        get {
-            return emailWasVerifiedPortal.bool ?? false
-        }
-        set {
-            isEnabledPortal.bool = newValue
-            storeInfo()
-        }
-    }
-
-    
-    /// The email verification code
-    
-    public var emailVerificationCode: String {
-        get {
-            return emailVerificationCodePortal.string ?? ""
-        }
-        set {
-            emailVerificationCodePortal.string = newValue
-            storeInfo()
-        }
-    }
-}

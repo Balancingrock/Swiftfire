@@ -40,6 +40,7 @@
 //       - Replaced postInfo with request.info
 //       - Removed inout from the service signature
 //       - Removed inout from the function.environment signature
+//       - Changed account handling
 // 1.2.1 - Fixed bug that failed to update the root directory for the sfadmin
 //         Added more debug entries as well as a couple of notification logentries
 // 1.2.0 - Added admin account creation and removal
@@ -351,6 +352,13 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
             return .next
         }
         
+        
+        // No verification necessary for the initial admin account
+        
+        account.isEnabled = true
+        account.emailVerificationCode = ""
+        
+        
         Log.atNotice?.log("Created admin account for: '\(name)'", id: connection.logId)
         
         serverAdminDomain.webroot = root
@@ -390,7 +398,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
             
             // Get the account for the login data
             
-            guard let account = serverAdminDomain.accounts.getAccount(for: name, using: pwd) else {
+            guard let account = serverAdminDomain.accounts.getActiveAccount(for: name, using: pwd) else {
                 
                 // The login attempt failed, no account found.
                 
@@ -413,7 +421,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
             }
 
             
-            Log.atNotice?.log("Admin \(name) logged in, \(account.uuid)", id: connection.logId)
+            Log.atNotice?.log("Admin \(name) logged in", id: connection.logId)
                 
                 
             // Associate the account with the session. This allows access for subsequent admin pages.
@@ -518,7 +526,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
         
         // An admin must be logged in
         
-        guard let account = session[.accountKey] as? Account, serverAdminDomain.accounts.contains(account.uuid) else {
+        guard let account = session[.accountKey] as? Account, serverAdminDomain.accounts.contains(account.name) else {
             
             Log.atDebug?.log("No admin logged in")
             
@@ -1232,15 +1240,15 @@ fileprivate func executeCreateDomain(_ request: Request) {
 
     if let domain = domains.createDomain(for: name) {
         domain.serviceNames = defaultServices
-        if let account = domain.accounts.getAccount(for: adminId, using: adminPwd) {
-            account.isAdmin = true
+        if let account = domain.accounts.getActiveAccount(for: adminId, using: adminPwd) {
+            account.isDomainAdmin = true
         } else {
             guard let account = domain.accounts.newAccount(name: adminId, password: adminPwd) else {
                 domains.remove(name)
                 Log.atError?.log("Could not create admin account")
                 return
             }
-            account.isAdmin = true
+            account.isDomainAdmin = true
         }
         Log.atNotice?.log("Added new domain with \(domain))")
     } else {
@@ -1349,9 +1357,16 @@ fileprivate func executeCreateAdmin(_ request: Request) {
         return
     }
     
-    if serverAdminDomain.accounts.newAccount(name: id, password: password) == nil {
+    guard let account = serverAdminDomain.accounts.newAccount(name: id, password: password) else {
         Log.atCritical?.log("Failed to create admin account for: \(id)")
+        return
     }
+    
+    
+    // Accounts created by the server admin do not need verification
+    
+    account.isEnabled = true
+    account.emailVerificationCode = ""
     
     Log.atNotice?.log("Created new admin account with ID = \(id)")
 }
@@ -1373,7 +1388,7 @@ fileprivate func executeDeleteAccount(_ request: Request) {
         return
     }
 
-    guard serverAdminDomain.accounts.remove(name: name) else {
+    guard serverAdminDomain.accounts.disable(name: name) else {
         Log.atError?.log("No account for name \(name) found")
         return
     }
@@ -1407,7 +1422,7 @@ fileprivate func executeSetNewPassword(_ request: Request) {
 
 fileprivate func executeSetDomainAdminPassword(_ request: Request) {
     
-    guard let domainName = request.info["Domain"], !domainName.isEmpty else {
+    guard let domainName = request.info["DomainName"], !domainName.isEmpty else {
         Log.atError?.log("No domain given")
         return
     }
@@ -1430,7 +1445,7 @@ fileprivate func executeSetDomainAdminPassword(_ request: Request) {
         
         // If it is an admin account, then update the password
         
-        if account.isAdmin {
+        if account.isDomainAdmin {
             
             guard let newPassword = request.info["Password"], !newPassword.isEmpty else {
                 Log.atError?.log("No password given")
@@ -1447,7 +1462,7 @@ fileprivate func executeSetDomainAdminPassword(_ request: Request) {
             
             // Make this account an admin
             
-            account.isAdmin = true
+            account.isDomainAdmin = true
             
             Log.atNotice?.log("Added account \(account.name) in domain \(domain.name) to the domain admins")
 
@@ -1463,6 +1478,12 @@ fileprivate func executeSetDomainAdminPassword(_ request: Request) {
                 }
             }
         }
+        
+        
+        // Ensure the account is usable
+        
+        account.isEnabled = true
+        account.emailVerificationCode = ""
 
     } else {
         
@@ -1472,7 +1493,13 @@ fileprivate func executeSetDomainAdminPassword(_ request: Request) {
             
             if let account = domain.accounts.newAccount(name: adminName, password: newPassword) {
                 
-                account.isAdmin = true
+                account.isDomainAdmin = true
+
+
+                // Ensure the account is usable
+                
+                account.isEnabled = true
+                account.emailVerificationCode = ""
 
                 Log.atNotice?.log("Created domain admin account for \(account.name) in domain \(domain.name)")
 

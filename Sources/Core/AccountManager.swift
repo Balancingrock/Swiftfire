@@ -37,6 +37,7 @@
 // History
 //
 // 1.3.0 #9: Prevented same-names with different capitalizations
+//       - Changed account handling
 // 1.2.0 - Added ability to remove accounts
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
@@ -116,12 +117,7 @@ public class AccountManager {
     
     /// The lookup table that associates an account name with an account id
     
-    private var nameLut: Dictionary<String, Int> = [:]
-    
-    
-    /// The lookup table that associates an uuid with an account name
-    
-    private var uuidLut: Dictionary<String, String> = [:]
+    private var nameLut: Dictionary<String, URL> = [:]
     
     
     /// The id of the last account created
@@ -149,15 +145,16 @@ public class AccountManager {
     public init?(directory: URL?) {
         guard let directory = directory else { return nil }
         self.root = directory
-        guard regenerateLuts() else { return nil }
+        guard generateLut() else { return nil }
     }
-    
 }
 
 
 // MARK: - Storage
 
 extension AccountManager {
+    
+    
     
     
     /// Save the accounts
@@ -167,11 +164,36 @@ extension AccountManager {
     
     /// Regenerates the lookup table from the contents on disk
     
-    public func regenerateLuts() -> Bool {
+    public func generateLut() -> Bool {
         
-        var nameLut: Dictionary<String, Int> = [:]
-        var uuidLut: Dictionary<String, String> = [:]
+        var nameLut: Dictionary<String, URL> = [:]
         
+        let rootPathParts = root.pathComponents
+
+        
+        /// Retrieves the account ID from an account URL
+        
+        func getAccountId(from accountUrl: URL) -> Int {
+            
+            let accountPathParts = accountUrl.pathComponents
+            
+            var accountId: Int = 0
+            var factor = 1
+            
+            for i in rootPathParts.count ... accountPathParts.count - 2 {
+                if let part = Int(accountPathParts[i]) {
+                    accountId = accountId + part * factor
+                    factor = factor * 100
+                } else {
+                    Log.atError?.log("Illegal value for path part: \(accountPathParts[i])")
+                }
+            }
+            
+            Log.atDebug?.log("Returning accountId = \(accountId) for url: \(accountUrl.path)")
+            
+            return accountId
+        }
+
         
         func processDirectory(dir: URL) -> Bool {
             
@@ -189,12 +211,9 @@ extension AccountManager {
                         if url.lastPathComponent == "_Account" {
                             
                             if let account = Account(withContentOfDirectory: url) {
-                                let lname = account.name
-                                nameLut[lname] = account.id
-                                uuidLut[account.uuid] = lname
-                                if account.id > lastAccountId { lastAccountId = account.id }
+                                nameLut[account.name.lowercased()] = url
+                                lastAccountId = Swift.max(getAccountId(from: url), lastAccountId)
                             } else {
-                                Log.atCritical?.log("Failed to read account from \(url.path)")
                                 return false
                             }
                             
@@ -221,7 +240,6 @@ extension AccountManager {
         if processDirectory(dir: root) {
             
             self.nameLut = nameLut
-            self.uuidLut = uuidLut
             
             Log.atNotice?.log("Regenerated the account LUT")
             return true
@@ -240,7 +258,9 @@ extension AccountManager {
 extension AccountManager {
     
     
-    /// Returns the account for the given name without using a password. First it will try to read the account from the cache. If the cache does not contain the account it will try to find it in the lookup table and if found, load it from file.
+    /// Returns the account for the given name without using a password, and irrespective of the status of email verification and/or enabled status.
+    ///
+    /// - Note: The account may be disabled (or the email address unverified)
     ///
     /// - Parameters:
     ///   - for: The name of the account to find. May not be empty.
@@ -258,29 +278,21 @@ extension AccountManager {
         return AccountManager.queue.sync {
             
             
-            // Try to extract it from the cache
+            // Get it from the cach, or load it from memory if it exists but is not present in the cache.
             
-            var account = accountCache[lname]
+            let account = accountCache[lname] ?? Account(withContentOfDirectory: nameLut[lname])
             
-            if account == nil {
-                
-                // Check the lookup table
-                
-                if let id = nameLut[lname] {
-                    let dir = AccountManager.createDirUrl(in: root, for: id)
-                    if let a = Account(withContentOfDirectory: dir) {
-                        accountCache[lname] = a
-                        account = a
-                    }
-                }
-            }
             
+            // Just in case, add it to the cache
+            
+            if account != nil { accountCache[lname] = account }
+                        
             return account
         }
     }
 
     
-    /// Returns the account for the given name and password. First it will try to read the account from the cache. If the cache does not contain the account it will try to find it in the lookup table and if found, load it from file. The password hash must matches the account hash.
+    /// Returns the account for the given name and password if the account exists, the password matches, it is enabled and the email address has been verified.
     ///
     /// - Parameters:
     ///   - for: The name of the account to find. May not be empty.
@@ -288,7 +300,7 @@ extension AccountManager {
     ///
     /// - Returns: On success the account, otherwise nil.
     
-    public func getAccount(for name: String, using password: String) -> Account? {
+    public func getActiveAccount(for name: String, using password: String) -> Account? {
         
         
         // Only valid parameters
@@ -299,33 +311,20 @@ extension AccountManager {
 
         return AccountManager.queue.sync {
             
+                        
+            // Get it from the cach, or load it from memory if it exists but is not present in the cache.
             
-            // Try to extract it from the cache
-            
-            var account = accountCache[lname]
-            
-            if account == nil {
-                
-                // Check the lookup table
-                
-                if let id = nameLut[lname] {
-                    let dir = AccountManager.createDirUrl(in: root, for: id)
-                    if let a = Account(withContentOfDirectory: dir) {
-                        accountCache[lname] = a
-                        account = a
-                    }
-                }
-            }
+            guard let account = accountCache[lname] ?? Account(withContentOfDirectory: nameLut[lname]) else { return nil }
             
             
-            // Was an existing account found?
+            // Just in case, add it to the cache (again)
             
-            if account == nil { return nil }
-            
+            accountCache[lname] = account
+
             
             // Check the password
             
-            if account?.hasSameDigest(as: password) ?? false {
+            if account.hasSameDigest(as: password) && account.isActive {
                 return account
             } else {
                 return nil
@@ -362,13 +361,12 @@ extension AccountManager {
             
             lastAccountId += 1
             let dir = AccountManager.createDirUrl(in: root, for: lastAccountId)
-            if let account = Account(id: lastAccountId, name: name, password: password, accountDir: dir) {
+            if let account = Account(name: name, password: password, accountDir: dir) {
                 
                 
                 // Add it to the lookup's and the cache
                 
-                uuidLut[account.uuid] = lname
-                nameLut[lname] = lastAccountId
+                nameLut[lname] = dir
                 accountCache[lname] = account
                 
                 
@@ -379,19 +377,6 @@ extension AccountManager {
                 Log.atError?.log()
                 return nil
             }
-        }
-    }
-    
-    
-    /// Checks if an account exists for the given uuid string.
-    ///
-    /// - Parameter uuid: The uuid of the account to test for.
-    ///
-    /// - Returns: True if the uuid is contained in this list. False otherwise.
-    
-    public func contains(_ uuid: String) -> Bool {
-        return AccountManager.queue.sync {
-            return uuidLut[uuid] != nil
         }
     }
     
@@ -407,7 +392,7 @@ extension AccountManager {
     }
     
     
-    /// Removes an account.
+    /// Disables an account from the LUT
     ///
     /// - Note: Make sure the user removing the account has sufficient privelidges!
     ///
@@ -415,48 +400,29 @@ extension AccountManager {
     ///
     /// - Returns: True if the account was deleted, false if the account did not exist.
 
-    public func remove(name: String) -> Bool {
+    public func disable(name: String) -> Bool {
         
         return AccountManager.queue.sync {
             
             
             // Get the id for the account, and remove it from the name LUT
             
-            guard let id = nameLut.removeValue(forKey: name.lowercased()) else {
+            guard let url = nameLut.removeValue(forKey: name.lowercased()) else {
                 Log.atError?.log("No LUT entry found for account with name \(name)")
                 return false
             }
             
             
-            // Get the path to the account directory
+            // Disable the account
             
-            let dir = AccountManager.createDirUrl(in: root, for: id)
-            
-            
-            // Get the account itself
-            
-            guard let account = Account(withContentOfDirectory: dir) else {
-                Log.atError?.log("No account found for name: \(name), and path: \(dir.path)")
+            if let account = Account(withContentOfDirectory: url) {
+                account.isEnabled = false
+            } else {
+                Log.atError?.log("Account could not be instantiated for: \(name)")
                 return false
             }
-            
-            
-            // Remove the account from the cache
-            
-            _ = accountCache.remove(name.lowercased())
 
-            
-            // Remove the entry form the UUID LUT
-            
-            uuidLut.removeValue(forKey: account.uuid)
-            
-            do {
-                try FileManager.default.removeItem(at: dir)
-            } catch let error {
-                Log.atError?.log("Error trying to remove account directory for: \(name), at path: \(dir.path), with error message: \(error.localizedDescription)")
-            }
-
-            Log.atNotice?.log("Removed the account for: \(name)")
+            Log.atNotice?.log("Disabled the account for: \(name)")
             
             return true
         }

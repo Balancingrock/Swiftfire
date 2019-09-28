@@ -38,6 +38,7 @@
 //
 // 1.3.0 - Replaced postInfo with request.info
 //       - Removed inout from the service signature
+//       - Updated for account changes
 // 1.2.1 - Removed dependency on Html
 // 1.2.0 - Initial version
 //
@@ -682,7 +683,7 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
             
         // Get the account for the login data
             
-        guard let account = domain.accounts.getAccount(for: name, using: pwd), account.isAdmin else {
+        guard let account = domain.accounts.getActiveAccount(for: name, using: pwd), account.isDomainAdmin else {
                 
             // The login attempt failed, no account found.
                 
@@ -722,7 +723,7 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
         return .next
     }
 
-    guard account.isAdmin else {
+    guard account.isDomainAdmin else {
         Log.atDebug?.log("Not an admin for domain: \(domain.name) using ID: \(account.name)", id: connection.logId)
         domainAdminLoginPage()
         return .next
@@ -779,7 +780,7 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
     
     // Return the domain admin page again
     
-    if let account = session[.accountKey] as? Account, account.isAdmin {
+    if let account = session[.accountKey] as? Account, account.isDomainAdmin {
         domainAdminPage(account)
     } else {
         domainAdminLoginPage()
@@ -974,7 +975,7 @@ fileprivate func executeRemoveAccount(_ request: Request, _ domain: Domain) {
         return
     }
 
-    if domain.accounts.remove(name: accountId) {
+    if domain.accounts.disable(name: accountId) {
         Log.atNotice?.log("Account \(accountId) removed from domain \(domain.name)")
     } else {
         Log.atError?.log("Account not found for \(accountId) in domain \(domain.name)")
@@ -998,8 +999,8 @@ fileprivate func executeAddAdminChangePassword(_ request: Request, _ domain: Dom
         
         // Grant admin rights to this account
         
-        if !account.isAdmin {
-            account.isAdmin = true
+        if !account.isDomainAdmin {
+            account.isDomainAdmin = true
             Log.atNotice?.log("Enabled admin rights for account \(adminId)")
         }
         
@@ -1012,7 +1013,9 @@ fileprivate func executeAddAdminChangePassword(_ request: Request, _ domain: Dom
             Log.atError?.log("Failed to update the password for domain admin \(adminId)")
         }
         
-        
+        account.isEnabled = true
+        account.emailVerificationCode = ""
+
     } else {
         
         
@@ -1020,7 +1023,10 @@ fileprivate func executeAddAdminChangePassword(_ request: Request, _ domain: Dom
         
         if let account = domain.accounts.newAccount(name: adminId, password: adminPwd) {
 
-            account.isAdmin = true
+            account.isDomainAdmin = true
+            
+            account.isEnabled = true
+            account.emailVerificationCode = ""
             
             Log.atNotice?.log("Added domain admin account with id: \(adminId)")
 

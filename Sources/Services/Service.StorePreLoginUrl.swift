@@ -104,7 +104,11 @@ func service_storePreLoginUrl(_ request: Request, _ connection: SFConnection, _ 
     
     // Add the relative path in the pre-login url key
     
+    Log.atDebug?.log("Pre login URL key old: \(session.info[.preLoginUrlKey] as? String ?? "not-a-string")")
+
     session.info[.preLoginUrlKey] = url
+    
+    Log.atDebug?.log("Pre login URL key new: \(session.info[.preLoginUrlKey] as? String ?? "not-a-string")")
     
     return .next
 }

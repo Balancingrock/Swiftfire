@@ -11,7 +11,7 @@ title: Login
 			<p style="margin-bottom:0px">Password:</p>
 			<input type="password" name="LoginPassword" value=""><br><br>
 			<input style="width:100%" type="submit" value="Login">
-			<p><a href="/template/register.sf.html">Register</a> - <a href="/template/register.sf.html">Forgot password?</a></p>
+			<p><a href="/templates/register.sf.html">Register</a> - <a href="/templates/register.sf.html">Forgot password?</a></p>
 		</div>
 	</div>
 </form>

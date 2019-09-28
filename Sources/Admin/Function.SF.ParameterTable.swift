@@ -37,6 +37,7 @@
 // History
 //
 // 1.3.0 - Removed inout from the function.environment signature
+//       - Changed account handling
 // 1.2.1 - Removed dependency on Html
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
@@ -105,7 +106,7 @@ func function_sf_parameterTable(_ args: Functions.Arguments, _ info: inout Funct
         return "Account error".data(using: String.Encoding.utf8)
     }
     
-    guard serverAdminDomain.accounts.contains(account.uuid) else {
+    guard serverAdminDomain.accounts.contains(account.name) else {
         return "Illegal access".data(using: String.Encoding.utf8)
     }
 

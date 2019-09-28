@@ -40,6 +40,7 @@
 //       - Removed old comments
 //       - Updated html code to use distinct names for the values: ParameterName and Value
 //       - Removed inout from the function.environment signature
+//       - Changed account handling
 // 1.2.0 - Fixed index problem when creating dictionary
 // 1.1.0 #5: Set PHP message to disabled if disabled
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
@@ -116,7 +117,7 @@ func function_sf_postingButtonedInput(_ args: Functions.Arguments, _ info: inout
         return "Account error".data(using: String.Encoding.utf8)
     }
     
-    guard serverAdminDomain.accounts.contains(account.uuid) else {
+    guard serverAdminDomain.accounts.contains(account.name) else {
         return "Illegal access".data(using: String.Encoding.utf8)
     }
 

@@ -243,9 +243,9 @@ fileprivate func executeLogin(_ request: Request, _ domain: Domain, _ info: Serv
     }
         
     
-    // Get the account (if it exists)
+    // Get the account (if it exists, is active and the password is correct)
     
-    guard let account = domain.accounts.getAccount(for: loginName, using: loginPassword) else {
+    guard let account = domain.accounts.getActiveAccount(for: loginName, using: loginPassword) else {
         request.info["PreviousAttemptMessage"] = "Unknown name - password combination"
         return LOGIN_TEMPLATE
     }
@@ -310,7 +310,7 @@ fileprivate func executeRegister(_ request: Request, _ connection: SFConnection,
         return REGISTER_TEMPLATE
     }
 
-    guard !domain.accounts.available(name: accountName) else {
+    guard domain.accounts.available(name: accountName) else {
         Log.atDebug?.log("An account with this name already exists")
         request.info[PREVIOUS_ATTEMPT_MESSAGE] = "Account name not available"
         return REGISTER_TEMPLATE
@@ -374,13 +374,13 @@ fileprivate func executeRegister(_ request: Request, _ connection: SFConnection,
         return REGISTER_TEMPLATE
     }
     
-    account.email = emailAddress
+    account.emailAddress = emailAddress
     account.emailVerificationCode = UUID().uuidString
     
     
     // Send email verification mail
     
-    let verificationLink = "http://\(domain.name):\(serverParameters.httpServicePortNumber)/command/\(EMAIL_VERIFICATION_COMMAND)?\(EMAIL_VERIFICATION_CODE_KEY)=\(account.emailVerificationCode)"
+    let verificationLink = "http://\(domain.name):\(serverParameters.httpServicePortNumber.stringValue)/command/\(EMAIL_VERIFICATION_COMMAND)?\(EMAIL_VERIFICATION_CODE_KEY)=\(account.emailVerificationCode)"
 
     
     var message: String = ""
@@ -389,21 +389,22 @@ fileprivate func executeRegister(_ request: Request, _ connection: SFConnection,
 
         let env = Functions.Environment(request: request, connection: connection, domain: domain, response: response, serviceInfo: info)
         request.info["Link"] = verificationLink
-        message = String(data: messageTemplate.getContent(with: env), encoding: .utf8) ?? "Click the following link (or copy it into the url field of a browser) to confirm your account at \(domain.name).\r\n Link = \(verificationLink)"
+        message = String(data: messageTemplate.getContent(with: env), encoding: .utf8) ?? "Click the following link (or copy it into the url field of a browser) to confirm your account at \(domain.name).\r\n Link = \(verificationLink)\r\n\r\n"
 
     } else {
         
-        message = "Click the following link (or copy it into the url field of a browser) to confirm your account at \(domain.name).\r\n Link = \(verificationLink)"
+        message = "Click the following link (or copy it into the url field of a browser) to confirm your account at \(domain.name).\r\n\r\nLink = \(verificationLink)"
     }
     
     let fromAddress = request.info["FromAddress"] ?? "accountVerification@\(domain.name)"
 
-    let email: String = """
-        To: \(emailAddress)\n
-        From: \(fromAddress)\n
-        Content-Type: text/html;\n
-        Subject: Confirm Account Creation at \(domain.name)\n\n
-        \(message)
+    let email: String =
+    """
+    To: \(emailAddress)
+    From: \(fromAddress)
+    Content-Type: text/html;
+    Subject: Confirm Account Creation at \(domain.name)\n
+    \(message)
     """
     
     sendEmail(email, domainName: domain.name)
@@ -435,7 +436,7 @@ fileprivate func executeEmailVerification(_ request: Request, _ response: Respon
         if account.emailVerificationCode == verificationCode {
             
             // Mark the account as verified
-            account.emailWasVerified = true
+            account.emailVerificationCode = ""
             
             // Keep track in the log
             Log.atNotice?.log("Account with name \(accountName) has been verified")

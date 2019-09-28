@@ -37,6 +37,7 @@
 // History
 //
 // 1.3.0 - Removed inout from the service signature
+//       - Changed account handling
 // 1.2.0 - Added domain admin to access setup page even when the domain is disabled
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
@@ -350,7 +351,7 @@ extension SFConnection {
             url: serviceInfo[.relativeResourcePathKey] as? String ?? "Unknown",
             address: self.remoteAddress,
             session: session?.id,
-            account: (session?[.accountKey] as? Account)?.uuid,
+            account: (session?[.accountKey] as? Account)?.name,
             responseCode: response.code ?? Response.Code._500_InternalServerError,
             request: request.asData(),
             responseData: response.data

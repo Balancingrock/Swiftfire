@@ -8,7 +8,7 @@ title: Domain - .show($requestInfo.DomainName)
 <div style="display:flex">
 	<div style="background-color:#f0f0f0; border: 2px solid lightgray; margin-left:auto; margin-right:auto;">
 		<form action="/serveradmin/sfcommand/SetDomainAdminPassword" method="post">
-			<input type="hidden" name="Domain" value=".show($requestInfo.DomainName)">
+			<input type="hidden" name="DomainName" value=".show($requestInfo.DomainName)">
 			<table>
 				<tr>
 					<td>Domain admin:</td>

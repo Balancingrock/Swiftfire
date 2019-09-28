@@ -38,6 +38,7 @@
 //
 // 1.3.0 - Replaced postInfo with request.info
 //       - Removed inout from the function.environment signature
+//       - Changed account handling
 // 1.2.1 - Removed dependency on Html
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
@@ -89,7 +90,6 @@
 
 import Foundation
 
-//import Html
 import Core
 
 
@@ -110,7 +110,7 @@ func function_sf_domainBlacklistTable(_ args: Functions.Arguments, _ info: inout
         return "Account error".data(using: String.Encoding.utf8)
     }
     
-    guard serverAdminDomain.accounts.contains(account.uuid) else {
+    guard serverAdminDomain.accounts.contains(account.name) else {
         return "Illegal access".data(using: String.Encoding.utf8)
     }
     

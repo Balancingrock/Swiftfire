@@ -91,12 +91,7 @@ public func function_loginLogout(_ args: Functions.Arguments, _ info: inout Func
     var html: String
     
     
-    // Don't display the login/logout line for the login page or register page
-    //
-    //if currentUrl.contains("template/login.sf.html") || currentUrl.contains("template/register.sf.html") {
-    //    return Data()
-    //}
-    
+    // Don't display the login/logout line for the login page or register page    
     
     if let account = session[.accountKey] as? Account {
                 
@@ -106,7 +101,7 @@ public func function_loginLogout(_ args: Functions.Arguments, _ info: inout Func
                 <p> - </p>
                 <div class="sf-loginlogout-secondoption">
                     <form method="post" action="/command/logout">
-                        <button type="submit" name="\(ORIGINATING_PAGE_URL)" value=".show($serviceinfo.relativeresourcepath)" style="border:none; background:none; cursor:pointer; margin:0 0 0 0; padding: 0 0 0 0;">\(logoutMessage)</button>
+                    <button type="submit" name="\(ORIGINATING_PAGE_URL)" value="\(environment.serviceInfo[.relativeResourcePathKey] as? String ?? "/index.sf.html")" style="border:none; background:none; cursor:pointer; margin:0 0 0 0; padding: 0 0 0 0;">\(logoutMessage)</button>
                     </form>
                 </div>
             </div>

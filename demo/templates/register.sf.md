@@ -1,7 +1,9 @@
 ---
 layout: page
-title: Login
+title: Register
 ---
+To register, fill out the fields below and click the 'Register' button. Upon verification of the fields values, an email will be sent to the given address containing a verification link. Visit that link to complete the registration process.
+
 <form action="/command/register" method="post">
 	<div style="display:flex; justify-content:center; margin-bottom:50px;">
 		<div style="margin-left:auto; margin-right:auto;">
@@ -18,8 +20,6 @@ title: Login
 			<br>
 			<p style="margin-bottom:0px">Email:</p>
 			<input type="text" name="RegisterEmail" value=".show($requestinfo!.RegisterEmail)">
-			<br>
-			<p>An email will be sent to the given address containing a confirmation link. Visit that link to complete the regstrationprocess.</p>
 			<br>
 			<br>
 			<input style="width:100%" type="submit" value="Register">
