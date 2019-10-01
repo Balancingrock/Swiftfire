@@ -3,7 +3,7 @@
 //  File:       SessionInfo.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.3.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,7 +36,8 @@
 //
 // History
 //
-// 1.0.0 Raised to v1.0.0, Removed old change log,
+// 1.3.0 - Changed from struct to class (to make pass-by-reference default)
+// 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 
@@ -48,14 +49,14 @@ import Custom
 
 /// The session information store
 
-public struct SessionInfo {
+public class SessionInfo {
     
     public subscript(key: SessionInfoKey) -> CustomStringConvertible? {
         set { dict[key] = newValue }
         get { return dict[key] }
     }
     
-    public mutating func remove(key: SessionInfoKey) {
+    public func remove(key: SessionInfoKey) {
         dict.removeValue(forKey: key)
     }
     

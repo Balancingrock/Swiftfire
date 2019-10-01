@@ -40,26 +40,68 @@
 //
 // =====================================================================================================================
 
+// Note - Setting up postfix on macOS 12.14
+//
+// In /etc/postfix edit the main.cf file to contain the following (at the end, check for possible conflicts):
+//
+// tls_random_source = dev:/dev/urandom
+// smtp_sasl_mechanism_filter = plain
+// smtp_sasl_auth_enable = yes
+// smtp_sasl_password_maps=hash:/etc/postfix/sasl_passwd
+// smtp_sasl_security_options =
+// smtp_use_tls=yes
+// smtp_tls_security_level=encrypt
+// relayhost = smtp.<your-email-provider>.com:587
+//
+// Also in /etc/postfix create the file referenced above: sassl_passwd with the following content:
+//
+// smtp.<your-email-provider>.com:587 <your-name>:<your-password>
+//
+// Then create a map from the file with: sudo postmap sasl_passwd
+//
+// Start postscript with: sudo postscript start
+// or reload if already running with: sudo postfix reload
+//
+// Test by creating a file with an email header and transfer the file with: sendmail -vt < mail.txt
+//
+// Check with unix mail if the email (file) was transferred correctly. (type 'mail' and once mail opened follow it by the number of the mail you want to see)
+
+
 import Foundation
 
 
-fileprivate let mailQueue = DispatchQueue.global(qos: DispatchQoS.QoSClass.background)
+/// This queue/thread will be used to transfer the mails.
 
+fileprivate let mailQueue = DispatchQueue.global(qos: .background)
+
+
+/// Sends an email using the postfix unix utility.
+///
+/// - Note: Ths function only works if postfix is running (and set up correctly)
+///
+/// - Parameters:
+///   - mail: The email to be transmitted. It should -as a minimum- contain the To, From and Subject fields.
+///   - domainName: The domain this email is sent from, used for logging purposes only.
 
 public func sendEmail(_ mail: String, domainName: String) {
     
+    
+    // Do this on a seperate queue in the background so this operation is non-blocking.
+    
     mailQueue.async { [mail, domainName] in
         
-        guard let utf8mail = mail.appending("\r\n.").data(using: .utf8), utf8mail.count > 0 else {
+        // Ensure the mail is ok
+        
+        guard let utf8mail = mail.data(using: .utf8), utf8mail.count > 0 else {
             Log.atDebug?.log("No mail present")
             return
         }
         
-        let options: Array<String> = ["-t"]
+        let options: Array<String> = ["-t"] // This option tells sendmail to read the from/to/subject from the email string itself.
         
-        let errpipe = Pipe()
-        let outpipe = Pipe()
-        let inpipe = Pipe()
+        let errpipe = Pipe() // should remain empty
+        let outpipe = Pipe() // should remain empty (but if you use other options you may get some text)
+        let inpipe = Pipe()  // will be used to transfer the mail to sendmail
         
         
         // Setup the process that will send the mail
@@ -98,9 +140,18 @@ public func sendEmail(_ mail: String, domainName: String) {
             }
             
             
-            // Set a timeout.
+            // Data transfer complete
+            
+            inpipe.fileHandleForWriting.closeFile()
+            
+            
+            // Set a timeout. 10 seconds should be more than enough.
             
             let timeoutAfter = DispatchTime(uptimeNanoseconds: DispatchTime.now().uptimeNanoseconds + UInt64(10000) * 1000000)
+            
+            
+            // Setup the process timeout on another queue
+            
             DispatchQueue.global().asyncAfter(deadline: timeoutAfter) {
                 [weak process] in
                 Log.atDebug?.log("Sendmail Timeout expired, process \(process != nil ? "is still running" : "has exited already")")
@@ -157,6 +208,7 @@ public func sendEmail(_ mail: String, domainName: String) {
                 - Sendmail Output      : \(d.count) bytes
                 Below the output of sendmail is given in the following block format:
                 (----- Email input -----)
+                ...
                 (----- Standard Error -----)
                 ...
                 (----- Standard Out -----)

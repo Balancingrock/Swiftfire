@@ -38,6 +38,7 @@
 //
 // 1.3.0 - Moved getInfo and postInfo into requestinfo
 //       - Added a requestinfo! to return an empty string if the requested parameter does not exist
+//       - Fixed a bug that caused the account name not to be returned
 // 1.2.0 - Initial version
 //
 // =====================================================================================================================
@@ -159,12 +160,12 @@ public func evaluateKeyArgument(_ arg: String, using functionsInfo: Functions.In
         
     case "$account":
         
-        guard let sessionInfo = (environment.serviceInfo[.sessionKey] as? SessionInfo) else {
-            Log.atError?.log("No SessionInfo found")
+        guard let session = (environment.serviceInfo[.sessionKey] as? Session) else {
+            Log.atError?.log("No Session found")
             return "***error***"
         }
 
-        guard let account = sessionInfo[.accountKey] as? Account else {
+        guard let account = session.info[.accountKey] as? Account else {
             return ""
         }
         

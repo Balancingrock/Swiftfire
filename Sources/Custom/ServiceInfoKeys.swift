@@ -91,7 +91,7 @@ public enum ServiceInfoKey: String {
     ///
     /// __Type__: Session
     ///
-    /// __Set by__: Service.GetSession
+    /// __Set by__: Service.GetSession or Service.command.executeEmailVerification
     ///
     /// __Used by__: Multiple, general purpose.
     

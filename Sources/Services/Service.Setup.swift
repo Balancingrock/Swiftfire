@@ -452,9 +452,9 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
                                 </form>
                             </td>
                             <td>
-                                <form action="\(domainCommand("AddAdminChangePassword"))" method="post">
-                                    <input type="hidden" name="AdminID" value="\(accountName)">
-                                    <input type="text" name="AdminPassword" value="">
+                                <form action="\(domainCommand("ChangePassword"))" method="post">
+                                    <input type="hidden" name="ChangePasswordName" value="\(accountName)">
+                                    <input type="text" name="ChangePasswordPassword" value="">
                                     <input type="submit" value="Set New Password">
                                 </form>
                             </td>
@@ -470,7 +470,7 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
                             <td>\(accountName)</td>
                             <td></td>
                             <td>
-                                <form action="\(domainCommand("AddAdminChangePassword"))" method="post">
+                                <form action="\(domainCommand("ChangePassword"))" method="post">
                                     <input type="hidden" name="AdminID" value="\(accountName)">
                                     <input type="text" name="AdminPassword" value="">
                                     <input type="submit" value="Set New Password">
@@ -569,7 +569,7 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
                             \(domainBlacklistTable())
                             <h2>Domain Services</h2>
                             \(domainServicesTable())
-                            <h2>Domain admin list</h2>
+                            <h2>Domain Accounts</h2>
                             \(domainAdminList())
                             <h2>Add Admin or change Password</h2>
                             \(addDomainAdmin())
@@ -759,6 +759,7 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
                         
                 case "RemoveAccount": executeRemoveAccount(request, domain)
                 case "AddAdminChangePassword": executeAddAdminChangePassword(request, domain)
+                case "ChangePassword": executeChangePassword(request, domain)
                 case "Logoff":
                     session.info.remove(key: .accountKey)
                     Log.atNotice?.log("Admin logged out")
@@ -1034,5 +1035,37 @@ fileprivate func executeAddAdminChangePassword(_ request: Request, _ domain: Dom
             
             Log.atError?.log("Failed to add domain admin for id: \(adminId)")
         }
+    }
+}
+
+fileprivate func executeChangePassword(_ request: Request, _ domain: Domain) {
+    
+    guard let name = request.info["ChangePasswordName"] else {
+        Log.atError?.log("Missing name")
+        return
+    }
+
+    guard let pwd = request.info["ChangePasswordPassword"] else {
+        Log.atError?.log("Missing password")
+        return
+    }
+
+    if let account = domain.accounts.getAccountWithoutPassword(for: name) {
+
+        
+        // Change the password
+        
+        if account.updatePassword(pwd) {
+            Log.atNotice?.log("Updated the password for domain admin \(name)")
+        } else {
+            Log.atError?.log("Failed to update the password for domain admin \(name)")
+        }
+        
+        account.isEnabled = true
+        account.emailVerificationCode = ""
+
+    } else {
+     
+        Log.atError?.log("Account not found for \(name)")
     }
 }

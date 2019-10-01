@@ -292,6 +292,30 @@ public final class Domain {
     public var accountNamesWaitingForVerification: ItemManager!
     
     
+    /// A list of account names waiting for a new password
+    
+    public var accountsWaitingForNewPassword: Array<Account> = [] {
+        
+        didSet {
+            
+            // Take the opportunity to remove expired entries
+            let now = Date().unixTime
+            while let account = accountsWaitingForNewPassword.first {
+                if account.newPasswordRequestTimestamp + 24 * 60 * 60 < now {
+                    accountsWaitingForNewPassword.removeFirst()
+                } else {
+                    break
+                }
+            }
+            
+            // Prevent out-of-memory attacks
+            while accountsWaitingForNewPassword.count > 100 {
+                _ = accountsWaitingForNewPassword.removeFirst()
+            }
+        }
+    }
+    
+    
     // Counter for hits on pages (note that not all pages will be counted, only for those pages for which a hitcounter is requested)
     // This set of counters is maintained by the function_NofPageHits
     
@@ -443,6 +467,9 @@ public final class Domain {
         
         if let url = Urls.domainAccountNamesWaitingForVerificationFile(for: name) {
             accountNamesWaitingForVerification = ItemManager(from: url)
+            if accountNamesWaitingForVerification == nil {
+                accountNamesWaitingForVerification = ItemManager.createArrayManager(values: Array<String>())
+            }
         } else {
             Log.atCritical?.log("Failed to retrieve name for accountNamesWaitingForVerification")
             accountNamesWaitingForVerification = ItemManager.createArrayManager(values: Array<String>())

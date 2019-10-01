@@ -83,15 +83,47 @@ fileprivate let REGISTER_COMMAND = "register"
 
 fileprivate let REGISTER_TEMPLATE = "templates/register.sf.html"
 fileprivate let REGISTER_CONTINUE_TEMPLATE = "templates/registerContinue.sf.html"
-fileprivate let REGISTER_VERIFICATION_EMAIL_TEXT_TEMPLATE = "templates/verificationEmailText.sf.txt"
+fileprivate let REGISTER_VERIFICATION_EMAIL_TEXT_TEMPLATE = "templates/emailVerificationText.sf.html"
 
 fileprivate let REGISTER_NAME_KEY = "RegisterName" // Necessary, unique, non-empty
 fileprivate let REGISTER_PASSWORD1_KEY = "RegisterPassword1" // Necessary, non-empty
 fileprivate let REGISTER_PASSWORD2_KEY = "RegisterPassword2" // Necessary, non-empty
-fileprivate let REGISTER_EMAIL_KEY = "RegisterEmail" // Necessary, email-pattern (*@*.*)
+fileprivate let REGISTER_EMAIL_KEY = "RegisterEmail" // Necessary, email-pattern, verified by a regex that covers 99%
 fileprivate let REGISTER_FROM_KEY_OPTIONAL = "FromAddress" // Optional, unchecked
 fileprivate let REGISTER_SUBJECT_KEY_OPTIONAL = "Subject" // Optional, unchecked
 
+
+// Creates an email with a link to set a new password
+
+fileprivate let FORGOT_PASSWORD_COMMAND = "forgotPassword"
+
+fileprivate let FORGOT_PASSWORD_TEMPLATE = "templates/forgotPassword.sf.html"
+fileprivate let FORGOT_PASSWORD_CONTINUE_TEMPLATE = "templates/forgotPasswordContinue.sf.html"
+fileprivate let FORGOT_PASSWORD_EMAIL_TEXT_TEMPLATE = "templates/requestNewPasswordText.sf.html"
+
+fileprivate let FORGOT_PASSWORD_NAME_KEY = "ForgotPasswordName"
+
+
+// The request new password command (2-stage, followed by set new password)
+// This command is triggered by the forgot password mail that was send
+
+fileprivate let REQUEST_NEW_PASSWORD_COMMAND = "requestNewPasswordCommand"
+
+fileprivate let REQUEST_NEW_PASSWORD_FAILED_TEMPLATE = "templates/requestNewPasswordFailed.sf.html"
+
+fileprivate let REQUEST_NEW_PASSWORD_CODE_KEY = "RequestNewPasswordCode"
+
+
+// The set new password command (the follow-up of the request new password Command)
+
+fileprivate let SET_NEW_PASSWORD_COMMAND = "setNewPasswordCommand"
+
+fileprivate let SET_NEW_PASSWORD_TEMPLATE = "templates/setNewPassword.sf.html"
+fileprivate let SET_NEW_PASSWORD_SUCCESS_TEMPLATE = "templates/setNewPasswordSuccess.sf.html"
+
+fileprivate let SET_NEW_PASSWORD_ACCOUNT_NAME_KEY = "Name"
+fileprivate let SET_NEW_PASSWORD_PASSWORD1_KEY = "SetNewPassword1"
+fileprivate let SET_NEW_PASSWORD_PASSWORD2_KEY = "SetNewPassword2"
 
 
 /// Executes commands given in the URL. Only active if the URL started with the command keyword followed by a command identifier.
@@ -143,25 +175,13 @@ func service_commands(_ request: Request, _ connection: SFConnection, _ domain: 
     
     switch command {
         
-    case LOGIN_COMMAND:
-        
-        relativePath = executeLogin(request, domain, info)
-        
-        
-    case LOGOUT_COMMAND:
-            
-        relativePath = executeLogout(request, info)
-
-        
-    case EMAIL_VERIFICATION_COMMAND:
-        
-        relativePath = executeEmailVerification(request, response, domain, info)
-        
-        
-    case REGISTER_COMMAND:
-        
-        relativePath = executeRegister(request, connection, domain, response, info)
-        
+    case LOGIN_COMMAND: relativePath = executeLogin(request, domain, info)
+    case LOGOUT_COMMAND: relativePath = executeLogout(request, info)
+    case EMAIL_VERIFICATION_COMMAND: relativePath = executeEmailVerification(request, response, domain, info)
+    case REGISTER_COMMAND: relativePath = executeRegister(request, connection, domain, response, info)
+    case FORGOT_PASSWORD_COMMAND: relativePath = executeForgotPassword(request, connection, domain, response, info)
+    case REQUEST_NEW_PASSWORD_COMMAND: relativePath = executeRequestNewPassword(request, domain)
+    case SET_NEW_PASSWORD_COMMAND: relativePath = executeSetNewPassword(request, domain)
         
     default:
         
@@ -191,7 +211,7 @@ func service_commands(_ request: Request, _ connection: SFConnection, _ domain: 
 }
 
 
-// MARK: Command execution
+// MARK: Commands for execution
 
 
 fileprivate func executeLogin(_ request: Request, _ domain: Domain, _ info: Services.Info) -> String? {
@@ -236,12 +256,7 @@ fileprivate func executeLogin(_ request: Request, _ domain: Domain, _ info: Serv
         Log.atError?.log("Missing '\(LOGIN_PASSWORD_KEY)' in request.info")
         return LOGIN_TEMPLATE
     }
-    
-    guard loginPassword.count > 4 else {
-        request.info["PreviousAttemptMessage"] = "The password should contain more than 4 characters"
-        return LOGIN_TEMPLATE
-    }
-        
+            
     
     // Get the account (if it exists, is active and the password is correct)
     
@@ -252,6 +267,8 @@ fileprivate func executeLogin(_ request: Request, _ domain: Domain, _ info: Serv
     
     
     // Success
+    
+    Log.atDebug?.log("Account name \(account.name) logged in")
     
     session.info[.accountKey] = account
     
@@ -324,9 +341,9 @@ fileprivate func executeRegister(_ request: Request, _ connection: SFConnection,
         return REGISTER_TEMPLATE
     }
     
-    guard !password1.isEmpty else {
-        Log.atDebug?.log("Password is empty")
-        request.info[PREVIOUS_ATTEMPT_MESSAGE] = "First password cannot be empty"
+    guard password1.count > 4 else {
+        Log.atDebug?.log("Password should contain more than 4 characters")
+        request.info[PREVIOUS_ATTEMPT_MESSAGE] = "Password should contain more than 4 characters"
         return REGISTER_TEMPLATE
     }
 
@@ -367,7 +384,7 @@ fileprivate func executeRegister(_ request: Request, _ connection: SFConnection,
     }
     
     
-    // Create new account
+    // Create new account with a verification code
     
     guard let account = domain.accounts.newAccount(name: accountName, password: password1) else {
         Log.atError?.log("Could not create a new account with name '\(accountName)' and password '\(password1)'")
@@ -378,6 +395,11 @@ fileprivate func executeRegister(_ request: Request, _ connection: SFConnection,
     account.emailVerificationCode = UUID().uuidString
     
     
+    // Add the new account to the accounts waiting for verification
+    
+    domain.accountNamesWaitingForVerification?.root?.appendElement(account.name)
+    
+    
     // Send email verification mail
     
     let verificationLink = "http://\(domain.name):\(serverParameters.httpServicePortNumber.stringValue)/command/\(EMAIL_VERIFICATION_COMMAND)?\(EMAIL_VERIFICATION_CODE_KEY)=\(account.emailVerificationCode)"
@@ -385,14 +407,16 @@ fileprivate func executeRegister(_ request: Request, _ connection: SFConnection,
     
     var message: String = ""
     
-    if case .success(let messageTemplate) = SFDocument.factory(path: (domain.webroot + "/" + REGISTER_VERIFICATION_EMAIL_TEXT_TEMPLATE)) {
+    switch SFDocument.factory(path: (domain.webroot + "/" + REGISTER_VERIFICATION_EMAIL_TEXT_TEMPLATE)) {
+    case .success(let messageTemplate):
 
         let env = Functions.Environment(request: request, connection: connection, domain: domain, response: response, serviceInfo: info)
         request.info["Link"] = verificationLink
         message = String(data: messageTemplate.getContent(with: env), encoding: .utf8) ?? "Click the following link (or copy it into the url field of a browser) to confirm your account at \(domain.name).\r\n Link = \(verificationLink)\r\n\r\n"
 
-    } else {
-        
+    case .error(let err):
+    
+        Log.atError?.log("Failed to read template with error: \(err)")
         message = "Click the following link (or copy it into the url field of a browser) to confirm your account at \(domain.name).\r\n\r\nLink = \(verificationLink)"
     }
     
@@ -421,7 +445,7 @@ fileprivate func executeEmailVerification(_ request: Request, _ response: Respon
     }
     
     guard let waitingAccounts = domain.accountNamesWaitingForVerification?.root?.arrayOfString else {
-        Log.atNotice?.log("Warning, an attempt was made to verify an account while there are no accounts waiting for verification")
+        Log.atNotice?.log("An attempt was made to verify an account while there are no accounts waiting for verification")
         return EMAIL_VERIFICATION_FAILED_TEMPLATE
     }
     
@@ -444,11 +468,8 @@ fileprivate func executeEmailVerification(_ request: Request, _ response: Respon
             // Remove the account from the waiting list
             domain.accountNamesWaitingForVerification!.root!.removeElement(atIndex: index)
             
-            // Assign the account to the session
-            (info[.sessionKey] as? Session)?.info[.accountKey] = account
-            
-            Log.atDebug?.log("Account with name \(accountName) verified and logged-in")
-            
+            // Note: Do not automatically login. That could cause somebody else but the user to be logged in as that user.
+                        
             // Successful account verification
             success = true
             
@@ -464,4 +485,157 @@ fileprivate func executeEmailVerification(_ request: Request, _ response: Respon
     }
 }
 
+fileprivate func executeForgotPassword(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ response: Response, _ info: Services.Info) -> String {
 
+    // Note: We always return the 'success' template as we do not want to give out any clues to a possible hack attempt
+    
+    // The request info should contain a name key
+
+    guard let accountName = request.info[FORGOT_PASSWORD_NAME_KEY] else {
+        Log.atError?.log("No '\(FORGOT_PASSWORD_NAME_KEY)' found")
+        return FORGOT_PASSWORD_CONTINUE_TEMPLATE
+    }
+
+    guard !accountName.isEmpty else {
+        Log.atDebug?.log("Account name is empty")
+        return FORGOT_PASSWORD_CONTINUE_TEMPLATE
+    }
+
+    guard let account = domain.accounts.getAccountWithoutPassword(for: accountName) else {
+        Log.atDebug?.log("An account with this name already exists")
+        return FORGOT_PASSWORD_CONTINUE_TEMPLATE
+    }
+
+    
+    account.newPasswordVerificationCode = UUID().uuidString
+    account.newPasswordRequestTimestamp = Date().unixTime
+    
+    
+    // Add the new account to the accounts waiting for verification
+    
+    domain.accountsWaitingForNewPassword.append(account)
+    
+    
+    // Send email verification mail
+    
+    let verificationLink = "http://\(domain.name):\(serverParameters.httpServicePortNumber.stringValue)/command/\(REQUEST_NEW_PASSWORD_COMMAND)?\(REQUEST_NEW_PASSWORD_CODE_KEY)=\(account.newPasswordVerificationCode)"
+
+    
+    var message: String = ""
+    
+    switch SFDocument.factory(path: (domain.webroot + "/" + FORGOT_PASSWORD_EMAIL_TEXT_TEMPLATE)) {
+    case .success(let messageTemplate):
+
+        let env = Functions.Environment(request: request, connection: connection, domain: domain, response: response, serviceInfo: info)
+        request.info["Link"] = verificationLink
+        message = String(data: messageTemplate.getContent(with: env), encoding: .utf8) ?? "Click the following link (or copy it into the url field of a browser) to create a new password.\r\n Link = \(verificationLink)\r\n\r\n"
+
+    case .error(let err):
+    
+        Log.atError?.log("Failed to read template with error: \(err)")
+        message = "Click the following link (or copy it into the url field of a browser) to create a new password.\r\n Link = \(verificationLink)\r\n\r\n"
+    }
+    
+    let fromAddress = request.info["FromAddress"] ?? "accountVerification@\(domain.name)"
+
+    let email: String =
+    """
+    To: \(account.emailAddress)
+    From: \(fromAddress)
+    Content-Type: text/html;
+    Subject: Set new password at \(domain.name)\n
+    \(message)
+    """
+    
+    sendEmail(email, domainName: domain.name)
+    
+    return FORGOT_PASSWORD_CONTINUE_TEMPLATE
+}
+
+fileprivate func executeRequestNewPassword(_ request: Request, _ domain: Domain) -> String {
+    
+    guard let code = request.info[REQUEST_NEW_PASSWORD_CODE_KEY] else {
+        Log.atError?.log("Missing \(REQUEST_NEW_PASSWORD_CODE_KEY)")
+        return REQUEST_NEW_PASSWORD_FAILED_TEMPLATE
+    }
+    
+    var account: Account?
+    for a in domain.accountsWaitingForNewPassword {
+        if code == a.newPasswordVerificationCode {
+            domain.accountsWaitingForNewPassword.removeObject(object: a)
+            account = a
+            break
+        }
+    }
+    
+    if let account = account {
+        
+        // Set the account name and request the set new password page
+        request.info["Name"] = account.name
+        return SET_NEW_PASSWORD_TEMPLATE
+        
+    } else {
+        
+        Log.atError?.log("The account was not found, possible time-out?")
+        return REQUEST_NEW_PASSWORD_FAILED_TEMPLATE
+    }
+}
+
+fileprivate func executeSetNewPassword(_ request: Request, _ domain: Domain) -> String {
+    
+    guard let accountName = request.info[SET_NEW_PASSWORD_ACCOUNT_NAME_KEY] else {
+        Log.atError?.log("Missing account \(SET_NEW_PASSWORD_ACCOUNT_NAME_KEY)")
+        request.info[PREVIOUS_ATTEMPT_MESSAGE] = "Server error, please contact the administrator"
+        return SET_NEW_PASSWORD_TEMPLATE
+    }
+    
+    guard let account = domain.accounts.getAccountWithoutPassword(for: accountName) else {
+        Log.atError?.log("Unknown account name \(accountName)")
+        request.info[PREVIOUS_ATTEMPT_MESSAGE] = "Server error, please contact the administrator"
+        return SET_NEW_PASSWORD_TEMPLATE
+    }
+    
+    
+    // The request info should contain a Password1 key
+
+    guard let password1 = request.info[SET_NEW_PASSWORD_PASSWORD1_KEY] else {
+        Log.atError?.log("No '\(SET_NEW_PASSWORD_PASSWORD1_KEY)' found")
+        request.info[PREVIOUS_ATTEMPT_MESSAGE] = "Server error, please contact the administrator"
+        return SET_NEW_PASSWORD_TEMPLATE
+    }
+    
+    guard password1.count > 4 else {
+        Log.atDebug?.log("Password should contain more than 4 characters")
+        request.info[PREVIOUS_ATTEMPT_MESSAGE] = "Password should contain more than 4 characters"
+        return SET_NEW_PASSWORD_TEMPLATE
+    }
+
+    
+    // The request info should contain a Password2 key
+
+    guard let password2 = request.info[SET_NEW_PASSWORD_PASSWORD2_KEY] else {
+        Log.atError?.log("No '\(SET_NEW_PASSWORD_PASSWORD2_KEY)' found")
+        request.info[PREVIOUS_ATTEMPT_MESSAGE] = "Server error, please contact the administrator"
+        return SET_NEW_PASSWORD_TEMPLATE
+    }
+    
+    guard password1 == password2 else {
+        Log.atDebug?.log("Passwords are not the same")
+        request.info[PREVIOUS_ATTEMPT_MESSAGE] = "First and second password must be equal"
+        return SET_NEW_PASSWORD_TEMPLATE
+    }
+    
+    
+    // Set the new password
+    
+    guard account.updatePassword(password1) else {
+        Log.atError?.log("Could not changethe password")
+        request.info[PREVIOUS_ATTEMPT_MESSAGE] = "Server error, please contact the administrator"
+        return SET_NEW_PASSWORD_TEMPLATE
+    }
+    
+    account.newPasswordVerificationCode = ""
+    account.newPasswordRequestTimestamp = 0
+    
+    return SET_NEW_PASSWORD_SUCCESS_TEMPLATE
+}

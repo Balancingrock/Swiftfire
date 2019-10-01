@@ -10,19 +10,19 @@ To register, fill out the fields below and click the 'Register' button. Upon ver
 			<p>.show($requestinfo!.PreviousAttemptMessage)</p>
 			<br>
 			<p style="margin-bottom:0px">Name:</p>
-			<input type="text" name="RegisterName" value=".show($requestinfo!.RegisterName)" autofocus>
+			<input style="color:black;" type="text" name="RegisterName" value=".show($requestinfo!.RegisterName)" autofocus>
 			<br>
 			<p style="margin-bottom:0px">Password:</p>
-			<input type="password" name="RegisterPassword1" value=".show($requestinfo!.RegisterPassword1)">
+			<input style="color:black;" type="password" name="RegisterPassword1" value=".show($requestinfo!.RegisterPassword1)">
 			<br>
 			<p style="margin-bottom:0px">Password:</p>
-			<input type="password" name="RegisterPassword2" value=".show($requestinfo!.RegisterPassword2)">
+			<input style="color:black;" type="password" name="RegisterPassword2" value=".show($requestinfo!.RegisterPassword2)">
 			<br>
 			<p style="margin-bottom:0px">Email:</p>
-			<input type="text" name="RegisterEmail" value=".show($requestinfo!.RegisterEmail)">
+			<input style="color:black;" type="text" name="RegisterEmail" value=".show($requestinfo!.RegisterEmail)">
 			<br>
 			<br>
-			<input style="width:100%" type="submit" value="Register">
+			<input style="width:100%; color:black;" type="submit" value="Register">
 		</div>
 	</div>
 </form>

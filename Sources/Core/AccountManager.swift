@@ -50,7 +50,6 @@ import KeyedCache
 import VJson
 
 
-
 public class AccountManager {
     
     
@@ -369,6 +368,8 @@ extension AccountManager {
                 nameLut[lname] = dir
                 accountCache[lname] = account
                 
+                
+                Log.atNotice?.log("Created account with name: '\(name)' and id: \(lastAccountId).")
                 
                 return account
                 

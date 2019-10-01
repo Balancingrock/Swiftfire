@@ -51,6 +51,19 @@ import COpenSsl
 import BRBON
 
 
+// These are a minor performance enhancement (as using a static namefield reduces runtime overhead, while restricting the name length to 5 chars optimizes memory)
+
+fileprivate let ENABLED_NF = NameField("enab")!
+fileprivate let NAME_NF = NameField("name")!
+fileprivate let IS_DOMAIN_ADMIN_NF = NameField("isdad")!
+fileprivate let EMAIL_ADDRESS_NF = NameField("email")!
+fileprivate let EMAIL_VERIFICATION_CODE_NF = NameField("emvcd")!
+fileprivate let NEW_PWD_VERIFICATION_CODE_NF = NameField("npwdc")!
+fileprivate let NEW_PWD_REQUEST_TIMESTAMP_NF = NameField("npwdt")!
+fileprivate let DIGEST_NF = NameField("dgst")!
+fileprivate let SALT_NF = NameField("salt")!
+
+
 /// An account within swiftfire. Used for admin account and can be used for domain accounts as well.
 
 public final class Account: EstimatedMemoryConsumption {
@@ -78,13 +91,13 @@ public final class Account: EstimatedMemoryConsumption {
     
     public var isEnabled: Bool {
         get {
-            if let v = db.root["enabled"].bool { return v }
+            if let v = db.root[ENABLED_NF].bool { return v }
             Log.atError?.log("Error retrieving enabled from account store")
             return false
         }
         set {
-            //db.root["enabled"].bool = newValue
-            db.root.updateItem(newValue, withName: "enabled")
+            //db.root[ENABLED_NF].bool = newValue
+            db.root.updateItem(newValue, withNameField: ENABLED_NF)
             store()
         }
     }
@@ -94,13 +107,13 @@ public final class Account: EstimatedMemoryConsumption {
     
     public var name: String {
         get {
-            if let v = db.root["name"].string { return v }
+            if let v = db.root[NAME_NF].string { return v }
             Log.atError?.log("Error retrieving name from account store")
             return "***error***"
         }
         set {
-            //db.root["name"].string = newValue
-            db.root.updateItem(newValue, withName: "name")
+            //db.root[NAME_NF].string = newValue
+            db.root.updateItem(newValue, withNameField: NAME_NF)
             store()
         }
     }
@@ -110,13 +123,13 @@ public final class Account: EstimatedMemoryConsumption {
     
     public var emailAddress: String {
         get {
-            if let v = db.root["emailAddress"].string { return v }
+            if let v = db.root[EMAIL_ADDRESS_NF].string { return v }
             Log.atError?.log("Error retrieving emailAddress from account store")
             return "***error***"
         }
         set {
-            //db.root["emailAddress"].string = newValue
-            db.root.updateItem(newValue, withName: "emailAddress")
+            //db.root[EMAIL_ADDRESS_NF].string = newValue
+            db.root.updateItem(newValue, withNameField: EMAIL_ADDRESS_NF)
             store()
         }
     }
@@ -128,13 +141,13 @@ public final class Account: EstimatedMemoryConsumption {
     
     public var emailVerificationCode: String {
         get {
-            if let v = db.root["emailVerificationCode"].string { return v }
+            if let v = db.root[EMAIL_VERIFICATION_CODE_NF].string { return v }
             Log.atError?.log("Error retrieving emailVerificationCode from account store")
             return "***error***"
         }
         set {
-            //db.root["emailVerificationCode"].string = newValue
-            db.root.updateItem(newValue, withName: "emailVerificationCode")
+            //db.root[EMAIL_VERIFICATION_CODE_NF].string = newValue
+            db.root.updateItem(newValue, withNameField: EMAIL_VERIFICATION_CODE_NF)
             store()
         }
     }
@@ -146,17 +159,53 @@ public final class Account: EstimatedMemoryConsumption {
     
     public var isDomainAdmin: Bool {
         get {
-            if let v = db.root["isAdmin"].bool { return v }
+            if let v = db.root[IS_DOMAIN_ADMIN_NF].bool { return v }
             Log.atError?.log("Error retrieving isAdmin from account store")
             return false
         }
         set {
-            //db.root["isAdmin"].bool = newValue
-            db.root.updateItem(newValue, withName: "isAdmin")
+            //db.root[IS_DOMAIN_ADMIN_NF].bool = newValue
+            db.root.updateItem(newValue, withNameField: IS_DOMAIN_ADMIN_NF)
             store()
         }
     }
     
+    
+    /// The new password verification code for this account.
+    ///
+    /// Should be empty for verified email addresses, should be a UUID-string when a verification email has been sent.
+    
+    public var newPasswordVerificationCode: String {
+        get {
+            if let v = db.root[NEW_PWD_VERIFICATION_CODE_NF].string { return v }
+            Log.atError?.log("Error retrieving newPasswordVerificationCode from account store")
+            return "***error***"
+        }
+        set {
+            //db.root[NEW_PWD_VERIFICATION_CODE_NF].string = newValue
+            db.root.updateItem(newValue, withNameField: NEW_PWD_VERIFICATION_CODE_NF)
+            store()
+        }
+    }
+
+    
+    /// The timestamp of the last new password request was made.
+    ///
+    /// Should be empty for verified email addresses, should be a UUID-string when a verification email has been sent.
+    
+    public var newPasswordRequestTimestamp: Int64 {
+        get {
+            if let v = db.root[NEW_PWD_REQUEST_TIMESTAMP_NF].int64 { return v }
+            Log.atError?.log("Error retrieving newPasswordRequestTimestamp from account store")
+            return 0 // always expired
+        }
+        set {
+            //db.root[NEW_PWD_REQUEST_TIMESTAMP_NF].int64 = newValue
+            db.root.updateItem(newValue, withNameField: NEW_PWD_REQUEST_TIMESTAMP_NF)
+            store()
+        }
+    }
+
     
     // MARK:- Private from here
     
@@ -179,13 +228,13 @@ public final class Account: EstimatedMemoryConsumption {
     
     private var digest: String {
         get {
-            if let v = db.root["digest"].string { return v }
+            if let v = db.root[DIGEST_NF].string { return v }
             Log.atError?.log("Error retrieving digest from account store")
             return "***error***"
         }
         set {
-            //db.root["digest"].string = newValue
-            db.root.updateItem(newValue, withName: "digest")
+            //db.root[DIGEST_NF].string = newValue
+            db.root.updateItem(newValue, withNameField: DIGEST_NF)
             // Note: No 'store' operation here, see 'updatePassword' for that
         }
     }
@@ -195,13 +244,13 @@ public final class Account: EstimatedMemoryConsumption {
     
     private var salt: String {
         get {
-            if let v = db.root["salt"].string { return v }
+            if let v = db.root[SALT_NF].string { return v }
             Log.atError?.log("Error retrieving salt from account store")
             return "***error***"
         }
         set {
-            //db.root["salt"].string = newValue
-            db.root.updateItem(newValue, withName: "salt")
+            //db.root[SALT_NF].string = newValue
+            db.root.updateItem(newValue, withNameField: SALT_NF)
             // Note: No 'store' operation here, see 'updatePassword' for that
         }
     }
@@ -235,7 +284,7 @@ public final class Account: EstimatedMemoryConsumption {
 
         self.emailAddress = ""
         self.emailVerificationCode = ""
-        self.isEnabled = false
+        self.isEnabled = true
 
         store()
     }
