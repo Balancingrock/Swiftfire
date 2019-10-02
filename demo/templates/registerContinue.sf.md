@@ -4,7 +4,7 @@ title: Complete registration
 ---
 Thanks for registering.
 
-An email has been sent to .show($requestinfo.RegisterEmail)
+An email has been sent to .show($requestinfo.register-email)
 
 Please wait for this email and visit the confirmation link in it to complete the registration process.
 

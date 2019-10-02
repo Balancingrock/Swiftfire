@@ -177,7 +177,7 @@ public func sendEmail(_ mail: String, domainName: String) {
                 if data.count > 0 {
                     Log.atDebug?.log("Unexpectedly read \(data.count) bytes from sendmail, content: \(String(data: data, encoding: .utf8) ?? "")")
                 } else {
-                    Log.atDebug?.log("Sendmail completed without error")
+                    Log.atDebug?.log("Sendmail completed without output")
                 }
                 
             } else {

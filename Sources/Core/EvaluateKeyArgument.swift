@@ -95,7 +95,7 @@ public func evaluateKeyArgument(_ arg: String, using functionsInfo: Functions.In
     
     case "$requestinfo":
                 
-        guard let result = environment.request.info[String(args[1])] else {
+        guard let result = environment.request.info[String(args[1]).lowercased()] else {
             Log.atError?.log("Request.info does not contain key: \(args[1])")
             return "***error***"
         }
@@ -105,12 +105,12 @@ public func evaluateKeyArgument(_ arg: String, using functionsInfo: Functions.In
         
     case "$requestinfo!":
 
-        return environment.request.info[String(args[1])] ?? ""
+        return environment.request.info[String(args[1]).lowercased()] ?? ""
 
         
     case "$functionsinfo":
         
-        guard let result = functionsInfo[String(args[1])] as? String else {
+        guard let result = functionsInfo[String(args[1]).lowercased()] as? String else {
             Log.atError?.log("FunctionInfo does not contain key: \(args[1])")
             return "***error***"
         }
