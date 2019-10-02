@@ -113,7 +113,7 @@ func function_sf_deleteDomain(_ args: Functions.Arguments, _ info: inout Functio
     
     // Check that a valid domain name was specified
     
-    guard let name = environment.request.info["DomainName"] else {
+    guard let name = environment.request.info["domainname"] else {
             Log.atError?.log("Missing DomainName", from: Source(id: -1, file: #file, function: #function, line: #line))
             return "***Error***".data(using: String.Encoding.utf8)
     }

@@ -106,7 +106,7 @@ public func function_sf_domainButton(_ args: Functions.Arguments, _ info: inout 
     
     // Check that a valid domain name was specified
     
-    guard let name = environment.request.info["DomainName"] else {
+    guard let name = environment.request.info["domainname"] else {
         return "***Error***".data(using: String.Encoding.utf8)
     }
     

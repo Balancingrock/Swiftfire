@@ -424,15 +424,17 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
         
         func domainAdminList() -> String {
             
-            var html: String = """
+            var html: String =
+            """
                 <div class="center-content">
                     <div class="table-container">
                         <table>
                             <thead>
                                 <tr>
                                     <th>Account ID</th>
-                                    <th></th>
-                                    <th></th>
+                                    <th>Remove</th>
+                                    <th>Password</th>
+                                    <th>Details</th>
                                 </tr>
                             </thead>
                             <tbody>
@@ -458,6 +460,12 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
                                     <input type="submit" value="Set New Password">
                                 </form>
                             </td>
+                            <td>
+                                <form action="\(domainCommand("AccountDetails"))" method="post">
+                                    <input type="hidden" name="account-name" value="\(accountName)">
+                                    <input type="submit" value="Details">
+                                </form>
+                            </td>
                         </tr>
                     """
                     
@@ -474,6 +482,12 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
                                     <input type="hidden" name="AdminID" value="\(accountName)">
                                     <input type="text" name="AdminPassword" value="">
                                     <input type="submit" value="Set New Password">
+                                </form>
+                            </td>
+                            <td>
+                                <form action="\(domainCommand("AccountDetails"))" method="post">
+                                    <input type="hidden" name="account-name" value="\(accountName)">
+                                    <input type="submit" value="Details">
                                 </form>
                             </td>
                         </tr>
@@ -588,7 +602,7 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
     
     func domainConfirmRemoveAccountPage(_ request: Request, _ domain: Domain) {
         
-        let adminId = request.info["AdminID"]!
+        let adminId = request.info["adminid"]!
 
         let html: String =
         """
@@ -664,7 +678,7 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
     // If login information is available, then verify if it is from a domain admin
     // ===========================================================================
         
-    if let name = request.info["LoginID"], let pwd = request.info["LoginPassword"] {
+    if let name = request.info["loginid"], let pwd = request.info["loginpassword"] {
             
         Log.atDebug?.log("Found login information for admin \(name)")
             
@@ -760,6 +774,7 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
                 case "RemoveAccount": executeRemoveAccount(request, domain)
                 case "AddAdminChangePassword": executeAddAdminChangePassword(request, domain)
                 case "ChangePassword": executeChangePassword(request, domain)
+                case "AccountDetails": break
                 case "Logoff":
                     session.info.remove(key: .accountKey)
                     Log.atNotice?.log("Admin logged out")
@@ -791,12 +806,12 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
     
 fileprivate func executeUpdateParameter(_ request: Request, _ domain: Domain) {
     
-    guard let parameter = request.info["Parameter"] else {
+    guard let parameter = request.info["parameter"] else {
         Log.atError?.log("Missing parameter name in request.info")
         return
     }
     
-    guard let value = request.info["Value"] else {
+    guard let value = request.info["value"] else {
         Log.atError?.log("Missing parameter value in request.info")
         return
     }
@@ -826,12 +841,12 @@ fileprivate func executeUpdateParameter(_ request: Request, _ domain: Domain) {
 
 fileprivate func executeUpdateBlacklist(_ request: Request, _ domain: Domain) {
     
-    guard let address = request.info["Address"] else {
+    guard let address = request.info["address"] else {
         Log.atError?.log("Missing address")
         return
     }
     
-    guard let actionStr = request.info["Action"] else {
+    guard let actionStr = request.info["action"] else {
         Log.atError?.log("Missing address")
         return
     }
@@ -859,7 +874,7 @@ fileprivate func executeUpdateBlacklist(_ request: Request, _ domain: Domain) {
 
 fileprivate func executeRemoveFromBlacklist(_ request: Request, _ domain: Domain) {
     
-    guard let address = request.info["Address"] else {
+    guard let address = request.info["address"] else {
         Log.atError?.log("Missing address")
         return
     }
@@ -875,12 +890,12 @@ fileprivate func executeRemoveFromBlacklist(_ request: Request, _ domain: Domain
 
 fileprivate func executeAddToBlacklist(_ request: Request, _ domain: Domain) {
     
-    guard let address = request.info["Address"] else {
+    guard let address = request.info["address"] else {
         Log.atError?.log("Missing address")
         return
     }
     
-    guard let actionStr = request.info["Action"] else {
+    guard let actionStr = request.info["action"] else {
         Log.atError?.log("Missing address")
         return
     }
@@ -916,14 +931,14 @@ fileprivate func executeUpdateServices(_ request: Request, _ domain: Domain) {
     
     var error = false;
     
-    while let _ = request.info["seqName\(index)"] {
+    while let _ = request.info["seqname\(index)"] {
         
-        if let _ = request.info["usedName\(index)"] {
+        if let _ = request.info["usedname\(index)"] {
             
-            if  let newIndexStr = request.info["seqName\(index)"],
+            if  let newIndexStr = request.info["seqname\(index)"],
                 let newIndex = Int(newIndexStr) {
                 
-                if let newName = request.info["nameName\(index)"] {
+                if let newName = request.info["namename\(index)"] {
                     serviceArr.append(ServiceItem(index: newIndex, name: newName))
                 } else {
                     error = true
@@ -961,7 +976,7 @@ fileprivate func executeUpdateServices(_ request: Request, _ domain: Domain) {
 
 fileprivate func executeConfirmDeleteAccount(_ request: Request, _ domain: Domain) -> Bool {
     
-    guard let adminId = request.info["AdminID"] else {
+    guard let adminId = request.info["adminid"] else {
         Log.atError?.log("Missing admin ID")
         return false
     }
@@ -971,7 +986,7 @@ fileprivate func executeConfirmDeleteAccount(_ request: Request, _ domain: Domai
 
 fileprivate func executeRemoveAccount(_ request: Request, _ domain: Domain) {
     
-    guard let accountId = request.info["RemoveAccountId"] else {
+    guard let accountId = request.info["removeaccountid"] else {
         Log.atError?.log("Missing RemoveAccountId")
         return
     }
@@ -985,12 +1000,12 @@ fileprivate func executeRemoveAccount(_ request: Request, _ domain: Domain) {
 
 fileprivate func executeAddAdminChangePassword(_ request: Request, _ domain: Domain) {
     
-    guard let adminId = request.info["AdminID"] else {
+    guard let adminId = request.info["adminid"] else {
         Log.atError?.log("Missing admin ID")
         return
     }
 
-    guard let adminPwd = request.info["AdminPassword"] else {
+    guard let adminPwd = request.info["adminpassword"] else {
         Log.atError?.log("Missing admin password")
         return
     }
@@ -1040,12 +1055,12 @@ fileprivate func executeAddAdminChangePassword(_ request: Request, _ domain: Dom
 
 fileprivate func executeChangePassword(_ request: Request, _ domain: Domain) {
     
-    guard let name = request.info["ChangePasswordName"] else {
+    guard let name = request.info["changepasswordname"] else {
         Log.atError?.log("Missing name")
         return
     }
 
-    guard let pwd = request.info["ChangePasswordPassword"] else {
+    guard let pwd = request.info["changepasswordpassword"] else {
         Log.atError?.log("Missing password")
         return
     }

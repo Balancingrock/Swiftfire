@@ -153,7 +153,7 @@ func function_sf_postingButtonedInput(_ args: Functions.Arguments, _ info: inout
     // If the value is not set, then check for the presence of a domain name in the post info. If found, then check for a parameter from that domain to be used as the default value.
     
     if value == nil {
-        if let name = environment.request.info["DomainName"] {
+        if let name = environment.request.info["domainname"] {
             if let domain = domains.domain(for: name) {
                 switch arr[1] {
                 case "root": value = domain.webroot

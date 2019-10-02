@@ -90,13 +90,13 @@ import Services
 
 // These identifiers are the glue between admin creation/login pages and the code in this function.
 
-private let SERVER_ADMIN_CREATE_ACCOUNT_NAME = "ServerAdminCreateAccountName"
-private let SERVER_ADMIN_CREATE_ACCOUNT_PWD1 = "ServerAdminCreateAccountPwd1"
-private let SERVER_ADMIN_CREATE_ACCOUNT_PWD2 = "ServerAdminCreateAccountPwd2"
-private let SERVER_ADMIN_CREATE_ACCOUNT_ROOT = "ServerAdminCreateAccountRoot"
+private let SERVER_ADMIN_CREATE_ACCOUNT_NAME = "serveradmincreateaccountname"
+private let SERVER_ADMIN_CREATE_ACCOUNT_PWD1 = "serveradmincreateaccountpwd1"
+private let SERVER_ADMIN_CREATE_ACCOUNT_PWD2 = "serveradmincreateaccountpwd2"
+private let SERVER_ADMIN_CREATE_ACCOUNT_ROOT = "serveradmincreateaccountroot"
 
-private let SERVER_ADMIN_LOGIN_NAME = "ServerAdminLoginName"
-private let SERVER_ADMIN_LOGIN_PWD  = "ServerAdminLoginPwd"
+private let SERVER_ADMIN_LOGIN_NAME = "serveradminloginname"
+private let SERVER_ADMIN_LOGIN_PWD  = "serveradminloginpwd"
 
 
 /// Intercepts access to the URL path: /serveradmin and redirects them to the adminSiteRoot. In effect making the server
@@ -766,12 +766,12 @@ fileprivate func executeSetParameter(_ request: Request) {
 
 fileprivate func executeUpdateBlacklist(_ request: Request) {
     
-    guard let address = request.info["Address"] else {
+    guard let address = request.info["address"] else {
         Log.atError?.log("Missing address")
         return
     }
     
-    guard let action = request.info["Action"] else {
+    guard let action = request.info["action"] else {
         Log.atError?.log("Missing action")
         return
     }
@@ -804,14 +804,14 @@ fileprivate func executeUpdateBlacklist(_ request: Request) {
 fileprivate func executeAddToBlacklist(_ request: Request) {
     
     guard
-        let address = request.info["NewEntry"],
+        let address = request.info["newentry"],
         isValidIpAddress(address)
     else {
         Log.atError?.log("Unknown address for key NewEntry")
         return
     }
 
-    guard let action = request.info["Action"] else {
+    guard let action = request.info["action"] else {
         Log.atError?.log("Unknown action for key Action")
         return
     }
@@ -841,7 +841,7 @@ fileprivate func executeAddToBlacklist(_ request: Request) {
 
 fileprivate func executeRemoveFromBlacklist(_ request: Request) {
     
-    guard let address = request.info["Address"] else {
+    guard let address = request.info["address"] else {
         Log.atError?.log("Missing address for key Address")
         return
     }
@@ -859,19 +859,19 @@ fileprivate func executeRemoveFromBlacklist(_ request: Request) {
 fileprivate func executeUpdateDomainBlacklist(_ request: Request) {
     
     guard
-        let name = request.info["DomainName"],
+        let name = request.info["domainname"],
         let domain = domains.domain(for: name)
         else {
             Log.atError?.log("Missing or wrong domain name")
             return
     }
     
-    guard let address = request.info["Address"] else {
+    guard let address = request.info["address"] else {
         Log.atError?.log("Missing address")
         return
     }
     
-    guard let action = request.info["Action"] else {
+    guard let action = request.info["action"] else {
         Log.atError?.log("Missing action")
         return
     }
@@ -902,7 +902,7 @@ fileprivate func executeUpdateDomainBlacklist(_ request: Request) {
 fileprivate func executeAddToDomainBlacklist(_ request: Request) {
     
     guard
-        let name = request.info["DomainName"],
+        let name = request.info["domainname"],
         let domain = domains.domain(for: name)
         else {
             Log.atError?.log("Missing domain name")
@@ -910,14 +910,14 @@ fileprivate func executeAddToDomainBlacklist(_ request: Request) {
     }
     
     guard
-        let address = request.info["NewEntry"],
+        let address = request.info["newentry"],
         isValidIpAddress(address)
         else {
         Log.atError?.log("No 'NewEntry' key found in request.info")
         return
     }
     
-    guard let action = request.info["Action"] else {
+    guard let action = request.info["action"] else {
         Log.atError?.log("No 'Action' key found in request.info")
         return
     }
@@ -946,14 +946,14 @@ fileprivate func executeAddToDomainBlacklist(_ request: Request) {
 fileprivate func executeRemoveFromDomainBlacklist(_ request: Request) {
     
     guard
-        let name = request.info["DomainName"],
+        let name = request.info["domainname"],
         let domain = domains.domain(for: name)
         else {
             Log.atError?.log("Missing domain name")
             return
     }
     
-    guard let address = request.info["Address"] else {
+    guard let address = request.info["address"] else {
         Log.atError?.log("Missing address for key Address")
         return
     }
@@ -973,7 +973,7 @@ fileprivate func executeRemoveFromDomainBlacklist(_ request: Request) {
 
 fileprivate func executeUpdateDomain(_ request: Request) {
     
-    guard let name = request.info["DomainName"] else {
+    guard let name = request.info["domainname"] else {
         Log.atError?.log("Missing DomainName in request.info")
         return
     }
@@ -983,12 +983,12 @@ fileprivate func executeUpdateDomain(_ request: Request) {
         return
     }
     
-    guard let parameterName = request.info["Name"] else {
+    guard let parameterName = request.info["name"] else {
         Log.atError?.log("Missing parameter name in request.info")
         return
     }
 
-    guard let value = request.info["Value"] else {
+    guard let value = request.info["value"] else {
         Log.atError?.log("Missing parameter value in request.info")
         return
     }
@@ -1148,7 +1148,7 @@ fileprivate func executeUpdateDomain(_ request: Request) {
 
 fileprivate func executeUpdateDomainServices(_ request: Request) {
 
-    guard let domainName = request.info["DomainName"],
+    guard let domainName = request.info["domainname"],
           let domain = domains.domain(for: domainName) else { return }
     
     Log.atNotice?.log("Pre-update services for domain \(domain.name):\n\(domain.serviceNames)")
@@ -1162,14 +1162,14 @@ fileprivate func executeUpdateDomainServices(_ request: Request) {
     
     var index = 0
     
-    while let _ = request.info["seqName\(index)"] {
+    while let _ = request.info["seqname\(index)"] {
         
-        if let _ = request.info["usedName\(index)"] {
+        if let _ = request.info["usedname\(index)"] {
 
-            if  let newIndexStr = request.info["seqName\(index)"],
+            if  let newIndexStr = request.info["seqname\(index)"],
                 let newIndex = Int(newIndexStr) {
             
-                if let newName = request.info["nameName\(index)"] {
+                if let newName = request.info["namename\(index)"] {
                     serviceArr.append(ServiceItem(index: newIndex, name: newName))
                 } else {
                     Log.atError?.log("Missing nameName for index \(index)")
@@ -1198,7 +1198,7 @@ fileprivate func executeUpdateDomainServices(_ request: Request) {
 
 fileprivate func executeDeleteDomain(_ request: Request) {
     
-    guard let name = request.info["DomainName"] else {
+    guard let name = request.info["domainname"] else {
         Log.atError?.log("Missing DomainName in request.info")
         return
     }
@@ -1218,7 +1218,7 @@ fileprivate func executeDeleteDomain(_ request: Request) {
 
 fileprivate func executeCreateDomain(_ request: Request) {
     
-    guard let name = request.info["DomainName"], !name.isEmpty else {
+    guard let name = request.info["domainname"], !name.isEmpty else {
         Log.atError?.log("Missing DomainName in request.info")
         return
     }
@@ -1228,12 +1228,12 @@ fileprivate func executeCreateDomain(_ request: Request) {
         return
     }
     
-    guard let adminId = request.info["ID"], !adminId.isEmpty else {
+    guard let adminId = request.info["id"], !adminId.isEmpty else {
         Log.atError?.log("Missing Domain Admin ID in request.info")
         return
     }
     
-    guard let adminPwd = request.info["Password"], !adminPwd.isEmpty else {
+    guard let adminPwd = request.info["password"], !adminPwd.isEmpty else {
         Log.atError?.log("Missing Domain Admin PWD in request.info")
         return
     }
@@ -1261,12 +1261,12 @@ fileprivate func executeCreateDomain(_ request: Request) {
 
 fileprivate func executeCreateAlias(_ request: Request) {
     
-    guard let name = request.info["DomainName"] else {
+    guard let name = request.info["domainname"] else {
         Log.atError?.log("Missing DomainName in request.info")
         return
     }
 
-    guard let alias = request.info["Alias"], !alias.isEmpty else {
+    guard let alias = request.info["alias"], !alias.isEmpty else {
         Log.atError?.log("Missing Alias in request.info")
         return
     }
@@ -1286,7 +1286,7 @@ fileprivate func executeCreateAlias(_ request: Request) {
 
 fileprivate func executeDeleteAlias(_ request: Request) {
     
-    guard let alias = request.info["Alias"] else {
+    guard let alias = request.info["alias"] else {
         Log.atError?.log("Missing Alias in request.info")
         return
     }
@@ -1347,12 +1347,12 @@ fileprivate func executeLogout(_ session: Session) -> CommandExecutionResult {
 
 fileprivate func executeCreateAdmin(_ request: Request) {
     
-    guard let id = request.info["ID"] else {
+    guard let id = request.info["id"] else {
         Log.atError?.log("No ID given")
         return
     }
     
-    guard let password = request.info["Password"] else {
+    guard let password = request.info["password"] else {
         Log.atError?.log("No password given")
         return
     }
@@ -1373,7 +1373,7 @@ fileprivate func executeCreateAdmin(_ request: Request) {
 
 fileprivate func executeConfirmDeleteAccount(_ request: Request) -> CommandExecutionResult {
     
-    guard request.info["ID"] != nil else {
+    guard request.info["id"] != nil else {
         Log.atError?.log("No ID given")
         return .newPath("/pages/admin-management.sf.html")
     }
@@ -1383,7 +1383,7 @@ fileprivate func executeConfirmDeleteAccount(_ request: Request) -> CommandExecu
 
 fileprivate func executeDeleteAccount(_ request: Request) {
     
-    guard let name = request.info["ID"] else {
+    guard let name = request.info["id"] else {
         Log.atError?.log("No ID given")
         return
     }
@@ -1398,12 +1398,12 @@ fileprivate func executeDeleteAccount(_ request: Request) {
 
 fileprivate func executeSetNewPassword(_ request: Request) {
     
-    guard let name = request.info["ID"], !name.isEmpty else {
+    guard let name = request.info["id"], !name.isEmpty else {
         Log.atError?.log("No ID given")
         return
     }
 
-    guard let password = request.info["Password"], !password.isEmpty else {
+    guard let password = request.info["password"], !password.isEmpty else {
         Log.atError?.log("No new password given for \(name)")
         return
     }
@@ -1422,12 +1422,12 @@ fileprivate func executeSetNewPassword(_ request: Request) {
 
 fileprivate func executeSetDomainAdminPassword(_ request: Request) {
     
-    guard let domainName = request.info["DomainName"], !domainName.isEmpty else {
+    guard let domainName = request.info["domainname"], !domainName.isEmpty else {
         Log.atError?.log("No domain given")
         return
     }
 
-    guard let adminName = request.info["ID"], !adminName.isEmpty else {
+    guard let adminName = request.info["id"], !adminName.isEmpty else {
         Log.atError?.log("No ID given")
         return
     }
@@ -1447,7 +1447,7 @@ fileprivate func executeSetDomainAdminPassword(_ request: Request) {
         
         if account.isDomainAdmin {
             
-            guard let newPassword = request.info["Password"], !newPassword.isEmpty else {
+            guard let newPassword = request.info["password"], !newPassword.isEmpty else {
                 Log.atError?.log("No password given")
                 return
             }
@@ -1469,7 +1469,7 @@ fileprivate func executeSetDomainAdminPassword(_ request: Request) {
             
             // If there is a password, then also update the password
             
-            if let newPassword = request.info["Password"], !newPassword.isEmpty {
+            if let newPassword = request.info["password"], !newPassword.isEmpty {
                 
                 if account.updatePassword(newPassword) {
                     Log.atNotice?.log("Updated the password for account \(account.name) in domain \(domain.name)")
@@ -1489,7 +1489,7 @@ fileprivate func executeSetDomainAdminPassword(_ request: Request) {
         
         // Create a new admin account if the password is also given
         
-        if let newPassword = request.info["Password"], !newPassword.isEmpty {
+        if let newPassword = request.info["password"], !newPassword.isEmpty {
             
             if let account = domain.accounts.newAccount(name: adminName, password: newPassword) {
                 

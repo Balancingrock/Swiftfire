@@ -112,7 +112,7 @@ func function_sf_domainTelemetryTable(_ args: Functions.Arguments, _ info: inout
     
     // Check that a valid domain name was specified
     
-    guard let name = environment.request.info["DomainName"] else { return "***Error***".data(using: String.Encoding.utf8) }
+    guard let name = environment.request.info["domainname"] else { return "***Error***".data(using: String.Encoding.utf8) }
     
     guard let domain = domains.domain(for: name) else { return "***Error***".data(using: String.Encoding.utf8) }
     
