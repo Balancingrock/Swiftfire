@@ -5,9 +5,11 @@ title: Register
 To register, fill out the fields below and click the 'Register' button. Upon verification of the fields values, an email will be sent to the given address containing a verification link. Visit that link to complete the registration process.
 
 <form action="/command/register" method="post">
-	<div style="display:flex; justify-content:center; margin-bottom:50px;">
+	<div style="display:flex; flex-direction:column; justify-content:center; margin-bottom:50px;">
 		<div style="margin-left:auto; margin-right:auto;">
 			<p>.show($requestinfo!.previous-attempt-message)</p>
+		</div>
+		<div style="margin-left:auto; margin-right:auto;">
 			<br>
 			<p style="margin-bottom:0px">Name:</p>
 			<input style="color:black;" type="text" name="register-name" value=".show($requestinfo!.register-name)" autofocus>
