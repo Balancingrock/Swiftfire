@@ -303,6 +303,8 @@ public final class Domain {
             while let account = accountsWaitingForNewPassword.first {
                 if account.newPasswordRequestTimestamp + 24 * 60 * 60 < now {
                     accountsWaitingForNewPassword.removeFirst()
+                    account.newPasswordRequestTimestamp = 0
+                    //account.newPasswordVerificationCode = "" // Do not do this as it would reduce flexibility of the domain admin on the account details page
                 } else {
                     break
                 }

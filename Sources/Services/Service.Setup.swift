@@ -39,6 +39,7 @@
 // 1.3.0 - Replaced postInfo with request.info
 //       - Removed inout from the service signature
 //       - Updated for account changes
+//       - Added account details management
 // 1.2.1 - Removed dependency on Html
 // 1.2.0 - Initial version
 //
@@ -461,7 +462,7 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
                                 </form>
                             </td>
                             <td>
-                                <form action="\(domainCommand("AccountDetails"))" method="post">
+                                <form action="/setup/account-details" method="post">
                                     <input type="hidden" name="account-name" value="\(accountName)">
                                     <input type="submit" value="Details">
                                 </form>
@@ -485,7 +486,7 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
                                 </form>
                             </td>
                             <td>
-                                <form action="\(domainCommand("AccountDetails"))" method="post">
+                                <form action="/setup/account-details" method="post">
                                     <input type="hidden" name="account-name" value="\(accountName)">
                                     <input type="submit" value="Details">
                                 </form>
@@ -642,17 +643,9 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
     if response.code != nil { return .next }
     
     
-    // Prepare the url
-    
-    guard let urlstr = request.url else {
-        Log.atError?.log("No request URL found", id: connection.logId)
-        response.code = Response.Code._400_BadRequest
-        return .next
-    }
-    
-    Log.atDebug?.log("Raw URL request: \(urlstr)")
-    
-    let urlComponents = urlstr.split(separator: "/")
+    // Need >0, <4 url parts
+        
+    let urlComponents = request.resourcePathParts
     
     guard urlComponents.count > 0 && urlComponents.count <= 3 else { return .next }
     
@@ -755,38 +748,64 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
         
         switch urlComponents[1] {
         case "command":
-        
-            if urlComponents.count == 3 {
+                        
+            guard urlComponents.count == 3 else {
+                response.code = ._400_BadRequest
+                return .next
+            }
+            
+            switch urlComponents[2] {
                 
-                switch urlComponents[2] {
-                    
-                case "UpdateParameter": executeUpdateParameter(request, domain)
-                case "UpdateBlacklist": executeUpdateBlacklist(request, domain)
-                case "RemoveFromBlacklist": executeRemoveFromBlacklist(request, domain)
-                case "AddToBlacklist": executeAddToBlacklist(request, domain)
-                case "UpdateServices": executeUpdateServices(request, domain)
-                case "ConfirmDeleteAccount":
-                    if executeConfirmDeleteAccount(request, domain) {
-                        domainConfirmRemoveAccountPage(request, domain)
-                        return .next
-                    }
-                        
-                case "RemoveAccount": executeRemoveAccount(request, domain)
-                case "AddAdminChangePassword": executeAddAdminChangePassword(request, domain)
-                case "ChangePassword": executeChangePassword(request, domain)
-                case "AccountDetails": break
-                case "Logoff":
-                    session.info.remove(key: .accountKey)
-                    Log.atNotice?.log("Admin logged out")
-                        
-                default:
-                    Log.atError?.log("No command with name \(urlComponents[2])")
-                    break
+            case "UpdateParameter": executeUpdateParameter(request, domain)
+            case "UpdateBlacklist": executeUpdateBlacklist(request, domain)
+            case "RemoveFromBlacklist": executeRemoveFromBlacklist(request, domain)
+            case "AddToBlacklist": executeAddToBlacklist(request, domain)
+            case "UpdateServices": executeUpdateServices(request, domain)
+            case "ConfirmDeleteAccount":
+                if executeConfirmDeleteAccount(request, domain) {
+                    domainConfirmRemoveAccountPage(request, domain)
+                    return .next
+                }
+                
+            case "RemoveAccount": executeRemoveAccount(request, domain)
+            case "AddAdminChangePassword": executeAddAdminChangePassword(request, domain)
+            case "ChangePassword": executeChangePassword(request, domain)
+            case "Logoff":
+                session.info.remove(key: .accountKey)
+                Log.atNotice?.log("Admin logged out")
+                
+            default:
+                Log.atError?.log("No command with name \(urlComponents[2])")
+                break
+            }
+            
+        case "account-details":
+            
+            switch urlComponents.count {
+            case 3:
+                
+                if urlComponents[2] == "account-update" {
+                    updateAccount(request, domain)
+                    fallthrough
+                } else {
+                    Log.atError?.log("Unknown account detail update: \(urlComponents[2])")
+                    response.code = ._400_BadRequest
+                    return .next
                 }
 
-            } else {
-                Log.atError?.log("Too many parts in command")
+                
+            case 2:
+
+                createAccountDetailPage(request, domain, response)
+
+                
+            default:
+
+                response.code = ._400_BadRequest
             }
+
+            return .next
+            
             
         default:
             Log.atWarning?.log("No option with name \(urlComponents[1])")
@@ -794,7 +813,7 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
     }
     
     
-    // Return the domain admin page again
+    // Return the domain admin page again unless the admin logged out or a non-admin account logged in
     
     if let account = session[.accountKey] as? Account, account.isDomainAdmin {
         domainAdminPage(account)
@@ -1082,5 +1101,310 @@ fileprivate func executeChangePassword(_ request: Request, _ domain: Domain) {
     } else {
      
         Log.atError?.log("Account not found for \(name)")
+    }
+}
+
+
+fileprivate func createAccountDetailPage(_ request: Request, _ domain: Domain, _ response: Response) {
+    
+    guard let name = request.info["account-name"] else {
+        Log.atError?.log("Missing account-name in request.info")
+        response.code = ._500_InternalServerError
+        return
+    }
+    
+    guard let account = domain.accounts.getAccountWithoutPassword(for: name) else {
+        Log.atError?.log("Missing account")
+        response.code = ._500_InternalServerError
+        return
+    }
+    
+    
+    // Prevent confusion due to 'strange values' (not an error though)
+    
+    if account.newPasswordVerificationCode.isEmpty {
+        account.newPasswordRequestTimestamp = 0
+    }
+    
+    
+    // Build the page
+    
+    let html: String =
+    """
+    <!DOCTYPE html>
+    <html>
+        <head>
+            <meta charset="utf-8">
+            <meta http-equiv="X-UA-Compatible" content="IE=edge">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <meta name="theme-color" content="#ffffff">
+            <title>Account: \(account.name)</title>
+            <meta name="description" content="Account info">
+            <style>
+                table {
+                    border-collapse: collapse;
+                    width: 100%;
+                }
+
+                td, th {
+                    border: 1px solid gray;
+                    text-align: left;
+                    padding: 8px;
+                }
+
+                tr:nth-child(even) {
+                    background-color: lightgray;
+                }
+            </style>
+        </head>
+        <body>
+            <h1 style="margin-left:auto; margin-right:auto;">Account name: \(account.name)</h1>
+            <table>
+                <thead>
+                    <tr>
+                        <th>Parameter</th>
+                        <th>Value</th>
+                        <th>Description</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <tr>
+                        <td>Name:</td>
+                        <td>
+                            <form action="/setup/account-details/account-update" method="post">
+                                <input type="hidden" name="account-name" value="\(name)">
+                                <input type="hidden" name="parameter" value="account-name">
+                                <input type="text" name="value" value="\(account.name)">
+                                <input type="submit" value="Update">
+                            </form>
+                        </td>
+                        <td>
+                            <p style="margin-bottom:0;">The name of the account. Changes will be retroactive.</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Is Enabled:</td>
+                        <td>
+                            <form action="/setup/account-details/account-update" method="post">
+                                <input type="hidden" name="account-name" value="\(name)">
+                                <input type="hidden" name="parameter" value="is-enabled">
+                                <input type="checkbox" name="value" value="true" \(account.isEnabled ? "checked" : "")>
+                                <input type="submit" value="Update">
+                            </form>
+                        </td>
+                        <td>
+                            <p style="margin-bottom:0;">No changes can be made to the user content associated with this account as long as it is disabled. Note that a user cannot log in as long as the emailVerificationCode is not empty.</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Email address:</td>
+                        <td>
+                            <form action="/setup/account-details/account-update" method="post">
+                                <input type="hidden" name="account-name" value="\(name)">
+                                <input type="hidden" name="parameter" value="email-address">
+                                <input type="text" name="value" value="\(account.emailAddress)">
+                                <input type="submit" value="Update">
+                            </form>
+                        </td>
+                        <td>
+                            <p style="margin-bottom:0;">Updates to this field will be accepted AS IS. All auto-generated emails will be sent to this address.</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Email verification code:</td>
+                        <td>
+                            <form action="/setup/account-details/account-update" method="post">
+                                <input type="hidden" name="account-name" value="\(name)">
+                                <input type="hidden" name="parameter" value="email-verification-code">
+                                <input type="text" name="value" value="\(account.emailVerificationCode)">
+                                <input type="submit" value="Update">
+                            </form>
+                        </td>
+                        <td>
+                            <p style="margin-bottom:0;">This will be empty once the email address is verified.</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Is domain administrator:</td>
+                        <td>
+                            <form action="/setup/account-details/account-update" method="post">
+                                <input type="hidden" name="account-name" value="\(name)">
+                                <input type="hidden" name="parameter" value="is-domain-admin">
+                                <input type="checkbox" name="value" value="true" \(account.isDomainAdmin ? "checked" : "")>
+                                <input type="submit" value="Update">
+                            </form>
+                        </td>
+                        <td>
+                            <p style="margin-bottom:0;">If enabled, the account user gets access to the domain setup page.</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>New password verification code:</td>
+                        <td>
+                            <form action="/setup/account-details/account-update" method="post">
+                                <input type="hidden" name="account-name" value="\(name)">
+                                <input type="hidden" name="parameter" value="new-password-verification-code">
+                                <input type="text" name="value" value="\(account.newPasswordVerificationCode)">
+                                <input type="submit" value="Update">
+                            </form>
+                        </td>
+                        <td>
+                            <p style="margin-bottom:0;">Used temporary when the user requests a new password.</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>New password timestamp:</td>
+                        <td>
+                            <form action="/setup/account-details/account-update" method="post">
+                                <input type="hidden" name="account-name" value="\(name)">
+                                <input type="hidden" name="parameter" value="new-password-timestamp">
+                                <input type="text" name="value" value="\(account.newPasswordRequestTimestamp)" disabled>
+                                <input type="submit" value="Restart">
+                            </form>
+                        </td>
+                        <td>
+                            <p style="margin-bottom:0;">Time of the new password request made by the user (the request is valid for 24 hours). Will be zero if no request is pending. 'Restart' will start the 24 hour window again, but only if there is a new password verification code.</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Account directory URL:</td>
+                        <td colspan="2">\(account.dir.path)</td>
+                    </tr>
+                    <tr>
+                        <td>New password timestamp:</td>
+                        <td>
+                            <form action="/setup/account-details/account-update" method="post">
+                                <input type="hidden" name="account-name" value="\(name)">
+                                <input type="hidden" name="parameter" value="new-password">
+                                <input type="text" name="value" value="">
+                                <input type="submit" value="Set Password">
+                            </form>
+                        </td>
+                    <td>
+                        <p style="margin-bottom:0;">The password is not shown, but a new password can be set. A new password must have more than 4 characters. Setting a password of 4 characters or less will fail silently.</p>
+                        </td>
+                    </tr>
+                    <tr>
+                        <td>Account directory URL:</td>
+                        <td colspan="2">\(account.dir.path)</td>
+                    </tr>
+                </tbody>
+            </table>
+            <div>
+                <p><a href="/setup">Return to setup page</a></p>
+            </div>
+        </body>
+    </html>
+    """
+    
+    response.body = html.data(using: .utf8)
+    response.code = Response.Code._200_OK
+    response.contentType = mimeTypeHtml
+}
+
+
+fileprivate func updateAccount(_ request: Request, _ domain: Domain) {
+    
+    guard let name = request.info["account-name"], !name.isEmpty else {
+        Log.atError?.log("Missing account name")
+        return
+    }
+    
+    guard let parameter = request.info["parameter"], !parameter.isEmpty else {
+        Log.atError?.log("Missing parameter")
+        return
+    }
+    
+    guard let account = domain.accounts.getAccountWithoutPassword(for: name) else {
+        Log.atError?.log("Missing account")
+        return
+    }
+    
+    
+    switch parameter {
+        
+    case "account-name":
+        
+        if let value = request.info["value"], !value.isEmpty {
+            Log.atInfo?.log("Updating name of account \(account.name) to '\(value)'")
+            account.name = value
+        } else {
+            Log.atError?.log("New value not present or empty")
+        }
+        
+        
+    case "is-enabled":
+        
+        if request.info["value"] != nil {
+            Log.atInfo?.log("Enabling account \(account.name)")
+            account.isEnabled = true
+        } else {
+            Log.atInfo?.log("Disabling account \(account.name)")
+            account.isEnabled = false
+        }
+        
+        
+    case "email-address":
+        
+        if let value = request.info["value"], !value.isEmpty {
+            Log.atInfo?.log("Updating email address of account \(account.name) to '\(value)'")
+            account.emailAddress = value
+        } else {
+            Log.atError?.log("New value not present or empty")
+        }
+        
+        
+    case "email-verification-code":
+        
+        if let value = request.info["value"] {
+            Log.atInfo?.log("Updating email verification code of account \(account.name) to '\(value)'")
+            account.emailVerificationCode = value
+        } else {
+            Log.atError?.log("New value not present")
+        }
+
+        
+    case "is-domain-admin":
+        
+        if request.info["value"] != nil {
+            Log.atInfo?.log("Enabling domain admin privelidges of account \(account.name)")
+            account.isDomainAdmin = true
+        } else {
+            Log.atInfo?.log("Disabling domain admin privelidges of account \(account.name)")
+            account.isDomainAdmin = false
+        }
+
+        
+    case "new-password-verification-code":
+        
+        if let value = request.info["value"] {
+            Log.atInfo?.log("Updating new password verification code of account \(account.name) to '\(value)'")
+            account.newPasswordVerificationCode = value
+        } else {
+            Log.atError?.log("New value not present")
+        }
+
+        
+    case "new-password-timestamp":
+
+        if !account.newPasswordVerificationCode.isEmpty {
+            Log.atInfo?.log("Restarting timeout for new password of account \(account.name)")
+            account.newPasswordRequestTimestamp = Date().unixTime
+        }
+
+        
+    case "new-password":
+        
+        if let value = request.info["value"], value.count > 4 {
+            Log.atInfo?.log("Updating password of account \(account.name)")
+            _ = account.updatePassword(value)
+        } else {
+            Log.atError?.log("New value not present or too short")
+        }
+
+        
+    default:
+        Log.atError?.log("Unknown parameter: \(parameter)")
+        return
     }
 }

@@ -65,7 +65,6 @@ func service_storePreLoginUrl(_ request: Request, _ connection: SFConnection, _ 
     // Get the relative url
     
     guard let url = info[.relativeResourcePathKey] as? String else {
-        Log.atError?.log("No relative resource path found, this service should come after GetResourcePathFromUrl!")
         return .next
     }
 
