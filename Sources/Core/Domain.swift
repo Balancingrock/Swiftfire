@@ -38,6 +38,7 @@
 //
 // 1.3.0 - Replaced var with let due to Xcode 11
 //       #8 Fixed storing of all changes to the service names
+//       - Added default "Anon" account
 // 1.2.0 - Added admin keyword
 //       - Set session timeout to 600 (seconds)
 // 1.1.0 #3 Fixed loading & storing of domain service names
@@ -206,11 +207,23 @@ public final class Domain {
     
     /// The session timeout in seconds. A value of <= 0 means that no sessions will be created.
     ///
-    /// - Note: Sessions are necessary for domain setup. When the domain admin sets the session to 0 it is no longer possible to use the domain admin account. (But it can still be done by a server adminstrator)
+    /// - Note: Sessions are necessary for domain setup by the domain admin. When the domain admin sets the session to 0 it is no longer possible to use the domain admin account. (But it can still be done by a server adminstrator)
     
     public var sessionTimeout: Int = 600
     
     
+    /// Access to the comments
+    
+    public private(set) var comments: CommentManager!
+    
+    
+    /// The minimum threshold for an account to have its comments published with review by a moderator
+    ///
+    /// I.e: Once an account has this many approaved comment, further comments do not need approval
+    
+    public var autoCommentApprovalThreshold: Int32 = 5
+    
+
     /// The domain specific blacklist
     
     public var blacklist = Blacklist()
@@ -387,6 +400,10 @@ public final class Domain {
             Log.atEmergency?.log("Could not create account manager for domain \(self.name)")
             return nil
         }
+        if accounts.getAccountWithoutPassword(for: "Anon") == nil {
+            let anon = accounts.newAccount(name: "Anon", password: "Anon")
+            anon?.isEnabled = false
+        }
 
         
         // Create the 404 log
@@ -421,6 +438,11 @@ public final class Domain {
             Log.atEmergency?.log("Could not create statistics object for domain \(self.name)")
             return nil
         }
+        
+        
+        // Access to the comments of this domain
+        
+        self.comments = CommentManager(self)
         
         
         // Load the setup information

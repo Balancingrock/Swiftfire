@@ -56,12 +56,14 @@ import BRBON
 fileprivate let ENABLED_NF = NameField("enab")!
 fileprivate let NAME_NF = NameField("name")!
 fileprivate let IS_DOMAIN_ADMIN_NF = NameField("isdad")!
+fileprivate let IS_MODERATOR_NF = NameField("ismod")!
 fileprivate let EMAIL_ADDRESS_NF = NameField("email")!
 fileprivate let EMAIL_VERIFICATION_CODE_NF = NameField("emvcd")!
 fileprivate let NEW_PWD_VERIFICATION_CODE_NF = NameField("npwdc")!
 fileprivate let NEW_PWD_REQUEST_TIMESTAMP_NF = NameField("npwdt")!
 fileprivate let DIGEST_NF = NameField("dgst")!
 fileprivate let SALT_NF = NameField("salt")!
+fileprivate let NOF_COMMENTS_NF = NameField("ncom")!
 
 
 /// An account within swiftfire. Used for admin account and can be used for domain accounts as well.
@@ -171,6 +173,46 @@ public final class Account: EstimatedMemoryConsumption {
     }
     
     
+    /// The number of comments the user has made.
+    
+    public var nofComments: Int32 {
+        get {
+            if db.root[NOF_COMMENTS_NF].int32 == nil {
+                db.root.updateItem(Int32(0), withNameField: NOF_COMMENTS_NF)
+                store()
+            }
+            return db.root[NOF_COMMENTS_NF].int32!
+        }
+        set {
+            //db.root[NOF_COMMENTS_NF].bool = newValue
+            db.root.updateItem(newValue, withNameField: NOF_COMMENTS_NF)
+            store()
+        }
+    }
+
+    
+    /// Controls if this user has moderator capabilities.
+    ///
+    /// Is always true for domain administrators.
+    
+    public var isModerator: Bool {
+        get {
+            if db.root[IS_MODERATOR_NF].bool == nil {
+                db.root.updateItem(false, withNameField: IS_MODERATOR_NF)
+                store()
+            }
+            let isMod = db.root[IS_MODERATOR_NF].bool!
+            return isDomainAdmin || isMod
+        }
+        set {
+            //db.root[IS_MODERATOR_NF].bool = newValue
+            db.root.updateItem(newValue, withNameField: IS_MODERATOR_NF)
+            store()
+        }
+    }
+    
+    
+
     /// The new password verification code for this account.
     ///
     /// Should be empty for verified email addresses, should be a UUID-string when a verification email has been sent.

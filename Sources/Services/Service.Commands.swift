@@ -512,6 +512,11 @@ fileprivate func executeForgotPassword(_ request: Request, _ connection: SFConne
         return FORGOT_PASSWORD_CONTINUE_TEMPLATE
     }
 
+    guard accountName != "Anon" else {
+        Log.atDebug?.log("Cannot change Anon account")
+        return FORGOT_PASSWORD_CONTINUE_TEMPLATE
+    }
+
     guard let account = domain.accounts.getAccountWithoutPassword(for: accountName) else {
         Log.atDebug?.log("An account with this name already exists")
         return FORGOT_PASSWORD_CONTINUE_TEMPLATE

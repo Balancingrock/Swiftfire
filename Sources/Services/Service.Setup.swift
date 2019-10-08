@@ -443,6 +443,8 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
             
             for accountName in domain.accounts {
                 
+                if account.name == "Anon" { continue }
+                
                 if accountName != account.name {
                     
                     let row = """
@@ -785,7 +787,7 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
             case 3:
                 
                 if urlComponents[2] == "account-update" {
-                    updateAccount(request, domain)
+                    updateAccount(request, domain, connection)
                     fallthrough
                 } else {
                     Log.atError?.log("Unknown account detail update: \(urlComponents[2])")
@@ -1303,7 +1305,7 @@ fileprivate func createAccountDetailPage(_ request: Request, _ domain: Domain, _
 }
 
 
-fileprivate func updateAccount(_ request: Request, _ domain: Domain) {
+fileprivate func updateAccount(_ request: Request, _ domain: Domain, _ connection: SFConnection) {
     
     guard let name = request.info["account-name"], !name.isEmpty else {
         Log.atError?.log("Missing account name")
@@ -1320,6 +1322,10 @@ fileprivate func updateAccount(_ request: Request, _ domain: Domain) {
         return
     }
     
+    guard account.name != "Anon" else {
+        Log.atAlert?.log("Attempt to modify Anon account from IP: \(connection.remoteAddress)")
+        return
+    }
     
     switch parameter {
         

@@ -3,7 +3,7 @@
 //  File:       FileManager.Extensions.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.3.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,7 +36,8 @@
 //
 // History
 //
-// 1.0.0 Raised to v1.0.0, Removed old change log,
+// 1.3.0 - Added testFor
+// 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 
@@ -154,4 +155,103 @@ public extension FileManager {
             return .doesNotExist
         }
     }
+    
+    
+    /// The result of the testFor operation
+    ///
+    ///
+    
+    enum TestForResult {
+        
+        
+        /// In case the file does not exist or is neither writable or readable, no writable directory and the directory was not created.
+        
+        case fail
+        
+        
+        /// When the directory is readable but not writeable.
+        
+        case isReadableDir
+        
+        
+        /// When the directory exists, and can be written to.
+        
+        case isWriteableDir
+        
+        
+        /// When the file exists and is readable but not writeable.
+        
+        case isReadableFile
+        
+        
+        /// When the file exists and is readable and writeable.
+        
+        case isWriteableFile
+    }
+    
+    
+    /// Test the directory and file for existence and readability/writeability. Optionally creates the directory for the file.
+    ///
+    /// This operation is intended to be used for those cases a file must be read (and possibly written) but it is not sure if the file already exists or not. When the file does not exist the necessary directory structure can be generated instead such that the file can be created afterwards.
+    ///
+    /// - Parameters:
+    ///   - dir: The path for the directory
+    ///   - file: The filename plus extension
+    ///   - createDir: A flag that requests creation of the directory if it does not exist (including intermediates)
+    
+    func testFor(_ dir: String, file: String, createDir: Bool = false) -> TestForResult {
+        
+        let path = (dir as NSString).appendingPathComponent(file)
+
+        var isDir: ObjCBool = false
+        
+        
+        // Quick exit for nominal cases
+        
+        if FileManager.default.fileExists(atPath: path, isDirectory: &isDir), !isDir.boolValue {
+            
+            if FileManager.default.isWritableFile(atPath: path) {
+                return .isWriteableFile
+            }
+            
+            if FileManager.default.isReadableFile(atPath: path) {
+                return .isReadableFile
+            }
+            
+            return .fail
+        }
+        
+        
+        // The file does not exist, check if the directory exists
+        
+        if FileManager.default.fileExists(atPath: dir) {
+            
+            if FileManager.default.isWritableFile(atPath: dir) {
+                return .isWriteableDir
+            }
+            
+            if FileManager.default.isReadableFile(atPath: dir) {
+                return .isReadableDir
+            }
+            
+            return .fail
+
+            
+        } else {
+            
+            if createDir {
+                
+                // The directory does not exist, try to create it
+            
+                if (try? FileManager.default.createDirectory(at: URL(fileURLWithPath: dir, isDirectory: false), withIntermediateDirectories: true)) != nil {
+
+                    return .isWriteableDir
+                
+                }
+            }
+                
+            return .fail
+        }
+    }
+
 }
