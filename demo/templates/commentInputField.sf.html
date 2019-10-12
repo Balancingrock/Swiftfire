@@ -1,0 +1,13 @@
+<div class="sfincomment" width="100%">
+	<p class="sfincomment-title">You can leave a comment here:</p></br>
+	<p class="sfincomment-header">Anonymous comments are moderated. New users will have their first few posts moderated.</p></br>
+	<form action="/command/post-comment" method="post">
+		<div style="display:flex; flex-direction:column; margin-left:auto; margin-right:auto;">
+		<textarea class="sfcomment-textarea">.show($requestinfo!.comment-origc)</textarea></br>
+		<p class="sfincomment-howto">Use [i]..[/] for italic, [b]..[/] for bold. Use &gt for '>', &lt for '<'.></br>
+		<p class="sfincomment-login"><a href="/template/login.sf.html">Login first</a> to enable editing and removal</p></br>
+		<p class="sfincomment-name">Name:</p><input type="text" name="comment-input-name" value=".show($requestinfo.account-name)"></br>
+		
+		<p class=""></p><input type="submit" value="Submit">
+	</form>
+</div>

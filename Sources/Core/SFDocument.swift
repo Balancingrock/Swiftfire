@@ -38,6 +38,7 @@
 //
 // 1.3.0 #7 Removed local filemanager
 //       - Removed inout from the function.environment signature
+//       - Added block support
 // 1.0.0 Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
@@ -67,9 +68,26 @@ import BRUtils
 import KeyedCache
 
 
+/// A block of characters or a function in the document
+
+public class Block {
+    
+    var enabled: Bool = true
+    var id: String?
+}
+
+
+public extension Array where Element: Block {
+    
+    func enable(blockId: String) { self.forEach { if $0.id == blockId { $0.enabled = true } } }
+    
+    func disable(blockId: String) { self.forEach { if $0.id == blockId { $0.enabled = false } } }
+}
+
+
 /// This encapsulates a swiftfire document in its parsed form.
 
-public  class SFDocument: EstimatedMemoryConsumption {
+public class SFDocument: EstimatedMemoryConsumption {
 
     
     /// This cache contains SFDocuments that have already been processed.
@@ -87,7 +105,7 @@ public  class SFDocument: EstimatedMemoryConsumption {
     
     /// A block of characters that does not contain a function.
     
-    final class CharacterBlock: CustomStringConvertible {
+    final class CharacterBlock: Block, CustomStringConvertible {
         
         
         /// The data in the block
@@ -112,8 +130,8 @@ public  class SFDocument: EstimatedMemoryConsumption {
     
     /// A block of characters that contains a function, with the details of the function completely parsed.
     
-    final class FunctionBlock: CustomStringConvertible {
-        
+    final class FunctionBlock: Block, CustomStringConvertible {
+                
         
         /// The name of this function
         
@@ -149,10 +167,10 @@ public  class SFDocument: EstimatedMemoryConsumption {
     
     /// The blocks that are contained in a document
     
-    enum DocumentBlock {
-        case characterBlock(CharacterBlock)
-        case functionBlock(FunctionBlock)
-    }
+    //enum DocumentBlock {
+    //    case characterBlock(CharacterBlock)
+    //    case functionBlock(FunctionBlock)
+    //}
     
     
     /// The path on disk of the file
@@ -172,7 +190,7 @@ public  class SFDocument: EstimatedMemoryConsumption {
     
     /// The results of the parser
     
-    var blocks: Array<DocumentBlock> = []
+    public var blocks: Array<Block> = []
     
     
     /// All function call in prioritized order (lowest index = first to execute)
@@ -245,18 +263,49 @@ public  class SFDocument: EstimatedMemoryConsumption {
         
         var info = Functions.Info()
         
+        
+        // Add ourself to the environment (this enables control over the html 'flow')
+        
+        environment.sfdocument = self
+        
+        
+        // The result
+        
         var data = Data()
         
-        blocks.forEach({
+        
+        // Initially, disable all named blocks
+        
+        blocks.forEach { $0.enabled = ($0.id == nil) }
+        
+        
+        // Execute the enabled functionblocks and merge the results with the enabled character blocks
+        
+        blocks.forEach {
             
-            switch $0 {
-            case .characterBlock(let cb): data.append(cb.data)
-            case .functionBlock(let fb):
-                if let fbData = fb.function?(fb.arguments, &info, environment) {
-                    data.append(fbData)
+            if $0.enabled {
+            
+                switch $0.self {
+                
+                case is CharacterBlock:
+                
+                    data.append(($0 as! CharacterBlock).data)
+                    
+                    
+                case is FunctionBlock:
+                
+                    let fb = $0 as! FunctionBlock
+                    if let fbData = fb.function?(fb.arguments, &info, environment) {
+                        data.append(fbData)
+                    }
+
+                    
+                default:
+                    
+                    Log.atCritical?.log("Unknown block")
                 }
             }
-        })
+        }
         
         
         // Return the document

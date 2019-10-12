@@ -43,16 +43,26 @@
 import Foundation
 
 import BRBON
+import Http
 
 
-fileprivate let ORIGINAL_NF = NameField("orig")!
-fileprivate let HTMLIFIED_NF = NameField("html")!
-fileprivate let HTMLIFIED_VERSION_NF = NameField("vers")!
-fileprivate let ID_NF = NameField("id")!
-fileprivate let ORIGINAL_TIMESTAMP_NF = NameField("ots")!
-fileprivate let LAST_UPDATE_TIMESTAMP_NF = NameField("lut")!
-fileprivate let NOF_UPDATES_NF = NameField("nup")!
-fileprivate let DISPLAY_NAME_NF = NameField("dname")!
+public let COMMENT_ORIGINAL_RIK = "origc"
+public let COMMENT_HTMLIFIED_RIK = "htmlc"
+public let COMMENT_HTMLIFIED_VERION_RIK = "vers"
+//public let COMMENT_ID_RIK = "cmnti"
+public let COMMENT_ORIGINAL_TIMESTAMP_RIK = "cmnto"
+public let COMMENT_LAST_UPDATE_TIMESTAMP_RIK = "cmntl"
+public let COMMENT_NOFUPDATES_RIK = "cmntn"
+public let COMMENT_DISPLAY_NAME_RIK = "cmnta"
+
+fileprivate let ORIGINAL_NF = NameField(COMMENT_ORIGINAL_RIK)!
+fileprivate let HTMLIFIED_NF = NameField(COMMENT_HTMLIFIED_RIK)!
+fileprivate let HTMLIFIED_VERSION_NF = NameField(COMMENT_HTMLIFIED_VERION_RIK)!
+//fileprivate let ID_NF = NameField(COMMENT_ID_RIK)!
+fileprivate let ORIGINAL_TIMESTAMP_NF = NameField(COMMENT_ORIGINAL_TIMESTAMP_RIK)!
+fileprivate let LAST_UPDATE_TIMESTAMP_NF = NameField(COMMENT_LAST_UPDATE_TIMESTAMP_RIK)!
+fileprivate let NOF_UPDATES_NF = NameField(COMMENT_NOFUPDATES_RIK)!
+fileprivate let DISPLAY_NAME_NF = NameField(COMMENT_DISPLAY_NAME_RIK)!
 
 
 /// Every comment made by a use will be wrapped in an object of this class before it is written to permanent storage.
@@ -170,7 +180,7 @@ public final class Comment {
         db.root.updateItem(noHtml, withNameField: ORIGINAL_NF)
         db.root.updateItem(markedUp, withNameField: HTMLIFIED_NF)
         db.root.updateItem(Comment.htmlifyVersion, withNameField: HTMLIFIED_VERSION_NF)
-        db.root.updateItem(UUID().uuidString, withNameField: ID_NF)
+        //db.root.updateItem(UUID().uuidString, withNameField: ID_NF)
         db.root.updateItem(i, withNameField: ORIGINAL_TIMESTAMP_NF)
         db.root.updateItem(UInt16(0), withNameField: NOF_UPDATES_NF)
         db.root.updateItem(i, withNameField: LAST_UPDATE_TIMESTAMP_NF)
@@ -234,7 +244,7 @@ public final class Comment {
     
     /// The ID of this comment
     
-    public var id: String { return db.root[ID_NF].string ?? "" }
+    //public var id: String { return db.root[ID_NF].string ?? "" }
     
     
     /// The version of the htmlified conversion
@@ -286,5 +296,38 @@ public final class Comment {
         if (try? db.data.write(to: url)) != nil {
             Log.atError?.log("Failed to write updated comment to file \(url.path)")
         }
+    }
+    
+    
+    /// Put the comment information into the request.info directory
+    ///
+    /// - Parameters:
+    ///   - request: The request with the info dictionary to which to add the comment fields
+    ///   - index: The sequence number of this comment (given by the comment manager presumably on the basis of the commentUrlTable index)
+    
+    
+    public func addToRequestInfo(_ request: Request, index: Int) {
+        
+        db.root.forEach { (portal) in
+            if let key = portal.itemName {
+                switch portal.itemType {
+                case .bool: request.info["comment-\(key)"] = portal.bool!.description
+                case .int8: request.info["comment-\(key)"] = portal.int8!.description
+                case .int16: request.info["comment-\(key)"] = portal.int16!.description
+                case .int32: request.info["comment-\(key)"] = portal.int32!.description
+                case .int64: request.info["comment-\(key)"] = portal.int64!.description
+                case .uint8: request.info["comment-\(key)"] = portal.uint8!.description
+                case .uint16: request.info["comment-\(key)"] = portal.uint16!.description
+                case .uint32: request.info["comment-\(key)"] = portal.uint32!.description
+                case .uint64: request.info["comment-\(key)"] = portal.uint64!.description
+                case .float32: request.info["comment-\(key)"] = portal.float32!.description
+                case .float64: request.info["comment-\(key)"] = portal.float64!.description
+                case .string: request.info["comment-\(key)"] = portal.string!.description
+                case .none, .binary, .color, .crcBinary, .crcString, .font, .uuid, .null, .array, .dictionary, .sequence, .table: break
+                }
+            }
+        }
+        
+        request.info["comment-index"] = index.description
     }
 }

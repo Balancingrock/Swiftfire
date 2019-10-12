@@ -3,7 +3,7 @@
 //  File:       SFDocument.Parse.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.2.0
+//  Version:    1.3.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.3.0 - Added 'begin' and 'end' functions
 // 1.2.0 - Allowed the dot in the string of an argument to support the $<source>.<property> notation
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
@@ -68,7 +69,17 @@
 // .numberOfBoxes:2{"first":"jumping", "second":["throw", "catch"]}
 //
 // Note: Only a function that does have a corresponding entry in the registered function table will be recognized as
-// a function.
+// a function, with the exception of "blockStart" and "blockEnd".
+// =====================================================================================================================
+//
+/// There are two predefined functions: `begin` and `end`. These are used to name "blocks". Blocks are document fragments that can contain HTML code
+/// and/or functions, and can be enabled and disabled. By default, only unnamed blocks are enabled. A named block starts after a `begin`with the name
+/// given in the `begin` function. It ends with either the `end` function or a new `begin` function or the end of the document.
+///
+/// To enable a named block, call the sfdocument function _blocks.enable(<name>)_.
+///
+/// To disable a named block, call the sfdocument function _blocks.disable(<name>)_.
+//
 // =====================================================================================================================
 
 import Foundation
@@ -119,26 +130,55 @@ extension SFDocument {
         var argument: String = "" // Characters that may make up te argument for an array parameter
         
         var function: Functions.Signature? // The function signature, determined after the name is complete
-        var array: Array<String> = []     // The array arguments for a function
-        var json: VJson?                  // The JSON argument for a function
+        var array: Array<String> = []      // The array arguments for a function
+        var json: VJson?                   // The JSON argument for a function
 
-        func asJsonFunctionBlock() -> DocumentBlock {
+        var blockId: String?
+        
+        func asJsonFunctionBlock() -> FunctionBlock {
             let fb = FunctionBlock(name: name, function: function, arguments: Functions.Arguments.json(json!))
+            fb.id = blockId
             Log.atDebug?.log("Function block: \(fb)", type: "SFDocument")
-            return .functionBlock(fb)
+            return fb
         }
         
-        func asArrFunctionBlock() -> DocumentBlock {
-            let fb = FunctionBlock(name: name, function: function, arguments: Functions.Arguments.arrayOfString(array))
-            Log.atDebug?.log("Function block: \(fb)", type: "SFDocument")
-            return .functionBlock(fb)
+        func asArrFunctionBlock() -> FunctionBlock? {
+            
+            switch name {
+                
+            case "begin":
+                
+                if array.count == 1 {
+                    blockId = array[0]
+                } else {
+                    Log.atError?.log("Expected one argument, found \(array.count)")
+                }
+                return nil
+                
+            case "end":
+                
+                if array.count == 0 {
+                    blockId = nil
+                } else {
+                    Log.atError?.log("Expected no argument, found \(array.count)")
+                }
+                return nil
+            
+            default:
+            
+                let fb = FunctionBlock(name: name, function: function, arguments: Functions.Arguments.arrayOfString(array))
+                fb.id = blockId
+                Log.atDebug?.log("Function block: \(fb)", type: "SFDocument")
+                return fb
+            }
         }
         
-        func asCharacterBlock() -> DocumentBlock? {
+        func asCharacterBlock() -> CharacterBlock? {
             guard let data = charBuf.data(using: String.Encoding.utf8) else { return nil }
             let cb = CharacterBlock(data: data)
+            cb.id = blockId
             Log.atDebug?.log("Character block: \(cb)", type: "SFDocument")
-            return .characterBlock(cb)
+            return cb
         }
 
         
@@ -269,7 +309,7 @@ extension SFDocument {
                 }
                 charBuf = ""
                 // --
-                self.blocks.append(asArrFunctionBlock())
+                if let block = asArrFunctionBlock() { self.blocks.append(block) }
                 return .waitForLeadingSign
                 
             } else {
@@ -314,7 +354,7 @@ extension SFDocument {
                 }
                 charBuf = ""
                 // --
-                self.blocks.append(asArrFunctionBlock())
+                if let block = asArrFunctionBlock() { self.blocks.append(block) }
                 return .waitForLeadingSign
 
             } else if char == " " {

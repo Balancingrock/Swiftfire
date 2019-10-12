@@ -37,6 +37,7 @@
 // History
 //
 // 1.3.0 - Removed inout from the service and function signature
+//       - Added sfdocument
 // 1.2.0 - Changed key of functionInfo to string
 // 1.0.0 - Raised to v1.0.0, Removed old change log
 //
@@ -83,6 +84,11 @@ public final class Functions {
         /// The service chain info object.
         
         public var serviceInfo: Services.Info
+        
+        
+        /// The SFDocument this function is running on
+        
+        public var sfdocument: SFDocument?
         
         
         /// Create a new instance
@@ -161,14 +167,21 @@ public final class Functions {
     
     
     /// The available functions
+    ///
+    /// The two build-in functions are necessary for the document parser and are handled by the parser. I.e. they have no associated function.
     
-    public var registered: Dictionary<String, Functions.Entry> = [:]
+    public var registered: Dictionary<String, Functions.Entry> = ["begin":dummyEntry, "end":dummyEntry]
     
     
     /// Make this class instantiable
     
     public init() {}
 }
+
+
+fileprivate func dummyFunction(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: Functions.Environment) -> Data? { return nil }
+
+fileprivate let dummyEntry = Functions.Entry("dummy", dummyFunction)
 
 
 // MARK: - Operational

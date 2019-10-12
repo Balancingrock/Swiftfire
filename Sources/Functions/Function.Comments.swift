@@ -55,7 +55,7 @@ import BRBON
 /// _Number of arguments_:  >= 1
 ///
 /// _Type of argument_:
-///    - __identifier__: A unique identifier for the comments section. Each comments section should have a unique identifier to keep the cmments wit the article. The '.' in this identifier has a special meaning: it is used as a folder seperation character. Characters that are illegal in a file path should not be used (but are not tested for!). Leading dots will be removed. Example: identifier = "2019.10.08.article-slug" will result in the creation of a directory "domain/comments/2019/10/08/article-slug" that will contain the comment pointers. (Every account from which a comment is posted will also contain this directory path with the comments itself in it)
+///    - __identifier__: A unique identifier for the comments section. Each comments section should have a unique identifier to keep the comments with the article. The '.' in this identifier has a special meaning - it is used as a folder seperation character. Characters that are illegal in a file path should not be used (but are not tested for!). Leading dots will be removed. Example: identifier = "2019.10.08.article-slug" will result in the creation of a directory "domain/comments/2019/10/08/article-slug" that will contain the comment table and cache. (Every account from which a comment is posted will also contain this directory path with the comments itself in it)
 ///    - __options__: Additional specifiers that are used to create the comments section.
 ///             - anon: When present, anonymous comments are accepted, otherwise only logged in users are allowed to comment.
 ///
@@ -64,12 +64,12 @@ import BRBON
 ///
 /// _Return_: The HTML code. In case of an error the ***error*** string is returned.
 
-public func function_commentSection(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: Functions.Environment) -> Data? {
+public func function_comments(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: Functions.Environment) -> Data? {
     
     
     // The function arguments should be an array of string
     
-    guard case .arrayOfString(var arr) = args else {
+    guard case .arrayOfString(let arr) = args else {
         Log.atError?.log("Wrong type of arguments")
         return "***error***".data(using: .utf8)
     }
@@ -93,63 +93,17 @@ public func function_commentSection(_ args: Functions.Arguments, _ info: inout F
     
     // First attempt at retrieving the account
     
-    var account = session.info[.accountKey] as? Account
+    let account = session.info[.accountKey] as? Account
     
     
-    // Reform the identifier and remove all leading dots
+    var data: Data = "<div class=\"sfcomments\">".data(using: .utf8)!
     
-    var identifier = arr[0].lowercased()
-    while identifier.first == "." { identifier.removeFirst() }
+    data.append(environment.domain.comments.commentBlocks(for: arr[0].lowercased(), environment: environment))
+    
+    data.append(environment.domain.comments.commentInputField(account, environment))
+    
+    data.append("</div>".data(using: .utf8)!)
 
-    
-    // Setup default values for the options
-
-    var anonymousIsEnabled: Bool = false
-
-    
-    // Read options
-    
-    while arr.count > 1 {
-        let option = arr.removeFirst().lowercased()
-        switch option {
-        case "anon": anonymousIsEnabled = true
-        default:
-            Log.atError?.log("Unknown option: \(option)")
-        }
-    }
-
-    
-    // If anonymous is enabled then default to the Anon account
-    
-    if anonymousIsEnabled && account == nil {
-        account = environment.domain.accounts.getAccountWithoutPassword(for: "Anon")
-    }
-    
-            
-    // Transform the identifier into a domain comments path and an account comments path
-    
-    guard var commentsDirUrl = Urls.domainCommentsRootDir(for: environment.domain.name) else {
-        Log.atError?.log("Cannot create comments directory URL for domain")
-        return "***error***".data(using: .utf8)
-    }
-
-    var pathParts = identifier.split(separator: ".")
-    
-    while pathParts.count > 0 { commentsDirUrl.appendPathComponent(String(pathParts.removeFirst())) }
-    
-    
-    // Make sure the comments directory is available
-    
-    guard (try? FileManager.default.createDirectory(at: commentsDirUrl, withIntermediateDirectories: true)) != nil else {
-        Log.atError?.log("Cannot create directory path for \(commentsDirUrl.path)")
-        return "***error***".data(using: .utf8)
-    }
-
-    
-    // Retrieve the comment URLs
-    
-    
-    
-    return nil
+    return data
 }
 

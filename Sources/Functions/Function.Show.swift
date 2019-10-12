@@ -65,5 +65,5 @@ public func function_show(_ args: Functions.Arguments, _ info: inout Functions.I
     
     guard case .arrayOfString(let arr) = args, arr.count == 1 else { return "***error***".data(using: .utf8) }
 
-    return evaluateKeyArgument(arr[0], using: info, in: environment).data(using: .utf8)
+    return (evaluateKeyArgument(arr[0], using: info, in: environment) ?? "***error***").data(using: .utf8)
 }

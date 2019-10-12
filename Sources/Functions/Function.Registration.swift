@@ -3,7 +3,7 @@
 //  File:       Functions.Registration.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.2.0
+//  Version:    1.3.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.3.0 - Added function 'comments'
 // 1.2.0 - Added function 'show' and 'assign'
 // 1.0.1 - Documentation update
 //       - Replaced name definitions with direct text
@@ -66,4 +67,7 @@ public func registerFunctions() {
     functions.register(name: "show", function: function_show)
     functions.register(name: "assign", function: function_assign)
     functions.register(name: "loginLogout", function: function_loginLogout)
+    functions.register(name: "comments", function: function_comments)
+    functions.register(name: "enabled", function: function_enabled)
+    functions.register(name: "disabled", function: function_disabled)
 }

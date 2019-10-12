@@ -80,7 +80,7 @@ import Foundation
 ///   - ***error*** If there the request is invalid or of an non-existing source/key
 ///   - The requested value
 
-public func evaluateKeyArgument(_ arg: String, using functionsInfo: Functions.Info, in environment: Functions.Environment) -> String {
+public func evaluateKeyArgument(_ arg: String, using functionsInfo: Functions.Info, in environment: Functions.Environment) -> String? {
     
     guard (arg.first ?? " ") == "$" else { return arg } // Not a key argument
     
@@ -88,7 +88,7 @@ public func evaluateKeyArgument(_ arg: String, using functionsInfo: Functions.In
     
     guard args.count >= 2 else {
         Log.atError?.log("Missing source or key in argument")
-        return "***error***"
+        return nil
     }
     
     switch args[0].lowercased() {
@@ -97,7 +97,7 @@ public func evaluateKeyArgument(_ arg: String, using functionsInfo: Functions.In
                 
         guard let result = environment.request.info[String(args[1]).lowercased()] else {
             Log.atError?.log("Request.info does not contain key: \(args[1])")
-            return "***error***"
+            return nil
         }
         
         return result
@@ -112,7 +112,7 @@ public func evaluateKeyArgument(_ arg: String, using functionsInfo: Functions.In
         
         guard let result = functionsInfo[String(args[1]).lowercased()] as? String else {
             Log.atError?.log("FunctionInfo does not contain key: \(args[1])")
-            return "***error***"
+            return nil
         }
         
         return result
@@ -124,22 +124,22 @@ public func evaluateKeyArgument(_ arg: String, using functionsInfo: Functions.In
             
         case "absoluteresourcepath":
             
-            return (environment.serviceInfo[.absoluteResourcePathKey] as? String) ?? "***error***"
+            return environment.serviceInfo[.absoluteResourcePathKey] as? String
             
 
         case "relativeresourcepath":
             
-            return (environment.serviceInfo[.relativeResourcePathKey] as? String) ?? "***error***"
+            return environment.serviceInfo[.relativeResourcePathKey] as? String
 
             
         case "responsestarted":
         
-            return (environment.serviceInfo[.responseStartedKey] as? Int64)?.description ?? "***error***"
+            return (environment.serviceInfo[.responseStartedKey] as? Int64)?.description
 
 
         default:
             Log.atError?.log("No access to ServiceInfo mapped for key: \(args[1].lowercased())")
-            return "***error***"
+            return nil
         }
 
         
@@ -147,14 +147,14 @@ public func evaluateKeyArgument(_ arg: String, using functionsInfo: Functions.In
         
         guard (environment.serviceInfo[.sessionKey] as? SessionInfo) != nil else {
             Log.atError?.log("No SessionInfo found")
-            return "***error***"
+            return nil
         }
         
         switch args[1].lowercased() {
             
         default:
             Log.atError?.log("No access to SessionInfo mapped for key: \(args[1].lowercased())")
-            return "***error***"
+            return nil
         }
 
         
@@ -162,7 +162,7 @@ public func evaluateKeyArgument(_ arg: String, using functionsInfo: Functions.In
         
         guard let session = (environment.serviceInfo[.sessionKey] as? Session) else {
             Log.atError?.log("No Session found")
-            return "***error***"
+            return nil
         }
 
         guard let account = session.info[.accountKey] as? Account else {
@@ -175,7 +175,7 @@ public func evaluateKeyArgument(_ arg: String, using functionsInfo: Functions.In
             
         default:
             Log.atError?.log("No access to Account mapped for key: \(args[1].lowercased())")
-            return "***error***"
+            return nil
 
         }
         
@@ -234,12 +234,12 @@ public func evaluateKeyArgument(_ arg: String, using functionsInfo: Functions.In
 
         default:
             Log.atError?.log("No access to Domain mapped for key: \(args[1].lowercased())")
-            return "***error***"
+            return nil
         }
         
         
     default:
         Log.atError?.log("Unknown source for key argument: '\(args[0])'")
-        return "***error***"
+        return nil
     }
 }
