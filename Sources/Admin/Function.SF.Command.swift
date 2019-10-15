@@ -129,6 +129,6 @@ func function_sf_command(_ args: Functions.Arguments, _ info: inout Functions.In
 
     default:
                 
-        return "***error***".data(using: .utf8)
+        return htmlErrorMessage
     }
 }

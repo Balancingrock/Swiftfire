@@ -1,6 +1,6 @@
 // =====================================================================================================================
 //
-//  File:       Function.Enable-Disable.swift
+//  File:       Function.EnableDisable.swift
 //  Project:    Swiftfire
 //
 //  Version:    1.3.0
@@ -67,7 +67,7 @@ import Core
 ///
 /// _Returns_: nil
 
-public func function_enabled(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: Functions.Environment) -> Data? {
+public func function_enable(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: Functions.Environment) -> Data? {
 
     if evaluate(args, &info, environment) {
         
@@ -85,7 +85,7 @@ public func function_enabled(_ args: Functions.Arguments, _ info: inout Function
 }
 
 
-public func function_disabled(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: Functions.Environment) -> Data? {
+public func function_disable(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: Functions.Environment) -> Data? {
 
     if evaluate(args, &info, environment) {
         
@@ -121,7 +121,7 @@ fileprivate func evaluate(_ args: Functions.Arguments, _ info: inout Functions.I
             return false
         }
         
-        return evaluateKeyArgument(arr[2], using: info, in: environment) == nil
+        return readKey(arr[2], using: info, in: environment) == nil
         
         
     case "non-nil":
@@ -131,7 +131,7 @@ fileprivate func evaluate(_ args: Functions.Arguments, _ info: inout Functions.I
             return false
         }
         
-        return evaluateKeyArgument(arr[2], using: info, in: environment) != nil
+        return readKey(arr[2], using: info, in: environment) != nil
 
         
     case "empty":
@@ -141,7 +141,7 @@ fileprivate func evaluate(_ args: Functions.Arguments, _ info: inout Functions.I
             return false
         }
         
-        return evaluateKeyArgument(arr[2], using: info, in: environment)?.isEmpty ?? false
+        return readKey(arr[2], using: info, in: environment)?.isEmpty ?? false
 
         
     case "non-empty":
@@ -151,7 +151,53 @@ fileprivate func evaluate(_ args: Functions.Arguments, _ info: inout Functions.I
             return false
         }
         
-        return !(evaluateKeyArgument(arr[2], using: info, in: environment)?.isEmpty ?? false)
+        return !(readKey(arr[2], using: info, in: environment)?.isEmpty ?? false)
+
+    
+    case "equal":
+        
+        guard arr.count == 4 else {
+            Log.atError?.log("Wrong number of arguments, expected 4, found \(arr.count)")
+            return false
+        }
+        
+        let first = readKey(arr[2], using: info, in: environment)?.lowercased()
+        let second = readKey(arr[3], using: info, in: environment)?.lowercased()
+
+        return (first != nil) ? first == second : false
+        
+        
+    case "not-equal":
+            
+        guard arr.count == 4 else {
+            Log.atError?.log("Wrong number of arguments, expected 4, found \(arr.count)")
+            return false
+        }
+            
+        let first = readKey(arr[2], using: info, in: environment)?.lowercased()
+        let second = readKey(arr[3], using: info, in: environment)?.lowercased()
+
+        return (first != nil) ? first != second : false
+
+        
+    case "true":
+        
+        guard arr.count == 3 else {
+            Log.atError?.log("Wrong number of arguments, expected 3, found \(arr.count)")
+            return false
+        }
+        
+        return readKey(arr[2], using: info, in: environment) == "true"
+        
+        
+    case "false":
+        
+        guard arr.count == 3 else {
+            Log.atError?.log("Wrong number of arguments, expected 3, found \(arr.count)")
+            return false
+        }
+        
+        return readKey(arr[2], using: info, in: environment) == "false"
 
         
     default:

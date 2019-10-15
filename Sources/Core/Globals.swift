@@ -143,3 +143,8 @@ public var httpsServerAcceptQueue: DispatchQueue!
 // The default webserver service stack
 
 public var defaultServices: Array<String> = []
+
+
+// An often used error message
+
+public let htmlErrorMessage = "***error***".data(using: .utf8)!

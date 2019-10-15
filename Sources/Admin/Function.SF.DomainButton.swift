@@ -101,13 +101,14 @@ public func function_sf_domainButton(_ args: Functions.Arguments, _ info: inout 
     
     // Check for minimum the 2 arguments and an even number of arguments
 
-    guard case let .arrayOfString(arr) = args, arr.count >= 2, arr.count.isEven else { return "***Error***".data(using: String.Encoding.utf8) }
+    guard case let .arrayOfString(arr) = args, arr.count >= 2, arr.count.isEven else { return htmlErrorMessage }
     
     
     // Check that a valid domain name was specified
     
     guard let name = environment.request.info["domainname"] else {
-        return "***Error***".data(using: String.Encoding.utf8)
+        Log.atError?.log("Missing domainname in request.info")
+        return htmlErrorMessage
     }
     
     

@@ -1,6 +1,6 @@
 // =====================================================================================================================
 //
-//  File:       EvaluateKeyArgument.swift
+//  File:       KeyArgument.Read.swift
 //  Project:    Swiftfire
 //
 //  Version:    1.3.0
@@ -39,6 +39,7 @@
 // 1.3.0 - Moved getInfo and postInfo into requestinfo
 //       - Added a requestinfo! to return an empty string if the requested parameter does not exist
 //       - Fixed a bug that caused the account name not to be returned
+//       - Renamed function to `readKey`, renamed file to `KeyArgument.Read`
 // 1.2.0 - Initial version
 //
 // =====================================================================================================================
@@ -46,29 +47,29 @@
 import Foundation
 
 
-/// Parse the given argument and return the requested value if it is a keyed argument.
+/// Parse the given argument and return the requested value. The identifiers are case-insensitive. Use an exclamation mark behind the source identifier to return an empty string instead of nil if the requested parameter does not exist. Example: `$account.name!`.
 ///
 /// Example: $requestinfo.name will return the value of the dictionary entry under request.info["name"]
 ///
 /// Allowable identifiers
 ///
-/// _source requestInfo_: All possible strings. Returns an error message if the parameter does not exist
+/// _requestinfo_: All possible strings. Returns a nil if the parameter does not exist
 ///
-/// _source requestInfo!_: All possible strings. Will not retrun an error, but an empty string if the parameter does ot exist
+/// _functionsinfo_: None yet
 ///
-/// _source functionsInfo_: None yet
-///
-/// _source serviceInfo_:
+/// _serviceinfo_:
 ///
 ///    - absoluteresourcepath (String)
 ///    - relativeresourcepath (String)
 ///    - responsestarted (Int64.description)
 ///
-/// _source sessionInfo_: None yet
+/// _sessioninfo_: None yet
 ///
-/// _source account_:
+/// _account_:
 ///
 ///    - name (String)
+///    - is-domain-admin (Bool.description)
+///    - is-moderator (Bool.description)
 ///
 /// - Parameters:
 ///   - arg: The keyed argument.
@@ -76,24 +77,46 @@ import Foundation
 ///   - in: The environment the function is executing in.
 ///
 /// - Returns:
-///   - The argument if the argument does not start with '$'
-///   - ***error*** If there the request is invalid or of an non-existing source/key
-///   - The requested value
+///   - The argument if the argument is empty or does not start with '$'
+///   - The requested value if it exists.
+///   - If the requested value does not exist it returns either nil or -if the source identifier has an exclamation mark- an empty string.
 
-public func evaluateKeyArgument(_ arg: String, using functionsInfo: Functions.Info, in environment: Functions.Environment) -> String? {
+public func readKey(_ arg: String, using functionsInfo: Functions.Info, in environment: Functions.Environment) -> String? {
+        
+    guard !arg.isEmpty else { return "" }
     
-    guard (arg.first ?? " ") == "$" else { return arg } // Not a key argument
+    var argument = arg
+
+    guard argument.first == "$" else { return arg } // Not a key argument
     
-    let args = arg.split(separator: ".")
+    argument.removeFirst()
+        
+    let emptyForNil: Bool
+    if argument.last == "!" {
+        emptyForNil = true
+        argument.removeLast()
+    } else {
+        emptyForNil = false
+    }
+    
+    let args = argument.split(separator: ".")
     
     guard args.count >= 2 else {
         Log.atError?.log("Missing source or key in argument")
-        return nil
+        return arg
     }
+    
+    let result = reader(args, functionsInfo, environment)
+    
+    return emptyForNil ? (result ?? "") : result
+}
+
+
+fileprivate func reader(_ args: Array<Substring>, _ functionsInfo: Functions.Info, _ environment: Functions.Environment) -> String? {
     
     switch args[0].lowercased() {
     
-    case "$requestinfo":
+    case "request-info":
                 
         guard let result = environment.request.info[String(args[1]).lowercased()] else {
             Log.atError?.log("Request.info does not contain key: \(args[1])")
@@ -103,12 +126,7 @@ public func evaluateKeyArgument(_ arg: String, using functionsInfo: Functions.In
         return result
         
         
-    case "$requestinfo!":
-
-        return environment.request.info[String(args[1]).lowercased()] ?? ""
-
-        
-    case "$functionsinfo":
+    case "functions-info":
         
         guard let result = functionsInfo[String(args[1]).lowercased()] as? String else {
             Log.atError?.log("FunctionInfo does not contain key: \(args[1])")
@@ -118,21 +136,21 @@ public func evaluateKeyArgument(_ arg: String, using functionsInfo: Functions.In
         return result
 
         
-    case "$serviceinfo":
+    case "service-info":
         
         switch args[1].lowercased() {
             
-        case "absoluteresourcepath":
+        case "absolute-resource-path":
             
             return environment.serviceInfo[.absoluteResourcePathKey] as? String
             
 
-        case "relativeresourcepath":
+        case "relative-resource-path":
             
             return environment.serviceInfo[.relativeResourcePathKey] as? String
 
             
-        case "responsestarted":
+        case "response-started":
         
             return (environment.serviceInfo[.responseStartedKey] as? Int64)?.description
 
@@ -143,7 +161,7 @@ public func evaluateKeyArgument(_ arg: String, using functionsInfo: Functions.In
         }
 
         
-    case "$sessioninfo":
+    case "session-info":
         
         guard (environment.serviceInfo[.sessionKey] as? SessionInfo) != nil else {
             Log.atError?.log("No SessionInfo found")
@@ -158,7 +176,7 @@ public func evaluateKeyArgument(_ arg: String, using functionsInfo: Functions.In
         }
 
         
-    case "$account":
+    case "account":
         
         guard let session = (environment.serviceInfo[.sessionKey] as? Session) else {
             Log.atError?.log("No Session found")
@@ -166,12 +184,16 @@ public func evaluateKeyArgument(_ arg: String, using functionsInfo: Functions.In
         }
 
         guard let account = session.info[.accountKey] as? Account else {
-            return ""
+            return nil
         }
         
         switch args[1].lowercased() {
         
         case "name": return account.name
+            
+        case "is-domain-admin": return account.isDomainAdmin.description
+            
+        case "is-moderator": return account.isModerator.description
             
         default:
             Log.atError?.log("No access to Account mapped for key: \(args[1].lowercased())")
@@ -180,7 +202,7 @@ public func evaluateKeyArgument(_ arg: String, using functionsInfo: Functions.In
         }
         
         
-    case "$domain":
+    case "domain":
         
         switch args[1].lowercased() {
             
@@ -188,40 +210,40 @@ public func evaluateKeyArgument(_ arg: String, using functionsInfo: Functions.In
         
         case "root": return environment.domain.webroot
             
-        case "forewardurl": return environment.domain.forwardUrl
+        case "foreward-url": return environment.domain.forwardUrl
             
         case "enabled": return environment.domain.enabled.description
             
-        case "accesslogenabled": return environment.domain.accessLogEnabled.description
+        case "accesslog-enabled": return environment.domain.accessLogEnabled.description
             
-        case "404logenabled": return environment.domain.four04LogEnabled.description
+        case "404log-enabled": return environment.domain.four04LogEnabled.description
             
-        case "sessionlogenabled": return environment.domain.sessionLogEnabled.description
+        case "sessionlog-enabled": return environment.domain.sessionLogEnabled.description
             
-        case "phppath": return (environment.domain.phpPath?.path ?? "")
+        case "php-path": return (environment.domain.phpPath?.path ?? "")
             
-        case "phpoptions":
+        case "php-options":
             if environment.domain.phpPath != nil {
                 return (environment.domain.phpOptions ?? "")
             } else {
                 return "PHP Disabled"
             }
             
-        case "phpmapindex":
+        case "php-map-index":
             if environment.domain.phpPath != nil {
                 return environment.domain.phpMapIndex.description
             } else {
                 return "PHP Disabled"
             }
             
-        case "phpmapall":
+        case "php-map-all":
             if environment.domain.phpPath != nil {
                 return environment.domain.phpMapAll.description
             } else {
                 return "PHP Disabled"
             }
             
-        case "phptimeout":
+        case "php-timeout":
             if environment.domain.phpPath != nil {
                 return environment.domain.phpTimeout.description
             } else {
@@ -230,7 +252,7 @@ public func evaluateKeyArgument(_ arg: String, using functionsInfo: Functions.In
             
         case "sfresources": return environment.domain.sfresources
             
-        case "sessiontimeout": return environment.domain.sessionTimeout.description
+        case "session-timeout": return environment.domain.sessionTimeout.description
 
         default:
             Log.atError?.log("No access to Domain mapped for key: \(args[1].lowercased())")

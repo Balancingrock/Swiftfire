@@ -98,23 +98,26 @@ func function_sf_domainTelemetryTable(_ args: Functions.Arguments, _ info: inout
     // Check that a server admin is logged in
     
     guard let session = environment.serviceInfo[.sessionKey] as? Session else {
-        return "Session error".data(using: String.Encoding.utf8)
+        Log.atError?.log("Cannot get session")
+        return htmlErrorMessage
     }
     
     guard let account = session.info[.accountKey] as? Account else {
-        return "Account error".data(using: String.Encoding.utf8)
+        Log.atError?.log("Cannot get account")
+        return htmlErrorMessage
     }
     
     guard serverAdminDomain.accounts.contains(account.name) else {
-        return "Illegal access".data(using: String.Encoding.utf8)
+        Log.atError?.log("No admin logged in")
+        return htmlErrorMessage
     }
     
     
     // Check that a valid domain name was specified
     
-    guard let name = environment.request.info["domainname"] else { return "***Error***".data(using: String.Encoding.utf8) }
+    guard let name = environment.request.info["domainname"] else { return htmlErrorMessage }
     
-    guard let domain = domains.domain(for: name) else { return "***Error***".data(using: String.Encoding.utf8) }
+    guard let domain = domains.domain(for: name) else { return htmlErrorMessage }
     
     
     // Create the table

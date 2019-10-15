@@ -97,17 +97,17 @@ func function_sf_deleteDomain(_ args: Functions.Arguments, _ info: inout Functio
     
     guard let session = environment.serviceInfo[.sessionKey] as? Session else {
         Log.atError?.log("No session found", from: Source(id: -1, file: #file, function: #function, line: #line))
-        return "***Error***".data(using: String.Encoding.utf8)
+        return htmlErrorMessage
     }
     
     guard let account = session.info[.accountKey] as? Account else {
         Log.atError?.log("No account found", from: Source(id: -1, file: #file, function: #function, line: #line))
-        return "***Error***".data(using: String.Encoding.utf8)
+        return htmlErrorMessage
     }
     
     guard serverAdminDomain.accounts.contains(account.name) else {
         Log.atError?.log("Not an admin account: '\(account.name)'", from: Source(id: -1, file: #file, function: #function, line: #line))
-        return "***Error***".data(using: String.Encoding.utf8)
+        return htmlErrorMessage
     }
     
     
@@ -115,12 +115,12 @@ func function_sf_deleteDomain(_ args: Functions.Arguments, _ info: inout Functio
     
     guard let name = environment.request.info["domainname"] else {
             Log.atError?.log("Missing DomainName", from: Source(id: -1, file: #file, function: #function, line: #line))
-            return "***Error***".data(using: String.Encoding.utf8)
+            return htmlErrorMessage
     }
     
     guard domains.contains(name) else {
         Log.atError?.log("Domain with name \(name) does not exist", from: Source(id: -1, file: #file, function: #function, line: #line))
-        return "***Error***".data(using: String.Encoding.utf8)
+        return htmlErrorMessage
     }
     
     

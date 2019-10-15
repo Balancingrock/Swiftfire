@@ -63,9 +63,9 @@ import Core
 
 public func function_assign(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: Functions.Environment) -> Data? {
     
-    guard case .arrayOfString(let arr) = args, arr.count == 2 else { return "***error***".data(using: .utf8) }
+    guard case .arrayOfString(let arr) = args, arr.count == 2 else { return htmlErrorMessage }
     
-    let value = evaluateKeyArgument(arr[0], using: info, in: environment)
+    let value = readKey(arr[0], using: info, in: environment)
     
     let key = arr[1]
     

@@ -110,21 +110,24 @@ func function_sf_postingButtonedInput(_ args: Functions.Arguments, _ info: inout
     // Check access rights
     
     guard let session = environment.serviceInfo[.sessionKey] as? Session else {
-        return "Session error".data(using: String.Encoding.utf8)
+        Log.atError?.log("Missing session")
+        return htmlErrorMessage
     }
     
     guard let account = session.info[.accountKey] as? Account else {
-        return "Account error".data(using: String.Encoding.utf8)
+        Log.atError?.log("Missing account")
+        return htmlErrorMessage
     }
     
     guard serverAdminDomain.accounts.contains(account.name) else {
-        return "Illegal access".data(using: String.Encoding.utf8)
+        Log.atError?.log("No server admin logged in")
+        return htmlErrorMessage
     }
 
     
     // Check for minimum the 4 arguments and an even number of arguments
     
-    guard case .arrayOfString(let arr) = args, arr.count >= 4, (arr.count % 2 == 0) else { return "***Error***".data(using: String.Encoding.utf8) }
+    guard case .arrayOfString(let arr) = args, arr.count >= 4, (arr.count % 2 == 0) else { return htmlErrorMessage }
     
     
     // Create dictionary

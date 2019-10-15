@@ -91,7 +91,7 @@ public func postingButton(target: String, title: String, keyValuePairs: Dictiona
 ///    - __target__: link to be invoked when the input (button) is clicked
 ///    - __title__: Title of the input (button)
 ///    - __key-N__: The key N to include in a POST request of type x-www-form-urlencoded.
-///    - __value-N__: The value for key N to include in a POST request of type x-www-form-urlencoded. This may be a keyed argument, see Functions.md and/or the operation evaluateKeyArgument.
+///    - __value-N__: The value for key N to include in a POST request of type x-www-form-urlencoded. This may be a keyed argument, see Functions.md and/or the operation readKey.
 ///
 /// _Other input used_:
 ///    - the css class of the form is `posting-button-form`
@@ -104,7 +104,7 @@ public func function_postingButton(_ args: Functions.Arguments, _ info: inout Fu
     
     // Check for minimum the 4 arguments and an even number of arguments
     
-    guard case .arrayOfString(let arr) = args, arr.count >= 4, arr.count.isEven else { return "***Error***".data(using: String.Encoding.utf8) }
+    guard case .arrayOfString(let arr) = args, arr.count >= 4, arr.count.isEven else { return htmlErrorMessage }
     
     
     // Create dictionary
@@ -120,7 +120,7 @@ public func function_postingButton(_ args: Functions.Arguments, _ info: inout Fu
     // Parse for key argument values
     
     for (key, value) in dict {
-        dict[key] = evaluateKeyArgument(value, using: info, in: environment)
+        dict[key] = readKey(value, using: info, in: environment)
     }
     
     

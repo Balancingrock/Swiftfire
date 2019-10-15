@@ -10,4 +10,4 @@ If you waited more than 24 hours before using the link, then the link has expire
 
 It could also be that you inadvertently visited the link twice (or more) and the password was already changed.
 
-Either way, you can always [try again](/templates/forgotPassword.sf.html).
+Either way, you can always [try again](/templates/forgot-password.sf.html).

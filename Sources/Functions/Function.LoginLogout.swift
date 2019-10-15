@@ -72,7 +72,7 @@ public func function_loginLogout(_ args: Functions.Arguments, _ info: inout Func
     
     guard case .arrayOfString(let arr) = args, (arr.count == 0 || arr.count == 4) else {
         Log.atWarning?.log("Function .loginLogout() should have 0 or 4 arguments")
-        return "***error***".data(using: .utf8)
+        return htmlErrorMessage
     }
     
     

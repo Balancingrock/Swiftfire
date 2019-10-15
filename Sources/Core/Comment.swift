@@ -46,19 +46,19 @@ import BRBON
 import Http
 
 
-public let COMMENT_ORIGINAL_RIK = "origc"
-public let COMMENT_HTMLIFIED_RIK = "htmlc"
-public let COMMENT_HTMLIFIED_VERION_RIK = "vers"
-//public let COMMENT_ID_RIK = "cmnti"
-public let COMMENT_ORIGINAL_TIMESTAMP_RIK = "cmnto"
-public let COMMENT_LAST_UPDATE_TIMESTAMP_RIK = "cmntl"
-public let COMMENT_NOFUPDATES_RIK = "cmntn"
-public let COMMENT_DISPLAY_NAME_RIK = "cmnta"
+public let COMMENT_ORIGINAL_RIK = "orig"
+public let COMMENT_HTMLIFIED_RIK = "html"
+public let COMMENT_HTMLIFIED_VERSION_RIK = "v"
+public let COMMENT_IDENTIFIER_RIK = "id"
+public let COMMENT_ORIGINAL_TIMESTAMP_RIK = "timp"
+public let COMMENT_LAST_UPDATE_TIMESTAMP_RIK = "time"
+public let COMMENT_NOFUPDATES_RIK = "ned"
+public let COMMENT_DISPLAY_NAME_RIK = "name"
 
 fileprivate let ORIGINAL_NF = NameField(COMMENT_ORIGINAL_RIK)!
 fileprivate let HTMLIFIED_NF = NameField(COMMENT_HTMLIFIED_RIK)!
-fileprivate let HTMLIFIED_VERSION_NF = NameField(COMMENT_HTMLIFIED_VERION_RIK)!
-//fileprivate let ID_NF = NameField(COMMENT_ID_RIK)!
+fileprivate let HTMLIFIED_VERSION_NF = NameField(COMMENT_HTMLIFIED_VERSION_RIK)!
+fileprivate let IDENTIFIER_NF = NameField(COMMENT_IDENTIFIER_RIK)!
 fileprivate let ORIGINAL_TIMESTAMP_NF = NameField(COMMENT_ORIGINAL_TIMESTAMP_RIK)!
 fileprivate let LAST_UPDATE_TIMESTAMP_NF = NameField(COMMENT_LAST_UPDATE_TIMESTAMP_RIK)!
 fileprivate let NOF_UPDATES_NF = NameField(COMMENT_NOFUPDATES_RIK)!
@@ -95,7 +95,10 @@ public final class Comment {
         let replace: Dictionary<String, String> = [
             "[i]" : "<span style=\"font-style:italic\"",
             "[b]" : "<span style=\"font-weigth:bold\"",
-            "[/]" : "</span>"
+            "[/i]" : "</span>",
+            "[/b]" : "</span>",
+            "<" : "&lt",
+            ">" : "&gt"
         ]
         
         var result = comment
@@ -126,11 +129,12 @@ public final class Comment {
     ///
     /// - Parameters:
     ///     - text: The text for the comment as typed in by the user. Note that the characters '<' and '>' will be removed.
+    ///     - Identifier: The indentifier used to create the relative path.
     ///     - relativePath: The path where the comment will be stored relative to the account directory..
     ///     - displayName: Will be stored alongside the text, intended to be used as replacement for the author field when the Anon account is used.
     ///     - account: The account to use to store this comment
     
-    public init?(text: String, relativePath: String, displayName: String, account: Account) {
+    public init?(text: String, identifier: String, relativePath: String, displayName: String, account: Account) {
         
         guard !text.isEmpty else { return nil }
         
@@ -147,17 +151,18 @@ public final class Comment {
         
         // If a file already exists, increment the timestamp until a non-existing file URL is created
         
-        var i = Date().unixTime
+        let now = Date().unixTime
+        var i = now
         var flag = false
         var fileUrl: URL!
         while !flag {
-            fileUrl = dir.appendingPathComponent(i.description).appendingPathExtension("brbon")
+            fileUrl = dir.appendingPathComponent(String(i)).appendingPathExtension("brbon")
             if FileManager.default.fileExists(atPath: fileUrl.path) {
                 i += 1
             } else {
                 flag = true
             }
-            if i > 10 {
+            if (i - now) > 10 {
                 Log.atAlert?.log("Too many post attempts by single user: \(account.name)")
                 return nil
             }
@@ -180,7 +185,7 @@ public final class Comment {
         db.root.updateItem(noHtml, withNameField: ORIGINAL_NF)
         db.root.updateItem(markedUp, withNameField: HTMLIFIED_NF)
         db.root.updateItem(Comment.htmlifyVersion, withNameField: HTMLIFIED_VERSION_NF)
-        //db.root.updateItem(UUID().uuidString, withNameField: ID_NF)
+        db.root.updateItem(UUID().uuidString, withNameField: IDENTIFIER_NF)
         db.root.updateItem(i, withNameField: ORIGINAL_TIMESTAMP_NF)
         db.root.updateItem(UInt16(0), withNameField: NOF_UPDATES_NF)
         db.root.updateItem(i, withNameField: LAST_UPDATE_TIMESTAMP_NF)
@@ -244,7 +249,7 @@ public final class Comment {
     
     /// The ID of this comment
     
-    //public var id: String { return db.root[ID_NF].string ?? "" }
+    public var identifier: String { return db.root[IDENTIFIER_NF].string ?? "" }
     
     
     /// The version of the htmlified conversion
@@ -262,7 +267,7 @@ public final class Comment {
     public var lastUpdateTimestamp: Int64 { return db.root[LAST_UPDATE_TIMESTAMP_NF].int64 ?? 0 }
     
     
-    /// The total number f updates
+    /// The total number of updates
     
     public var totalNumberOfUpdates: UInt16 { return db.root[NOF_UPDATES_NF].uint16 ?? 0 }
 

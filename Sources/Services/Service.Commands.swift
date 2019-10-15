@@ -73,15 +73,15 @@ fileprivate let LOGOUT_COMMAND = "logout"
 
 // When somebody tried to do something which is not allowed, yet also not an error
 
-fileprivate let ATTEMPT_NOT_ALLOWED_TEMPLATE = "/templates/notAllowed.sf.html"
+fileprivate let ATTEMPT_NOT_ALLOWED_TEMPLATE = "/templates/not-allowed.sf.html"
 
 
 // Email verification. This command is received when a new user clicks the link in the confirmation email.
 
 fileprivate let EMAIL_VERIFICATION_COMMAND = "email-verification"
 
-fileprivate let EMAIL_VERIFICATION_SUCCESS_TEMPLATE = "/templates/emailVerificationSuccess.sf.html"
-fileprivate let EMAIL_VERIFICATION_FAILED_TEMPLATE = "/templates/emailVerificationFailed.sf.html"
+fileprivate let EMAIL_VERIFICATION_SUCCESS_TEMPLATE = "/templates/email-verification-success.sf.html"
+fileprivate let EMAIL_VERIFICATION_FAILED_TEMPLATE = "/templates/email-verification-failed.sf.html"
 
 fileprivate let EMAIL_VERIFICATION_CODE_KEY = "verification-code"
 
@@ -91,8 +91,8 @@ fileprivate let EMAIL_VERIFICATION_CODE_KEY = "verification-code"
 fileprivate let REGISTER_COMMAND = "register"
 
 fileprivate let REGISTER_TEMPLATE = "/templates/register.sf.html"
-fileprivate let REGISTER_CONTINUE_TEMPLATE = "/templates/registerContinue.sf.html"
-fileprivate let REGISTER_VERIFICATION_EMAIL_TEXT_TEMPLATE = "/templates/emailVerificationText.sf.html"
+fileprivate let REGISTER_CONTINUE_TEMPLATE = "/templates/register-continue.sf.html"
+fileprivate let REGISTER_VERIFICATION_EMAIL_TEXT_TEMPLATE = "/templates/email-verificationText.sf.html"
 
 fileprivate let REGISTER_NAME_KEY = "register-name" // Necessary, unique, non-empty
 fileprivate let REGISTER_PASSWORD1_KEY = "register-password-1" // Necessary, non-empty
@@ -106,9 +106,9 @@ fileprivate let REGISTER_SUBJECT_KEY_OPTIONAL = "subject" // Optional, unchecked
 
 fileprivate let FORGOT_PASSWORD_COMMAND = "forgot-password"
 
-fileprivate let FORGOT_PASSWORD_TEMPLATE = "/templates/forgotPassword.sf.html"
-fileprivate let FORGOT_PASSWORD_CONTINUE_TEMPLATE = "/templates/forgotPasswordContinue.sf.html"
-fileprivate let FORGOT_PASSWORD_EMAIL_TEXT_TEMPLATE = "/templates/requestNewPasswordText.sf.html"
+fileprivate let FORGOT_PASSWORD_TEMPLATE = "/templates/forgot-password.sf.html"
+fileprivate let FORGOT_PASSWORD_CONTINUE_TEMPLATE = "/templates/forgot-password-continue.sf.html"
+fileprivate let FORGOT_PASSWORD_EMAIL_TEXT_TEMPLATE = "/templates/request-new-password-text.sf.html"
 
 fileprivate let FORGOT_PASSWORD_NAME_KEY = "forgot-password-name"
 
@@ -118,7 +118,7 @@ fileprivate let FORGOT_PASSWORD_NAME_KEY = "forgot-password-name"
 
 fileprivate let REQUEST_NEW_PASSWORD_COMMAND = "request-new-password"
 
-fileprivate let REQUEST_NEW_PASSWORD_FAILED_TEMPLATE = "/templates/requestNewPasswordFailed.sf.html"
+fileprivate let REQUEST_NEW_PASSWORD_FAILED_TEMPLATE = "/templates/request-new-password-failed.sf.html"
 
 fileprivate let REQUEST_NEW_PASSWORD_CODE_KEY = "request-new-password-code"
 
@@ -127,13 +127,22 @@ fileprivate let REQUEST_NEW_PASSWORD_CODE_KEY = "request-new-password-code"
 
 fileprivate let SET_NEW_PASSWORD_COMMAND = "set-new-password"
 
-fileprivate let SET_NEW_PASSWORD_TEMPLATE = "/templates/setNewPassword.sf.html"
-fileprivate let SET_NEW_PASSWORD_SUCCESS_TEMPLATE = "/templates/setNewPasswordSuccess.sf.html"
+fileprivate let SET_NEW_PASSWORD_TEMPLATE = "/templates/set-new-password.sf.html"
+fileprivate let SET_NEW_PASSWORD_SUCCESS_TEMPLATE = "/templates/set-new-password-success.sf.html"
 
 fileprivate let SET_NEW_PASSWORD_ACCOUNT_NAME_KEY = "name"
 fileprivate let SET_NEW_PASSWORD_PASSWORD1_KEY = "set-new-password-1"
 fileprivate let SET_NEW_PASSWORD_PASSWORD2_KEY = "set-new-password-2"
 
+
+// This command posts a new comment
+
+fileprivate let POST_COMMENT_COMMAND = "post-comment"
+
+fileprivate let POST_COMMENT_DISPLAY_NAME_KEY = "display-name"
+fileprivate let POST_COMMENT_TEXT_KEY = "text"
+fileprivate let POST_COMMENT_PAGE_URL_KEY = "page-url"
+fileprivate let POST_COMMENT_IDENTIFIER_KEY = "comment-id"
 
 /// Executes commands given in the URL. Only active if the URL started with the command keyword followed by a command identifier.
 ///
@@ -191,6 +200,7 @@ func service_commands(_ request: Request, _ connection: SFConnection, _ domain: 
     case FORGOT_PASSWORD_COMMAND: relativePath = executeForgotPassword(request, connection, domain, response, info)
     case REQUEST_NEW_PASSWORD_COMMAND: relativePath = executeRequestNewPassword(request, domain)
     case SET_NEW_PASSWORD_COMMAND: relativePath = executeSetNewPassword(request, domain)
+    case POST_COMMENT_COMMAND: relativePath = executePostComment(request, domain, info)
         
     default:
         
@@ -661,4 +671,40 @@ fileprivate func executeSetNewPassword(_ request: Request, _ domain: Domain) -> 
     account.newPasswordRequestTimestamp = 0
     
     return SET_NEW_PASSWORD_SUCCESS_TEMPLATE
+}
+
+
+func executePostComment(_ request: Request, _ domain: Domain, _ info: Services.Info) -> String {
+    
+    guard let postUrl = request.info[POST_COMMENT_PAGE_URL_KEY] else {
+        Log.atError?.log("Missing \(POST_COMMENT_PAGE_URL_KEY) in request.info")
+        return "/index.sf.html"
+    }
+    
+    guard let text = request.info[POST_COMMENT_TEXT_KEY] else {
+        Log.atError?.log("Missing \(POST_COMMENT_TEXT_KEY) in request.info")
+        return postUrl
+    }
+    
+    guard text.count > 1 else {
+        Log.atDebug?.log("Character count too low, is: \(text.count), should be >1")
+        return postUrl
+    }
+    
+    guard let identifier = request.info[POST_COMMENT_IDENTIFIER_KEY] else {
+        Log.atDebug?.log("Missing identifier post")
+        return postUrl
+    }
+    
+    let displayName = request.info[POST_COMMENT_DISPLAY_NAME_KEY] ?? ""
+    
+    let account = (info[.sessionKey] as? Session)?.info[.accountKey] as? Account
+    
+    
+    /// The account and domain are known, create the comment
+    
+    domain.comments.newComment(text: text, identifier: identifier, displayName: displayName, account: account)
+    
+    
+    return postUrl
 }

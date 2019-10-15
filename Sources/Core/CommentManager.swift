@@ -78,9 +78,8 @@ import BRBON
 // Comments associated with a user-account can be edited or deleted by that user (or a moderator/domain-administrator).
 
 
-fileprivate let COMMENT_BLOCK_TEMPLATE = "/templates/commentBlock.sf.html"
-fileprivate let COMMENT_REMOVED_TEMPLATE = "/templates/commentRemoved.sf.html"
-fileprivate let COMMENT_INPUT_FIELD_TEMPLATE = "/templates/commentInputField.sf.html"
+fileprivate let COMMENT_BLOCK_TEMPLATE = "/templates/comment-block.sf.html"
+fileprivate let COMMENT_REMOVED_TEMPLATE = "/templates/comment-removed.sf.html"
 
 
 // For the comment URL table
@@ -152,6 +151,8 @@ public final class CommentManager {
 
     /// Returns the entire comment section including the input field for new comments if an account is present.
     ///
+    /// Side effect: Sets the request.info[nof-comments] value to the number of comments included
+    ///
     /// - Parameters:
     ///   - for: The identifier for the comment section.
     ///   - environment: The environment (request, domain, etc)
@@ -167,7 +168,7 @@ public final class CommentManager {
             
             guard let relativePath = CommentManager.identifier2RelativePath(identifier) else {
                 Log.atError?.log("The relative path cannot be empty (identifier error)")
-                return "***error***".data(using: .utf8)!
+                return htmlErrorMessage
             }
 
             
@@ -175,7 +176,7 @@ public final class CommentManager {
             
             guard let commentTableFile = commentTableFile(relativePath) else {
                 // Error log has been made
-                return "***error***".data(using: .utf8)!
+                return htmlErrorMessage
             }
 
             
@@ -183,9 +184,14 @@ public final class CommentManager {
             
             guard let (itemManager, table) = loadCommentTable(from: commentTableFile) else {
                 Log.atError?.log("ItemManager should be available at \(commentTableFile.path)")
-                return "***error***".data(using: .utf8)!
+                return htmlErrorMessage
             }
 
+            
+            // Side effect: initialize environment.request.info[nof-comments]
+            
+            environment.request.info["nof-comments"] = String(table.rowCount ?? 0)
+            
             
             // Check if the table has update markers
             
@@ -238,7 +244,7 @@ public final class CommentManager {
             // 1. Build new comment cache, 2. Append new entries to comment cache, 3. Return comment cache as is
             
             guard let commentCacheFile = commentCacheFile(relativePath) else {
-                return "***error***".data(using: .utf8)!
+                return htmlErrorMessage
             }
 
             if !FileManager.default.fileExists(atPath: commentCacheFile.path) {
@@ -270,7 +276,7 @@ public final class CommentManager {
                 return try Data.init(contentsOf: commentCacheFile)
             } catch let error {
                 Log.atError?.log("Cannot read comment cache error = \(error.localizedDescription)")
-                return "***error***".data(using: .utf8)!
+                return htmlErrorMessage
             }
         }
     }
@@ -300,8 +306,7 @@ public final class CommentManager {
                 data = try Data.init(contentsOf: file)
             } catch let error {
                 Log.atError?.log("Cannot read comment cache error = \(error.localizedDescription)")
-                data = "***error***".data(using: .utf8)!
-                return data
+                return htmlErrorMessage
             }
         }
         
@@ -315,8 +320,7 @@ public final class CommentManager {
             
             guard let commentPath = table[index, COMMENT_URL_NF].string else {
                 Log.atError?.log("Cannot retrieve path from comment table at row \(index)")
-                data = "***error***".data(using: .utf8)!
-                return data
+                return htmlErrorMessage
             }
             
             
@@ -345,7 +349,7 @@ public final class CommentManager {
         } catch let error {
             
             Log.atError?.log("Error updating the comment cache, error = \(error.localizedDescription)")
-            data = "***error***".data(using: .utf8)!
+            return htmlErrorMessage
         }
         
         return data
@@ -387,7 +391,7 @@ public final class CommentManager {
     ///   - environment: The environment for the template processing.
     ///
     /// - Returns: The utf8 encoded HTML code comprising the input field.
-    
+    /*
     public func commentInputField(_ account: Account?, _ environment: Functions.Environment) -> Data {
         
         
@@ -410,14 +414,14 @@ public final class CommentManager {
         
         guard case .success(let template) = SFDocument.factory(path: templatePath) else {
             Log.atDebug?.log("Cannot create document from commentTemplatePath \(templatePath)")
-            return "***error***".data(using: .utf8)!
+            return htmlErrorMessage
         }
                               
         
         // Return the result
         
         return template.getContent(with: environment)
-    }
+    }*/
     
 
     /// Updates the comments section for the given comment. This may invalidate cached values.
@@ -428,7 +432,7 @@ public final class CommentManager {
     ///   - displayName: A display name for the Anon account.
     ///   - account: The account for the comment.
 
-    public func appendNewComment(text: String, identifier: String, displayName: String, account: Account?) {
+    public func newComment(text: String, identifier: String, displayName: String, account: Account?) {
         
         
         // Make sure there is an account
@@ -448,7 +452,7 @@ public final class CommentManager {
             
             // Create (and store) the comment
             
-            guard let comment = Comment(text: text, relativePath: relativePath, displayName: displayName, account: account) else {
+            guard let comment = Comment(text: text, identifier: identifier, relativePath: relativePath, displayName: displayName, account: account) else {
                 Log.atError?.log("Failed to create a new comment")
                 return
             }

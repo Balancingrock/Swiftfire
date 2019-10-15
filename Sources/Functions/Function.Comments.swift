@@ -46,6 +46,9 @@ import Core
 import BRBON
 
 
+fileprivate let COMMENT_SECTION_TEMPLATE = "/templates/comment-section.sf.html"
+
+
 /// Returns the HTML code for a comments section.
 ///
 /// __Webpage Use__:
@@ -71,7 +74,7 @@ public func function_comments(_ args: Functions.Arguments, _ info: inout Functio
     
     guard case .arrayOfString(let arr) = args else {
         Log.atError?.log("Wrong type of arguments")
-        return "***error***".data(using: .utf8)
+        return htmlErrorMessage
     }
     
     
@@ -79,31 +82,35 @@ public func function_comments(_ args: Functions.Arguments, _ info: inout Functio
     
     guard arr.count >= 1 else {
         Log.atError?.log("Missing identifier in function argument")
-        return "***error***".data(using: .utf8)
+        return htmlErrorMessage
     }
     
+    let identifier = arr[0].lowercased()
     
-    // There must be a session
-    
-    guard let session = environment.serviceInfo[.sessionKey] as? Session else {
-        Log.atError?.log("No session found")
-        return "***error***".data(using: .utf8)
-    }
+    environment.request.info["comment-id"] = identifier
     
     
-    // First attempt at retrieving the account
-    
-    let account = session.info[.accountKey] as? Account
-    
-    
-    var data: Data = "<div class=\"sfcomments\">".data(using: .utf8)!
-    
-    data.append(environment.domain.comments.commentBlocks(for: arr[0].lowercased(), environment: environment))
-    
-    data.append(environment.domain.comments.commentInputField(account, environment))
-    
-    data.append("</div>".data(using: .utf8)!)
+    // Create the comment blocks
 
-    return data
+    let commentBlocks = environment.domain.comments.commentBlocks(for: identifier, environment: environment)
+    
+
+    // Assemble the comments section
+    
+    let templatePath = (environment.domain.webroot as NSString).appendingPathComponent(COMMENT_SECTION_TEMPLATE)
+
+    switch SFDocument.factory(path: templatePath) {
+        
+    case .error(let message):
+        
+        Log.atDebug?.log("Cannot create document from template path: \(templatePath), error message: \(message)")
+        return htmlErrorMessage
+        
+    
+    case .success(let template):
+        
+        environment.request.info["comment-blocks"] = String(data: commentBlocks, encoding: .utf8)
+        return template.getContent(with: environment)
+    }
 }
 

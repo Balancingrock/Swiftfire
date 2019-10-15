@@ -1,0 +1,31 @@
+.enable(edit, true, $account.is-domain-admin)
+.enable(edit, true, $account.is-moderator)
+.enable(edit, not-equal, $account.name, Anon)
+.enable(account-name, not-equal, $account.name, Anon)
+.enable(display-name, equal, $account.name, Anon)
+<div class="csb-block" width="100%">
+	<div class="csbb-top" width="100%">
+		<div class="csbbt-left">
+.begin(account-name)
+			<p>Name: .show($account.name)</p>
+.begin(display-name)
+			<p>Name: .show($request-info.comment-name)</p>
+.end()
+			<p>Date: .show($request-info.comment-timp)</p></br>
+			<p>Last edit: .show($request-info.comment-time)</p>
+			<p>Edits: .show($request-info.comment-ned)</p>
+		</div>
+		<div class="csbbt-right">
+			<p>.show($request-info.comment-html)</p>
+		</div>
+	</div>
+	<div class="csbb-bottom" width="100%">
+.begin(edit)
+		<form action="/command/comment-edit" method="post">
+			<input type="hidden" name="comment-account" value=".show($account.name)">
+			<input type="hidden" name="comment-identifier" value=".show($request-info.comment-id)">
+			<input type="submit" value="Edit">
+		</form>
+.end()
+	</div>
+</div>

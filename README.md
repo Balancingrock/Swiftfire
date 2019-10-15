@@ -2,7 +2,7 @@
 
 Swiftfire is a webserver that allows the injection of HTML code from routines written in Swift.
 
-The Swiftfire webserver can be extended with functions and services written in Swift. The services are used to process a HTTP request, and the functions are used to prepare a response by processing the requested page or file.  This makes it possible to create entire websites written in nothing else but HTML, CSS and Swift. No other languages, frameworks or external services necessary, with a minor exception for openSSL.
+The Swiftfire webserver can be extended with functions and services written in Swift. The services are used to process a HTTP request, and the functions are used to prepare a response by processing the requested page or file.  This makes it possible to create entire websites written in nothing else but HTML, CSS and Swift. No other languages, frameworks or external services necessary, with a minor exception for openSSL for HTTPS.
 
 To use Swiftfire as an end-user you need a MacOS computer capable of running at least MacOS 10.12.
 
@@ -11,6 +11,8 @@ To develop Swiftfire extensions you need Xcode as well.
 Linux compatibility is envisaged, but not yet actively supported.
 
 Visit the Swiftfire homepage at [http://swiftfire.nl](http://swiftfire.nl).
+
+Beware: In the current version 1.x Swiftfire is still experimental. It works, but as this way of building websites is still new, it has to be expected that significant changes will need to be made as we gain experience. Hence if you are following along, you should expect that new releases will necessitate some recoding, including any websites that you might be creating. Version 2.0 will be released when we are relatively certain that major recodings will no longer be needed. 
 
 ## How it works
 

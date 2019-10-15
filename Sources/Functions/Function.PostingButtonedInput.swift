@@ -106,7 +106,10 @@ func function_postingButtonedInput(_ args: Functions.Arguments, _ info: inout Fu
     
     // Check for minimum the 4 arguments and an even number of arguments
     
-    guard case .arrayOfString(let arr) = args, arr.count >= 4, arr.count.isEven else { return "***Error***".data(using: String.Encoding.utf8) }
+    guard case .arrayOfString(let arr) = args, arr.count >= 4, arr.count.isEven else {
+        Log.atError?.log("Need 4 arguments")
+        return htmlErrorMessage
+    }
     
     
     // Create dictionary

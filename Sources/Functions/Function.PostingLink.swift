@@ -92,7 +92,7 @@ public func function_postingLink(_ args: Functions.Arguments, _ info: inout Func
     
     // Check for minimum the 4 arguments and an even number of arguments
     
-    guard case .arrayOfString(let arr) = args, arr.count > 4, arr.count.isEven else { return "***Error***".data(using: String.Encoding.utf8) }
+    guard case .arrayOfString(let arr) = args, arr.count > 4, arr.count.isEven else { return htmlErrorMessage }
     
     
     // Create dictionary

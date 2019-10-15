@@ -1,0 +1,28 @@
+.enable(no-login, nil, $account.name)
+.enable(no-comments, equal, $request-info.nof-comments, 0)
+<div class="comment-section">
+	<div class="cs-top">
+		<p>Comments:</p>
+	</div>
+	<div class="cs-blocks">
+.begin(no-comments)
+		<p class="csb-none">There are no comments yet</p><br>
+.end()
+		.show($request-info.comment-blocks)
+	</div>
+	<div class="cs-input">
+		<form action="/command/post-comment" method="post">
+			<div class="csi-form">
+				<textarea class="csif-input" name="text" placeholder="Your comments"></textarea>
+				<div class="csif-howto"><p>Use [i]..[/i] for italic, [b]..[/b] for bold. Links will not be clickable.</p></div>
+.begin(no-login)
+				<div class="csif-anonymous"><p>Anonymous comments need approval by a moderator and cannot be edited or deleted. New users will have their first few posts moderated.</p></div>
+				<div class="csif-login"><p><a href="/template/login.sf.html">Login first</a> to enable editing and deletion of comments.</p></div>
+				<input class="csif-name" type="text" name="display-name" placeholder="Anonymous">
+.end()
+				<input type="hidden" name="page-url" value=".show($service-info.relative-resource-path)">
+				<input type="hidden" name="comment-id" value=".show($request-info.comment-id)">
+				<input class="csif-submit" type="submit" value="Submit">
+		</form>
+	</div>
+</div>

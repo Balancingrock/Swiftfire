@@ -7,21 +7,21 @@ To register, fill out the fields below and click the 'Register' button. Upon ver
 <form action="/command/register" method="post">
 	<div style="display:flex; flex-direction:column; justify-content:center; margin-bottom:50px;">
 		<div style="margin-left:auto; margin-right:auto;">
-			<p>.show($requestinfo!.previous-attempt-message)</p>
+			<p>.show($request-info.previous-attempt-message!)</p>
 		</div>
 		<div style="margin-left:auto; margin-right:auto;">
 			<br>
 			<p style="margin-bottom:0px">Name:</p>
-			<input style="color:black;" type="text" name="register-name" value=".show($requestinfo!.register-name)" autofocus>
+			<input style="color:black;" type="text" name="register-name" value=".show($request-info.register-name!)" autofocus>
 			<br>
 			<p style="margin-bottom:0px">Password:</p>
-			<input style="color:black;" type="password" name="register-password-1" value=".show($requestinfo!.RegisterPassword1)">
+			<input style="color:black;" type="password" name="register-password-1" value=".show($request-info.RegisterPassword1!)">
 			<br>
 			<p style="margin-bottom:0px">Password:</p>
-			<input style="color:black;" type="password" name="register-password-2" value=".show($requestinfo!.RegisterPassword2)">
+			<input style="color:black;" type="password" name="register-password-2" value=".show($request-info.RegisterPassword2!)">
 			<br>
 			<p style="margin-bottom:0px">Email:</p>
-			<input style="color:black;" type="text" name="register-email" value=".show($requestinfo!.register-email)">
+			<input style="color:black;" type="text" name="register-email" value=".show($request-info.register-email!)">
 			<br>
 			<br>
 			<input style="width:100%; color:black;" type="submit" value="Register">
