@@ -128,7 +128,7 @@ fileprivate func reader(_ args: Array<Substring>, _ functionsInfo: Functions.Inf
         
     case "functions-info":
         
-        guard let result = functionsInfo[String(args[1]).lowercased()] as? String else {
+        guard let result = functionsInfo[String(args[1]).lowercased()] else {
             Log.atError?.log("FunctionInfo does not contain key: \(args[1])")
             return nil
         }

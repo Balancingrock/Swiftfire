@@ -36,7 +36,8 @@
 //
 // History
 //
-// 1.3.0 - Added 'begin' and 'end' functions
+// 1.3.0 - Added control functions: 'if' and 'for'
+//       - Removed priority parameter since from here on functions will be sequence dependent
 // 1.2.0 - Allowed the dot in the string of an argument to support the $<source>.<property> notation
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
@@ -46,15 +47,13 @@
 //
 // Note: {} = sequence, [] = optional, | = or, .. = any in range
 //
-// <function> ::= <leading-sign><name>[<priority-seperator>[<priority>]]<arguments>
+// <function> ::= <leading-sign><name><arguments>
 //
 // <leading-sign>          ::= "."
 // <name>                  ::= <letter>|<digit>|<allowed-signs-in-name>{[<letter>|<digit>|<allowed-signs-in-name>]}
 // <letter>                ::= "A" .. "Z" | "a" .. "z"
 // <digit>                 ::= "0" .. "9"
 // <allowed-signs-in-name> ::= "-"|"_"
-// <priority-seperator>    ::= ":"
-// <priority>              ::= <digit>{[<digit>]}
 //
 // <arguments>             ::= "("[<argument>[{<argument-separator><argument>}]]")"|<json-object>
 // <json-object>           ::= "{"<json-code>"}"
@@ -66,20 +65,10 @@
 // Examples:
 // .numberOfHits()
 // .customSeparator(1, fourtyTwo)
-// .numberOfBoxes:2{"first":"jumping", "second":["throw", "catch"]}
+// .numberOfBoxes{"first":"jumping", "second":["throw", "catch"]}
 //
 // Note: Only a function that does have a corresponding entry in the registered function table will be recognized as
-// a function, with the exception of "blockStart" and "blockEnd".
-// =====================================================================================================================
-//
-/// There are two predefined functions: `begin` and `end`. These are used to name "blocks". Blocks are document fragments that can contain HTML code
-/// and/or functions, and can be enabled and disabled. By default, only unnamed blocks are enabled. A named block starts after a `begin`with the name
-/// given in the `begin` function. It ends with either the `end` function or a new `begin` function or the end of the document.
-///
-/// To enable a named block, call the sfdocument function _blocks.enable(<name>)_.
-///
-/// To disable a named block, call the sfdocument function _blocks.disable(<name>)_.
-//
+// a function, with the exception of the build in control functions.
 // =====================================================================================================================
 
 import Foundation
@@ -132,53 +121,48 @@ extension SFDocument {
         var function: Functions.Signature? // The function signature, determined after the name is complete
         var array: Array<String> = []      // The array arguments for a function
         var json: VJson?                   // The JSON argument for a function
-
-        var blockId: String?
         
-        func asJsonFunctionBlock() -> FunctionBlock {
+        var parentBlocks: Array<ControlBlock> = [self.blocks]
+        
+        func appendJsonFunctionBlock() {
             let fb = FunctionBlock(name: name, function: function, arguments: Functions.Arguments.json(json!))
-            fb.id = blockId
-            Log.atDebug?.log("Function block: \(fb)", type: "SFDocument")
-            return fb
+            parentBlocks.last!.blocks.append(fb)
         }
         
-        func asArrFunctionBlock() -> FunctionBlock? {
+        func appendArrFunctionBlock() -> Bool {
             
             switch name {
                 
-            case "begin":
+            case "if", "for":
                 
-                if array.count == 1 {
-                    blockId = array[0]
-                } else {
-                    Log.atError?.log("Expected one argument, found \(array.count)")
-                }
-                return nil
+                let cb = ControlBlock(name: name, function: function, arguments: Functions.Arguments.arrayOfString(array))
+                parentBlocks.last!.blocks.append(cb)
+                parentBlocks.append(cb)
+
                 
             case "end":
                 
-                if array.count == 0 {
-                    blockId = nil
+                if parentBlocks.count > 2 {
+                    parentBlocks.removeLast()
                 } else {
-                    Log.atError?.log("Expected no argument, found \(array.count)")
+                    Log.atError?.log("Syntaxt error, missing 'end'")
+                    return false
                 }
-                return nil
-            
+                
             default:
             
                 let fb = FunctionBlock(name: name, function: function, arguments: Functions.Arguments.arrayOfString(array))
-                fb.id = blockId
-                Log.atDebug?.log("Function block: \(fb)", type: "SFDocument")
-                return fb
+                parentBlocks.last!.blocks.append(fb)
             }
+            
+            return true
         }
         
-        func asCharacterBlock() -> CharacterBlock? {
-            guard let data = charBuf.data(using: String.Encoding.utf8) else { return nil }
+        func appendCharacterBlock() -> Bool {
+            guard let data = charBuf.data(using: String.Encoding.utf8) else { return false }
             let cb = CharacterBlock(data: data)
-            cb.id = blockId
-            Log.atDebug?.log("Character block: \(cb)", type: "SFDocument")
-            return cb
+            parentBlocks.last!.blocks.append(cb)
+            return true
         }
 
         
@@ -253,11 +237,7 @@ extension SFDocument {
                 jsonNesting -= 1
                 if jsonNesting == 0 {
                     // --
-                    if let cblock = asCharacterBlock() {
-                        self.blocks.append(cblock)
-                    } else {
-                        return .failed
-                    }
+                    if !appendCharacterBlock() { return .failed }
                     charBuf = ""
                     // --
                     do {
@@ -266,7 +246,7 @@ extension SFDocument {
                             charBuf.append(jsonBuf)
                             return .waitForLeadingSign
                         } else {
-                            self.blocks.append(asJsonFunctionBlock())
+                            appendJsonFunctionBlock()
                             return .waitForLeadingSign
                         }
                     } catch _ {
@@ -302,14 +282,10 @@ extension SFDocument {
             } else if char == ")" { // End of arguments
                 if !argument.isEmpty { array.append(argument) }
                 // --
-                if let cblock = asCharacterBlock() {
-                    self.blocks.append(cblock)
-                } else {
-                    return .failed
-                }
+                if !appendCharacterBlock() { return .failed }
                 charBuf = ""
                 // --
-                if let block = asArrFunctionBlock() { self.blocks.append(block) }
+                if !appendArrFunctionBlock() { return .failed }
                 return .waitForLeadingSign
                 
             } else {
@@ -347,14 +323,10 @@ extension SFDocument {
             } else if char == ")" {
                 if !argument.isEmpty { array.append(argument) }
                 // --
-                if let cblock = asCharacterBlock() {
-                    self.blocks.append(cblock)
-                } else {
-                    return .failed
-                }
+                if !appendCharacterBlock() { return .failed }
                 charBuf = ""
                 // --
-                if let block = asArrFunctionBlock() { self.blocks.append(block) }
+                if !appendArrFunctionBlock() { return .failed }
                 return .waitForLeadingSign
 
             } else if char == " " {
@@ -391,7 +363,7 @@ extension SFDocument {
         
         // Empty previous parsing results
         
-        self.blocks = []
+        self.blocks = ControlBlock(name: "root", function: nil, arguments: .arrayOfString([]))
         
         
         // Setup start condition for the parsing
@@ -430,11 +402,7 @@ extension SFDocument {
         // If the charBuf is not empty, then append it
         
         if success && !charBuf.isEmpty {
-            if let cb = asCharacterBlock() {
-                self.blocks.append(cb)
-            } else {
-                return false
-            }
+            if !appendCharacterBlock() { return false }
         }
         
         return success

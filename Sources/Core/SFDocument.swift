@@ -38,7 +38,7 @@
 //
 // 1.3.0 #7 Removed local filemanager
 //       - Removed inout from the function.environment signature
-//       - Added block support
+//       - Added flow control
 // 1.0.0 Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
@@ -68,23 +68,6 @@ import BRUtils
 import KeyedCache
 
 
-/// A block of characters or a function in the document
-
-public class Block {
-    
-    var enabled: Bool = true
-    var id: String?
-}
-
-
-public extension Array where Element: Block {
-    
-    func enable(blockId: String) { self.forEach { if $0.id == blockId { $0.enabled = true } } }
-    
-    func disable(blockId: String) { self.forEach { if $0.id == blockId { $0.enabled = false } } }
-}
-
-
 /// This encapsulates a swiftfire document in its parsed form.
 
 public class SFDocument: EstimatedMemoryConsumption {
@@ -103,9 +86,23 @@ public class SFDocument: EstimatedMemoryConsumption {
     private static let queue = DispatchQueue(label: "SFDocument cache", qos: DispatchQoS.default, attributes: DispatchQueue.Attributes(), autoreleaseFrequency: DispatchQueue.AutoreleaseFrequency.inherit, target: nil)
     
     
+    /// A root class for .sf. file fragments
+
+    public class Block {
+        
+        
+        /// Returns the data contained in this block
+        
+        func getData(_ info: inout Functions.Info, _ environment: Functions.Environment) -> Data? {
+            Log.atError?.log("Must be overriden")
+            return htmlErrorMessage
+        }
+    }
+
+    
     /// A block of characters that does not contain a function.
     
-    final class CharacterBlock: Block, CustomStringConvertible {
+    final class CharacterBlock: Block {
         
         
         /// The data in the block
@@ -113,24 +110,22 @@ public class SFDocument: EstimatedMemoryConsumption {
         let data: Data
         
         
-        /// CustomStringConvertible
-        
-        var description: String {
-            return "Characterblock contains \(data.count) bytes"
-        }
-        
-        
         /// Create a new instance
         
         init(data: Data) {
             self.data = data
         }
+        
+        
+        /// Returns the data contained in this block
+
+        override func getData(_ info: inout Functions.Info, _ environment: Functions.Environment) -> Data? { return data }
     }
     
     
     /// A block of characters that contains a function, with the details of the function completely parsed.
     
-    final class FunctionBlock: Block, CustomStringConvertible {
+    final class FunctionBlock: Block {
                 
         
         /// The name of this function
@@ -148,12 +143,47 @@ public class SFDocument: EstimatedMemoryConsumption {
         var arguments: Functions.Arguments
         
 
-        /// CustomStringConvertible
+        /// Create a new instance
         
-        var description: String {
-            return "FunctionBlock for function: \(name), with arguments: \(arguments)"
+        init(name: String, function: Functions.Signature?, arguments: Functions.Arguments) {
+            self.name = name
+            self.function = function
+            self.arguments = arguments
         }
         
+        
+        /// Returns the data contained in this block
+
+        override func getData(_ info: inout Functions.Info, _ environment: Functions.Environment) -> Data? {
+            return function?(arguments, &info, environment)
+        }
+    }
+    
+    
+    /// A control block, contains other blocks that may be executed conditionally or repeatedly
+    
+    final class ControlBlock: Block {
+        
+        
+        /// The control function of this block
+        
+        let name: String
+        
+        
+        /// The other blocks that are part of this block
+        
+        var blocks: Array<Block> = []
+        
+
+        /// References the function closure
+        
+        let function: Functions.Signature?
+        
+        
+        /// The arguments in the function brackets.
+        
+        var arguments: Functions.Arguments
+
         
         /// Create a new instance
         
@@ -162,15 +192,81 @@ public class SFDocument: EstimatedMemoryConsumption {
             self.function = function
             self.arguments = arguments
         }
+        
+        
+        /// Returns the data contained in this block
+
+        override func getData(_ info: inout Functions.Info, _ environment: Functions.Environment) -> Data? {
+            
+            switch name {
+            
+            case "root":
+                
+                var data = Data()
+
+                blocks.forEach {
+                    if let d = $0.getData(&info, environment) {
+                        data.append(d)
+                    }
+                }
+                
+                return data
+                
+                
+            case "if":
+                
+                var data = Data()
+
+                guard case .arrayOfString(let args) = arguments else {
+                    Log.atError?.log("No string arguments found")
+                }
+                                
+                if evaluateIf(args, &info, environment) {
+                    
+                    blocks.forEach {
+                        if let d = $0.getData(&info, environment) {
+                            data.append(d)
+                        }
+                    }
+                }
+                
+                return data
+                
+                
+            case "for":
+            
+                var data = Data()
+
+                guard case .arrayOfString(let args) = arguments else {
+                    Log.atError?.log("No string arguments found")
+                }
+                
+                var i = 0
+                
+                info["offset"] = String(i)
+                
+                while setupFor(args, &info, environment) {
+                    
+                    blocks.forEach {
+                        if let d = $0.getData(&info, environment) {
+                            data.append(d)
+                        }
+                    }
+                    
+                    i += 1
+                    info["offset"] = String(i)
+                }
+                
+                return data
+
+                
+            default:
+                
+                Log.atError?.log("Unknown control function \(name)")
+                return nil
+            }
+        }
     }
-    
-    
-    /// The blocks that are contained in a document
-    
-    //enum DocumentBlock {
-    //    case characterBlock(CharacterBlock)
-    //    case functionBlock(FunctionBlock)
-    //}
     
     
     /// The path on disk of the file
@@ -188,9 +284,9 @@ public class SFDocument: EstimatedMemoryConsumption {
     let fileModificationDate: Int64
     
     
-    /// The results of the parser
+    /// The results of the parser will be added to this top level control block
     
-    public var blocks: Array<Block> = []
+    internal var blocks: ControlBlock = ControlBlock(name: "root", function: nil, arguments: .arrayOfString([]))
     
     
     /// All function call in prioritized order (lowest index = first to execute)
@@ -263,56 +359,10 @@ public class SFDocument: EstimatedMemoryConsumption {
         
         var info = Functions.Info()
         
-        
-        // Add ourself to the environment (this enables control over the html 'flow')
-        
-        environment.sfdocument = self
-        
-        
-        // The result
-        
-        var data = Data()
-        
-        
-        // Initially, disable all named blocks
-        
-        blocks.forEach { $0.enabled = ($0.id == nil) }
-        
-        
-        // Execute the enabled functionblocks and merge the results with the enabled character blocks
-        
-        blocks.forEach {
-            
-            if $0.enabled {
-            
-                switch $0.self {
                 
-                case is CharacterBlock:
-                
-                    data.append(($0 as! CharacterBlock).data)
-                    
-                    
-                case is FunctionBlock:
-                
-                    let fb = $0 as! FunctionBlock
-                    if let fbData = fb.function?(fb.arguments, &info, environment) {
-                        data.append(fbData)
-                    }
-
-                    
-                default:
-                    
-                    Log.atCritical?.log("Unknown block")
-                }
-            }
-        }
-        
-        
-        // Return the document
-
-        return data
+        return blocks.getData(&info, environment) ?? Data()
     }
-
+    
     
     /// Create a new Swiftfire Document.
     ///
@@ -368,3 +418,169 @@ public class SFDocument: EstimatedMemoryConsumption {
         })
     }
 }
+
+
+fileprivate func evaluateIf(_ args: Array<String>, _ info: inout Functions.Info, _ environment: Functions.Environment) -> Bool {
+        
+    let condition = args[0]
+    
+    switch condition {
+    
+    case "nil":
+        
+        guard args.count == 2 else {
+            Log.atError?.log("Wrong number of arguments, expected 3, found \(args.count)")
+            return false
+        }
+        
+        return readKey(args[1], using: info, in: environment) == nil
+        
+        
+    case "non-nil":
+        
+        guard args.count == 2 else {
+            Log.atError?.log("Wrong number of arguments, expected 3, found \(args.count)")
+            return false
+        }
+        
+        return readKey(args[1], using: info, in: environment) != nil
+
+        
+    case "empty":
+        
+        guard args.count == 2 else {
+            Log.atError?.log("Wrong number of arguments, expected 3, found \(args.count)")
+            return false
+        }
+        
+        return readKey(args[1], using: info, in: environment)?.isEmpty ?? false
+
+        
+    case "non-empty":
+        
+        guard args.count == 2 else {
+            Log.atError?.log("Wrong number of arguments, expected 3, found \(args.count)")
+            return false
+        }
+        
+        return !(readKey(args[1], using: info, in: environment)?.isEmpty ?? false)
+
+    
+    case "equal":
+        
+        guard args.count == 3 else {
+            Log.atError?.log("Wrong number of arguments, expected 4, found \(args.count)")
+            return false
+        }
+        
+        let first = readKey(args[1], using: info, in: environment)?.lowercased()
+        let second = readKey(args[2], using: info, in: environment)?.lowercased()
+
+        return (first != nil) ? first == second : false
+        
+        
+    case "not-equal":
+            
+        guard args.count == 3 else {
+            Log.atError?.log("Wrong number of arguments, expected 4, found \(args.count)")
+            return false
+        }
+            
+        let first = readKey(args[1], using: info, in: environment)?.lowercased()
+        let second = readKey(args[2], using: info, in: environment)?.lowercased()
+
+        return (first != nil) ? first != second : false
+
+        
+    case "true":
+        
+        guard args.count == 2 else {
+            Log.atError?.log("Wrong number of arguments, expected 3, found \(args.count)")
+            return false
+        }
+        
+        return readKey(args[1], using: info, in: environment) == "true"
+        
+        
+    case "false":
+        
+        guard args.count == 2 else {
+            Log.atError?.log("Wrong number of arguments, expected 3, found \(args.count)")
+            return false
+        }
+        
+        return readKey(args[1], using: info, in: environment) == "false"
+
+        
+    default:
+        Log.atError?.log("Unknown condition \(condition)")
+        return false
+    }
+}
+
+
+protocol ForControlProtocol {
+    
+    var count: Int { get }
+    func setupForElement(at index: Int, in info: inout Functions.Info)
+}
+
+
+fileprivate func setupFor(_ args: Array<String>, _ info: inout Functions.Info, _ environment: Functions.Environment) -> Bool {
+
+    func getSource(for id: String) -> ForControlProtocol? {
+        
+        switch id {
+        
+        case "commentsWaitingForApproval": return environment.domain.comments.commentsWaitingForApproval
+            
+        case "comments": return environment.domain.comments.articleComments()
+        
+        default:
+            Log.atError?.log("Missing source for id: \(id)")
+            return nil
+        }
+    }
+
+    guard args.count == 1 || args.count == 3 else {
+        Log.atError?.log("Wrong number of arguments (expected 1 or 3, found: \(args.count)")
+        return false
+    }
+    
+    guard let offsetStr = info["offset"], let offsetIn = Int(offsetStr) else {
+        Log.atError?.log("Missing offset in info")
+        return false
+    }
+    
+    guard let source = getSource(for: args[0].lowercased()) else {
+        Log.atError?.log("Source not available")
+        return false
+    }
+    
+    var startOffset: Int = 0
+    var endOffset: Int = source.count
+    
+    if args.count == 3 {
+        guard let so = Int(args[1]) else {
+            Log.atError?.log("Cannot convert start offset to integer")
+            return false
+        }
+        startOffset = so
+        guard let eo = Int(args[2]) else {
+            Log.atError?.log("Cannot convert end offset to integer")
+            return false
+        }
+        endOffset = eo
+    }
+    
+    let offset = max(startOffset, offsetIn)
+    endOffset = min(endOffset, source.count)
+    
+    if offset > endOffset { return false }
+    
+    source.setupForElement(at: offset, in: &info)
+    
+    return true
+}
+
+

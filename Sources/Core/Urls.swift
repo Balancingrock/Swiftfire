@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.3.0 - Added domainCommentsForApprovalFile
 // 1.2.1 - Removed incorrect info
 //       - Removed serveradmin directory (was unused)
 // 1.1.0 - Replaced server blacklist with serverAdminDomain blacklist
@@ -271,17 +272,22 @@ public final class Urls {
     public static func domainCommentsRootDir(for name: String) -> URL? { return dirUrl(domainDir(for: name), "comments") }
     
     
-    /// The file for the domain hit counters
+    /// The directory for the domain hit counters
     
     public static func domainHitCountersDir(for name: String) -> URL? { return fileUrl(domainDir(for: name), "hit-counters") }
 
     
-    /// The file for the domain telemetry
+    /// The directory for the domain telemetry
     
     public static func domainTelemetryDir(for name: String) -> URL? { return fileUrl(domainDir(for: name), "telemetry") }
     
     
+    /// The file for the comments waiting for approval
+    
+    public static func domainCommentsForApprovalFile(for name: String) -> URL? { return fileUrl(domainDir(for: name), "commentsForApproval.txt") }
+
+    
     /// The file with account names waiting for verification
     
-    public static func domainAccountNamesWaitingForVerificationFile(for name: String) -> URL? { return fileUrl(domainDir(for: name), "accountNamesWaitingForVerification") }
+    public static func domainAccountNamesWaitingForVerificationFile(for name: String) -> URL? { return fileUrl(domainDir(for: name), "accountNamesWaitingForVerification.txt") }
 }

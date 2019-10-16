@@ -134,7 +134,11 @@ public final class CommentManager {
     
     /// The list with comments to be approaved
     
-    public var commentsForApproval: Array<Comment> = []
+    public var commentsForApproval: Array<Comment> = [] {
+        didSet {
+            storeCommentsForApproval()
+        }
+    }
 
     
     // A pointer to the domain for these comments
@@ -146,6 +150,7 @@ public final class CommentManager {
     
     init(_ domain: Domain) {
         self.domain = domain
+        loadCommentsForApproval()
     }
     
 
@@ -382,47 +387,7 @@ public final class CommentManager {
                 
         data.append(template.getContent(with: environment))
     }
-    
-
-    /// Return the HTML code for the comment input field
-    ///
-    /// - Parameters:
-    ///   - account: The account for the input field, used for the name only.
-    ///   - environment: The environment for the template processing.
-    ///
-    /// - Returns: The utf8 encoded HTML code comprising the input field.
-    /*
-    public func commentInputField(_ account: Account?, _ environment: Functions.Environment) -> Data {
         
-        
-        // Setup of the request.info for processing of the comment input section
-        // Needed are: Username
-        
-        if let account = account {
-            environment.request.info["comment-name"] = account.name
-        } else {
-            environment.request.info["comment-name"] = "Anon"
-        }
-        
-        
-        // Get the template path for the comment input
-        
-        let templatePath = (domain.webroot as NSString).appendingPathComponent(COMMENT_INPUT_FIELD_TEMPLATE)
-        
-        
-        // Build the template
-        
-        guard case .success(let template) = SFDocument.factory(path: templatePath) else {
-            Log.atDebug?.log("Cannot create document from commentTemplatePath \(templatePath)")
-            return htmlErrorMessage
-        }
-                              
-        
-        // Return the result
-        
-        return template.getContent(with: environment)
-    }*/
-    
 
     /// Updates the comments section for the given comment. This may invalidate cached values.
     ///
@@ -905,6 +870,38 @@ public final class CommentManager {
         dm.root.updateItem(tm, withNameField: COMMENT_URL_TABLE_NF)
         
         return dm
+    }
+
+
+    /// Stores the comments waiting for approval in a list of paths
+    
+    private func storeCommentsForApproval() {
+        
+        guard let url = Urls.domainCommentsForApprovalFile(for: domain.name) else {
+            Log.atError?.log("Cannot get url for domainCommentsForApprovalFile")
+            return
+        }
+        
+        let commentUrls = commentsForApproval.map { $0.url.path }
+        
+        commentUrls.store(to: url)
+    }
+    
+    
+    /// Loads the comments waiting for approval from a list of paths
+    
+    private func loadCommentsForApproval() {
+        
+        guard let url = Urls.domainCommentsForApprovalFile(for: domain.name) else {
+            Log.atError?.log("Cannot get url for domainCommentsForApprovalFile")
+            return
+        }
+
+        var commentUrls: Array<String> = []
+
+        commentUrls.load(from: url)
+        
+        commentsForApproval = commentUrls.compactMap { Comment(url: URL(fileURLWithPath: $0)) }
     }
 }
 

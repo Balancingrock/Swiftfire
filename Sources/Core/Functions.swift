@@ -37,7 +37,7 @@
 // History
 //
 // 1.3.0 - Removed inout from the service and function signature
-//       - Added sfdocument
+//       - Changed Functions.Info to String-String dictionary
 // 1.2.0 - Changed key of functionInfo to string
 // 1.0.0 - Raised to v1.0.0, Removed old change log
 //
@@ -84,11 +84,6 @@ public final class Functions {
         /// The service chain info object.
         
         public var serviceInfo: Services.Info
-        
-        
-        /// The SFDocument this function is running on
-        
-        public var sfdocument: SFDocument?
         
         
         /// Create a new instance
@@ -146,7 +141,7 @@ public final class Functions {
     
     /// The type used to transfer data between function calls.
     
-    public typealias Info = Dictionary<String, Any>
+    public typealias Info = Dictionary<String, String>
     
     
     /// The signature of the "Insert Content Here" function calls
