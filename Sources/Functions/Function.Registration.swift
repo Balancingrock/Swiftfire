@@ -68,6 +68,4 @@ public func registerFunctions() {
     functions.register(name: "assign", function: function_assign)
     functions.register(name: "loginLogout", function: function_loginLogout)
     functions.register(name: "comments", function: function_comments)
-    functions.register(name: "enable", function: function_enable)
-    functions.register(name: "disable", function: function_disable)
 }

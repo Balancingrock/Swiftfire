@@ -116,7 +116,7 @@ fileprivate func reader(_ args: Array<Substring>, _ functionsInfo: Functions.Inf
     
     switch args[0].lowercased() {
     
-    case "request-info":
+    case "request":
                 
         guard let result = environment.request.info[String(args[1]).lowercased()] else {
             Log.atError?.log("Request.info does not contain key: \(args[1])")
@@ -126,7 +126,7 @@ fileprivate func reader(_ args: Array<Substring>, _ functionsInfo: Functions.Inf
         return result
         
         
-    case "functions-info":
+    case "info":
         
         guard let result = functionsInfo[String(args[1]).lowercased()] else {
             Log.atError?.log("FunctionInfo does not contain key: \(args[1])")
@@ -136,7 +136,7 @@ fileprivate func reader(_ args: Array<Substring>, _ functionsInfo: Functions.Inf
         return result
 
         
-    case "service-info":
+    case "service":
         
         switch args[1].lowercased() {
             
@@ -161,7 +161,7 @@ fileprivate func reader(_ args: Array<Substring>, _ functionsInfo: Functions.Inf
         }
 
         
-    case "session-info":
+    case "session":
         
         guard (environment.serviceInfo[.sessionKey] as? SessionInfo) != nil else {
             Log.atError?.log("No SessionInfo found")

@@ -122,7 +122,7 @@ extension SFDocument {
         var array: Array<String> = []      // The array arguments for a function
         var json: VJson?                   // The JSON argument for a function
         
-        var parentBlocks: Array<ControlBlock> = [self.blocks]
+        var parentBlocks: Array<ControlBlock> = []
         
         func appendJsonFunctionBlock() {
             let fb = FunctionBlock(name: name, function: function, arguments: Functions.Arguments.json(json!))
@@ -142,7 +142,7 @@ extension SFDocument {
                 
             case "end":
                 
-                if parentBlocks.count > 2 {
+                if parentBlocks.count >= 2 {
                     parentBlocks.removeLast()
                 } else {
                     Log.atError?.log("Syntaxt error, missing 'end'")
@@ -364,6 +364,8 @@ extension SFDocument {
         // Empty previous parsing results
         
         self.blocks = ControlBlock(name: "root", function: nil, arguments: .arrayOfString([]))
+        
+        parentBlocks = [self.blocks]
         
         
         // Setup start condition for the parsing

@@ -109,6 +109,12 @@ public func function_comments(_ args: Functions.Arguments, _ info: inout Functio
     
     case .success(let template):
         
+        // Setup the template needs
+        
+        info["has-comments"] = String(environment.domain.comments.hasComments(identifier))
+        info["can-edit"] = String()
+        info["can-remove"] = String()
+
         environment.request.info["comment-blocks"] = String(data: commentBlocks, encoding: .utf8)
         return template.getContent(with: environment)
     }

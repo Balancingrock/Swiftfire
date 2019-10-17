@@ -165,7 +165,7 @@ public final class Functions {
     ///
     /// The two build-in functions are necessary for the document parser and are handled by the parser. I.e. they have no associated function.
     
-    public var registered: Dictionary<String, Functions.Entry> = ["begin":dummyEntry, "end":dummyEntry]
+    public var registered: Dictionary<String, Functions.Entry> = ["if":dummyEntry, "for":dummyEntry, "end":dummyEntry]
     
     
     /// Make this class instantiable

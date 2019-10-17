@@ -36,6 +36,7 @@ private let version = "1.3.0b"
 //
 // History
 //
+// 1.3.0 Fixed description of server version.
 // 1.2.1 Updated to version 1.2.1
 // 1.2.0 Updated to version 1.2.0
 // 1.1.0 Updated to version 1.1.0
@@ -56,7 +57,7 @@ public final class ServerTelemetry {
     
     public let serverVersion = NamedStringValue(
         name: "ServerVersion",
-        about: "The version number of the server & console",
+        about: "The version number of the server",
         value: version,
         resetValue: version)
     

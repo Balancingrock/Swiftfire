@@ -134,7 +134,7 @@ public final class CommentManager {
     
     /// The list with comments to be approaved
     
-    public var commentsForApproval: Array<Comment> = [] {
+    public var forApproval: Array<Comment> = [] {
         didSet {
             storeCommentsForApproval()
         }
@@ -153,7 +153,34 @@ public final class CommentManager {
         loadCommentsForApproval()
     }
     
+    
+    /// Returns true if the given identifier has comments.
+    
+    public func hasComments(_ identifier: String) -> Bool {
+        
+        
+        // Get the relative path for the table, cache and comments
+        
+        guard let relativePath = CommentManager.identifier2RelativePath(identifier) else {
+            Log.atError?.log("The relative path cannot be empty (identifier error)")
+            return false
+        }
 
+        
+        // Get the url of the comment table
+        
+        guard let commentTableFile = commentTableFile(relativePath) else {
+            // Error log has been made
+            return false
+        }
+
+        
+        // Check if the table exists
+        
+        return FileManager.default.isReadableFile(atPath: commentTableFile.path)
+    }
+    
+    
     /// Returns the entire comment section including the input field for new comments if an account is present.
     ///
     /// Side effect: Sets the request.info[nof-comments] value to the number of comments included
@@ -383,9 +410,12 @@ public final class CommentManager {
             return
         }
         
-        comment.addToRequestInfo(environment.request, index: sequenceNumber)
-                
-        data.append(template.getContent(with: environment))
+        var info = Functions.Info()
+        info["offset"] = String(sequenceNumber)
+        
+        comment.addSelf(to: &info)
+                        
+        data.append(template.blocks.getData(&info, environment) ?? Data())
     }
         
 
@@ -426,7 +456,7 @@ public final class CommentManager {
             // For the Anon account, always store the comment in the wait-for-approval list
             
             if account.name == "Anon" {
-                domain.comments.commentsForApproval.append(comment)
+                domain.comments.forApproval.append(comment)
                 return
             }
             
@@ -435,7 +465,7 @@ public final class CommentManager {
             
             if account.nofComments <= domain.autoCommentApprovalThreshold {
             
-                domain.comments.commentsForApproval.append(comment)
+                domain.comments.forApproval.append(comment)
             
             } else {
                 
@@ -550,7 +580,7 @@ public final class CommentManager {
             
             // Remove it from the waiting list
             
-            self.commentsForApproval.removeObject(object: comment)
+            self.forApproval.removeObject(object: comment)
             
             
             // And remove it from the account comment area
@@ -673,7 +703,7 @@ public final class CommentManager {
             
             // Remove it from the waiting list
             
-            self.commentsForApproval.removeObject(object: comment)
+            self.forApproval.removeObject(object: comment)
 
             
             // Add it to the comment table
@@ -882,7 +912,7 @@ public final class CommentManager {
             return
         }
         
-        let commentUrls = commentsForApproval.map { $0.url.path }
+        let commentUrls = forApproval.map { $0.url.path }
         
         commentUrls.store(to: url)
     }
@@ -901,7 +931,7 @@ public final class CommentManager {
 
         commentUrls.load(from: url)
         
-        commentsForApproval = commentUrls.compactMap { Comment(url: URL(fileURLWithPath: $0)) }
+        forApproval = commentUrls.compactMap { Comment(url: URL(fileURLWithPath: $0)) }
     }
 }
 

@@ -53,7 +53,8 @@ public let COMMENT_IDENTIFIER_RIK = "id"
 public let COMMENT_ORIGINAL_TIMESTAMP_RIK = "timp"
 public let COMMENT_LAST_UPDATE_TIMESTAMP_RIK = "time"
 public let COMMENT_NOFUPDATES_RIK = "ned"
-public let COMMENT_DISPLAY_NAME_RIK = "name"
+public let COMMENT_DISPLAY_NAME_RIK = "dname"
+public let COMMENT_SEQUENCE_NUMBER_RIK = "ind"
 
 fileprivate let ORIGINAL_NF = NameField(COMMENT_ORIGINAL_RIK)!
 fileprivate let HTMLIFIED_NF = NameField(COMMENT_HTMLIFIED_RIK)!
@@ -63,6 +64,7 @@ fileprivate let ORIGINAL_TIMESTAMP_NF = NameField(COMMENT_ORIGINAL_TIMESTAMP_RIK
 fileprivate let LAST_UPDATE_TIMESTAMP_NF = NameField(COMMENT_LAST_UPDATE_TIMESTAMP_RIK)!
 fileprivate let NOF_UPDATES_NF = NameField(COMMENT_NOFUPDATES_RIK)!
 fileprivate let DISPLAY_NAME_NF = NameField(COMMENT_DISPLAY_NAME_RIK)!
+fileprivate let SEQUENCE_NUMBER_NF = NameField(COMMENT_SEQUENCE_NUMBER_RIK)!
 
 
 /// Every comment made by a use will be wrapped in an object of this class before it is written to permanent storage.
@@ -129,12 +131,13 @@ public final class Comment {
     ///
     /// - Parameters:
     ///     - text: The text for the comment as typed in by the user. Note that the characters '<' and '>' will be removed.
-    ///     - Identifier: The indentifier used to create the relative path.
+    ///     - identifier: The indentifier used to create the relative path.
+    ///     - sequenceNumber: The n-th comment for the identifier.
     ///     - relativePath: The path where the comment will be stored relative to the account directory..
     ///     - displayName: Will be stored alongside the text, intended to be used as replacement for the author field when the Anon account is used.
     ///     - account: The account to use to store this comment
     
-    public init?(text: String, identifier: String, relativePath: String, displayName: String, account: Account) {
+    public init?(text: String, identifier: String, sequenceNumber: UInt16, relativePath: String, displayName: String, account: Account) {
         
         guard !text.isEmpty else { return nil }
         
@@ -190,7 +193,7 @@ public final class Comment {
         db.root.updateItem(UInt16(0), withNameField: NOF_UPDATES_NF)
         db.root.updateItem(i, withNameField: LAST_UPDATE_TIMESTAMP_NF)
         db.root.updateItem(displayName, withNameField: DISPLAY_NAME_NF)
-        
+        db.root.updateItem(sequenceNumber, withNameField: SEQUENCE_NUMBER_NF)
         
         // Save it
         
@@ -272,6 +275,11 @@ public final class Comment {
     public var totalNumberOfUpdates: UInt16 { return db.root[NOF_UPDATES_NF].uint16 ?? 0 }
 
     
+    /// The sequence number for this comment
+    
+    public var sequenceNumber: UInt16 { return db.root[SEQUENCE_NUMBER_NF].uint16 ?? 0}
+    
+    
     /// Replace the original comment. Stores immediately after updating.
     /// Increments the total number of updates
     /// Updates the timestamp of last update.
@@ -302,8 +310,14 @@ public final class Comment {
             Log.atError?.log("Failed to write updated comment to file \(url.path)")
         }
     }
+}
+
+extension Comment: FunctionsInfoDataSource {
     
+    public func addSelf(to info: inout Functions.Info) { db.root.addSelf(to: &info) }
     
+
+    /*
     /// Put the comment information into the request.info directory
     ///
     /// - Parameters:
@@ -334,5 +348,5 @@ public final class Comment {
         }
         
         request.info["comment-index"] = index.description
-    }
+    }*/
 }

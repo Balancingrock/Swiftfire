@@ -219,6 +219,7 @@ public class SFDocument: EstimatedMemoryConsumption {
 
                 guard case .arrayOfString(let args) = arguments else {
                     Log.atError?.log("No string arguments found")
+                    return nil
                 }
                                 
                 if evaluateIf(args, &info, environment) {
@@ -239,6 +240,7 @@ public class SFDocument: EstimatedMemoryConsumption {
 
                 guard case .arrayOfString(let args) = arguments else {
                     Log.atError?.log("No string arguments found")
+                    return nil
                 }
                 
                 var i = 0
@@ -421,8 +423,13 @@ public class SFDocument: EstimatedMemoryConsumption {
 
 
 fileprivate func evaluateIf(_ args: Array<String>, _ info: inout Functions.Info, _ environment: Functions.Environment) -> Bool {
-        
-    let condition = args[0]
+    
+    guard args.count >= 2 else {
+        Log.atError?.log("Wrong number of arguments, expected >= 2, found \(args.count)")
+        return false
+    }
+    
+    let condition = args[1]
     
     switch condition {
     
@@ -433,7 +440,7 @@ fileprivate func evaluateIf(_ args: Array<String>, _ info: inout Functions.Info,
             return false
         }
         
-        return readKey(args[1], using: info, in: environment) == nil
+        return readKey(args[0], using: info, in: environment) == nil
         
         
     case "non-nil":
@@ -443,7 +450,7 @@ fileprivate func evaluateIf(_ args: Array<String>, _ info: inout Functions.Info,
             return false
         }
         
-        return readKey(args[1], using: info, in: environment) != nil
+        return readKey(args[0], using: info, in: environment) != nil
 
         
     case "empty":
@@ -453,7 +460,7 @@ fileprivate func evaluateIf(_ args: Array<String>, _ info: inout Functions.Info,
             return false
         }
         
-        return readKey(args[1], using: info, in: environment)?.isEmpty ?? false
+        return readKey(args[0], using: info, in: environment)?.isEmpty ?? false
 
         
     case "non-empty":
@@ -463,7 +470,7 @@ fileprivate func evaluateIf(_ args: Array<String>, _ info: inout Functions.Info,
             return false
         }
         
-        return !(readKey(args[1], using: info, in: environment)?.isEmpty ?? false)
+        return !(readKey(args[0], using: info, in: environment)?.isEmpty ?? false)
 
     
     case "equal":
@@ -473,7 +480,7 @@ fileprivate func evaluateIf(_ args: Array<String>, _ info: inout Functions.Info,
             return false
         }
         
-        let first = readKey(args[1], using: info, in: environment)?.lowercased()
+        let first = readKey(args[0], using: info, in: environment)?.lowercased()
         let second = readKey(args[2], using: info, in: environment)?.lowercased()
 
         return (first != nil) ? first == second : false
@@ -486,7 +493,7 @@ fileprivate func evaluateIf(_ args: Array<String>, _ info: inout Functions.Info,
             return false
         }
             
-        let first = readKey(args[1], using: info, in: environment)?.lowercased()
+        let first = readKey(args[0], using: info, in: environment)?.lowercased()
         let second = readKey(args[2], using: info, in: environment)?.lowercased()
 
         return (first != nil) ? first != second : false
@@ -499,7 +506,7 @@ fileprivate func evaluateIf(_ args: Array<String>, _ info: inout Functions.Info,
             return false
         }
         
-        return readKey(args[1], using: info, in: environment) == "true"
+        return readKey(args[0], using: info, in: environment) == "true"
         
         
     case "false":
@@ -509,7 +516,7 @@ fileprivate func evaluateIf(_ args: Array<String>, _ info: inout Functions.Info,
             return false
         }
         
-        return readKey(args[1], using: info, in: environment) == "false"
+        return readKey(args[0], using: info, in: environment) == "false"
 
         
     default:
@@ -519,22 +526,13 @@ fileprivate func evaluateIf(_ args: Array<String>, _ info: inout Functions.Info,
 }
 
 
-protocol ForControlProtocol {
-    
-    var count: Int { get }
-    func setupForElement(at index: Int, in info: inout Functions.Info)
-}
-
-
 fileprivate func setupFor(_ args: Array<String>, _ info: inout Functions.Info, _ environment: Functions.Environment) -> Bool {
 
-    func getSource(for id: String) -> ForControlProtocol? {
+    func getSource(for id: String) -> ControlBlockDataSource? {
         
         switch id {
         
-        case "commentsWaitingForApproval": return environment.domain.comments.commentsWaitingForApproval
-            
-        case "comments": return environment.domain.comments.articleComments()
+        case "comments-for-approval": return environment.domain.comments.forApproval
         
         default:
             Log.atError?.log("Missing source for id: \(id)")
@@ -578,7 +576,7 @@ fileprivate func setupFor(_ args: Array<String>, _ info: inout Functions.Info, _
     
     if offset > endOffset { return false }
     
-    source.setupForElement(at: offset, in: &info)
+    source.addElement(at: offset, to: &info)
     
     return true
 }
