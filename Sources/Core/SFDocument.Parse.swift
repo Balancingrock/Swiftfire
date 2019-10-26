@@ -36,7 +36,7 @@
 //
 // History
 //
-// 1.3.0 - Added control functions: 'if' and 'for'
+// 1.3.0 - Added control functions: 'if', 'for', 'cached'
 //       - Removed priority parameter since from here on functions will be sequence dependent
 // 1.2.0 - Allowed the dot in the string of an argument to support the $<source>.<property> notation
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
@@ -133,7 +133,51 @@ extension SFDocument {
             
             switch name {
                 
-            case "if", "for":
+            case "for":
+                
+                let cb = ControlBlock(name: name, function: function, arguments: Functions.Arguments.arrayOfString(array))
+                parentBlocks.last!.blocks.append(cb)
+                parentBlocks.append(cb)
+
+            case "if":
+                
+                let cb = ControlBlock(name: name, function: function, arguments: Functions.Arguments.arrayOfString(array))
+                parentBlocks.last!.blocks.append(cb)
+                parentBlocks.append(cb)
+                
+                // Create an additional 'then' block that contains the "then" case blocks.
+                let tb = ControlBlock(name: "then", function: function, arguments: Functions.Arguments.arrayOfString([]))
+                parentBlocks.last!.blocks.append(tb)
+                parentBlocks.append(tb)
+
+
+            case "else":
+                
+                // Remove the 'then' block from the parent stack
+                if parentBlocks.count >= 2 {
+                    let pb = parentBlocks.removeLast()
+                    if pb.name != "then" {
+                        Log.atError?.log("Syntax error, 'else' not preceded by 'if'")
+                        return false
+                    }
+                } else {
+                    Log.atError?.log("Syntaxt error, missing 'end'")
+                    return false
+                }
+                
+                let eb = ControlBlock(name: name, function: function, arguments: Functions.Arguments.arrayOfString([]))
+                parentBlocks.last!.blocks.append(eb)
+                parentBlocks.append(eb)
+
+
+            case "cached":
+                
+                let cb = ControlBlock(name: name, function: function, arguments: Functions.Arguments.arrayOfString(array))
+                parentBlocks.last!.blocks.append(cb)
+                parentBlocks.append(cb)
+
+                
+            case "comment":
                 
                 let cb = ControlBlock(name: name, function: function, arguments: Functions.Arguments.arrayOfString(array))
                 parentBlocks.last!.blocks.append(cb)
@@ -143,7 +187,20 @@ extension SFDocument {
             case "end":
                 
                 if parentBlocks.count >= 2 {
-                    parentBlocks.removeLast()
+                    let pb = parentBlocks.removeLast()
+                    if pb.name == "else" || pb.name == "then" { // In case of an 'else' or 'then' block, also remove the 'if' block
+                        if parentBlocks.count >= 2 {
+                            let pb = parentBlocks.removeLast()
+                            // catch syntax errors
+                            if pb.name != "if" {
+                                Log.atError?.log("Syntax error, missing 'if'")
+                                return false
+                            }
+                        } else {
+                            Log.atError?.log("Syntaxt error, missing 'end'")
+                            return false
+                        }
+                    }
                 } else {
                     Log.atError?.log("Syntaxt error, missing 'end'")
                     return false
@@ -171,6 +228,7 @@ extension SFDocument {
         func waitForLeadingSign(_ char: Character) -> Mode {
         
             if char != "." {
+                                
                 charBuf.append(char)
                 return .waitForLeadingSign
                 
@@ -181,7 +239,7 @@ extension SFDocument {
                 
             }
         }
-
+        
         func readName(_ char: Character, _ unicode: UnicodeScalar) -> Mode {
             
             if validNameCharacter.contains(unicode) {

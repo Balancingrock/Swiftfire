@@ -67,5 +67,5 @@ public func registerFunctions() {
     functions.register(name: "show", function: function_show)
     functions.register(name: "assign", function: function_assign)
     functions.register(name: "loginLogout", function: function_loginLogout)
-    functions.register(name: "comments", function: function_comments)
+    functions.register(name: "commentSection", function: function_commentSection)
 }

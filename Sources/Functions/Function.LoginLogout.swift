@@ -112,11 +112,11 @@ public func function_loginLogout(_ args: Functions.Arguments, _ info: inout Func
         html = """
             <div class="sf-loginlogout">
                 <div class="sf-loginlogout-firstoption">
-                    <a href="/templates/login.sf.html">\(loginMessage)</a>
+                    <a href="/pages/login.sf.html">\(loginMessage)</a>
                 </div>
                 <p> - </p>
                 <div class="sf-loginlogout-secondoption">
-                    <a href="/templates/register.sf.html">\(registerMessage)</a>
+                    <a href="/pages/register.sf.html">\(registerMessage)</a>
                 </div>
             </div>
         """

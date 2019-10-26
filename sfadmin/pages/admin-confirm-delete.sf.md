@@ -9,10 +9,10 @@ menuInclude: no
 			Confirm removal of admin account:
 		</div>
 		<div class="center-content" style="margin: 30px 0px 40px 0px; background-color: yellow;">
-			.show($requestInfo.ID)
+			.show($request.ID)
 		</div>
 		<div class="flex-row-vcenter" style="justify-content: space-between;">
-			.postingButton("/serveradmin/sfcommand/DeleteAccount", "Confirmed", ID, $requestInfo.ID)
+			.postingButton("/serveradmin/sfcommand/DeleteAccount", "Confirmed", ID, $request.ID)
 			.postingButton("/serveradmin/pages/admin-management.sf.html", Cancel, "", "")
 		</div>
 	</div>

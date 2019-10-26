@@ -39,6 +39,7 @@
 // 1.3.0 - Replaced var with let due to Xcode 11
 //       #8 Fixed storing of all changes to the service names
 //       - Added default "Anon" account
+//       - Added general purpose cache
 // 1.2.0 - Added admin keyword
 //       - Set session timeout to 600 (seconds)
 // 1.1.0 #3 Fixed loading & storing of domain service names
@@ -48,12 +49,14 @@
 // =====================================================================================================================
 
 import Foundation
+
 import VJson
 import SwifterLog
 import SecureSockets
 import BRUtils
 import Http
 import BRBON
+import KeyedCache
 
 
 /// Represents an internet domain.
@@ -335,6 +338,11 @@ public final class Domain {
     // This set of counters is maintained by the function_NofPageHits
     
     public var hitCounters: HitCounters = HitCounters()
+    
+    
+    /// A general purpose cache
+    
+    public var cache: MemoryCache<String, Data> = MemoryCache(limitStrategy: LimitStrategy.bySize(1_000_000), purgeStrategy: PurgeStrategy.leastUsed)
     
     
     /// The directory for the certificate files.

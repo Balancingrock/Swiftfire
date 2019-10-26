@@ -47,7 +47,7 @@ import SwifterLog
 import Core
 
 
-// Commands, templates and keys
+// Commands, templates, pages and keys
 //
 // Note that commands and templates are lowercase
 // Template paths are case sensitive and must lead with a "/"
@@ -59,7 +59,7 @@ public let ORIGINATING_PAGE_URL_KEY = "originating-page-url"
 
 fileprivate let LOGIN_COMMAND = "login"
 
-fileprivate let LOGIN_TEMPLATE = "/templates/login.sf.html"
+fileprivate let LOGIN_TEMPLATE = "/pages/login.sf.html"
 
 fileprivate let LOGIN_NAME_KEY = "login-name"
 fileprivate let LOGIN_PASSWORD_KEY = "login-password"
@@ -73,15 +73,15 @@ fileprivate let LOGOUT_COMMAND = "logout"
 
 // When somebody tried to do something which is not allowed, yet also not an error
 
-fileprivate let ATTEMPT_NOT_ALLOWED_TEMPLATE = "/templates/not-allowed.sf.html"
+fileprivate let ATTEMPT_NOT_ALLOWED_TEMPLATE = "/pages/not-allowed.sf.html"
 
 
 // Email verification. This command is received when a new user clicks the link in the confirmation email.
 
 fileprivate let EMAIL_VERIFICATION_COMMAND = "email-verification"
 
-fileprivate let EMAIL_VERIFICATION_SUCCESS_TEMPLATE = "/templates/email-verification-success.sf.html"
-fileprivate let EMAIL_VERIFICATION_FAILED_TEMPLATE = "/templates/email-verification-failed.sf.html"
+fileprivate let EMAIL_VERIFICATION_SUCCESS_TEMPLATE = "/pages/email-verification-success.sf.html"
+fileprivate let EMAIL_VERIFICATION_FAILED_TEMPLATE = "/pages/email-verification-failed.sf.html"
 
 fileprivate let EMAIL_VERIFICATION_CODE_KEY = "verification-code"
 
@@ -90,9 +90,9 @@ fileprivate let EMAIL_VERIFICATION_CODE_KEY = "verification-code"
 
 fileprivate let REGISTER_COMMAND = "register"
 
-fileprivate let REGISTER_TEMPLATE = "/templates/register.sf.html"
-fileprivate let REGISTER_CONTINUE_TEMPLATE = "/templates/register-continue.sf.html"
-fileprivate let REGISTER_VERIFICATION_EMAIL_TEXT_TEMPLATE = "/templates/email-verificationText.sf.html"
+fileprivate let REGISTER_TEMPLATE = "/pages/register.sf.html"
+fileprivate let REGISTER_CONTINUE_TEMPLATE = "/pages/register-continue.sf.html"
+fileprivate let REGISTER_VERIFICATION_EMAIL_TEXT_TEMPLATE = "/templates/email-verification-text.sf.html"
 
 fileprivate let REGISTER_NAME_KEY = "register-name" // Necessary, unique, non-empty
 fileprivate let REGISTER_PASSWORD1_KEY = "register-password-1" // Necessary, non-empty
@@ -106,8 +106,8 @@ fileprivate let REGISTER_SUBJECT_KEY_OPTIONAL = "subject" // Optional, unchecked
 
 fileprivate let FORGOT_PASSWORD_COMMAND = "forgot-password"
 
-fileprivate let FORGOT_PASSWORD_TEMPLATE = "/templates/forgot-password.sf.html"
-fileprivate let FORGOT_PASSWORD_CONTINUE_TEMPLATE = "/templates/forgot-password-continue.sf.html"
+fileprivate let FORGOT_PASSWORD_TEMPLATE = "/pages/forgot-password.sf.html"
+fileprivate let FORGOT_PASSWORD_CONTINUE_TEMPLATE = "/pages/forgot-password-continue.sf.html"
 fileprivate let FORGOT_PASSWORD_EMAIL_TEXT_TEMPLATE = "/templates/request-new-password-text.sf.html"
 
 fileprivate let FORGOT_PASSWORD_NAME_KEY = "forgot-password-name"
@@ -118,7 +118,7 @@ fileprivate let FORGOT_PASSWORD_NAME_KEY = "forgot-password-name"
 
 fileprivate let REQUEST_NEW_PASSWORD_COMMAND = "request-new-password"
 
-fileprivate let REQUEST_NEW_PASSWORD_FAILED_TEMPLATE = "/templates/request-new-password-failed.sf.html"
+fileprivate let REQUEST_NEW_PASSWORD_FAILED_TEMPLATE = "/pages/request-new-password-failed.sf.html"
 
 fileprivate let REQUEST_NEW_PASSWORD_CODE_KEY = "request-new-password-code"
 
@@ -127,8 +127,8 @@ fileprivate let REQUEST_NEW_PASSWORD_CODE_KEY = "request-new-password-code"
 
 fileprivate let SET_NEW_PASSWORD_COMMAND = "set-new-password"
 
-fileprivate let SET_NEW_PASSWORD_TEMPLATE = "/templates/set-new-password.sf.html"
-fileprivate let SET_NEW_PASSWORD_SUCCESS_TEMPLATE = "/templates/set-new-password-success.sf.html"
+fileprivate let SET_NEW_PASSWORD_TEMPLATE = "/pages/set-new-password.sf.html"
+fileprivate let SET_NEW_PASSWORD_SUCCESS_TEMPLATE = "/pages/set-new-password-success.sf.html"
 
 fileprivate let SET_NEW_PASSWORD_ACCOUNT_NAME_KEY = "name"
 fileprivate let SET_NEW_PASSWORD_PASSWORD1_KEY = "set-new-password-1"

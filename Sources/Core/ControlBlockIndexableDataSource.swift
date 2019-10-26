@@ -1,6 +1,6 @@
 // =====================================================================================================================
 //
-//  File:       ControlBlockDataSource.swift
+//  File:       ControlBlockIndexableDataSource.swift
 //  Project:    Swiftfire
 //
 //  Version:    1.3.0
@@ -45,9 +45,9 @@ import Foundation
 import BRBON
 
 
-/// The data source protocol for a control block that can itterate over a number of elements in a collection..
+/// The data source protocol for a control block that has indexed access to the elements in a collection.
 
-public protocol ControlBlockDataSource {
+public protocol ControlBlockIndexableDataSource {
     
     
     /// The number of elements in this source
@@ -73,7 +73,8 @@ public protocol FunctionsInfoDataSource {
     func addSelf(to info: inout Functions.Info)
 }
 
-extension Array: ControlBlockDataSource where Element: FunctionsInfoDataSource {
+
+extension Array: ControlBlockIndexableDataSource where Element: FunctionsInfoDataSource {
     
     public func addElement(at index: Int, to info: inout Functions.Info) {
         guard index < self.count else { return }
@@ -81,6 +82,7 @@ extension Array: ControlBlockDataSource where Element: FunctionsInfoDataSource {
         self[index].addSelf(to: &info)
     }
 }
+
 
 extension Dictionary: FunctionsInfoDataSource {
     
@@ -92,6 +94,7 @@ extension Dictionary: FunctionsInfoDataSource {
         }
     }
 }
+
 
 extension Portal: FunctionsInfoDataSource {
     
@@ -116,7 +119,7 @@ extension Portal: FunctionsInfoDataSource {
     }
 }
 
-extension Portal: ControlBlockDataSource {
+extension Portal: ControlBlockIndexableDataSource {
 
     public func addElement(at index: Int, to info: inout Functions.Info) {
         switch self.itemType! {

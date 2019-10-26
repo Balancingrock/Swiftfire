@@ -95,8 +95,8 @@ func service_storePreLoginUrl(_ request: Request, _ connection: SFConnection, _ 
     
     // Is this not a login url?
     
-    if url.contains("templates") {
-        Log.atDebug?.log("No tracking of templates")
+    if url.contains("login") {
+        Log.atDebug?.log("No tracking of login urls")
         return .next
     }
     

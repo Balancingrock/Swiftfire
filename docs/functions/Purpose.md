@@ -55,7 +55,7 @@ More formal, the syntax is as follows:
 <key_argument> ::= <dollar-sign><source-name><dot><key>
 
 <dollar-sign> ::= "$"
-<source-name> ::= "requestInfo"|"requestInfo!"|"serviceInfo"|"functionInfo"|"account"
+<source-name> ::= "request"|"service"|"function"|"account"
 <dot> ::= "."
 <key> ::= <letter>|<digit>
 ~~~~

@@ -199,9 +199,9 @@ public extension FileManager {
     ///   - file: The filename plus extension
     ///   - createDir: A flag that requests creation of the directory if it does not exist (including intermediates)
     
-    func testFor(_ dir: String, file: String, createDir: Bool = false) -> TestForResult {
+    func testFor(_ dir: NSString, file: String, createDir: Bool = false) -> TestForResult {
         
-        let path = (dir as NSString).appendingPathComponent(file)
+        let path = dir.appendingPathComponent(file)
 
         var isDir: ObjCBool = false
         
@@ -224,13 +224,13 @@ public extension FileManager {
         
         // The file does not exist, check if the directory exists
         
-        if FileManager.default.fileExists(atPath: dir) {
+        if FileManager.default.fileExists(atPath: dir as String) {
             
-            if FileManager.default.isWritableFile(atPath: dir) {
+            if FileManager.default.isWritableFile(atPath: dir as String) {
                 return .isWriteableDir
             }
             
-            if FileManager.default.isReadableFile(atPath: dir) {
+            if FileManager.default.isReadableFile(atPath: dir as String) {
                 return .isReadableDir
             }
             
@@ -243,7 +243,7 @@ public extension FileManager {
                 
                 // The directory does not exist, try to create it
             
-                if (try? FileManager.default.createDirectory(at: URL(fileURLWithPath: dir, isDirectory: false), withIntermediateDirectories: true)) != nil {
+                if (try? FileManager.default.createDirectory(at: URL(fileURLWithPath: dir as String, isDirectory: true), withIntermediateDirectories: true)) != nil {
 
                     return .isWriteableDir
                 
@@ -252,6 +252,34 @@ public extension FileManager {
                 
             return .fail
         }
+    }
+
+    
+    /// Returns the modification date of the file in msec since 1970.01.01 (Java date).
+    ///
+    /// This is a convenience wrapper for modificationDateOfFile:atPath.
+    ///
+    /// - Parameter of: The URL of the file.
+    ///
+    /// - Returns: The modification date of the file. nil if the file does not exist.
+    
+    func modificationDateOfFile(atUrl url: URL) -> Int64? {
+
+        return modificationDateOfFile(atPath: url.path)
+    }
+
+    
+    /// Returns the modification date of the file in msec since 1970.01.01 (Java date).
+    ///
+    /// There is also a convenience wrapper modificationDateOfFile:atUrl
+    ///
+    /// - Parameter of: The path of the file.
+    ///
+    /// - Returns: The modification date of the file. nil if the file does not exist.
+    
+    func modificationDateOfFile(atPath path: String) -> Int64? {
+
+        return try? (FileManager.default.attributesOfFileSystem(forPath: path) as NSDictionary).fileModificationDate()?.javaDate
     }
 
 }

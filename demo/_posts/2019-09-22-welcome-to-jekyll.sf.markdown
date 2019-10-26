@@ -14,6 +14,6 @@ This demo site uses our Classic-Jekyll-Theme, in the future we hope to enhance t
 
 For more information on Jekyll, check out the [Jekyll docs][jekyll-docs].
 
-.comments(2019.09.22.welcome)
+.commentSection(2019.09.22.welcome, anon)
 
 [jekyll-docs]: https://jekyllrb.com/docs/home

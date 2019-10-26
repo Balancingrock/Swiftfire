@@ -40,6 +40,7 @@
 //       - Removed inout from the service signature
 //       - Updated for account changes
 //       - Added account details management
+//       - Changed 'requestinfo' identifier to 'request'
 // 1.2.1 - Removed dependency on Html
 // 1.2.0 - Initial version
 //
@@ -517,7 +518,7 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
                 <div class="center-content">
                     <div class="table-container">
                         <form method="post" action="\(domainCommand("AddAdminChangePassword"))">
-                            <input type="hidden" name="Domain" value=".show($requestinfo.DomainName)">
+                            <input type="hidden" name="Domain" value=".show($request.DomainName)">
                             <table>
                                 <tr>
                                     <td>Domain admin:</td>

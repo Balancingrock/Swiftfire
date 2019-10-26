@@ -67,7 +67,7 @@ fileprivate let COMMENT_SECTION_TEMPLATE = "/templates/comment-section.sf.html"
 ///
 /// _Return_: The HTML code. In case of an error the ***error*** string is returned.
 
-public func function_comments(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: Functions.Environment) -> Data? {
+public func function_commentSection(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: Functions.Environment) -> Data? {
     
     
     // The function arguments should be an array of string
@@ -80,43 +80,69 @@ public func function_comments(_ args: Functions.Arguments, _ info: inout Functio
     
     // At least the identifier should be present
     
-    guard arr.count >= 1 else {
+    guard arr.count > 0 else {
         Log.atError?.log("Missing identifier in function argument")
         return htmlErrorMessage
     }
     
     let identifier = arr[0].lowercased()
     
+    Log.atDebug?.log("Prepping comment section for id: \(identifier)")
+    
+    
+    // See if the anon option is present
+    
+    var anonEnabled = false
+    if arr.count == 2 {
+        if arr[1].lowercased() == "anon" { anonEnabled = true }
+    }
+    
+    
+    // Check if comments can be enabled
+    
+    let commentsEnabled: Bool
+    if anonEnabled {
+        commentsEnabled = true
+    } else {
+        if let sessionInfo = environment.serviceInfo[.sessionKey] as? SessionInfo,
+           let account = sessionInfo[.accountKey] as? Account {
+            if account.isDomainAdmin || account.isModerator || account.name != "Anon" {
+                commentsEnabled = true
+            } else {
+                commentsEnabled = false
+            }
+        } else {
+            commentsEnabled = false
+        }
+    }
+    
+    
+    // Set the request.info parameters needed by the template
+    
     environment.request.info["comment-id"] = identifier
     
-    
-    // Create the comment blocks
 
-    let commentBlocks = environment.domain.comments.commentBlocks(for: identifier, environment: environment)
+    // Set the info parameters needed by the template
     
+    let tableFileModificationDate = environment.domain.comments.modificationDate(for: identifier) ?? 0
+    
+    info["has-comments"] = String(environment.domain.comments.nofComments(for: identifier) != 0)
+    info["afterstamp"] = String(tableFileModificationDate)
+    info["comments-enabled"] = String(commentsEnabled)
 
+    
     // Assemble the comments section
     
     let templatePath = (environment.domain.webroot as NSString).appendingPathComponent(COMMENT_SECTION_TEMPLATE)
 
     switch SFDocument.factory(path: templatePath) {
-        
+
+    case .success(let template): return template.getContent(info: &info, environment: environment)
+
     case .error(let message):
         
         Log.atDebug?.log("Cannot create document from template path: \(templatePath), error message: \(message)")
         return htmlErrorMessage
-        
-    
-    case .success(let template):
-        
-        // Setup the template needs
-        
-        info["has-comments"] = String(environment.domain.comments.hasComments(identifier))
-        info["can-edit"] = String()
-        info["can-remove"] = String()
-
-        environment.request.info["comment-blocks"] = String(data: commentBlocks, encoding: .utf8)
-        return template.getContent(with: environment)
     }
 }
 

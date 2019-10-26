@@ -59,11 +59,7 @@ import BRBON
 //
 // A _commentSection_ is stored as a table of _comment_ URLs in the domain comment manager, using the directory path derived from the _identifier_.
 //
-// Along with the _comment_ URL table a _commentCache_ is stored with all the _commentBlocks_ referred to by the table.
-//
-// The _commentCache_ is updated only when the _commentSection_ needs to be displayed.
-//
-// The _comment_ URL table is updated when comments are added/edited/removed.
+// The _comment_ URL table is updated or 'touched' when comments are added/edited/removed.
 //
 // A special user _Anon_ is present that can be used by the to store comments made by users that want to remain anonymous.
 //
@@ -78,31 +74,309 @@ import BRBON
 // Comments associated with a user-account can be edited or deleted by that user (or a moderator/domain-administrator).
 
 
-fileprivate let COMMENT_BLOCK_TEMPLATE = "/templates/comment-block.sf.html"
-fileprivate let COMMENT_REMOVED_TEMPLATE = "/templates/comment-removed.sf.html"
+fileprivate let COMMENT_BLOCK_TEMPLATE = "/pages/comment-block.sf.html"
+fileprivate let COMMENT_REMOVED_TEMPLATE = "/pages/comment-removed.sf.html"
 
 
 // For the comment URL table
 
-fileprivate let NEEDS_UPDATE_NF = NameField("nu")!
-fileprivate let NEEDS_UPDATE_CS = ColumnSpecification(type: .bool, nameField: NEEDS_UPDATE_NF, byteCount: 1)
-fileprivate let NEEDS_UPDATE_CI = 0
+fileprivate let COMMENT_SEQUENCE_NUMBER_NF = NameField("sn")!
+fileprivate let COMMENT_SEQUENCE_NUMBER_CS = ColumnSpecification(type: .uint16, nameField: COMMENT_SEQUENCE_NUMBER_NF, byteCount: 2)
+fileprivate let COMMENT_SEQUENCE_NUMBER_CI = 0
 
 fileprivate let COMMENT_URL_NF = NameField("cu")!
 fileprivate let COMMENT_URL_CS = ColumnSpecification(type: .string, nameField: COMMENT_URL_NF, byteCount: 128)
 fileprivate let COMMENT_URL_CI = 1
 
-fileprivate var COMMENT_URL_TABLE_SPECIFICATION = [NEEDS_UPDATE_CS, COMMENT_URL_CS]
+fileprivate var COMMENT_URL_TABLE_SPECIFICATION = [COMMENT_URL_CS, COMMENT_SEQUENCE_NUMBER_CS]
 
 
-// The comment URL table (above) is wrapped in a dictionary to allow future upgrading
+// The comment URL table (above) is wrapped in a dictionary
 
-fileprivate let COMMENT_URL_TABLE_NF = NameField("ctb")!
+fileprivate let URL_TABLE_NF = NameField("ctb")! // The table itself
+fileprivate let NOF_COMMENTS_NF = NameField("nofc")! // The number of comments made (may be higher than the number of rows in the table)
 
 
 /// Manages the comments for a domain.
 
 public final class CommentManager {
+    
+    
+    /// The table item manager cache.
+    
+    private class TableCache {
+
+        
+        /// A reference to the domain to enable name access
+        
+        unowned var domain: Domain
+        
+        
+        /// The dictionary with identifier/item-manager associations
+        
+        var dict: Dictionary<String, ItemManager> = [:]
+        
+        
+        /// Associate a URL with an identifier (note: This dictionary is kept in sync with the item manager dictionary.
+        
+        var urls: Dictionary<String, URL> = [:]
+        
+        
+        /// The array for least-used detection
+        
+        var arr: Array<String> = []
+        
+        
+        /// Create new table cache
+        
+        init(_ domain: Domain) {
+            self.domain = domain
+        }
+        
+                
+        /// Add a new entry to the cache
+        ///
+        /// Can also remove older entries if the number of entries is too large
+    
+        private func add(_ id: String, _ im: ItemManager, _ url: URL) {
+            
+            while arr.count > 50 {
+                let str = arr.removeLast()
+                dict.removeValue(forKey: str)
+                urls.removeValue(forKey: str)
+                // The (table) item manager is now removed from the cache, when another operation -including in another thread- is still using it, it will be deallocated when that operation is ready.
+            }
+
+            dict[id] = im
+            urls[id] = url
+            arr.insert(id, at: 0)
+        }
+        
+        
+        /// The filename for the comment table files
+        
+        let filename = "comment-table.brbon"
+        
+        
+        /// Return the path to the domain's root comment path
+        
+        private func commentTableDirPath(forId id: String) -> NSString? {
+            
+            guard let relativePath = CommentManager.identifier2RelativePath(id) else { return nil }
+            
+            let rootDirPath = Urls.domainCommentsRootDirPath(for: domain.name)
+            
+            return rootDirPath.appendingPathComponent(relativePath) as NSString
+        }
+        
+        
+        /// Return the path to the commentTable.
+        ///
+        /// - Parameter relativePath: The relative path (to the comments-root of the domain) to the directory in which the comment table must be located.
+        ///
+        /// - Returns: The path for the file (either present or when it can be created). Nil when an error occured. If an error occured, an error log entry wil have been made.
+        
+        private func commentTableFilePath(forId id: String) -> String? {
+            
+            guard let fileDirPath = commentTableDirPath(forId: id) else { return nil }
+            
+            switch FileManager.default.testFor(fileDirPath, file: filename, createDir: true) {
+            
+            case .fail:
+                Log.atError?.log("Cannot read or write comment table for identifier: \(id)")
+                return nil
+            
+            case .isReadableFile:
+                Log.atError?.log("Cannot write to comment table for identifier: \(id)")
+                return nil
+
+            case .isWriteableFile:
+                return fileDirPath.appendingPathComponent(filename)
+                
+            case .isReadableDir:
+                Log.atError?.log("Cannot read directory for comment table for identifier: \(id)")
+                return nil
+
+            case .isWriteableDir:
+                return fileDirPath.appendingPathComponent(filename)
+            }
+        }
+
+                
+        /// Returns a comment table manager if the corresponding file exists. Returns nil if the file does not exist.
+        
+        func getCommentTableForExistingFile(forId id: String) -> ItemManager? {
+                                
+            
+            // If it is present, return it
+            
+            if let im = dict[id] {
+                let i = arr.firstIndex(of: id)!
+                arr.insert(arr.remove(at: i), at: 0) // Move it to the 'most recent used' place
+                return im
+            }
+            
+            
+            // The target file
+            
+            guard let fileDirPath = commentTableDirPath(forId: id) else { return nil }
+                        
+            
+            // Read the item manager from file
+            
+            switch FileManager.default.testFor(fileDirPath, file: filename, createDir: true) {
+            case .isWriteableFile, .isWriteableDir: break
+            default:
+                Log.atError?.log("Cannot write to file or cannot create file at: \(fileDirPath)")
+                return nil
+            }
+            
+            let fileUrl = URL(fileURLWithPath: fileDirPath.appendingPathComponent(filename), isDirectory: false)
+            
+            
+            // Read the item manager from file
+            
+            guard let im = ItemManager.init(from: fileUrl) else {
+                Log.atError?.log("Could not read file at: \(fileUrl.path)")
+                return nil
+            }
+            
+            
+            // Add the new item manager
+            
+            add(id, im, fileUrl)
+
+
+            return im
+        }
+        
+        
+        /// Returns a comment table manager and creates one if it does not exist. Returns nil if the file cannot be created.
+        
+        func getCommentTable(forId id: String) -> ItemManager? {
+            
+            
+            // Try if it is available
+            
+            if let im = getCommentTableForExistingFile(forId: id) { return im }
+            
+            
+            // It needs to be created
+            
+            
+            // Get the path to the file (fail now if the file cannot be created)
+            
+            guard let filePath = commentTableFilePath(forId: id) else { return nil }
+            
+            
+            // Create a new ItemManager for the table
+            
+            let im = ItemManager.createDictionaryManager()
+            let tm = ItemManager.createTableManager(columns: &COMMENT_URL_TABLE_SPECIFICATION)
+            im.root.updateItem(tm, withNameField: URL_TABLE_NF)
+            im.root.updateItem(UInt16(0), withNameField: NOF_COMMENTS_NF)
+            
+            
+            // Create the URL for storage
+            
+            let fileUrl = URL(fileURLWithPath: filePath, isDirectory: false)
+            
+            
+            // Store the (empty table) file
+
+            do {
+                try im.data.write(to: fileUrl)
+            } catch let error {
+                Log.atError?.log("Could not write table to file, error: \(error.localizedDescription)")
+                return nil
+            }
+
+            
+            // Add the new table to the cache
+            
+            add(id, im, fileUrl)
+            
+            
+            return im
+        }
+        
+        
+        /// Touches the content modification date of the associated file
+        
+        func touch(tableFor id: String) {
+            
+            guard getCommentTableForExistingFile(forId: id) != nil else {
+                Log.atError?.log("No such file exists for id: \(id)")
+                return
+            }
+            
+            guard var url = urls[id] else {
+                Log.atError?.log("Programming error")
+                return
+            }
+            
+            do {
+                var rv = try url.resourceValues(forKeys: [URLResourceKey.contentModificationDateKey])
+                rv.contentModificationDate = Date()
+                try url.setResourceValues(rv)
+            } catch let error {
+                Log.atError?.log("Unable to touch filr at \(url.path) with error: \(error.localizedDescription)")
+            }
+        }
+        
+        
+        /// Returns the content modification date of the file, will create the file if it does not exist yet.
+        ///
+        /// - Returns: the msec since 1970.01.01 (Java Date), returns nil if the file does not exist or an error occured.
+        
+        func modificationDate(for id: String) -> Int64? {
+            
+            // Force loading/creation of the file
+            
+            guard getCommentTableForExistingFile(forId: id) != nil else { return nil }
+            
+            guard let url = urls[id] else {
+                Log.atError?.log("Programming error")
+                return nil
+            }
+            
+            do {
+                guard let ts = try url.resourceValues(forKeys: [URLResourceKey.contentModificationDateKey]).contentModificationDate else {
+                    Log.atError?.log("")
+                    return nil
+                }
+                
+                return ts.javaDate
+                
+            } catch let error {
+                
+                Log.atError?.log("An error occured with message: \(error.localizedDescription)")
+                return nil
+            }
+        }
+        
+        
+        /// Store the table manager for the given id to file
+        
+        func store(tableFor id: String) {
+        
+            guard let url = urls[id] else {
+                Log.atError?.log("Cannot find corresponding URL, cannot save, data may be lost")
+                return
+            }
+            
+            guard let im = dict[id] else {
+                Log.atError?.log("Cannot find corresponding item manager, cannot save, data may be lost")
+                return
+            }
+            
+            do {
+                try im.data.write(to: url)
+            } catch let error {
+                Log.atError?.log("Cannot save item manager, error message: \(error.localizedDescription)")
+            }
+        }
+    }
     
     
     /// Creates a relative directory path from a base url and the identifier
@@ -118,18 +392,26 @@ public final class CommentManager {
         
         // There must be at least one character left
         
-        guard !pid.isEmpty else { return nil }
+        guard !pid.isEmpty else {
+            Log.atError?.log("Cannot transform identifier '\(identifier)' into a relative path")
+            return nil
+        }
 
         
         // Transform the identifier into a relative path
 
         return pid.replacingOccurrences(of: ".", with: "/")
     }
-
+    
     
     /// The queue on which all work will be serialized.
     
-    private let queue = DispatchQueue.init(label: "CommentsAccess", qos: DispatchQoS.userInitiated, attributes: DispatchQueue.Attributes.init(), autoreleaseFrequency: DispatchQueue.AutoreleaseFrequency.workItem, target: nil)
+    fileprivate let queue = DispatchQueue.init(label: "CommentsAccess", qos: DispatchQoS.userInitiated, attributes: DispatchQueue.Attributes.init(), autoreleaseFrequency: DispatchQueue.AutoreleaseFrequency.workItem, target: nil)
+    
+    
+    /// The (table) item manager cache
+    
+    private let tableCache: TableCache
     
     
     /// The list with comments to be approaved
@@ -150,34 +432,31 @@ public final class CommentManager {
     
     init(_ domain: Domain) {
         self.domain = domain
+        tableCache = TableCache(domain)
         loadCommentsForApproval()
     }
     
     
-    /// Returns true if the given identifier has comments.
+    /// Return the modificationdate of the content for the file with the given ID.
+    ///
+    /// Returns nil if an error occured. It will create the file if the file did not exist yet.
     
-    public func hasComments(_ identifier: String) -> Bool {
-        
-        
-        // Get the relative path for the table, cache and comments
-        
-        guard let relativePath = CommentManager.identifier2RelativePath(identifier) else {
-            Log.atError?.log("The relative path cannot be empty (identifier error)")
-            return false
-        }
-
-        
-        // Get the url of the comment table
-        
-        guard let commentTableFile = commentTableFile(relativePath) else {
-            // Error log has been made
-            return false
-        }
-
-        
-        // Check if the table exists
-        
-        return FileManager.default.isReadableFile(atPath: commentTableFile.path)
+    public func modificationDate(for id: String) -> Int64? { return tableCache.modificationDate(for: id) }
+    
+    
+    /// Return the comment table for the identifier
+    
+    public func commentTable(for id: String) -> Portal? {
+        let itemManager = tableCache.getCommentTable(forId: id)
+        return itemManager?.root[URL_TABLE_NF].portal
+    }
+    
+    
+    /// The number of comments in a comment-table
+    
+    public func nofComments(for id: String) -> Int {
+        let itemManager = tableCache.getCommentTable(forId: id)
+        return itemManager?.root[URL_TABLE_NF].rowCount ?? 0
     }
     
     
@@ -190,7 +469,7 @@ public final class CommentManager {
     ///   - environment: The environment (request, domain, etc)
     ///
     /// - Returns: The UTF8 encoded HTML code. Will contain '***error***' if an error occured. Each comment will be wrapped in its own HTML element (depending on the comment template) but there is no overall container.
-    
+    /*
     public func commentBlocks(for identifier: String, environment: Functions.Environment) -> Data {
         
         return queue.sync {
@@ -312,7 +591,7 @@ public final class CommentManager {
             }
         }
     }
-    
+    */
     
     /// Rebuild the cache from the given table starting at the given index. Write the result to the table.
     ///
@@ -323,7 +602,7 @@ public final class CommentManager {
     ///    - environment: The environment necessary for the creation of the individual comment blocks.
     ///
     /// - Returns: The content of the rebuild cache.
-    
+    /*
     private func rebuildCache(fromTable table: Portal, fromIndex: Int, toFile file: URL, environment: Functions.Environment) -> Data {
         
         var index = fromIndex
@@ -386,7 +665,7 @@ public final class CommentManager {
         
         return data
     }
-    
+    */
     
     /// Add the HTML code of the comment to the data using the comment template
     ///
@@ -395,7 +674,7 @@ public final class CommentManager {
     ///   - cache: The (html) data to add the comment (html) data to
     ///   - environment: The environment to be used for the template processing
     ///   - sequenceNumber: The sequence number for the comment at the given path.
-    
+    /*
     private func appendToCache(commentAtPath commentPath: String, cache data: inout Data, _ environment: Functions.Environment, sequenceNumber: Int) {
         
         let templatePath = (domain.webroot as NSString).appendingPathComponent(COMMENT_BLOCK_TEMPLATE)
@@ -417,7 +696,7 @@ public final class CommentManager {
                         
         data.append(template.blocks.getData(&info, environment) ?? Data())
     }
-        
+    */
 
     /// Updates the comments section for the given comment. This may invalidate cached values.
     ///
@@ -429,25 +708,47 @@ public final class CommentManager {
 
     public func newComment(text: String, identifier: String, displayName: String, account: Account?) {
         
-        
-        // Make sure there is an account
-        
-        guard let account = account ?? domain.accounts.getAccountWithoutPassword(for: "Anon") else {
-            Log.atError?.log("Failed to retrieve Anon account")
-            return
-        }
-        
-        guard let relativePath = CommentManager.identifier2RelativePath(identifier) else {
-            Log.atError?.log("The relative path cannot be empty (identifier error)")
-            return
-        }
-        
         queue.sync {
 
             
+            // Make sure there is an account
+        
+            guard let account = account ?? domain.accounts.getAccountWithoutPassword(for: "Anon") else {
+                Log.atError?.log("Failed to retrieve Anon account")
+                return
+            }
+        
+            
+            // Get the relative path for the comment
+            
+            guard let relativePath = CommentManager.identifier2RelativePath(identifier) else {
+                Log.atError?.log("The relative path cannot be empty (identifier error)")
+                return
+            }
+
+            
+            // To determine the sequence number of a comment, retrieve the comment table (create if needed)
+            
+            guard let commentTable: ItemManager = tableCache.getCommentTable(forId: identifier) else { return }
+            
+            
+            // Get the sequence number of this comment
+            
+            guard let oldCount = commentTable.root[NOF_COMMENTS_NF].uint16 else {
+                Log.atError?.log("Canot read comment count in comment table")
+                return
+            }
+            
+            
+            // Increase the count
+            
+            let newCount = oldCount + 1
+            commentTable.root[NOF_COMMENTS_NF] = newCount
+            
+            
             // Create (and store) the comment
             
-            guard let comment = Comment(text: text, identifier: identifier, relativePath: relativePath, displayName: displayName, account: account) else {
+            guard let comment = Comment(text: text, identifier: identifier, sequenceNumber: newCount, relativePath: relativePath, displayName: displayName, account: account) else {
                 Log.atError?.log("Failed to create a new comment")
                 return
             }
@@ -456,22 +757,29 @@ public final class CommentManager {
             // For the Anon account, always store the comment in the wait-for-approval list
             
             if account.name == "Anon" {
-                domain.comments.forApproval.append(comment)
-                return
-            }
-            
-            
-            // For all other account, only store the comment in the wait-for-approval list if the auto-approve threshold has not yet been reached.
-            
-            if account.nofComments <= domain.autoCommentApprovalThreshold {
-            
+                
                 domain.comments.forApproval.append(comment)
             
             } else {
+            
+            
+                // For all other account, only store the comment in the wait-for-approval list if the auto-approve threshold has not yet been reached.
+            
+                if account.nofComments <= domain.autoCommentApprovalThreshold {
+            
+                    domain.comments.forApproval.append(comment)
+            
+                } else {
                 
-                account.nofComments += 1
-                appendToTable(comment, relativePath)
+                    account.nofComments += 1
+                    appendToTable(comment, relativePath)
+                }
             }
+            
+            
+            // Update the comment table file
+            
+            tableCache.store(tableFor: identifier)
         }
     }
     
@@ -505,42 +813,14 @@ public final class CommentManager {
             }
 
             
-            // Get the comment table file reference
-            
-            guard let commentTableFile = commentTableFile(relativePath) else {
-                // Error log has been made
-                return
-            }
-            
-            
-            // Get the table and its manager
-            
-            guard let (itemManager, table) = loadCommentTable(from: commentTableFile) else {
-                Log.atError?.log("ItemManager should be available at \(commentTableFile.path)")
-                return
-            }
-
-            
-            // Get the index of the comment to be updated
-            
-            guard let index = table.index(of: comment) else {
-                Log.atError?.log("Comment \(comment.url.path) not found in table \(commentTableFile.path)")
-                return
-            }
-            
-            
-            // Update table and comment
+            // Update comment
             
             comment.replaceText(with: text) // autosave
-            table[index, NEEDS_UPDATE_CI].bool = true
+
             
+            // Touch the comment table file to ensure an update of cached content
             
-            // Save the table
-            
-            guard (try? itemManager.data.write(to: commentTableFile)) != nil else {
-                Log.atError?.log("Error saving updated table \(commentTableFile.path)")
-                return
-            }
+            tableCache.touch(tableFor: identifier)
         }
     }
     
@@ -605,6 +885,7 @@ public final class CommentManager {
         
         queue.sync {
             
+            
             // Get the relative path from the identifier
             
             guard let relativePath = CommentManager.identifier2RelativePath(identifier) else {
@@ -615,24 +896,18 @@ public final class CommentManager {
             
             // Get the comment itself
                         
-            guard let comment = loadComment(relativePath, account, timestamp: originalTimestamp) else {
-                // Error log has been made
-                return
-            }
+            guard let comment = loadComment(relativePath, account, timestamp: originalTimestamp) else { return }
                         
             
-            // Get the comment table url
+            // Get the comment table itemmanager
             
-            guard let commentTableFile = commentTableFile(relativePath) else {
-                // Error log has been made
-                return
-            }
+            guard let itemManager = tableCache.getCommentTableForExistingFile(forId: identifier) else { return }
             
             
-            // Load the cooment table and its manager
+            // Get the table
             
-            guard let (itemManager, table) = loadCommentTable(from: commentTableFile) else {
-                Log.atError?.log("ItemManager should be available at \(commentTableFile.path)")
+            guard let table = itemManager.root[URL_TABLE_NF].portal else {
+                Log.atError?.log("Cannot locate url table")
                 return
             }
             
@@ -640,14 +915,14 @@ public final class CommentManager {
             // Get the index for the comment to be removed
             
             guard let index = table.index(of: comment) else {
-                Log.atError?.log("Comment \(comment.url.path) not found in table \(commentTableFile.path)")
+                Log.atError?.log("Comment \(comment.url.path) not found in table")
                 return
             }
             
             
             // Update table
             
-            table[index, COMMENT_URL_CI].string = ""
+            table.removeRow(index)
             
             
             // Remove it from the account comment area
@@ -659,16 +934,12 @@ public final class CommentManager {
             
             // Save the table
             
-            guard (try? itemManager.data.write(to: commentTableFile)) != nil else {
-                Log.atError?.log("Error saving updated table \(commentTableFile.path)")
-                return
-            }
+            tableCache.store(tableFor: identifier)
         }
-
     }
     
     
-    /// Removes a comment from the waiting-for-approval list and adds it to the comment block
+    /// Removes a comment from the waiting-for-approval list and adds it to the comment table
     ///
     /// - Parameters:
     ///   - identifier: The identifier for the comment section.
@@ -687,18 +958,12 @@ public final class CommentManager {
             
             // Get the relative path from the identifier
             
-            guard let relativePath = CommentManager.identifier2RelativePath(identifier) else {
-                Log.atError?.log("The relative path cannot be empty (identifier error)")
-                return
-            }
+            guard let relativePath = CommentManager.identifier2RelativePath(identifier) else { return }
 
             
             // Load the comment itself
                         
-            guard let comment = self.loadComment(relativePath, account, timestamp: originalTimestamp) else {
-                // Error log has been made
-                return
-            }
+            guard let comment = self.loadComment(relativePath, account, timestamp: originalTimestamp) else { return }
 
             
             // Remove it from the waiting list
@@ -706,9 +971,41 @@ public final class CommentManager {
             self.forApproval.removeObject(object: comment)
 
             
-            // Add it to the comment table
+            // Get the table
             
-            self.appendToTable(comment, relativePath)
+            guard let itemManager = self.tableCache.getCommentTableForExistingFile(forId: identifier) else { return }
+            guard let table = itemManager.root[URL_TABLE_NF].portal else {
+                Log.atError?.log("")
+                return
+            }
+            
+            
+            // Find the proper place in the table
+            
+            var insertionIndex = 0
+            table.itterateFields(ofColumn: COMMENT_SEQUENCE_NUMBER_CI) { (portal, index) -> Bool in
+                if comment.sequenceNumber < (portal.uint16 ?? 0) {
+                    return true
+                } else {
+                    insertionIndex = index
+                    return false
+                }
+            }
+            
+            
+            // Insert it into the comment table
+            
+            switch table.insertRows(atIndex: insertionIndex, amount: 1, defaultValues: { (portal) in
+                switch portal.column! {
+                case COMMENT_SEQUENCE_NUMBER_CI: portal.uint16 = comment.sequenceNumber
+                case COMMENT_URL_CI: portal.crcString = BRCrcString(comment.url.path)
+                default:
+                    Log.atError?.log("Unknown table column with column index: \(portal.column!)")
+                }}) {
+            case .success: break
+            case .error(let error): Log.atError?.log("Error code received: \(error.description)")
+            case .noAction: Log.atError?.log("Unexpected code executed")
+            }
         }
     }
     
@@ -720,23 +1017,20 @@ public final class CommentManager {
     ///
     /// - Parameters:
     ///   - comment: The comment to be added.
-    ///   - relativePath: The relative path of the comment and the comment table.
+    ///   - identifier: The identifier of the webpage where the comment is placed.
 
-    private func appendToTable(_ comment: Comment, _ relativePath: String) {
+    private func appendToTable(_ comment: Comment, _ identifier: String) {
         
     
-        // Get the url for the table
-        
-        guard let commentTableFile = commentTableFile(relativePath) else {
-            // Error log entry has already been generated
-            return
-        }
-
-        
         // Get the comment table
         
-        guard let (itemManager, table) = loadCommentTable(from: commentTableFile, createIfMissing: true) else {
-            Log.atError?.log("Cannot add to comment table")
+        guard let itemManager = tableCache.getCommentTableForExistingFile(forId: identifier) else { return }
+
+        
+        // Get the table itself
+        
+        guard let table = itemManager.root[URL_TABLE_NF].portal else {
+            Log.atError?.log("Table manager does not contain table")
             return
         }
         
@@ -746,7 +1040,7 @@ public final class CommentManager {
         table.addRows(1) { (portal) in
             switch portal.column {
             case COMMENT_URL_CI: portal.crcString = BRCrcString(comment.url.path)
-            case NEEDS_UPDATE_CI: portal.bool = true
+            case COMMENT_SEQUENCE_NUMBER_CI: portal.uint16 = comment.sequenceNumber
             default:
                 Log.atError?.log("Unknown table index \(portal.column ?? -1)")
             }
@@ -755,10 +1049,7 @@ public final class CommentManager {
         
         // Save the table
         
-        guard (try? itemManager.data.write(to: commentTableFile)) != nil else {
-            Log.atError?.log("Cannot write comment table file to \(commentTableFile.path)")
-            return
-        }
+        tableCache.store(tableFor: identifier)
     }
     
     
@@ -782,12 +1073,26 @@ public final class CommentManager {
     }
     
     
+    /// The URL for the comment table file
+    /*
+    public func commentTableFileUrl(for id: String) -> URL? {
+        
+        guard let relativePath = CommentManager.identifier2RelativePath(id) else { return nil }
+        
+        guard let root = Urls.domainCommentsRootDir(for: domain.name) else { return nil }
+        
+        let dir = root.appendingPathComponent(relativePath, isDirectory: true)
+        
+        return dir.appendingPathComponent("commentTable.brbon", isDirectory: false)
+    }*/
+    
+    
     /// Return the path to the commentTable.
     ///
     /// - Parameter relativePath: The relative path (to the comments-root of the domain) to the directory in which the comment table must be located.
     ///
     /// - Returns: The url for the file (either present or when it can be created). Nil when an error occured. If an error occured, an error log entry wil have been made.
-    
+    /*
     private func commentTableFile(_ relativePath: String) -> URL? {
         
         
@@ -823,7 +1128,7 @@ public final class CommentManager {
         case .isWriteableDir:
             return dir.appendingPathComponent(name, isDirectory: false)
         }
-    }
+    }*/
 
     
     /// Return the path to the commentCache.
@@ -831,7 +1136,7 @@ public final class CommentManager {
     /// - Parameter relativePath: The relative path (to the comments-root of the domain) to the directory in which the comments cache must be located.
     ///
     /// - Returns: The url for the file (either present or when it can be created). Nil when an error occured. If an error occured, an error log entry wil have been made.
-    
+    /*
     private func commentCacheFile(_ relativePath: String) -> URL? {
         
         
@@ -867,11 +1172,11 @@ public final class CommentManager {
         case .isWriteableDir:
             return dir.appendingPathComponent(name, isDirectory: false)
         }
-    }
+    }*/
 
     
     /// Load and return the comment table and its item manager.
-    
+    /*
     private func loadCommentTable(from url: URL, createIfMissing: Bool = false) -> (ItemManager, Portal)? {
         
         
@@ -879,28 +1184,25 @@ public final class CommentManager {
                 
         let itemManager = ItemManager(from: url) ?? createCommentTableItemManager()
         
-        guard let table = itemManager.root[COMMENT_URL_TABLE_NF].portal else {
-            Log.atError?.log("Missing \(COMMENT_URL_TABLE_NF.string) in \(url.path)")
+        guard let table = itemManager.root[URL_TABLE_NF].portal else {
+            Log.atError?.log("Missing \(URL_TABLE_NF.string) in \(url.path)")
             return nil
         }
 
         
         return (itemManager, table)
-    }
+    }*/
 
     
     /// Creates a new comment table block item manager.
     ///
     /// Note that the actual table is wrapped in a block to ensure future upgradability.
-    
+    /*
     private func createCommentTableItemManager() -> ItemManager {
     
-        let dm = ItemManager.createDictionaryManager()
-        let tm = ItemManager.createTableManager(columns: &COMMENT_URL_TABLE_SPECIFICATION)
-        dm.root.updateItem(tm, withNameField: COMMENT_URL_TABLE_NF)
         
         return dm
-    }
+    }*/
 
 
     /// Stores the comments waiting for approval in a list of paths

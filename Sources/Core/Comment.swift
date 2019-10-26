@@ -195,10 +195,13 @@ public final class Comment {
         db.root.updateItem(displayName, withNameField: DISPLAY_NAME_NF)
         db.root.updateItem(sequenceNumber, withNameField: SEQUENCE_NUMBER_NF)
         
+        
         // Save it
         
-        if (try? db.data.write(to: url)) != nil {
-            Log.atError?.log("Failed to write comment to file \(url.path)")
+        do {
+            try db.data.write(to: url)
+        } catch let error {
+            Log.atError?.log("Failed to write comment to file \(url.path) with error message: \(error.localizedDescription)")
         }
     }
     

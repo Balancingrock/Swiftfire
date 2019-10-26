@@ -3,7 +3,7 @@
 //  File:       Urls.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.2.1
+//  Version:    1.3.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -37,6 +37,7 @@
 // History
 //
 // 1.3.0 - Added domainCommentsForApprovalFile
+//         Started change for seperation of URL for files and NSString for paths
 // 1.2.1 - Removed incorrect info
 //       - Removed serveradmin directory (was unused)
 // 1.1.0 - Replaced server blacklist with serverAdminDomain blacklist
@@ -72,17 +73,6 @@ import Foundation
 public final class Urls {
     
     
-    /// Determines if a file exists and is not a directory
-    
-    public static func exists(url: URL?) -> Bool {
-        if url == nil { return false }
-        var isDir: ObjCBool = false
-        let exists = FileManager.default.fileExists(atPath: url!.path, isDirectory: &isDir)
-        if isDir.boolValue { return false }
-        return exists
-    }
-
-
     /// Create a directory url and ensure that the directory exists.
     ///
     /// - Parameters:
@@ -91,15 +81,27 @@ public final class Urls {
     
     static func dirUrl(_ root: URL?, _ name: String) -> URL? {
         
-        guard let root = root else { return nil }
+        guard let root = root else {
+            Log.atError?.log("No root url present")
+            return nil
+        }
         
+        let url = root.appendingPathComponent(name, isDirectory: true)
+
         do {
             
-            let url = root.appendingPathComponent(name)
             try FileManager.default.createDirectory(atPath: url.path, withIntermediateDirectories: true, attributes: nil)
             return url
             
-        } catch { return nil }
+        } catch let error {
+            
+            Log.atError?.log("Could not create directory at path: \(url) with error message: \(error.localizedDescription)")
+            return nil
+        }
+    }
+    
+    static func dirPath(_ root: NSString, _ name: String) -> NSString {
+        return root.appendingPathComponent(name) as NSString
     }
     
     
@@ -110,14 +112,21 @@ public final class Urls {
     ///   - name: The name for the file
     
     static func fileUrl(_ root: URL?, _ name: String) -> URL? {
-        guard let root = root else { return nil }
+        guard let root = root else {
+            Log.atError?.log("No root url present")
+            return nil
+        }
+        return root.appendingPathComponent(name, isDirectory: false)
+    }
+    
+    static func filePath(_ root: NSString, _ name: String) -> String {
         return root.appendingPathComponent(name)
     }
     
-
+    
     /// The root directory (Application Support Directory)
     
-    static var rootDir: URL? = {
+    static var applicationSupportDirectoryUrl: URL = {
         
         let filemanager = FileManager.default
         
@@ -129,19 +138,28 @@ public final class Urls {
                 create: true)
             
             let appName = ProcessInfo.processInfo.processName
-            let dirpath = appSupportRootpath.appendingPathComponent(appName)
+            let dirpath = appSupportRootpath.appendingPathComponent(appName, isDirectory: true)
             try filemanager.createDirectory(atPath: dirpath.path, withIntermediateDirectories: true, attributes: nil)
             
             return dirpath
             
-        } catch { return nil }
+        } catch let error {
+            Log.atError?.log("Could not retrieve/create application support directory with error message: \(error.localizedDescription)")
+            print("Could not retrieve/create application support directory with error message: \(error.localizedDescription)")
+            exit(1)
+        }
     }()
+    
+    
+    /// The path to the application support directory
+    
+    static var applicationSupportDirectoryPath: NSString = { return applicationSupportDirectoryUrl.path as NSString }()
     
     
     // =================================================================================================================
     /// Ssl support directory
     
-    public static var sslDir: URL? = { dirUrl(rootDir, "ssl") }()
+    public static var sslDir: URL? = { dirUrl(applicationSupportDirectoryUrl, "ssl") }()
     
     
     /// The directory for the server certificate & private key
@@ -152,7 +170,7 @@ public final class Urls {
     // =================================================================================================================
     /// The directory containing the parameter and domain files with default values
     
-    public static var settingsDir: URL? = { dirUrl(rootDir, "settings") }()
+    public static var settingsDir: URL? = { dirUrl(applicationSupportDirectoryUrl, "settings") }()
     
     
     /// The file with parameter defaults
@@ -163,13 +181,13 @@ public final class Urls {
     // =================================================================================================================
     /// The directory for the server telemetry
     
-    public static var serverTelemetryDir: URL? = { dirUrl(rootDir, "telemetry") }()
+    public static var serverTelemetryDir: URL? = { dirUrl(applicationSupportDirectoryUrl, "telemetry") }()
 
     
     // =================================================================================================================
     /// The directory containing the logging files
     
-    public static var logsDir: URL? = { dirUrl(rootDir, "logs") }()
+    public static var logsDir: URL? = { dirUrl(applicationSupportDirectoryUrl, "logs") }()
 
     
     // =================================================================================================================
@@ -187,7 +205,9 @@ public final class Urls {
     // =================================================================================================================
     /// The directory for the domains (and aliasses)
     
-    public static var domainsDir: URL? = { dirUrl(rootDir, "domains") }()
+    public static var domainsDir: URL? = { dirUrl(applicationSupportDirectoryUrl, "domains") }()
+    
+    public static var domainsDirPath: NSString = { dirPath(applicationSupportDirectoryPath, "domains") }()
     
     
     /// The file with domain defaults
@@ -200,6 +220,8 @@ public final class Urls {
     
     public static func domainDir(for name: String) -> URL? { return dirUrl(domainsDir, name) }
 
+    public static func domainDirPath(for name: String) -> NSString { return dirPath(domainsDirPath, name) }
+    
     
     /// The domain accounts directory
     
@@ -269,7 +291,7 @@ public final class Urls {
     
     /// The directory for the domain comments section
     
-    public static func domainCommentsRootDir(for name: String) -> URL? { return dirUrl(domainDir(for: name), "comments") }
+    public static func domainCommentsRootDirPath(for name: String) -> NSString { return dirPath(domainDirPath(for: name), "comments") }
     
     
     /// The directory for the domain hit counters

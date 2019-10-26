@@ -65,11 +65,13 @@ public func function_assign(_ args: Functions.Arguments, _ info: inout Functions
     
     guard case .arrayOfString(let arr) = args, arr.count == 2 else { return htmlErrorMessage }
     
-    let value = readKey(arr[0], using: info, in: environment)
+    let value = readKey(arr[1], using: info, in: environment)
     
-    let key = arr[1]
+    let key = arr[0].lowercased()
     
     info[key] = value
+    
+    Log.atDebug?.log("Set info.\(key) to value: \(value ?? "nil")")
     
     return Data()
 }

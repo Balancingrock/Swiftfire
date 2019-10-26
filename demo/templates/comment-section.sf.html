@@ -3,23 +3,25 @@
 		<p>Comments:</p>
 	</div>
 	<div class="cs-blocks">
-.if($info.nof-comments, equal, 0)
+.if($info.has-comments, false)
 		<p class="csb-none">There are no comments yet</p><br>
-.end()
-.if($info.nof-comments, not-equal, 0)
-	.for(comments)
-		.if($info.comment-removed, true)
-		.end()
-		.if($info.comment-removed, false)
+.else()
+	.cached($request.comment-id, $info.afterstamp)
+		.for(comments)
+			.if($info.comment-removed, true)
+		<div class="csb-block">
+			<p class="csbb-removed">This comment has been removed.</p>
+		</div>
+			.else()
 		<div class="csb-block" width="100%">
 			<div class="csbb-top" width="100%">
 				<div class="csbbt-left">
-			.if($account.name, not-nil)
+				.if($account.name, not-nil)
 					<p>Name: .show($account.name)</p>
-			.end()
-			.if($account.name, nil)
-					<p>Name: .show($info.name)</p>
-			.end()
+				.else()
+					<p>Name: .show($info.dname)</p>
+				.end()
+					<p>No: .show($info.ind)</p>
 					<p>Date: .show($info.timp)</p></br>
 					<p>Last edit: .show($info.time)</p>
 					<p>Edits: .show($info.ned)</p>
@@ -29,40 +31,47 @@
 				</div>
 			</div>
 			<div class="csbb-bottom" width="100%">
-			.if($info.can-remove)
+				.if($info.can-remove)
 				<form action="/command/comment-remove" method="post">
 					<input type="hidden" name="comment-account" value=".show($account.name)">
-					<input type="hidden" name="comment-identifier" value=".show($request.comment-id)">
+					<input type="hidden" name="comment-id" value=".show($info.comment-id)">
 					<input type="submit" value="Remove">
 				</form>
 
-			.end()
-			.if($info.can-edit)
+				.end()
+				.if($info.can-edit)
 				<form action="/command/comment-edit" method="post">
 					<input type="hidden" name="comment-account" value=".show($account.name)">
-					<input type="hidden" name="comment-identifier" value=".show($request.comment-id)">
+					<input type="hidden" name="comment-id" value=".show($info.comment-id)">
 					<input type="submit" value="Edit">
 				</form>
-			.end()
+				.end()
 			</div>
 		</div>
-		.end(if-comment-removed)
-	.end(for-comments)
+			.end(if-comment-removed)
+		.end(for-comments)
+	.end(cached)
 .end()
 	</div>
+.if($info.comments-enabled, true)
 	<div class="cs-input">
 		<form action="/command/post-comment" method="post">
 			<div class="csi-form">
 				<textarea class="csif-input" name="text" placeholder="Your comments"></textarea>
 				<div class="csif-howto"><p>Use [i]..[/i] for italic, [b]..[/b] for bold. Links will not be clickable.</p></div>
-.if($account.name, nil)
+	.if($account.name, nil)
 				<div class="csif-anonymous"><p>Anonymous comments need approval by a moderator and cannot be edited or deleted. New users will have their first few posts moderated.</p></div>
 				<div class="csif-login"><p><a href="/template/login.sf.html">Login first</a> to enable editing and removal of comments.</p></div>
 				<input class="csif-name" type="text" name="display-name" placeholder="Anonymous">
-.end()
+	.end()
 				<input type="hidden" name="page-url" value=".show($service.relative-resource-path)">
-				<input type="hidden" name="comment-id" value=".show($info.comment-id)">
+				<input type="hidden" name="comment-id" value=".show($request.comment-id)">
 				<input class="csif-submit" type="submit" value="Submit">
 		</form>
 	</div>
+.else()
+	<div class="cs-input">
+		<p class="csi-not-allowed">Anonymous comments are not allowed, please login to comment.</p>
+	</div>
+.end()
 </div>

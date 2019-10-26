@@ -82,12 +82,18 @@ import Foundation
 ///   - If the requested value does not exist it returns either nil or -if the source identifier has an exclamation mark- an empty string.
 
 public func readKey(_ arg: String, using functionsInfo: Functions.Info, in environment: Functions.Environment) -> String? {
-        
-    guard !arg.isEmpty else { return "" }
+    
+    guard !arg.isEmpty else {
+        Log.atError?.log("Unexpected empty argument")
+        return ""
+    }
     
     var argument = arg
 
-    guard argument.first == "$" else { return arg } // Not a key argument
+    guard argument.first == "$" else {
+        Log.atDebug?.log("Returning \(argument) (not a key argument)")
+        return arg
+    } // Not a key argument
     
     argument.removeFirst()
         
@@ -101,7 +107,7 @@ public func readKey(_ arg: String, using functionsInfo: Functions.Info, in envir
     
     let args = argument.split(separator: ".")
     
-    guard args.count >= 2 else {
+    guard args.count > 0 else {
         Log.atError?.log("Missing source or key in argument")
         return arg
     }
@@ -117,9 +123,14 @@ fileprivate func reader(_ args: Array<Substring>, _ functionsInfo: Functions.Inf
     switch args[0].lowercased() {
     
     case "request":
-                
+        
+        guard args.count == 2 else {
+            Log.atError?.log("Missing source or key in argument")
+            return nil
+        }
+        
         guard let result = environment.request.info[String(args[1]).lowercased()] else {
-            Log.atError?.log("Request.info does not contain key: \(args[1])")
+            Log.atDebug?.log("Request.Info does not contain key: \(args[1])")
             return nil
         }
         
@@ -128,8 +139,13 @@ fileprivate func reader(_ args: Array<Substring>, _ functionsInfo: Functions.Inf
         
     case "info":
         
+        guard args.count == 2 else {
+            Log.atError?.log("Missing source or key in argument")
+            return nil
+        }
+
         guard let result = functionsInfo[String(args[1]).lowercased()] else {
-            Log.atError?.log("FunctionInfo does not contain key: \(args[1])")
+            Log.atDebug?.log("FunctionInfo does not contain key: \(args[1])")
             return nil
         }
         
@@ -138,6 +154,11 @@ fileprivate func reader(_ args: Array<Substring>, _ functionsInfo: Functions.Inf
         
     case "service":
         
+        guard args.count == 2 else {
+            Log.atError?.log("Missing source or key in argument")
+            return nil
+        }
+
         switch args[1].lowercased() {
             
         case "absolute-resource-path":
@@ -152,7 +173,11 @@ fileprivate func reader(_ args: Array<Substring>, _ functionsInfo: Functions.Inf
             
         case "response-started":
         
-            return (environment.serviceInfo[.responseStartedKey] as? Int64)?.description
+            if let i = environment.serviceInfo[.responseStartedKey] as? Int64 {
+                return String(i)
+            } else {
+                return nil
+            }
 
 
         default:
@@ -168,6 +193,11 @@ fileprivate func reader(_ args: Array<Substring>, _ functionsInfo: Functions.Inf
             return nil
         }
         
+        guard args.count == 2 else {
+            Log.atError?.log("Missing source or key in argument")
+            return nil
+        }
+
         switch args[1].lowercased() {
             
         default:
@@ -183,27 +213,43 @@ fileprivate func reader(_ args: Array<Substring>, _ functionsInfo: Functions.Inf
             return nil
         }
 
-        guard let account = session.info[.accountKey] as? Account else {
-            return nil
-        }
-        
-        switch args[1].lowercased() {
-        
-        case "name": return account.name
+        switch args.count {
             
-        case "is-domain-admin": return account.isDomainAdmin.description
+        case 1:
             
-        case "is-moderator": return account.isModerator.description
-            
-        default:
-            Log.atError?.log("No access to Account mapped for key: \(args[1].lowercased())")
-            return nil
+            return (session.info[.accountKey] as? Account) != nil ? "not-nil" : "nil"
 
+            
+        case 2:
+            
+            guard let account = session.info[.accountKey] as? Account else { return nil }
+                        
+            switch args[1].lowercased() {
+        
+            case "name": return account.name
+            
+            case "is-domain-admin": return String(account.isDomainAdmin)
+            
+            case "is-moderator": return String(account.isModerator)
+            
+            default:
+                Log.atError?.log("No access to Account mapped for key: \(args[1].lowercased())")
+                return nil
+            }
+        
+        default:
+            Log.atError?.log("Ilegal number of arguments for $account source: \(args.count)")
+            return nil
         }
         
         
     case "domain":
         
+        guard args.count == 2 else {
+            Log.atError?.log("Missing source or key in argument")
+            return nil
+        }
+
         switch args[1].lowercased() {
             
         case "name": return environment.domain.name
@@ -212,13 +258,13 @@ fileprivate func reader(_ args: Array<Substring>, _ functionsInfo: Functions.Inf
             
         case "foreward-url": return environment.domain.forwardUrl
             
-        case "enabled": return environment.domain.enabled.description
+        case "enabled": return String(environment.domain.enabled)
             
-        case "accesslog-enabled": return environment.domain.accessLogEnabled.description
+        case "accesslog-enabled": return String(environment.domain.accessLogEnabled)
             
-        case "404log-enabled": return environment.domain.four04LogEnabled.description
+        case "404log-enabled": return String(environment.domain.four04LogEnabled)
             
-        case "sessionlog-enabled": return environment.domain.sessionLogEnabled.description
+        case "sessionlog-enabled": return String(environment.domain.sessionLogEnabled)
             
         case "php-path": return (environment.domain.phpPath?.path ?? "")
             
@@ -231,29 +277,31 @@ fileprivate func reader(_ args: Array<Substring>, _ functionsInfo: Functions.Inf
             
         case "php-map-index":
             if environment.domain.phpPath != nil {
-                return environment.domain.phpMapIndex.description
+                return String(environment.domain.phpMapIndex)
             } else {
                 return "PHP Disabled"
             }
             
         case "php-map-all":
             if environment.domain.phpPath != nil {
-                return environment.domain.phpMapAll.description
+                return String(environment.domain.phpMapAll)
             } else {
                 return "PHP Disabled"
             }
             
         case "php-timeout":
             if environment.domain.phpPath != nil {
-                return environment.domain.phpTimeout.description
+                return String(environment.domain.phpTimeout)
             } else {
                 return "PHP Disabled"
             }
             
         case "sfresources": return environment.domain.sfresources
             
-        case "session-timeout": return environment.domain.sessionTimeout.description
+        case "session-timeout": return String(environment.domain.sessionTimeout)
 
+        case "comments-for-approval-count": return String(environment.domain.comments.forApproval.count)
+        
         default:
             Log.atError?.log("No access to Domain mapped for key: \(args[1].lowercased())")
             return nil

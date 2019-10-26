@@ -202,6 +202,8 @@ public class SFDocument: EstimatedMemoryConsumption {
             
             case "root":
                 
+                Log.atDebug?.log("Root")
+                
                 var data = Data()
 
                 blocks.forEach {
@@ -213,33 +215,66 @@ public class SFDocument: EstimatedMemoryConsumption {
                 return data
                 
                 
-            case "if":
+            case "if": // Note that the 'then' and 'else' blocks have no associated cases but are executed as part of the 'if' case
                 
+                Log.atDebug?.log("if")
+
                 var data = Data()
 
                 guard case .arrayOfString(let args) = arguments else {
-                    Log.atError?.log("No string arguments found")
+                    Log.atError?.log("Syntax error: No string arguments found")
                     return nil
                 }
                                 
                 if evaluateIf(args, &info, environment) {
                     
-                    blocks.forEach {
-                        if let d = $0.getData(&info, environment) {
+                    Log.atDebug?.log("then")
+
+                    if blocks.count > 0 {
+                        if let d = blocks[0].getData(&info, environment) {
+                            data.append(d)
+                        }
+                    }
+                    
+                } else {
+
+                    Log.atDebug?.log("else")
+
+                    if blocks.count > 1 {
+                        if let d = blocks[1].getData(&info, environment) {
                             data.append(d)
                         }
                     }
                 }
                 
+                Log.atDebug?.log("endif")
+
+                return data
+                
+                
+            case "then", "else":
+                
+                Log.atDebug?.log("then-else-execution")
+
+                var data = Data()
+
+                blocks.forEach {
+                    if let d = $0.getData(&info, environment) {
+                        data.append(d)
+                    }
+                }
+
                 return data
                 
                 
             case "for":
             
+                Log.atDebug?.log("for")
+
                 var data = Data()
 
                 guard case .arrayOfString(let args) = arguments else {
-                    Log.atError?.log("No string arguments found")
+                    Log.atError?.log("Syntax error: No string arguments found")
                     return nil
                 }
                 
@@ -249,6 +284,8 @@ public class SFDocument: EstimatedMemoryConsumption {
                 
                 while setupFor(args, &info, environment) {
                     
+                    Log.atDebug?.log("index = \(i)")
+
                     blocks.forEach {
                         if let d = $0.getData(&info, environment) {
                             data.append(d)
@@ -259,8 +296,48 @@ public class SFDocument: EstimatedMemoryConsumption {
                     info["offset"] = String(i)
                 }
                 
+                Log.atDebug?.log("endfor")
+
                 return data
 
+                
+            case "cached":
+                
+                Log.atDebug?.log("cached")
+
+                guard case .arrayOfString(let args) = arguments else {
+                    Log.atError?.log("Syntax error: No string arguments found")
+                    return nil
+                }
+                
+                guard args.count == 2 else {
+                    Log.atError?.log("Syntax error: Expected 2 arguments for 'cache' statement, found \(args.count)")
+                    return nil
+                }
+                
+                guard !blocks.isEmpty else {
+                    Log.atError?.log("Syntax error: No cache building blocks present")
+                    return nil
+                }
+
+                guard
+                    let value = readKey(args[1], using: info, in: environment),
+                    let timestamp = Int64(value) else {
+                    Log.atError?.log("Syntax error: invalid timestamp argument: \(args[1])")
+                    return nil
+                }
+                
+                Log.atDebug?.log("endcached")
+
+                return cachedData(forIdentifier: args[0], ifCachedAfter: timestamp, elseCreateFrom: blocks, info: &info, environment: environment)
+                
+                
+            case "comment":
+                
+                Log.atDebug?.log("comment")
+                
+                return Data()
+                
                 
             default:
                 
@@ -365,6 +442,14 @@ public class SFDocument: EstimatedMemoryConsumption {
         return blocks.getData(&info, environment) ?? Data()
     }
     
+    
+    /// Processes the function calls and merges the original document data with the results.
+    
+    public func getContent(info: inout Functions.Info, environment: Functions.Environment) -> Data {
+                
+        return blocks.getData(&info, environment) ?? Data()
+    }
+
     
     /// Create a new Swiftfire Document.
     ///
@@ -528,12 +613,16 @@ fileprivate func evaluateIf(_ args: Array<String>, _ info: inout Functions.Info,
 
 fileprivate func setupFor(_ args: Array<String>, _ info: inout Functions.Info, _ environment: Functions.Environment) -> Bool {
 
-    func getSource(for id: String) -> ControlBlockDataSource? {
+    func getSource(for id: String) -> ControlBlockIndexableDataSource? {
         
         switch id {
         
         case "comments-for-approval": return environment.domain.comments.forApproval
         
+        case "comments":
+            guard let identifier = environment.request.info["comment-id"] else { return nil }
+            return environment.domain.comments.commentTable(for: identifier)
+            
         default:
             Log.atError?.log("Missing source for id: \(id)")
             return nil
@@ -550,10 +639,7 @@ fileprivate func setupFor(_ args: Array<String>, _ info: inout Functions.Info, _
         return false
     }
     
-    guard let source = getSource(for: args[0].lowercased()) else {
-        Log.atError?.log("Source not available")
-        return false
-    }
+    guard let source = getSource(for: args[0].lowercased()) else { return false }
     
     var startOffset: Int = 0
     var endOffset: Int = source.count
@@ -582,3 +668,39 @@ fileprivate func setupFor(_ args: Array<String>, _ info: inout Functions.Info, _
 }
 
 
+/// Returns the data in cache if present and created after the timestamp. If not present (or after the timestamp) then the data is created anew and entered in the cache as well as returned.
+///
+/// - Parameters:
+///   - forIdentifier: The identifier by which to locate the item in the cache
+///   - ifCachedAfter: Int64, in JavaDate (msec since 1970-01-01)
+///   - elseCreateFrom: The blocks from which to create the data anew
+///   - info: The Function.Info dictionary needed by the block expansion
+///   - environment: The environment needed by the block expansion
+
+fileprivate func cachedData(forIdentifier identifier: String, ifCachedAfter timestamp: Int64, elseCreateFrom blocks: Array<SFDocument.Block>, info: inout Functions.Info, environment: Functions.Environment) -> Data {
+    
+    
+    // Check the cache first
+    
+    if let data = environment.domain.cache[identifier, timestamp] { return data }
+    
+    
+    // Not in the cache, create it.
+        
+    var data = Data()
+    blocks.forEach {
+        if let d = $0.getData(&info, environment) {
+            data.append(d)
+        }
+    }
+    
+    
+    // Add it to the cache
+    
+    environment.domain.cache[identifier] = data
+    
+    
+    // And return it
+    
+    return data
+}
