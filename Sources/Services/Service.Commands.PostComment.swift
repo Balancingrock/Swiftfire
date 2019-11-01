@@ -1,9 +1,9 @@
 // =====================================================================================================================
 //
-//  File:       DateFormatters.swift
+//  File:       Service.Commands.PostComment.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.3.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,51 +36,54 @@
 //
 // History
 //
-// 1.0.0 - Initial version
+// 1.3.0 - Initial version
 //
 // =====================================================================================================================
 
 import Foundation
 
-
-public let dateFormatter: DateFormatter = {
-    let ltf = DateFormatter()
-    ltf.dateFormat = "yyyy-MM-dd'T'HH.mm.ss.SSSZ"
-    return ltf
-}()
+import Core
+import Http
 
 
-public let commentDateFormatter: DateFormatter = {
-    let ltf = DateFormatter()
-    ltf.dateFormat = "yyyy MMM dd HH:mm:ss"
-    return ltf
-}()
+// The command
+
+internal let COMMAND_POST_COMMENT = "post-comment"
 
 
-/// Use to create filenames when they have to be time-stamped
-/// The timestamp will have a leading separator '-' and a trailing '.'.
-///
-/// - Note: THis formatter is thread safe
+// Defined in the HTML of the originating page and used here
 
-fileprivate let filenameTimestampFormatter: DateFormatter = {
-    let ltf = DateFormatter()
-    ltf.dateFormat = "-yyyy-MM-dd'T'HH.mm.ss.SSSZ."
-    return ltf
-}()
+fileprivate let COMMENT_DISPLAY_NAME_KEY = "display-name"
 
 
-/// Create a time stamped filename from the given name and extension combined with the current time.
-///
-/// - Note: The timestamp will have a leading seperator '-'
+// Executes the post comment command
 
-public func timestampedFilename(name: String, ext: String) -> String {
-    return name + filenameTimestampFormatter.string(from: Date()) + ext
-}
-
-
-/// Create a time stamped URL from the given directory URL plus name/extension.
-
-public func timestampedFileUrl(dir url: URL?, name: String, ext: String) -> URL? {
-    guard let url = url else { return nil }
-    return url.appendingPathComponent(timestampedFilename(name: name, ext: ext))
+func executePostComment(_ request: Request, _ domain: Domain, _ info: Services.Info) -> String? {
+        
+    guard let text = request.info[COMMENT_TEXT_KEY] else {
+        Log.atError?.log("Missing \(COMMENT_TEXT_KEY) in request.info")
+        return nil
+    }
+    
+    guard text.count > 1 else {
+        Log.atDebug?.log("Character count too low, is: \(text.count), should be >1")
+        return nil
+    }
+    
+    guard let identifier = request.info[COMMENT_SECTION_IDENTIFIER_KEY] else {
+        Log.atError?.log("Missing \(COMMENT_SECTION_IDENTIFIER_KEY) in request.info")
+        return nil
+    }
+    
+    let displayName = request.info[COMMENT_DISPLAY_NAME_KEY] ?? "Anon"
+    
+    let account = (info[.sessionKey] as? Session)?.info[.accountKey] as? Account
+    
+    
+    /// The account and domain are known, create the comment
+    
+    domain.comments.newComment(text: text, identifier: identifier, displayName: displayName, account: account)
+    
+    
+    return nil
 }

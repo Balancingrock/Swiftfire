@@ -65,6 +65,7 @@ public func registerFunctions() {
     functions.register(name: "postingButtonedInput", function: function_postingButtonedInput)
     functions.register(name: "nofPageHits", function: function_nofPageHits)
     functions.register(name: "show", function: function_show)
+    functions.register(name: "setup", function: function_setup)
     functions.register(name: "assign", function: function_assign)
     functions.register(name: "loginLogout", function: function_loginLogout)
     functions.register(name: "commentSection", function: function_commentSection)

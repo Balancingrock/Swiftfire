@@ -282,4 +282,22 @@ public extension FileManager {
         return try? (FileManager.default.attributesOfFileSystem(forPath: path) as NSDictionary).fileModificationDate()?.javaDate
     }
 
+    
+    /// Removes the file at the URL and any empty directories as a result of that.
+    
+    func removeFileAndEmptyDirectories(from url: URL) {
+        var url = url
+        do {
+            try FileManager.default.removeItem(at: url)
+            url = url.deletingLastPathComponent()
+            
+            while try FileManager.default.contentsOfDirectory(at: url, includingPropertiesForKeys: nil, options: [.skipsHiddenFiles, .skipsSubdirectoryDescendants, .skipsPackageDescendants]).count == 0 {
+                
+                try FileManager.default.removeItem(at: url)
+                url = url.deletingLastPathComponent()
+            }
+        } catch let error {
+            Log.atCritical?.log("A file system error occured: \(error.localizedDescription)\nTrying to ignore...")
+        }
+    }
 }

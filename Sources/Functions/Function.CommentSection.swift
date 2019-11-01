@@ -98,7 +98,7 @@ public func function_commentSection(_ args: Functions.Arguments, _ info: inout F
     }
     
     
-    // Check if comments can be enabled
+    // Check if comment creation can be enabled
     
     let commentsEnabled: Bool
     if anonEnabled {
@@ -119,7 +119,7 @@ public func function_commentSection(_ args: Functions.Arguments, _ info: inout F
     
     // Set the request.info parameters needed by the template
     
-    environment.request.info["comment-id"] = identifier
+    environment.request.info["comment-section-identifier"] = identifier
     
 
     // Set the info parameters needed by the template
@@ -129,7 +129,7 @@ public func function_commentSection(_ args: Functions.Arguments, _ info: inout F
     info["has-comments"] = String(environment.domain.comments.nofComments(for: identifier) != 0)
     info["afterstamp"] = String(tableFileModificationDate)
     info["comments-enabled"] = String(commentsEnabled)
-
+    
     
     // Assemble the comments section
     

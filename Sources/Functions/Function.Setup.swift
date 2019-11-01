@@ -1,9 +1,9 @@
 // =====================================================================================================================
 //
-//  File:       DateFormatters.swift
+//  File:       Function.Setup.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.3.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,51 +36,48 @@
 //
 // History
 //
-// 1.0.0 - Initial version
+// 1.3.0 - Initial version
 //
 // =====================================================================================================================
 
 import Foundation
 
-
-public let dateFormatter: DateFormatter = {
-    let ltf = DateFormatter()
-    ltf.dateFormat = "yyyy-MM-dd'T'HH.mm.ss.SSSZ"
-    return ltf
-}()
+import Core
 
 
-public let commentDateFormatter: DateFormatter = {
-    let ltf = DateFormatter()
-    ltf.dateFormat = "yyyy MMM dd HH:mm:ss"
-    return ltf
-}()
-
-
-/// Use to create filenames when they have to be time-stamped
-/// The timestamp will have a leading separator '-' and a trailing '.'.
+/// Setup the info directory.
 ///
-/// - Note: THis formatter is thread safe
-
-fileprivate let filenameTimestampFormatter: DateFormatter = {
-    let ltf = DateFormatter()
-    ltf.dateFormat = "-yyyy-MM-dd'T'HH.mm.ss.SSSZ."
-    return ltf
-}()
-
-
-/// Create a time stamped filename from the given name and extension combined with the current time.
+/// __Webpage Use__:
 ///
-/// - Note: The timestamp will have a leading seperator '-'
+/// _Signature_: .setup(key)
+///
+/// _Number of arguments_: 1
+///
+/// _Type of argument_: String
+///
+/// _Returns_: An empty data, but the info directory will be setup with the requested data
 
-public func timestampedFilename(name: String, ext: String) -> String {
-    return name + filenameTimestampFormatter.string(from: Date()) + ext
-}
+public func function_setup(_ args: Functions.Arguments, _ info: inout Functions.Info, _ environment: Functions.Environment) -> Data? {
+    
+    guard case .arrayOfString(let arr) = args, arr.count == 1 else { return htmlErrorMessage }
 
-
-/// Create a time stamped URL from the given directory URL plus name/extension.
-
-public func timestampedFileUrl(dir url: URL?, name: String, ext: String) -> URL? {
-    guard let url = url else { return nil }
-    return url.appendingPathComponent(timestampedFilename(name: name, ext: ext))
+    let selector = arr[0].lowercased()
+    
+    switch selector {
+        
+    case "first-comment-to-approve":
+        
+        if environment.domain.comments.forApproval.count == 0 {
+            info["none"] = "true"
+        } else {
+            info["none"] = "false"
+            environment.domain.comments.forApproval[0].addSelf(to: &info)
+        }
+        
+    default:
+        
+        Log.atDebug?.log("")
+    }
+    
+    return Data()
 }

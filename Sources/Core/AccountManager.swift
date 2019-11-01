@@ -52,6 +52,8 @@ import VJson
 
 public class AccountManager {
     
+    static let ACCOUNT_DIRECTORY_NAME = "_Account" // The underscore is for reasons of sorting in the finder
+    
     
     // The queue for concurrent access protection
     
@@ -103,7 +105,7 @@ public class AccountManager {
         
         var url = accountsRoot
         centiFractionsStr.forEach({ url.appendPathComponent($0) })
-        url.appendPathComponent("_Account") // The underscore is for reasons of sorting in the finder
+        url.appendPathComponent(AccountManager.ACCOUNT_DIRECTORY_NAME)
                 
         return url
     }
@@ -207,7 +209,7 @@ extension AccountManager {
                     var isDir: ObjCBool = false
                     if FileManager.default.fileExists(atPath: url.path, isDirectory: &isDir) && isDir.boolValue {
                         
-                        if url.lastPathComponent == "_Account" {
+                        if url.lastPathComponent == AccountManager.ACCOUNT_DIRECTORY_NAME {
                             
                             if let account = Account(withContentOfDirectory: url) {
                                 nameLut[account.name.lowercased()] = url

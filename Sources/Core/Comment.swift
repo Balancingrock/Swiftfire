@@ -46,25 +46,28 @@ import BRBON
 import Http
 
 
-public let COMMENT_ORIGINAL_RIK = "orig"
-public let COMMENT_HTMLIFIED_RIK = "html"
-public let COMMENT_HTMLIFIED_VERSION_RIK = "v"
-public let COMMENT_IDENTIFIER_RIK = "id"
-public let COMMENT_ORIGINAL_TIMESTAMP_RIK = "timp"
-public let COMMENT_LAST_UPDATE_TIMESTAMP_RIK = "time"
-public let COMMENT_NOFUPDATES_RIK = "ned"
-public let COMMENT_DISPLAY_NAME_RIK = "dname"
-public let COMMENT_SEQUENCE_NUMBER_RIK = "ind"
+public let COMMENT_ORIGINAL_TEXT = "orig"
+public let COMMENT_HTMLIFIED_TEXT = "html"
+public let COMMENT_HTMLIFIED_VERSION_TEXT = "v"
+public let COMMENT_SECTION_IDENTIFIER = "csid"
+public let COMMENT_UUID = "uuid"
+public let COMMENT_ORIGINAL_TIMESTAMP = "timp"
+public let COMMENT_LAST_UPDATE_TIMESTAMP = "time"
+public let COMMENT_NOFUPDATES = "ned"
+public let COMMENT_DISPLAY_NAME = "dname"
+public let COMMENT_SEQUENCE_NUMBER = "ind"
+public let COMMENT_ACCOUNT_NAME = "aname"
 
-fileprivate let ORIGINAL_NF = NameField(COMMENT_ORIGINAL_RIK)!
-fileprivate let HTMLIFIED_NF = NameField(COMMENT_HTMLIFIED_RIK)!
-fileprivate let HTMLIFIED_VERSION_NF = NameField(COMMENT_HTMLIFIED_VERSION_RIK)!
-fileprivate let IDENTIFIER_NF = NameField(COMMENT_IDENTIFIER_RIK)!
-fileprivate let ORIGINAL_TIMESTAMP_NF = NameField(COMMENT_ORIGINAL_TIMESTAMP_RIK)!
-fileprivate let LAST_UPDATE_TIMESTAMP_NF = NameField(COMMENT_LAST_UPDATE_TIMESTAMP_RIK)!
-fileprivate let NOF_UPDATES_NF = NameField(COMMENT_NOFUPDATES_RIK)!
-fileprivate let DISPLAY_NAME_NF = NameField(COMMENT_DISPLAY_NAME_RIK)!
-fileprivate let SEQUENCE_NUMBER_NF = NameField(COMMENT_SEQUENCE_NUMBER_RIK)!
+fileprivate let ORIGINAL_NF = NameField(COMMENT_ORIGINAL_TEXT)!
+fileprivate let HTMLIFIED_NF = NameField(COMMENT_HTMLIFIED_TEXT)!
+fileprivate let HTMLIFIED_VERSION_NF = NameField(COMMENT_HTMLIFIED_VERSION_TEXT)!
+fileprivate let COMMENT_SECTION_IDENTIFIER_NF = NameField(COMMENT_SECTION_IDENTIFIER)!
+fileprivate let UUID_NF = NameField(COMMENT_UUID)!
+fileprivate let ORIGINAL_TIMESTAMP_NF = NameField(COMMENT_ORIGINAL_TIMESTAMP)!
+fileprivate let LAST_UPDATE_TIMESTAMP_NF = NameField(COMMENT_LAST_UPDATE_TIMESTAMP)!
+fileprivate let NOF_UPDATES_NF = NameField(COMMENT_NOFUPDATES)!
+fileprivate let DISPLAY_NAME_NF = NameField(COMMENT_DISPLAY_NAME)!
+fileprivate let SEQUENCE_NUMBER_NF = NameField(COMMENT_SEQUENCE_NUMBER)!
 
 
 /// Every comment made by a use will be wrapped in an object of this class before it is written to permanent storage.
@@ -82,6 +85,8 @@ public final class Comment {
     
     
     /// Version number of the htmlify-er
+    ///
+    /// This might be used by future enhancements to convert the existing comments to a new style
     
     static let htmlifyVersion: UInt8 = 1
 
@@ -172,6 +177,7 @@ public final class Comment {
         }
         self.url = fileUrl
         
+        
         // Make the input save by removing the < and >
         
         let noHtml = Comment.removeHtml(text)
@@ -188,7 +194,8 @@ public final class Comment {
         db.root.updateItem(noHtml, withNameField: ORIGINAL_NF)
         db.root.updateItem(markedUp, withNameField: HTMLIFIED_NF)
         db.root.updateItem(Comment.htmlifyVersion, withNameField: HTMLIFIED_VERSION_NF)
-        db.root.updateItem(UUID().uuidString, withNameField: IDENTIFIER_NF)
+        db.root.updateItem(identifier, withNameField: COMMENT_SECTION_IDENTIFIER_NF)
+        db.root.updateItem(UUID().uuidString, withNameField: UUID_NF)
         db.root.updateItem(i, withNameField: ORIGINAL_TIMESTAMP_NF)
         db.root.updateItem(UInt16(0), withNameField: NOF_UPDATES_NF)
         db.root.updateItem(i, withNameField: LAST_UPDATE_TIMESTAMP_NF)
@@ -253,9 +260,14 @@ public final class Comment {
     public var htmlified: String { return db.root[HTMLIFIED_NF].string ?? "" }
     
     
-    /// The ID of this comment
+    /// The Identifier of this comment
     
-    public var identifier: String { return db.root[IDENTIFIER_NF].string ?? "" }
+    public var identifier: String { return db.root[COMMENT_SECTION_IDENTIFIER_NF].string ?? "" }
+
+    
+    /// The UUID of this comment
+    
+    public var uuid: String { return db.root[UUID_NF].string ?? "" }
     
     
     /// The version of the htmlified conversion
@@ -282,7 +294,7 @@ public final class Comment {
     
     public var sequenceNumber: UInt16 { return db.root[SEQUENCE_NUMBER_NF].uint16 ?? 0}
     
-    
+        
     /// Replace the original comment. Stores immediately after updating.
     /// Increments the total number of updates
     /// Updates the timestamp of last update.
@@ -313,43 +325,54 @@ public final class Comment {
             Log.atError?.log("Failed to write updated comment to file \(url.path)")
         }
     }
+    
+    
+    // The account for this comment
+    //
+    // Note: This is an expensive operation be sure to cache the result from anything you need from the account
+    
+    public var account: Account? {
+        var accountDirectoryPath = url.path as NSString
+        while accountDirectoryPath.lastPathComponent != AccountManager.ACCOUNT_DIRECTORY_NAME {
+            accountDirectoryPath = accountDirectoryPath.deletingLastPathComponent as NSString
+        }
+        var accountDir = url
+        while accountDir.lastPathComponent != AccountManager.ACCOUNT_DIRECTORY_NAME {
+            accountDir = accountDir.deletingLastPathComponent()
+        }
+        return Account(withContentOfDirectory: accountDir)
+    }
 }
 
 extension Comment: FunctionsInfoDataSource {
     
-    public func addSelf(to info: inout Functions.Info) { db.root.addSelf(to: &info) }
-    
-
-    /*
-    /// Put the comment information into the request.info directory
-    ///
-    /// - Parameters:
-    ///   - request: The request with the info dictionary to which to add the comment fields
-    ///   - index: The sequence number of this comment (given by the comment manager presumably on the basis of the commentUrlTable index)
-    
-    
-    public func addToRequestInfo(_ request: Request, index: Int) {
+    public func addSelf(to info: inout Functions.Info) {
         
-        db.root.forEach { (portal) in
-            if let key = portal.itemName {
-                switch portal.itemType {
-                case .bool: request.info["comment-\(key)"] = portal.bool!.description
-                case .int8: request.info["comment-\(key)"] = portal.int8!.description
-                case .int16: request.info["comment-\(key)"] = portal.int16!.description
-                case .int32: request.info["comment-\(key)"] = portal.int32!.description
-                case .int64: request.info["comment-\(key)"] = portal.int64!.description
-                case .uint8: request.info["comment-\(key)"] = portal.uint8!.description
-                case .uint16: request.info["comment-\(key)"] = portal.uint16!.description
-                case .uint32: request.info["comment-\(key)"] = portal.uint32!.description
-                case .uint64: request.info["comment-\(key)"] = portal.uint64!.description
-                case .float32: request.info["comment-\(key)"] = portal.float32!.description
-                case .float64: request.info["comment-\(key)"] = portal.float64!.description
-                case .string: request.info["comment-\(key)"] = portal.string!.description
-                case .none, .binary, .color, .crcBinary, .crcString, .font, .uuid, .null, .array, .dictionary, .sequence, .table: break
-                }
+        db.root.addSelf(to: &info)
+        
+        
+        // If the associated account is not the Anon account, replace the displayName
+        
+        if let myAccount = account {
+            let aname = myAccount.name
+            if aname == "Anon" {
+                info[COMMENT_DISPLAY_NAME] = "Anon-" + aname
+            } else {
+                info[COMMENT_DISPLAY_NAME] = aname
             }
+            info[COMMENT_ACCOUNT_NAME] = aname
         }
         
-        request.info["comment-index"] = index.description
-    }*/
+        
+        // Make sure the time is readable
+        
+        if let t = info["timp"], let i = Int64(t) { // Time of posting
+            let d = Date(unixTime: i)
+            info["timp"] = commentDateFormatter.string(from: d)
+        }
+        if let t = info["time"], let i = Int64(t) { // Time of edit
+            let d = Date(unixTime: i)
+            info["time"] = commentDateFormatter.string(from: d)
+        }
+    }
 }

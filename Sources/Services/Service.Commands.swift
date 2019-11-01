@@ -135,14 +135,16 @@ fileprivate let SET_NEW_PASSWORD_PASSWORD1_KEY = "set-new-password-1"
 fileprivate let SET_NEW_PASSWORD_PASSWORD2_KEY = "set-new-password-2"
 
 
-// This command posts a new comment
+// General purpose keys used in the POST requests
 
-fileprivate let POST_COMMENT_COMMAND = "post-comment"
+internal let BUTTON_KEY = "button"
+internal let NEXT_URL_KEY = "next-url"
+internal let ACCOUNT_NAME_KEY = "account-name"
+internal let COMMENT_UUID_KEY = "comment-uuid"
+internal let COMMENT_SECTION_IDENTIFIER_KEY = "comment-section-identifier"
+internal let COMMENT_TEXT_KEY = "comment-text"
+internal let COMMENT_ORIGINAL_TIMESTAMP_KEY = "comment-original-timestamp"
 
-fileprivate let POST_COMMENT_DISPLAY_NAME_KEY = "display-name"
-fileprivate let POST_COMMENT_TEXT_KEY = "text"
-fileprivate let POST_COMMENT_PAGE_URL_KEY = "page-url"
-fileprivate let POST_COMMENT_IDENTIFIER_KEY = "comment-id"
 
 /// Executes commands given in the URL. Only active if the URL started with the command keyword followed by a command identifier.
 ///
@@ -170,8 +172,7 @@ func service_commands(_ request: Request, _ connection: SFConnection, _ domain: 
     guard
         request.resourcePathParts.count > 1,
         request.resourcePathParts[0].lowercased() == "command"
-        
-        else {
+    else {
         Log.atInfo?.log("The request does not contain a command")
         return .next
     }
@@ -200,7 +201,8 @@ func service_commands(_ request: Request, _ connection: SFConnection, _ domain: 
     case FORGOT_PASSWORD_COMMAND: relativePath = executeForgotPassword(request, connection, domain, response, info)
     case REQUEST_NEW_PASSWORD_COMMAND: relativePath = executeRequestNewPassword(request, domain)
     case SET_NEW_PASSWORD_COMMAND: relativePath = executeSetNewPassword(request, domain)
-    case POST_COMMENT_COMMAND: relativePath = executePostComment(request, domain, info)
+    case COMMAND_POST_COMMENT: relativePath = executePostComment(request, domain, info)
+    case COMMAND_COMMENT_REVIEW: relativePath = executeCommentReview(request, domain, info)
         
     default:
         
@@ -211,6 +213,12 @@ func service_commands(_ request: Request, _ connection: SFConnection, _ domain: 
 
     
     // Redirect the request
+    
+    if relativePath == nil {
+        if let nextUrl = request.info[NEXT_URL_KEY] {
+            relativePath = nextUrl
+        }
+    }
     
     guard relativePath != nil else {
         if response.code == nil {
@@ -343,6 +351,15 @@ fileprivate func executeRegister(_ request: Request, _ connection: SFConnection,
     guard !accountName.isEmpty else {
         Log.atDebug?.log("Account name is empty")
         request.info[PREVIOUS_ATTEMPT_MESSAGE_KEY] = "Missing account name"
+        return REGISTER_TEMPLATE
+    }
+    
+    
+    // The next test prevents the creation of a special account name that could be used to remove/edit comments from other anon users.
+    
+    guard !accountName.lowercased().starts(with: "anon") else {
+        Log.atDebug?.log("The account name cannot start with 'anon-'")
+        request.info[PREVIOUS_ATTEMPT_MESSAGE_KEY] = "Account names cannot start with 'anon'"
         return REGISTER_TEMPLATE
     }
 
@@ -674,37 +691,3 @@ fileprivate func executeSetNewPassword(_ request: Request, _ domain: Domain) -> 
 }
 
 
-func executePostComment(_ request: Request, _ domain: Domain, _ info: Services.Info) -> String {
-    
-    guard let postUrl = request.info[POST_COMMENT_PAGE_URL_KEY] else {
-        Log.atError?.log("Missing \(POST_COMMENT_PAGE_URL_KEY) in request.info")
-        return "/index.sf.html"
-    }
-    
-    guard let text = request.info[POST_COMMENT_TEXT_KEY] else {
-        Log.atError?.log("Missing \(POST_COMMENT_TEXT_KEY) in request.info")
-        return postUrl
-    }
-    
-    guard text.count > 1 else {
-        Log.atDebug?.log("Character count too low, is: \(text.count), should be >1")
-        return postUrl
-    }
-    
-    guard let identifier = request.info[POST_COMMENT_IDENTIFIER_KEY] else {
-        Log.atDebug?.log("Missing identifier post")
-        return postUrl
-    }
-    
-    let displayName = request.info[POST_COMMENT_DISPLAY_NAME_KEY] ?? ""
-    
-    let account = (info[.sessionKey] as? Session)?.info[.accountKey] as? Account
-    
-    
-    /// The account and domain are known, create the comment
-    
-    domain.comments.newComment(text: text, identifier: identifier, displayName: displayName, account: account)
-    
-    
-    return postUrl
-}

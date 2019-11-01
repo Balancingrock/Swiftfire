@@ -66,6 +66,7 @@ import Foundation
 import SwifterLog
 import BRUtils
 import KeyedCache
+import BRBON
 
 
 /// This encapsulates a swiftfire document in its parsed form.
@@ -198,6 +199,8 @@ public class SFDocument: EstimatedMemoryConsumption {
 
         override func getData(_ info: inout Functions.Info, _ environment: Functions.Environment) -> Data? {
             
+            Log.atDebug?.log("Controlblock: \(name)")
+            
             switch name {
             
             case "root":
@@ -284,7 +287,7 @@ public class SFDocument: EstimatedMemoryConsumption {
                 
                 while setupFor(args, &info, environment) {
                     
-                    Log.atDebug?.log("index = \(i)")
+                    Log.atDebug?.log("offset = \(i)")
 
                     blocks.forEach {
                         if let d = $0.getData(&info, environment) {
@@ -461,7 +464,7 @@ public class SFDocument: EstimatedMemoryConsumption {
     ///
     /// - Returns: Nil if the file cannot be read.
     
-    public static func factory(path: String, data: Data? = nil) -> Result<SFDocument> {
+    public static func factory(path: String, data: Data? = nil) -> BRUtils.Result<SFDocument> {
         
         return queue.sync(execute: {
             
@@ -528,7 +531,7 @@ fileprivate func evaluateIf(_ args: Array<String>, _ info: inout Functions.Info,
         return readKey(args[0], using: info, in: environment) == nil
         
         
-    case "non-nil":
+    case "not-nil":
         
         guard args.count == 2 else {
             Log.atError?.log("Wrong number of arguments, expected 3, found \(args.count)")
@@ -548,7 +551,7 @@ fileprivate func evaluateIf(_ args: Array<String>, _ info: inout Functions.Info,
         return readKey(args[0], using: info, in: environment)?.isEmpty ?? false
 
         
-    case "non-empty":
+    case "not-empty":
         
         guard args.count == 2 else {
             Log.atError?.log("Wrong number of arguments, expected 3, found \(args.count)")
@@ -620,7 +623,7 @@ fileprivate func setupFor(_ args: Array<String>, _ info: inout Functions.Info, _
         case "comments-for-approval": return environment.domain.comments.forApproval
         
         case "comments":
-            guard let identifier = environment.request.info["comment-id"] else { return nil }
+            guard let identifier = environment.request.info["comment-section-identifier"] else { return nil }
             return environment.domain.comments.commentTable(for: identifier)
             
         default:
@@ -639,10 +642,11 @@ fileprivate func setupFor(_ args: Array<String>, _ info: inout Functions.Info, _
         return false
     }
     
-    guard let source = getSource(for: args[0].lowercased()) else { return false }
+    let id = args[0].lowercased()
+    guard let source = getSource(for: id) else { return false }
     
     var startOffset: Int = 0
-    var endOffset: Int = source.count
+    var endOffset: Int = source.count - 1
     
     if args.count == 3 {
         guard let so = Int(args[1]) else {
@@ -658,11 +662,62 @@ fileprivate func setupFor(_ args: Array<String>, _ info: inout Functions.Info, _
     }
     
     let offset = max(startOffset, offsetIn)
-    endOffset = min(endOffset, source.count)
+    endOffset = min(endOffset, source.count - 1)
     
     if offset > endOffset { return false }
     
-    source.addElement(at: offset, to: &info)
+    
+    switch id {
+        
+    case "comments-for-approval": source.addElement(at: offset, to: &info)
+        
+    case "comments":
+        
+        guard let table = source as? Portal, table.isTable else {
+            Log.atError?.log("Cannot convert source to Portal")
+            return false
+        }
+        
+        guard let path = table[offset, COMMENT_URL_CI].string else {
+            Log.atError?.log("Cannot retrieve path for comment from comment table")
+            return false
+        }
+        
+        // Load the comment
+        
+        let url = URL(fileURLWithPath: path, isDirectory: false)
+        
+        guard let comment = Comment(url: url) else {
+            Log.atError?.log("Cannot create comment from url from the comment table")
+            return false
+        }
+        
+        comment.addSelf(to: &info)
+        
+        info["can-edit"] = "false"
+
+        if let session = environment.serviceInfo[.sessionKey] as? Session,
+           let currentAccount = session[.accountKey] as? Account {
+            
+            if currentAccount.isModerator || currentAccount.isDomainAdmin {
+                
+                info["can-edit"] = "true"
+            
+            } else {
+                
+                if let commentAccount = comment.account {
+                    
+                    info["can-edit"] = String(commentAccount.name == currentAccount.name)
+                }
+            }
+        }
+        
+    default:
+        
+        Log.atError?.log("Missing source for id: \(id)")
+        return false
+    }
+    
     
     return true
 }
@@ -682,7 +737,9 @@ fileprivate func cachedData(forIdentifier identifier: String, ifCachedAfter time
     
     // Check the cache first
     
-    if let data = environment.domain.cache[identifier, timestamp] { return data }
+    if let data = environment.domain.cache[identifier, timestamp] {
+        return data
+    }
     
     
     // Not in the cache, create it.
