@@ -315,10 +315,13 @@ public final class CommentManager {
             
             do {
                 var rv = try url.resourceValues(forKeys: [URLResourceKey.contentModificationDateKey])
+                Log.atDebug?.log("Old modification date: \(rv.contentModificationDate?.javaDate ?? -1)")
                 rv.contentModificationDate = Date()
                 try url.setResourceValues(rv)
+                rv = try url.resourceValues(forKeys: [URLResourceKey.contentModificationDateKey])
+                Log.atDebug?.log("New modification date: \(rv.contentModificationDate?.javaDate ?? -1)")
             } catch let error {
-                Log.atError?.log("Unable to touch filr at \(url.path) with error: \(error.localizedDescription)")
+                Log.atError?.log("Unable to update content modification date file at \(url.path) with error: \(error.localizedDescription)")
             }
         }
         
@@ -343,6 +346,8 @@ public final class CommentManager {
                     Log.atError?.log("")
                     return nil
                 }
+                
+                Log.atDebug?.log("Returning modification date: \(ts.javaDate)")
                 
                 return ts.javaDate
                 
@@ -473,7 +478,7 @@ public final class CommentManager {
             
             // Make sure there is an account
         
-            guard let account = account ?? domain.accounts.getAccountWithoutPassword(for: "Anon") else {
+            guard let account = account ?? domain.accounts.getActiveAccount(withName: "Anon", andPassword: "Anon") else {
                 Log.atError?.log("Failed to retrieve Anon account")
                 return
             }
@@ -567,7 +572,7 @@ public final class CommentManager {
             
             // Get the comment itself
             
-            guard let comment = self.loadComment(relativePath, account, timestamp: originalTimestamp) else {
+            guard let comment = self.loadComment(relativePath, account, originalTimestamp) else {
                 // Error log has been made
                 return
             }
@@ -646,7 +651,7 @@ public final class CommentManager {
             
             // Get the comment itself
                         
-            guard let comment = loadComment(relativePath, account, timestamp: originalTimestamp) else { return }
+            guard let comment = loadComment(relativePath, account, originalTimestamp) else { return }
                         
             
             // Get the comment table itemmanager
@@ -824,9 +829,9 @@ public final class CommentManager {
     ///   - account: The account for the comment.
     ///   - timestamp: The timestamp the comment was made.
 
-    private func loadComment(_ relativePath: String, _ account: Account, timestamp: String) -> Comment? {
+    private func loadComment(_ relativePath: String, _ account: Account, _ timestamp: String) -> Comment? {
         
-        let commentUrl = account.dir.appendingPathComponent(relativePath, isDirectory: false).appendingPathComponent(timestamp, isDirectory: false).appendingPathExtension("brbon")
+        let commentUrl = account.dir.appendingPathComponent(relativePath, isDirectory: true).appendingPathComponent(timestamp, isDirectory: false).appendingPathExtension("brbon")
         
         guard let comment = Comment(url: commentUrl) else {
             Log.atError?.log("Comment not found for path \(commentUrl.path)")
@@ -835,138 +840,6 @@ public final class CommentManager {
 
         return comment
     }
-    
-    
-    /// The URL for the comment table file
-    /*
-    public func commentTableFileUrl(for id: String) -> URL? {
-        
-        guard let relativePath = CommentManager.identifier2RelativePath(id) else { return nil }
-        
-        guard let root = Urls.domainCommentsRootDir(for: domain.name) else { return nil }
-        
-        let dir = root.appendingPathComponent(relativePath, isDirectory: true)
-        
-        return dir.appendingPathComponent("commentTable.brbon", isDirectory: false)
-    }*/
-    
-    
-    /// Return the path to the commentTable.
-    ///
-    /// - Parameter relativePath: The relative path (to the comments-root of the domain) to the directory in which the comment table must be located.
-    ///
-    /// - Returns: The url for the file (either present or when it can be created). Nil when an error occured. If an error occured, an error log entry wil have been made.
-    /*
-    private func commentTableFile(_ relativePath: String) -> URL? {
-        
-        
-        // The target directory
-        
-        guard let rootDir = Urls.domainCommentsRootDir(for: domain.name) else {
-            Log.atError?.log("Cannot retrieve comments root directory")
-            return nil
-        }
-        
-        let dir = rootDir.appendingPathComponent(relativePath, isDirectory: true)
-        
-        let name = "commentTable.brbon"
-        
-        
-        switch FileManager.default.testFor(dir.path, file: name, createDir: true) {
-        
-        case .fail:
-            Log.atError?.log("Cannot read or write comment table in \(dir.path)")
-            return nil
-        
-        case .isReadableFile:
-            Log.atError?.log("Cannot write comment table in \(dir.path)")
-            return nil
-
-        case .isWriteableFile:
-            return dir.appendingPathComponent(name, isDirectory: false)
-            
-        case .isReadableDir:
-            Log.atError?.log("Cannot read directory for comment table in \(dir.path)")
-            return nil
-
-        case .isWriteableDir:
-            return dir.appendingPathComponent(name, isDirectory: false)
-        }
-    }*/
-
-    
-    /// Return the path to the commentCache.
-    ///
-    /// - Parameter relativePath: The relative path (to the comments-root of the domain) to the directory in which the comments cache must be located.
-    ///
-    /// - Returns: The url for the file (either present or when it can be created). Nil when an error occured. If an error occured, an error log entry wil have been made.
-    /*
-    private func commentCacheFile(_ relativePath: String) -> URL? {
-        
-        
-        // The target directory
-        
-        guard let rootDir = Urls.domainCommentsRootDir(for: domain.name) else {
-            Log.atError?.log("Cannot retrieve comments root directory")
-            return nil
-        }
-        
-        let dir = rootDir.appendingPathComponent(relativePath, isDirectory: true)
-        
-        let name = "commentCache.html"
-        
-        
-        switch FileManager.default.testFor(dir.path, file: name, createDir: true) {
-        
-        case .fail:
-            Log.atError?.log("Cannot read or write comment cache in \(dir.path)")
-            return nil
-        
-        case .isReadableFile:
-            Log.atError?.log("Cannot write comment cache in \(dir.path)")
-            return nil
-
-        case .isWriteableFile:
-            return dir.appendingPathComponent(name, isDirectory: false)
-            
-        case .isReadableDir:
-            Log.atError?.log("Cannot read directory for comment cache in \(dir.path)")
-            return nil
-
-        case .isWriteableDir:
-            return dir.appendingPathComponent(name, isDirectory: false)
-        }
-    }*/
-
-    
-    /// Load and return the comment table and its item manager.
-    /*
-    private func loadCommentTable(from url: URL, createIfMissing: Bool = false) -> (ItemManager, Portal)? {
-        
-        
-        // Ensure the comments table exists
-                
-        let itemManager = ItemManager(from: url) ?? createCommentTableItemManager()
-        
-        guard let table = itemManager.root[URL_TABLE_NF].portal else {
-            Log.atError?.log("Missing \(URL_TABLE_NF.string) in \(url.path)")
-            return nil
-        }
-
-        
-        return (itemManager, table)
-    }*/
-
-    
-    /// Creates a new comment table block item manager.
-    ///
-    /// Note that the actual table is wrapped in a block to ensure future upgradability.
-    /*
-    private func createCommentTableItemManager() -> ItemManager {
-    
-        
-        return dm
-    }*/
 
 
     /// Stores the comments waiting for approval in a list of paths

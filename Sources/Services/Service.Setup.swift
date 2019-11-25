@@ -693,7 +693,7 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
             
         // Get the account for the login data
             
-        guard let account = domain.accounts.getActiveAccount(for: name, using: pwd), account.isDomainAdmin else {
+        guard let account = domain.accounts.getActiveAccount(withName: name, andPassword: pwd), account.isDomainAdmin else {
                 
             // The login attempt failed, no account found.
                 
@@ -998,12 +998,12 @@ fileprivate func executeUpdateServices(_ request: Request, _ domain: Domain) {
 
 fileprivate func executeConfirmDeleteAccount(_ request: Request, _ domain: Domain) -> Bool {
     
-    guard let adminId = request.info["adminid"] else {
+    guard let adminId = request.info["adminid"], let uuid = UUID(uuidString: adminId) else {
         Log.atError?.log("Missing admin ID")
         return false
     }
     
-    return domain.accounts.getAccountWithoutPassword(for: adminId) != nil
+    return domain.accounts.getAccount(for: uuid) != nil
 }
 
 fileprivate func executeRemoveAccount(_ request: Request, _ domain: Domain) {
@@ -1022,7 +1022,7 @@ fileprivate func executeRemoveAccount(_ request: Request, _ domain: Domain) {
 
 fileprivate func executeAddAdminChangePassword(_ request: Request, _ domain: Domain) {
     
-    guard let adminId = request.info["adminid"] else {
+    guard let adminId = request.info["adminid"], let uuid = UUID(uuidString: adminId) else {
         Log.atError?.log("Missing admin ID")
         return
     }
@@ -1032,7 +1032,7 @@ fileprivate func executeAddAdminChangePassword(_ request: Request, _ domain: Dom
         return
     }
 
-    if let account = domain.accounts.getAccountWithoutPassword(for: adminId) {
+    if let account = domain.accounts.getAccount(for: uuid) {
         
         
         // Grant admin rights to this account
@@ -1077,8 +1077,8 @@ fileprivate func executeAddAdminChangePassword(_ request: Request, _ domain: Dom
 
 fileprivate func executeChangePassword(_ request: Request, _ domain: Domain) {
     
-    guard let name = request.info["changepasswordname"] else {
-        Log.atError?.log("Missing name")
+    guard let str = request.info["changepasswordid"], let uuid = UUID(uuidString: str) else {
+        Log.atError?.log("Missing id")
         return
     }
 
@@ -1087,15 +1087,15 @@ fileprivate func executeChangePassword(_ request: Request, _ domain: Domain) {
         return
     }
 
-    if let account = domain.accounts.getAccountWithoutPassword(for: name) {
+    if let account = domain.accounts.getAccount(for: uuid) {
 
         
         // Change the password
         
         if account.updatePassword(pwd) {
-            Log.atNotice?.log("Updated the password for domain admin \(name)")
+            Log.atNotice?.log("Updated the password for domain admin \(account.name)")
         } else {
-            Log.atError?.log("Failed to update the password for domain admin \(name)")
+            Log.atError?.log("Failed to update the password for domain admin \(account.name)")
         }
         
         account.isEnabled = true
@@ -1103,20 +1103,20 @@ fileprivate func executeChangePassword(_ request: Request, _ domain: Domain) {
 
     } else {
      
-        Log.atError?.log("Account not found for \(name)")
+        Log.atError?.log("Account not found for uuid: \(str)")
     }
 }
 
 
 fileprivate func createAccountDetailPage(_ request: Request, _ domain: Domain, _ response: Response) {
     
-    guard let name = request.info["account-name"] else {
-        Log.atError?.log("Missing account-name in request.info")
+    guard let str = request.info["account-uuid"], let uuid = UUID(uuidString: str) else {
+        Log.atError?.log("Missing account-uuid in request.info")
         response.code = ._500_InternalServerError
         return
     }
     
-    guard let account = domain.accounts.getAccountWithoutPassword(for: name) else {
+    guard let account = domain.accounts.getAccount(for: uuid) else {
         Log.atError?.log("Missing account")
         response.code = ._500_InternalServerError
         return
@@ -1175,7 +1175,7 @@ fileprivate func createAccountDetailPage(_ request: Request, _ domain: Domain, _
                         <td>Name:</td>
                         <td>
                             <form action="/setup/account-details/account-update" method="post">
-                                <input type="hidden" name="account-name" value="\(name)">
+                                <input type="hidden" name="account-uuid" value="\(account.uuid.uuidString)">
                                 <input type="hidden" name="parameter" value="account-name">
                                 <input type="text" name="value" value="\(account.name)">
                                 <input type="submit" value="Update">
@@ -1189,7 +1189,7 @@ fileprivate func createAccountDetailPage(_ request: Request, _ domain: Domain, _
                         <td>Is Enabled:</td>
                         <td>
                             <form action="/setup/account-details/account-update" method="post">
-                                <input type="hidden" name="account-name" value="\(name)">
+                                <input type="hidden" name="account-uuid" value="\(account.uuid.uuidString)">
                                 <input type="hidden" name="parameter" value="is-enabled">
                                 <input type="checkbox" name="value" value="true" \(account.isEnabled ? "checked" : "")>
                                 <input type="submit" value="Update">
@@ -1203,7 +1203,7 @@ fileprivate func createAccountDetailPage(_ request: Request, _ domain: Domain, _
                         <td>Email address:</td>
                         <td>
                             <form action="/setup/account-details/account-update" method="post">
-                                <input type="hidden" name="account-name" value="\(name)">
+                                <input type="hidden" name="account-uuid" value="\(account.uuid.uuidString)">
                                 <input type="hidden" name="parameter" value="email-address">
                                 <input type="text" name="value" value="\(account.emailAddress)">
                                 <input type="submit" value="Update">
@@ -1217,7 +1217,7 @@ fileprivate func createAccountDetailPage(_ request: Request, _ domain: Domain, _
                         <td>Email verification code:</td>
                         <td>
                             <form action="/setup/account-details/account-update" method="post">
-                                <input type="hidden" name="account-name" value="\(name)">
+                                <input type="hidden" name="account-uuid" value="\(account.uuid.uuidString)">
                                 <input type="hidden" name="parameter" value="email-verification-code">
                                 <input type="text" name="value" value="\(account.emailVerificationCode)">
                                 <input type="submit" value="Update">
@@ -1231,7 +1231,7 @@ fileprivate func createAccountDetailPage(_ request: Request, _ domain: Domain, _
                         <td>Is domain administrator:</td>
                         <td>
                             <form action="/setup/account-details/account-update" method="post">
-                                <input type="hidden" name="account-name" value="\(name)">
+                                <input type="hidden" name="account-uuid" value="\(account.uuid.uuidString)">
                                 <input type="hidden" name="parameter" value="is-domain-admin">
                                 <input type="checkbox" name="value" value="true" \(account.isDomainAdmin ? "checked" : "")>
                                 <input type="submit" value="Update">
@@ -1245,7 +1245,7 @@ fileprivate func createAccountDetailPage(_ request: Request, _ domain: Domain, _
                         <td>New password verification code:</td>
                         <td>
                             <form action="/setup/account-details/account-update" method="post">
-                                <input type="hidden" name="account-name" value="\(name)">
+                                <input type="hidden" name="account-uuid" value="\(account.uuid.uuidString)">
                                 <input type="hidden" name="parameter" value="new-password-verification-code">
                                 <input type="text" name="value" value="\(account.newPasswordVerificationCode)">
                                 <input type="submit" value="Update">
@@ -1259,7 +1259,7 @@ fileprivate func createAccountDetailPage(_ request: Request, _ domain: Domain, _
                         <td>New password timestamp:</td>
                         <td>
                             <form action="/setup/account-details/account-update" method="post">
-                                <input type="hidden" name="account-name" value="\(name)">
+                                <input type="hidden" name="account-uuid" value="\(account.uuid.uuidString)">
                                 <input type="hidden" name="parameter" value="new-password-timestamp">
                                 <input type="text" name="value" value="\(account.newPasswordRequestTimestamp)" disabled>
                                 <input type="submit" value="Restart">
@@ -1277,7 +1277,7 @@ fileprivate func createAccountDetailPage(_ request: Request, _ domain: Domain, _
                         <td>New password timestamp:</td>
                         <td>
                             <form action="/setup/account-details/account-update" method="post">
-                                <input type="hidden" name="account-name" value="\(name)">
+                                <input type="hidden" name="account-uuid" value="\(account.uuid.uuidString)">
                                 <input type="hidden" name="parameter" value="new-password">
                                 <input type="text" name="value" value="">
                                 <input type="submit" value="Set Password">
@@ -1308,8 +1308,8 @@ fileprivate func createAccountDetailPage(_ request: Request, _ domain: Domain, _
 
 fileprivate func updateAccount(_ request: Request, _ domain: Domain, _ connection: SFConnection) {
     
-    guard let name = request.info["account-name"], !name.isEmpty else {
-        Log.atError?.log("Missing account name")
+    guard let str = request.info["account-uuid"], !str.isEmpty, let uuid = UUID(uuidString: str) else {
+        Log.atError?.log("Missing account uuid")
         return
     }
     
@@ -1318,7 +1318,7 @@ fileprivate func updateAccount(_ request: Request, _ domain: Domain, _ connectio
         return
     }
     
-    guard let account = domain.accounts.getAccountWithoutPassword(for: name) else {
+    guard let account = domain.accounts.getAccount(for: uuid) else {
         Log.atError?.log("Missing account")
         return
     }

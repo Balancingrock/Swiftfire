@@ -53,7 +53,7 @@ import Core
 // Template paths are case sensitive and must lead with a "/"
 
 fileprivate let PREVIOUS_ATTEMPT_MESSAGE_KEY = "previous-attempt-message"
-public let ORIGINATING_PAGE_URL_KEY = "originating-page-url"
+public let ORIGINAL_PAGE_URL_KEY = "original-page-url"
 
 // Login. This command is used to login to an existing account. It needs the LoginName and LoginPassword.
 
@@ -110,7 +110,7 @@ fileprivate let FORGOT_PASSWORD_TEMPLATE = "/pages/forgot-password.sf.html"
 fileprivate let FORGOT_PASSWORD_CONTINUE_TEMPLATE = "/pages/forgot-password-continue.sf.html"
 fileprivate let FORGOT_PASSWORD_EMAIL_TEXT_TEMPLATE = "/templates/request-new-password-text.sf.html"
 
-fileprivate let FORGOT_PASSWORD_NAME_KEY = "forgot-password-name"
+fileprivate let FORGOT_PASSWORD_ACCOUNT_ID_KEY = "forgot-password-account-id"
 
 
 // The request new password command (2-stage, followed by set new password)
@@ -130,7 +130,7 @@ fileprivate let SET_NEW_PASSWORD_COMMAND = "set-new-password"
 fileprivate let SET_NEW_PASSWORD_TEMPLATE = "/pages/set-new-password.sf.html"
 fileprivate let SET_NEW_PASSWORD_SUCCESS_TEMPLATE = "/pages/set-new-password-success.sf.html"
 
-fileprivate let SET_NEW_PASSWORD_ACCOUNT_NAME_KEY = "name"
+fileprivate let SET_NEW_PASSWORD_ACCOUNT_ID_KEY = "uuid"
 fileprivate let SET_NEW_PASSWORD_PASSWORD1_KEY = "set-new-password-1"
 fileprivate let SET_NEW_PASSWORD_PASSWORD2_KEY = "set-new-password-2"
 
@@ -139,7 +139,8 @@ fileprivate let SET_NEW_PASSWORD_PASSWORD2_KEY = "set-new-password-2"
 
 internal let BUTTON_KEY = "button"
 internal let NEXT_URL_KEY = "next-url"
-internal let ACCOUNT_NAME_KEY = "account-name"
+internal let ACCOUNT_ID_KEY = "account-id"
+internal let COMMENT_ACCOUNT_KEY = "comment-account-id"
 internal let COMMENT_UUID_KEY = "comment-uuid"
 internal let COMMENT_SECTION_IDENTIFIER_KEY = "comment-section-identifier"
 internal let COMMENT_TEXT_KEY = "comment-text"
@@ -203,7 +204,10 @@ func service_commands(_ request: Request, _ connection: SFConnection, _ domain: 
     case SET_NEW_PASSWORD_COMMAND: relativePath = executeSetNewPassword(request, domain)
     case COMMAND_POST_COMMENT: relativePath = executePostComment(request, domain, info)
     case COMMAND_COMMENT_REVIEW: relativePath = executeCommentReview(request, domain, info)
-        
+    case COMMAND_REMOVE_COMMENT: relativePath = executeRemoveComment(request, domain, info)
+    case COMMAND_EDIT_COMMENT: relativePath = executeEditComment(request, domain, info)
+    case COMMAND_UPDATE_COMMENT: relativePath = executeUpdateComment(request, domain, info)
+
     default:
         
         Log.atError?.log("Unknown command with name: \(command) (original URL name: \(request.resourcePathParts[1]))")
@@ -222,8 +226,8 @@ func service_commands(_ request: Request, _ connection: SFConnection, _ domain: 
     
     guard relativePath != nil else {
         if response.code == nil {
-            Log.atError?.log("The relative path is still empty!")
-            response.code = ._500_InternalServerError
+            assert(false, "The relative path is still empty!")
+            relativePath = "index.sf.html"
         }
         return .next
     }
@@ -287,7 +291,7 @@ fileprivate func executeLogin(_ request: Request, _ domain: Domain, _ info: Serv
     
     // Get the account (if it exists, is active and the password is correct)
     
-    guard let account = domain.accounts.getActiveAccount(for: loginName, using: loginPassword) else {
+    guard let account = domain.accounts.getActiveAccount(withName: loginName, andPassword: loginPassword) else {
         request.info[PREVIOUS_ATTEMPT_MESSAGE_KEY] = "Unknown name - password combination"
         return LOGIN_TEMPLATE
     }
@@ -315,7 +319,7 @@ fileprivate func executeLogout(_ request: Request, _ info: Services.Info) -> Str
 
     session.info.remove(key: .accountKey)
     
-    return request.info[ORIGINATING_PAGE_URL_KEY] ?? "/index.sf.html"
+    return request.info[ORIGINAL_PAGE_URL_KEY] ?? "/index.sf.html"
 }
 
 
@@ -433,7 +437,7 @@ fileprivate func executeRegister(_ request: Request, _ connection: SFConnection,
     
     // Add the new account to the accounts waiting for verification
     
-    domain.accountNamesWaitingForVerification?.root?.appendElement(account.name)
+    domain.accountIdsWaitingForVerification?.root?.appendElement(account.uuid)
     
     
     // Send email verification mail
@@ -481,16 +485,21 @@ fileprivate func executeEmailVerification(_ request: Request, _ response: Respon
         return nil
     }
     
-    guard let waitingAccounts = domain.accountNamesWaitingForVerification?.root?.arrayOfString else {
+    guard let waitingAccounts = domain.accountIdsWaitingForVerification?.root?.arrayOfString else {
         Log.atNotice?.log("An attempt was made to verify an account while there are no accounts waiting for verification")
         return EMAIL_VERIFICATION_FAILED_TEMPLATE
     }
     
     var success = false
-    for (index, accountName) in waitingAccounts.enumerated() {
+    for (index, accountId) in waitingAccounts.enumerated() {
         
-        guard let account = domain.accounts.getAccountWithoutPassword(for: accountName) else {
-            Log.atNotice?.log("Could not find account with name \(accountName) in domain")
+        guard let uuid = UUID(uuidString: accountId) else {
+            Log.atNotice?.log("Could not create UUID for: \(accountId)")
+            return EMAIL_VERIFICATION_FAILED_TEMPLATE
+        }
+        
+        guard let account = domain.accounts.getAccount(for: uuid) else {
+            Log.atNotice?.log("Could not find account with UUID \(accountId)")
             return EMAIL_VERIFICATION_FAILED_TEMPLATE
         }
         
@@ -500,10 +509,10 @@ fileprivate func executeEmailVerification(_ request: Request, _ response: Respon
             account.emailVerificationCode = ""
             
             // Keep track in the log
-            Log.atNotice?.log("Account with name \(accountName) has been verified")
+            Log.atNotice?.log("Account with name \(account.name) and uuid \(accountId) has been verified")
             
             // Remove the account from the waiting list
-            domain.accountNamesWaitingForVerification!.root!.removeElement(atIndex: index)
+            domain.accountIdsWaitingForVerification!.root!.removeElement(atIndex: index)
             
             // Note: Do not automatically login. That could cause somebody else but the user to be logged in as that user.
                         
@@ -529,23 +538,28 @@ fileprivate func executeForgotPassword(_ request: Request, _ connection: SFConne
     
     // The request info should contain a name key
 
-    guard let accountName = request.info[FORGOT_PASSWORD_NAME_KEY] else {
-        Log.atError?.log("No '\(FORGOT_PASSWORD_NAME_KEY)' found")
+    guard let accountId = request.info[FORGOT_PASSWORD_ACCOUNT_ID_KEY] else {
+        Log.atError?.log("No '\(FORGOT_PASSWORD_ACCOUNT_ID_KEY)' found")
         return FORGOT_PASSWORD_CONTINUE_TEMPLATE
     }
 
-    guard !accountName.isEmpty else {
-        Log.atDebug?.log("Account name is empty")
+    guard !accountId.isEmpty else {
+        Log.atDebug?.log("Account id is empty")
         return FORGOT_PASSWORD_CONTINUE_TEMPLATE
     }
 
-    guard accountName != "Anon" else {
+    guard accountId != "Anon" else {
         Log.atDebug?.log("Cannot change Anon account")
         return FORGOT_PASSWORD_CONTINUE_TEMPLATE
     }
+    
+    guard let uuid = UUID(uuidString: accountId) else {
+        Log.atDebug?.log("Cannot create UUID from \(accountId)")
+        return FORGOT_PASSWORD_CONTINUE_TEMPLATE
+    }
 
-    guard let account = domain.accounts.getAccountWithoutPassword(for: accountName) else {
-        Log.atDebug?.log("An account with this name already exists")
+    guard let account = domain.accounts.getAccount(for: uuid) else {
+        Log.atDebug?.log("No account for uuid: \(accountId)")
         return FORGOT_PASSWORD_CONTINUE_TEMPLATE
     }
 
@@ -615,7 +629,7 @@ fileprivate func executeRequestNewPassword(_ request: Request, _ domain: Domain)
     if let account = account {
         
         // Set the account name and request the set new password page
-        request.info[SET_NEW_PASSWORD_ACCOUNT_NAME_KEY] = account.name
+        request.info[SET_NEW_PASSWORD_ACCOUNT_ID_KEY] = account.uuid.uuidString
         return SET_NEW_PASSWORD_TEMPLATE
         
     } else {
@@ -628,20 +642,20 @@ fileprivate func executeRequestNewPassword(_ request: Request, _ domain: Domain)
 
 fileprivate func executeSetNewPassword(_ request: Request, _ domain: Domain) -> String {
     
-    guard let accountName = request.info[SET_NEW_PASSWORD_ACCOUNT_NAME_KEY] else {
-        Log.atError?.log("Missing account name")
+    guard let accountId = request.info[SET_NEW_PASSWORD_ACCOUNT_ID_KEY], let uuid = UUID(uuidString: accountId) else {
+        Log.atError?.log("Missing account id")
         request.info[PREVIOUS_ATTEMPT_MESSAGE_KEY] = "Server error, please contact the administrator"
         return SET_NEW_PASSWORD_TEMPLATE
     }
     
-    guard let account = domain.accounts.getAccountWithoutPassword(for: accountName) else {
-        Log.atError?.log("Unknown account name `\(accountName)`")
+    guard let account = domain.accounts.getAccount(for: uuid) else {
+        Log.atError?.log("Unknown account for uuid: \(accountId)")
         request.info[PREVIOUS_ATTEMPT_MESSAGE_KEY] = "Server error, please contact the administrator"
         return SET_NEW_PASSWORD_TEMPLATE
     }
     
     guard account.newPasswordRequestTimestamp != 0 else {
-        Log.atNotice?.log("Somebody seems to be trying to set a new password for `\(accountName)` without a pending request")
+        Log.atNotice?.log("Somebody seems to be trying to set a new password for `\(account.name)` without a pending request")
         return ATTEMPT_NOT_ALLOWED_TEMPLATE
     }
     

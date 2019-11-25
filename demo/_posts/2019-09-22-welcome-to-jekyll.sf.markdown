@@ -2,7 +2,7 @@
 layout: post
 title:  "Welcome to Swiftfire & Jekyll!"
 date:   2019-09-22
-categories: swiftfire jekyll update
+categories:
 ---
 Welcome to Swiftfire and Jekyll.
 

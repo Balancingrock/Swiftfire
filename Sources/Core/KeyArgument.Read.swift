@@ -179,6 +179,10 @@ fileprivate func reader(_ args: Array<Substring>, _ functionsInfo: Functions.Inf
                 return nil
             }
 
+        case "error-message":
+            
+            return environment.serviceInfo[.errorMessageKey] as? String
+
 
         default:
             Log.atError?.log("No access to ServiceInfo mapped for key: \(args[1].lowercased())")

@@ -305,7 +305,7 @@ public final class Domain {
     
     /// A list of account names to be verified
     
-    public var accountNamesWaitingForVerification: ItemManager!
+    public var accountIdsWaitingForVerification: ItemManager!
     
     
     /// A list of account names waiting for a new password
@@ -408,7 +408,7 @@ public final class Domain {
             Log.atEmergency?.log("Could not create account manager for domain \(self.name)")
             return nil
         }
-        if accounts.getAccountWithoutPassword(for: "Anon") == nil {
+        if accounts.available(name: "Anon") {
             let anon = accounts.newAccount(name: "Anon", password: "Anon")
             anon?.isEnabled = false
         }
@@ -497,14 +497,14 @@ public final class Domain {
             statisticsRolloverTime = WallclockTime(j) ?? WallclockTime(hour: 0, minute: 0, second: 0)
         }
         
-        if let url = Urls.domainAccountNamesWaitingForVerificationFile(for: name) {
-            accountNamesWaitingForVerification = ItemManager(from: url)
-            if accountNamesWaitingForVerification == nil {
-                accountNamesWaitingForVerification = ItemManager.createArrayManager(values: Array<String>())
+        if let url = Urls.domainAccountIdsWaitingForVerificationFile(for: name) {
+            accountIdsWaitingForVerification = ItemManager(from: url)
+            if accountIdsWaitingForVerification == nil {
+                accountIdsWaitingForVerification = ItemManager.createArrayManager(values: Array<String>())
             }
         } else {
             Log.atCritical?.log("Failed to retrieve name for accountNamesWaitingForVerification")
-            accountNamesWaitingForVerification = ItemManager.createArrayManager(values: Array<String>())
+            accountIdsWaitingForVerification = ItemManager.createArrayManager(values: Array<String>())
         }
     }
     
@@ -563,9 +563,9 @@ public final class Domain {
 
         json.save(to: setupFile)
         
-        if let url = Urls.domainAccountNamesWaitingForVerificationFile(for: name) {
-            if accountNamesWaitingForVerification != nil {
-                try? accountNamesWaitingForVerification.data.write(to: url)
+        if let url = Urls.domainAccountIdsWaitingForVerificationFile(for: name) {
+            if accountIdsWaitingForVerification != nil {
+                try? accountIdsWaitingForVerification.data.write(to: url)
             }
         }
     }

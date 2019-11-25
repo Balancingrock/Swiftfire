@@ -1,3 +1,15 @@
+.assign(can-edit, false)
+.if($account.name, not-equal, Anon)
+	.if($account.name, equal, $info.aname)
+		.assign(can-edit, true)
+	.end()
+	.if($account.is-domain-admin, true)
+		.assign(can-edit, true)
+	.end()
+	.if($account.is-moderator, true)
+		.assign(can-edit, true)
+	.end()
+.end()
 <style>
 p { margin: 0; display: block; }
 input { color: black; }
@@ -34,13 +46,20 @@ textarea { color: black; box-sizing: border-box; max-width: 100%; min-width: 100
 	font-size: .9em;
 }
 .details-footer {
+	.if($info.can-edit, true)
 	display: flex;
+	.else()
+	display: none;
+	.end()
 	flex-direction: row;
 	justify-content: flex-end;
+	align-items: baseline;
 }
 .small-button {
 	background-color: #e8e8e8;
 	border: 0;
+	margin-top: 2px;
+	margin-left: 4px;
 	font-size: .8em;
 	color: darkblue;
 }
@@ -70,18 +89,6 @@ textarea { color: black; box-sizing: border-box; max-width: 100%; min-width: 100
 .else()
 	.cached($request.comment-section-identifier, $info.afterstamp)
 		.for(comments)
-			.assign($info.can-edit, false)
-			.if($account.name, not-equal, Anon)
-				.if($account.name, equal, $info.aname)
-					.assign($info.can-edit, true)
-				.end()
-				.if($account.is-domain-admin, true)
-					.assign($info.can-edit, true)
-				.end()
-				.if($account.is-moderator, true)
-					.assign($info.can-edit, true)
-				.end()
-			.end()
 			.if($info.comment-removed, true)
 	<div class="comment-block">
 		<p>This comment has been removed.</p>
@@ -89,25 +96,24 @@ textarea { color: black; box-sizing: border-box; max-width: 100%; min-width: 100
 			.else()
 	<div class="comment-block">
 		<div class="block-ident"></div>
-		<div class="block-details">
+		<form class="block-details" method="post">
 			<div class="details-header">
-				<p>(.show($info.ind)) .show($info.dname) wrote <span class="grey-text">on .show($info.timp).if($account.name, equal, $info.aname) edit: .show($info.time).end():</span></p>
+				<p>(.show($info.ind)) .show($info.dname) wrote <span class="grey-text">on .show($info.ftimp).if($account.name, equal, $info.aname) edit: .show($info.ftime).end():</span></p>
 			</div>
 			<div class="details-text">
 				<p>.show($info.html)</p>
 			</div>
 			<div class="details-footer">
-				.if($info.can-edit, true)
-				<form method="post">
-					<input type="hidden" name="comment-account" value=".show($account.name)">
-					<input type="hidden" name="comment-uuid" value=".show($info.uuid)">
-					<input type="hidden" name="comment-section-identifier" value=".show($request.comment-section-identifier)">
-					<input class="small-button" type="submit" name="remove-button" value="Remove" formAction="/command/comment-remove">
-					<input class="small-button" type="submit" name="edit-button" value="Edit" formAction="/command/comment-edit">
-				</form>
-				.end()
+				<p class="small-grey" style="flex-grow: 1">Remove is final</p>
+				<input type="hidden" name="next-url" value=".show($service.relative-resource-path)">
+				<input type="hidden" name="comment-account" value=".show($info.aname)">
+				<input type="hidden" name="comment-original-timestamp" value=".show($info.timp)">
+				<input type="hidden" name="comment-text" value=".show($info.orig)">
+				<input type="hidden" name="comment-section-identifier" value=".show($request.comment-section-identifier)">
+				<input class="small-button" style="color:red;" type="submit" name="remove-button" value="Remove" formAction="/command/remove-comment">
+				<input class="small-button" type="submit" name="edit-button" value="Edit" formAction="/command/edit-comment">
 			</div>
-		</div>
+		</form>
 	</div>
 			.end(if-comment-removed)
 		.end(for-comments)

@@ -78,13 +78,18 @@ func executeCommentReview(_ request: Request, _ domain: Domain, _ info: Services
         return ORIGINATING_PAGE_URL
     }
     
-    guard let accountName = request.info[ACCOUNT_NAME_KEY] else {
-        Log.atError?.log("Missing \(ACCOUNT_NAME_KEY) in request.info")
+    guard let accountIdStr = request.info[ACCOUNT_ID_KEY] else {
+        Log.atError?.log("Missing \(ACCOUNT_ID_KEY) in request.info")
         return ORIGINATING_PAGE_URL
     }
     
-    guard let account = domain.accounts.getAccountWithoutPassword(for: accountName) else {
-        Log.atError?.log("No account for name: \(accountName)")
+    guard let accountId = UUID(uuidString: accountIdStr) else {
+        Log.atError?.log("Connot create UUID from: \(accountIdStr)")
+        return ORIGINATING_PAGE_URL
+    }
+    
+    guard let account = domain.accounts.getAccount(for: accountId) else {
+        Log.atError?.log("No account with UUID: \(accountId.uuidString)")
         return ORIGINATING_PAGE_URL
     }
 
@@ -94,7 +99,7 @@ func executeCommentReview(_ request: Request, _ domain: Domain, _ info: Services
     }
 
     guard let button = request.info[BUTTON_KEY] else {
-        Log.atError?.log("Missing \(ACCOUNT_NAME_KEY) in request.info")
+        Log.atError?.log("Missing \(ACCOUNT_ID_KEY) in request.info")
         return ORIGINATING_PAGE_URL
     }
     

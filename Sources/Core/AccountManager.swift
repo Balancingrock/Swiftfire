@@ -116,9 +116,14 @@ public class AccountManager {
     private var root: URL!
     
     
-    /// The lookup table that associates an account name with an account id
+    /// The lookup table that associates an account name with an account uuid
     
-    private var nameLut: Dictionary<String, URL> = [:]
+    private var nameLut: Dictionary<String, UUID> = [:]
+    
+    
+    /// The looup table that associates an account uuid with an account url
+    
+    private var uuidLut: Dictionary<UUID, URL> = [:]
     
     
     /// The id of the last account created
@@ -138,7 +143,7 @@ public class AccountManager {
     
     /// The account cache
     
-    private var accountCache: MemoryCache = MemoryCache<String, Account>(limitStrategy: .byItems(100), purgeStrategy: .leastRecentUsed)
+    private var accountCache: MemoryCache = MemoryCache<UUID, Account>(limitStrategy: .byItems(100), purgeStrategy: .leastRecentUsed)
     
     
     /// Initialize from file
@@ -163,11 +168,13 @@ extension AccountManager {
     public func store() {}
     
     
-    /// Regenerates the lookup table from the contents on disk
+    /// Regenerates the lookup tables from the contents on disk
     
     public func generateLut() -> Bool {
         
-        var nameLut: Dictionary<String, URL> = [:]
+        var nameLut: Dictionary<String, UUID> = [:]
+        
+        var uuidLut: Dictionary<UUID, URL> = [:]
         
         let rootPathParts = root.pathComponents
 
@@ -212,7 +219,8 @@ extension AccountManager {
                         if url.lastPathComponent == AccountManager.ACCOUNT_DIRECTORY_NAME {
                             
                             if let account = Account(withContentOfDirectory: url) {
-                                nameLut[account.name.lowercased()] = url
+                                nameLut[account.name] = account.uuid
+                                uuidLut[account.uuid] = url
                                 lastAccountId = Swift.max(getAccountId(from: url), lastAccountId)
                             } else {
                                 return false
@@ -236,18 +244,19 @@ extension AccountManager {
             }
         }
         
-        Log.atWarning?.log("Attempting to recreate account LUT from raw account data")
+        Log.atDebug?.log("Recreating account LUTs")
         
         if processDirectory(dir: root) {
             
             self.nameLut = nameLut
+            self.uuidLut = uuidLut
             
-            Log.atNotice?.log("Regenerated the account LUT")
+            Log.atNotice?.log("Regenerated the account LUTs")
             return true
             
         } else {
             
-            Log.atCritical?.log("Could not recreate account LUT from raw account data, accounts may have been lost!")
+            Log.atCritical?.log("Could not recreate account LUTs, accounts may have been lost!")
             return false
         }
     }
@@ -259,6 +268,38 @@ extension AccountManager {
 extension AccountManager {
     
     
+    /// - Returns: The account for the given uuid or nil. If the account exists, it will be placed in the cache.
+    
+    private func getAccount(_ uuid: UUID) -> Account? {
+        
+        
+        // Retrieve it from chache if possible
+        
+        if let account = accountCache[uuid] { return account }
+        
+        
+        // Retrieve it from memory and add to the cache
+        
+        let account = Account(withContentOfDirectory: uuidLut[uuid])
+        if let account = account { accountCache[account.uuid] = account }
+        
+        return account
+    }
+    
+    
+    /// - Returns: The account for the given name or nil. If it exists it will be placed in the cache.
+    
+    private func getAccount(_ name: String) -> Account? {
+        
+        
+        // Retrieve the uuid for the name
+        
+        guard let uuid = nameLut[name.lowercased()] else { return nil }
+        
+        return getAccount(uuid)
+    }
+
+
     /// Returns the account for the given name without using a password, and irrespective of the status of email verification and/or enabled status.
     ///
     /// - Note: The account may be disabled (or the email address unverified)
@@ -269,26 +310,12 @@ extension AccountManager {
     /// - Returns: On success the account, otherwise nil.
     
     public func getAccountWithoutPassword(for name: String) -> Account? {
-        
-        
-        // Only valid parameters
-        
+                
         if name.isEmpty { return nil }
-        let lname = name.lowercased()
         
         return AccountManager.queue.sync {
             
-            
-            // Get it from the cach, or load it from memory if it exists but is not present in the cache.
-            
-            let account = accountCache[lname] ?? Account(withContentOfDirectory: nameLut[lname])
-            
-            
-            // Just in case, add it to the cache
-            
-            if account != nil { accountCache[lname] = account }
-                        
-            return account
+            return getAccount(name)
         }
     }
 
@@ -296,43 +323,61 @@ extension AccountManager {
     /// Returns the account for the given name and password if the account exists, the password matches, it is enabled and the email address has been verified.
     ///
     /// - Parameters:
-    ///   - for: The name of the account to find. May not be empty.
-    ///   - using: The password over which to calculate the hash and compare it with the stored hash. May not be empty.
+    ///   - withName: The name of the account to find. May not be empty.
+    ///   - andPassword: The password over which to calculate the hash and compare it with the stored hash. May not be empty.
     ///
     /// - Returns: On success the account, otherwise nil.
     
-    public func getActiveAccount(for name: String, using password: String) -> Account? {
+    public func getActiveAccount(withName name: String, andPassword password: String) -> Account? {
         
         
         // Only valid parameters
         
         if password.isEmpty { return nil }
         if name.isEmpty { return nil }
-        let lname = name.lowercased()
 
         return AccountManager.queue.sync {
             
-                        
-            // Get it from the cach, or load it from memory if it exists but is not present in the cache.
             
-            guard let account = accountCache[lname] ?? Account(withContentOfDirectory: nameLut[lname]) else { return nil }
+            // Get the uuid of the account
             
+            guard let account = getAccount(name) else { return nil }
             
-            // Just in case, add it to the cache (again)
-            
-            accountCache[lname] = account
-
             
             // Check the password
             
-            if account.hasSameDigest(as: password) && account.isActive {
-                return account
-            } else {
-                return nil
-            }
+            guard account.hasSameDigest(as: password) else { return nil }
+            
+            
+            // Check the activity status
+            
+            guard account.isActive else { return nil }
+
+            
+            // Is ok
+            
+            return account
         }
     }
     
+    
+    /// Returns the account for the given uuid irrespective of the status of email verification and/or enabled status.
+    ///
+    /// - Note: The account may be disabled (or the email address unverified)
+    ///
+    /// - Parameters:
+    ///   - for: The uuid of the account to find. May not be empty.
+    ///
+    /// - Returns: On success the account, otherwise nil.
+    
+    public func getAccount(for uuid: UUID) -> Account? {
+        
+        return AccountManager.queue.sync {
+            
+            return Account(withContentOfDirectory: uuidLut[uuid])
+        }
+    }
+
     
     /// Create a new account and adds it to the cache.
     ///
@@ -358,17 +403,24 @@ extension AccountManager {
             if nameLut[lname] != nil { return nil }
             
             
+            // Create a unique uuid
+            
+            var uuid = UUID()
+            while uuidLut[uuid] != nil { uuid = UUID() }
+            
+            
             // Create the new account
             
             lastAccountId += 1
             let dir = AccountManager.createDirUrl(in: root, for: lastAccountId)
-            if let account = Account(name: name, password: password, accountDir: dir) {
+            if let account = Account(name: name, password: password, uuid: uuid, accountDir: dir) {
                 
                 
                 // Add it to the lookup's and the cache
                 
-                nameLut[lname] = dir
-                accountCache[lname] = account
+                nameLut[lname] = uuid
+                uuidLut[uuid] = dir
+                accountCache[uuid] = account
                 
                 
                 Log.atNotice?.log("Created account with name: '\(name)' and id: \(lastAccountId).")
@@ -395,7 +447,7 @@ extension AccountManager {
     }
     
     
-    /// Disables an account from the LUT
+    /// Disables an account
     ///
     /// - Note: Make sure the user removing the account has sufficient privelidges!
     ///
@@ -408,23 +460,19 @@ extension AccountManager {
         return AccountManager.queue.sync {
             
             
-            // Get the id for the account, and remove it from the name LUT
+            // Get the account
             
-            guard let url = nameLut.removeValue(forKey: name.lowercased()) else {
-                Log.atError?.log("No LUT entry found for account with name \(name)")
+            guard let account = getAccount(name) else {
+                Log.atError?.log("No entry found for account with name \(name)")
                 return false
             }
             
             
             // Disable the account
             
-            if let account = Account(withContentOfDirectory: url) {
-                account.isEnabled = false
-            } else {
-                Log.atError?.log("Account could not be instantiated for: \(name)")
-                return false
-            }
+            account.isEnabled = false
 
+            
             Log.atNotice?.log("Disabled the account for: \(name)")
             
             return true

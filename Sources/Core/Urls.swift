@@ -311,5 +311,5 @@ public final class Urls {
     
     /// The file with account names waiting for verification
     
-    public static func domainAccountNamesWaitingForVerificationFile(for name: String) -> URL? { return fileUrl(domainDir(for: name), "accountNamesWaitingForVerification.txt") }
+    public static func domainAccountIdsWaitingForVerificationFile(for name: String) -> URL? { return fileUrl(domainDir(for: name), "accountIdsWaitingForVerification.txt") }
 }

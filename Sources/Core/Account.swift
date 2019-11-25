@@ -53,32 +53,48 @@ import BRBON
 
 // These are a minor performance enhancement (as using a static namefield reduces runtime overhead, while restricting the name length to 5 chars optimizes memory)
 
-fileprivate let ENABLED_NF = NameField("enab")!
-fileprivate let NAME_NF = NameField("name")!
-fileprivate let IS_DOMAIN_ADMIN_NF = NameField("isdad")!
-fileprivate let IS_MODERATOR_NF = NameField("ismod")!
-fileprivate let EMAIL_ADDRESS_NF = NameField("email")!
-fileprivate let EMAIL_VERIFICATION_CODE_NF = NameField("emvcd")!
-fileprivate let NEW_PWD_VERIFICATION_CODE_NF = NameField("npwdc")!
-fileprivate let NEW_PWD_REQUEST_TIMESTAMP_NF = NameField("npwdt")!
-fileprivate let DIGEST_NF = NameField("dgst")!
-fileprivate let SALT_NF = NameField("salt")!
-fileprivate let NOF_COMMENTS_NF = NameField("ncom")!
+fileprivate let ACCOUNT_ENABLED_NF = NameField("enab")!
+fileprivate let ACCOUNT_UUID_NF = NameField("uuid")!
+fileprivate let ACCOUNT_NAME_NF = NameField("name")!
+fileprivate let ACCOUNT_IS_DOMAIN_ADMIN_NF = NameField("isdad")!
+fileprivate let ACCOUNT_IS_MODERATOR_NF = NameField("ismod")!
+fileprivate let ACCOUNT_EMAIL_ADDRESS_NF = NameField("email")!
+fileprivate let ACCOUNT_EMAIL_VERIFICATION_CODE_NF = NameField("emvcd")!
+fileprivate let ACCOUNT_NEW_PWD_VERIFICATION_CODE_NF = NameField("npwdc")!
+fileprivate let ACCOUNT_NEW_PWD_REQUEST_TIMESTAMP_NF = NameField("npwdt")!
+fileprivate let ACCOUNT_DIGEST_NF = NameField("dgst")!
+fileprivate let ACCOUNT_SALT_NF = NameField("salt")!
+fileprivate let ACCOUNT_NOF_COMMENTS_NF = NameField("ncom")!
 
 
 /// An account within swiftfire. Used for admin account and can be used for domain accounts as well.
 
 public final class Account: EstimatedMemoryConsumption {
     
-    // Note: This class uses the default EstimatedMemoryConsumption implementation.
+    public var estimatedMemoryConsumption: Int { return self.db.root.count }
+
     
+    /// Data storage for the account.
+    
+    private var db: ItemManager!
+
     
     // MARK:- Public interface
+
+    /// The UUID for this account
+    
+    public var uuid: UUID {
+        if let v = db.root[ACCOUNT_UUID_NF].uuid { return v }
+        Log.atCritical?.log("Error retrieving uuid from account store")
+        // Note a random UUID is extremely unlikely to actually refer to an account, but it could happen. However given that this situation should never happen in the first place, this small risk is accepted. The only alternative would be to make the uuid an optional or to shut down the server.
+        return UUID()
+    }
+
     
     /// The path of the file containing this account
         
     public let dir: URL
-
+    
     
     /// True if the account is active.
     ///
@@ -93,13 +109,12 @@ public final class Account: EstimatedMemoryConsumption {
     
     public var isEnabled: Bool {
         get {
-            if let v = db.root[ENABLED_NF].bool { return v }
-            Log.atError?.log("Error retrieving enabled from account store")
+            if let v = db.root[ACCOUNT_ENABLED_NF].bool { return v }
+            Log.atCritical?.log("Error retrieving enabled from account store")
             return false
         }
         set {
-            //db.root[ENABLED_NF].bool = newValue
-            db.root.updateItem(newValue, withNameField: ENABLED_NF)
+            db.root.updateItem(newValue, withNameField: ACCOUNT_ENABLED_NF)
             store()
         }
     }
@@ -109,13 +124,12 @@ public final class Account: EstimatedMemoryConsumption {
     
     public var name: String {
         get {
-            if let v = db.root[NAME_NF].string { return v }
-            Log.atError?.log("Error retrieving name from account store")
+            if let v = db.root[ACCOUNT_NAME_NF].string { return v }
+            Log.atCritical?.log("Error retrieving name from account store")
             return "***error***"
         }
         set {
-            //db.root[NAME_NF].string = newValue
-            db.root.updateItem(newValue, withNameField: NAME_NF)
+            db.root.updateItem(newValue, withNameField: ACCOUNT_NAME_NF)
             store()
         }
     }
@@ -125,13 +139,12 @@ public final class Account: EstimatedMemoryConsumption {
     
     public var emailAddress: String {
         get {
-            if let v = db.root[EMAIL_ADDRESS_NF].string { return v }
-            Log.atError?.log("Error retrieving emailAddress from account store")
+            if let v = db.root[ACCOUNT_EMAIL_ADDRESS_NF].string { return v }
+            Log.atCritical?.log("Error retrieving emailAddress from account store")
             return "***error***"
         }
         set {
-            //db.root[EMAIL_ADDRESS_NF].string = newValue
-            db.root.updateItem(newValue, withNameField: EMAIL_ADDRESS_NF)
+            db.root.updateItem(newValue, withNameField: ACCOUNT_EMAIL_ADDRESS_NF)
             store()
         }
     }
@@ -143,13 +156,12 @@ public final class Account: EstimatedMemoryConsumption {
     
     public var emailVerificationCode: String {
         get {
-            if let v = db.root[EMAIL_VERIFICATION_CODE_NF].string { return v }
-            Log.atError?.log("Error retrieving emailVerificationCode from account store")
+            if let v = db.root[ACCOUNT_EMAIL_VERIFICATION_CODE_NF].string { return v }
+            Log.atCritical?.log("Error retrieving emailVerificationCode from account store")
             return "***error***"
         }
         set {
-            //db.root[EMAIL_VERIFICATION_CODE_NF].string = newValue
-            db.root.updateItem(newValue, withNameField: EMAIL_VERIFICATION_CODE_NF)
+            db.root.updateItem(newValue, withNameField: ACCOUNT_EMAIL_VERIFICATION_CODE_NF)
             store()
         }
     }
@@ -161,13 +173,12 @@ public final class Account: EstimatedMemoryConsumption {
     
     public var isDomainAdmin: Bool {
         get {
-            if let v = db.root[IS_DOMAIN_ADMIN_NF].bool { return v }
-            Log.atError?.log("Error retrieving isAdmin from account store")
+            if let v = db.root[ACCOUNT_IS_DOMAIN_ADMIN_NF].bool { return v }
+            Log.atCritical?.log("Error retrieving isAdmin from account store")
             return false
         }
         set {
-            //db.root[IS_DOMAIN_ADMIN_NF].bool = newValue
-            db.root.updateItem(newValue, withNameField: IS_DOMAIN_ADMIN_NF)
+            db.root.updateItem(newValue, withNameField: ACCOUNT_IS_DOMAIN_ADMIN_NF)
             store()
         }
     }
@@ -177,15 +188,14 @@ public final class Account: EstimatedMemoryConsumption {
     
     public var nofComments: Int32 {
         get {
-            if db.root[NOF_COMMENTS_NF].int32 == nil {
-                db.root.updateItem(Int32(0), withNameField: NOF_COMMENTS_NF)
+            if db.root[ACCOUNT_NOF_COMMENTS_NF].int32 == nil {
+                db.root.updateItem(Int32(0), withNameField: ACCOUNT_NOF_COMMENTS_NF)
                 store()
             }
-            return db.root[NOF_COMMENTS_NF].int32!
+            return db.root[ACCOUNT_NOF_COMMENTS_NF].int32!
         }
         set {
-            //db.root[NOF_COMMENTS_NF].bool = newValue
-            db.root.updateItem(newValue, withNameField: NOF_COMMENTS_NF)
+            db.root.updateItem(newValue, withNameField: ACCOUNT_NOF_COMMENTS_NF)
             store()
         }
     }
@@ -197,16 +207,15 @@ public final class Account: EstimatedMemoryConsumption {
     
     public var isModerator: Bool {
         get {
-            if db.root[IS_MODERATOR_NF].bool == nil {
-                db.root.updateItem(false, withNameField: IS_MODERATOR_NF)
+            if db.root[ACCOUNT_IS_MODERATOR_NF].bool == nil {
+                db.root.updateItem(false, withNameField: ACCOUNT_IS_MODERATOR_NF)
                 store()
             }
-            let isMod = db.root[IS_MODERATOR_NF].bool!
+            let isMod = db.root[ACCOUNT_IS_MODERATOR_NF].bool!
             return isDomainAdmin || isMod
         }
         set {
-            //db.root[IS_MODERATOR_NF].bool = newValue
-            db.root.updateItem(newValue, withNameField: IS_MODERATOR_NF)
+            db.root.updateItem(newValue, withNameField: ACCOUNT_IS_MODERATOR_NF)
             store()
         }
     }
@@ -219,13 +228,12 @@ public final class Account: EstimatedMemoryConsumption {
     
     public var newPasswordVerificationCode: String {
         get {
-            if let v = db.root[NEW_PWD_VERIFICATION_CODE_NF].string { return v }
+            if let v = db.root[ACCOUNT_NEW_PWD_VERIFICATION_CODE_NF].string { return v }
             Log.atError?.log("Error retrieving newPasswordVerificationCode from account store")
             return "***error***"
         }
         set {
-            //db.root[NEW_PWD_VERIFICATION_CODE_NF].string = newValue
-            db.root.updateItem(newValue, withNameField: NEW_PWD_VERIFICATION_CODE_NF)
+            db.root.updateItem(newValue, withNameField: ACCOUNT_NEW_PWD_VERIFICATION_CODE_NF)
             store()
         }
     }
@@ -237,13 +245,12 @@ public final class Account: EstimatedMemoryConsumption {
     
     public var newPasswordRequestTimestamp: Int64 {
         get {
-            if let v = db.root[NEW_PWD_REQUEST_TIMESTAMP_NF].int64 { return v }
+            if let v = db.root[ACCOUNT_NEW_PWD_REQUEST_TIMESTAMP_NF].int64 { return v }
             Log.atError?.log("Error retrieving newPasswordRequestTimestamp from account store")
             return 0 // always expired
         }
         set {
-            //db.root[NEW_PWD_REQUEST_TIMESTAMP_NF].int64 = newValue
-            db.root.updateItem(newValue, withNameField: NEW_PWD_REQUEST_TIMESTAMP_NF)
+            db.root.updateItem(newValue, withNameField: ACCOUNT_NEW_PWD_REQUEST_TIMESTAMP_NF)
             store()
         }
     }
@@ -261,22 +268,16 @@ public final class Account: EstimatedMemoryConsumption {
     }()
     
     
-    /// Data storage for the account.
-    
-    private var db: ItemManager!
-
-    
     /// The digest for the user password.
     
     private var digest: String {
         get {
-            if let v = db.root[DIGEST_NF].string { return v }
+            if let v = db.root[ACCOUNT_DIGEST_NF].string { return v }
             Log.atError?.log("Error retrieving digest from account store")
             return "***error***"
         }
         set {
-            //db.root[DIGEST_NF].string = newValue
-            db.root.updateItem(newValue, withNameField: DIGEST_NF)
+            db.root.updateItem(newValue, withNameField: ACCOUNT_DIGEST_NF)
             // Note: No 'store' operation here, see 'updatePassword' for that
         }
     }
@@ -286,13 +287,12 @@ public final class Account: EstimatedMemoryConsumption {
     
     private var salt: String {
         get {
-            if let v = db.root[SALT_NF].string { return v }
+            if let v = db.root[ACCOUNT_SALT_NF].string { return v }
             Log.atError?.log("Error retrieving salt from account store")
             return "***error***"
         }
         set {
-            //db.root[SALT_NF].string = newValue
-            db.root.updateItem(newValue, withNameField: SALT_NF)
+            db.root.updateItem(newValue, withNameField: ACCOUNT_SALT_NF)
             // Note: No 'store' operation here, see 'updatePassword' for that
         }
     }
@@ -301,12 +301,12 @@ public final class Account: EstimatedMemoryConsumption {
     /// Create a new instance
     ///
     /// - Paramaters:
-    ///   - id: A unique integer
     ///   - name: String, should be unique for this account.
     ///   - password: An integer that must be matched to allow somebody to use this account.
+    ///   - uuid: A unique UUID to identify this account.
     ///   - accountDir: A URL pointing to the directory for the account. The directory will be created if it does not exist. No attempt will be made to initialize the account from the content of the directory (if any).
     
-    init?(name: String, password: String, accountDir: URL) {
+    internal init?(name: String, password: String, uuid: UUID, accountDir: URL) {
         
         do {
             try FileManager.default.createDirectory(atPath: accountDir.path, withIntermediateDirectories: true, attributes: nil)
@@ -316,25 +316,32 @@ public final class Account: EstimatedMemoryConsumption {
         }
 
         self.dir = accountDir
+
         self.db = ItemManager.createDictionaryManager()
+        self.db.root.updateItem(uuid, withNameField: ACCOUNT_UUID_NF)
+        self.db.root.updateItem(name, withNameField: ACCOUNT_NAME_NF)
+        self.db.root.updateItem("", withNameField: ACCOUNT_EMAIL_ADDRESS_NF)
+        self.db.root.updateItem("", withNameField: ACCOUNT_EMAIL_VERIFICATION_CODE_NF)
+        self.db.root.updateItem(true, withNameField: ACCOUNT_ENABLED_NF)
+        self.db.root.updateItem(false, withNameField: ACCOUNT_IS_MODERATOR_NF)
+        self.db.root.updateItem(false, withNameField: ACCOUNT_IS_DOMAIN_ADMIN_NF)
+        self.db.root.updateItem(Int32(0), withNameField: ACCOUNT_NOF_COMMENTS_NF)
+        self.db.root.updateItem(Int64(0), withNameField: ACCOUNT_NEW_PWD_REQUEST_TIMESTAMP_NF)
+        self.db.root.updateItem("", withNameField: ACCOUNT_NEW_PWD_VERIFICATION_CODE_NF)
         
-        self.salt = createSalt()
+        let salt = createSalt()
         guard let pwdDigest = createDigest(for: password, with: self.salt) else { return nil }
-        self.digest = pwdDigest
+
+        self.db.root.updateItem(salt, withNameField: ACCOUNT_SALT_NF)
+        self.db.root.updateItem(pwdDigest, withNameField: ACCOUNT_DIGEST_NF)
         
-        self.name = name
-
-        self.emailAddress = ""
-        self.emailVerificationCode = ""
-        self.isEnabled = true
-
         store()
     }
     
     
     /// Read the account parameters from a directory.
     
-    init?(withContentOfDirectory accountDir: URL?) {
+    internal init?(withContentOfDirectory accountDir: URL?) {
         
         guard let accountDir = accountDir else { return nil }
         

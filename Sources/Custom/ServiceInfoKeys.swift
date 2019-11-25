@@ -98,6 +98,17 @@ public enum ServiceInfoKey: String {
     case sessionKey = "Session"
     
     
+    /// An error message for end-user consumption. This will be displayed by the 'error.sf.html' page.
+    ///
+    /// __Type__: String
+    ///
+    /// __Set by__: Any service/session process that cannot be completed.
+    ///
+    /// __Used by__: To inform the end user of the error and let him restart operations rather than simply failing with an HTML error code.
+    
+    case errorMessageKey = "ErrorMessage"
+    
+    
     // =================================================================
     // Don't make any changes above this line, add new definitions below
     // =================================================================

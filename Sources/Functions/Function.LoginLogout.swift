@@ -101,7 +101,7 @@ public func function_loginLogout(_ args: Functions.Arguments, _ info: inout Func
                 <p> - </p>
                 <div class="sf-loginlogout-secondoption">
                     <form method="post" action="/command/logout">
-                    <button type="submit" name="\(ORIGINATING_PAGE_URL_KEY)" value="\(environment.serviceInfo[.relativeResourcePathKey] as? String ?? "/index.sf.html")" style="border:none; background:none; cursor:pointer; margin:0 0 0 0; padding: 0 0 0 0;">\(logoutMessage)</button>
+                    <button type="submit" name="\(ORIGINAL_PAGE_URL_KEY)" value="\(environment.serviceInfo[.relativeResourcePathKey] as? String ?? "/index.sf.html")" style="border:none; background:none; cursor:pointer; margin:0 0 0 0; padding: 0 0 0 0;">\(logoutMessage)</button>
                     </form>
                 </div>
             </div>

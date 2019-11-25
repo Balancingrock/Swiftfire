@@ -38,6 +38,7 @@
 //
 // 1.3.0 - Added control functions: 'if', 'for', 'cached'
 //       - Removed priority parameter since from here on functions will be sequence dependent
+//       - Removed JSON argument option because of possible clashes with CSS and since it has not proven its need
 // 1.2.0 - Allowed the dot in the string of an argument to support the $<source>.<property> notation
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
@@ -55,8 +56,7 @@
 // <digit>                 ::= "0" .. "9"
 // <allowed-signs-in-name> ::= "-"|"_"
 //
-// <arguments>             ::= "("[<argument>[{<argument-separator><argument>}]]")"|<json-object>
-// <json-object>           ::= "{"<json-code>"}"
+// <arguments>             ::= "("[<argument>[{<argument-separator><argument>}]]")"
 // <argument>              ::= <string>|<quoted-string>
 // <arguments-separator>   ::= ","
 // <string>                ::= {[" "]}<name>{[" "]}
@@ -72,9 +72,9 @@
 // =====================================================================================================================
 
 import Foundation
+
 import SwifterLog
 import Ascii
-import VJson
 
 
 // Constants
@@ -99,7 +99,6 @@ extension SFDocument {
         enum Mode {
             case waitForLeadingSign
             case readName
-            case readJsonArgument
             case readArrayArgument
             case readString
             case readAfterBackslash
@@ -112,23 +111,15 @@ extension SFDocument {
 
         var charBuf: String = "" // Buffers characters that do not belong to a function
         var evalBuf: String = "" // Buffers characters that may belong to a function, except for possible json code
-        var jsonBuf: String = "" // Buffers characters that may consist of json code
-        var jsonNesting: Int = 0 // A counter that increments for "{" and decrements for "}"
 
         var name: String = ""     // Characters that may make up the name of a function
         var argument: String = "" // Characters that may make up te argument for an array parameter
         
         var function: Functions.Signature? // The function signature, determined after the name is complete
         var array: Array<String> = []      // The array arguments for a function
-        var json: VJson?                   // The JSON argument for a function
         
         var parentBlocks: Array<ControlBlock> = []
-        
-        func appendJsonFunctionBlock() {
-            let fb = FunctionBlock(name: name, function: function, arguments: Functions.Arguments.json(json!))
-            parentBlocks.last!.blocks.append(fb)
-        }
-        
+                
         func appendArrFunctionBlock() -> Bool {
             
             switch name {
@@ -259,17 +250,6 @@ extension SFDocument {
                     return .waitForLeadingSign
                 }
                 
-            } else if char == "{" {
-                function = functions.registered[name]?.function
-                if function != nil  {
-                    jsonBuf = "{"
-                    jsonNesting = 1
-                    return .readJsonArgument
-                } else {
-                    charBuf.append(evalBuf)
-                    return .waitForLeadingSign
-                }
-                
             } else if char == "." {
                 charBuf.append(evalBuf)
                 name = ""
@@ -280,44 +260,6 @@ extension SFDocument {
                 evalBuf.append(char)
                 charBuf.append(evalBuf)
                 return .waitForLeadingSign
-            }
-        }
-
-        func readJsonArgument(_ char: Character) -> Mode {
-            
-            if char == "{" {
-                jsonBuf.append(char)
-                jsonNesting += 1
-                return .readJsonArgument
-                
-            } else if char == "}" {
-                jsonBuf.append(char)
-                jsonNesting -= 1
-                if jsonNesting == 0 {
-                    // --
-                    if !appendCharacterBlock() { return .failed }
-                    charBuf = ""
-                    // --
-                    do {
-                        json = try VJson.parse(string: jsonBuf)
-                        if json == nil {
-                            charBuf.append(jsonBuf)
-                            return .waitForLeadingSign
-                        } else {
-                            appendJsonFunctionBlock()
-                            return .waitForLeadingSign
-                        }
-                    } catch _ {
-                        charBuf.append(jsonBuf)
-                        return .waitForLeadingSign
-                    }
-                } else {
-                    return .readJsonArgument
-                }
-                
-            } else {
-                jsonBuf.append(char)
-                return .readJsonArgument
             }
         }
 
@@ -449,7 +391,6 @@ extension SFDocument {
                 
             case .waitForLeadingSign:   mode = waitForLeadingSign(char)
             case .readName:             mode = readName(char, unicodeScalar)
-            case .readJsonArgument:     mode = readJsonArgument(char)
             case .readArrayArgument:    mode = readArrayArgument(char)
             case .readString:           mode = readString(char)
             case .readAfterBackslash:   mode = readAfterBackslash(char)

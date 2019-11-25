@@ -331,8 +331,10 @@ public class SFDocument: EstimatedMemoryConsumption {
                 }
                 
                 Log.atDebug?.log("endcached")
+                
+                let identifier = readKey(args[0], using: info, in: environment) ?? args[0]
 
-                return cachedData(forIdentifier: args[0], ifCachedAfter: timestamp, elseCreateFrom: blocks, info: &info, environment: environment)
+                return cachedData(forIdentifier: identifier, ifCachedAfter: timestamp, elseCreateFrom: blocks, info: &info, environment: environment)
                 
                 
             case "comment":
@@ -734,6 +736,7 @@ fileprivate func setupFor(_ args: Array<String>, _ info: inout Functions.Info, _
 
 fileprivate func cachedData(forIdentifier identifier: String, ifCachedAfter timestamp: Int64, elseCreateFrom blocks: Array<SFDocument.Block>, info: inout Functions.Info, environment: Functions.Environment) -> Data {
     
+    Log.atDebug?.log("Attempting to retrieve identifier \(identifier) for timestamp \(timestamp) (filter: modification)")
     
     // Check the cache first
     
@@ -741,6 +744,7 @@ fileprivate func cachedData(forIdentifier identifier: String, ifCachedAfter time
         return data
     }
     
+    Log.atDebug?.log("Recreating cache content (filter: modification)")
     
     // Not in the cache, create it.
         

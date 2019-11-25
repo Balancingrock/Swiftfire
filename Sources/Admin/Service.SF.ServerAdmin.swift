@@ -398,7 +398,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
             
             // Get the account for the login data
             
-            guard let account = serverAdminDomain.accounts.getActiveAccount(for: name, using: pwd) else {
+            guard let account = serverAdminDomain.accounts.getActiveAccount(withName: name, andPassword: pwd) else {
                 
                 // The login attempt failed, no account found.
                 
@@ -1240,7 +1240,7 @@ fileprivate func executeCreateDomain(_ request: Request) {
 
     if let domain = domains.createDomain(for: name) {
         domain.serviceNames = defaultServices
-        if let account = domain.accounts.getActiveAccount(for: adminId, using: adminPwd) {
+        if let account = domain.accounts.getActiveAccount(withName: adminId, andPassword: adminPwd) {
             account.isDomainAdmin = true
         } else {
             guard let account = domain.accounts.newAccount(name: adminId, password: adminPwd) else {
@@ -1398,25 +1398,25 @@ fileprivate func executeDeleteAccount(_ request: Request) {
 
 fileprivate func executeSetNewPassword(_ request: Request) {
     
-    guard let name = request.info["id"], !name.isEmpty else {
+    guard let id = request.info["id"], !id.isEmpty, let uuid = UUID(uuidString: id) else {
         Log.atError?.log("No ID given")
         return
     }
 
     guard let password = request.info["password"], !password.isEmpty else {
-        Log.atError?.log("No new password given for \(name)")
+        Log.atError?.log("No new password given")
         return
     }
     
-    guard let accountToBeChanged = serverAdminDomain.accounts.getAccountWithoutPassword(for: name) else {
-        Log.atError?.log("No account found for: \(name)")
+    guard let accountToBeChanged = serverAdminDomain.accounts.getAccount(for: uuid) else {
+        Log.atError?.log("No account found for uuid: \(uuid)")
         return
     }
     
     if accountToBeChanged.updatePassword(password) {
-        Log.atNotice?.log("Password was changed for: \(name)")
+        Log.atNotice?.log("Password was changed for: \(accountToBeChanged.name)")
     } else {
-        Log.atError?.log("Password could not be changed for: \(name)")
+        Log.atError?.log("Password could not be changed for: \(accountToBeChanged.name)")
     }
 }
 
@@ -1436,6 +1436,7 @@ fileprivate func executeSetDomainAdminPassword(_ request: Request) {
         Log.atError?.log("No domain known for \(domainName)")
         return
     }
+    
     
     
     // Check if the account exists

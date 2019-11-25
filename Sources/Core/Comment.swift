@@ -46,6 +46,7 @@ import BRBON
 import Http
 
 
+public let COMMENT_ACCOUNT_UUID = "auuid"
 public let COMMENT_ORIGINAL_TEXT = "orig"
 public let COMMENT_HTMLIFIED_TEXT = "html"
 public let COMMENT_HTMLIFIED_VERSION_TEXT = "v"
@@ -58,6 +59,10 @@ public let COMMENT_DISPLAY_NAME = "dname"
 public let COMMENT_SEQUENCE_NUMBER = "ind"
 public let COMMENT_ACCOUNT_NAME = "aname"
 
+public let COMMENT_FORMATTED_ORIGINAL_TIMESTAMP = "ftimp"
+public let COMMENT_FORMATTED_LAST_UPDATE_TIMESTAMP = "ftime"
+
+fileprivate let ACCOUNT_UUID_NF = NameField(COMMENT_ACCOUNT_UUID)!
 fileprivate let ORIGINAL_NF = NameField(COMMENT_ORIGINAL_TEXT)!
 fileprivate let HTMLIFIED_NF = NameField(COMMENT_HTMLIFIED_TEXT)!
 fileprivate let HTMLIFIED_VERSION_NF = NameField(COMMENT_HTMLIFIED_VERSION_TEXT)!
@@ -100,8 +105,8 @@ public final class Comment {
     public static func htmlify(_ comment: String) -> String {
         
         let replace: Dictionary<String, String> = [
-            "[i]" : "<span style=\"font-style:italic\"",
-            "[b]" : "<span style=\"font-weigth:bold\"",
+            "[i]" : "<span style=\"font-style:italic\">",
+            "[b]" : "<span style=\"font-weigth:bold\">",
             "[/i]" : "</span>",
             "[/b]" : "</span>",
             "<" : "&lt",
@@ -191,6 +196,7 @@ public final class Comment {
         // Initialize the db
         
         db = ItemManager.createDictionaryManager()
+        db.root.updateItem(account.uuid, withNameField: ACCOUNT_UUID_NF)
         db.root.updateItem(noHtml, withNameField: ORIGINAL_NF)
         db.root.updateItem(markedUp, withNameField: HTMLIFIED_NF)
         db.root.updateItem(Comment.htmlifyVersion, withNameField: HTMLIFIED_VERSION_NF)
@@ -250,6 +256,9 @@ public final class Comment {
     }
     
     
+    public var accountId: UUID { return db.root[ACCOUNT_UUID_NF].uuid ?? UUID() }
+    
+    
     /// The original comment (after removing the < and >)
     
     public var original: String { return db.root[ORIGINAL_NF].string ?? "" }
@@ -292,9 +301,14 @@ public final class Comment {
     
     /// The sequence number for this comment
     
-    public var sequenceNumber: UInt16 { return db.root[SEQUENCE_NUMBER_NF].uint16 ?? 0}
+    public var sequenceNumber: UInt16 { return db.root[SEQUENCE_NUMBER_NF].uint16 ?? 0 }
     
-        
+    
+    /// The display name
+    
+    public var displayName: String { return db.root[DISPLAY_NAME_NF].string ?? "" }
+    
+    
     /// Replace the original comment. Stores immediately after updating.
     /// Increments the total number of updates
     /// Updates the timestamp of last update.
@@ -321,8 +335,10 @@ public final class Comment {
         db.root.updateItem(Date().unixTime, withNameField: LAST_UPDATE_TIMESTAMP_NF)
 
         
-        if (try? db.data.write(to: url)) != nil {
-            Log.atError?.log("Failed to write updated comment to file \(url.path)")
+        do {
+            try db.data.write(to: url)
+        } catch let error {
+            Log.atError?.log("Failed to write updated comment to file \(url.path), error message: \(error.localizedDescription)")
         }
     }
     
@@ -355,12 +371,12 @@ extension Comment: FunctionsInfoDataSource {
         
         if let myAccount = account {
             let aname = myAccount.name
+            info[COMMENT_ACCOUNT_NAME] = aname
             if aname == "Anon" {
-                info[COMMENT_DISPLAY_NAME] = "Anon-" + aname
+                info[COMMENT_DISPLAY_NAME] = "Anon " + displayName
             } else {
                 info[COMMENT_DISPLAY_NAME] = aname
             }
-            info[COMMENT_ACCOUNT_NAME] = aname
         }
         
         
@@ -368,11 +384,11 @@ extension Comment: FunctionsInfoDataSource {
         
         if let t = info["timp"], let i = Int64(t) { // Time of posting
             let d = Date(unixTime: i)
-            info["timp"] = commentDateFormatter.string(from: d)
+            info["ftimp"] = commentDateFormatter.string(from: d)
         }
         if let t = info["time"], let i = Int64(t) { // Time of edit
             let d = Date(unixTime: i)
-            info["time"] = commentDateFormatter.string(from: d)
+            info["ftime"] = commentDateFormatter.string(from: d)
         }
     }
 }
