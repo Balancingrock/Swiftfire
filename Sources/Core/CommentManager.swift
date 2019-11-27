@@ -362,7 +362,7 @@ public final class CommentManager {
         /// Store the table manager for the given id to file
         
         func store(tableFor id: String) {
-        
+                    
             guard let url = urls[id] else {
                 Log.atError?.log("Cannot find corresponding URL, cannot save, data may be lost")
                 return
@@ -378,6 +378,9 @@ public final class CommentManager {
             } catch let error {
                 Log.atError?.log("Cannot save item manager, error message: \(error.localizedDescription)")
             }
+            
+            // Writing to file does not seem to update the modified content timestamp
+            self.touch(tableFor: id)
         }
     }
     
@@ -478,7 +481,7 @@ public final class CommentManager {
             
             // Make sure there is an account
         
-            guard let account = account ?? domain.accounts.getActiveAccount(withName: "Anon", andPassword: "Anon") else {
+            guard let account = account ?? domain.accounts.getAccountWithoutPassword(for: "Anon") else {
                 Log.atError?.log("Failed to retrieve Anon account")
                 return
             }
@@ -521,7 +524,7 @@ public final class CommentManager {
 
             // For the Anon account, always store the comment in the wait-for-approval list
             
-            if account.name == "Anon" {
+            if account.isAnon {
                 
                 domain.comments.forApproval.append(comment)
             
@@ -536,7 +539,7 @@ public final class CommentManager {
             
                 } else {
                 
-                    account.nofComments += 1
+                    account.increaseNofComments()
                     appendToTable(comment, relativePath)
                 }
             }
@@ -688,6 +691,11 @@ public final class CommentManager {
             // Save the table
             
             tableCache.store(tableFor: identifier)
+            
+            
+            // Decrement the number of comments for the account
+            
+            account.decrementNofComments()
         }
     }
     
@@ -775,9 +783,13 @@ public final class CommentManager {
             // Store the updated table
             
             self.tableCache.store(tableFor: comment.identifier)
+            
+            
+            // Increase the number of comments for the account
+            
+            self.domain.accounts.getAccount(for: comment.accountId)?.increaseNofComments()
         }
     }
-    
     
     
     /// Updates (or creates) the comment block for a new comment

@@ -337,7 +337,7 @@ fileprivate func executeRegister(_ request: Request, _ connection: SFConnection,
     // Note that the address is logged, the admin can decide to block this address
     
     guard session.nofRegistrationAttempts < 10 else {
-        Log.atCritical?.log("Too many registration attempts from IP address: \(connection.remoteAddress)")
+        Log.atAlert?.log("Too many registration attempts from IP address: \(connection.remoteAddress)")
         request.info[PREVIOUS_ATTEMPT_MESSAGE_KEY] = "Too many registration attempts, try again later"
         return REGISTER_TEMPLATE
     }

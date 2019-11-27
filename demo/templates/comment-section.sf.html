@@ -98,7 +98,7 @@ textarea { color: black; box-sizing: border-box; max-width: 100%; min-width: 100
 		<div class="block-ident"></div>
 		<form class="block-details" method="post">
 			<div class="details-header">
-				<p>(.show($info.ind)) .show($info.dname) wrote <span class="grey-text">on .show($info.ftimp).if($account.name, equal, $info.aname) edit: .show($info.ftime).end():</span></p>
+				<p>(.show($info.ind)) .show($info.dname)<span class="grey-text"> wrote on .show($info.ftimp).if($account.name, equal, $info.aname) edit: .show($info.ftime).end():</span></p>
 			</div>
 			<div class="details-text">
 				<p>.show($info.html)</p>
@@ -106,7 +106,7 @@ textarea { color: black; box-sizing: border-box; max-width: 100%; min-width: 100
 			<div class="details-footer">
 				<p class="small-grey" style="flex-grow: 1">Remove is final</p>
 				<input type="hidden" name="next-url" value=".show($service.relative-resource-path)">
-				<input type="hidden" name="comment-account" value=".show($info.aname)">
+				<input type="hidden" name="comment-account-id" value=".show($info.auuid)">
 				<input type="hidden" name="comment-original-timestamp" value=".show($info.timp)">
 				<input type="hidden" name="comment-text" value=".show($info.orig)">
 				<input type="hidden" name="comment-section-identifier" value=".show($request.comment-section-identifier)">

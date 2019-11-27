@@ -178,7 +178,7 @@ public func restartHttpAndHttpsServers() {
     
     if serverCtx == nil && domainCtxs.count == 0 {
         
-        Log.atCritical?.log("No certificate or private key (or combo) found, cannot start the HTTPS server")
+        Log.atWarning?.log("No certificate or private key (or combo) found, cannot start the HTTPS server")
         
         serverTelemetry.httpsServerStatus.value = "No Cert|Key"
         

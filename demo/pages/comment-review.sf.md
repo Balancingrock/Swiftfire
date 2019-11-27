@@ -44,7 +44,7 @@ p { margin: 0; }
 		<p style="display: block; margin-bottom: 1em;">Comment by: .show($info.dname)</p>
 	</div>
 	<form method="post" action="/command/comment-review">
-		<input type="hidden" name="account-name" value=".show($account.name)">
+		<input type="hidden" name="account-id" value=".show($info.auuid)">
 		<input type="hidden" name="comment-uuid" value=".show($info.uuid)">
 		<input type="hidden" name="comment-section-identifier" value=".show($info.csid)">
 		<input type="hidden" name="next-url" value="/pages/comment-review.sf.html">

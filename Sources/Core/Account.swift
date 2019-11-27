@@ -81,19 +81,27 @@ public final class Account: EstimatedMemoryConsumption {
     
     // MARK:- Public interface
 
+    
     /// The UUID for this account
     
-    public var uuid: UUID {
+    public lazy var uuid: UUID = {
         if let v = db.root[ACCOUNT_UUID_NF].uuid { return v }
         Log.atCritical?.log("Error retrieving uuid from account store")
         // Note a random UUID is extremely unlikely to actually refer to an account, but it could happen. However given that this situation should never happen in the first place, this small risk is accepted. The only alternative would be to make the uuid an optional or to shut down the server.
         return UUID()
-    }
+    }()
 
     
     /// The path of the file containing this account
         
     public let dir: URL
+    
+    
+    /// Set to 'true' if this account is the anonymous account
+    
+    public lazy var isAnon: Bool = {
+        return name.lowercased() == "anon"
+    }()
     
     
     /// True if the account is active.
@@ -221,7 +229,6 @@ public final class Account: EstimatedMemoryConsumption {
     }
     
     
-
     /// The new password verification code for this account.
     ///
     /// Should be empty for verified email addresses, should be a UUID-string when a verification email has been sent.
@@ -330,7 +337,7 @@ public final class Account: EstimatedMemoryConsumption {
         self.db.root.updateItem("", withNameField: ACCOUNT_NEW_PWD_VERIFICATION_CODE_NF)
         
         let salt = createSalt()
-        guard let pwdDigest = createDigest(for: password, with: self.salt) else { return nil }
+        guard let pwdDigest = createDigest(for: password, with: salt) else { return nil }
 
         self.db.root.updateItem(salt, withNameField: ACCOUNT_SALT_NF)
         self.db.root.updateItem(pwdDigest, withNameField: ACCOUNT_DIGEST_NF)
@@ -401,6 +408,20 @@ extension Account: CustomStringConvertible {
 // MARK: - Functional interface
 
 extension Account {
+    
+    
+    /// Increase the number of comments associated with this account
+    
+    public func increaseNofComments() {
+        if !isAnon { nofComments += 1 }
+    }
+    
+    
+    /// Decrease the number of comments associated with this account
+    
+    public func decrementNofComments() {
+        if !isAnon { nofComments -= 1 }
+    }
     
     
     /// Update password (digest). A new salt is created also. If the operation fails, the values of the salt and the digest will remain as they are.

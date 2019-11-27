@@ -293,7 +293,8 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
     // If there area no admin accounts, only accept the creation of an admin account
     // =============================================================================
 
-    if serverAdminDomain.accounts.isEmpty {
+    if serverAdminDomain.accounts.count == 1 &&
+        serverAdminDomain.accounts.getAccountWithoutPassword(for: "Anon") != nil {
         
         Log.atDebug?.log("No admin account found")
                 
@@ -475,7 +476,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
     
     if !adminSiteRootIsValid() {
         
-        Log.atError?.log("Admin site root is invalid at: \(serverParameters.adminSiteRoot.value)")
+        Log.atWarning?.log("Admin site root is invalid at: \(serverParameters.adminSiteRoot.value)")
         
         adminStatusPage()
         return .next
