@@ -93,7 +93,7 @@ public func function_loginLogout(_ args: Functions.Arguments, _ info: inout Func
     
     // Don't display the login/logout line for the login page or register page    
     
-    if let account = session[.accountKey] as? Account {
+    if let account = session.info.getAccount(inDomain: environment.domain) {
                 
         html = """
             <div class="sf-loginlogout">

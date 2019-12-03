@@ -112,6 +112,8 @@ func executeCommentReview(_ request: Request, _ domain: Domain, _ info: Services
         
         domain.comments.approveComment(uuid: uuid)
         
+        Log.atDebug?.log("Comment approved")
+        
         
     case REJECT_BUTTON:
         
@@ -119,6 +121,8 @@ func executeCommentReview(_ request: Request, _ domain: Domain, _ info: Services
         
         domain.comments.rejectComment(uuid: uuid)
         
+        Log.atDebug?.log("Comment rejested")
+
         
     case PREVIEW_BUTTON:
         
@@ -131,6 +135,8 @@ func executeCommentReview(_ request: Request, _ domain: Domain, _ info: Services
         
         domain.comments.updateComment(text: text, identifier: identifier, account: account, originalTimestamp: ot)
         
+        Log.atDebug?.log("Comment previewed")
+
         
     case UPDATE_AND_ACCEPT_BUTTON:
         
@@ -143,6 +149,8 @@ func executeCommentReview(_ request: Request, _ domain: Domain, _ info: Services
         
         domain.comments.updateComment(text: text, identifier: identifier, account: account, originalTimestamp: ot)
         domain.comments.approveComment(uuid: uuid)
+        
+        Log.atDebug?.log("Comment updated and approved")
 
         
     default:

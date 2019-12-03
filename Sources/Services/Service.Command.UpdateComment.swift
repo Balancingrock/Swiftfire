@@ -90,7 +90,7 @@ func executeUpdateComment(_ request: Request, _ domain: Domain, _ info: Services
         return nil
     }
     
-    guard let loginAccount = (info[.sessionKey] as? Session)?.info[.accountKey] as? Account else {
+    guard let loginAccount = (info[.sessionKey] as? Session)?.info.getAccount(inDomain: domain) else {
         Log.atDebug?.log("No user logged in")
         info[.errorMessageKey] = "Recoverable error: No user logged in (possibly session expired?)."
         return "error.sf.html"

@@ -80,11 +80,12 @@ func executeRemoveComment(_ request: Request, _ domain: Domain, _ info: Services
         return nil
     }
     
-    guard let loginAccount = (info[.sessionKey] as? Session)?.info[.accountKey] as? Account else {
-        Log.atError?.log("No user logged in")
-        return nil
+    guard let loginAccount = (info[.sessionKey] as? Session)?.info.getAccount(inDomain: domain) else {
+        Log.atDebug?.log("No user logged in")
+        request.info[PREVIOUS_ATTEMPT_MESSAGE_KEY] = "Login required"
+        return LOGIN_TEMPLATE
     }
-    
+        
     guard loginAccount.isModerator || loginAccount.isDomainAdmin || (loginAccount === account) else {
         Log.atWarning?.log("User \(loginAccount.name) does not have the rights to remove this comment \(identifier), \(originalTimestamp)")
         return nil

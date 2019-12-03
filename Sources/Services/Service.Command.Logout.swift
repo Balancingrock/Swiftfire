@@ -1,6 +1,6 @@
 // =====================================================================================================================
 //
-//  File:       SessionInfo.swift
+//  File:       Service.Command.Logout.swift
 //  Project:    Swiftfire
 //
 //  Version:    1.3.0
@@ -12,7 +12,7 @@
 //
 //  Copyright:  (c) 2019 Marinus van der Lugt, All rights reserved.
 //
-//  License:    Use or redistribute this code any way you like with the following two provision:
+//  License:    Use or redistribute this code any way you like with the following two provisions:
 //
 //  1) You ACCEPT this source code AS IS without any guarantees that it will work as intended. Any liability from its
 //  use is YOURS.
@@ -36,56 +36,32 @@
 //
 // History
 //
-// 1.3.0 - Changed from struct to class (to make pass-by-reference default)
-// 1.0.0 - Raised to v1.0.0, Removed old change log,
+// 1.3.0 - Initial version
 //
 // =====================================================================================================================
 
 import Foundation
 
-import VJson
-import Custom
+import Core
+import Http
 
 
-/// The session information store
-///
-/// SessionInfo is alive as long as the seeion itself. Several minutes as a minimum, several hours is also possible. It is thus imperative _NOT_ to store any data structures here that is buffered in a cache. This could lead to duplicate instances once the content of the cache is replaced and another thread/session needs access to the account.
+// Logout. Disassociate an account with the session.
 
-public class SessionInfo {
-    
-    public subscript(key: SessionInfoKey) -> CustomStringConvertible? {
-        set { dict[key] = newValue }
-        get { return dict[key] }
-    }
-    
-    public func remove(key: SessionInfoKey) {
-        dict.removeValue(forKey: key)
-    }
-    
-    public var dict: Dictionary<SessionInfoKey, CustomStringConvertible> = [:]
-    
-    public var json: VJson {
-        let json = VJson()
-        for (key, value) in dict {
-            json[key.rawValue] &= value.description
-        }
-        return json
-    }
-}
+internal let LOGOUT_COMMAND = "logout"
 
-extension SessionInfo {
-    
-    public func getAccount(inDomain domain: Domain?) -> Account? {
-        if let uuid = self[.accountUuidKey] as? UUID {
-            return domain?.accounts.getAccount(for: uuid)
-        }
-        return nil
-    }
-}
 
-extension SessionInfo: CustomStringConvertible {
+internal func executeLogout(_ request: Request, _ info: Services.Info) -> String? {
     
-    public var description: String {
-        return dict.map({ "\($0.key): \($0.value)" }).sorted().joined(separator: ",\n")
+    
+    // A session should be present
+    
+    guard let session = info[.sessionKey] as? Session else {
+        Log.atError?.log("Missing session")
+        return LOGIN_TEMPLATE
     }
+
+    session.info.remove(key: .accountUuidKey)
+    
+    return request.info[ORIGINAL_PAGE_URL_KEY] ?? "/index.sf.html"
 }

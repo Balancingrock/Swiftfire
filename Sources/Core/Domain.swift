@@ -222,9 +222,9 @@ public final class Domain {
     
     /// The minimum threshold for an account to have its comments published with review by a moderator
     ///
-    /// I.e: Once an account has this many approaved comment, further comments do not need approval
+    /// I.e: Once an account has this many approved comments, further comments do not need approval
     
-    public var autoCommentApprovalThreshold: Int32 = 5
+    public var autoCommentApprovalThreshold: Int32 = 2
     
 
     /// The domain specific blacklist
@@ -303,9 +303,14 @@ public final class Domain {
     public var accounts: AccountManager!
     
     
-    /// A list of account names to be verified
+    /// A list of UUIDs of the accounts waiting for verification
     
-    public var accountIdsWaitingForVerification: ItemManager!
+    public var accountUuidsWaitingForVerification: Array<String> = [] {
+        didSet {
+            let url = Urls.domainAccountIdsWaitingForVerificationFile(for: name)
+            accountUuidsWaitingForVerification.store(to: url)
+        }
+    }
     
     
     /// A list of account names waiting for a new password
@@ -408,9 +413,9 @@ public final class Domain {
             Log.atEmergency?.log("Could not create account manager for domain \(self.name)")
             return nil
         }
-        if accounts.available(name: "Anon") {
+        if !accounts.available(name: "Anon") {
             let anon = accounts.newAccount(name: "Anon", password: "Anon")
-            anon?.isEnabled = false
+            anon?.isEnabled = true
         }
 
         
@@ -498,13 +503,9 @@ public final class Domain {
         }
         
         if let url = Urls.domainAccountIdsWaitingForVerificationFile(for: name) {
-            accountIdsWaitingForVerification = ItemManager(from: url)
-            if accountIdsWaitingForVerification == nil {
-                accountIdsWaitingForVerification = ItemManager.createArrayManager(values: Array<String>())
-            }
+            accountUuidsWaitingForVerification.load(from: url)
         } else {
-            Log.atCritical?.log("Failed to retrieve name for accountNamesWaitingForVerification")
-            accountIdsWaitingForVerification = ItemManager.createArrayManager(values: Array<String>())
+            Log.atCritical?.log("Failed to retrieve url for accountNamesWaitingForVerification")
         }
     }
     
@@ -562,12 +563,6 @@ public final class Domain {
         json["NofRecentResponseLogs"] &= nofRecentResponseLogs
 
         json.save(to: setupFile)
-        
-        if let url = Urls.domainAccountIdsWaitingForVerificationFile(for: name) {
-            if accountIdsWaitingForVerification != nil {
-                try? accountIdsWaitingForVerification.data.write(to: url)
-            }
-        }
     }
 }
 

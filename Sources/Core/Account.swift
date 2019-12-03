@@ -114,6 +114,8 @@ public final class Account: EstimatedMemoryConsumption {
     
     
     /// True if the account is enabled.
+    ///
+    /// An account is enabled by default. It should only be enabled/disabled by a domain admin.
     
     public var isEnabled: Bool {
         get {
@@ -328,7 +330,7 @@ public final class Account: EstimatedMemoryConsumption {
         self.db.root.updateItem(uuid, withNameField: ACCOUNT_UUID_NF)
         self.db.root.updateItem(name, withNameField: ACCOUNT_NAME_NF)
         self.db.root.updateItem("", withNameField: ACCOUNT_EMAIL_ADDRESS_NF)
-        self.db.root.updateItem("", withNameField: ACCOUNT_EMAIL_VERIFICATION_CODE_NF)
+        self.db.root.updateItem("not verified yet", withNameField: ACCOUNT_EMAIL_VERIFICATION_CODE_NF) // this deactivates the account
         self.db.root.updateItem(true, withNameField: ACCOUNT_ENABLED_NF)
         self.db.root.updateItem(false, withNameField: ACCOUNT_IS_MODERATOR_NF)
         self.db.root.updateItem(false, withNameField: ACCOUNT_IS_DOMAIN_ADMIN_NF)

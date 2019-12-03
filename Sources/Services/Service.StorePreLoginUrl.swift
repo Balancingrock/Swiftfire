@@ -79,7 +79,7 @@ func service_storePreLoginUrl(_ request: Request, _ connection: SFConnection, _ 
     
     // Is a user logged in?
     
-    if let account = session.info[.accountKey] as? Account {
+    if let account = session.info.getAccount(inDomain: domain) {
         Log.atDebug?.log("User \(account.name) logged in")
         return .next
     }

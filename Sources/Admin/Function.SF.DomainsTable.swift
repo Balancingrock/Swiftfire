@@ -103,7 +103,7 @@ func function_sf_domainsTable(_ args: Functions.Arguments, _ info: inout Functio
         return "Session error".data(using: String.Encoding.utf8)
     }
     
-    guard let account = session.info[.accountKey] as? Account else {
+    guard let account = session.info.getAccount(inDomain: environment.domain) else {
         return "Account error".data(using: String.Encoding.utf8)
     }
     

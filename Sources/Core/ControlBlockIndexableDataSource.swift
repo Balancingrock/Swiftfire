@@ -114,8 +114,7 @@ extension Portal: FunctionsInfoDataSource {
         case .crcString: if let name = itemName { info[name] = string! }
         case .float32: if let name = itemName { info[name] = String(float32!) }
         case .float64: if let name = itemName { info[name] = String(float64!) }
-        case .dictionary:
-            self.forEach { $0.addSelf(to: &info) }
+        case .dictionary: self.forEach { $0.addSelf(to: &info) }
         case .array, .binary, .crcBinary, .sequence, .table, .color, .font, .null: break
         }
     }

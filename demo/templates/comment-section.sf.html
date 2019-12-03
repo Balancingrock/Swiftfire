@@ -123,10 +123,10 @@ textarea { color: black; box-sizing: border-box; max-width: 100%; min-width: 100
 	<div class="comment-input">
 		<form class="input-form" action="/command/post-comment" method="post">
 			<textarea name="comment-text" placeholder="Your comments"></textarea>
-			<p class="small-grey">Use [i]..[/i] for italic, [b]..[/b] for bold. Links will not be clickable.</p>
+			<p class="small-grey">Use [i]..[/i] for italic, [b]..[/b] for bold, &<span>gt</span> for '&gt' and <span>&</span>lt for '&lt'. Links will not be clickable.</p>
 	.if($account.name, nil)
 			<p class="small-grey">Anonymous comments need approval by a moderator and cannot be edited or deleted. New users will have their first few posts moderated.</p>
-			<p class="small-grey"><a href="/template/login.sf.html">Login first</a> to enable editing and removal of comments.</p>
+			<p class="small-grey"><a href="/pages/login.sf.html">Login first</a> to enable editing and removal of comments.</p>
 			<input class="input-form-button" type="text" name="display-name" placeholder="Anonymous">
 	.end()
 			<input type="hidden" name="next-url" value=".show($service.relative-resource-path)">

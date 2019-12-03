@@ -106,7 +106,7 @@ func function_sf_domainBlacklistTable(_ args: Functions.Arguments, _ info: inout
         return "Session error".data(using: String.Encoding.utf8)
     }
     
-    guard let account = session.info[.accountKey] as? Account else {
+    guard let account = session.info.getAccount(inDomain: environment.domain) else {
         return "Account error".data(using: String.Encoding.utf8)
     }
     

@@ -102,7 +102,7 @@ func function_sf_domainTelemetryTable(_ args: Functions.Arguments, _ info: inout
         return htmlErrorMessage
     }
     
-    guard let account = session.info[.accountKey] as? Account else {
+    guard let account = session.info.getAccount(inDomain: environment.domain) else {
         Log.atError?.log("Cannot get account")
         return htmlErrorMessage
     }

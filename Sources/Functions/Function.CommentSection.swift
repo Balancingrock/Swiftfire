@@ -105,7 +105,7 @@ public func function_commentSection(_ args: Functions.Arguments, _ info: inout F
         commentsEnabled = true
     } else {
         if let sessionInfo = environment.serviceInfo[.sessionKey] as? SessionInfo,
-           let account = sessionInfo[.accountKey] as? Account {
+            let account = sessionInfo.getAccount(inDomain: environment.domain) {
             if account.isDomainAdmin || account.isModerator || account.name != "Anon" {
                 commentsEnabled = true
             } else {

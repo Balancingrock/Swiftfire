@@ -1,6 +1,6 @@
 // =====================================================================================================================
 //
-//  File:       SessionInfo.swift
+//  File:       Service.Command.RequestNewPassword.swift
 //  Project:    Swiftfire
 //
 //  Version:    1.3.0
@@ -12,7 +12,7 @@
 //
 //  Copyright:  (c) 2019 Marinus van der Lugt, All rights reserved.
 //
-//  License:    Use or redistribute this code any way you like with the following two provision:
+//  License:    Use or redistribute this code any way you like with the following two provisions:
 //
 //  1) You ACCEPT this source code AS IS without any guarantees that it will work as intended. Any liability from its
 //  use is YOURS.
@@ -36,56 +36,51 @@
 //
 // History
 //
-// 1.3.0 - Changed from struct to class (to make pass-by-reference default)
-// 1.0.0 - Raised to v1.0.0, Removed old change log,
+// 1.3.0 - Initial version
 //
 // =====================================================================================================================
 
 import Foundation
 
-import VJson
-import Custom
+import Core
+import Http
 
 
-/// The session information store
-///
-/// SessionInfo is alive as long as the seeion itself. Several minutes as a minimum, several hours is also possible. It is thus imperative _NOT_ to store any data structures here that is buffered in a cache. This could lead to duplicate instances once the content of the cache is replaced and another thread/session needs access to the account.
+// The request new password command (2-stage, followed by set new password)
+// This command is triggered by the forgot password mail that was send
 
-public class SessionInfo {
+internal let REQUEST_NEW_PASSWORD_COMMAND = "request-new-password"
+
+fileprivate let REQUEST_NEW_PASSWORD_FAILED_TEMPLATE = "/pages/request-new-password-failed.sf.html"
+
+internal let REQUEST_NEW_PASSWORD_CODE_KEY = "request-new-password-code"
+
+
+internal func executeRequestNewPassword(_ request: Request, _ domain: Domain) -> String {
     
-    public subscript(key: SessionInfoKey) -> CustomStringConvertible? {
-        set { dict[key] = newValue }
-        get { return dict[key] }
+    guard let code = request.info[REQUEST_NEW_PASSWORD_CODE_KEY] else {
+        Log.atError?.log("Missing \(REQUEST_NEW_PASSWORD_CODE_KEY)")
+        return REQUEST_NEW_PASSWORD_FAILED_TEMPLATE
     }
     
-    public func remove(key: SessionInfoKey) {
-        dict.removeValue(forKey: key)
-    }
-    
-    public var dict: Dictionary<SessionInfoKey, CustomStringConvertible> = [:]
-    
-    public var json: VJson {
-        let json = VJson()
-        for (key, value) in dict {
-            json[key.rawValue] &= value.description
+    var account: Account?
+    for a in domain.accountsWaitingForNewPassword {
+        if code == a.newPasswordVerificationCode {
+            domain.accountsWaitingForNewPassword.removeObject(object: a)
+            account = a
+            break
         }
-        return json
     }
-}
-
-extension SessionInfo {
     
-    public func getAccount(inDomain domain: Domain?) -> Account? {
-        if let uuid = self[.accountUuidKey] as? UUID {
-            return domain?.accounts.getAccount(for: uuid)
-        }
-        return nil
-    }
-}
-
-extension SessionInfo: CustomStringConvertible {
-    
-    public var description: String {
-        return dict.map({ "\($0.key): \($0.value)" }).sorted().joined(separator: ",\n")
+    if let account = account {
+        
+        // Set the account name and request the set new password page
+        request.info[SET_NEW_PASSWORD_ACCOUNT_ID_KEY] = account.uuid.uuidString
+        return SET_NEW_PASSWORD_TEMPLATE
+        
+    } else {
+        
+        Log.atError?.log("The account was not found, possible time-out or double-try?")
+        return REQUEST_NEW_PASSWORD_FAILED_TEMPLATE
     }
 }

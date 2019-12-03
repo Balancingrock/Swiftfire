@@ -366,7 +366,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
         
         serverParameters.store()
         
-        session[.accountKey] = account
+        session[.accountUuidKey] = account.uuid
         
         relPath = "/"
         
@@ -399,7 +399,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
             
             // Get the account for the login data
             
-            guard let account = serverAdminDomain.accounts.getActiveAccount(withName: name, andPassword: pwd) else {
+            guard let account = serverAdminDomain.accounts.getAccount(withName: name, andPassword: pwd) else {
                 
                 // The login attempt failed, no account found.
                 
@@ -408,7 +408,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
                 
                 // Failed login, reset possible account
                 
-                session[.accountKey] = nil
+                session[.accountUuidKey] = nil
                 
                 
                 // Set the timestamp for the failed attempt
@@ -427,7 +427,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
                 
             // Associate the account with the session. This allows access for subsequent admin pages.
                 
-            session[.accountKey] = account
+            session[.accountUuidKey] = account.uuid
                 
                 
             // If an admin tried to access an protected page while not logged-in, then the URL of that page is stored in the session.
@@ -527,7 +527,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
         
         // An admin must be logged in
         
-        guard let account = session[.accountKey] as? Account, serverAdminDomain.accounts.contains(account.name) else {
+        guard let account = session.info.getAccount(inDomain: domain), serverAdminDomain.accounts.contains(account.name) else {
             
             Log.atDebug?.log("No admin logged in")
             
@@ -1241,7 +1241,7 @@ fileprivate func executeCreateDomain(_ request: Request) {
 
     if let domain = domains.createDomain(for: name) {
         domain.serviceNames = defaultServices
-        if let account = domain.accounts.getActiveAccount(withName: adminId, andPassword: adminPwd) {
+        if let account = domain.accounts.getAccount(withName: adminId, andPassword: adminPwd) {
             account.isDomainAdmin = true
         } else {
             guard let account = domain.accounts.newAccount(name: adminId, password: adminPwd) else {
@@ -1337,11 +1337,9 @@ fileprivate func executeQuitSwiftfire() {
 
 fileprivate func executeLogout(_ session: Session) -> CommandExecutionResult {
     
-    if let account = session[.accountKey] as? Account {
-        Log.atNotice?.log("Serveradmin \(account.name) logged out")
-    }
+    Log.atNotice?.log("Serveradmin logged out")
     
-    session[.accountKey] = nil
+    session[.accountUuidKey] = nil
     
     return .newPath("/pages/login.sf.html")
 }

@@ -221,13 +221,15 @@ fileprivate func reader(_ args: Array<Substring>, _ functionsInfo: Functions.Inf
             
         case 1:
             
-            return (session.info[.accountKey] as? Account) != nil ? "not-nil" : "nil"
+            return (session.info[.accountUuidKey] as? Account) != nil ? "not-nil" : "nil"
 
             
         case 2:
             
-            guard let account = session.info[.accountKey] as? Account else { return nil }
+            guard let uuid = session.info[.accountUuidKey] as? UUID else { return nil }
                         
+            guard let account = environment.domain.accounts.getAccount(for: uuid) else { return nil }
+            
             switch args[1].lowercased() {
         
             case "name": return account.name

@@ -351,7 +351,7 @@ extension SFConnection {
             url: serviceInfo[.relativeResourcePathKey] as? String ?? "Unknown",
             address: self.remoteAddress,
             session: session?.id,
-            account: (session?[.accountKey] as? Account)?.name,
+            account: (session?[.accountUuidKey] as? UUID)?.uuidString,
             responseCode: response.code ?? Response.Code._500_InternalServerError,
             request: request.asData(),
             responseData: response.data

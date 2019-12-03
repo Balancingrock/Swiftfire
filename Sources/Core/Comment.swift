@@ -104,21 +104,28 @@ public final class Comment {
     
     public static func htmlify(_ comment: String) -> String {
         
-        let replace: Dictionary<String, String> = [
-            "[i]" : "<span style=\"font-style:italic\">",
-            "[b]" : "<span style=\"font-weigth:bold\">",
-            "[/i]" : "</span>",
-            "[/b]" : "</span>",
+        let replaceLtGt: Dictionary<String, String> = [
             "<" : "&lt",
             ">" : "&gt"
         ]
         
+        let replaceItalicBold: Dictionary<String, String> = [
+            "[i]" : "<span style=\"font-style:italic\">",
+            "[b]" : "<span style=\"font-weight:bold\">",
+            "[/i]" : "</span>",
+            "[/b]" : "</span>"
+        ]
+        
         var result = comment
         
-        for (key, value) in replace {
+        for (key, value) in replaceLtGt {
             result = result.replacingOccurrences(of: key, with: value)
         }
-        
+
+        for (key, value) in replaceItalicBold {
+            result = result.replacingOccurrences(of: key, with: value)
+        }
+
         return result
     }
     

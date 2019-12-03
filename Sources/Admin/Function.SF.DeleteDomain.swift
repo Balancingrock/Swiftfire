@@ -100,7 +100,7 @@ func function_sf_deleteDomain(_ args: Functions.Arguments, _ info: inout Functio
         return htmlErrorMessage
     }
     
-    guard let account = session.info[.accountKey] as? Account else {
+    guard let account = session.info.getAccount(inDomain: environment.domain) else {
         Log.atError?.log("No account found", from: Source(id: -1, file: #file, function: #function, line: #line))
         return htmlErrorMessage
     }

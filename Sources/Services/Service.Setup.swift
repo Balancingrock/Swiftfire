@@ -693,7 +693,7 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
             
         // Get the account for the login data
             
-        guard let account = domain.accounts.getActiveAccount(withName: name, andPassword: pwd), account.isDomainAdmin else {
+        guard let account = domain.accounts.getAccount(withName: name, andPassword: pwd), account.isDomainAdmin else {
                 
             // The login attempt failed, no account found.
                 
@@ -702,7 +702,7 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
                 
             // Failed login, reset possible account
                 
-            session[.accountKey] = nil
+            session[.accountUuidKey] = nil
                 
                 
             // Set the timestamp for the failed attempt
@@ -721,13 +721,13 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
             
         // Associate the account with the session. This allows access for subsequent admin pages.
             
-        session[.accountKey] = account
+        session[.accountUuidKey] = account
     }
     
     
     // Check if an admin is logged in
     
-    guard let account = session[.accountKey] as? Account else {
+    guard let account = session.info.getAccount(inDomain: domain) else {
         Log.atDebug?.log("No account present", id: connection.logId)
         domainAdminLoginPage()
         return .next
@@ -774,7 +774,7 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
             case "AddAdminChangePassword": executeAddAdminChangePassword(request, domain)
             case "ChangePassword": executeChangePassword(request, domain)
             case "Logoff":
-                session.info.remove(key: .accountKey)
+                session.info.remove(key: .accountUuidKey)
                 Log.atNotice?.log("Admin logged out")
                 
             default:
@@ -818,7 +818,7 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
     
     // Return the domain admin page again unless the admin logged out or a non-admin account logged in
     
-    if let account = session[.accountKey] as? Account, account.isDomainAdmin {
+    if let account = session.info.getAccount(inDomain: domain), account.isDomainAdmin {
         domainAdminPage(account)
     } else {
         domainAdminLoginPage()

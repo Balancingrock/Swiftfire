@@ -53,17 +53,15 @@ public enum SessionInfoKey: String {
     // The following definitions are needed by the core Swiftfire framework
     
     
-    /// The account associated with this session. It is only present if a user has logged-in.
+    /// The UUID of the account associated with this session. It is only present if a user has logged-in.
     ///
-    /// Note: It is currently only used for server-admin accounts. But will be used in the future for domain admins and user accounts as well.
-    ///
-    /// __Type__: Account
+    /// __Type__: UUID
     ///
     /// __Set by__: Service.ServerAdmin (for server admin accounts only)
     ///
     /// __Used by__: Services.ServerAdmin (for server admin accounts only)
     
-    case accountKey = "Account"
+    case accountUuidKey = "Account"
     
     
     /// The URL that was requested, but discarded because a user needed to login first. This key can be used to immediately redirect the user to the requested page after he has logged-in.

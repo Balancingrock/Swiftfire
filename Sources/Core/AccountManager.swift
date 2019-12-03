@@ -219,7 +219,7 @@ extension AccountManager {
                         if url.lastPathComponent == AccountManager.ACCOUNT_DIRECTORY_NAME {
                             
                             if let account = Account(withContentOfDirectory: url) {
-                                nameLut[account.name] = account.uuid
+                                nameLut[account.name.lowercased()] = account.uuid
                                 uuidLut[account.uuid] = url
                                 lastAccountId = Swift.max(getAccountId(from: url), lastAccountId)
                             } else {
@@ -320,7 +320,7 @@ extension AccountManager {
     }
 
     
-    /// Returns the account for the given name and password if the account exists, the password matches, it is enabled and the email address has been verified.
+    /// Returns the account for the given name and password if the account exists and the password matches.
     ///
     /// - Parameters:
     ///   - withName: The name of the account to find. May not be empty.
@@ -328,7 +328,7 @@ extension AccountManager {
     ///
     /// - Returns: On success the account, otherwise nil.
     
-    public func getActiveAccount(withName name: String, andPassword password: String) -> Account? {
+    public func getAccount(withName name: String, andPassword password: String) -> Account? {
         
         
         // Only valid parameters
@@ -348,11 +348,6 @@ extension AccountManager {
             
             guard account.hasSameDigest(as: password) else { return nil }
             
-            
-            // Check the activity status
-            
-            guard account.isActive else { return nil }
-
             
             // Is ok
             
@@ -374,7 +369,7 @@ extension AccountManager {
         
         return AccountManager.queue.sync {
             
-            return Account(withContentOfDirectory: uuidLut[uuid])
+            return getAccount(uuid)
         }
     }
 

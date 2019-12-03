@@ -140,6 +140,8 @@ public final class CommentManager {
     
         private func add(_ id: String, _ im: ItemManager, _ url: URL) {
             
+            assert(!id.contains("/"))
+            
             while arr.count > 50 {
                 let str = arr.removeLast()
                 dict.removeValue(forKey: str)
@@ -531,16 +533,17 @@ public final class CommentManager {
             } else {
             
             
-                // For all other account, only store the comment in the wait-for-approval list if the auto-approve threshold has not yet been reached.
+                // For all other accounts, store the comment in the wait-for-approval list if the auto-approve threshold has not yet been reached.
             
-                if account.nofComments <= domain.autoCommentApprovalThreshold {
+                if account.nofComments < domain.autoCommentApprovalThreshold {
             
                     domain.comments.forApproval.append(comment)
             
                 } else {
                 
                     account.increaseNofComments()
-                    appendToTable(comment, relativePath)
+                    addToTable(comment)
+                    //appendToTable(comment, identifier)
                 }
             }
             
@@ -728,6 +731,9 @@ public final class CommentManager {
             let comment = self.forApproval.remove(at: i)
 
             
+            self.addToTable(comment)
+            
+            /*
             // Get the table
             
             guard let itemManager = self.tableCache.getCommentTableForExistingFile(forId: comment.identifier) else { return }
@@ -788,7 +794,74 @@ public final class CommentManager {
             // Increase the number of comments for the account
             
             self.domain.accounts.getAccount(for: comment.accountId)?.increaseNofComments()
+             */
         }
+    }
+    
+    
+    private func addToTable(_ comment: Comment) {
+        
+        
+        // Get the table
+        
+        guard let itemManager = self.tableCache.getCommentTableForExistingFile(forId: comment.identifier) else { return }
+        guard let table = itemManager.root[URL_TABLE_NF].portal else {
+            Log.atError?.log("")
+            return
+        }
+        
+        
+        // Find the proper place in the table
+        
+        var insertionIndex = 0
+        table.itterateFields(ofColumn: COMMENT_SEQUENCE_NUMBER_CI) { (portal, index) -> Bool in
+            if comment.sequenceNumber < (portal.uint16 ?? 0) {
+                return true
+            } else {
+                insertionIndex = index
+                return false
+            }
+        }
+        
+        
+        // Insert it into the comment table
+        
+        if table.count == 0 {
+            switch (table.addRows(1, values: { (portal) in
+                switch portal.column! {
+                case COMMENT_SEQUENCE_NUMBER_CI: portal.uint16 = comment.sequenceNumber
+                case COMMENT_URL_CI: portal.string = comment.url.path
+                default:
+                    Log.atError?.log("Unknown table column with column index: \(portal.column!)")
+                }
+            })) {
+                case .success: break
+                case .error(let error): Log.atError?.log("Error code received: \(error.description)")
+                case .noAction: Log.atError?.log("Unexpected code executed")
+            }
+        } else {
+            switch table.insertRows(atIndex: insertionIndex, amount: 1, defaultValues: { (portal) in
+                switch portal.column! {
+                case COMMENT_SEQUENCE_NUMBER_CI: portal.uint16 = comment.sequenceNumber
+                case COMMENT_URL_CI: portal.string = comment.url.path
+                default:
+                    Log.atError?.log("Unknown table column with column index: \(portal.column!)")
+                }}) {
+            case .success: break
+            case .error(let error): Log.atError?.log("Error code received: \(error.description)")
+            case .noAction: Log.atError?.log("Unexpected code executed")
+            }
+        }
+        
+        
+        // Store the updated table
+        
+        self.tableCache.store(tableFor: comment.identifier)
+        
+        
+        // Increase the number of comments for the account
+        
+        self.domain.accounts.getAccount(for: comment.accountId)?.increaseNofComments()
     }
     
     
@@ -799,7 +872,7 @@ public final class CommentManager {
     /// - Parameters:
     ///   - comment: The comment to be added.
     ///   - identifier: The identifier of the webpage where the comment is placed.
-
+    /*
     private func appendToTable(_ comment: Comment, _ identifier: String) {
         
     
@@ -820,7 +893,7 @@ public final class CommentManager {
         
         table.addRows(1) { (portal) in
             switch portal.column {
-            case COMMENT_URL_CI: portal.crcString = BRCrcString(comment.url.path)
+            case COMMENT_URL_CI: portal.string = comment.url.path
             case COMMENT_SEQUENCE_NUMBER_CI: portal.uint16 = comment.sequenceNumber
             default:
                 Log.atError?.log("Unknown table index \(portal.column ?? -1)")
@@ -831,7 +904,7 @@ public final class CommentManager {
         // Save the table
         
         tableCache.store(tableFor: identifier)
-    }
+    }*/
     
     
     /// Load a comment

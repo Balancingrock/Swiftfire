@@ -699,7 +699,8 @@ fileprivate func setupFor(_ args: Array<String>, _ info: inout Functions.Info, _
         info["can-edit"] = "false"
 
         if let session = environment.serviceInfo[.sessionKey] as? Session,
-           let currentAccount = session[.accountKey] as? Account {
+            let uuid = session[.accountUuidKey] as? UUID,
+            let currentAccount = environment.domain.accounts.getAccount(for: uuid) {
             
             if currentAccount.isModerator || currentAccount.isDomainAdmin {
                 
