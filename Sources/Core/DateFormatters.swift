@@ -3,7 +3,7 @@
 //  File:       DateFormatters.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.3.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -12,7 +12,7 @@
 //
 //  Copyright:  (c) 2019 Marinus van der Lugt, All rights reserved.
 //
-//  License:    Use or redistribute this code any way you like with the following two provision:
+//  License:    Use or redistribute this code any way you like with the following two provisions:
 //
 //  1) You ACCEPT this source code AS IS without any guarantees that it will work as intended. Any liability from its
 //  use is YOURS.
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.3.0 - Added formatter for comment's
 // 1.0.0 - Initial version
 //
 // =====================================================================================================================

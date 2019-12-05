@@ -12,7 +12,7 @@
 //
 //  Copyright:  (c) 2017-2019 Marinus van der Lugt, All rights reserved.
 //
-//  License:    Use or redistribute this code any way you like with the following two provision:
+//  License:    Use or redistribute this code any way you like with the following two provisions:
 //
 //  1) You ACCEPT this source code AS IS without any guarantees that it will work as intended. Any liability from its
 //  use is YOURS.
