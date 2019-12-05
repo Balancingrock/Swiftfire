@@ -573,7 +573,15 @@ fileprivate func evaluateIf(_ args: Array<String>, _ info: inout Functions.Info,
         let first = readKey(args[0], using: info, in: environment)?.lowercased()
         let second = readKey(args[2], using: info, in: environment)?.lowercased()
 
-        return (first != nil) ? first == second : false
+        if first == nil {
+            if second == nil {
+                return true
+            } else {
+                return false
+            }
+        } else {
+            return first == second
+        }
         
         
     case "not-equal":

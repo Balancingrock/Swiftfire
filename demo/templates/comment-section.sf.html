@@ -1,15 +1,3 @@
-.assign(can-edit, false)
-.if($account.name, not-equal, Anon)
-	.if($account.name, equal, $info.aname)
-		.assign(can-edit, true)
-	.end()
-	.if($account.is-domain-admin, true)
-		.assign(can-edit, true)
-	.end()
-	.if($account.is-moderator, true)
-		.assign(can-edit, true)
-	.end()
-.end()
 <style>
 p { margin: 0; display: block; }
 input { color: black; }
@@ -46,15 +34,24 @@ textarea { color: black; box-sizing: border-box; max-width: 100%; min-width: 100
 	font-size: .9em;
 }
 .details-footer {
-	.if($info.can-edit, true)
-	display: flex;
-	.else()
 	display: none;
-	.end()
 	flex-direction: row;
 	justify-content: flex-end;
 	align-items: baseline;
 }
+.is-user-.show($account.uuid) {
+	display: flex;
+}
+.if($account.is-domain-admin, true)
+.is-admin {
+	display: flex;
+}
+.end()
+.if($account.is-moderator, true)
+.is-moderator {
+	display: flex;
+}
+.end()
 .small-button {
 	background-color: #e8e8e8;
 	border: 0;
@@ -103,15 +100,13 @@ textarea { color: black; box-sizing: border-box; max-width: 100%; min-width: 100
 			<div class="details-text">
 				<p>.show($info.html)</p>
 			</div>
-			<div class="details-footer">
-				<p class="small-grey" style="flex-grow: 1">Remove is final</p>
+			<div class="details-footer is-admin is-moderator is-user-.show($info.auuid)">
 				<input type="hidden" name="next-url" value=".show($service.relative-resource-path)">
 				<input type="hidden" name="comment-account-id" value=".show($info.auuid)">
 				<input type="hidden" name="comment-original-timestamp" value=".show($info.timp)">
 				<input type="hidden" name="comment-text" value=".show($info.orig)">
 				<input type="hidden" name="comment-section-identifier" value=".show($request.comment-section-identifier)">
-				<input class="small-button" style="color:red;" type="submit" name="remove-button" value="Remove" formAction="/command/remove-comment">
-				<input class="small-button" type="submit" name="edit-button" value="Edit" formAction="/command/edit-comment">
+				<input class="small-button" type="submit" name="edit-button" value="Edit/Remove" formAction="/command/edit-comment">
 			</div>
 		</form>
 	</div>
@@ -123,7 +118,7 @@ textarea { color: black; box-sizing: border-box; max-width: 100%; min-width: 100
 	<div class="comment-input">
 		<form class="input-form" action="/command/post-comment" method="post">
 			<textarea name="comment-text" placeholder="Your comments"></textarea>
-			<p class="small-grey">Use [i]..[/i] for italic, [b]..[/b] for bold, &<span>gt</span> for '&gt' and <span>&</span>lt for '&lt'. Links will not be clickable.</p>
+			<p class="small-grey">Use [i]..[/i] for italic, [b]..[/b] for bold. Links will not be clickable.</p>
 	.if($account.name, nil)
 			<p class="small-grey">Anonymous comments need approval by a moderator and cannot be edited or deleted. New users will have their first few posts moderated.</p>
 			<p class="small-grey"><a href="/pages/login.sf.html">Login first</a> to enable editing and removal of comments.</p>

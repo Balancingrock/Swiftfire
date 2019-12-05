@@ -1,6 +1,6 @@
 // =====================================================================================================================
 //
-//  File:       Service.Command.EditComment.swift
+//  File:       Service.Command.CancelUpdateComment.swift
 //  Project:    Swiftfire
 //
 //  Version:    1.3.0
@@ -48,33 +48,12 @@ import Http
 
 // The command
 
-internal let COMMAND_EDIT_COMMENT = "edit-comment"
+internal let COMMAND_CANCEL_UPDATE_COMMENT = "cancel-update-comment"
 
 
 // Executes the post comment command
 
-func executeEditComment(_ request: Request, _ domain: Domain, _ info: Services.Info) -> String? {
-    
-    guard let text = request.info[COMMENT_TEXT_KEY] else {
-        Log.atError?.log("Missing \(COMMENT_TEXT_KEY) in request.info")
-        return nil
-    }
-    
-    guard text.count > 1 else {
-        Log.atDebug?.log("Character count too low, is: \(text.count), should be >1")
-        return nil
-    }
-
-    
-    // Add formatting
-    
-    let markedUp = Comment.htmlify(text)
-
-    
-    // Write the preview string to request info
-    
-    request.info["preview"] = markedUp
-    
-    
-    return "/pages/comment-edit.sf.html"
+func executeCancelUpdateComment(_ request: Request, _ domain: Domain, _ info: Services.Info) -> String? {
+    return nil
 }
+

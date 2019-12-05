@@ -133,6 +133,7 @@ func service_commands(_ request: Request, _ connection: SFConnection, _ domain: 
     case COMMAND_REMOVE_COMMENT: relativePath = executeRemoveComment(request, domain, info)
     case COMMAND_EDIT_COMMENT: relativePath = executeEditComment(request, domain, info)
     case COMMAND_UPDATE_COMMENT: relativePath = executeUpdateComment(request, domain, info)
+    case COMMAND_CANCEL_UPDATE_COMMENT: relativePath = executeCancelUpdateComment(request, domain, info)
 
     default:
         

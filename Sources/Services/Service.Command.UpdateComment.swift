@@ -60,6 +60,8 @@ func executeUpdateComment(_ request: Request, _ domain: Domain, _ info: Services
         return nil
     }
     
+    Log.atDebug?.log("Updating comment to: \(text)")
+    
     guard text.count > 1 else {
         Log.atDebug?.log("Character count too low, is: \(text.count), should be >1")
         return nil

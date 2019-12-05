@@ -79,16 +79,7 @@ fileprivate let SEQUENCE_NUMBER_NF = NameField(COMMENT_SEQUENCE_NUMBER)!
 
 public final class Comment {
     
-    
-    /// Remove all '<'and '>' signs.
-    
-    public static func removeHtml(_ comment: String) -> String {
-        let regex = try! NSRegularExpression(pattern: "<|>", options: .init())
-        let result = regex.stringByReplacingMatches(in: comment, options: .init(), range: NSRange(location: 0, length: comment.count), withTemplate: "")
-        return result
-    }
-    
-    
+
     /// Version number of the htmlify-er
     ///
     /// This might be used by future enhancements to convert the existing comments to a new style
@@ -190,21 +181,16 @@ public final class Comment {
         self.url = fileUrl
         
         
-        // Make the input save by removing the < and >
-        
-        let noHtml = Comment.removeHtml(text)
-        
-        
         // Add formatting
         
-        let markedUp = Comment.htmlify(noHtml)
+        let markedUp = Comment.htmlify(text)
         
         
         // Initialize the db
         
         db = ItemManager.createDictionaryManager()
         db.root.updateItem(account.uuid, withNameField: ACCOUNT_UUID_NF)
-        db.root.updateItem(noHtml, withNameField: ORIGINAL_NF)
+        db.root.updateItem(text, withNameField: ORIGINAL_NF)
         db.root.updateItem(markedUp, withNameField: HTMLIFIED_NF)
         db.root.updateItem(Comment.htmlifyVersion, withNameField: HTMLIFIED_VERSION_NF)
         db.root.updateItem(identifier, withNameField: COMMENT_SECTION_IDENTIFIER_NF)
@@ -323,19 +309,14 @@ public final class Comment {
     public func replaceText(with comment: String) {
         
         
-        // Make the input save by removing the < and >
-        
-        let noHtml = Comment.removeHtml(comment)
-        
-        
         // Add formatting
         
-        let markedUp = Comment.htmlify(noHtml)
+        let markedUp = Comment.htmlify(comment)
         
         
         // Update the db
         
-        db.root.updateItem(noHtml, withNameField: ORIGINAL_NF)
+        db.root.updateItem(comment, withNameField: ORIGINAL_NF)
         db.root.updateItem(markedUp, withNameField: HTMLIFIED_NF)
         db.root.updateItem(Comment.htmlifyVersion, withNameField: HTMLIFIED_VERSION_NF)
         db.root.updateItem((totalNumberOfUpdates + 1), withNameField: NOF_UPDATES_NF)

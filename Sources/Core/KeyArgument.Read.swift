@@ -221,7 +221,7 @@ fileprivate func reader(_ args: Array<Substring>, _ functionsInfo: Functions.Inf
             
         case 1:
             
-            return (session.info[.accountUuidKey] as? Account) != nil ? "not-nil" : "nil"
+            return (session.info[.accountUuidKey] as? UUID) != nil ? "not-nil" : "nil"
 
             
         case 2:
@@ -233,6 +233,8 @@ fileprivate func reader(_ args: Array<Substring>, _ functionsInfo: Functions.Inf
             switch args[1].lowercased() {
         
             case "name": return account.name
+                
+            case "uuid": return account.uuid.uuidString
             
             case "is-domain-admin": return String(account.isDomainAdmin)
             

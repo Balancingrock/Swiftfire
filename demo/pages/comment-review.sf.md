@@ -1,7 +1,7 @@
 ---
 layout: page
 title: Review Comments for Approval
-menuInclude: yes
+menuInclude: no
 menuTopTitle: Admin
 menuSubTitle: Review comments for approval
 ---
