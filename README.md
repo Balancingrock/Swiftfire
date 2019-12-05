@@ -64,6 +64,7 @@ Once set up, any access to the port that has as its URL: '/serveradmin' will end
 - Handles multiple domains
 - Sessions are supported
 - Accounts are supported
+- Integrated comment system
 - Client forwarding (to other hosts or a different port on the same host)
 - Integrated usage statistics (page visits)
 - Blacklisting (refusal of service) on IP basis for Server and per domain
@@ -162,6 +163,7 @@ The sources for the server admin site are generated using Jekyll. If changes mus
 
 #### HEAD
 
+- Added comment system
 - Fixed (removed) warning when using xcode 11
 - Fixed issue #7 (removed local FileManager instances)
 - Moved getInfo and postInfo from the services.info to Request.info (in the Http library) & deleted Service.DecodePostFromUrlEncoded.swift
