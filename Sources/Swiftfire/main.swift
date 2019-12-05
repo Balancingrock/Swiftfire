@@ -82,7 +82,7 @@ Log.singleton.networkTransmitAtAndAboveLevel = SwifterLog.Level.none
 
 // First message
 
-Log.atNotice?.log("Starting Swiftfire webserver")
+Log.atNotice?.log("Starting Swiftfire webserver \(serverTelemetry.serverVersion)")
 
 
 // =======================================
@@ -236,6 +236,8 @@ do {
     guard let domain = Domain("serveradmin") else {
         emergencyExit("The Server Admin (Pseudo) Domain could not be created")
     }
+    
+    assert(domain.accounts!.getAccountWithoutPassword(for: "Anon") == nil)
     
     serverAdminDomain = domain
 

@@ -413,9 +413,12 @@ public final class Domain {
             Log.atEmergency?.log("Could not create account manager for domain \(self.name)")
             return nil
         }
-        if !accounts.available(name: "Anon") {
-            let anon = accounts.newAccount(name: "Anon", password: "Anon")
-            anon?.isEnabled = true
+        if name != "serveradmin" {
+            // All domains will have an Anon(ymous) account except for the serveradmin domain.
+            if !accounts.available(name: "Anon") {
+                let anon = accounts.newAccount(name: "Anon", password: "Anon")
+                anon?.isEnabled = true
+            }
         }
 
         

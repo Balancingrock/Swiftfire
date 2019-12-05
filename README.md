@@ -22,7 +22,7 @@ Every domain that is hosted under Swiftfire implements a stack of services. By d
 
 For each (valid and accepted) request that arrives at the server, Swiftfire finds the stack of services to execute and does so one service after the other.
 
-You can add your own services to modify or extend de default behaviour.
+You can add your own services to modify or extend the default behaviour.
 
 However it is much more likely that you will want to create your own functions.
 
@@ -44,7 +44,7 @@ or any other number of course.
 
 The best part is, you can define and write the functions yourself.
 
-It is up to you to determine how much you want to do in Swift. For example, you could decide to have the entire landing page to be created by a function. To do that let index.sf.html exists only of: `.buildLandingPage()`. And of course you have to implement the function that is registered under the name `buildLandingPage`.
+It is up to you to determine how much you want to do in Swift. For example, you could decide to have the entire landing page to be created by a function. To do that let index.sf.html exist only of: `.buildLandingPage()`. And of course you have to implement the function that is registered under the name `buildLandingPage`.
 
 It is fast. Depending of course on the amount and complexity of the services and functions, Swiftfire as presented here is very fast. On our server (a mac mini) the static pages are usually served in less than 2mS. Adding functions and services may increase this number of course. Still since the function calls and services refer to compiled code instead of interpreted code the speed of Swiftfire can be expected to be higher than interpreter solutions.
 

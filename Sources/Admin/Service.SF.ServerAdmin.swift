@@ -293,8 +293,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
     // If there area no admin accounts, only accept the creation of an admin account
     // =============================================================================
 
-    if serverAdminDomain.accounts.count == 1 &&
-        serverAdminDomain.accounts.getAccountWithoutPassword(for: "Anon") != nil {
+    if serverAdminDomain.accounts.count == 0 {
         
         Log.atDebug?.log("No admin account found")
                 
