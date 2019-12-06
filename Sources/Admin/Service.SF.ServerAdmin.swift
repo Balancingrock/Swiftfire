@@ -1371,8 +1371,8 @@ fileprivate func executeCreateAdmin(_ request: Request) {
 
 fileprivate func executeConfirmDeleteAccount(_ request: Request) -> CommandExecutionResult {
     
-    guard request.info["id"] != nil else {
-        Log.atError?.log("No ID given")
+    guard request.info["name"] != nil else {
+        Log.atError?.log("No name given")
         return .newPath("/pages/admin-management.sf.html")
     }
     
@@ -1381,8 +1381,8 @@ fileprivate func executeConfirmDeleteAccount(_ request: Request) -> CommandExecu
 
 fileprivate func executeDeleteAccount(_ request: Request) {
     
-    guard let name = request.info["id"] else {
-        Log.atError?.log("No ID given")
+    guard let name = request.info["name"] else {
+        Log.atError?.log("No name given")
         return
     }
 
@@ -1391,12 +1391,12 @@ fileprivate func executeDeleteAccount(_ request: Request) {
         return
     }
     
-    Log.atNotice?.log("Server Admin Account \(name) removed.")
+    Log.atNotice?.log("Server Admin Account \(name) disabled.")
 }
 
 fileprivate func executeSetNewPassword(_ request: Request) {
     
-    guard let id = request.info["id"], !id.isEmpty, let uuid = UUID(uuidString: id) else {
+    guard let id = request.info["uuid"], !id.isEmpty, let uuid = UUID(uuidString: id) else {
         Log.atError?.log("No ID given")
         return
     }

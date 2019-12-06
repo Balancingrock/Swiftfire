@@ -76,7 +76,7 @@ public final class Account: EstimatedMemoryConsumption {
     
     /// Data storage for the account.
     
-    private var db: ItemManager!
+    internal var db: ItemManager!
 
     
     // MARK:- Public interface
@@ -596,3 +596,12 @@ extension Account {
     }
 }
 
+extension Account: FunctionsInfoDataSource {
+    
+    public func addSelf(to info: inout Functions.Info) {
+        db.root.addSelf(to: &info)
+        // Remove sensitive info
+        info.removeValue(forKey: ACCOUNT_SALT_NF.string)
+        info.removeValue(forKey: ACCOUNT_DIGEST_NF.string)
+    }
+}

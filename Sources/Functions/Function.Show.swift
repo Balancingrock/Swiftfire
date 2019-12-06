@@ -65,5 +65,9 @@ public func function_show(_ args: Functions.Arguments, _ info: inout Functions.I
     
     guard case .arrayOfString(let arr) = args, arr.count == 1 else { return htmlErrorMessage }
 
-    return (readKey(arr[0], using: info, in: environment))?.data(using: .utf8) ?? htmlErrorMessage
+    let str = readKey(arr[0], using: info, in: environment)
+    
+    Log.atDebug?.log("Show for key \(arr[0]) with value: \(str == nil ? "nil" : (str!.isEmpty ? "empty" : str!))")
+    
+    return str?.data(using: .utf8) ?? htmlErrorMessage
 }

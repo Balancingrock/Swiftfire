@@ -254,3 +254,23 @@ extension Blacklist: CustomStringConvertible {
         }
     }
 }
+
+
+extension Blacklist: ControlBlockIndexableDataSource {
+
+    public var cbCount: Int { return list.count }
+    
+    public func addElement(at index: Int, to info: inout Functions.Info) {
+        
+        guard index < list.count else { return }
+        
+        let listIndex = list.index(list.startIndex, offsetBy: index)
+        
+        let address = list[listIndex].key
+        
+        let action = list[listIndex].value
+        
+        info["address"] = address
+        info["action"] = action.rawValue
+    }
+}

@@ -52,7 +52,7 @@ public protocol ControlBlockIndexableDataSource {
     
     /// The number of elements in this source
     
-    var count: Int { get }
+    var cbCount: Int { get }
     
     
     /// Adds the contents of self to a Functions.Info dictionary
@@ -75,6 +75,8 @@ public protocol FunctionsInfoDataSource {
 
 
 extension Array: ControlBlockIndexableDataSource where Element: FunctionsInfoDataSource {
+    
+    public var cbCount: Int { return count }
     
     public func addElement(at index: Int, to info: inout Functions.Info) {
         guard index < self.count else { return }
@@ -121,6 +123,8 @@ extension Portal: FunctionsInfoDataSource {
 }
 
 extension Portal: ControlBlockIndexableDataSource {
+
+    public var cbCount: Int { return count }
 
     public func addElement(at index: Int, to info: inout Functions.Info) {
         switch self.itemType! {

@@ -636,6 +636,12 @@ fileprivate func setupFor(_ args: Array<String>, _ info: inout Functions.Info, _
             guard let identifier = environment.request.info["comment-section-identifier"] else { return nil }
             return environment.domain.comments.commentTable(for: identifier)
             
+        case "accounts":
+            return environment.domain.accounts
+            
+        case "blacklist":
+            return environment.domain.blacklist
+            
         default:
             Log.atError?.log("Missing source for id: \(id)")
             return nil
@@ -656,7 +662,7 @@ fileprivate func setupFor(_ args: Array<String>, _ info: inout Functions.Info, _
     guard let source = getSource(for: id) else { return false }
     
     var startOffset: Int = 0
-    var endOffset: Int = source.count - 1
+    var endOffset: Int = source.cbCount - 1
     
     if args.count == 3 {
         guard let so = Int(args[1]) else {
@@ -672,14 +678,17 @@ fileprivate func setupFor(_ args: Array<String>, _ info: inout Functions.Info, _
     }
     
     let offset = max(startOffset, offsetIn)
-    endOffset = min(endOffset, source.count - 1)
+    endOffset = min(endOffset, source.cbCount - 1)
     
     if offset > endOffset { return false }
     
     
     switch id {
         
-    case "comments-for-approval": source.addElement(at: offset, to: &info)
+    case "comments-for-approval": fallthrough
+    case "accounts": fallthrough
+        
+    case "blacklist": source.addElement(at: offset, to: &info)
         
     case "comments":
         
@@ -704,7 +713,7 @@ fileprivate func setupFor(_ args: Array<String>, _ info: inout Functions.Info, _
         
         comment.addSelf(to: &info)
         
-        info["can-edit"] = "false"
+/*        info["can-edit"] = "false"
 
         if let session = environment.serviceInfo[.sessionKey] as? Session,
             let uuid = session[.accountUuidKey] as? UUID,
@@ -721,7 +730,7 @@ fileprivate func setupFor(_ args: Array<String>, _ info: inout Functions.Info, _
                     info["can-edit"] = String(commentAccount.name == currentAccount.name)
                 }
             }
-        }
+        }*/
         
     default:
         

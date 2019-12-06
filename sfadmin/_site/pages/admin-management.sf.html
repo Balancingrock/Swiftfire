@@ -20,7 +20,7 @@
 	<meta name="description" content="Swiftfire Server Admin">
 
 	<link rel="stylesheet" href="/serveradmin/assets/main.css">
-	<link rel="canonical" href="/serveradmin/pages/admin-management.sf.html">
+	<link rel="canonical" href="http://localhost:4000/serveradmin/pages/admin-management.sf.html">
 	<link rel="alternate" type="application/rss+xml" title="Swiftfire Server Admin" href="/serveradmin/feed.xml">
 </head>
 <!-- end of include head.html -->
@@ -64,7 +64,7 @@
 	<div class="item">
 		<div class="title">
 			<label class="symbol"><p></p></label>
-			<div class="text"><a href="/serveradmin/index.html"><p>Home</p></a></div>
+			<div class="text"><a href="http://localhost:4000/serveradmin/index.html"><p>Home</p></a></div>
 		</div>
 	</div>
 	<div class="item-separator"><p><!-- empty but necessary --></p></div>
@@ -165,7 +165,51 @@
 	</header>
 	<div class="page-content" itemprop="articleBody">
 <!-- Page content -->
-   <div class="center-content">.sf-adminTable()</div>
+   <div class="center-content">
+	<table class="default-table">
+		<thead>
+            <tr>
+                <th>Account ID</th>
+                <th></th>
+                <th></th>
+            </tr>
+        </thead>
+        <tbody>
+        .for(accounts)
+        	.if($account.uuid, equal, $info.uuid)
+        	    <tr>
+                    <td><p class="half-margins-no-padding">.show($info.name)</p></td>
+                    <td></td>
+                    <td>
+                        <form method="post" action="/serveradmin/sfcommand/SetNewPassword">
+                            <input type="hidden" name="uuid" value=".show($info.uuid)" />
+                            <input type="text" name="Password" value="" />
+                            <input type="submit" value="Set New Password" />
+                        </form>
+                    </td>
+                </tr>
+        	.else()
+                <tr>
+                    <td><p class="half-margins-no-padding">.show($info.name)</p></td>
+                    <td>
+                        <form method="post" action="/serveradmin/sfcommand/ConfirmDeleteAccount">
+                            <button type="submit" name="name" value=".show($info.name)">Delete</button>
+                        </form>
+                    </td>
+                    <td>
+                        <form method="post" action="/serveradmin/sfcommand/SetNewPassword">
+                            <input type="hidden" name="uuid" value=".show($info.uuid)" />
+                            <input type="text" name="Password" value="" />
+                            <input type="submit" value="Set New Password" />
+                        </form>
+                    </td>
+                </tr>
+        	.end(if)
+        .end(for)
+		</tbody>
+	</table>
+</div>
+
 <h1 style="text-align: center;">Create New Admin Account</h1>
 <form action="/serveradmin/sfcommand/CreateAdmin" method="post">
 	<div style="display:flex; flex-direction:column; justify-content:center;">

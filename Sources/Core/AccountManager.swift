@@ -219,8 +219,10 @@ extension AccountManager {
                         if url.lastPathComponent == AccountManager.ACCOUNT_DIRECTORY_NAME {
                             
                             if let account = Account(withContentOfDirectory: url) {
-                                nameLut[account.name.lowercased()] = account.uuid
-                                uuidLut[account.uuid] = url
+                                if account.isEnabled {
+                                    nameLut[account.name.lowercased()] = account.uuid
+                                    uuidLut[account.uuid] = url
+                                }
                                 lastAccountId = Swift.max(getAccountId(from: url), lastAccountId)
                             } else {
                                 return false
@@ -468,6 +470,13 @@ extension AccountManager {
             account.isEnabled = false
 
             
+            // Remove it from the luts & cache
+            
+            _ = accountCache.remove(account.uuid)
+            uuidLut.removeValue(forKey: account.uuid)
+            nameLut.removeValue(forKey: account.name.lowercased())
+            
+            
             Log.atNotice?.log("Disabled the account for: \(name)")
             
             return true
@@ -530,5 +539,33 @@ extension AccountManager: Sequence {
         return AccountManager.queue.sync {
             return AccountNameGenerator(source: self)
         }
+    }
+}
+
+extension AccountManager: ControlBlockIndexableDataSource {
+    
+    public var cbCount: Int {
+        if getAccountWithoutPassword(for: "Anon") != nil {
+            return count - 1
+        } else {
+            return count
+        }
+    }
+    
+    public func addElement(at index: Int, to info: inout Functions.Info) {
+        
+        // Get the index of the asked-for account
+        var lutIndex = uuidLut.index(uuidLut.startIndex, offsetBy: index)
+
+        // If the index of the anon account exists, and it is lower or equal than the asked index, then increase the asked for index by 1 to compensate for the anon account that may not be returned
+        if let anon = getAccountWithoutPassword(for: "Anon") {
+            let anonIndex = uuidLut.index(forKey: anon.uuid)!
+            if anonIndex <= lutIndex {
+                lutIndex = uuidLut.index(after: lutIndex)
+            }
+        }
+        
+        // Add the account at lutIndex to info
+        if let account = getAccount(uuidLut[lutIndex].key) { account.addSelf(to: &info) }
     }
 }

@@ -15,12 +15,12 @@
 	<meta name="msapplication-config" content="/serveradmin/icons/browserconfig.xml">
 	<meta name="theme-color" content="#ffffff">
 
-	<title>Delete .sf-domainDetail(name)</title>
+	<title>Confirm removal of domain: .show($request.domainname)</title>
 
 	<meta name="description" content="Swiftfire Server Admin">
 
 	<link rel="stylesheet" href="/serveradmin/assets/main.css">
-	<link rel="canonical" href="/serveradmin/pages/deletedomain.sf.html">
+	<link rel="canonical" href="http://localhost:4000/serveradmin/pages/deletedomain.sf.html">
 	<link rel="alternate" type="application/rss+xml" title="Swiftfire Server Admin" href="/serveradmin/feed.xml">
 </head>
 <!-- end of include head.html -->
@@ -64,7 +64,7 @@
 	<div class="item">
 		<div class="title">
 			<label class="symbol"><p></p></label>
-			<div class="text"><a href="/serveradmin/index.html"><p>Home</p></a></div>
+			<div class="text"><a href="http://localhost:4000/serveradmin/index.html"><p>Home</p></a></div>
 		</div>
 	</div>
 	<div class="item-separator"><p><!-- empty but necessary --></p></div>
@@ -160,17 +160,18 @@
 <!-- Start of main content -->
 <article class="page" itemscope itemtype="http://schema.org/Article">
 	<header class="page-header">
-		<h1 class="page-title" itemprop="name headline">Delete .sf-domainDetail(name)</h1>
+		<h1 class="page-title" itemprop="name headline">Confirm removal of domain: .show($request.domainname)</h1>
 		<p class="page-meta"></p>
 	</header>
 	<div class="page-content" itemprop="articleBody">
 <!-- Page content -->
    <div class="centered-buttons">
-.sf-deleteDomain()
-</div>
-
-<div class="centered-buttons" style="margin-top:1em">
-.postingButton("/serveradmin/pages/domain-management.sf.html", Cancel, "", "")
+    <form method="post" action="/serveradmin/sfcommand/DeleteDomain">
+        <button class="posting-button-button" type="submit" name="DomainName" value=".show($request.domainname)">Delete</button>
+    </form>
+	<form method="post" action="/serveradmin/pages/domain-management.sf.html">
+        <button type="submit" name="Cancel" value="Cancel">Cancel</button>
+    </form>
 </div>
 
 <!-- End of page content -->
