@@ -701,11 +701,11 @@ fileprivate func executeSfCommand(_ pathComponents: Array<String>, _ request: Re
     case "ConfirmedQuit": executeQuitSwiftfire(); return .newPath("/pages/bye.sf.html")
     case "UpdateDomain": executeUpdateDomain(request); return .newPath("/pages/domain.sf.html")
     case "UpdateDomainServices": executeUpdateDomainServices(request); return .newPath("/pages/domain.sf.html")
-    case "DeleteDomain": executeDeleteDomain(request); return .newPath("/pages/domain-management.sf.html")
-    case "CreateDomain": executeCreateDomain(request); return .newPath("/pages/domain-management.sf.html")
+    case "delete-domain": executeDeleteDomain(request); return .newPath("/pages/domain-management.sf.html")
+    case "create-domain": executeCreateDomain(request); return .newPath("/pages/domain-management.sf.html")
     case "CreateAdmin": executeCreateAdmin(request); return .newPath("/pages/admin-management.sf.html")
-    case "CreateAlias": executeCreateAlias(request); return .newPath("/pages/domain-management.sf.html")
-    case "DeleteAlias": executeDeleteAlias(request); return .newPath("/pages/domain-management.sf.html")
+    case "create-alias": executeCreateAlias(request); return .newPath("/pages/domain-management.sf.html")
+    case "delete-alias": executeDeleteAlias(request); return .newPath("/pages/domain-management.sf.html")
     case "DeleteAccount": executeDeleteAccount(request); return .newPath("/pages/admin-management.sf.html")
     case "ConfirmDeleteAccount": return executeConfirmDeleteAccount(request)
     case "SetNewPassword": executeSetNewPassword(request); return .newPath("/pages/admin-management.sf.html")
@@ -860,7 +860,7 @@ fileprivate func executeUpdateDomainBlacklist(_ request: Request) {
     
     guard
         let name = request.info["domainname"],
-        let domain = domains.domain(for: name)
+        let domain = domainManager.domain(for: name)
         else {
             Log.atError?.log("Missing or wrong domain name")
             return
@@ -903,7 +903,7 @@ fileprivate func executeAddToDomainBlacklist(_ request: Request) {
     
     guard
         let name = request.info["domainname"],
-        let domain = domains.domain(for: name)
+        let domain = domainManager.domain(for: name)
         else {
             Log.atError?.log("Missing domain name")
             return
@@ -947,7 +947,7 @@ fileprivate func executeRemoveFromDomainBlacklist(_ request: Request) {
     
     guard
         let name = request.info["domainname"],
-        let domain = domains.domain(for: name)
+        let domain = domainManager.domain(for: name)
         else {
             Log.atError?.log("Missing domain name")
             return
@@ -978,7 +978,7 @@ fileprivate func executeUpdateDomain(_ request: Request) {
         return
     }
         
-    guard let domain = domains.domain(for: name) else {
+    guard let domain = domainManager.domain(for: name) else {
         Log.atError?.log("No domain for DomainName value \(name)")
         return
     }
@@ -1149,7 +1149,7 @@ fileprivate func executeUpdateDomain(_ request: Request) {
 fileprivate func executeUpdateDomainServices(_ request: Request) {
 
     guard let domainName = request.info["domainname"],
-          let domain = domains.domain(for: domainName) else { return }
+          let domain = domainManager.domain(for: domainName) else { return }
     
     Log.atNotice?.log("Pre-update services for domain \(domain.name):\n\(domain.serviceNames)")
     
@@ -1198,17 +1198,17 @@ fileprivate func executeUpdateDomainServices(_ request: Request) {
 
 fileprivate func executeDeleteDomain(_ request: Request) {
     
-    guard let name = request.info["domainname"] else {
-        Log.atError?.log("Missing DomainName in request.info")
+    guard let name = request.info["domain-name"] else {
+        Log.atError?.log("Missing domain-name in request.info")
         return
     }
     
-    guard domains.contains(name) else {
+    guard domainManager.contains(name) else {
         Log.atError?.log("Domain '\(name)' does not exist")
         return
     }
     
-    domains.remove(name)
+    domainManager.remove(name)
     
     Log.atNotice?.log("Deleted domain '\(name)')")
 }
@@ -1218,33 +1218,33 @@ fileprivate func executeDeleteDomain(_ request: Request) {
 
 fileprivate func executeCreateDomain(_ request: Request) {
     
-    guard let name = request.info["domainname"], !name.isEmpty else {
-        Log.atError?.log("Missing DomainName in request.info")
+    guard let name = request.info["domain-name"], !name.isEmpty else {
+        Log.atError?.log("Missing domain-name in request.info")
         return
     }
     
-    guard !domains.contains(name) else {
+    guard !domainManager.contains(name) else {
         Log.atError?.log("Domain '\(name)' already exists")
         return
     }
     
-    guard let adminId = request.info["id"], !adminId.isEmpty else {
+    guard let adminId = request.info["domain-admin-id"], !adminId.isEmpty else {
         Log.atError?.log("Missing Domain Admin ID in request.info")
         return
     }
     
-    guard let adminPwd = request.info["password"], !adminPwd.isEmpty else {
+    guard let adminPwd = request.info["domain-admin-password"], !adminPwd.isEmpty else {
         Log.atError?.log("Missing Domain Admin PWD in request.info")
         return
     }
 
-    if let domain = domains.createDomain(for: name) {
+    if let domain = domainManager.createDomain(for: name) {
         domain.serviceNames = defaultServices
         if let account = domain.accounts.getAccount(withName: adminId, andPassword: adminPwd) {
             account.isDomainAdmin = true
         } else {
             guard let account = domain.accounts.newAccount(name: adminId, password: adminPwd) else {
-                domains.remove(name)
+                domainManager.remove(name)
                 Log.atError?.log("Could not create admin account")
                 return
             }
@@ -1261,7 +1261,7 @@ fileprivate func executeCreateDomain(_ request: Request) {
 
 fileprivate func executeCreateAlias(_ request: Request) {
     
-    guard let name = request.info["domainname"] else {
+    guard let name = request.info["domain-name"] else {
         Log.atError?.log("Missing DomainName in request.info")
         return
     }
@@ -1271,12 +1271,12 @@ fileprivate func executeCreateAlias(_ request: Request) {
         return
     }
 
-    guard domains.contains(name) else {
+    guard domainManager.contains(name) else {
         Log.atError?.log("Domain '\(name)' does not exist")
         return
     }
 
-    domains.createAlias(alias, forDomainWithName: name)
+    domainManager.createAlias(alias, forDomainWithName: name)
     
     Log.atNotice?.log("Created new alias '\(alias)' for domain '\(name)'")
 }
@@ -1286,17 +1286,17 @@ fileprivate func executeCreateAlias(_ request: Request) {
 
 fileprivate func executeDeleteAlias(_ request: Request) {
     
-    guard let alias = request.info["alias"] else {
-        Log.atError?.log("Missing Alias in request.info")
+    guard let alias = request.info["alias-name"] else {
+        Log.atError?.log("Missing alias-name in request.info")
         return
     }
     
-    guard domains.contains(alias) else {
+    guard domainManager.contains(alias) else {
         Log.atError?.log("Alias '\(alias)' does not exist")
         return
     }
     
-    domains.remove(alias)
+    domainManager.remove(alias)
     
     Log.atNotice?.log("Deleted alias '\(alias)'")
 }
@@ -1430,7 +1430,7 @@ fileprivate func executeSetDomainAdminPassword(_ request: Request) {
         return
     }
 
-    guard let domain = domains.domain(for: domainName) else {
+    guard let domain = domainManager.domain(for: domainName) else {
         Log.atError?.log("No domain known for \(domainName)")
         return
     }

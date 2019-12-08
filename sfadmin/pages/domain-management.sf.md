@@ -2,23 +2,80 @@
 layout: page
 title: Domain Management
 ---
-<div class="center-content">.sf-domainsTable()</div>
-<form action="/serveradmin/sfcommand/CreateDomain" method="post">
+<div class="center-content">
+	<div class="domains-list">
+	.for(domains)
+		<table class="domains-table">
+            <thead>
+            	<tr>
+            		<th>Domain:</th>
+            		<th>.show($info.domain-name)</th>
+            	</tr>
+            </thead>
+            <tbody>
+	  			.for(aliases, $info.domain-name)
+	  				.if($info.for-index, equal, $info.for-start-index)
+	  					<tr>
+    	        			<td>Aliases:</td>
+            				<td>
+            					<div>
+                           			<p>.show($info.alias)</p>
+                        			<form method="post" action="/serveradmin/sfcommand/delete-alias">
+                            			<input type="hidden" name="alias-name" value=".show($info.alias!)">
+                            			<button type="submit">Delete</button>
+                        			</form>
+                        		</div>
+                    		</td>
+                		</tr>
+					.else()
+	  					<tr>
+                    		<td></td>
+                    		<td>
+                    			<div>
+                            		<p>.show($info.alias)</p>
+                            		<form method="post" action="/serveradmin/sfcommand/delete-alias">
+                                		<button type="submit" name="alias-name" value=".show($info.alias!)">Delete Alias</button>
+                            		</form>
+                        		</div>
+                    		</td>
+                		</tr>
+                	.end(if)
+	  			.end(for-aliases)
+	  			<tr>
+                    <td></td>
+                    <td>
+                        <form method="post" action="/serveradmin/sfcommand/create-alias">
+                            <input type="hidden" name="domain-name" value=".show($info.domain-name)">
+                            <input type="text" name="Alias" value="">
+                            <button type="submit">Create Alias</button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <form method="post" action="/serveradmin/pages/delete-domain.sf.html">
+            <button type="submit" name="domain-name" value=".show($info.domain-name)">Delete Domain</button>
+        </form>
+	.end(for-domains)
+	</div>
+</div>
+
+<form action="/serveradmin/sfcommand/create-domain" method="post">
 	<div class="center-content">
 		<div style="display:flex; flex-direction:column; justify-content:center;">
 			<div style="display:flex; flex-direction:column; align-items:flex-end">
 				<table class="centered outlined-table table-cell-margins">
 					<tr>
 						<td><span>Add domain with name:</span></td>
-						<td><input type="text" name="DomainName" value=""></td>
+						<td><input type="text" name="domain-name" value=""></td>
 					</tr>
 					<tr>
 						<td><span>Domain Admin ID:</span></td>
-						<td><input type="text" name="ID" value=""></td>
+						<td><input type="text" name="domain-admin-id" value=""></td>
 					</tr>
 					<tr>
 						<td><span>Domain Admin Password:</span></td>
-						<td><input type="text" name="Password" value=""></td>
+						<td><input type="text" name="domain-admin-password" value=""></td>
 					</tr>
 				</table>
 				<div>

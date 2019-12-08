@@ -837,3 +837,29 @@ extension Domain: CustomStringConvertible {
         return str
     }
 }
+
+
+extension Domain: FunctionsInfoDataSource {
+    
+    public func addSelf(to info: inout Functions.Info) {
+        info["domain-name"] = name
+        info["domain-root"] = webroot
+        info["domain-enabled"] = String(enabled)
+        info["domain-foreward"] = forwardUrl
+        info["domain-access-log-enabled"] = String(accessLogEnabled)
+        info["domain-404-log-enabled"] = String(four04LogEnabled)
+        info["domain-session-log-enabled"] = String(sessionLogEnabled)
+        info["domain-session-timeout"] = String(sessionTimeout)
+        info["domain-php-path"] = phpPath?.path ?? "Not Set"
+        info["domain-php-options"] = phpOptions ?? ""
+        info["domain-php-map-index"] = String(phpMapIndex)
+        info["domain-php-map-all"] = String(phpMapAll)
+        info["domain-php-timeout"] = String(phpTimeout)
+        info["domain-resources"] = String(sfresources)
+        info["domain-visits-per-statistics-file"] = String(visitsPerStatisticsFile)
+        info["domain-statistics-file-rollover-time"] = "\(statisticsRolloverTime)"
+        info["domain-nof-recent-request-logged"] = String(nofRecentRequestLogs)
+        info["domain-nof-recent-response-logged"] = String(nofRecentResponseLogs)
+        //info["domain-aliases"] = String(AliasControlBlockIndexableDataSource(domainManager: domainManager, domain: self).cbCount)
+    }
+}

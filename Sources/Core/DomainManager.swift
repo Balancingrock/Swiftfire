@@ -1,6 +1,6 @@
 // =====================================================================================================================
 //
-//  File:       Domains.swift
+//  File:       DomainManager.swift
 //  Project:    Swiftfire
 //
 //  Version:    1.3.0
@@ -52,7 +52,7 @@ import BRUtils
 
 /// The class that manages all domains.
 
-public final class Domains {
+public final class DomainManager {
     
     
     /// The managed domains
@@ -64,7 +64,7 @@ public final class Domains {
     }
     
     
-    /// Create a new Domains object.
+    /// Create a new DomainManager object.
     
     init?() {
         
@@ -209,7 +209,7 @@ public final class Domains {
 
 // MARK: - Operational
 
-extension Domains {
+extension DomainManager {
 
     
     /// The number of domains
@@ -333,7 +333,7 @@ extension Domains {
 
 // MARK: - Support for the generator and sequence protocol
 
-extension Domains: Sequence {
+extension DomainManager: Sequence {
     
     
     public struct DomainGenerator: IteratorProtocol {
@@ -346,7 +346,7 @@ extension Domains: Sequence {
         // The objects already delivered through the generator
         private var sent: Array<Domain> = []
         
-        public init(source: Domains) {
+        public init(source: DomainManager) {
             for domain in source.domains.values {
                 self.source[domain.name] = domain
             }
@@ -392,13 +392,58 @@ extension Domains: Sequence {
 
 // MARK: - CustomStringConvertible
 
-extension Domains: CustomStringConvertible {
+extension DomainManager: CustomStringConvertible {
     
     public var description: String {
         if self.count == 0 {
-            return "Domains: No domains defined"
+            return "DomainManager: No domains defined"
         } else {
             return self.reduce("Domains:\n\n") { $0 + $1.description }
         }
+    }
+}
+
+
+struct DomainControlBlockIndexableDataSource: ControlBlockIndexableDataSource {
+    
+    private var domains: Array<Domain> = []
+    
+    public init(_ domainManager: DomainManager) {
+        OUTER: for domain in domainManager.domains.values {
+            for d in domains {
+                if d.name == domain.name { continue OUTER }
+            }
+            domains.append(domain)
+        }
+        domains.sort { $0.name > $1.name }
+    }
+    
+    public var cbCount: Int { return domains.count }
+    
+    public func addElement(at index: Int, to info: inout Functions.Info) {
+        guard index < domains.count else { return }
+        domains[index].addSelf(to: &info)
+    }
+}
+
+struct AliasControlBlockIndexableDataSource: ControlBlockIndexableDataSource {
+    
+    private var aliases: Array<String> = []
+    
+    public init(domainManager: DomainManager, domain: Domain) {
+        domainManager.domains.forEach { (key, value) in
+            if value === domain {
+                if key != domain.name {
+                    aliases.append(key)
+                }
+            }
+        }
+    }
+
+    var cbCount: Int { return aliases.count }
+    
+    func addElement(at index: Int, to info: inout Functions.Info) {
+        guard index < aliases.count else { return }
+        info["alias"] = aliases[index]
     }
 }

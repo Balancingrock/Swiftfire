@@ -117,7 +117,7 @@ func function_sf_domainTelemetryTable(_ args: Functions.Arguments, _ info: inout
     
     guard let name = environment.request.info["domainname"] else { return htmlErrorMessage }
     
-    guard let domain = domains.domain(for: name) else { return htmlErrorMessage }
+    guard let domain = domainManager.domain(for: name) else { return htmlErrorMessage }
     
     
     // Create the table

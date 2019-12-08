@@ -116,7 +116,7 @@ func function_sf_domainsMenu(_ args: Functions.Arguments, _ info: inout Function
                 </div>
     """
 
-    for domain in domains {
+    for domain in domainManager {
         html += """
             <div class="subitem-separator"><p><!-- empty but necessary! --></p></div>
             <div class="subitem">

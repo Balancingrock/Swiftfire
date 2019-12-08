@@ -206,25 +206,25 @@ do {
 
 
 // ===================
-// Prepare the domains
+// Prepare the domainManager
 // ===================
 
 do {
-    guard domains != nil else { emergencyExit("Could not create domains") }
+    guard domainManager != nil else { emergencyExit("Could not create domainManager") }
     
     // Remove unknown services from the domains
     
-    domains.forEach() { $0.removeUnknownServices() }
+    domainManager.forEach() { $0.removeUnknownServices() }
     
     
     // Rebuild the available services for the domains
     
-    domains.forEach { $0.rebuildServices() }
+    domainManager.forEach { $0.rebuildServices() }
 
     
     // log the domain settings
     
-    Log.atNotice?.log("Domain settings:\n\n\(String(describing: domains))\n")
+    Log.atNotice?.log("Domain settings:\n\n\(String(describing: domainManager))\n")
 }
 
 
@@ -357,7 +357,7 @@ Log.atNotice?.log("Closed header logging file")
 // Persist the state of the domains
 // ================================
 
-domains.shutdown()
+domainManager.shutdown()
 
 
 // ===============

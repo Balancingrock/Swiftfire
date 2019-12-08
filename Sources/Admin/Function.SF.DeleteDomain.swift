@@ -118,7 +118,7 @@ func function_sf_deleteDomain(_ args: Functions.Arguments, _ info: inout Functio
             return htmlErrorMessage
     }
     
-    guard domains.contains(name) else {
+    guard domainManager.contains(name) else {
         Log.atError?.log("Domain with name \(name) does not exist", from: Source(id: -1, file: #file, function: #function, line: #line))
         return htmlErrorMessage
     }

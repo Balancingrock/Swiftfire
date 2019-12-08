@@ -162,7 +162,7 @@ extension SFConnection {
                 
                 // Find the domain, if none is found, then http 1.0 is not supported
                 
-                if domains.domain(for: serverParameters.http1_0DomainName.value) != nil {
+                if domainManager.domain(for: serverParameters.http1_0DomainName.value) != nil {
                     
                     host = Host(address: serverParameters.http1_0DomainName.value, port: nil)
                     
@@ -198,7 +198,7 @@ extension SFConnection {
         
         // If there are no domains defined, always switch to the serveradmin domain
         
-        if domains.count == 0 {
+        if domainManager.count == 0 {
             domain = serverAdminDomain
         }
         
@@ -211,7 +211,7 @@ extension SFConnection {
             
             // Get the domain from the host
             
-            if let hostDomain = domains.domain(for: host.address) {
+            if let hostDomain = domainManager.domain(for: host.address) {
                 
                 
                 // Make sure the domain is enabled

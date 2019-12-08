@@ -959,6 +959,44 @@ public final class CommentManager {
     }
 }
 
+public extension CommentManager {
+    
+    func getControlBlockIndexableDataSource(forCommentSectionIdentifier id: String) -> CommentsControlBlockIndexableDataSource? {
+        return CommentsControlBlockIndexableDataSource(commentManager: self, commentSectionIdentifier: id)
+    }
+}
+
+public struct CommentsControlBlockIndexableDataSource: ControlBlockIndexableDataSource {
+    
+    public var commentPaths: Array<String> = []
+    
+    public init?(commentManager: CommentManager, commentSectionIdentifier: String) {
+        
+        guard let table = commentManager.commentTable(for: commentSectionIdentifier) else { return nil }
+        
+        guard table.isTable else {
+            Log.atError?.log("Cannot convert source to Portal")
+            return nil
+        }
+        
+        table.itterateFields(ofColumn: COMMENT_URL_CI) { (portal, _) -> Bool in
+            if let url = portal.string { commentPaths.append(url) }
+            return true
+        }
+    }
+    
+    public var cbCount: Int { commentPaths.count }
+    
+    public func addElement(at index: Int, to info: inout Functions.Info) {
+        
+        guard index < commentPaths.count else { return }
+        
+        let url = URL(fileURLWithPath: commentPaths[index], isDirectory: false)
+        
+        if let comment = Comment(url: url) { comment.addSelf(to: &info) }
+    }
+}
+
 
 fileprivate extension Portal {
     

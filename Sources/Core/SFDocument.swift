@@ -281,13 +281,22 @@ public class SFDocument: EstimatedMemoryConsumption {
                     return nil
                 }
                 
-                var i = 0
+                guard let source = getForLoopSource(args, &info, environment) else { return nil }
                 
-                info["offset"] = String(i)
+                guard let (startIndex, count) = getForLoopRange(args, &info, environment) else { return nil }
+
+                let fcount = count ?? (source.cbCount - startIndex) + 1
+                let endIndex = min(startIndex + fcount + 1, source.cbCount)
                 
-                while setupFor(args, &info, environment) {
+                info["for-start-index"] = String(startIndex)
+                info["for-end-index"] = String(endIndex)
+                info["for-index"] = String(startIndex)
+                
+                for i in startIndex ..< endIndex {
+
+                    source.addElement(at: i, to: &info)
                     
-                    Log.atDebug?.log("offset = \(i)")
+                    Log.atDebug?.log("for-index = \(i)")
 
                     blocks.forEach {
                         if let d = $0.getData(&info, environment) {
@@ -295,8 +304,7 @@ public class SFDocument: EstimatedMemoryConsumption {
                         }
                     }
                     
-                    i += 1
-                    info["offset"] = String(i)
+                    info["for-index"] = String(i)
                 }
                 
                 Log.atDebug?.log("endfor")
@@ -512,6 +520,129 @@ public class SFDocument: EstimatedMemoryConsumption {
 }
 
 
+fileprivate func getForLoopSource(_ args: Array<String>, _ info: inout Functions.Info, _ environment: Functions.Environment) -> ControlBlockIndexableDataSource? {
+    
+    guard args.count > 0 else {
+        Log.atError?.log("No source specifier found")
+        return nil
+    }
+
+    let selector = args[0].lowercased()
+    
+    switch selector {
+        
+    case "comments-for-approval": return environment.domain.comments.forApproval
+    
+    case "accounts": return environment.domain.accounts
+    
+    case "blacklist": return environment.domain.blacklist
+    
+    case "domains": return DomainControlBlockIndexableDataSource(domainManager)
+
+    case "comments":
+        
+        guard args.count > 1 else {
+            Log.atError?.log("Missing comment section identifier")
+            return nil
+        }
+        guard let id = readKey(args[1], using: info, in: environment) else {
+            Log.atError?.log("Cannot read key: '\(args[1])'")
+            return nil
+        }
+        return environment.domain.comments.getControlBlockIndexableDataSource(forCommentSectionIdentifier: id)
+
+    case "aliases":
+        
+        guard args.count > 1 else {
+            Log.atError?.log("Missing domain name")
+            return nil
+        }
+        guard let name = readKey(args[1], using: info, in: environment) else {
+            Log.atError?.log("Cannot read key: '\(args[1])'")
+            return nil
+        }
+        guard let domain = domainManager.domain(for: name) else { return nil }
+        return AliasControlBlockIndexableDataSource(domainManager: domainManager, domain: domain)
+    
+    default:
+        Log.atError?.log("Unrecognised source specifier: \(selector)")
+        return nil
+    }
+}
+    
+    
+fileprivate func getForLoopRange(_ args: Array<String>, _ info: inout Functions.Info, _ environment: Functions.Environment) -> (Int, Int?)? {
+    
+    guard args.count > 0 else {
+        Log.atError?.log("No source specifier found")
+        return nil
+    }
+
+    let selector = args[0].lowercased()
+    
+    var skip: Int
+    
+    switch selector {
+        
+    case "comments-for-approval": skip = 1
+    
+    case "accounts": skip = 1
+    
+    case "blacklist": skip = 1
+    
+    case "domains": skip = 1
+
+    case "comments": skip = 2
+        
+    case "aliases": skip = 2
+        
+    default:
+        Log.atError?.log("Unrecognised source specifier: \(selector)")
+        return nil
+    }
+
+    if args.count == skip {
+        return (0, nil)
+    }
+    
+    if args.count == skip + 1 {
+        guard let val = readKey(args[skip], using: info, in: environment) else {
+            Log.atError?.log("Cannot read value for: \(args[skip])")
+            return nil
+        }
+        guard let ival = Int(val) else {
+            Log.atError?.log("Cannot read integer from: \(val)")
+            return nil
+        }
+        return (ival, nil)
+    }
+    
+    if args.count == skip + 2 {
+        guard let startVal = readKey(args[skip], using: info, in: environment) else {
+            Log.atError?.log("Cannot read value for: \(args[skip])")
+            return nil
+        }
+        guard let start = Int(startVal) else {
+            Log.atError?.log("Cannot read integer from: \(startVal)")
+            return nil
+        }
+        guard let countKey = readKey(args[skip + 1], using: info, in: environment) else {
+            Log.atError?.log("Cannot read value for: \(args[skip + 1])")
+            return nil
+        }
+        guard let count = Int(countKey) else {
+            Log.atError?.log("Cannot read integer from: \(countKey)")
+            return nil
+        }
+        return (start, count)
+    }
+    
+    Log.atError?.log("Too many arguments: \(args.count)")
+
+    return nil
+}
+
+
 fileprivate func evaluateIf(_ args: Array<String>, _ info: inout Functions.Info, _ environment: Functions.Environment) -> Bool {
     
     guard args.count >= 2 else {
@@ -563,7 +694,7 @@ fileprivate func evaluateIf(_ args: Array<String>, _ info: inout Functions.Info,
         return !(readKey(args[0], using: info, in: environment)?.isEmpty ?? false)
 
     
-    case "equal":
+    case "equal", "equals":
         
         guard args.count == 3 else {
             Log.atError?.log("Wrong number of arguments, expected 4, found \(args.count)")
@@ -623,7 +754,7 @@ fileprivate func evaluateIf(_ args: Array<String>, _ info: inout Functions.Info,
     }
 }
 
-
+/*
 fileprivate func setupFor(_ args: Array<String>, _ info: inout Functions.Info, _ environment: Functions.Environment) -> Bool {
 
     func getSource(for id: String) -> ControlBlockIndexableDataSource? {
@@ -631,17 +762,18 @@ fileprivate func setupFor(_ args: Array<String>, _ info: inout Functions.Info, _
         switch id {
         
         case "comments-for-approval": return environment.domain.comments.forApproval
-        
+        case "accounts": return environment.domain.accounts
+        case "blacklist": return environment.domain.blacklist
+        case "domains": return DomainControlBlockIndexableDataSource(domainManager)
+
         case "comments":
             guard let identifier = environment.request.info["comment-section-identifier"] else { return nil }
-            return environment.domain.comments.commentTable(for: identifier)
-            
-        case "accounts":
-            return environment.domain.accounts
-            
-        case "blacklist":
-            return environment.domain.blacklist
-            
+            return environment.domain.comments.getControlBlockIndexableDataSource(forCommentSectionIdentifier: identifier)
+
+        case "aliases":
+            guard let domainName = info["domain-name"] else { return nil }
+            guard let domain = domainManager.domain(for: domainName) else { return nil }
+            return AliasControlBlockIndexableDataSource(domainManager: domainManager, domain: domain)
         default:
             Log.atError?.log("Missing source for id: \(id)")
             return nil
@@ -653,13 +785,15 @@ fileprivate func setupFor(_ args: Array<String>, _ info: inout Functions.Info, _
         return false
     }
     
-    guard let offsetStr = info["offset"], let offsetIn = Int(offsetStr) else {
+    guard let offsetStr = info["for-index"], let offsetIn = Int(offsetStr) else {
         Log.atError?.log("Missing offset in info")
         return false
     }
     
     let id = args[0].lowercased()
     guard let source = getSource(for: id) else { return false }
+    
+    info["for-count"] = String(source.cbCount)
     
     var startOffset: Int = 0
     var endOffset: Int = source.cbCount - 1
@@ -682,65 +816,10 @@ fileprivate func setupFor(_ args: Array<String>, _ info: inout Functions.Info, _
     
     if offset > endOffset { return false }
     
-    
-    switch id {
+    source.addElement(at: offset, to: &info)
         
-    case "comments-for-approval": fallthrough
-    case "accounts": fallthrough
-        
-    case "blacklist": source.addElement(at: offset, to: &info)
-        
-    case "comments":
-        
-        guard let table = source as? Portal, table.isTable else {
-            Log.atError?.log("Cannot convert source to Portal")
-            return false
-        }
-        
-        guard let path = table[offset, COMMENT_URL_CI].string else {
-            Log.atError?.log("Cannot retrieve path for comment from comment table")
-            return false
-        }
-        
-        // Load the comment
-        
-        let url = URL(fileURLWithPath: path, isDirectory: false)
-        
-        guard let comment = Comment(url: url) else {
-            Log.atError?.log("Cannot create comment from url from the comment table")
-            return false
-        }
-        
-        comment.addSelf(to: &info)
-        
-/*        info["can-edit"] = "false"
-
-        if let session = environment.serviceInfo[.sessionKey] as? Session,
-            let uuid = session[.accountUuidKey] as? UUID,
-            let currentAccount = environment.domain.accounts.getAccount(for: uuid) {
-            
-            if currentAccount.isModerator || currentAccount.isDomainAdmin {
-                
-                info["can-edit"] = "true"
-            
-            } else {
-                
-                if let commentAccount = comment.account {
-                    
-                    info["can-edit"] = String(commentAccount.name == currentAccount.name)
-                }
-            }
-        }*/
-        
-    default:
-        
-        Log.atError?.log("Missing source for id: \(id)")
-        return false
-    }
-    
-    
     return true
-}
+}*/
 
 
 /// Returns the data in cache if present and created after the timestamp. If not present (or after the timestamp) then the data is created anew and entered in the cache as well as returned.

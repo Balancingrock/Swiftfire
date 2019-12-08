@@ -124,7 +124,7 @@ public func restartHttpAndHttpsServers() {
         
         // Rebuild the available services for the domains
         
-        domains.forEach { $0.rebuildServices() }
+        domainManager.forEach { $0.rebuildServices() }
     }
     
     
@@ -344,9 +344,9 @@ fileprivate func checkDomainCtxs() -> [ServerCtx] {
     
     let today = Date().javaDate
     
-    var domainCtxs = domains.ctxs
+    var domainCtxs = domainManager.ctxs
     
-    for domain in domains {
+    for domain in domainManager {
         
         switch domain.ctx {
             

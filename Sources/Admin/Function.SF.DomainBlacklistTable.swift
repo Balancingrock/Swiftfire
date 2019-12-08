@@ -119,7 +119,7 @@ func function_sf_domainBlacklistTable(_ args: Functions.Arguments, _ info: inout
     
     guard let name = environment.request.info["domainname"] else { return "Domain name error".data(using: String.Encoding.utf8) }
     
-    guard let domain = domains.domain(for: name) else { return "No domain error".data(using: String.Encoding.utf8) }
+    guard let domain = domainManager.domain(for: name) else { return "No domain error".data(using: String.Encoding.utf8) }
 
     
     // Create the table

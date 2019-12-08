@@ -48,7 +48,7 @@ fast-content-build: no
 # - yes: Upload the image to be used as favicon to that site, create a favicon files folder called 'icons', download the generated file/folder and replace the contents of the site's icons directory with the files from realfavicongenerator.
 # - no: The folder 'icons' can be removed.
 #
-realfavicongenerator: yes
+realfavicongenerator: no
 
 # For the number of posts visible on the home page.
 # Value: > 0

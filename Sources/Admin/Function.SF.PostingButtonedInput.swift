@@ -157,7 +157,7 @@ func function_sf_postingButtonedInput(_ args: Functions.Arguments, _ info: inout
     
     if value == nil {
         if let name = environment.request.info["domainname"] {
-            if let domain = domains.domain(for: name) {
+            if let domain = domainManager.domain(for: name) {
                 switch arr[1] {
                 case "root": value = domain.webroot
                 case "forewardurl": value = domain.forwardUrl

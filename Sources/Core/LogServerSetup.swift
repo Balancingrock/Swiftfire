@@ -52,7 +52,7 @@ func logServerSetup() {
     
     Log.atNotice?.log("Registered Functions:\n\n\(functions)\n")
     
-    Log.atNotice?.log("Domain settings:\n\n\(String(describing: domains))\n")
+    Log.atNotice?.log("Domain settings:\n\n\(String(describing: domainManager))\n")
     
     Log.atNotice?.log("ServerAdminDomain settings:\n\n\(String(describing: serverAdminDomain))\n")
 }

@@ -92,11 +92,11 @@ public let functions = Functions()
 public var headerLogger: HttpHeaderLogger!
 
 
-// The domains are still empty after creation, they have to be loaded before starting the server(s)
+// The domainManager are still empty after creation, they have to be loaded before starting the server(s)
 
 /// All available domains
 
-public let domains: Domains! = Domains()
+public let domainManager: DomainManager! = DomainManager()
 
 
 // The server domain has to exist, a test for non-nil is necessary before starting the server(s)
