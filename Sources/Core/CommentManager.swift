@@ -535,7 +535,7 @@ public final class CommentManager {
             
                 // For all other accounts, store the comment in the wait-for-approval list if the auto-approve threshold has not yet been reached.
             
-                if account.nofComments < domain.autoCommentApprovalThreshold {
+                if account.nofComments < domain.commentAutoApprovalThreshold {
             
                     domain.comments.forApproval.append(comment)
             

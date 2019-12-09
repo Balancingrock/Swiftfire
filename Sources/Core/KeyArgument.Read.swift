@@ -308,12 +308,16 @@ fileprivate func reader(_ args: Array<Substring>, _ functionsInfo: Functions.Inf
             
         case "session-timeout": return String(environment.domain.sessionTimeout)
 
-        case "comments-for-approval-count": return String(environment.domain.comments.forApproval.count)
+        case "comment-auto-approval-threshold": return String(environment.domain.comments.forApproval.count)
         
         default:
             Log.atError?.log("No access to Domain mapped for key: \(args[1].lowercased())")
             return nil
         }
+        
+    
+    // case "server":
+        
         
         
     default:

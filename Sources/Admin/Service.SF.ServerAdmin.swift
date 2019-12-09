@@ -699,7 +699,7 @@ fileprivate func executeSfCommand(_ pathComponents: Array<String>, _ request: Re
     case "Quit": return .newPath("/pages/quit.sf.html")
     case "CancelQuit": return .newPath("")
     case "ConfirmedQuit": executeQuitSwiftfire(); return .newPath("/pages/bye.sf.html")
-    case "UpdateDomain": executeUpdateDomain(request); return .newPath("/pages/domain.sf.html")
+    case "update-domain-parameter": executeUpdateDomainParameter(request); return .newPath("/pages/domain.sf.html")
     case "UpdateDomainServices": executeUpdateDomainServices(request); return .newPath("/pages/domain.sf.html")
     case "delete-domain": executeDeleteDomain(request); return .newPath("/pages/domain-management.sf.html")
     case "create-domain": executeCreateDomain(request); return .newPath("/pages/domain-management.sf.html")
@@ -971,25 +971,25 @@ fileprivate func executeRemoveFromDomainBlacklist(_ request: Request) {
 
 /// Update a parameter in a domain.
 
-fileprivate func executeUpdateDomain(_ request: Request) {
+fileprivate func executeUpdateDomainParameter(_ request: Request) {
     
-    guard let name = request.info["domainname"] else {
-        Log.atError?.log("Missing DomainName in request.info")
-        return
-    }
-        
-    guard let domain = domainManager.domain(for: name) else {
-        Log.atError?.log("No domain for DomainName value \(name)")
+    guard let domainName = request.info["domain-name"] else {
+        Log.atError?.log("Missing domain name")
         return
     }
     
-    guard let parameterName = request.info["name"] else {
-        Log.atError?.log("Missing parameter name in request.info")
+    guard let domain = domainManager.domain(for: domainName) else {
+        Log.atError?.log("No domain with name: \(domainName)")
+        return
+    }
+    
+    guard let parameterName = request.info["parameter-name"] else {
+        Log.atError?.log("Missing parameter name")
         return
     }
 
-    guard let value = request.info["value"] else {
-        Log.atError?.log("Missing parameter value in request.info")
+    guard let parameterValue = request.info["parameter-value"] else {
+        Log.atError?.log("Missing parameter value")
         return
     }
     
@@ -998,16 +998,16 @@ fileprivate func executeUpdateDomain(_ request: Request) {
         
         Log.atNotice?.log("Old value for domain \(domain.name) webroot = \(domain.webroot)")
         
-        domain.webroot = value
+        domain.webroot = parameterValue
     
         Log.atNotice?.log("New value for domain \(domain.name) webroot = \(domain.webroot)")
         
         
-    case "forewardurl":
+    case "foreward-url":
 
         Log.atNotice?.log("Old value for domain \(domain.name) forewardUrl = \(domain.forwardUrl)")
 
-        domain.forwardUrl = value
+        domain.forwardUrl = parameterValue
 
         Log.atNotice?.log("New value for domain \(domain.name) forewardUrl = \(domain.forwardUrl)")
 
@@ -1016,85 +1016,85 @@ fileprivate func executeUpdateDomain(_ request: Request) {
         
         Log.atNotice?.log("Old value for domain \(domain.name) enabled = \(domain.enabled)")
 
-        domain.enabled = Bool(lettersOrDigits: value) ?? domain.enabled
+        domain.enabled = Bool(lettersOrDigits: parameterValue) ?? domain.enabled
     
         Log.atNotice?.log("New value for domain \(domain.name) enabled = \(domain.enabled)")
 
     
-    case "accesslogenabled":
+    case "access-log-enabled":
         
         Log.atNotice?.log("Old value for domain \(domain.name) accessLogEnabled = \(domain.accessLogEnabled)")
 
-        domain.accessLogEnabled = Bool(lettersOrDigits: value) ?? domain.accessLogEnabled
+        domain.accessLogEnabled = Bool(lettersOrDigits: parameterValue) ?? domain.accessLogEnabled
 
         Log.atNotice?.log("New value for domain \(domain.name) accessLogEnabled = \(domain.accessLogEnabled)")
 
         
-    case "404logenabled":
+    case "404-log-enabled":
         
         Log.atNotice?.log("Old value for domain \(domain.name) 404log-enabled = \(domain.four04LogEnabled)")
 
-        domain.four04LogEnabled = Bool(lettersOrDigits: value) ?? domain.four04LogEnabled
+        domain.four04LogEnabled = Bool(lettersOrDigits: parameterValue) ?? domain.four04LogEnabled
 
         Log.atNotice?.log("New value for domain \(domain.name) 404log-enabled = \(domain.four04LogEnabled)")
 
         
-    case "sessionlogenabled":
+    case "session-log-enabled":
         
         Log.atNotice?.log("Old value for domain \(domain.name) sessionLogEnabled = \(domain.sessionLogEnabled)")
 
-        domain.sessionLogEnabled = Bool(lettersOrDigits: value) ?? domain.sessionLogEnabled
+        domain.sessionLogEnabled = Bool(lettersOrDigits: parameterValue) ?? domain.sessionLogEnabled
     
         Log.atNotice?.log("New value for domain \(domain.name) sessionLogEnabled = \(domain.sessionLogEnabled)")
 
     
-    case "phppath":
+    case "php-path":
         
         Log.atNotice?.log("Old value for domain \(domain.name) phpPath = \(domain.phpPath?.path ?? "nil")")
 
         domain.phpPath = nil
-        if FileManager.default.isExecutableFile(atPath: value) {
-            let url = URL(fileURLWithPath: value)
+        if FileManager.default.isExecutableFile(atPath: parameterValue) {
+            let url = URL(fileURLWithPath: parameterValue)
             if url.lastPathComponent == "php" {
-                domain.phpPath = URL(fileURLWithPath: value)
+                domain.phpPath = URL(fileURLWithPath: parameterValue)
             }
         }
         
         Log.atNotice?.log("New value for domain \(domain.name) phpPath = \(domain.phpPath?.path ?? "nil")")
 
         
-    case "phpoptions":
+    case "php-options":
         
         if domain.phpPath != nil {
             
             Log.atNotice?.log("Old value for domain \(domain.name) phpOptions = \(domain.phpOptions ?? "nil")")
 
-            domain.phpOptions = value
+            domain.phpOptions = parameterValue
 
             Log.atNotice?.log("New value for domain \(domain.name) phpOptions = \(domain.phpOptions ?? "nil")")
         }
         
         
-    case "phpmapindex":
+    case "php-map-index":
         
         if domain.phpPath != nil {
             
             Log.atNotice?.log("Old value for domain \(domain.name) phpMapIndex = \(domain.phpMapIndex)")
 
-            domain.phpMapIndex = Bool(lettersOrDigits: value) ?? domain.phpMapIndex
+            domain.phpMapIndex = Bool(lettersOrDigits: parameterValue) ?? domain.phpMapIndex
 
             Log.atNotice?.log("New value for domain \(domain.name) phpMapIndex = \(domain.phpMapIndex)")
         }
         
         
-    case "phpmapall":
+    case "php-map-all":
         
         if domain.phpPath != nil {
             
             Log.atNotice?.log("Old value for domain \(domain.name) phpMapAll = \(domain.phpMapAll)")
             Log.atNotice?.log("Old value for domain \(domain.name) phpMapIndex = \(domain.phpMapIndex)")
 
-            if Bool(lettersOrDigits: value) ?? domain.phpMapAll {
+            if Bool(lettersOrDigits: parameterValue) ?? domain.phpMapAll {
                 domain.phpMapAll = true
                 domain.phpMapIndex = true
             } else {
@@ -1106,38 +1106,47 @@ fileprivate func executeUpdateDomain(_ request: Request) {
         }
         
         
-    case "phptimeout":
+    case "php-timeout":
 
         if domain.phpPath != nil {
             
             Log.atNotice?.log("Old value for domain \(domain.name) phpTimeout = \(domain.phpTimeout)")
 
-            domain.phpTimeout = Int(value) ?? domain.phpTimeout
+            domain.phpTimeout = Int(parameterValue) ?? domain.phpTimeout
 
             Log.atNotice?.log("New value for domain \(domain.name) phpTimeout = \(domain.phpTimeout)")
         }
 
         
-    case "sfresources":
+    case "sf-resources":
         
         Log.atNotice?.log("Old value for domain \(domain.name) sfresources = \(domain.sfresources)")
 
-        domain.sfresources = value
+        domain.sfresources = parameterValue
 
         Log.atNotice?.log("New value for domain \(domain.name) sfresources = \(domain.sfresources)")
 
         
-    case "sessiontimeout":
+    case "session-timeout":
         
         Log.atNotice?.log("Old value for domain \(domain.name) sessionTimeout = \(domain.sessionTimeout)")
 
-        domain.sessionTimeout = Int(value) ?? domain.sessionTimeout
+        domain.sessionTimeout = Int(parameterValue) ?? domain.sessionTimeout
     
         Log.atNotice?.log("New value for domain \(domain.name) sessionTimeout = \(domain.sessionTimeout)")
 
         
+    case "comment-auto-approval-threshold":
+        
+        Log.atNotice?.log("Old value for domain \(domain.name) commentAutoApprovalThreshold = \(domain.commentAutoApprovalThreshold)")
+
+        domain.commentAutoApprovalThreshold = Int32(parameterValue) ?? domain.commentAutoApprovalThreshold
+    
+        Log.atNotice?.log("New value for domain \(domain.name) commentAutoApprovalThreshold = \(domain.commentAutoApprovalThreshold)")
+
+        
     default:
-        Log.atError?.log("Unknown key '\(parameterName)' with value '\(value)'")
+        Log.atError?.log("Unknown key '\(parameterName)' with value '\(parameterValue)'")
     }
     
     domain.storeSetup()

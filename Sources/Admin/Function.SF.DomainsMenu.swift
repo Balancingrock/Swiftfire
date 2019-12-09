@@ -127,7 +127,7 @@ func function_sf_domainsMenu(_ args: Functions.Arguments, _ info: inout Function
                     </label>
                     <div class="text">
                         <form class="posting-link-form" method="post" action="/serveradmin/pages/domain.sf.html">
-                            <button type="submit" name="DomainName" value="\(domain.name)" class="posting-link-button">\(domain.name)</button>
+                            <button type="submit" name="domain-name" value="\(domain.name)" class="posting-link-button">\(domain.name)</button>
                         </form>
                     </div>
                 </div>

@@ -224,7 +224,7 @@ public final class Domain {
     ///
     /// I.e: Once an account has this many approved comments, further comments do not need approval
     
-    public var autoCommentApprovalThreshold: Int32 = 2
+    public var commentAutoApprovalThreshold: Int32 = 2
     
 
     /// The domain specific blacklist
