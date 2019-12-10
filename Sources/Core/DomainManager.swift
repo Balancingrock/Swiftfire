@@ -403,12 +403,22 @@ extension DomainManager: CustomStringConvertible {
     }
 }
 
+extension DomainManager {
+    
+    public var controlBlockIndexableDataSource: ControlBlockIndexableDataSource {
+        return DomainControlBlockIndexableDataSource(self)
+    }
+    
+    public func aliasControlBlockIndexableDataSource(forDomain domain: Domain) -> ControlBlockIndexableDataSource {
+        return AliasControlBlockIndexableDataSource(domainManager: self, domain: domain)
+    }
+}
 
 struct DomainControlBlockIndexableDataSource: ControlBlockIndexableDataSource {
     
     private var domains: Array<Domain> = []
     
-    public init(_ domainManager: DomainManager) {
+    fileprivate init(_ domainManager: DomainManager) {
         OUTER: for domain in domainManager.domains.values {
             for d in domains {
                 if d.name == domain.name { continue OUTER }
@@ -418,7 +428,7 @@ struct DomainControlBlockIndexableDataSource: ControlBlockIndexableDataSource {
         domains.sort { $0.name > $1.name }
     }
     
-    public var cbCount: Int { return domains.count }
+    public var nofElements: Int { return domains.count }
     
     public func addElement(at index: Int, to info: inout Functions.Info) {
         guard index < domains.count else { return }
@@ -430,7 +440,7 @@ struct AliasControlBlockIndexableDataSource: ControlBlockIndexableDataSource {
     
     private var aliases: Array<String> = []
     
-    public init(domainManager: DomainManager, domain: Domain) {
+    fileprivate init(domainManager: DomainManager, domain: Domain) {
         domainManager.domains.forEach { (key, value) in
             if value === domain {
                 if key != domain.name {
@@ -440,7 +450,7 @@ struct AliasControlBlockIndexableDataSource: ControlBlockIndexableDataSource {
         }
     }
 
-    var cbCount: Int { return aliases.count }
+    var nofElements: Int { return aliases.count }
     
     func addElement(at index: Int, to info: inout Functions.Info) {
         guard index < aliases.count else { return }

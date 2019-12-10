@@ -316,9 +316,43 @@ fileprivate func reader(_ args: Array<Substring>, _ functionsInfo: Functions.Inf
         }
         
     
-    // case "server":
+    case "server-telemetry":
+            
+        guard args.count == 2 else {
+            Log.atError?.log("Missing source or key in argument")
+            return nil
+        }
+
+        let telemetryName = args[1]
         
+        for t in serverTelemetry.all {
+            if t.name == telemetryName { return t.stringValue }
+        }
+
+        Log.atError?.log("No access to server-telemetry mapped for key: \(args[1])")
         
+        return nil
+
+        
+    case "server-parameter":
+                
+        guard args.count == 2 else {
+            Log.atError?.log("Missing source or key in argument")
+            return nil
+        }
+
+        let parameterName = args[1]
+        Log.atError?.log("Input Parameter name = \(parameterName)")
+
+        for p in serverParameters.all {
+            Log.atError?.log("Parameter name = \(p.name)")
+            if p.name == parameterName { return p.stringValue }
+        }
+
+        Log.atError?.log("No access to server-parameter mapped for key: \(args[1])")
+        
+        return nil
+
         
     default:
         Log.atError?.log("Unknown source for key argument: '\(args[0])'")

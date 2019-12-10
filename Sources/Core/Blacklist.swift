@@ -256,21 +256,37 @@ extension Blacklist: CustomStringConvertible {
 }
 
 
-extension Blacklist: ControlBlockIndexableDataSource {
+extension Blacklist {
 
-    public var cbCount: Int { return list.count }
+    public var controlBlockIndexableDataSource: ControlBlockIndexableDataSource{
+        return BlacklistControlBlockIndexableDataSource(self)
+    }    
+}
+
+public struct BlacklistControlBlockIndexableDataSource: ControlBlockIndexableDataSource {
+    
+    private struct Entry {
+        let address: String
+        let action: String
+        func add(to info: inout Functions.Info) {
+            info["blacklist-address"] = address
+            info["blacklist-action"] = action
+        }
+    }
+    
+    private var arr: Array<Entry> = []
+    
+    fileprivate init(_ blacklist: Blacklist) {
+        blacklist.list.forEach { (key: String, value: Blacklist.Action) in
+            let entry = Entry(address: key, action: value.rawValue)
+            arr.append(entry)
+        }
+    }
+    
+    public var nofElements: Int { return arr.count }
     
     public func addElement(at index: Int, to info: inout Functions.Info) {
-        
-        guard index < list.count else { return }
-        
-        let listIndex = list.index(list.startIndex, offsetBy: index)
-        
-        let address = list[listIndex].key
-        
-        let action = list[listIndex].value
-        
-        info["address"] = address
-        info["action"] = action.rawValue
+        guard index < arr.count else { return }
+        arr[index].add(to: &info)
     }
 }

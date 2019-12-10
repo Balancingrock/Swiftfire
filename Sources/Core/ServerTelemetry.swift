@@ -167,3 +167,27 @@ extension ServerTelemetry: CustomStringConvertible {
         return str
     }
 }
+
+
+extension ServerTelemetry {
+    
+    public var controlBlockIndexableDataSource: ControlBlockIndexableDataSource {
+        return ServerTelemetryControlBlockIndexableDataSource(self)
+    }
+}
+
+public struct ServerTelemetryControlBlockIndexableDataSource: ControlBlockIndexableDataSource {
+
+    private var all: Array<NamedValueProtocol> = []
+    
+    fileprivate init(_ dt: ServerTelemetry) {
+        all = dt.all
+    }
+
+    public var nofElements: Int { return all.count }
+    
+    public func addElement(at index: Int, to info: inout Functions.Info) {
+        guard index < all.count else { return }
+        all[index].addSelf(to: &info)
+    }
+}

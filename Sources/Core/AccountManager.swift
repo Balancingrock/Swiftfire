@@ -400,10 +400,10 @@ extension AccountManager {
             if nameLut[lname] != nil { return nil }
             
             
-            // Create a unique uuid
+            // Create a unique uuid (unique in self and in the server admin domain accounts)
             
             var uuid = UUID()
-            while uuidLut[uuid] != nil { uuid = UUID() }
+            while (uuidLut[uuid] != nil) || (serverAdminDomain.accounts.uuidLut[uuid] != nil) { uuid = UUID() }
             
             
             // Create the new account
@@ -544,7 +544,7 @@ extension AccountManager: Sequence {
 
 extension AccountManager: ControlBlockIndexableDataSource {
     
-    public var cbCount: Int {
+    public var nofElements: Int {
         if getAccountWithoutPassword(for: "Anon") != nil {
             return count - 1
         } else {

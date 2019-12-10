@@ -147,7 +147,7 @@ func function_sf_domainServicesTable(_ args: Functions.Arguments, _ info: inout 
     // Create the table
     
     var html: String = """
-        <form method="post" action="/serveradmin/sfcommand/UpdateDomainServices">
+        <form method="post" action="/serveradmin/command/UpdateDomainServices">
             <input type="hidden" name="DomainName" value="\(domain.name)">
             <table class="domain-service-table">
                 <thead>

@@ -2,12 +2,32 @@
 layout: page
 title: "Domain: .show($request.domain-name)"
 ---
-## Administrator
+## Telemetry
+{: .text-centered}
+
+<table class="domain-telemetry-table">
+    <thead>
+        <tr>
+        	<th>Name</th><th>Value</th><th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+    	.for(domain-telemetry, $request.domain-name)
+            <tr>
+                <td class="table-column-name">.show($info.named-value-protocol-name)</td>
+                <td class="table-column-value">.show($info.named-value-protocol-value)</td>
+                <td class="table-column-description">.show($info.named-value-protocol-about)</td>
+            </tr>
+        .end(for)
+    </tbody>
+</table>
+
+## Domain Admin
 {: .text-centered}
 
 <div style="display:flex">
 	<div style="background-color:#f0f0f0; border: 2px solid lightgray; margin-left:auto; margin-right:auto;">
-		<form action="/serveradmin/sfcommand/SetDomainAdminPassword" method="post">
+		<form action="/serveradmin/command/set-domain-admin-password" method="post">
 			<input type="hidden" name="domain-name" value=".show($request.domain-name)">
 			<table>
 				<tr>
@@ -29,11 +49,11 @@ title: "Domain: .show($request.domain-name)"
 {: .text-centered}
 
 <div class="domain-details-table">
-	<table style="border: collapse">
+	<table class="default-table">
 		<thead>
 			<tr>
-				<th text-align="left">Parameter</th>
-				<th text-align="center">Value</th>
+				<th text-align="left" style="width:160px">Parameter</th>
+				<th text-align="center" style="width:260px">Value</th>
 				<th text-align="left">Description</th>
 			</tr>
 		</thead>
@@ -41,7 +61,7 @@ title: "Domain: .show($request.domain-name)"
 			<tr>
 				<td>Root:</td>
 				<td>
-					<form method="post" action="/serveradmin/sfcommand/update-domain-parameter">
+					<form method="post" action="/serveradmin/command/update-domain-parameter">
 						<input type="hidden" name="parameter-name" value="root">
 						<input type="hidden" name="domain-name" value=".show($request.domain-name)">
             			<input type="text" name="parameter-value" value=".domainParameter($request.domain-name, root)">
@@ -51,9 +71,9 @@ title: "Domain: .show($request.domain-name)"
 				<td>The root directory containing the main entry (index file) of the website</td>
 			</tr>
 			<tr>
-				<td>Enabled:</td>
+				<td class="col1">Enabled:</td>
 				<td>
-					<form method="post" action="/serveradmin/sfcommand/update-domain-parameter">
+					<form method="post" action="/serveradmin/command/update-domain-parameter">
 						<input type="hidden" name="parameter-name" value="enabled">
 						<input type="hidden" name="domain-name" value=".show($request.domain-name)">
             			<input type="text" name="parameter-value" value=".domainParameter($request.domain-name, enabled)">
@@ -65,7 +85,7 @@ title: "Domain: .show($request.domain-name)"
 			<tr>
 				<td>SF Resources:</td>
 				<td>
-					<form method="post" action="/serveradmin/sfcommand/update-domain-parameter">
+					<form method="post" action="/serveradmin/command/update-domain-parameter">
 						<input type="hidden" name="parameter-name" value="sf-resources">
 						<input type="hidden" name="domain-name" value=".show($request.domain-name)">
             			<input type="text" name="parameter-value" value=".domainParameter($request.domain-name, sf-resources)">
@@ -77,7 +97,7 @@ title: "Domain: .show($request.domain-name)"
 			<tr>
 				<td>Access Log:</td>
 				<td>
-					<form method="post" action="/serveradmin/sfcommand/update-domain-parameter">
+					<form method="post" action="/serveradmin/command/update-domain-parameter">
 						<input type="hidden" name="parameter-name" value="access-log-enabled">
 						<input type="hidden" name="domain-name" value=".show($request.domain-name)">
             			<input type="text" name="parameter-value" value=".domainParameter($request.domain-name, access-log-enabled)">
@@ -89,7 +109,7 @@ title: "Domain: .show($request.domain-name)"
 			<tr>
 				<td>404 Log:</td>
 				<td>
-					<form method="post" action="/serveradmin/sfcommand/update-domain-parameter">
+					<form method="post" action="/serveradmin/command/update-domain-parameter">
 						<input type="hidden" name="parameter-name" value="404-log-enabled">
 						<input type="hidden" name="domain-name" value=".show($request.domain-name)">
             			<input type="text" name="parameter-value" value=".domainParameter($request.domain-name, 404-log-enabled)">
@@ -101,7 +121,7 @@ title: "Domain: .show($request.domain-name)"
 			<tr>
 				<td>Session Log:</td>
 				<td>
-					<form method="post" action="/serveradmin/sfcommand/update-domain-parameter">
+					<form method="post" action="/serveradmin/command/update-domain-parameter">
 						<input type="hidden" name="parameter-name" value="session-log-enabled">
 						<input type="hidden" name="domain-name" value=".show($request.domain-name)">
             			<input type="text" name="parameter-value" value=".domainParameter($request.domain-name, session-log-enabled)">
@@ -113,7 +133,7 @@ title: "Domain: .show($request.domain-name)"
 			<tr>
 				<td>Session timeout:</td>
 				<td>
-					<form method="post" action="/serveradmin/sfcommand/update-domain-parameter">
+					<form method="post" action="/serveradmin/command/update-domain-parameter">
 						<input type="hidden" name="parameter-name" value="session-timeout">
 						<input type="hidden" name="domain-name" value=".show($request.domain-name)">
             			<input type="text" name="parameter-value" value=".domainParameter($request.domain-name, session-timeout)">
@@ -125,7 +145,7 @@ title: "Domain: .show($request.domain-name)"
 			<tr>
 				<td>PHP Path:</td>
 				<td>
-					<form method="post" action="/serveradmin/sfcommand/update-domain-parameter">
+					<form method="post" action="/serveradmin/command/update-domain-parameter">
 						<input type="hidden" name="parameter-name" value="php-path">
 						<input type="hidden" name="domain-name" value=".show($request.domain-name)">
             			<input type="text" name="parameter-value" value=".domainParameter($request.domain-name, php-path)">
@@ -137,7 +157,7 @@ title: "Domain: .show($request.domain-name)"
 			<tr>
 				<td>PHP Options:</td>
 				<td>
-					<form method="post" action="/serveradmin/sfcommand/update-domain-parameter">
+					<form method="post" action="/serveradmin/command/update-domain-parameter">
 						<input type="hidden" name="parameter-name" value="php-options">
 						<input type="hidden" name="domain-name" value=".show($request.domain-name)">
             			<input type="text" name="parameter-value" value=".domainParameter($request.domain-name, php-options)">
@@ -149,7 +169,7 @@ title: "Domain: .show($request.domain-name)"
 			<tr>
 				<td>PHP Map Index:</td>
 				<td>
-					<form method="post" action="/serveradmin/sfcommand/update-domain-parameter">
+					<form method="post" action="/serveradmin/command/update-domain-parameter">
 						<input type="hidden" name="parameter-name" value="php-map-index">
 						<input type="hidden" name="domain-name" value=".show($request.domain-name)">
             			<input type="text" name="parameter-value" value=".domainParameter($request.domain-name, php-map-index)">
@@ -161,7 +181,7 @@ title: "Domain: .show($request.domain-name)"
 			<tr>
 				<td>PHP Map All:</td>
 				<td>
-					<form method="post" action="/serveradmin/sfcommand/update-domain-parameter">
+					<form method="post" action="/serveradmin/command/update-domain-parameter">
 						<input type="hidden" name="parameter-name" value="php-map-all">
 						<input type="hidden" name="domain-name" value=".show($request.domain-name)">
             			<input type="text" name="parameter-value" value=".domainParameter($request.domain-name, php-map-all)">
@@ -173,7 +193,7 @@ title: "Domain: .show($request.domain-name)"
 			<tr>
 				<td>PHP Timeout:</td>
 				<td>
-					<form method="post" action="/serveradmin/sfcommand/update-domain-parameter">
+					<form method="post" action="/serveradmin/command/update-domain-parameter">
 						<input type="hidden" name="parameter-name" value="php-timeout">
 						<input type="hidden" name="domain-name" value=".show($request.domain-name)">
             			<input type="text" name="parameter-value" value=".domainParameter($request.domain-name, php-timeout)">
@@ -185,7 +205,7 @@ title: "Domain: .show($request.domain-name)"
 			<tr>
 				<td>Foreward URL:</td>
 				<td>
-					<form method="post" action="/serveradmin/sfcommand/update-domain-parameter">
+					<form method="post" action="/serveradmin/command/update-domain-parameter">
 						<input type="hidden" name="parameter-name" value="foreward-url">
 						<input type="hidden" name="domain-name" value=".show($request.domain-name)">
             			<input type="text" name="parameter-value" value=".domainParameter($request.domain-name, foreward-url)">
@@ -197,7 +217,7 @@ title: "Domain: .show($request.domain-name)"
 			<tr>
 				<td>Comments Auto Approval Threshold:</td>
 				<td>
-					<form method="post" action="/serveradmin/sfcommand/update-domain-parameter">
+					<form method="post" action="/serveradmin/command/update-domain-parameter">
 						<input type="hidden" name="parameter-name" value="comment-auto-approval-threshold">
 						<input type="hidden" name="domain-name" value=".show($request.domain-name)">
             			<input type="text" name="parameter-value" value=".domainParameter($request.domain-name, comment-auto-approval-threshold)">
@@ -209,27 +229,3 @@ title: "Domain: .show($request.domain-name)"
 		</tbody>
 	</table>
 </div>
-
-<div class="line"></div>
-
-## Telemetry
-{: .text-centered}
-
-.sf-domainTelemetryTable()
-
-<div class="line"></div>
-
-## Blacklist
-{: .text-centered}
-
-.sf-domainBlacklistTable()
-
-<div class="line"></div>
-
-## Services
-{: .text-centered}
-
-The services marked 'used' are currently in use, select or deselect as necessary. The services are executed in top to bottom order. To change the order, renumber as necessary.
-{: .text-centered}
-
-.sf-domainServicesTable()

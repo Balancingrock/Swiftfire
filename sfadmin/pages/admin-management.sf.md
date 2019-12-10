@@ -16,13 +16,13 @@ menuSubTitle: Management
             </tr>
         </thead>
         <tbody>
-        .for(accounts)
+        .for(server-accounts)
         	.if($account.uuid, equal, $info.uuid)
         	    <tr>
                     <td><p class="half-margins-no-padding">.show($info.name)</p></td>
                     <td></td>
                     <td>
-                        <form method="post" action="/serveradmin/sfcommand/SetNewPassword">
+                        <form method="post" action="/serveradmin/command/set-new-password">
                             <input type="hidden" name="uuid" value=".show($info.uuid)">
                             <input type="text" name="Password" value="">
                             <input type="submit" value="Set New Password">
@@ -33,12 +33,12 @@ menuSubTitle: Management
                 <tr>
                     <td><p class="half-margins-no-padding">.show($info.name)</p></td>
                     <td>
-                        <form method="post" action="/serveradmin/sfcommand/ConfirmDeleteAccount">
+                        <form method="post" action="/serveradmin/command/confirm-delete-account">
                             <button type="submit" name="name" value=".show($info.name)">Delete</button>
                         </form>
                     </td>
                     <td>
-                        <form method="post" action="/serveradmin/sfcommand/SetNewPassword">
+                        <form method="post" action="/serveradmin/command/set-new-password">
                             <input type="hidden" name="uuid" value=".show($info.uuid)">
                             <input type="text" name="Password" value="">
                             <input type="submit" value="Set New Password">
@@ -52,7 +52,7 @@ menuSubTitle: Management
 </div>
 
 <h1 style="text-align: center;">Create New Admin Account</h1>
-<form action="/serveradmin/sfcommand/CreateAdmin" method="post">
+<form action="/serveradmin/command/create-admin" method="post">
 	<div style="display:flex; flex-direction:column; justify-content:center;">
 		<table class="centered outlined-table table-cell-margins">
 			<tr>

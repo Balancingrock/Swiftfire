@@ -95,8 +95,8 @@ private let SERVER_ADMIN_CREATE_ACCOUNT_PWD1 = "serveradmincreateaccountpwd1"
 private let SERVER_ADMIN_CREATE_ACCOUNT_PWD2 = "serveradmincreateaccountpwd2"
 private let SERVER_ADMIN_CREATE_ACCOUNT_ROOT = "serveradmincreateaccountroot"
 
-private let SERVER_ADMIN_LOGIN_NAME = "serveradminloginname"
-private let SERVER_ADMIN_LOGIN_PWD  = "serveradminloginpwd"
+private let SERVER_ADMIN_LOGIN_NAME = "server-admin-login-name"
+private let SERVER_ADMIN_LOGIN_PWD  = "server-admin-login-password"
 
 
 /// Intercepts access to the URL path: /serveradmin and redirects them to the adminSiteRoot. In effect making the server
@@ -214,7 +214,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
                      <p style="margin-bottom:0px;">Swiftfire Version  : \(serverTelemetry.serverVersion.value)</p>
                      <p style="margin-bottom:0px;">HTTP Server Status : \(serverTelemetry.httpServerStatus.value)</p>
                      <p style="margin-bottom:0px;">HTTPS Server Status: \(serverTelemetry.httpsServerStatus.value)</p>
-                     <form action="/serveradmin/sfcommand/SetRoot" method="post">
+                     <form action="/serveradmin/command/set-root" method="post">
                         <div>
                            <p style="margin-bottom:0px;color:\(rootColor);">\(message)</p>
                            <input type="text" name="\(SERVER_ADMIN_CREATE_ACCOUNT_ROOT)" value="\(serverParameters.adminSiteRoot.value)">
@@ -453,7 +453,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
     
     // Special case: The root site for the serveradmin must be updated
     
-    if relPath.contains("sfcommand/SetRoot") {
+    if relPath.contains("command/set-root") {
         
         Log.atDebug?.log("Found set root command")
         
@@ -488,7 +488,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
 
     let testPath = (serverAdminDomain.webroot as NSString).appendingPathComponent(relPath)
     var absPath: String = ""
-    if !testPath.contains("sfcommand") {
+    if !testPath.contains("command") {
         
         switch FileManager.default.readableResourceFileExists(at: testPath, for: serverAdminDomain) {
             
@@ -519,7 +519,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
     // Note: Other pages are allowed in order to facilitate the formatting and layout of the login page
     
     let fileExtension = (absPath as NSString).pathExtension.lowercased()
-    if (fileExtension == "htm" || fileExtension == "html" || fileExtension == "php" || relPath.contains("sfcommand")) {
+    if (fileExtension == "htm" || fileExtension == "html" || fileExtension == "php" || relPath.contains("command")) {
         
         Log.atDebug?.log("A protected page is requested")
         
@@ -550,11 +550,11 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
     // Special case: execute server commands
     // =================================================================================================================
 
-    if pathComponents.count >= 2 && pathComponents[0] == "sfcommand" {
+    if pathComponents.count >= 2 && pathComponents[0] == "command" {
         
         pathComponents.removeFirst()
         
-        switch executeSfCommand(pathComponents, request, session, info, response) {
+        switch executeCommand(pathComponents, request, session, info, response) {
         
         case .next: return .next
             
@@ -683,7 +683,7 @@ fileprivate enum CommandExecutionResult {
     case nop
 }
 
-fileprivate func executeSfCommand(_ pathComponents: Array<String>, _ request: Request, _ session: Session, _ info: Services.Info, _ response: Response) -> CommandExecutionResult {
+fileprivate func executeCommand(_ pathComponents: Array<String>, _ request: Request, _ session: Session, _ info: Services.Info, _ response: Response) -> CommandExecutionResult {
     
     guard let commandName = pathComponents.first else {
         Log.atError?.log("No command name found")
@@ -693,33 +693,33 @@ fileprivate func executeSfCommand(_ pathComponents: Array<String>, _ request: Re
     Log.atDebug?.log("Executing command: \(commandName)")
 
     switch commandName {
-    case "SetRoot": executeSetRoot(request); return .newPath("")
-    case "SetParameter": executeSetParameter(request); return .newPath("/pages/parameters.sf.html")
-    case "Restart": executeRestart(); return .newPath("/pages/restart.sf.html")
-    case "Quit": return .newPath("/pages/quit.sf.html")
-    case "CancelQuit": return .newPath("")
-    case "ConfirmedQuit": executeQuitSwiftfire(); return .newPath("/pages/bye.sf.html")
+    case "set-root": executeSetRoot(request); return .newPath("")
+    case "set-server-parameter": executeSetParameter(request); return .newPath("/pages/parameters.sf.html")
+    case "restart": executeRestart(); return .newPath("/pages/restart.sf.html")
+    case "quit": return .newPath("/pages/quit.sf.html")
+    case "cancel-quit": return .newPath("")
+    case "confirmed-quit": executeQuitSwiftfire(); return .newPath("/pages/bye.sf.html")
     case "update-domain-parameter": executeUpdateDomainParameter(request); return .newPath("/pages/domain.sf.html")
-    case "UpdateDomainServices": executeUpdateDomainServices(request); return .newPath("/pages/domain.sf.html")
+    //case "UpdateDomainServices": executeUpdateDomainServices(request); return .newPath("/pages/domain.sf.html")
     case "delete-domain": executeDeleteDomain(request); return .newPath("/pages/domain-management.sf.html")
     case "create-domain": executeCreateDomain(request); return .newPath("/pages/domain-management.sf.html")
-    case "CreateAdmin": executeCreateAdmin(request); return .newPath("/pages/admin-management.sf.html")
+    case "create-admin": executeCreateAdmin(request); return .newPath("/pages/admin-management.sf.html")
     case "create-alias": executeCreateAlias(request); return .newPath("/pages/domain-management.sf.html")
     case "delete-alias": executeDeleteAlias(request); return .newPath("/pages/domain-management.sf.html")
-    case "DeleteAccount": executeDeleteAccount(request); return .newPath("/pages/admin-management.sf.html")
-    case "ConfirmDeleteAccount": return executeConfirmDeleteAccount(request)
-    case "SetNewPassword": executeSetNewPassword(request); return .newPath("/pages/admin-management.sf.html")
-    case "UpdateBlacklist": executeUpdateBlacklist(request); return .newPath("/pages/blacklist.sf.html")
-    case "AddToBlacklist": executeAddToBlacklist(request); return .newPath("/pages/blacklist.sf.html")
-    case "RemoveFromBlacklist": executeRemoveFromBlacklist(request); return .newPath("/pages/blacklist.sf.html")
-    case "UpdateDomainBlacklist": executeUpdateDomainBlacklist(request); return .newPath("/pages/domain.sf.html")
-    case "AddToDomainBlacklist": executeAddToDomainBlacklist(request); return .newPath("/pages/domain.sf.html")
-    case "RemoveFromDomainBlacklist": executeRemoveFromDomainBlacklist(request); return .newPath("/pages/domain.sf.html")
-    case "SetDomainAdminPassword": executeSetDomainAdminPassword(request); return .newPath("/pages/domain.sf.html")
-    case "Logout": return executeLogout(session);
+    case "delete-account": executeDeleteAccount(request); return .newPath("/pages/admin-management.sf.html")
+    case "confirm-delete-account": return executeConfirmDeleteAccount(request)
+    case "set-new-password": executeSetNewPassword(request); return .newPath("/pages/admin-management.sf.html")
+    case "update-blacklist": executeUpdateBlacklist(request); return .newPath("/pages/blacklist.sf.html")
+    case "add-to-blacklist": executeAddToBlacklist(request); return .newPath("/pages/blacklist.sf.html")
+    case "remove-from-blacklist": executeRemoveFromBlacklist(request); return .newPath("/pages/blacklist.sf.html")
+    //case "UpdateDomainBlacklist": executeUpdateDomainBlacklist(request); return .newPath("/pages/domain.sf.html")
+    //case "AddToDomainBlacklist": executeAddToDomainBlacklist(request); return .newPath("/pages/domain.sf.html")
+    //case "RemoveFromDomainBlacklist": executeRemoveFromDomainBlacklist(request); return .newPath("/pages/domain.sf.html")
+    case "set-domain-admin-password": executeSetDomainAdminPassword(request); return .newPath("/pages/domain.sf.html")
+    case "logout": return executeLogout(session);
         
     default:
-        Log.atError?.log("Unknown sfcommand: \(commandName)")
+        Log.atError?.log("Unknown command: \(commandName)")
         return .nop
     }
 }
@@ -742,25 +742,32 @@ fileprivate func executeSetRoot(_ request: Request) {
 
 fileprivate func executeSetParameter(_ request: Request) {
         
-    OUTER: for (key, value) in request.postInfo {
-    
-        for p in serverParameters.all {
+    guard let parameterName = request.info["server-parameter-name"] else {
+        Log.atError?.log("Missing server parameter name")
+        return
+    }
+
+    guard let value = request.info["server-parameter-value"] else {
+        Log.atError?.log("Missing server parameter name")
+        return
+    }
+
+    for p in serverParameters.all {
         
-            if p.name == key {
+        if p.name == parameterName {
                 
-                Log.atNotice?.log("Setting parameter '\(key)' from '\(p.stringValue)'")
+            Log.atNotice?.log("Setting parameter '\(parameterName)' from '\(p.stringValue)'")
                 
-                _ = p.setValue(value)
+            _ = p.setValue(value)
                 
-                serverParameters.store()
+            serverParameters.store()
                 
-                Log.atNotice?.log("Setting parameter '\(key)' to '\(value)'")
+            Log.atNotice?.log("Setting parameter '\(parameterName)' to '\(value)'")
                 
-                continue OUTER
-            }
+            break
         }
         
-        Log.atError?.log("Unknown parameter name \(key)")
+        Log.atError?.log("Unknown parameter name \(parameterName)")
     }
 }
 

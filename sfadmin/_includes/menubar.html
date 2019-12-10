@@ -414,8 +414,45 @@
 
 
 	<!-- Domains menu -->
-		
-	.sf-domainsMenu()
+	
+	<div class="item-separator"><p><!-- empty but necessary! --></p></div>
+        <div class="item">
+            <input id="domain-checkbox" type="checkbox">
+            <div class="title">
+                <label class="symbol" for="domain-checkbox">
+                    <p class="code"><!-- will be filled by disclosure indicator --></p>
+                </label>
+                <div class="text"><a href="/serveradmin/pages/domain-management.sf.html"><p>Domains</p></a></div>
+            </div>
+            <div class="dropdown">
+                <div class="subitem-separator"><p><!-- empty but necessary! --></p></div>
+                <div class="subitem">
+                    <input type="checkbox" id="DomainManagement-checkbox">
+                    <div class="title">
+                        <label class="symbol" for="DomainManagement-checkbox">
+                            <p></p>
+                        </label>
+                        <div class="text"><a href="/serveradmin/pages/domain-management.sf.html"><p>Manage Domains</p></a></div>
+                    </div>
+                </div>
+    		.for(server-domains)
+            <div class="subitem-separator"><p><!-- empty but necessary! --></p></div>
+            <div class="subitem">
+                <input type="checkbox" id=".show($info.domain-name)-checkbox">
+                <div class="title">
+                    <label class="symbol" for=".show($info.domain-name)-checkbox">
+                        <p></p>
+                    </label>
+                    <div class="text">
+                        <form class="posting-link-form" method="post" action="/serveradmin/pages/domain.sf.html">
+                            <button type="submit" name="domain-name" value=".show($info.domain-name)" class="posting-link-button">.show($info.domain-name)</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        	.end(for)
+        </div>
+    </div>
 
 
 	{%- comment -%}<!-- Categories menu -->{%- endcomment -%}

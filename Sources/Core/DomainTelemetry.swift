@@ -165,6 +165,13 @@ extension DomainTelemetry {
         all.forEach { json[$0.name] &= $0.value }
         _ = json.save(to: file)
     }
+    
+    
+    /// Return a controlBlockIndexableDataSource for the content of self.
+    
+    public var controlBlockIndexableDataSource: ControlBlockIndexableDataSource {
+        return DomainTelemetryControlBlockIndexableDataSource(self)
+    }
 }
 
 
@@ -179,5 +186,22 @@ extension DomainTelemetry {
         var str = ""
         str += all.map({ " \($0.name): \($0.value)" }).joined(separator: "\n")
         return str
+    }
+}
+
+
+public struct DomainTelemetryControlBlockIndexableDataSource: ControlBlockIndexableDataSource {
+
+    private var all: Array<NamedValueProtocol> = []
+    
+    fileprivate init(_ dt: DomainTelemetry) {
+        all = dt.all
+    }
+
+    public var nofElements: Int { return all.count }
+    
+    public func addElement(at index: Int, to info: inout Functions.Info) {
+        guard index < all.count else { return }
+        all[index].addSelf(to: &info)
     }
 }

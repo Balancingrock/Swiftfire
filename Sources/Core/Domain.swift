@@ -860,6 +860,6 @@ extension Domain: FunctionsInfoDataSource {
         info["domain-statistics-file-rollover-time"] = "\(statisticsRolloverTime)"
         info["domain-nof-recent-request-logged"] = String(nofRecentRequestLogs)
         info["domain-nof-recent-response-logged"] = String(nofRecentResponseLogs)
-        //info["domain-aliases"] = String(AliasControlBlockIndexableDataSource(domainManager: domainManager, domain: self).cbCount)
+        //info["domain-aliases"] = String(AliasControlBlockIndexableDataSource(domainManager: domainManager, domain: self).nofElements)
     }
 }

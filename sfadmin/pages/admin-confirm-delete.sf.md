@@ -12,7 +12,7 @@ menuInclude: no
 			.show($request.name)
 		</div>
 		<div class="flex-row-vcenter" style="justify-content: space-between;">
-			<form method="post" action="/serveradmin/sfcommand/DeleteAccount">
+			<form method="post" action="/serveradmin/command/delete-account">
 				<input type="hidden" name="name" value=".show($request.name)">
 				<input type="submit" value="Confirm">
 			</form>

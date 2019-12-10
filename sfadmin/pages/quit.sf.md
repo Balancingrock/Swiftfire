@@ -10,6 +10,11 @@ menuInclude: no
 It can only be manually restarted at the server itself.
 
 <div class="centered-buttons">
-.sf-command(ConfirmedQuit, "Confirm Quit").sf-command(CancelQuit, Cancel)
+    <form method="post" action="/serveradmin/command/confirmed-quit">
+        <input type="submit" value="Confirm Quit">
+    </form>
+    <form method="post" action="/serveradmin/command/cancel-quit">
+        <input type="submit" value="Cancel">
+    </form>
 </div>
 

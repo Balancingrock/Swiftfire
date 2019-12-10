@@ -1,10 +1,13 @@
 ---
 layout: page
-title: Blacklist
+title: Server Blacklist
 menuInclude: yes
 menuTopTitle: Blacklist
 menuTopIndex: 6
 ---
+{: .text-centered}
+Addresses blacklisted here are blacklisted for all domains.
+
 <div class="blacklist-table">
 	<table class="server-blacklist-table">
         <thead>
@@ -15,25 +18,25 @@ menuTopIndex: 6
             </tr>
         </thead>
         <tbody>
-        .for(blacklist)
+        .for(server-blacklist)
             <tr>
-                <td>.show($info.address)</td>
+                <td>.show($info.blacklist-address)</td>
                 <td>
-                    <form method="post" action="/serveradmin/sfcommand/UpdateBlacklist">
-                    	<input type="hidden" name="Address" value=".show($info.address)">
-                    	.if($info.action, equal, closeConnection)
+                    <form method="post" action="/serveradmin/command/update-blacklist">
+                    	<input type="hidden" name="Address" value=".show($info.blacklist-address)">
+                    	.if($info.blacklist-action, equal, closeConnection)
 	                    	<input type="radio" name="Action" value="close" checked>
 	                    .else()
 	                    	<input type="radio" name="Action" value="close">
 	                    .end()
                     	<span> Close Connection, </span>
-                    	.if($info.action, equal, send503ServiceUnavailable)
+                    	.if($info.blacklist-action, equal, send503ServiceUnavailable)
 	                    	<input type="radio" name="Action" value="503" checked>
 	                    .else()
                     		<input type="radio" name="Action" value="503">
                     	.end()
                     	<span> 503 Service Unavailable, </span>
-                    	.if($info.action, equal, send401Unauthorized)
+                    	.if($info.blacklist-action, equal, send401Unauthorized)
 	                    	<input type="radio" name="Action" value="401" checked>
 	                    .else()
     	                	<input type="radio" name="Action" value="401">
@@ -43,8 +46,8 @@ menuTopIndex: 6
                     </form>
                 </td>
                 <td>
-                    <form method="post" action="/serveradmin/sfcommand/RemoveFromBlacklist">
-                        <input type="hidden" name="Address" value=".show($info.address)">
+                    <form method="post" action="/serveradmin/command/remove-from-blacklist">
+                        <input type="hidden" name="Address" value=".show($info.blacklist-address)">
                         <input type="submit" value="Delete">
                     </form>
                 </td>
@@ -53,7 +56,7 @@ menuTopIndex: 6
         </tbody>
     </table>
     <br>
-    <form class="server-blacklist-create" method="post" action="/serveradmin/sfcommand/AddToBlacklist">
+    <form class="server-blacklist-create" method="post" action="/serveradmin/command/add-to-blacklist">
         <div>
             <span>Address: </span>
             <input type="text" name="NewEntry" value="">

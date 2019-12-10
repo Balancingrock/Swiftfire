@@ -78,6 +78,3 @@ public class NamedValue {
         self.about = about
     }
 }
-
-
-

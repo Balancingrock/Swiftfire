@@ -285,8 +285,8 @@ public class SFDocument: EstimatedMemoryConsumption {
                 
                 guard let (startIndex, count) = getForLoopRange(args, &info, environment) else { return nil }
 
-                let fcount = count ?? (source.cbCount - startIndex) + 1
-                let endIndex = min(startIndex + fcount + 1, source.cbCount)
+                let fcount = count ?? (source.nofElements - startIndex) + 1
+                let endIndex = min(startIndex + fcount + 1, source.nofElements)
                 
                 info["for-start-index"] = String(startIndex)
                 info["for-end-index"] = String(endIndex)
@@ -533,11 +533,69 @@ fileprivate func getForLoopSource(_ args: Array<String>, _ info: inout Functions
         
     case "comments-for-approval": return environment.domain.comments.forApproval
     
-    case "accounts": return environment.domain.accounts
+    case "server-accounts":
+        
+        guard environment.serverAdminIsLoggedIn else {
+            Log.atAlert?.log("Attempt to use server admin priviledge by \(environment.account?.name ?? "")")
+            return nil
+        }
+
+        return environment.domain.accounts
     
-    case "blacklist": return environment.domain.blacklist
+    case "server-parameters":
+        
+        guard environment.serverAdminIsLoggedIn else {
+            Log.atAlert?.log("Attempt to use server admin priviledge by \(environment.account?.name ?? "")")
+            return nil
+        }
+
+        return serverParameters.controlBlockIndexableDataSource
+        
+    case "server-telemetry":
+            
+        guard environment.serverAdminIsLoggedIn else {
+            Log.atAlert?.log("Attempt to use server admin priviledge by \(environment.account?.name ?? "")")
+            return nil
+        }
+
+        return serverTelemetry.controlBlockIndexableDataSource
+
+    case "server-blacklist":
+        
+        guard environment.serverAdminIsLoggedIn else {
+            Log.atAlert?.log("Attempt to use server admin priviledge by \(environment.account?.name ?? "")")
+            return nil
+        }
+
+        return serverAdminDomain.blacklist.controlBlockIndexableDataSource
     
-    case "domains": return DomainControlBlockIndexableDataSource(domainManager)
+    case "blacklist":
+            
+        guard environment.domainAdminIsLoggedIn else {
+            Log.atAlert?.log("Attempt to use server admin priviledge by \(environment.account?.name ?? "")")
+            return nil
+        }
+
+        guard args.count > 1 else {
+            Log.atError?.log("Missing domain name")
+            return nil
+        }
+
+        guard let domainName = readKey(args[1], using: info, in: environment) else {
+            Log.atError?.log("Cannot read key: '\(args[1])'")
+            return nil
+        }
+
+        return domainManager.domain(for: domainName)?.blacklist.controlBlockIndexableDataSource
+
+    case "server-domains":
+        
+        guard environment.serverAdminIsLoggedIn else {
+            Log.atAlert?.log("Attempt to use server admin priviledge by \(environment.account?.name ?? "")")
+            return nil
+        }
+
+        return domainManager.controlBlockIndexableDataSource
 
     case "comments":
         
@@ -551,7 +609,7 @@ fileprivate func getForLoopSource(_ args: Array<String>, _ info: inout Functions
         }
         return environment.domain.comments.getControlBlockIndexableDataSource(forCommentSectionIdentifier: id)
 
-    case "aliases":
+    case "domain-aliases":
         
         guard args.count > 1 else {
             Log.atError?.log("Missing domain name")
@@ -562,8 +620,29 @@ fileprivate func getForLoopSource(_ args: Array<String>, _ info: inout Functions
             return nil
         }
         guard let domain = domainManager.domain(for: name) else { return nil }
-        return AliasControlBlockIndexableDataSource(domainManager: domainManager, domain: domain)
-    
+        return domainManager.aliasControlBlockIndexableDataSource(forDomain: domain)
+
+    case "domain-telemetry":
+        
+        guard environment.serverAdminIsLoggedIn else {
+            Log.atAlert?.log("Attempt to use server admin priviledge by \(environment.account?.name ?? "")")
+            return nil
+        }
+
+        var domain = environment.domain
+        
+        if args.count > 1 {
+            guard let domainName = readKey(args[1], using: info, in: environment) else {
+                Log.atError?.log("Cannot read key: '\(args[1])'")
+                return nil
+            }
+            if let specifiedDomain = domainManager.domain(for: domainName) {
+                domain = specifiedDomain
+            }
+        }
+        
+        return domain.telemetry.controlBlockIndexableDataSource
+        
     default:
         Log.atError?.log("Unrecognised source specifier: \(selector)")
         return nil
@@ -586,16 +665,24 @@ fileprivate func getForLoopRange(_ args: Array<String>, _ info: inout Functions.
         
     case "comments-for-approval": skip = 1
     
-    case "accounts": skip = 1
-    
-    case "blacklist": skip = 1
-    
-    case "domains": skip = 1
-
     case "comments": skip = 2
+
+    case "server-accounts": skip = 1
+    
+    case "server-blacklist": skip = 1
+
+    case "server-domains": skip = 1
+
+    case "server-parameters": skip = 1
         
-    case "aliases": skip = 2
+    case "server-telemetry": skip = 1
+
+    case "blacklist": skip = 1
         
+    case "domain-telemetry": skip = 2
+
+    case "domain-aliases": skip = 2
+
     default:
         Log.atError?.log("Unrecognised source specifier: \(selector)")
         return nil
@@ -793,10 +880,10 @@ fileprivate func setupFor(_ args: Array<String>, _ info: inout Functions.Info, _
     let id = args[0].lowercased()
     guard let source = getSource(for: id) else { return false }
     
-    info["for-count"] = String(source.cbCount)
+    info["for-count"] = String(source.nofElements)
     
     var startOffset: Int = 0
-    var endOffset: Int = source.cbCount - 1
+    var endOffset: Int = source.nofElements - 1
     
     if args.count == 3 {
         guard let so = Int(args[1]) else {
@@ -812,7 +899,7 @@ fileprivate func setupFor(_ args: Array<String>, _ info: inout Functions.Info, _
     }
     
     let offset = max(startOffset, offsetIn)
-    endOffset = min(endOffset, source.cbCount - 1)
+    endOffset = min(endOffset, source.nofElements - 1)
     
     if offset > endOffset { return false }
     

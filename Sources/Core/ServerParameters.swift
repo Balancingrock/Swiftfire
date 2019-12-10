@@ -491,3 +491,26 @@ public func setupParametersDidSetActions() {
     }
 }
 
+
+extension ServerParameters {
+    
+    public var controlBlockIndexableDataSource: ControlBlockIndexableDataSource {
+        return ServerParameterControlBlockIndexableDataSource(self)
+    }
+}
+
+public struct ServerParameterControlBlockIndexableDataSource: ControlBlockIndexableDataSource {
+
+    private var all: Array<NamedValueProtocol> = []
+    
+    fileprivate init(_ dt: ServerParameters) {
+        all = dt.all
+    }
+
+    public var nofElements: Int { return all.count }
+    
+    public func addElement(at index: Int, to info: inout Functions.Info) {
+        guard index < all.count else { return }
+        all[index].addSelf(to: &info)
+    }
+}

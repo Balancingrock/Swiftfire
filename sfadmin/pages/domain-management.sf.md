@@ -4,7 +4,7 @@ title: Domain Management
 ---
 <div class="center-content">
 	<div class="domains-list">
-	.for(domains)
+	.for(server-domains)
 		<table class="domains-table">
             <thead>
             	<tr>
@@ -13,14 +13,14 @@ title: Domain Management
             	</tr>
             </thead>
             <tbody>
-	  			.for(aliases, $info.domain-name)
+	  			.for(domain-aliases, $info.domain-name)
 	  				.if($info.for-index, equal, $info.for-start-index)
 	  					<tr>
     	        			<td>Aliases:</td>
             				<td>
             					<div>
                            			<p>.show($info.alias)</p>
-                        			<form method="post" action="/serveradmin/sfcommand/delete-alias">
+                        			<form method="post" action="/serveradmin/command/delete-alias">
                             			<input type="hidden" name="alias-name" value=".show($info.alias!)">
                             			<button type="submit">Delete</button>
                         			</form>
@@ -33,7 +33,7 @@ title: Domain Management
                     		<td>
                     			<div>
                             		<p>.show($info.alias)</p>
-                            		<form method="post" action="/serveradmin/sfcommand/delete-alias">
+                            		<form method="post" action="/serveradmin/command/delete-alias">
                                 		<button type="submit" name="alias-name" value=".show($info.alias!)">Delete Alias</button>
                             		</form>
                         		</div>
@@ -44,7 +44,7 @@ title: Domain Management
 	  			<tr>
                     <td></td>
                     <td>
-                        <form method="post" action="/serveradmin/sfcommand/create-alias">
+                        <form method="post" action="/serveradmin/command/create-alias">
                             <input type="hidden" name="domain-name" value=".show($info.domain-name)">
                             <input type="text" name="Alias" value="">
                             <button type="submit">Create Alias</button>
@@ -60,7 +60,7 @@ title: Domain Management
 	</div>
 </div>
 
-<form action="/serveradmin/sfcommand/create-domain" method="post">
+<form action="/serveradmin/command/create-domain" method="post">
 	<div class="center-content">
 		<div style="display:flex; flex-direction:column; justify-content:center;">
 			<div style="display:flex; flex-direction:column; align-items:flex-end">

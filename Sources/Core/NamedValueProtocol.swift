@@ -53,7 +53,7 @@ public typealias DidSetActionSignature = () -> Void
 
 /// This contains the operations that have no default implementation.
 
-public protocol NamedValueProtocol {
+public protocol NamedValueProtocol: FunctionsInfoDataSource {
     
     /// The name of the item
     
@@ -85,4 +85,13 @@ public protocol NamedValueProtocol {
     /// Adds an action to be executed after an update
     
     func addDidSetAction(_ action: @escaping DidSetActionSignature)
+}
+
+extension NamedValueProtocol {
+    
+    public func addSelf(to info: inout Functions.Info) {
+        info["named-value-protocol-name"] = name
+        info["named-value-protocol-about"] = about
+        info["named-value-protocol-value"] = stringValue
+    }
 }

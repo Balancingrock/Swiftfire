@@ -985,7 +985,7 @@ public struct CommentsControlBlockIndexableDataSource: ControlBlockIndexableData
         }
     }
     
-    public var cbCount: Int { commentPaths.count }
+    public var nofElements: Int { commentPaths.count }
     
     public func addElement(at index: Int, to info: inout Functions.Info) {
         

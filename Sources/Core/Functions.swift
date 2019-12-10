@@ -224,3 +224,36 @@ extension Functions: CustomStringConvertible {
         return str
     }
 }
+
+
+// MARK: - Function.Environment conveniance accessors
+
+extension Functions.Environment {
+    
+    public var account: Account? {
+        
+        guard let session = serviceInfo[.sessionKey] as? Session else { return nil }
+        
+        return session.info.getAccount(inDomain: domain)
+    }
+    
+    public var serverAdminIsLoggedIn: Bool {
+        
+        guard let session = serviceInfo[.sessionKey] as? Session else { return false }
+        
+        let account = session.info.getAccount(inDomain: serverAdminDomain)
+        
+        return account != nil
+    }
+    
+    public var domainAdminIsLoggedIn: Bool {
+        
+        guard let session = serviceInfo[.sessionKey] as? Session else { return false }
+        
+        guard let account = session.info.getAccount(inDomain: domain) else { return false }
+        
+        return account.isDomainAdmin
+    }
+
+}
+

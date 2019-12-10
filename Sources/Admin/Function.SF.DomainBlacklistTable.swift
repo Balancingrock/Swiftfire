@@ -146,7 +146,7 @@ func function_sf_domainBlacklistTable(_ args: Functions.Arguments, _ info: inout
             <tr>
                 <td>\(address)</td>
                 <td>
-                    <form method="post" action="/serveradmin/sfcommand/UpdateDomainBlacklist">
+                    <form method="post" action="/serveradmin/command/UpdateDomainBlacklist">
                         <input type="hidden" name="Address" value="\(address)">
                         <input type="radio" name="Action" value="close" \(action == .closeConnection ? "checked" : "")>
                         <span> Close Connection, </span>
@@ -159,7 +159,7 @@ func function_sf_domainBlacklistTable(_ args: Functions.Arguments, _ info: inout
                     </form>
                 </td>
                 <td>
-                    <form method="post" action="/serveradmin/sfcommand/RemoveFromDomainBlacklist">
+                    <form method="post" action="/serveradmin/command/RemoveFromDomainBlacklist">
                         <input type="hidden" name="Address" value="\(address)">
                         <input type="hidden" name="DomainName" value="\(domain.name)">
                         <input type="submit" value="Delete">
@@ -173,7 +173,7 @@ func function_sf_domainBlacklistTable(_ args: Functions.Arguments, _ info: inout
             </tbody>
         </table>
         <br>
-        <form class="server-blacklist-create" method="post" action="/serveradmin/sfcommand/AddToDomainBlacklist">
+        <form class="server-blacklist-create" method="post" action="/serveradmin/command/AddToDomainBlacklist">
             <input type="hidden" name="DomainName" value="\(domain.name)">
             <div>
                 <span>Address: </span>
