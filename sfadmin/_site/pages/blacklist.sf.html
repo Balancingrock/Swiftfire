@@ -6,16 +6,8 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="apple-touch-icon" sizes="180x180" href="/serveradmin/icons/apple-touch-icon.png">
-	<link rel="icon" type="image/png" sizes="32x32" href="/serveradmin/icons/favicon-32x32.png">
-	<link rel="icon" type="image/png" sizes="16x16" href="/serveradmin/icons/favicon-16x16.png">
-	<link rel="manifest" href="/serveradmin/icons/manifest.json">
-	<link rel="mask-icon" href="/serveradmin/icons/safari-pinned-tab.svg" color="#5bbad5">
-	<link rel="shortcut icon" href="/serveradmin/icons/favicon.ico">
-	<meta name="msapplication-config" content="/serveradmin/icons/browserconfig.xml">
-	<meta name="theme-color" content="#ffffff">
 
-	<title>Blacklist</title>
+	<title>Server Blacklist</title>
 
 	<meta name="description" content="Swiftfire Server Admin">
 
@@ -143,8 +135,45 @@
 			</div>
 		</div>
 	</div><!-- Domains menu -->
-		
-	.sf-domainsMenu()
+	
+	<div class="item-separator"><p><!-- empty but necessary! --></p></div>
+        <div class="item">
+            <input id="domain-checkbox" type="checkbox">
+            <div class="title">
+                <label class="symbol" for="domain-checkbox">
+                    <p class="code"><!-- will be filled by disclosure indicator --></p>
+                </label>
+                <div class="text"><a href="/serveradmin/pages/domain-management.sf.html"><p>Domains</p></a></div>
+            </div>
+            <div class="dropdown">
+                <div class="subitem-separator"><p><!-- empty but necessary! --></p></div>
+                <div class="subitem">
+                    <input type="checkbox" id="DomainManagement-checkbox">
+                    <div class="title">
+                        <label class="symbol" for="DomainManagement-checkbox">
+                            <p></p>
+                        </label>
+                        <div class="text"><a href="/serveradmin/pages/domain-management.sf.html"><p>Manage Domains</p></a></div>
+                    </div>
+                </div>
+    		.for(server-domains)
+            <div class="subitem-separator"><p><!-- empty but necessary! --></p></div>
+            <div class="subitem">
+                <input type="checkbox" id=".show($info.domain-name)-checkbox">
+                <div class="title">
+                    <label class="symbol" for=".show($info.domain-name)-checkbox">
+                        <p></p>
+                    </label>
+                    <div class="text">
+                        <form class="posting-link-form" method="post" action="/serveradmin/pages/domain.sf.html">
+                            <button type="submit" name="domain-name" value=".show($info.domain-name)" class="posting-link-button">.show($info.domain-name)</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        	.end(for)
+        </div>
+    </div>
 </nav>
 <!-- end of include menubar.html -->
 
@@ -160,12 +189,14 @@
 <!-- Start of main content -->
 <article class="page" itemscope itemtype="http://schema.org/Article">
 	<header class="page-header">
-		<h1 class="page-title" itemprop="name headline">Blacklist</h1>
+		<h1 class="page-title" itemprop="name headline">Server Blacklist</h1>
 		<p class="page-meta"></p>
 	</header>
 	<div class="page-content" itemprop="articleBody">
 <!-- Page content -->
-   <div class="blacklist-table">
+   <p class="text-centered">Addresses blacklisted here are blacklisted for all domains.</p>
+
+<div class="blacklist-table">
 	<table class="server-blacklist-table">
         <thead>
             <tr>
@@ -175,25 +206,25 @@
             </tr>
         </thead>
         <tbody>
-        .for(blacklist)
+        .for(server-blacklist)
             <tr>
-                <td>.show($info.address)</td>
+                <td>.show($info.blacklist-address)</td>
                 <td>
-                    <form method="post" action="/serveradmin/sfcommand/UpdateBlacklist">
-                    	<input type="hidden" name="Address" value=".show($info.address)" />
-                    	.if($info.action, equal, closeConnection)
+                    <form method="post" action="/serveradmin/command/update-blacklist">
+                    	<input type="hidden" name="Address" value=".show($info.blacklist-address)" />
+                    	.if($info.blacklist-action, equal, closeConnection)
 	                    	<input type="radio" name="Action" value="close" checked="" />
 	                    .else()
 	                    	<input type="radio" name="Action" value="close" />
 	                    .end()
                     	<span> Close Connection, </span>
-                    	.if($info.action, equal, send503ServiceUnavailable)
+                    	.if($info.blacklist-action, equal, send503ServiceUnavailable)
 	                    	<input type="radio" name="Action" value="503" checked="" />
 	                    .else()
                     		<input type="radio" name="Action" value="503" />
                     	.end()
                     	<span> 503 Service Unavailable, </span>
-                    	.if($info.action, equal, send401Unauthorized)
+                    	.if($info.blacklist-action, equal, send401Unauthorized)
 	                    	<input type="radio" name="Action" value="401" checked="" />
 	                    .else()
     	                	<input type="radio" name="Action" value="401" />
@@ -203,8 +234,8 @@
                     </form>
                 </td>
                 <td>
-                    <form method="post" action="/serveradmin/sfcommand/RemoveFromBlacklist">
-                        <input type="hidden" name="Address" value=".show($info.address)" />
+                    <form method="post" action="/serveradmin/command/remove-from-blacklist">
+                        <input type="hidden" name="Address" value=".show($info.blacklist-address)" />
                         <input type="submit" value="Delete" />
                     </form>
                 </td>
@@ -213,7 +244,7 @@
         </tbody>
     </table>
     <br />
-    <form class="server-blacklist-create" method="post" action="/serveradmin/sfcommand/AddToBlacklist">
+    <form class="server-blacklist-create" method="post" action="/serveradmin/command/add-to-blacklist">
         <div>
             <span>Address: </span>
             <input type="text" name="NewEntry" value="" />

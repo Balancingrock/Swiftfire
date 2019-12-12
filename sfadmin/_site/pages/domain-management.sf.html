@@ -6,14 +6,6 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="apple-touch-icon" sizes="180x180" href="/serveradmin/icons/apple-touch-icon.png">
-	<link rel="icon" type="image/png" sizes="32x32" href="/serveradmin/icons/favicon-32x32.png">
-	<link rel="icon" type="image/png" sizes="16x16" href="/serveradmin/icons/favicon-16x16.png">
-	<link rel="manifest" href="/serveradmin/icons/manifest.json">
-	<link rel="mask-icon" href="/serveradmin/icons/safari-pinned-tab.svg" color="#5bbad5">
-	<link rel="shortcut icon" href="/serveradmin/icons/favicon.ico">
-	<meta name="msapplication-config" content="/serveradmin/icons/browserconfig.xml">
-	<meta name="theme-color" content="#ffffff">
 
 	<title>Domain Management</title>
 
@@ -143,8 +135,45 @@
 			</div>
 		</div>
 	</div><!-- Domains menu -->
-		
-	.sf-domainsMenu()
+	
+	<div class="item-separator"><p><!-- empty but necessary! --></p></div>
+        <div class="item">
+            <input id="domain-checkbox" type="checkbox">
+            <div class="title">
+                <label class="symbol" for="domain-checkbox">
+                    <p class="code"><!-- will be filled by disclosure indicator --></p>
+                </label>
+                <div class="text"><a href="/serveradmin/pages/domain-management.sf.html"><p>Domains</p></a></div>
+            </div>
+            <div class="dropdown">
+                <div class="subitem-separator"><p><!-- empty but necessary! --></p></div>
+                <div class="subitem">
+                    <input type="checkbox" id="DomainManagement-checkbox">
+                    <div class="title">
+                        <label class="symbol" for="DomainManagement-checkbox">
+                            <p></p>
+                        </label>
+                        <div class="text"><a href="/serveradmin/pages/domain-management.sf.html"><p>Manage Domains</p></a></div>
+                    </div>
+                </div>
+    		.for(server-domains)
+            <div class="subitem-separator"><p><!-- empty but necessary! --></p></div>
+            <div class="subitem">
+                <input type="checkbox" id=".show($info.domain-name)-checkbox">
+                <div class="title">
+                    <label class="symbol" for=".show($info.domain-name)-checkbox">
+                        <p></p>
+                    </label>
+                    <div class="text">
+                        <form class="posting-link-form" method="post" action="/serveradmin/pages/domain.sf.html">
+                            <button type="submit" name="domain-name" value=".show($info.domain-name)" class="posting-link-button">.show($info.domain-name)</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        	.end(for)
+        </div>
+    </div>
 </nav>
 <!-- end of include menubar.html -->
 
@@ -165,23 +194,80 @@
 	</header>
 	<div class="page-content" itemprop="articleBody">
 <!-- Page content -->
-   <div class="center-content">.sf-domainsTable()</div>
-<form action="/serveradmin/sfcommand/CreateDomain" method="post">
+   <div class="center-content">
+	<div class="domains-list">
+	.for(server-domains)
+		<table class="domains-table">
+            <thead>
+            	<tr>
+            		<th>Domain:</th>
+            		<th>.show($info.domain-name)</th>
+            	</tr>
+            </thead>
+            <tbody>
+	  			.for(domain-aliases, $info.domain-name)
+	  				.if($info.for-index, equal, $info.for-start-index)
+	  					<tr>
+    	        			<td>Aliases:</td>
+            				<td>
+            					<div>
+                           			<p>.show($info.alias)</p>
+                        			<form method="post" action="/serveradmin/command/delete-alias">
+                            			<input type="hidden" name="alias-name" value=".show($info.alias!)" />
+                            			<button type="submit">Delete</button>
+                        			</form>
+                        		</div>
+                    		</td>
+                		</tr>
+					.else()
+	  					<tr>
+                    		<td></td>
+                    		<td>
+                    			<div>
+                            		<p>.show($info.alias)</p>
+                            		<form method="post" action="/serveradmin/command/delete-alias">
+                                		<button type="submit" name="alias-name" value=".show($info.alias!)">Delete Alias</button>
+                            		</form>
+                        		</div>
+                    		</td>
+                		</tr>
+                	.end(if)
+	  			.end(for-aliases)
+	  			<tr>
+                    <td></td>
+                    <td>
+                        <form method="post" action="/serveradmin/command/create-alias">
+                            <input type="hidden" name="domain-name" value=".show($info.domain-name)" />
+                            <input type="text" name="Alias" value="" />
+                            <button type="submit">Create Alias</button>
+                        </form>
+                    </td>
+                </tr>
+            </tbody>
+        </table>
+        <form method="post" action="/serveradmin/pages/delete-domain.sf.html">
+            <button type="submit" name="domain-name" value=".show($info.domain-name)">Delete Domain</button>
+        </form>
+	.end(for-domains)
+	</div>
+</div>
+
+<form action="/serveradmin/command/create-domain" method="post">
 	<div class="center-content">
 		<div style="display:flex; flex-direction:column; justify-content:center;">
 			<div style="display:flex; flex-direction:column; align-items:flex-end">
 				<table class="centered outlined-table table-cell-margins">
 					<tr>
 						<td><span>Add domain with name:</span></td>
-						<td><input type="text" name="DomainName" value="" /></td>
+						<td><input type="text" name="domain-name" value="" /></td>
 					</tr>
 					<tr>
 						<td><span>Domain Admin ID:</span></td>
-						<td><input type="text" name="ID" value="" /></td>
+						<td><input type="text" name="domain-admin-id" value="" /></td>
 					</tr>
 					<tr>
 						<td><span>Domain Admin Password:</span></td>
-						<td><input type="text" name="Password" value="" /></td>
+						<td><input type="text" name="domain-admin-password" value="" /></td>
 					</tr>
 				</table>
 				<div>

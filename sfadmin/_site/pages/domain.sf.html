@@ -6,16 +6,8 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="apple-touch-icon" sizes="180x180" href="/serveradmin/icons/apple-touch-icon.png">
-	<link rel="icon" type="image/png" sizes="32x32" href="/serveradmin/icons/favicon-32x32.png">
-	<link rel="icon" type="image/png" sizes="16x16" href="/serveradmin/icons/favicon-16x16.png">
-	<link rel="manifest" href="/serveradmin/icons/manifest.json">
-	<link rel="mask-icon" href="/serveradmin/icons/safari-pinned-tab.svg" color="#5bbad5">
-	<link rel="shortcut icon" href="/serveradmin/icons/favicon.ico">
-	<meta name="msapplication-config" content="/serveradmin/icons/browserconfig.xml">
-	<meta name="theme-color" content="#ffffff">
 
-	<title>Domain - .show($request.DomainName)</title>
+	<title>Domain: .show($request.domain-name)</title>
 
 	<meta name="description" content="Swiftfire Server Admin">
 
@@ -143,8 +135,45 @@
 			</div>
 		</div>
 	</div><!-- Domains menu -->
-		
-	.sf-domainsMenu()
+	
+	<div class="item-separator"><p><!-- empty but necessary! --></p></div>
+        <div class="item">
+            <input id="domain-checkbox" type="checkbox">
+            <div class="title">
+                <label class="symbol" for="domain-checkbox">
+                    <p class="code"><!-- will be filled by disclosure indicator --></p>
+                </label>
+                <div class="text"><a href="/serveradmin/pages/domain-management.sf.html"><p>Domains</p></a></div>
+            </div>
+            <div class="dropdown">
+                <div class="subitem-separator"><p><!-- empty but necessary! --></p></div>
+                <div class="subitem">
+                    <input type="checkbox" id="DomainManagement-checkbox">
+                    <div class="title">
+                        <label class="symbol" for="DomainManagement-checkbox">
+                            <p></p>
+                        </label>
+                        <div class="text"><a href="/serveradmin/pages/domain-management.sf.html"><p>Manage Domains</p></a></div>
+                    </div>
+                </div>
+    		.for(server-domains)
+            <div class="subitem-separator"><p><!-- empty but necessary! --></p></div>
+            <div class="subitem">
+                <input type="checkbox" id=".show($info.domain-name)-checkbox">
+                <div class="title">
+                    <label class="symbol" for=".show($info.domain-name)-checkbox">
+                        <p></p>
+                    </label>
+                    <div class="text">
+                        <form class="posting-link-form" method="post" action="/serveradmin/pages/domain.sf.html">
+                            <button type="submit" name="domain-name" value=".show($info.domain-name)" class="posting-link-button">.show($info.domain-name)</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        	.end(for)
+        </div>
+    </div>
 </nav>
 <!-- end of include menubar.html -->
 
@@ -160,17 +189,36 @@
 <!-- Start of main content -->
 <article class="page" itemscope itemtype="http://schema.org/Article">
 	<header class="page-header">
-		<h1 class="page-title" itemprop="name headline">Domain - .show($request.DomainName)</h1>
+		<h1 class="page-title" itemprop="name headline">Domain: .show($request.domain-name)</h1>
 		<p class="page-meta"></p>
 	</header>
 	<div class="page-content" itemprop="articleBody">
 <!-- Page content -->
-   <h2 class="text-centered" id="administrator">Administrator</h2>
+   <h2 class="text-centered" id="telemetry">Telemetry</h2>
+
+<table class="domain-telemetry-table">
+    <thead>
+        <tr>
+        	<th>Name</th><th>Value</th><th>Description</th>
+        </tr>
+    </thead>
+    <tbody>
+    	.for(domain-telemetry, $request.domain-name)
+            <tr>
+                <td class="table-column-name">.show($info.named-value-protocol-name)</td>
+                <td class="table-column-value">.show($info.named-value-protocol-value)</td>
+                <td class="table-column-description">.show($info.named-value-protocol-about)</td>
+            </tr>
+        .end(for)
+    </tbody>
+</table>
+
+<h2 class="text-centered" id="domain-admin">Domain Admin</h2>
 
 <div style="display:flex">
 	<div style="background-color:#f0f0f0; border: 2px solid lightgray; margin-left:auto; margin-right:auto;">
-		<form action="/serveradmin/sfcommand/SetDomainAdminPassword" method="post">
-			<input type="hidden" name="DomainName" value=".show($request.DomainName)" />
+		<form action="/serveradmin/command/set-domain-admin-password" method="post">
+			<input type="hidden" name="domain-name" value=".show($request.domain-name)" />
 			<table>
 				<tr>
 					<td>Domain admin:</td>
@@ -189,102 +237,187 @@
 
 <h2 class="text-centered" id="parameters">Parameters</h2>
 
-<table class="domain-details-table">
-  <thead>
-    <tr>
-      <th style="text-align: left">Parameter</th>
-      <th style="text-align: center">Value</th>
-      <th style="text-align: left">Description</th>
-    </tr>
-  </thead>
-  <tbody>
-    <tr>
-      <td style="text-align: left">Root:</td>
-      <td style="text-align: center">.sf-postingButtonedInput(“/serveradmin/sfcommand/UpdateDomain”, root, “”, Update)</td>
-      <td style="text-align: left">The root directory containing the main entry (index file) of the website</td>
-    </tr>
-    <tr>
-      <td style="text-align: left">Enabled:</td>
-      <td style="text-align: center">.sf-postingButtonedInput(“/serveradmin/sfcommand/UpdateDomain”, enabled, “”, Update)</td>
-      <td style="text-align: left">The domain is enabled when set to ‘true’, disabled otherwise</td>
-    </tr>
-    <tr>
-      <td style="text-align: left">SF Resources:</td>
-      <td style="text-align: center">.sf-postingButtonedInput(“/serveradmin/sfcommand/UpdateDomain”, sfresources, “”, Update)</td>
-      <td style="text-align: left">(Optional) The directory containing resources for Swiftfire, see documentation</td>
-    </tr>
-    <tr>
-      <td style="text-align: left">Access Log:</td>
-      <td style="text-align: center">.sf-postingButtonedInput(“/serveradmin/sfcommand/UpdateDomain”, accesslogenabled, “”, Update)</td>
-      <td style="text-align: left">Generate a log of all clients when ‘true’</td>
-    </tr>
-    <tr>
-      <td style="text-align: left">404 Log:</td>
-      <td style="text-align: center">.sf-postingButtonedInput(“/serveradmin/sfcommand/UpdateDomain”, 404logenabled, “”, Update)</td>
-      <td style="text-align: left">Generate a log of all URL that resulted in a 404 error when ‘true’</td>
-    </tr>
-    <tr>
-      <td style="text-align: left">Session log:</td>
-      <td style="text-align: center">.sf-postingButtonedInput(“/serveradmin/sfcommand/UpdateDomain”, sessionlogenabled, “”, Update)</td>
-      <td style="text-align: left">Generate a log of all sessions when ‘true’</td>
-    </tr>
-    <tr>
-      <td style="text-align: left">Session timeout:</td>
-      <td style="text-align: center">.sf-postingButtonedInput(“/serveradmin/sfcommand/UpdateDomain”, sessiontimeout, “”, Update)</td>
-      <td style="text-align: left">A session is considered expired when inactive for this long (in seconds)</td>
-    </tr>
-    <tr>
-      <td style="text-align: left">PHP Path:</td>
-      <td style="text-align: center">.sf-postingButtonedInput(“/serveradmin/sfcommand/UpdateDomain”, phppath, “”, Update)</td>
-      <td style="text-align: left">(Optional) Enable PHP by setting the path to the interpreter</td>
-    </tr>
-    <tr>
-      <td style="text-align: left">PHP Options:</td>
-      <td style="text-align: center">.sf-postingButtonedInput(“/serveradmin/sfcommand/UpdateDomain”, phpoptions, “”, Update)</td>
-      <td style="text-align: left">(Optional) Options that will be sent to the PHP interpreter</td>
-    </tr>
-    <tr>
-      <td style="text-align: left">PHP Map Index:</td>
-      <td style="text-align: center">.sf-postingButtonedInput(“/serveradmin/sfcommand/UpdateDomain”, phpmapindex, “”, Update)</td>
-      <td style="text-align: left">Maps index requests to include index.php and index.sf.php</td>
-    </tr>
-    <tr>
-      <td style="text-align: left">PHP Map All:</td>
-      <td style="text-align: center">.sf-postingButtonedInput(“/serveradmin/sfcommand/UpdateDomain”, phpmapall, “”, Update)</td>
-      <td style="text-align: left">Allows to map *.html to *.php</td>
-    </tr>
-    <tr>
-      <td style="text-align: left">PHP Timeout:</td>
-      <td style="text-align: center">.sf-postingButtonedInput(“/serveradmin/sfcommand/UpdateDomain”, phptimeout, “”, Update)</td>
-      <td style="text-align: left">Timeout for PHP processing (in mSec)</td>
-    </tr>
-    <tr>
-      <td style="text-align: left">Foreward URL:</td>
-      <td style="text-align: center">.sf-postingButtonedInput(“/serveradmin/sfcommand/UpdateDomain”, forewardurl, “”, Update)</td>
-      <td style="text-align: left">(Optional) Forwards all incoming traffic to this url</td>
-    </tr>
-  </tbody>
-</table>
-
-<div class="line"></div>
-
-<h2 class="text-centered" id="telemetry">Telemetry</h2>
-
-<p>.sf-domainTelemetryTable()</p>
-
-<div class="line"></div>
-
-<h2 class="text-centered" id="blacklist">Blacklist</h2>
-
-<p>.sf-domainBlacklistTable()</p>
-
-<div class="line"></div>
-
-<h2 class="text-centered" id="services">Services</h2>
-
-<p class="text-centered">The services marked ‘used’ are currently in use, select or deselect as necessary. The services are executed in top to bottom order. To change the order, renumber as necessary.</p>
-
-<p>.sf-domainServicesTable()</p>
+<div class="domain-details-table">
+	<table class="default-table">
+		<thead>
+			<tr>
+				<th text-align="left" style="width:160px">Parameter</th>
+				<th text-align="center" style="width:260px">Value</th>
+				<th text-align="left">Description</th>
+			</tr>
+		</thead>
+		<tbody>
+			<tr>
+				<td>Root:</td>
+				<td>
+					<form method="post" action="/serveradmin/command/update-domain-parameter">
+						<input type="hidden" name="parameter-name" value="root" />
+						<input type="hidden" name="domain-name" value=".show($request.domain-name)" />
+            			<input type="text" name="parameter-value" value=".domainParameter($request.domain-name, root)" />
+            			<input type="submit" value="Update" />
+					</form>
+				</td>
+				<td>The root directory containing the main entry (index file) of the website</td>
+			</tr>
+			<tr>
+				<td class="col1">Enabled:</td>
+				<td>
+					<form method="post" action="/serveradmin/command/update-domain-parameter">
+						<input type="hidden" name="parameter-name" value="enabled" />
+						<input type="hidden" name="domain-name" value=".show($request.domain-name)" />
+            			<input type="text" name="parameter-value" value=".domainParameter($request.domain-name, enabled)" />
+            			<input type="submit" value="Update" />
+					</form>
+				</td>
+				<td>The domain is enabled when set to 'true', disabled otherwise</td>
+			</tr>
+			<tr>
+				<td>SF Resources:</td>
+				<td>
+					<form method="post" action="/serveradmin/command/update-domain-parameter">
+						<input type="hidden" name="parameter-name" value="sf-resources" />
+						<input type="hidden" name="domain-name" value=".show($request.domain-name)" />
+            			<input type="text" name="parameter-value" value=".domainParameter($request.domain-name, sf-resources)" />
+            			<input type="submit" value="Update" />
+					</form>
+				</td>
+				<td>(Optional) The directory containing resources for Swiftfire, see documentation</td>
+			</tr>
+			<tr>
+				<td>Access Log:</td>
+				<td>
+					<form method="post" action="/serveradmin/command/update-domain-parameter">
+						<input type="hidden" name="parameter-name" value="access-log-enabled" />
+						<input type="hidden" name="domain-name" value=".show($request.domain-name)" />
+            			<input type="text" name="parameter-value" value=".domainParameter($request.domain-name, access-log-enabled)" />
+            			<input type="submit" value="Update" />
+					</form>
+				</td>
+				<td>Generate a log of all clients when 'true'</td>
+			</tr>
+			<tr>
+				<td>404 Log:</td>
+				<td>
+					<form method="post" action="/serveradmin/command/update-domain-parameter">
+						<input type="hidden" name="parameter-name" value="404-log-enabled" />
+						<input type="hidden" name="domain-name" value=".show($request.domain-name)" />
+            			<input type="text" name="parameter-value" value=".domainParameter($request.domain-name, 404-log-enabled)" />
+            			<input type="submit" value="Update" />
+					</form>
+				</td>
+				<td>Generate a log of all URL that resulted in a 404 error when 'true'</td>
+			</tr>
+			<tr>
+				<td>Session Log:</td>
+				<td>
+					<form method="post" action="/serveradmin/command/update-domain-parameter">
+						<input type="hidden" name="parameter-name" value="session-log-enabled" />
+						<input type="hidden" name="domain-name" value=".show($request.domain-name)" />
+            			<input type="text" name="parameter-value" value=".domainParameter($request.domain-name, session-log-enabled)" />
+            			<input type="submit" value="Update" />
+					</form>
+				</td>
+				<td>Generate a log of all sessions when 'true'</td>
+			</tr>
+			<tr>
+				<td>Session timeout:</td>
+				<td>
+					<form method="post" action="/serveradmin/command/update-domain-parameter">
+						<input type="hidden" name="parameter-name" value="session-timeout" />
+						<input type="hidden" name="domain-name" value=".show($request.domain-name)" />
+            			<input type="text" name="parameter-value" value=".domainParameter($request.domain-name, session-timeout)" />
+            			<input type="submit" value="Update" />
+					</form>
+				</td>
+				<td>A session is considered expired when inactive for this long (in seconds)</td>
+			</tr>
+			<tr>
+				<td>PHP Path:</td>
+				<td>
+					<form method="post" action="/serveradmin/command/update-domain-parameter">
+						<input type="hidden" name="parameter-name" value="php-path" />
+						<input type="hidden" name="domain-name" value=".show($request.domain-name)" />
+            			<input type="text" name="parameter-value" value=".domainParameter($request.domain-name, php-path)" />
+            			<input type="submit" value="Update" />
+					</form>
+				</td>
+				<td>(Optional) Enable PHP by setting the path to the interpreter</td>
+			</tr>
+			<tr>
+				<td>PHP Options:</td>
+				<td>
+					<form method="post" action="/serveradmin/command/update-domain-parameter">
+						<input type="hidden" name="parameter-name" value="php-options" />
+						<input type="hidden" name="domain-name" value=".show($request.domain-name)" />
+            			<input type="text" name="parameter-value" value=".domainParameter($request.domain-name, php-options)" />
+            			<input type="submit" value="Update" />
+					</form>
+				</td>
+				<td>(Optional) Options that will be sent to the PHP interpreter</td>
+			</tr>
+			<tr>
+				<td>PHP Map Index:</td>
+				<td>
+					<form method="post" action="/serveradmin/command/update-domain-parameter">
+						<input type="hidden" name="parameter-name" value="php-map-index" />
+						<input type="hidden" name="domain-name" value=".show($request.domain-name)" />
+            			<input type="text" name="parameter-value" value=".domainParameter($request.domain-name, php-map-index)" />
+            			<input type="submit" value="Update" />
+					</form>
+				</td>
+				<td>Maps index requests to include index.php and index.sf.php</td>
+			</tr>
+			<tr>
+				<td>PHP Map All:</td>
+				<td>
+					<form method="post" action="/serveradmin/command/update-domain-parameter">
+						<input type="hidden" name="parameter-name" value="php-map-all" />
+						<input type="hidden" name="domain-name" value=".show($request.domain-name)" />
+            			<input type="text" name="parameter-value" value=".domainParameter($request.domain-name, php-map-all)" />
+            			<input type="submit" value="Update" />
+					</form>
+				</td>
+				<td>Allows to map *.html to *.php</td>
+			</tr>
+			<tr>
+				<td>PHP Timeout:</td>
+				<td>
+					<form method="post" action="/serveradmin/command/update-domain-parameter">
+						<input type="hidden" name="parameter-name" value="php-timeout" />
+						<input type="hidden" name="domain-name" value=".show($request.domain-name)" />
+            			<input type="text" name="parameter-value" value=".domainParameter($request.domain-name, php-timeout)" />
+            			<input type="submit" value="Update" />
+					</form>
+				</td>
+				<td>Timeout for PHP processing (in mSec)</td>
+			</tr>
+			<tr>
+				<td>Foreward URL:</td>
+				<td>
+					<form method="post" action="/serveradmin/command/update-domain-parameter">
+						<input type="hidden" name="parameter-name" value="foreward-url" />
+						<input type="hidden" name="domain-name" value=".show($request.domain-name)" />
+            			<input type="text" name="parameter-value" value=".domainParameter($request.domain-name, foreward-url)" />
+            			<input type="submit" value="Update" />
+					</form>
+				</td>
+				<td>(Optional) Forwards all incoming traffic to this url</td>
+			</tr>
+			<tr>
+				<td>Comments Auto Approval Threshold:</td>
+				<td>
+					<form method="post" action="/serveradmin/command/update-domain-parameter">
+						<input type="hidden" name="parameter-name" value="comment-auto-approval-threshold" />
+						<input type="hidden" name="domain-name" value=".show($request.domain-name)" />
+            			<input type="text" name="parameter-value" value=".domainParameter($request.domain-name, comment-auto-approval-threshold)" />
+            			<input type="submit" value="Update" />
+					</form>
+				</td>
+				<td>User comments will be approved automatically after this many approved comments</td>
+			</tr>
+		</tbody>
+	</table>
+</div>
 
 <!-- End of page content -->
 </div>

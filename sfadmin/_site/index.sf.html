@@ -6,14 +6,6 @@
 	<meta charset="utf-8">
 	<meta http-equiv="X-UA-Compatible" content="IE=edge">
 	<meta name="viewport" content="width=device-width, initial-scale=1">
-	<link rel="apple-touch-icon" sizes="180x180" href="/serveradmin/icons/apple-touch-icon.png">
-	<link rel="icon" type="image/png" sizes="32x32" href="/serveradmin/icons/favicon-32x32.png">
-	<link rel="icon" type="image/png" sizes="16x16" href="/serveradmin/icons/favicon-16x16.png">
-	<link rel="manifest" href="/serveradmin/icons/manifest.json">
-	<link rel="mask-icon" href="/serveradmin/icons/safari-pinned-tab.svg" color="#5bbad5">
-	<link rel="shortcut icon" href="/serveradmin/icons/favicon.ico">
-	<meta name="msapplication-config" content="/serveradmin/icons/browserconfig.xml">
-	<meta name="theme-color" content="#ffffff">
 
 	<title>Swiftfire Server Admin</title>
 
@@ -143,8 +135,45 @@
 			</div>
 		</div>
 	</div><!-- Domains menu -->
-		
-	.sf-domainsMenu()
+	
+	<div class="item-separator"><p><!-- empty but necessary! --></p></div>
+        <div class="item">
+            <input id="domain-checkbox" type="checkbox">
+            <div class="title">
+                <label class="symbol" for="domain-checkbox">
+                    <p class="code"><!-- will be filled by disclosure indicator --></p>
+                </label>
+                <div class="text"><a href="/serveradmin/pages/domain-management.sf.html"><p>Domains</p></a></div>
+            </div>
+            <div class="dropdown">
+                <div class="subitem-separator"><p><!-- empty but necessary! --></p></div>
+                <div class="subitem">
+                    <input type="checkbox" id="DomainManagement-checkbox">
+                    <div class="title">
+                        <label class="symbol" for="DomainManagement-checkbox">
+                            <p></p>
+                        </label>
+                        <div class="text"><a href="/serveradmin/pages/domain-management.sf.html"><p>Manage Domains</p></a></div>
+                    </div>
+                </div>
+    		.for(server-domains)
+            <div class="subitem-separator"><p><!-- empty but necessary! --></p></div>
+            <div class="subitem">
+                <input type="checkbox" id=".show($info.domain-name)-checkbox">
+                <div class="title">
+                    <label class="symbol" for=".show($info.domain-name)-checkbox">
+                        <p></p>
+                    </label>
+                    <div class="text">
+                        <form class="posting-link-form" method="post" action="/serveradmin/pages/domain.sf.html">
+                            <button type="submit" name="domain-name" value=".show($info.domain-name)" class="posting-link-button">.show($info.domain-name)</button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        	.end(for)
+        </div>
+    </div>
 </nav>
 <!-- end of include menubar.html -->
 
@@ -163,43 +192,45 @@
 <div class="status-table" style="overflow-x:auto;">
 
   <table>
-    <thead>
-      <tr>
-        <th style="text-align: left">Item</th>
-        <th style="text-align: center">Value</th>
-        <th style="text-align: center">Status</th>
-        <th> </th>
-        <th> </th>
-      </tr>
-    </thead>
-    <tbody>
-      <tr>
-        <td style="text-align: left">Swiftfire Version:</td>
-        <td style="text-align: center">.sf-telemetryValue(“ServerVersion”)</td>
-        <td style="text-align: center"> </td>
-        <td>.sf-command(Restart)</td>
-        <td>.sf-command(Quit)</td>
-      </tr>
-      <tr>
-        <td style="text-align: left">HTTP Portnumber:</td>
-        <td style="text-align: center">.sf-parameterValue(“HttpServicePortNumber”)</td>
-        <td style="text-align: center">.sf-telemetryValue(“HttpServerStatus”)</td>
-        <td> </td>
-        <td> </td>
-      </tr>
-      <tr>
-        <td style="text-align: left">HTTPS Portnumber:</td>
-        <td style="text-align: center">.sf-parameterValue(“HttpsServicePortNumber”)</td>
-        <td style="text-align: center">.sf-telemetryValue(“HttpsServerStatus”)</td>
-        <td> </td>
-        <td> </td>
-      </tr>
-    </tbody>
-  </table>
+	<thead>
+		<tr>
+			<th>Item</th><th>Value</th><th>Status</th><th>Action</th>
+		</tr>
+	</thead>
+	<tbody>
+		<tr>
+			<td>Swiftfire Version</td>
+			<td>.show($server-telemetry.ServerVersion)</td>
+			<td></td>
+			<td>
+				<div style="display:flex">
+					<form method="post" action="/serveradmin/command/restart">
+						<button type="submit">Restart</button>
+					</form>
+					<form method="post" action="/serveradmin/command/quit" style="margin-left:2em">
+						<button type="submit">Quit</button>
+					</form>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td>HTTP Port</td>
+			<td>.show($server-parameter.HttpServicePortNumber)</td>
+			<td>.show($server-telemetry.HttpServerStatus)</td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>HTTPS Port</td>
+			<td>.show($server-parameter.HttpsServicePortNumber)</td>
+			<td>.show($server-telemetry.HttpsServerStatus)</td>
+			<td></td>
+		</tr>
+	</tbody>
+</table>
 
 </div>
 
-<p class="text-centered">Server admin site root: .sf-parameterValue(ServerAdminSiteRoot)</p>
+<p class="text-centered">Server admin site root: <span style="background-color:#eee">.show($server-parameter.ServerAdminSiteRoot)</span></p>
 
 <!-- End of main content -->
 
