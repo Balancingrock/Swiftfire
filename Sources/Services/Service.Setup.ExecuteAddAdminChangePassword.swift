@@ -1,6 +1,6 @@
 // =====================================================================================================================
 //
-//  File:       Service.Setup.Page.Logoff.swift
+//  File:       Service.Setup.ExecuteAddAdminChangePassword.swift
 //  Project:    Swiftfire
 //
 //  Version:    1.3.0
@@ -42,24 +42,61 @@
 
 import Foundation
 
+import Http
 import Core
 
 
-internal func logoff(_ domain: Domain) -> String {
+internal func executeAddAdminChangePassword(_ request: Request, _ domain: Domain) {
     
-    func setupCommand(_ domain: Domain, _ cmd: String) -> String {
-        return "/\(domain.setupKeyword!)/command/\(cmd)"
+    guard let adminId = request.info["adminid"], let uuid = UUID(uuidString: adminId) else {
+        Log.atError?.log("Missing admin ID")
+        return
     }
-    
-    let html: String = """
-        <div class="center-content">
-            <div class="table-container">
-                <form method="post" action="\(setupCommand(domain, "logoff"))">
-                    <input type="submit" value="Logoff">
-                </form>
-            </div>
-        </div>
-    """
-    
-    return html
+
+    guard let adminPwd = request.info["adminpassword"] else {
+        Log.atError?.log("Missing admin password")
+        return
+    }
+
+    if let account = domain.accounts.getAccount(for: uuid) {
+        
+        
+        // Grant admin rights to this account
+        
+        if !account.isDomainAdmin {
+            account.isDomainAdmin = true
+            Log.atNotice?.log("Enabled admin rights for account \(adminId)")
+        }
+        
+        
+        // Change the password
+        
+        if account.updatePassword(adminPwd) {
+            Log.atNotice?.log("Updated the password for domain admin \(adminId)")
+        } else {
+            Log.atError?.log("Failed to update the password for domain admin \(adminId)")
+        }
+        
+        account.isEnabled = true
+        account.emailVerificationCode = ""
+
+    } else {
+        
+        
+        // Add an admin
+        
+        if let account = domain.accounts.newAccount(name: adminId, password: adminPwd) {
+
+            account.isDomainAdmin = true
+            
+            account.isEnabled = true
+            account.emailVerificationCode = ""
+            
+            Log.atNotice?.log("Added domain admin account with id: \(adminId)")
+
+        } else {
+            
+            Log.atError?.log("Failed to add domain admin for id: \(adminId)")
+        }
+    }
 }

@@ -49,24 +49,9 @@ import Core
 // =================================
 // Names for the available functions
 // =================================
-/*
-let SF_PARAMETER_VALUE = "sf-parameterValue"
-let SF_TELEMETRY_VALUE = "sf-telemetryValue"
-let SF_COMMAND = "sf-command"
-let SF_PARAMETER_TABLE = "sf-parameterTable"
-let SF_TELEMETRY_TABLE = "sf-telemetryTable"
-let SF_BLACKLIST_TABLE = "sf-blacklistTable"
-let SF_DOMAINS_MENU = "sf-domainsMenu"
-let SF_DOMAINS_TABLE = "sf-domainsTable"*/
-let SF_DOMAIN_PARAMETER = "domainParameter"/*
-let SF_DOMAIN_TELEMETRY_TABLE = "sf-domainTelemetryTable"
-let SF_POSTING_BUTTONED_INPUT = "sf-postingButtonedInput"
-let SF_DOMAIN_SERVICES_TABLE = "sf-domainServicesTable"
-let SF_DOMAIN_BLACKLIST_TABLE = "sf-domainBlacklistTable"
-let SF_STATISTICS_PAGE = "sf-statisticsPage"
-let SF_DOMAIN_BUTTON = "sf-domainButton"
-let SF_ADMIN_TABLE = "sf-adminTable"
-*/
+
+let SF_DOMAIN_PARAMETER = "domainParameter"
+
 
 // ==================================================
 // Add to the next function to register new functions
@@ -76,13 +61,5 @@ let SF_ADMIN_TABLE = "sf-adminTable"
 /// Register the functions
 
 public func sfRegisterFunctions() {
-    //functions.register(name: SF_PARAMETER_VALUE, function: function_sf_parameterValue)
-    //functions.register(name: SF_TELEMETRY_VALUE, function: function_sf_telemetryValue)
-    //functions.register(name: SF_TELEMETRY_TABLE, function: function_sf_telemetryTable)
-    //functions.register(name: SF_DOMAINS_MENU, function: function_sf_domainsMenu)
-    //functions.register(name: SF_DOMAIN_TELEMETRY_TABLE, function: function_sf_domainTelemetryTable)
-    //functions.register(name: SF_DOMAIN_SERVICES_TABLE, function: function_sf_domainServicesTable)
-    //functions.register(name: SF_POSTING_BUTTONED_INPUT, function: function_sf_postingButtonedInput)
-    //functions.register(name: SF_DOMAIN_BUTTON, function: function_sf_domainButton)
     functions.register(name: SF_DOMAIN_PARAMETER, function: function_sf_domainParameter)
 }

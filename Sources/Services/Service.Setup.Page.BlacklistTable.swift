@@ -46,6 +46,10 @@ import Core
 
 internal func blacklistTable(_ domain: Domain) -> String {
     
+    func setupCommand(_ cmd: String) -> String {
+        return "/\(domain.setupKeyword!)/command/\(cmd)"
+    }
+
     var html: String = """
         <div class="center-content">
             <div class="table-container">
@@ -64,7 +68,7 @@ internal func blacklistTable(_ domain: Domain) -> String {
             <tr>
                 <td>\(address)</td>
                 <td>
-                    <form method="post" action="\(domainCommand(domain, "update-blacklist"))">
+                    <form method="post" action="\(setupCommand("update-blacklist"))">
                         <div style="display:flex; flex-direction:row; align-items:center;">
                             <input type="hidden" name="blacklist-address" value="\(address)">
                             <input type="radio" name="blacklist-action" value="close" \(action == .closeConnection ? "checked" : "")>
@@ -78,7 +82,7 @@ internal func blacklistTable(_ domain: Domain) -> String {
                     </form>
                 </td>
                 <td>
-                    <form method="post" action="\(domainCommand(domain, "remove-from-blacklist"))">
+                    <form method="post" action="\(setupCommand("remove-from-blacklist"))">
                         <input type="hidden" name="blacklist-address" value="\(address)">
                         <input type="submit" value="Remove">
                     </form>
@@ -97,7 +101,7 @@ internal func blacklistTable(_ domain: Domain) -> String {
         <h3>Add address to blacklist</h3>
         <div class="center-content">
             <div class="table-container">
-                <form method="post" action="\(domainCommand(domain, "add-to-blacklist"))")>
+                <form method="post" action="\(setupCommand("add-to-blacklist"))")>
                     <table>
                         <tbody>
                             <tr>

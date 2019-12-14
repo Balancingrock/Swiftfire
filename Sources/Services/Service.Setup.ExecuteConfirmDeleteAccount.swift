@@ -1,6 +1,6 @@
 // =====================================================================================================================
 //
-//  File:       Service.Setup.Page.Logoff.swift
+//  File:       Service.Setup.ExecuteConfirmDeleteAccount.swift
 //  Project:    Swiftfire
 //
 //  Version:    1.3.0
@@ -42,24 +42,16 @@
 
 import Foundation
 
+import Http
 import Core
 
 
-internal func logoff(_ domain: Domain) -> String {
+internal func executeConfirmDeleteAccount(_ request: Request, _ domain: Domain) -> Bool {
     
-    func setupCommand(_ domain: Domain, _ cmd: String) -> String {
-        return "/\(domain.setupKeyword!)/command/\(cmd)"
+    guard let adminId = request.info["admin-name"], let uuid = UUID(uuidString: adminId) else {
+        Log.atError?.log("Missing admin ID")
+        return false
     }
     
-    let html: String = """
-        <div class="center-content">
-            <div class="table-container">
-                <form method="post" action="\(setupCommand(domain, "logoff"))">
-                    <input type="submit" value="Logoff">
-                </form>
-            </div>
-        </div>
-    """
-    
-    return html
+    return domain.accounts.getAccount(for: uuid) != nil
 }

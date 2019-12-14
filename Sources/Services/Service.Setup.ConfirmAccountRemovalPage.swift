@@ -48,6 +48,10 @@ import Core
 
 internal func confirmAccountRemovalPage(_ request: Request, _ response: Response, _ domain: Domain) {
     
+    func setupCommand(_ cmd: String) -> String {
+        return "/\(domain.setupKeyword!)/command/\(cmd)"
+    }
+
     let adminId = request.info["admin-id"]!
 
     let html: String =
@@ -67,8 +71,8 @@ internal func confirmAccountRemovalPage(_ request: Request, _ response: Response
                     <div style="margin-left:auto; margin-right:auto;">
                         <h1>Confirm removal of account with name: \(adminId)</h1>
                         <form method="post">
-                            <input type="hidden" name="RemoveAccountId" value="\(adminId)">
-                            <input type="submit" value="Confirmed" formaction="\(domainCommand(domain, "remove-account"))">
+                            <input type="hidden" name="remove-account-id" value="\(adminId)">
+                            <input type="submit" value="Confirmed" formaction="\(setupCommand("remove-account"))">
                             <input type="submit" value="Don't remove" formaction="/\(domain.setupKeyword!)">
                         </form>
                     </div>

@@ -46,6 +46,10 @@ import Core
 
 internal func parameterTable(_ domain: Domain) -> String {
     
+    func setupCommand(_ cmd: String) -> String {
+        return "/\(domain.setupKeyword!)/command/\(cmd)"
+    }
+    
     let html = """
     <div class="table-container center-content">
         <table>
@@ -58,7 +62,7 @@ internal func parameterTable(_ domain: Domain) -> String {
             <tr>
                 <td>Enabled</td>
                 <td>
-                    <form method="post" action="\(domainCommand(domain, "update-parameter"))">
+                    <form method="post" action="\(setupCommand("update-parameter"))">
                         <input type="hidden" name="parameter-name" value="enabled">
                         <input type="text" name="parameter-value" value="\(domain.enabled)">
                         <input type="submit" value="Update">
@@ -69,7 +73,7 @@ internal func parameterTable(_ domain: Domain) -> String {
             <tr>
                 <td>Access Log</td>
                 <td>
-                    <form method="post" action="\(domainCommand(domain, "update-parameter"))">
+                    <form method="post" action="\(setupCommand("update-parameter"))">
                         <input type="hidden" name="parameter-name" value="accessLogEnabled">
                         <input type="text" name="parameter-value" value="\(domain.accessLogEnabled)">
                         <input type="submit" value="Update">
@@ -80,7 +84,7 @@ internal func parameterTable(_ domain: Domain) -> String {
             <tr>
                 <td>404 Log</td>
                 <td>
-                    <form method="post" action="\(domainCommand(domain, "update-parameter"))">
+                    <form method="post" action="\(setupCommand("update-parameter"))">
                         <input type="hidden" name="parameter-name" value="four04LogEnabled">
                         <input type="text" name="parameter-value" value="\(domain.four04LogEnabled)">
                         <input type="submit" value="Update">
@@ -91,7 +95,7 @@ internal func parameterTable(_ domain: Domain) -> String {
             <tr>
                 <td>Session Log</td>
                 <td>
-                    <form method="post" action="\(domainCommand(domain, "update-parameter"))">
+                    <form method="post" action="\(setupCommand("update-parameter"))">
                         <input type="hidden" name="parameter-name" value="sessionLogEnabled">
                         <input type="text" name="parameter-value" value="\(domain.sessionLogEnabled)">
                         <input type="submit" value="Update">
@@ -102,7 +106,7 @@ internal func parameterTable(_ domain: Domain) -> String {
             <tr>
                 <td>Session Timeout</td>
                 <td>
-                    <form method="post" action="\(domainCommand(domain, "update-parameter"))">
+                    <form method="post" action="\(setupCommand("update-parameter"))">
                         <input type="hidden" name="parameter-name" value="sessionTimeout">
                         <input type="text" name="parameter-value" value="\(domain.sessionTimeout)">
                         <input type="submit" value="Update">
@@ -113,7 +117,7 @@ internal func parameterTable(_ domain: Domain) -> String {
             <tr>
                 <td>PHP Map Index</td>
                 <td>
-                    <form method="post" action="\(domainCommand(domain, "update-parameter"))">
+                    <form method="post" action="\(setupCommand("update-parameter"))">
                         <input type="hidden" name="parameter-name" value="phpMapIndex">
                         <input type="text" name="parameter-value" value="\(domain.phpMapIndex)">
                         <input type="submit" value="Update">
@@ -124,7 +128,7 @@ internal func parameterTable(_ domain: Domain) -> String {
             <tr>
                 <td>PHP Map All</td>
                 <td>
-                    <form method="post" action="\(domainCommand(domain, "update-parameter"))">
+                    <form method="post" action="\(setupCommand("update-parameter"))">
                         <input type="hidden" name="parameter-name" value="phpMapAll">
                         <input type="text" name="parameter-value" value="\(domain.phpMapAll)">
                         <input type="submit" value="Update">
@@ -135,7 +139,7 @@ internal func parameterTable(_ domain: Domain) -> String {
             <tr>
                 <td>PHP Timeout</td>
                 <td>
-                    <form method="post" action="\(domainCommand(domain, "update-parameter"))">
+                    <form method="post" action="\(setupCommand("update-parameter"))">
                         <input type="hidden" name="parameter-name" value="phpTimeout">
                         <input type="text" name="parameter-value" value="\(domain.phpTimeout)">
                         <input type="submit" value="Update">
@@ -146,7 +150,7 @@ internal func parameterTable(_ domain: Domain) -> String {
             <tr>
                 <td>Foreward URL</td>
                 <td>
-                    <form method="post" action="\(domainCommand(domain, "update-parameter"))">
+                    <form method="post" action="\(setupCommand("update-parameter"))">
                         <input type="hidden" name="parameter-name" value="forwardUrl">
                         <input type="text" name="parameter-value" value="\(domain.forwardUrl)">
                         <input type="submit" value="Update">

@@ -47,7 +47,10 @@ import Core
 
 internal func servicesTable(_ domain: Domain) -> String {
 
-    
+    func setupCommand(_ cmd: String) -> String {
+        return "/\(domain.setupKeyword!)/command/\(cmd)"
+    }
+
     // Prepare the table data
     
     struct TableRow {
@@ -77,7 +80,7 @@ internal func servicesTable(_ domain: Domain) -> String {
     var html: String = """
         <div class="center-content">
             <div class="table-container">
-                <form method="post" action="\(domainCommand(domain, "update-services"))">
+                <form method="post" action="\(setupCommand("update-services"))">
                     <table>
                         <thead>
                             <tr>

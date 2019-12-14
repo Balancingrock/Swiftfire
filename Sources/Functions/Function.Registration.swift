@@ -60,9 +60,6 @@ import Core
 
 public func registerFunctions() {
     functions.register(name: "timestamp", function: function_timestamp)
-    functions.register(name: "postingLink", function: function_postingLink)
-    functions.register(name: "postingButton", function: function_postingButton)
-    functions.register(name: "postingButtonedInput", function: function_postingButtonedInput)
     functions.register(name: "nofPageHits", function: function_nofPageHits)
     functions.register(name: "show", function: function_show)
     functions.register(name: "setup", function: function_setup)

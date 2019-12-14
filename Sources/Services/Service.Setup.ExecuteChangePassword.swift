@@ -1,6 +1,6 @@
 // =====================================================================================================================
 //
-//  File:       Service.Setup.Page.Logoff.swift
+//  File:       Service.Setup.ExecuteChangePassword.swift
 //  Project:    Swiftfire
 //
 //  Version:    1.3.0
@@ -42,24 +42,38 @@
 
 import Foundation
 
+import Http
 import Core
 
 
-internal func logoff(_ domain: Domain) -> String {
+internal func executeChangePassword(_ request: Request, _ domain: Domain) {
     
-    func setupCommand(_ domain: Domain, _ cmd: String) -> String {
-        return "/\(domain.setupKeyword!)/command/\(cmd)"
+    guard let str = request.info["changepasswordid"], let uuid = UUID(uuidString: str) else {
+        Log.atError?.log("Missing id")
+        return
     }
-    
-    let html: String = """
-        <div class="center-content">
-            <div class="table-container">
-                <form method="post" action="\(setupCommand(domain, "logoff"))">
-                    <input type="submit" value="Logoff">
-                </form>
-            </div>
-        </div>
-    """
-    
-    return html
+
+    guard let pwd = request.info["changepasswordpassword"] else {
+        Log.atError?.log("Missing password")
+        return
+    }
+
+    if let account = domain.accounts.getAccount(for: uuid) {
+
+        
+        // Change the password
+        
+        if account.updatePassword(pwd) {
+            Log.atNotice?.log("Updated the password for domain admin \(account.name)")
+        } else {
+            Log.atError?.log("Failed to update the password for domain admin \(account.name)")
+        }
+        
+        account.isEnabled = true
+        account.emailVerificationCode = ""
+
+    } else {
+     
+        Log.atError?.log("Account not found for uuid: \(str)")
+    }
 }

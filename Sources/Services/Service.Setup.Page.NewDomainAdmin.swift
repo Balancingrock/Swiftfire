@@ -47,10 +47,14 @@ import Core
                 
 func newDomainAdmin(_ domain: Domain) -> String {
     
+    func setupCommand(_ cmd: String) -> String {
+        return "/\(domain.setupKeyword!)/command/\(cmd)"
+    }
+
     let html: String = """
         <div class="center-content">
             <div class="table-container">
-                <form method="post" action="\(domainCommand(domain, "add-admin-change-password"))">
+                <form method="post" action="\(setupCommand("add-admin-change-password"))">
                     <input type="hidden" name="Domain" value=".show($request.DomainName)">
                     <table>
                         <tr>

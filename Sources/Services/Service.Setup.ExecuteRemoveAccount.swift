@@ -1,6 +1,6 @@
 // =====================================================================================================================
 //
-//  File:       Service.Setup.Page.Logoff.swift
+//  File:       Service.Setup.ExecuteRemoveAccount.swift
 //  Project:    Swiftfire
 //
 //  Version:    1.3.0
@@ -42,24 +42,20 @@
 
 import Foundation
 
+import Http
 import Core
 
 
-internal func logoff(_ domain: Domain) -> String {
+internal func executeRemoveAccount(_ request: Request, _ domain: Domain) {
     
-    func setupCommand(_ domain: Domain, _ cmd: String) -> String {
-        return "/\(domain.setupKeyword!)/command/\(cmd)"
+    guard let accountId = request.info["remove-account-id"] else {
+        Log.atError?.log("Missing remove-account-id")
+        return
     }
-    
-    let html: String = """
-        <div class="center-content">
-            <div class="table-container">
-                <form method="post" action="\(setupCommand(domain, "logoff"))">
-                    <input type="submit" value="Logoff">
-                </form>
-            </div>
-        </div>
-    """
-    
-    return html
+
+    if domain.accounts.disable(name: accountId) {
+        Log.atNotice?.log("Account \(accountId) removed from domain \(domain.name)")
+    } else {
+        Log.atError?.log("Account not found for \(accountId) in domain \(domain.name)")
+    }
 }

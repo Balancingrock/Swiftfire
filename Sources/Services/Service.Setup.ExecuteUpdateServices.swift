@@ -1,6 +1,6 @@
 // =====================================================================================================================
 //
-//  File:       Service.Setup.Page.Logoff.swift
+//  File:       Service.Setup.ExecuteUpdateServices.swift
 //  Project:    Swiftfire
 //
 //  Version:    1.3.0
@@ -42,24 +42,62 @@
 
 import Foundation
 
+import Http
 import Core
 
 
-internal func logoff(_ domain: Domain) -> String {
+internal func executeUpdateServices(_ request: Request, _ domain: Domain) {
     
-    func setupCommand(_ domain: Domain, _ cmd: String) -> String {
-        return "/\(domain.setupKeyword!)/command/\(cmd)"
+    struct ServiceItem {
+        let index: Int
+        let name: String
     }
     
-    let html: String = """
-        <div class="center-content">
-            <div class="table-container">
-                <form method="post" action="\(setupCommand(domain, "logoff"))">
-                    <input type="submit" value="Logoff">
-                </form>
-            </div>
-        </div>
-    """
+    var serviceArr: Array<ServiceItem> = []
     
-    return html
+    var index = 0
+    
+    var error = false;
+    
+    while let _ = request.info["seqname\(index)"] {
+        
+        if let _ = request.info["usedname\(index)"] {
+            
+            if  let newIndexStr = request.info["seqname\(index)"],
+                let newIndex = Int(newIndexStr) {
+                
+                if let newName = request.info["namename\(index)"] {
+                    serviceArr.append(ServiceItem(index: newIndex, name: newName))
+                } else {
+                    error = true
+                    Log.atError?.log("Missing nameName for index \(index)")
+                }
+                
+            } else {
+                error = true
+                Log.atError?.log("Missing seqName for index \(index)")
+            }
+        }
+        index += 1
+    }
+    
+    guard error == false else { return }
+    
+    serviceArr.sort(by: { $0.index < $1.index })
+    
+    domain.serviceNames = serviceArr.map({ $0.name })
+    
+    domain.rebuildServices()
+    
+    domain.storeSetup()
+    
+    var str = ""
+    if domain.serviceNames.count == 0 {
+        str += "\nDomain Service Names:\n None\n"
+    } else {
+        str += "\nDomain Service Names:\n"
+        domain.serviceNames.forEach() { str += " service name = \($0)\n" }
+    }
+
+    Log.atNotice?.log("Updated services for domain \(domain.name) to/n\(str)")
 }

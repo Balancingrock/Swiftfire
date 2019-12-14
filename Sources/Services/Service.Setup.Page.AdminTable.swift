@@ -47,6 +47,10 @@ import Core
 
 internal func adminTable(_ domain: Domain, _ account: Account) -> String {
     
+    func setupCommand(_ cmd: String) -> String {
+        return "/\(domain.setupKeyword!)/command/\(cmd)"
+    }
+    
     var html: String =
     """
         <div class="center-content">
@@ -73,13 +77,13 @@ internal func adminTable(_ domain: Domain, _ account: Account) -> String {
                 <tr>
                     <td>\(accountName)</td>
                     <td>
-                        <form action="\(domainCommand(domain, "confirm-delete-account"))" method="post">
+                        <form action="\(setupCommand("confirm-delete-account"))" method="post">
                             <input type="hidden" name="admin-name" value="\(accountName)">
                             <input type="submit" value="Remove">
                         </form>
                     </td>
                     <td>
-                        <form action="\(domainCommand(domain, "change-password"))" method="post">
+                        <form action="\(setupCommand("change-password"))" method="post">
                             <input type="hidden" name="change-password-name" value="\(accountName)">
                             <input type="text" name="change-password-password" value="">
                             <input type="submit" value="Set New Password">
@@ -103,7 +107,7 @@ internal func adminTable(_ domain: Domain, _ account: Account) -> String {
                     <td>\(accountName)</td>
                     <td></td>
                     <td>
-                        <form action="\(domainCommand(domain, "change-password"))" method="post">
+                        <form action="\(setupCommand("change-password"))" method="post">
                             <input type="hidden" name="admin-name" value="\(accountName)">
                             <input type="text" name="admin-password" value="">
                             <input type="submit" value="Set New Password">
