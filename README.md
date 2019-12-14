@@ -1,27 +1,6 @@
-# Goal
+# Build websites with Swift.
 
-We are now far enough ahead in the project to give you our (preliminary) end goal:
-
-_To create a single-source stand-alone extensible website-application capable of serving multiple domains._
-
-That is quite a mouthfull, so lets take that apart:
-
-- _Single Source_: All source code written by ourselves, no dependencies on external libraries. The only exception is made for openSSL as we believe that security is a specialised field and best achieved by using a widely known and well reputed codebase.
-- _Stand-alone_: All web traffic is between the website user (client) and the website application. No external (micro-) services necessary for any of the functions provided by the application.
-- _Extensible_: It should be possible for the website creator to add functionality as required.
-- _Website application_: An application that implements a website. This application contains everything necessary to serve the website and create the dynamic content of the website. No other tools are needed (no server, no comment system provider, no wiki provider, no forum provider, no stats provider etc)
-- _Multiple domains_: If the website creator has multiple domains, all these domains should be able to be served using a single app.
-
-## What is not included
-
-Just as important to understand what is included is to know what is not included:
-
-- email: There is no email server included. However it is possible to send emails from the website application, but this capability relies on an email system beiing provided by another application on the server.
-- site builder: No HTML website builder is provided. The website application assumes that a website was build either manually or by another application. Note that an example site is present which is created by Jekyll and the server admin web-based GUI is also created using Jekyll.
-
-# Build websites in Swift.
-
-Swiftfire is a webserver that allows the injection of HTML code from routines written in Swift.
+Swiftfire is a webserver that allows the injection of HTML code from routines written with Swift.
 
 The Swiftfire webserver can be extended with functions and services written in Swift. The services are used to process a HTTP request, and the functions are used to prepare a response by processing the requested page or file.  This makes it possible to create entire websites written in nothing else but HTML, CSS and Swift. No other languages, frameworks or external services necessary, with a minor exception for openSSL for HTTPS.
 
@@ -67,7 +46,7 @@ The best part is, you can define and write the functions yourself.
 
 It is up to you to determine how much you want to do in Swift. For example, you could decide to have the entire landing page to be created by a function. To do that let index.sf.html exist only of: `.buildLandingPage()`. And of course you have to implement the function that is registered under the name `buildLandingPage`.
 
-It is fast. Depending of course on the amount and complexity of the services and functions, Swiftfire as presented here is very fast. On our server (a mac mini) the static pages are usually served in less than 2mS. Adding functions and services may increase this number of course. Still since the function calls and services refer to compiled code instead of interpreted code the speed of Swiftfire can be expected to be higher than interpreter solutions.
+It is fast. Depending of course on the amount and complexity of the services and functions, Swiftfire as presented here is very fast. On our server (a mac mini) the static pages are usually served in less than 2mS. Adding functions and services will increase this number of course. Still since the function calls and services refer to compiled code instead of interpreted code the speed of Swiftfire can be expected to be higher than interpreter solutions.
 
 Oh, and it does PHP as well...
 
@@ -193,6 +172,7 @@ The sources for the server admin site are generated using Jekyll. If changes mus
 - Fixed issue #9 (account names with differ in case only are no longer allowed)
 - Added functions for account creation by users with auto-email verification
 - Added `demo` site to showcase features and serve as a user website template
+- Rewritten sfadmin to push all html code into html files (i.e. functions should not contain html code)
 
 #### 1.2.1
 
