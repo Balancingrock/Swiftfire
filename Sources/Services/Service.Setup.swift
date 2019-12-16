@@ -130,7 +130,7 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
                 
             // Failed login, reset possible account
                 
-            session[.accountUuidKey] = nil
+            session.userLogout()
                 
                 
             // Set the timestamp for the failed attempt
@@ -149,7 +149,11 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
             
         // Associate the account with the session. This allows access for subsequent admin pages.
             
-        session[.accountUuidKey] = account
+        session[.accountUuidKey] = account.uuid.uuidString
+    
+    } else {
+        
+        Log.atDebug?.log("No login parameters found")
     }
     
     
@@ -202,7 +206,7 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
             case "add-admin-change-password": executeAddAdminChangePassword(request, domain)
             case "change-password": executeChangePassword(request, domain)
             case "logoff":
-                session.info.remove(key: .accountUuidKey)
+                session.userLogout()
                 Log.atNotice?.log("Admin logged out")
                 
             default:
@@ -247,8 +251,10 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
     // Return the setup page again unless the admin logged out or a non-admin account logged in
     
     if let account = session.info.getAccount(inDomain: domain), account.isDomainAdmin {
+        Log.atDebug?.log("Returning setup page")
         setupPage(domain, account, response)
     } else {
+        Log.atDebug?.log("Returning login page")
         loginPage(response, domain.name)
     }
     return .next

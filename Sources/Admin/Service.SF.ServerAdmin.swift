@@ -365,7 +365,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
         
         serverParameters.store()
         
-        session[.accountUuidKey] = account.uuid
+        session[.accountUuidKey] = account.uuid.uuidString
         
         relPath = "/"
         
@@ -407,7 +407,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
                 
                 // Failed login, reset possible account
                 
-                session[.accountUuidKey] = nil
+                session.userLogout()
                 
                 
                 // Set the timestamp for the failed attempt
@@ -426,7 +426,7 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
                 
             // Associate the account with the session. This allows access for subsequent admin pages.
                 
-            session[.accountUuidKey] = account.uuid
+            session[.accountUuidKey] = account.uuid.uuidString
                 
                 
             // If an admin tried to access an protected page while not logged-in, then the URL of that page is stored in the session.
@@ -660,7 +660,7 @@ fileprivate func adminSiteRootIsValid() -> Bool {
     if !FileManager.default.fileExists(atPath: path, isDirectory: &isDirectory) { return false }
         
         
-    // There is something, it must be a directory, check for index.html or index.htm
+    // There is something, it must be a directory, check for an index file
         
     if !isDirectory.boolValue { return false }
             
@@ -700,7 +700,6 @@ fileprivate func executeCommand(_ pathComponents: Array<String>, _ request: Requ
     case "cancel-quit": return .newPath("")
     case "confirmed-quit": executeQuitSwiftfire(); return .newPath("/pages/bye.sf.html")
     case "update-domain-parameter": executeUpdateDomainParameter(request); return .newPath("/pages/domain.sf.html")
-    //case "UpdateDomainServices": executeUpdateDomainServices(request); return .newPath("/pages/domain.sf.html")
     case "delete-domain": executeDeleteDomain(request); return .newPath("/pages/domain-management.sf.html")
     case "create-domain": executeCreateDomain(request); return .newPath("/pages/domain-management.sf.html")
     case "create-admin": executeCreateAdmin(request); return .newPath("/pages/admin-management.sf.html")
@@ -712,9 +711,6 @@ fileprivate func executeCommand(_ pathComponents: Array<String>, _ request: Requ
     case "update-blacklist": executeUpdateBlacklist(request); return .newPath("/pages/blacklist.sf.html")
     case "add-to-blacklist": executeAddToBlacklist(request); return .newPath("/pages/blacklist.sf.html")
     case "remove-from-blacklist": executeRemoveFromBlacklist(request); return .newPath("/pages/blacklist.sf.html")
-    //case "UpdateDomainBlacklist": executeUpdateDomainBlacklist(request); return .newPath("/pages/domain.sf.html")
-    //case "AddToDomainBlacklist": executeAddToDomainBlacklist(request); return .newPath("/pages/domain.sf.html")
-    //case "RemoveFromDomainBlacklist": executeRemoveFromDomainBlacklist(request); return .newPath("/pages/domain.sf.html")
     case "set-domain-admin-password": executeSetDomainAdminPassword(request); return .newPath("/pages/domain.sf.html")
     case "logout": return executeLogout(session);
         
@@ -1354,7 +1350,7 @@ fileprivate func executeLogout(_ session: Session) -> CommandExecutionResult {
     
     Log.atNotice?.log("Serveradmin logged out")
     
-    session[.accountUuidKey] = nil
+    session.userLogout()
     
     return .newPath("/pages/login.sf.html")
 }
@@ -1436,12 +1432,12 @@ fileprivate func executeSetNewPassword(_ request: Request) {
 
 fileprivate func executeSetDomainAdminPassword(_ request: Request) {
     
-    guard let domainName = request.info["domainname"], !domainName.isEmpty else {
+    guard let domainName = request.info["domain-name"], !domainName.isEmpty else {
         Log.atError?.log("No domain given")
         return
     }
 
-    guard let adminName = request.info["id"], !adminName.isEmpty else {
+    guard let adminName = request.info["domain-admin-id"], !adminName.isEmpty else {
         Log.atError?.log("No ID given")
         return
     }
@@ -1462,7 +1458,7 @@ fileprivate func executeSetDomainAdminPassword(_ request: Request) {
         
         if account.isDomainAdmin {
             
-            guard let newPassword = request.info["password"], !newPassword.isEmpty else {
+            guard let newPassword = request.info["domain-admin-password"], !newPassword.isEmpty else {
                 Log.atError?.log("No password given")
                 return
             }
@@ -1484,7 +1480,7 @@ fileprivate func executeSetDomainAdminPassword(_ request: Request) {
             
             // If there is a password, then also update the password
             
-            if let newPassword = request.info["password"], !newPassword.isEmpty {
+            if let newPassword = request.info["domain-admin-password"], !newPassword.isEmpty {
                 
                 if account.updatePassword(newPassword) {
                     Log.atNotice?.log("Updated the password for account \(account.name) in domain \(domain.name)")

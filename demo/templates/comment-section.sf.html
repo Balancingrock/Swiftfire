@@ -85,7 +85,7 @@ textarea { color: black; box-sizing: border-box; max-width: 100%; min-width: 100
 
 .else()
 	.cached($request.comment-section-identifier, $info.afterstamp)
-		.for(comments)
+		.for(comments, $request.comment-section-identifier)
 			.if($info.comment-removed, true)
 	<div class="comment-block">
 		<p>This comment has been removed.</p>

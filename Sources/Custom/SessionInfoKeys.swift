@@ -56,7 +56,7 @@ public enum SessionInfoKey: String {
     
     /// The UUID of the account associated with this session. It is only present if a user has logged-in.
     ///
-    /// __Type__: UUID
+    /// __Type__: String
     ///
     /// __Set by__: Service.ServerAdmin (for server admin accounts only)
     ///

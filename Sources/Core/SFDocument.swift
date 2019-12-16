@@ -590,7 +590,9 @@ fileprivate func getForLoopSource(_ args: Array<String>, _ info: inout Functions
 
     case "server-domains":
         
-        guard environment.account != nil, environment.serverAdminIsLoggedIn else {
+        if environment.account == nil { return nil } // Prevent alert on logout
+        
+        guard environment.serverAdminIsLoggedIn else {
             Log.atAlert?.log("Attempt to use server admin priviledge by \(environment.account?.name ?? "")")
             return nil
         }

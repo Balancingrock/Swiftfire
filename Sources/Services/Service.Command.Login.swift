@@ -128,7 +128,7 @@ internal func executeLogin(_ request: Request, _ domain: Domain, _ info: Service
     
     Log.atDebug?.log("Account name \(account.name) logged in")
     
-    session.info[.accountUuidKey] = account.uuid
+    session.info[.accountUuidKey] = account.uuid.uuidString
     
     return (session.info[.preLoginUrlKey] as? String) ?? "/index.sf.html"
 }

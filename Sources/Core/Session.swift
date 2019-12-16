@@ -271,6 +271,13 @@ public class Session: CustomStringConvertible {
             self.isExclusive = false
         }
     }
+    
+    
+    /// Logout a user
+    
+    public func userLogout() {
+        info.userLogout()
+    }
 }
 
 

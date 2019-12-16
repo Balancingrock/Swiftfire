@@ -49,7 +49,7 @@ import Custom
 
 /// The session information store
 ///
-/// SessionInfo is alive as long as the seeion itself. Several minutes as a minimum, several hours is also possible. It is thus imperative _NOT_ to store any data structures here that is buffered in a cache. This could lead to duplicate instances once the content of the cache is replaced and another thread/session needs access to the account.
+/// SessionInfo is alive as long as the session itself. Several minutes as a minimum, several hours is also possible. It is thus imperative _NOT_ to store any data structures here that are buffered in a cache. This could lead to duplicate instances once the content of the cache is replaced and another thread/session needs access to the account.
 
 public class SessionInfo {
     
@@ -71,15 +71,16 @@ public class SessionInfo {
         }
         return json
     }
+    
+    public func userLogout() { remove(key: .accountUuidKey) }
 }
 
 extension SessionInfo {
     
     public func getAccount(inDomain domain: Domain?) -> Account? {
-        if let uuid = self[.accountUuidKey] as? UUID {
-            return domain?.accounts.getAccount(for: uuid)
-        }
-        return nil
+        guard let str = self[.accountUuidKey] as? String else { return nil }
+        guard let uuid = UUID(uuidString: str) else { return nil }
+        return domain?.accounts.getAccount(for: uuid)
     }
 }
 

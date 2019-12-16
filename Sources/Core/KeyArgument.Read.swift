@@ -221,14 +221,12 @@ fileprivate func reader(_ args: Array<Substring>, _ functionsInfo: Functions.Inf
             
         case 1:
             
-            return (session.info[.accountUuidKey] as? UUID) != nil ? "not-nil" : "nil"
+            return (session.info[.accountUuidKey] as? String) != nil ? "not-nil" : "nil"
 
             
         case 2:
-            
-            guard let uuid = session.info[.accountUuidKey] as? UUID else { return nil }
-                        
-            guard let account = environment.domain.accounts.getAccount(for: uuid) else { return nil }
+                                    
+            guard let account = environment.account else { return nil }
             
             switch args[1].lowercased() {
         
@@ -342,10 +340,8 @@ fileprivate func reader(_ args: Array<Substring>, _ functionsInfo: Functions.Inf
         }
 
         let parameterName = args[1]
-        Log.atError?.log("Input Parameter name = \(parameterName)")
 
         for p in serverParameters.all {
-            Log.atError?.log("Parameter name = \(p.name)")
             if p.name == parameterName { return p.stringValue }
         }
 
