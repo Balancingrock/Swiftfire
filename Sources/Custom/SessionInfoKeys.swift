@@ -78,6 +78,17 @@ public enum SessionInfoKey: String {
     case preLoginUrlKey = "PreLoginUrl"
     
     
+    /// The request.info of the request that was made, but discarded because a user needed to login first. This key must be used to restore the original request in cooperation with the preLoginUrlKey..
+    ///
+    /// __Type__: Dictionary<String, String>
+    ///
+    /// __Set by__: Service.StorePreLoginUrl
+    ///
+    /// __Used by__: Services.ServerAdmin (for server admin accounts only)
+
+    case preLoginRequestInfoKey = "PreLoginRequestInfo"
+    
+    
     /// Time of last login attempt. This is used to enforce a minimum delay between login attempts. This helps in preventing brute force attacks.
     ///
     /// __Type__: Int64, intepreted as a javaDate, in milli seconds since 1 jan 1970.

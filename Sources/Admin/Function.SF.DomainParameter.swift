@@ -118,7 +118,7 @@ func function_sf_domainParameter(_ args: Functions.Arguments, _ info: inout Func
         return htmlErrorMessage
     }
     
-    guard let account = session.info.getAccount(inDomain: environment.domain) else {
+    guard let account = session.getAccount(inDomain: environment.domain) else {
         Log.atError?.log("No account found")
         return htmlErrorMessage
     }

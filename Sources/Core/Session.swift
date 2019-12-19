@@ -112,7 +112,7 @@ public class Session: CustomStringConvertible {
     
     /// A custom dictionary for information that must be associated with the session.
     
-    public var info: SessionInfo = SessionInfo()
+    fileprivate var info: SessionInfo = SessionInfo()
     
     
     /// The timeout for this session in seconds.
@@ -151,7 +151,7 @@ public class Session: CustomStringConvertible {
     
     public subscript(key: SessionInfoKey) -> CustomStringConvertible? {
         set {
-            Session.queue.async {
+            Session.queue.sync {
                 [weak self] in
                 guard let `self` = self else { return }
                 self.info.dict[key] = newValue
@@ -166,6 +166,12 @@ public class Session: CustomStringConvertible {
         }
     }
     
+    public func removeValue(forKey key: SessionInfoKey) {
+        Session.queue.sync {
+            [weak self] in
+            self?.info.remove(key: key)
+        }
+    }
     
     /// Debugging information
     
@@ -277,6 +283,13 @@ public class Session: CustomStringConvertible {
     
     public func userLogout() {
         info.userLogout()
+    }
+    
+    
+    public func getAccount(inDomain domain: Domain?) -> Account? {
+        guard let str = info[.accountUuidKey] as? String else { return nil }
+        guard let uuid = UUID(uuidString: str) else { return nil }
+        return domain?.accounts.getAccount(for: uuid)
     }
 }
 

@@ -54,7 +54,8 @@ import Core
 ///    - services.info[.relativeResourcePath]: Will be checked for html, or php page that is not login .
 ///
 /// _Output_:
-///    - services.info[.preLoginUrlKey]: The URL of the last usefull page before a login.
+///    - session.info[.preLoginUrlKey]: The URL of the last usefull page before a login.
+///    - session.info[.preLoginRequestInfoKey]: The request.info contents of the request before the login.
 ///
 /// _Sequence_:
 ///   - Should come after GetSession and GetResourcePathFromUrl
@@ -79,7 +80,7 @@ func service_storePreLoginUrl(_ request: Request, _ connection: SFConnection, _ 
     
     // Is a user logged in?
     
-    if let account = session.info.getAccount(inDomain: domain) {
+    if let account = session.getAccount(inDomain: domain) {
         Log.atDebug?.log("User \(account.name) logged in")
         return .next
     }
@@ -103,11 +104,12 @@ func service_storePreLoginUrl(_ request: Request, _ connection: SFConnection, _ 
     
     // Add the relative path in the pre-login url key
     
-    Log.atDebug?.log("Pre login URL key old: \(session.info[.preLoginUrlKey] as? String ?? "not-a-string")")
+    Log.atDebug?.log("Pre login URL key old: \(session[.preLoginUrlKey] as? String ?? "not-a-string")")
 
-    session.info[.preLoginUrlKey] = url
+    session[.preLoginUrlKey] = url
+    session[.preLoginRequestInfoKey] = request.info
     
-    Log.atDebug?.log("Pre login URL key new: \(session.info[.preLoginUrlKey] as? String ?? "not-a-string")")
+    Log.atDebug?.log("Pre login URL key new: \(session[.preLoginUrlKey] as? String ?? "not-a-string")")
     
     return .next
 }

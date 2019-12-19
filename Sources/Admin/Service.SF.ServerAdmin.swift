@@ -435,6 +435,9 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
             if let path = session[.preLoginUrlKey] as? String {
                 Log.atDebug?.log("Replacing relPath value \(relPath) with \(path)")
                 relPath = path
+                if let d = session[.preLoginRequestInfoKey] as? Dictionary<String, String> {
+                    request.info = d
+                }
             } else {
                 Log.atDebug?.log("Replacing relPath value \(relPath) with \"\\\"")
                 relPath = "/"
@@ -443,8 +446,9 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
                 
             // Remove the previous access url from the session.
                 
-            session[.preLoginUrlKey] = nil
-                
+            session.removeValue(forKey: .preLoginUrlKey)
+            session.removeValue(forKey: .preLoginRequestInfoKey)
+
                 
             /*** Fallthrough ***/
         }
@@ -526,16 +530,17 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
         
         // An admin must be logged in
         
-        guard let account = session.info.getAccount(inDomain: domain), serverAdminDomain.accounts.contains(account.name) else {
+        guard let account = session.getAccount(inDomain: domain), serverAdminDomain.accounts.contains(account.name) else {
             
             Log.atDebug?.log("No admin logged in")
             
             
             // Save the current request url, it will be used when the admin logs in (unless the login page was requested)
             
-            if (session.info[.preLoginUrlKey] == nil) && !relPath.contains("login") {
+            if (session[.preLoginUrlKey] == nil) && !relPath.contains("login") {
                 Log.atDebug?.log("Setting the session preLoginUrl to \(relPath)")
-                session.info[.preLoginUrlKey] = relPath
+                session[.preLoginUrlKey] = relPath
+                session[.preLoginRequestInfoKey] = request.info
             }
             
             loginAdminAccountPage()
@@ -1250,8 +1255,14 @@ fileprivate func executeCreateDomain(_ request: Request) {
         return
     }
 
+    guard let domainRoot = request.info["domain-root"], !domainRoot.isEmpty else {
+        Log.atError?.log("Missing Domain Root in request.info")
+        return
+    }
+
     if let domain = domainManager.createDomain(for: name) {
         domain.serviceNames = defaultServices
+        domain.webroot = domainRoot
         if let account = domain.accounts.getAccount(withName: adminId, andPassword: adminPwd) {
             account.isDomainAdmin = true
         } else {

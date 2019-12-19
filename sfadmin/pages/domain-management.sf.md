@@ -34,7 +34,7 @@ title: Domain Management
                     			<div>
                             		<p>.show($info.alias)</p>
                             		<form method="post" action="/serveradmin/command/delete-alias">
-                                		<button type="submit" name="alias-name" value=".show($info.alias!)">Delete Alias</button>
+                                		<button type="submit" name="alias-name" value=".show($info.alias!)">Delete</button>
                             		</form>
                         		</div>
                     		</td>
@@ -53,8 +53,9 @@ title: Domain Management
                 </tr>
             </tbody>
         </table>
-        <form method="post" action="/serveradmin/pages/delete-domain.sf.html">
-            <button type="submit" name="domain-name" value=".show($info.domain-name)">Delete Domain</button>
+        <form method="post" style="display:flex; justify-content:space-between; width:100%; margin-bottom:30px;">
+            <button type="submit" name="domain-name" value=".show($info.domain-name)" formaction="/serveradmin/pages/delete-domain.sf.html">Delete Domain</button>
+            <button type="submit" name="domain-name" value=".show($info.domain-name)" formaction="/serveradmin/pages/domain.sf.html">Domain Setup</button>
         </form>
 	.end(for-domains)
 	</div>
@@ -76,6 +77,10 @@ title: Domain Management
 					<tr>
 						<td><span>Domain Admin Password:</span></td>
 						<td><input type="text" name="domain-admin-password" value=""></td>
+					</tr>
+					<tr>
+						<td><span>Website Root Directory:</span></td>
+						<td><input type="text" name="domain-root" value=""></td>
 					</tr>
 				</table>
 				<div>

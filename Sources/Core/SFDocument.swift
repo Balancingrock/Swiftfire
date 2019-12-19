@@ -198,9 +198,7 @@ public class SFDocument: EstimatedMemoryConsumption {
         /// Returns the data contained in this block
 
         override func getData(_ info: inout Functions.Info, _ environment: Functions.Environment) -> Data? {
-            
-            Log.atDebug?.log("Controlblock: \(name)")
-            
+                        
             switch name {
             
             case "root":
@@ -257,8 +255,6 @@ public class SFDocument: EstimatedMemoryConsumption {
                 
             case "then", "else":
                 
-                Log.atDebug?.log("then-else-execution")
-
                 var data = Data()
 
                 blocks.forEach {
@@ -288,10 +284,6 @@ public class SFDocument: EstimatedMemoryConsumption {
                 let fcount = count ?? (source.nofElements - startIndex) + 1
                 let endIndex = min(startIndex + fcount + 1, source.nofElements)
                 
-                info["for-start-index"] = String(startIndex)
-                info["for-end-index"] = String(endIndex)
-                info["for-index"] = String(startIndex)
-                
                 for i in startIndex ..< endIndex {
 
                     source.addElement(at: i, to: &info)
@@ -299,12 +291,15 @@ public class SFDocument: EstimatedMemoryConsumption {
                     Log.atDebug?.log("for-index = \(i)")
 
                     blocks.forEach {
+
+                        info["for-start-index"] = String(startIndex)
+                        info["for-end-index"] = String(endIndex)
+                        info["for-index"] = String(i)
+
                         if let d = $0.getData(&info, environment) {
                             data.append(d)
                         }
                     }
-                    
-                    info["for-index"] = String(i)
                 }
                 
                 Log.atDebug?.log("endfor")

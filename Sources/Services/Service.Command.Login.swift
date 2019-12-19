@@ -128,7 +128,20 @@ internal func executeLogin(_ request: Request, _ domain: Domain, _ info: Service
     
     Log.atDebug?.log("Account name \(account.name) logged in")
     
-    session.info[.accountUuidKey] = account.uuid.uuidString
+    session[.accountUuidKey] = account.uuid.uuidString
     
-    return (session.info[.preLoginUrlKey] as? String) ?? "/index.sf.html"
+    
+    // Return a previous access attempt, or the default
+    
+    var newUrl = "/index.sf.html"
+    if let preLoginUrl = session[.preLoginUrlKey] as? String {
+        newUrl = preLoginUrl
+        if let preLoginInfo = session[.preLoginRequestInfoKey] as? Dictionary<String, String> {
+            request.info = preLoginInfo
+        }
+        session.removeValue(forKey: .preLoginUrlKey)
+        session.removeValue(forKey: .preLoginRequestInfoKey)
+    }
+    
+    return newUrl
 }

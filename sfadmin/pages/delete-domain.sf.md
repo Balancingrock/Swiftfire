@@ -11,3 +11,6 @@ menuInclude: no
         <button type="submit" name="Cancel" value="Cancel">Cancel</button>
     </form>
 </div>
+
+Note: The domain root directory and the domain support directory in "Application Support/Swiftfire/domains/.show($request.domain-name)" will not be deleted, this must be done separately. Creating the domain again before deleting these directories will cause the instant reappearance of the domain as it was before.
+{:.text-centered}

@@ -159,7 +159,7 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
     
     // Check if an admin is logged in
     
-    guard let account = session.info.getAccount(inDomain: domain) else {
+    guard let account = session.getAccount(inDomain: domain) else {
         Log.atDebug?.log("No account present", id: connection.logId)
         loginPage(response, domain.name)
         return .next
@@ -250,7 +250,7 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
     
     // Return the setup page again unless the admin logged out or a non-admin account logged in
     
-    if let account = session.info.getAccount(inDomain: domain), account.isDomainAdmin {
+    if let account = session.getAccount(inDomain: domain), account.isDomainAdmin {
         Log.atDebug?.log("Returning setup page")
         setupPage(domain, account, response)
     } else {

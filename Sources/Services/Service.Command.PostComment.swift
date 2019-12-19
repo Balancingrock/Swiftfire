@@ -77,7 +77,7 @@ func executePostComment(_ request: Request, _ domain: Domain, _ info: Services.I
     
     let displayName = request.info[COMMENT_DISPLAY_NAME_KEY] ?? "Anon"
     
-    let account = (info[.sessionKey] as? Session)?.info.getAccount(inDomain: domain)
+    let account = (info[.sessionKey] as? Session)?.getAccount(inDomain: domain)
     
     
     /// The account and domain are known, create the comment

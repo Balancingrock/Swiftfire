@@ -80,7 +80,7 @@ func executeRemoveComment(_ request: Request, _ domain: Domain, _ info: Services
         return nil
     }
     
-    guard let loginAccount = (info[.sessionKey] as? Session)?.info.getAccount(inDomain: domain) else {
+    guard let loginAccount = (info[.sessionKey] as? Session)?.getAccount(inDomain: domain) else {
         Log.atDebug?.log("No user logged in")
         request.info[PREVIOUS_ATTEMPT_MESSAGE_KEY] = "Login required"
         return LOGIN_TEMPLATE

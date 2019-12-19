@@ -51,20 +51,20 @@ import Custom
 ///
 /// SessionInfo is alive as long as the session itself. Several minutes as a minimum, several hours is also possible. It is thus imperative _NOT_ to store any data structures here that are buffered in a cache. This could lead to duplicate instances once the content of the cache is replaced and another thread/session needs access to the account.
 
-public class SessionInfo {
+internal class SessionInfo {
     
-    public subscript(key: SessionInfoKey) -> CustomStringConvertible? {
+    subscript(key: SessionInfoKey) -> CustomStringConvertible? {
         set { dict[key] = newValue }
         get { return dict[key] }
     }
     
-    public func remove(key: SessionInfoKey) {
+    func remove(key: SessionInfoKey) {
         dict.removeValue(forKey: key)
     }
     
-    public var dict: Dictionary<SessionInfoKey, CustomStringConvertible> = [:]
+    var dict: Dictionary<SessionInfoKey, CustomStringConvertible> = [:]
     
-    public var json: VJson {
+    var json: VJson {
         let json = VJson()
         for (key, value) in dict {
             json[key.rawValue] &= value.description
@@ -72,16 +72,7 @@ public class SessionInfo {
         return json
     }
     
-    public func userLogout() { remove(key: .accountUuidKey) }
-}
-
-extension SessionInfo {
-    
-    public func getAccount(inDomain domain: Domain?) -> Account? {
-        guard let str = self[.accountUuidKey] as? String else { return nil }
-        guard let uuid = UUID(uuidString: str) else { return nil }
-        return domain?.accounts.getAccount(for: uuid)
-    }
+    func userLogout() { remove(key: .accountUuidKey) }
 }
 
 extension SessionInfo: CustomStringConvertible {

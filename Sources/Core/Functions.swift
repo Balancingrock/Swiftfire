@@ -234,14 +234,14 @@ extension Functions.Environment {
         
         guard let session = serviceInfo[.sessionKey] as? Session else { return nil }
         
-        return session.info.getAccount(inDomain: domain)
+        return session.getAccount(inDomain: domain)
     }
     
     public var serverAdminIsLoggedIn: Bool {
         
         guard let session = serviceInfo[.sessionKey] as? Session else { return false }
         
-        let account = session.info.getAccount(inDomain: serverAdminDomain)
+        let account = session.getAccount(inDomain: serverAdminDomain)
         
         return account != nil
     }
@@ -250,7 +250,7 @@ extension Functions.Environment {
         
         guard let session = serviceInfo[.sessionKey] as? Session else { return false }
         
-        guard let account = session.info.getAccount(inDomain: domain) else { return false }
+        guard let account = session.getAccount(inDomain: domain) else { return false }
         
         return account.isDomainAdmin
     }

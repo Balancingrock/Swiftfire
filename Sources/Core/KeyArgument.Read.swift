@@ -221,7 +221,7 @@ fileprivate func reader(_ args: Array<Substring>, _ functionsInfo: Functions.Inf
             
         case 1:
             
-            return (session.info[.accountUuidKey] as? String) != nil ? "not-nil" : "nil"
+            return (session[.accountUuidKey] as? String) != nil ? "not-nil" : "nil"
 
             
         case 2:

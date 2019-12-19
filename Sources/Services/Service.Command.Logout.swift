@@ -61,7 +61,7 @@ internal func executeLogout(_ request: Request, _ info: Services.Info) -> String
         return LOGIN_TEMPLATE
     }
 
-    session.info.remove(key: .accountUuidKey)
+    session.removeValue(forKey: .accountUuidKey)
     
     return request.info[ORIGINAL_PAGE_URL_KEY] ?? "/index.sf.html"
 }
