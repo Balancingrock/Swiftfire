@@ -208,7 +208,7 @@ public final class SFConnection: SwifterSockets.Connection {
     override public func receiverClosed() {}
     
     override public func receiverError(_ message: String) {
-        Log.atError?.log("Error event: \(message)", id: logId, type: "SFConnection")
+        Log.atWarning?.log("Error event: \(message)", id: logId, type: "SFConnection")
     }
     
     override public func receiverLoop() -> Bool {

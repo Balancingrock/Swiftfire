@@ -51,7 +51,7 @@ title: Domain Management
             				<div>
                        			<p>.show($info.alias)</p>
                     			<form method="post" action="/serveradmin/command/delete-alias">
-                        			<input type="hidden" name="alias" value=".show($info.alias!)">
+                        			<input type="hidden" name="alias-name" value=".show($info.alias!)">
                         			<button type="submit">Delete</button>
                     			</form>
                      		</div>
@@ -62,8 +62,8 @@ title: Domain Management
                     <td></td>
                     <td>
                         <form method="post" action="/serveradmin/command/create-alias">
-                            <input type="hidden" name="domain" value=".show($info.domain-name)">
-                            <input type="text" name="alias" value="">
+                            <input type="hidden" name="domain-name" value=".show($info.domain-name)">
+                            <input type="text" name="alias-name" value="">
                             <button type="submit">Create Alias</button>
                         </form>
                     </td>
@@ -71,8 +71,8 @@ title: Domain Management
             </tbody>
         </table>
         <form method="post" style="display:flex; justify-content:space-between; width:100%; margin-bottom:30px;">
-            <button type="submit" name="domain" value=".show($info.domain-name)" formaction="/serveradmin/pages/delete-domain.sf.html">Delete Domain</button>
-            <button type="submit" name="domain" value=".show($info.domain-name)" formaction="/serveradmin/pages/domain.sf.html">Domain Setup</button>
+            <button type="submit" name="domain-name" value=".show($info.domain-name)" formaction="/serveradmin/pages/delete-domain.sf.html">Delete Domain</button>
+            <button type="submit" name="domain-name" value=".show($info.domain-name)" formaction="/serveradmin/pages/domain.sf.html">Domain Setup</button>
         </form>
 	.end(for-domains)
 	</div>
