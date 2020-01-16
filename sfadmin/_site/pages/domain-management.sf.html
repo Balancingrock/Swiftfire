@@ -12,7 +12,7 @@
 	<meta name="description" content="Swiftfire Server Admin">
 
 	<link rel="stylesheet" href="/serveradmin/assets/main.css">
-	<link rel="canonical" href="http://localhost:4000/serveradmin/pages/domain-management.sf.html">
+	<link rel="canonical" href="/serveradmin/pages/domain-management.sf.html">
 	<link rel="alternate" type="application/rss+xml" title="Swiftfire Server Admin" href="/serveradmin/feed.xml">
 </head>
 <!-- end of include head.html -->
@@ -56,7 +56,7 @@
 	<div class="item">
 		<div class="title">
 			<label class="symbol"><p></p></label>
-			<div class="text"><a href="http://localhost:4000/serveradmin/index.html"><p>Home</p></a></div>
+			<div class="text"><a href="/serveradmin/index.html"><p>Home</p></a></div>
 		</div>
 	</div>
 	<div class="item-separator"><p><!-- empty but necessary --></p></div>
@@ -206,39 +206,29 @@
             </thead>
             <tbody>
 	  			.for(domain-aliases, $info.domain-name)
+  					<tr>
 	  				.if($info.for-index, equal, $info.for-start-index)
-	  					<tr>
-    	        			<td>Aliases:</td>
-            				<td>
-            					<div>
-                           			<p>.show($info.alias)</p>
-                        			<form method="post" action="/serveradmin/command/delete-alias">
-                            			<input type="hidden" name="alias-name" value=".show($info.alias!)" />
-                            			<button type="submit">Delete</button>
-                        			</form>
-                        		</div>
-                    		</td>
-                		</tr>
-					.else()
-	  					<tr>
-                    		<td></td>
-                    		<td>
-                    			<div>
-                            		<p>.show($info.alias)</p>
-                            		<form method="post" action="/serveradmin/command/delete-alias">
-                                		<button type="submit" name="alias-name" value=".show($info.alias!)">Delete</button>
-                            		</form>
-                        		</div>
-                    		</td>
-                		</tr>
-                	.end(if)
+    	        		<td>Aliases:</td>
+    	        	.else()
+                    	<td></td>
+                    .end(if)
+            			<td>
+            				<div>
+                       			<p>.show($info.alias)</p>
+                    			<form method="post" action="/serveradmin/command/delete-alias">
+                        			<input type="hidden" name="alias" value=".show($info.alias!)" />
+                        			<button type="submit">Delete</button>
+                    			</form>
+                     		</div>
+                		</td>
+            		</tr>
 	  			.end(for-aliases)
 	  			<tr>
                     <td></td>
                     <td>
                         <form method="post" action="/serveradmin/command/create-alias">
-                            <input type="hidden" name="domain-name" value=".show($info.domain-name)" />
-                            <input type="text" name="Alias" value="" />
+                            <input type="hidden" name="domain" value=".show($info.domain-name)" />
+                            <input type="text" name="alias" value="" />
                             <button type="submit">Create Alias</button>
                         </form>
                     </td>
@@ -246,8 +236,8 @@
             </tbody>
         </table>
         <form method="post" style="display:flex; justify-content:space-between; width:100%; margin-bottom:30px;">
-            <button type="submit" name="domain-name" value=".show($info.domain-name)" formaction="/serveradmin/pages/delete-domain.sf.html">Delete Domain</button>
-            <button type="submit" name="domain-name" value=".show($info.domain-name)" formaction="/serveradmin/pages/domain.sf.html">Domain Setup</button>
+            <button type="submit" name="domain" value=".show($info.domain-name)" formaction="/serveradmin/pages/delete-domain.sf.html">Delete Domain</button>
+            <button type="submit" name="domain" value=".show($info.domain-name)" formaction="/serveradmin/pages/domain.sf.html">Domain Setup</button>
         </form>
 	.end(for-domains)
 	</div>

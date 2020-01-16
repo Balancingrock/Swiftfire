@@ -12,7 +12,7 @@
 	<meta name="description" content="Swiftfire Server Admin">
 
 	<link rel="stylesheet" href="/serveradmin/assets/main.css">
-	<link rel="canonical" href="http://localhost:4000/serveradmin/pages/blacklist.sf.html">
+	<link rel="canonical" href="/serveradmin/pages/blacklist.sf.html">
 	<link rel="alternate" type="application/rss+xml" title="Swiftfire Server Admin" href="/serveradmin/feed.xml">
 </head>
 <!-- end of include head.html -->
@@ -56,7 +56,7 @@
 	<div class="item">
 		<div class="title">
 			<label class="symbol"><p></p></label>
-			<div class="text"><a href="http://localhost:4000/serveradmin/index.html"><p>Home</p></a></div>
+			<div class="text"><a href="/serveradmin/index.html"><p>Home</p></a></div>
 		</div>
 	</div>
 	<div class="item-separator"><p><!-- empty but necessary --></p></div>
@@ -211,23 +211,23 @@
                 <td>.show($info.blacklist-address)</td>
                 <td>
                     <form method="post" action="/serveradmin/command/update-blacklist">
-                    	<input type="hidden" name="Address" value=".show($info.blacklist-address)" />
+                    	<input type="hidden" name="address" value=".show($info.blacklist-address)" />
                     	.if($info.blacklist-action, equal, closeConnection)
-	                    	<input type="radio" name="Action" value="close" checked="" />
+	                    	<input type="radio" name="action" value="close" checked="" />
 	                    .else()
-	                    	<input type="radio" name="Action" value="close" />
+	                    	<input type="radio" name="action" value="close" />
 	                    .end()
                     	<span> Close Connection, </span>
                     	.if($info.blacklist-action, equal, send503ServiceUnavailable)
-	                    	<input type="radio" name="Action" value="503" checked="" />
+	                    	<input type="radio" name="action" value="503" checked="" />
 	                    .else()
-                    		<input type="radio" name="Action" value="503" />
+                    		<input type="radio" name="action" value="503" />
                     	.end()
                     	<span> 503 Service Unavailable, </span>
                     	.if($info.blacklist-action, equal, send401Unauthorized)
-	                    	<input type="radio" name="Action" value="401" checked="" />
+	                    	<input type="radio" name="action" value="401" checked="" />
 	                    .else()
-    	                	<input type="radio" name="Action" value="401" />
+    	                	<input type="radio" name="action" value="401" />
     	                .end()
                     	<span> 401 Unauthorized </span>
                     	<input type="submit" value="Update" />
@@ -235,7 +235,7 @@
                 </td>
                 <td>
                     <form method="post" action="/serveradmin/command/remove-from-blacklist">
-                        <input type="hidden" name="Address" value=".show($info.blacklist-address)" />
+                        <input type="hidden" name="address" value=".show($info.blacklist-address)" />
                         <input type="submit" value="Delete" />
                     </form>
                 </td>
@@ -247,14 +247,14 @@
     <form class="server-blacklist-create" method="post" action="/serveradmin/command/add-to-blacklist">
         <div>
             <span>Address: </span>
-            <input type="text" name="NewEntry" value="" />
+            <input type="text" name="address" value="" />
         </div>
         <div>
-            <input type="radio" name="Action" value="close" checked="" />
+            <input type="radio" name="action" value="close" checked="" />
             <span> Close, </span>
-            <input type="radio" name="Action" value="503" />
+            <input type="radio" name="action" value="503" />
             <span> 503 Service Unavailable, </span>
-            <input type="radio" name="Action" value="401" />
+            <input type="radio" name="action" value="401" />
             <span> 401 Unauthorized</span>
         </div>
         <div>

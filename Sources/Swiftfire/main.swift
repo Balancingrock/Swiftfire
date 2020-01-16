@@ -172,7 +172,9 @@ do {
         serviceName_GetSession,
         serviceName_WaitUntilBodyComplete,
         serviceName_Setup,
+        serviceName_Commands,
         serviceName_GetResourcePathFromUrl,
+        serviceName_StorePreLoginUrl,
         serviceName_GetFileAtResourcePath,
         serviceName_RestartSessionTimeout,
         serviceName_TransferResponse

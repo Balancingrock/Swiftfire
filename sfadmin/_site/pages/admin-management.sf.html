@@ -12,7 +12,7 @@
 	<meta name="description" content="Swiftfire Server Admin">
 
 	<link rel="stylesheet" href="/serveradmin/assets/main.css">
-	<link rel="canonical" href="http://localhost:4000/serveradmin/pages/admin-management.sf.html">
+	<link rel="canonical" href="/serveradmin/pages/admin-management.sf.html">
 	<link rel="alternate" type="application/rss+xml" title="Swiftfire Server Admin" href="/serveradmin/feed.xml">
 </head>
 <!-- end of include head.html -->
@@ -56,7 +56,7 @@
 	<div class="item">
 		<div class="title">
 			<label class="symbol"><p></p></label>
-			<div class="text"><a href="http://localhost:4000/serveradmin/index.html"><p>Home</p></a></div>
+			<div class="text"><a href="/serveradmin/index.html"><p>Home</p></a></div>
 		</div>
 	</div>
 	<div class="item-separator"><p><!-- empty but necessary --></p></div>
@@ -212,7 +212,7 @@
                     <td>
                         <form method="post" action="/serveradmin/command/set-new-password">
                             <input type="hidden" name="uuid" value=".show($info.uuid)" />
-                            <input type="text" name="Password" value="" />
+                            <input type="text" name="password" value="" />
                             <input type="submit" value="Set New Password" />
                         </form>
                     </td>
@@ -222,13 +222,14 @@
                     <td><p class="half-margins-no-padding">.show($info.name)</p></td>
                     <td>
                         <form method="post" action="/serveradmin/command/confirm-delete-account">
-                            <button type="submit" name="name" value=".show($info.name)">Delete</button>
+                        	<input type="hidden" name="name" value=".show($info.name)" />
+                            <button type="submit" name="uuid" value=".show($info.uuid)">Delete</button>
                         </form>
                     </td>
                     <td>
                         <form method="post" action="/serveradmin/command/set-new-password">
                             <input type="hidden" name="uuid" value=".show($info.uuid)" />
-                            <input type="text" name="Password" value="" />
+                            <input type="text" name="password" value="" />
                             <input type="submit" value="Set New Password" />
                         </form>
                     </td>
@@ -248,7 +249,7 @@
 					<span style="margin-top: 4px; margin-right: 4px">Admin ID: </span>
 				</td>
 				<td>
-					<input type="text" name="ID" value="" style="text-align:center;" />
+					<input type="text" name="name" value="" style="text-align:center;" />
 				</td>
 			</tr>
 			<tr>
@@ -256,7 +257,7 @@
 					<span style="margin-top: 4px; margin-right: 4px">Password: </span>
 				</td>
 				<td>
-					<input type="text" name="Password" value="" style="text-align:center;" />
+					<input type="text" name="password" value="" style="text-align:center;" />
 				</td>
 			</tr>
 		</table>
