@@ -4,6 +4,13 @@ title: Telemetry
 menuInclude: yes
 menuTopTitle: Telemetry
 menuTopIndex: 5
+#
+# Input:
+#	server-telemetry
+#		$info.named-value-protocol-name: The name of the telemetry item
+# 		$info.named-value-protocol-value: The value of the telemetry item
+# 		$info.named-value-protocol-about: The description of the telemetry item
+#
 ---
 <div class="telemetry-table">
     <table class="telemetry-table">

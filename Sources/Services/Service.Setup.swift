@@ -197,8 +197,7 @@ func service_setup(_ request: Request, _ connection: SFConnection, _ domain: Dom
             case "add-to-blacklist": executeAddToBlacklist(request, domain)
             case "update-services": executeUpdateServices(request, domain)
             case "confirm-delete-account":
-                if executeConfirmDeleteAccount(request, domain) {
-                    confirmAccountRemovalPage(request, response, domain)
+                if executeConfirmDeleteAccount(request, response, domain) {
                     return .next
                 }
                 

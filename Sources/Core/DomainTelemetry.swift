@@ -70,7 +70,7 @@ public final class DomainTelemetry {
     /// The number of 200 (Successfull reply)
     
     public let nof200 = NamedIntValue(
-        name: "Nof code 200:",
+        name: "Nof Code 200:",
         about: "The number of code 200 (successful) accesses",
         value: 0,
         resetValue: 0)
@@ -79,7 +79,7 @@ public final class DomainTelemetry {
     /// The number of 400 (Bad Request)
     
     public let nof400 = NamedIntValue(
-        name: "Nof code 400:",
+        name: "Nof Code 400:",
         about: "The number of code 400 (Bad Request) accesses",
         value: 0,
         resetValue: 0)
@@ -88,7 +88,7 @@ public final class DomainTelemetry {
     /// The number of 403 (Forbidden)
     
     public let nof403 = NamedIntValue(
-        name: "Nof code 403:",
+        name: "Nof Code 403:",
         about: "The number of code 403 (Forbidden) accesses",
         value: 0,
         resetValue: 0)
@@ -97,7 +97,7 @@ public final class DomainTelemetry {
     /// The number of 404 (File/Resource Not Found)
     
     public let nof404 = NamedIntValue(
-        name: "Nof code 404:",
+        name: "Nof Code 404:",
         about: "The number of code 404 (Not found) accesses",
         value: 0,
         resetValue: 0)
@@ -106,7 +106,7 @@ public final class DomainTelemetry {
     /// The number of 500 (Server Error)
     
     public let nof500 = NamedIntValue(
-        name: "Nof code 500:",
+        name: "Nof Code 500:",
         about: "The number of code 500 (Server error) accesses",
         value: 0,
         resetValue: 0)
@@ -115,7 +115,7 @@ public final class DomainTelemetry {
     /// The number of 501 (Not Implemented)
     
     public let nof501 = NamedIntValue(
-        name: "Nof code 501:",
+        name: "Nof Code 501:",
         about: "The number of code 501 (Not implemented) accesses",
         value: 0,
         resetValue: 0)
@@ -124,7 +124,7 @@ public final class DomainTelemetry {
     /// The number of 505 (HTTP version not supported)
     
     public let nof505 = NamedIntValue(
-        name: "Nof code 505:",
+        name: "Nof Code 505:",
         about: "The number of code 505 (Version not supported) accesses",
         value: 0,
         resetValue: 0)

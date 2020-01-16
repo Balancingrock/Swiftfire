@@ -1,6 +1,24 @@
 ---
 layout: page
 title: "Domain: .show($request.domain-name)"
+#
+# Input:
+#	$request.domain-name
+#	domain-telemetry
+#		$info.named-value-protocol-name: The name of the telemetry item
+# 		$info.named-value-protocol-value: The value of the telemetry item
+# 		$info.named-value-protocol-about: The description of the telemetry item
+#
+# Output:
+# 	URL(POST): /serveradmin/command/set-domain-admin-password
+# 		domain-admin-id: The name of the domain admin
+# 		domain-admin-password: The new password for the domain admin
+#
+# 	URL(POST): /serveradmin/command/update-domain-parameter
+# 		parameter-name: The name of the parameter to be updated (always 'root')
+# 		domain-name: The name of the domain for the parameter to be updated
+# 		parameter-value: The value for the parameter
+#
 ---
 ## Telemetry
 {: .text-centered}
@@ -32,12 +50,12 @@ title: "Domain: .show($request.domain-name)"
 			<table>
 				<tr>
 					<td>Domain admin:</td>
-					<td><input type="text" name="ID" value=""></td>
+					<td><input type="text" name="domain-admin-id" value=""></td>
 					<td></td>
 				</tr>
 				<tr>
 					<td>(New) Password:</td>
-					<td><input type="text" name="Password" value=""></td>
+					<td><input type="text" name="domain-admin-password" value=""></td>
 					<td><input type="submit" value="Create Admin or Change Password"></td>
 				</tr>
 			</table>

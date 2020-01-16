@@ -4,6 +4,18 @@ title: Parameters
 menuInclude: yes
 menuTopTitle: Parameters
 menuTopIndex: 4
+#
+# Input:
+#	server-parameters
+#		$info.named-value-protocol-name
+#		$info.named-value-protocol-value
+#		$info.named-value-protocol-about
+#
+# Output:
+#	URL(POST): /serveradmin/command/set-server-parameter
+#		server-parameter-name: The name of the server parameter
+#		server-parameter-value: The value for the server parameter
+#
 ---
 <table class="parameter-table">
     <thead>

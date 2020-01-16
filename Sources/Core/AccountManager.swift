@@ -448,20 +448,18 @@ extension AccountManager {
     ///
     /// - Note: Make sure the user removing the account has sufficient privelidges!
     ///
-    /// - Parameter name: The name of the account to remove.
-    ///
-    /// - Returns: True if the account was deleted, false if the account did not exist.
+    /// - Parameter uuid: The uuid of the account to remove.
 
-    public func disable(name: String) -> Bool {
+    public func disable(uuid: UUID) {
         
         return AccountManager.queue.sync {
             
             
             // Get the account
             
-            guard let account = getAccount(name) else {
-                Log.atError?.log("No entry found for account with name \(name)")
-                return false
+            guard let account = getAccount(uuid) else {
+                Log.atError?.log("No account found for uuid: \(uuid.uuidString)")
+                return
             }
             
             
@@ -476,10 +474,7 @@ extension AccountManager {
             uuidLut.removeValue(forKey: account.uuid)
             nameLut.removeValue(forKey: account.name.lowercased())
             
-            
-            Log.atNotice?.log("Disabled the account for: \(name)")
-            
-            return true
+            Log.atNotice?.log("Disabled account with name: \(account.name)")
         }
     }
 }

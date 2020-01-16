@@ -2,6 +2,15 @@
 layout: page
 title: Quit Swiftfire
 menuInclude: no
+#
+# Input:
+#	-
+#
+# Output:
+#	URL: /serveradmin/command/confirmed-quit
+#
+#	URL: /serveradmin/command/cancel-quit
+#
 ---
 {:.text-centered}
 ## Are you sure you want to quit Swiftfire?

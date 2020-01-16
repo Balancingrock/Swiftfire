@@ -50,6 +50,22 @@ internal func parameterTable(_ domain: Domain) -> String {
         return "/\(domain.setupKeyword!)/command/\(cmd)"
     }
     
+    func parameterRow(text: String, name: String, value: String, comment: String) -> String {
+        return """
+        <tr>
+            <td>\(text)</td>
+            <td>
+                <form method="post" action="\(setupCommand("update-parameter"))">
+                    <input type="hidden" name="parameter-name" value="\(name)">
+                    <input type="text" name="parameter-value" value="\(value)">
+                    <input type="submit" value="Update">
+                </form>
+            </td>
+            <td>\(comment)</td>
+        </tr>
+        """
+    }
+    
     let html = """
     <div class="table-container center-content">
         <table>
@@ -59,105 +75,61 @@ internal func parameterTable(_ domain: Domain) -> String {
             </tr>
         </thead>
         <tbody>
-            <tr>
-                <td>Enabled</td>
-                <td>
-                    <form method="post" action="\(setupCommand("update-parameter"))">
-                        <input type="hidden" name="parameter-name" value="enabled">
-                        <input type="text" name="parameter-value" value="\(domain.enabled)">
-                        <input type="submit" value="Update">
-                    </form>
-                </td>
-                <td>The domain is enabled when set to 'true', disabled otherwise</td>
-            </tr>
-            <tr>
-                <td>Access Log</td>
-                <td>
-                    <form method="post" action="\(setupCommand("update-parameter"))">
-                        <input type="hidden" name="parameter-name" value="accessLogEnabled">
-                        <input type="text" name="parameter-value" value="\(domain.accessLogEnabled)">
-                        <input type="submit" value="Update">
-                    </form>
-                </td>
-                <td>The access log is enabled when set to 'true', disabled otherwise</td>
-            </tr>
-            <tr>
-                <td>404 Log</td>
-                <td>
-                    <form method="post" action="\(setupCommand("update-parameter"))">
-                        <input type="hidden" name="parameter-name" value="four04LogEnabled">
-                        <input type="text" name="parameter-value" value="\(domain.four04LogEnabled)">
-                        <input type="submit" value="Update">
-                    </form>
-                </td>
-                <td>The 404 log is enabled when set to 'true', disabled otherwise</td>
-            </tr>
-            <tr>
-                <td>Session Log</td>
-                <td>
-                    <form method="post" action="\(setupCommand("update-parameter"))">
-                        <input type="hidden" name="parameter-name" value="sessionLogEnabled">
-                        <input type="text" name="parameter-value" value="\(domain.sessionLogEnabled)">
-                        <input type="submit" value="Update">
-                    </form>
-                </td>
-                <td>The session log is enabled when set to 'true', disabled otherwise</td>
-            </tr>
-            <tr>
-                <td>Session Timeout</td>
-                <td>
-                    <form method="post" action="\(setupCommand("update-parameter"))">
-                        <input type="hidden" name="parameter-name" value="sessionTimeout">
-                        <input type="text" name="parameter-value" value="\(domain.sessionTimeout)">
-                        <input type="submit" value="Update">
-                    </form>
-                </td>
-                <td>A session is considered expired when inactive for this long (in seconds)</td>
-            </tr>
-            <tr>
-                <td>PHP Map Index</td>
-                <td>
-                    <form method="post" action="\(setupCommand("update-parameter"))">
-                        <input type="hidden" name="parameter-name" value="phpMapIndex">
-                        <input type="text" name="parameter-value" value="\(domain.phpMapIndex)">
-                        <input type="submit" value="Update">
-                    </form>
-                </td>
-                <td>Maps index requests to include index.php and index.sf.php</td>
-            </tr>
-            <tr>
-                <td>PHP Map All</td>
-                <td>
-                    <form method="post" action="\(setupCommand("update-parameter"))">
-                        <input type="hidden" name="parameter-name" value="phpMapAll">
-                        <input type="text" name="parameter-value" value="\(domain.phpMapAll)">
-                        <input type="submit" value="Update">
-                    </form>
-                </td>
-                <td>Allows to map *.html to *.php</td>
-            </tr>
-            <tr>
-                <td>PHP Timeout</td>
-                <td>
-                    <form method="post" action="\(setupCommand("update-parameter"))">
-                        <input type="hidden" name="parameter-name" value="phpTimeout">
-                        <input type="text" name="parameter-value" value="\(domain.phpTimeout)">
-                        <input type="submit" value="Update">
-                    </form>
-                </td>
-                <td>Timeout for PHP processing (in mSec)</td>
-            </tr>
-            <tr>
-                <td>Foreward URL</td>
-                <td>
-                    <form method="post" action="\(setupCommand("update-parameter"))">
-                        <input type="hidden" name="parameter-name" value="forwardUrl">
-                        <input type="text" name="parameter-value" value="\(domain.forwardUrl)">
-                        <input type="submit" value="Update">
-                    </form>
-                </td>
-                <td>(Optional) Forwards all incoming traffic to this url</td>
-            </tr>
+            \(parameterRow(
+                text: "Enabled",
+                name: "enabled",
+                value: String(domain.enabled),
+                comment: "The domain is enabled when set to 'true', disabled otherwise"))
+            \(parameterRow(
+                text: "Access Log",
+                name: "access-log-enabled",
+                value: String(domain.accessLogEnabled),
+                comment: "The access log is enabled when set to 'true', disabled otherwise"))
+            \(parameterRow(
+                text: "404 Log",
+                name: "404-log-enabled",
+                value: String(domain.four04LogEnabled),
+                comment: "The 404 log is enabled when set to 'true', disabled otherwise"))
+            \(parameterRow(
+                text: "Session Log",
+                name: "session-log-enabled",
+                value: String(domain.sessionLogEnabled),
+                comment: "The session log is enabled when set to 'true', disabled otherwise"))
+            \(parameterRow(
+                text: "Session Timeout",
+                name: "session-timeout",
+                value: String(domain.sessionTimeout),
+                comment: "A session is considered expired when inactive for this long (in seconds)"))
+            \(parameterRow(
+                text: "PHP Executable Path",
+                name: "php-executable-path",
+                value: String(domain.phpPath?.path ?? "Disabled"),
+                comment: "To enable PHP, set a path to the php executable to be used"))
+            \(parameterRow(
+                text: "PHP Map Index",
+                name: "php-map-index",
+                value: String(domain.phpPath == nil ? "nvt" : String(domain.phpMapIndex)),
+                comment: "Maps index.*.html to index.*.php if no index.*.html found (enable PHP first)"))
+            \(parameterRow(
+                text: "PHP Map All",
+                name: "php-map-all",
+                value: String(domain.phpPath == nil ? "nvt" : String(domain.phpMapAll)),
+                comment: "Maps *.html to *.php if no *.html file found (enable PHP first)"))
+            \(parameterRow(
+                text: "PHP Timeout",
+                name: "php-timeout",
+                value: String(domain.phpPath == nil ? "nvt" : String(domain.phpTimeout)),
+                comment: "Timeout for PHP processing (in mSec - enable PHP first)"))
+            \(parameterRow(
+                text: "Comment Auto Approval Threshold",
+                name: "comment-auto-approval-threshold",
+                value: String(domain.commentAutoApprovalThreshold),
+                comment: "Auto approve comments when this many comments have been manually approved"))
+            \(parameterRow(
+                text: "Forward URL",
+                name: "forward-url",
+                value: String(domain.forwardUrl),
+                comment: "Forwards all incoming traffic to this url (clear to disable)"))
         </tbody>
         </table>
     </div>

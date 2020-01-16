@@ -48,7 +48,7 @@ import Http
 
 // This creates a new account and sends a verification email
 
-internal let REGISTER_COMMAND = "register"
+internal let COMMAND_REGISTER = "register"
 
 fileprivate let REGISTER_TEMPLATE = "/pages/register.sf.html"
 fileprivate let REGISTER_CONTINUE_TEMPLATE = "/pages/register-continue.sf.html"
@@ -181,7 +181,7 @@ internal func executeRegister(_ request: Request, _ connection: SFConnection, _ 
     
     // Send email verification mail
     
-    let verificationLink = "http://\(domain.name):\(serverParameters.httpServicePortNumber.stringValue)/command/\(EMAIL_VERIFICATION_COMMAND)?\(EMAIL_VERIFICATION_CODE_KEY)=\(account.emailVerificationCode)"
+    let verificationLink = "http://\(domain.name):\(serverParameters.httpServicePortNumber.stringValue)/command/\(COMMAND_EMAIL_VERIFICATION)?\(EMAIL_VERIFICATION_CODE_KEY)=\(account.emailVerificationCode)"
 
     
     var message: String = ""

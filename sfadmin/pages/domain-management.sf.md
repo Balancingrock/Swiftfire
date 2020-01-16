@@ -1,6 +1,33 @@
 ---
 layout: page
 title: Domain Management
+#
+# Input:
+#	server-domains
+#		$info.domain-name
+#		domain-aliases
+#			$info.alias
+#
+# Output:
+#	URL(POST): /serveradmin/command/delete-alias
+#		alias-name: The alias name to be removed
+#
+#	URL(POST): /serveradmin/command/create-alias
+#		domain-name: The name of the domain for which to create a new alias
+#		alias-name: The name for the new alias
+#
+#	URL(POST): /serveradmin/pages/delete-domain.sf.html
+#		domain-name: The name of the domain to be removed
+#
+#	URL(POST): /serveradmin/pages/domain.sf.html
+#		domain-name: The name of the domain to set up
+#	
+#	URL(POST): /serveradmin/command/create-domain
+#		domain-name: The name of the new domain
+#		domain-admin-id: The name of the domain admin
+#		domain-admin-password: The password for the domain admin
+#		domain-root: The root address of the new domain
+#
 ---
 <div class="center-content">
 	<div class="domains-list">
@@ -14,39 +41,29 @@ title: Domain Management
             </thead>
             <tbody>
 	  			.for(domain-aliases, $info.domain-name)
+  					<tr>
 	  				.if($info.for-index, equal, $info.for-start-index)
-	  					<tr>
-    	        			<td>Aliases:</td>
-            				<td>
-            					<div>
-                           			<p>.show($info.alias)</p>
-                        			<form method="post" action="/serveradmin/command/delete-alias">
-                            			<input type="hidden" name="alias-name" value=".show($info.alias!)">
-                            			<button type="submit">Delete</button>
-                        			</form>
-                        		</div>
-                    		</td>
-                		</tr>
-					.else()
-	  					<tr>
-                    		<td></td>
-                    		<td>
-                    			<div>
-                            		<p>.show($info.alias)</p>
-                            		<form method="post" action="/serveradmin/command/delete-alias">
-                                		<button type="submit" name="alias-name" value=".show($info.alias!)">Delete</button>
-                            		</form>
-                        		</div>
-                    		</td>
-                		</tr>
-                	.end(if)
+    	        		<td>Aliases:</td>
+    	        	.else()
+                    	<td></td>
+                    .end(if)
+            			<td>
+            				<div>
+                       			<p>.show($info.alias)</p>
+                    			<form method="post" action="/serveradmin/command/delete-alias">
+                        			<input type="hidden" name="alias" value=".show($info.alias!)">
+                        			<button type="submit">Delete</button>
+                    			</form>
+                     		</div>
+                		</td>
+            		</tr>
 	  			.end(for-aliases)
 	  			<tr>
                     <td></td>
                     <td>
                         <form method="post" action="/serveradmin/command/create-alias">
-                            <input type="hidden" name="domain-name" value=".show($info.domain-name)">
-                            <input type="text" name="Alias" value="">
+                            <input type="hidden" name="domain" value=".show($info.domain-name)">
+                            <input type="text" name="alias" value="">
                             <button type="submit">Create Alias</button>
                         </form>
                     </td>
@@ -54,8 +71,8 @@ title: Domain Management
             </tbody>
         </table>
         <form method="post" style="display:flex; justify-content:space-between; width:100%; margin-bottom:30px;">
-            <button type="submit" name="domain-name" value=".show($info.domain-name)" formaction="/serveradmin/pages/delete-domain.sf.html">Delete Domain</button>
-            <button type="submit" name="domain-name" value=".show($info.domain-name)" formaction="/serveradmin/pages/domain.sf.html">Domain Setup</button>
+            <button type="submit" name="domain" value=".show($info.domain-name)" formaction="/serveradmin/pages/delete-domain.sf.html">Delete Domain</button>
+            <button type="submit" name="domain" value=".show($info.domain-name)" formaction="/serveradmin/pages/domain.sf.html">Domain Setup</button>
         </form>
 	.end(for-domains)
 	</div>

@@ -8,3 +8,4 @@ sfadmin/.jekyll-cache
 sfadmin/.sass-cache
 sfadmin/Gemfile.lock
 sfadmin/.DS_Store
+/local-support

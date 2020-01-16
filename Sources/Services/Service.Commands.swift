@@ -121,13 +121,13 @@ func service_commands(_ request: Request, _ connection: SFConnection, _ domain: 
     
     switch command {
         
-    case LOGIN_COMMAND: relativePath = executeLogin(request, domain, info)
-    case LOGOUT_COMMAND: relativePath = executeLogout(request, info)
-    case EMAIL_VERIFICATION_COMMAND: relativePath = executeEmailVerification(request, response, domain, info)
-    case REGISTER_COMMAND: relativePath = executeRegister(request, connection, domain, response, info)
-    case FORGOT_PASSWORD_COMMAND: relativePath = executeForgotPassword(request, connection, domain, response, info)
-    case REQUEST_NEW_PASSWORD_COMMAND: relativePath = executeRequestNewPassword(request, domain)
-    case SET_NEW_PASSWORD_COMMAND: relativePath = executeSetNewPassword(request, domain)
+    case COMMAND_LOGIN: relativePath = executeLogin(request, domain, info)
+    case COMMAND_LOGOUT: relativePath = executeLogout(request, info)
+    case COMMAND_EMAIL_VERIFICATION: relativePath = executeEmailVerification(request, response, domain, info)
+    case COMMAND_REGISTER: relativePath = executeRegister(request, connection, domain, response, info)
+    case COMMAND_FORGOT_PASSWORD: relativePath = executeForgotPassword(request, connection, domain, response, info)
+    case COMMAND_REQUEST_NEW_PASSWORD: relativePath = executeRequestNewPassword(request, domain)
+    case COMMAND_SET_NEW_PASSWORD: relativePath = executeSetNewPassword(request, domain)
     case COMMAND_POST_COMMENT: relativePath = executePostComment(request, domain, info)
     case COMMAND_COMMENT_REVIEW: relativePath = executeCommentReview(request, domain, info)
     case COMMAND_REMOVE_COMMENT: relativePath = executeRemoveComment(request, domain, info)

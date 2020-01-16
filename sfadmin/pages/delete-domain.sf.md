@@ -2,6 +2,16 @@
 layout: page
 title: "Confirm removal of domain: .show($request.domain-name)"
 menuInclude: no
+#
+# Input:
+#	$request.domain-name: The name of the domain to be removed
+#
+# Output:
+#	URL(POST): /serveradmin/command/delete-domain
+#		domain-name: The domain name to be removed
+#
+#	URL: /serveradmin/pages/domain-management.sf.html
+#
 ---
 <div class="centered-buttons">
     <form method="post" action="/serveradmin/command/delete-domain">

@@ -48,7 +48,7 @@ import Http
 
 // Email verification. This command is received when a new user clicks the link in the confirmation email.
 
-internal let EMAIL_VERIFICATION_COMMAND = "email-verification"
+internal let COMMAND_EMAIL_VERIFICATION = "email-verification"
 
 fileprivate let EMAIL_VERIFICATION_SUCCESS_TEMPLATE = "/pages/email-verification-success.sf.html"
 fileprivate let EMAIL_VERIFICATION_FAILED_TEMPLATE = "/pages/email-verification-failed.sf.html"

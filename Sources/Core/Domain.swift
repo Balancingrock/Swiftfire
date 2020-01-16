@@ -414,7 +414,7 @@ public final class Domain {
             return nil
         }
         if name != "serveradmin" {
-            // All domains will have an Anon(ymous) account except for the serveradmin domain.
+            // All domains will have an Anon(ymous) account except the serveradmin domain.
             if accounts.available(name: "Anon") {
                 let anon = accounts.newAccount(name: "Anon", password: "Anon")
                 anon?.isEnabled = true

@@ -764,12 +764,12 @@ fileprivate func executeSetParameter(_ request: Request) {
             serverParameters.store()
                 
             Log.atNotice?.log("Setting parameter '\(parameterName)' to '\(value)'")
-                
-            break
+            
+            return
         }
-        
-        Log.atError?.log("Unknown parameter name \(parameterName)")
     }
+
+    Log.atError?.log("Unknown parameter name \(parameterName)")
 }
 
 fileprivate func executeUpdateBlacklist(_ request: Request) {
@@ -812,15 +812,15 @@ fileprivate func executeUpdateBlacklist(_ request: Request) {
 fileprivate func executeAddToBlacklist(_ request: Request) {
     
     guard
-        let address = request.info["newentry"],
+        let address = request.info["address"],
         isValidIpAddress(address)
     else {
-        Log.atError?.log("Unknown address for key NewEntry")
+        Log.atError?.log("Unknown address for key address")
         return
     }
 
     guard let action = request.info["action"] else {
-        Log.atError?.log("Unknown action for key Action")
+        Log.atError?.log("Unknown action for key action")
         return
     }
 
@@ -864,118 +864,6 @@ fileprivate func executeRemoveFromBlacklist(_ request: Request) {
     Log.atNotice?.log("Removed address \(address) with action \(action) from server blacklist")
 }
 
-fileprivate func executeUpdateDomainBlacklist(_ request: Request) {
-    
-    guard
-        let name = request.info["domainname"],
-        let domain = domainManager.domain(for: name)
-        else {
-            Log.atError?.log("Missing or wrong domain name")
-            return
-    }
-    
-    guard let address = request.info["address"] else {
-        Log.atError?.log("Missing address")
-        return
-    }
-    
-    guard let action = request.info["action"] else {
-        Log.atError?.log("Missing action")
-        return
-    }
-
-    let newAction: Blacklist.Action = {
-        switch action {
-        case "close": return .closeConnection
-        case "503": return .send503ServiceUnavailable
-        case "401": return .send401Unauthorized
-        default:
-            Log.atError?.log("Unknown action \(action)")
-            return .closeConnection
-        }
-    }()
-    
-    guard let oldAction = domain.blacklist.action(for: address) else {
-        Log.atError?.log("Address \(address) not present in blacklist of domain \(domain.name)")
-        return
-    }
-    
-    Log.atNotice?.log("Updated action of address \(address) from \(oldAction) in domain \(domain.name) blacklist")
-    
-    domain.blacklist.update(action: newAction, for: address)
-    
-    Log.atNotice?.log("Updated action of address \(address) to \(action) in domain \(domain.name) blacklist")
-}
-
-fileprivate func executeAddToDomainBlacklist(_ request: Request) {
-    
-    guard
-        let name = request.info["domainname"],
-        let domain = domainManager.domain(for: name)
-        else {
-            Log.atError?.log("Missing domain name")
-            return
-    }
-    
-    guard
-        let address = request.info["newentry"],
-        isValidIpAddress(address)
-        else {
-        Log.atError?.log("No 'NewEntry' key found in request.info")
-        return
-    }
-    
-    guard let action = request.info["action"] else {
-        Log.atError?.log("No 'Action' key found in request.info")
-        return
-    }
-    
-    let newAction: Blacklist.Action = {
-        switch action {
-        case "close": return .closeConnection
-        case "503": return .send503ServiceUnavailable
-        case "401": return .send401Unauthorized
-        default:
-            Log.atError?.log("Unknown action \(action)")
-            return .closeConnection
-        }
-    }()
-    
-    if domain.blacklist.action(for: address) != nil {
-        Log.atError?.log("Address \(address) is already present in blacklist of domain \(domain.name)")
-        return
-    }
-
-    domain.blacklist.add(address, action: newAction)
-    
-    Log.atNotice?.log("Added address \(address) with action \(action) to domain \(domain.name) blacklist")
-}
-
-fileprivate func executeRemoveFromDomainBlacklist(_ request: Request) {
-    
-    guard
-        let name = request.info["domainname"],
-        let domain = domainManager.domain(for: name)
-        else {
-            Log.atError?.log("Missing domain name")
-            return
-    }
-    
-    guard let address = request.info["address"] else {
-        Log.atError?.log("Missing address for key Address")
-        return
-    }
-    
-    guard let oldAction = domain.blacklist.action(for: address) else {
-        Log.atError?.log("Address \(address) not present in blacklist of domain \(domain.name)")
-        return
-    }
-
-    domain.blacklist.remove(address)
-    
-    Log.atNotice?.log("Removed address \(address) with action \(oldAction) from domain \(domain.name) blacklist")
-}
-
 
 /// Update a parameter in a domain.
 
@@ -1010,148 +898,6 @@ fileprivate func executeUpdateDomainParameter(_ request: Request) {
     
         Log.atNotice?.log("New value for domain \(domain.name) webroot = \(domain.webroot)")
         
-        
-    case "foreward-url":
-
-        Log.atNotice?.log("Old value for domain \(domain.name) forewardUrl = \(domain.forwardUrl)")
-
-        domain.forwardUrl = parameterValue
-
-        Log.atNotice?.log("New value for domain \(domain.name) forewardUrl = \(domain.forwardUrl)")
-
-        
-    case "enabled":
-        
-        Log.atNotice?.log("Old value for domain \(domain.name) enabled = \(domain.enabled)")
-
-        domain.enabled = Bool(lettersOrDigits: parameterValue) ?? domain.enabled
-    
-        Log.atNotice?.log("New value for domain \(domain.name) enabled = \(domain.enabled)")
-
-    
-    case "access-log-enabled":
-        
-        Log.atNotice?.log("Old value for domain \(domain.name) accessLogEnabled = \(domain.accessLogEnabled)")
-
-        domain.accessLogEnabled = Bool(lettersOrDigits: parameterValue) ?? domain.accessLogEnabled
-
-        Log.atNotice?.log("New value for domain \(domain.name) accessLogEnabled = \(domain.accessLogEnabled)")
-
-        
-    case "404-log-enabled":
-        
-        Log.atNotice?.log("Old value for domain \(domain.name) 404log-enabled = \(domain.four04LogEnabled)")
-
-        domain.four04LogEnabled = Bool(lettersOrDigits: parameterValue) ?? domain.four04LogEnabled
-
-        Log.atNotice?.log("New value for domain \(domain.name) 404log-enabled = \(domain.four04LogEnabled)")
-
-        
-    case "session-log-enabled":
-        
-        Log.atNotice?.log("Old value for domain \(domain.name) sessionLogEnabled = \(domain.sessionLogEnabled)")
-
-        domain.sessionLogEnabled = Bool(lettersOrDigits: parameterValue) ?? domain.sessionLogEnabled
-    
-        Log.atNotice?.log("New value for domain \(domain.name) sessionLogEnabled = \(domain.sessionLogEnabled)")
-
-    
-    case "php-path":
-        
-        Log.atNotice?.log("Old value for domain \(domain.name) phpPath = \(domain.phpPath?.path ?? "nil")")
-
-        domain.phpPath = nil
-        if FileManager.default.isExecutableFile(atPath: parameterValue) {
-            let url = URL(fileURLWithPath: parameterValue)
-            if url.lastPathComponent == "php" {
-                domain.phpPath = URL(fileURLWithPath: parameterValue)
-            }
-        }
-        
-        Log.atNotice?.log("New value for domain \(domain.name) phpPath = \(domain.phpPath?.path ?? "nil")")
-
-        
-    case "php-options":
-        
-        if domain.phpPath != nil {
-            
-            Log.atNotice?.log("Old value for domain \(domain.name) phpOptions = \(domain.phpOptions ?? "nil")")
-
-            domain.phpOptions = parameterValue
-
-            Log.atNotice?.log("New value for domain \(domain.name) phpOptions = \(domain.phpOptions ?? "nil")")
-        }
-        
-        
-    case "php-map-index":
-        
-        if domain.phpPath != nil {
-            
-            Log.atNotice?.log("Old value for domain \(domain.name) phpMapIndex = \(domain.phpMapIndex)")
-
-            domain.phpMapIndex = Bool(lettersOrDigits: parameterValue) ?? domain.phpMapIndex
-
-            Log.atNotice?.log("New value for domain \(domain.name) phpMapIndex = \(domain.phpMapIndex)")
-        }
-        
-        
-    case "php-map-all":
-        
-        if domain.phpPath != nil {
-            
-            Log.atNotice?.log("Old value for domain \(domain.name) phpMapAll = \(domain.phpMapAll)")
-            Log.atNotice?.log("Old value for domain \(domain.name) phpMapIndex = \(domain.phpMapIndex)")
-
-            if Bool(lettersOrDigits: parameterValue) ?? domain.phpMapAll {
-                domain.phpMapAll = true
-                domain.phpMapIndex = true
-            } else {
-                domain.phpMapAll = false
-            }
-
-            Log.atNotice?.log("New value for domain \(domain.name) phpMapAll = \(domain.phpMapAll)")
-            Log.atNotice?.log("New value for domain \(domain.name) phpMapIndex = \(domain.phpMapIndex)")
-        }
-        
-        
-    case "php-timeout":
-
-        if domain.phpPath != nil {
-            
-            Log.atNotice?.log("Old value for domain \(domain.name) phpTimeout = \(domain.phpTimeout)")
-
-            domain.phpTimeout = Int(parameterValue) ?? domain.phpTimeout
-
-            Log.atNotice?.log("New value for domain \(domain.name) phpTimeout = \(domain.phpTimeout)")
-        }
-
-        
-    case "sf-resources":
-        
-        Log.atNotice?.log("Old value for domain \(domain.name) sfresources = \(domain.sfresources)")
-
-        domain.sfresources = parameterValue
-
-        Log.atNotice?.log("New value for domain \(domain.name) sfresources = \(domain.sfresources)")
-
-        
-    case "session-timeout":
-        
-        Log.atNotice?.log("Old value for domain \(domain.name) sessionTimeout = \(domain.sessionTimeout)")
-
-        domain.sessionTimeout = Int(parameterValue) ?? domain.sessionTimeout
-    
-        Log.atNotice?.log("New value for domain \(domain.name) sessionTimeout = \(domain.sessionTimeout)")
-
-        
-    case "comment-auto-approval-threshold":
-        
-        Log.atNotice?.log("Old value for domain \(domain.name) commentAutoApprovalThreshold = \(domain.commentAutoApprovalThreshold)")
-
-        domain.commentAutoApprovalThreshold = Int32(parameterValue) ?? domain.commentAutoApprovalThreshold
-    
-        Log.atNotice?.log("New value for domain \(domain.name) commentAutoApprovalThreshold = \(domain.commentAutoApprovalThreshold)")
-
         
     default:
         Log.atError?.log("Unknown key '\(parameterName)' with value '\(parameterValue)'")
@@ -1216,7 +962,7 @@ fileprivate func executeUpdateDomainServices(_ request: Request) {
 fileprivate func executeDeleteDomain(_ request: Request) {
     
     guard let name = request.info["domain-name"] else {
-        Log.atError?.log("Missing domain-name in request.info")
+        Log.atError?.log("Missing identifier in request.info: domain-name")
         return
     }
     
@@ -1285,12 +1031,12 @@ fileprivate func executeCreateDomain(_ request: Request) {
 fileprivate func executeCreateAlias(_ request: Request) {
     
     guard let name = request.info["domain-name"] else {
-        Log.atError?.log("Missing DomainName in request.info")
+        Log.atError?.log("Missing identifier in request.info: domain-name")
         return
     }
 
-    guard let alias = request.info["alias"], !alias.isEmpty else {
-        Log.atError?.log("Missing Alias in request.info")
+    guard let alias = request.info["alias-name"], !alias.isEmpty else {
+        Log.atError?.log("Missing identifier in request.info: alias-name")
         return
     }
 
@@ -1310,7 +1056,7 @@ fileprivate func executeCreateAlias(_ request: Request) {
 fileprivate func executeDeleteAlias(_ request: Request) {
     
     guard let alias = request.info["alias-name"] else {
-        Log.atError?.log("Missing alias-name in request.info")
+        Log.atError?.log("Missing identifier in request.info: alias-name")
         return
     }
     
@@ -1368,8 +1114,8 @@ fileprivate func executeLogout(_ session: Session) -> CommandExecutionResult {
 
 fileprivate func executeCreateAdmin(_ request: Request) {
     
-    guard let id = request.info["id"] else {
-        Log.atError?.log("No ID given")
+    guard let id = request.info["name"] else {
+        Log.atError?.log("No name given")
         return
     }
     
@@ -1394,27 +1140,32 @@ fileprivate func executeCreateAdmin(_ request: Request) {
 
 fileprivate func executeConfirmDeleteAccount(_ request: Request) -> CommandExecutionResult {
     
+    guard request.info["uuid"] != nil else {
+        Log.atError?.log("No uuid given")
+        return .newPath("/pages/admin-management.sf.html")
+    }
+    
     guard request.info["name"] != nil else {
         Log.atError?.log("No name given")
         return .newPath("/pages/admin-management.sf.html")
     }
-    
+
     return .newPath("/pages/admin-confirm-delete.sf.html")
 }
 
 fileprivate func executeDeleteAccount(_ request: Request) {
     
-    guard let name = request.info["name"] else {
-        Log.atError?.log("No name given")
-        return
-    }
-
-    guard serverAdminDomain.accounts.disable(name: name) else {
-        Log.atError?.log("No account for name \(name) found")
+    guard let uuidStr = request.info["uuid"] else {
+        Log.atError?.log("No uuid found")
         return
     }
     
-    Log.atNotice?.log("Server Admin Account \(name) disabled.")
+    guard let uuid = UUID(uuidString: uuidStr) else {
+        Log.atError?.log("Invalid uuid string found: \(uuidStr)")
+        return
+    }
+
+    serverAdminDomain.accounts.disable(uuid: uuid)
 }
 
 fileprivate func executeSetNewPassword(_ request: Request) {
@@ -1511,7 +1262,7 @@ fileprivate func executeSetDomainAdminPassword(_ request: Request) {
         
         // Create a new admin account if the password is also given
         
-        if let newPassword = request.info["password"], !newPassword.isEmpty {
+        if let newPassword = request.info["domain-admin-password"], !newPassword.isEmpty {
             
             if let account = domain.accounts.newAccount(name: adminName, password: newPassword) {
                 

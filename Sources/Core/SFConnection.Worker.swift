@@ -259,23 +259,26 @@ extension SFConnection {
                 let result = SwifterSockets.connectToTipServer(atAddress: domain.forwardHost!.address, atPort: (domain.forwardHost!.port ?? "80"), connectionObjectFactory: forwardingConnectionFactory)
                 
                 if case let .error(message) = result {
-                    Log.atError?.log(message, id: logId)
+                    Log.atWarning?.log(message, id: logId)
                 }
                 if case let .success(conn) = result {
                     forwarder = conn as? Forwarder
                     forwarder!.client = self
                 }
-            
-                if forwarder != nil {
+            }
+
+            // The forwarding connection will be closed when the forwarding target closes its connection. Until then all data received from the forwarding target will be routed to the client.
+
+            if forwarder != nil {
+                if let urlStr = request.url, let setupKeyword = domain.setupKeyword, urlStr.hasPrefix("/\(setupKeyword)") {
+                    // The forwarder should not forward a request to the setup keyword, otherwise the domain admin cannot disable the forwarding.
+                } else {
                     var data: Data = request.asData()!
                     if let body = request.body { data.append(body) }
                     _ = forwarder?.transfer(data, callback: nil)
+                    return
                 }
             }
-            
-            // The forwarding connection will be closed when the forwarding target closes its connection. Until then all data received from the forwarding target will be routed to the client.
-
-            return
         }
         
         

@@ -48,7 +48,7 @@ import Http
 
 // Creates an email with a link to set a new password
 
-internal let FORGOT_PASSWORD_COMMAND = "forgot-password"
+internal let COMMAND_FORGOT_PASSWORD = "forgot-password"
 
 fileprivate let FORGOT_PASSWORD_TEMPLATE = "/pages/forgot-password.sf.html"
 fileprivate let FORGOT_PASSWORD_CONTINUE_TEMPLATE = "/pages/forgot-password-continue.sf.html"
@@ -100,7 +100,7 @@ internal func executeForgotPassword(_ request: Request, _ connection: SFConnecti
     
     // Send email verification mail
     
-    let verificationLink = "http://\(domain.name):\(serverParameters.httpServicePortNumber.stringValue)/command/\(REQUEST_NEW_PASSWORD_COMMAND)?\(REQUEST_NEW_PASSWORD_CODE_KEY)=\(account.newPasswordVerificationCode)"
+    let verificationLink = "http://\(domain.name):\(serverParameters.httpServicePortNumber.stringValue)/command/\(COMMAND_REQUEST_NEW_PASSWORD)?\(REQUEST_NEW_PASSWORD_CODE_KEY)=\(account.newPasswordVerificationCode)"
 
     
     var message: String = ""

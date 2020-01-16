@@ -266,11 +266,11 @@ fileprivate func reader(_ args: Array<Substring>, _ functionsInfo: Functions.Inf
             
         case "enabled": return String(environment.domain.enabled)
             
-        case "accesslog-enabled": return String(environment.domain.accessLogEnabled)
+        case "access-log-enabled": return String(environment.domain.accessLogEnabled)
             
-        case "404log-enabled": return String(environment.domain.four04LogEnabled)
+        case "404-log-enabled": return String(environment.domain.four04LogEnabled)
             
-        case "sessionlog-enabled": return String(environment.domain.sessionLogEnabled)
+        case "session-log-enabled": return String(environment.domain.sessionLogEnabled)
             
         case "php-path": return (environment.domain.phpPath?.path ?? "")
             
@@ -302,7 +302,7 @@ fileprivate func reader(_ args: Array<Substring>, _ functionsInfo: Functions.Inf
                 return "PHP Disabled"
             }
             
-        case "sfresources": return environment.domain.sfresources
+        case "sf-resources": return environment.domain.sfresources
             
         case "session-timeout": return String(environment.domain.sessionTimeout)
 

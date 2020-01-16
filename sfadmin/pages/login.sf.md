@@ -4,6 +4,15 @@ title: Server Admin Login
 menuInclude: yes
 menuTopTitle: Admin
 menuSubTitle: Login
+#
+# Input:
+#	-
+#
+# Output:
+#	URL(POST): /serveradmin
+#		server-admin-login-name: The name of the server admin that wants to log in
+#		server-admin-login-password: The password of the server admin that wants to log in
+#
 ---
 <form action="/serveradmin" method="post">
 <div style="display:flex; justify-content:center; margin-bottom:50px;">

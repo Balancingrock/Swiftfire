@@ -1,5 +1,19 @@
 ---
 layout: default
+#
+# Input:
+# 	$server-telemetry.ServerVersion
+# 	$server-parameter.HttpServicePortNumber
+# 	$server-parameter.HttpServerStatus
+# 	$server-parameter.HttpsServicePortNumber
+# 	$server-parameter.HttpsServerStatus
+# 	$server-parameter.ServerAdminSiteRoot
+#
+# Output:
+#	URL: /serveradmin/command/restart
+#
+#	URL: /serveradmin/command/quit
+#
 ---
 {:.text-centered}
 ### Swiftfire status as of: .timestamp()

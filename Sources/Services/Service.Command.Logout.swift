@@ -48,7 +48,7 @@ import Http
 
 // Logout. Disassociate an account with the session.
 
-internal let LOGOUT_COMMAND = "logout"
+internal let COMMAND_LOGOUT = "logout"
 
 
 internal func executeLogout(_ request: Request, _ info: Services.Info) -> String? {

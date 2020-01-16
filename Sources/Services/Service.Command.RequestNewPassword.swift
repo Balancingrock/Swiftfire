@@ -49,7 +49,7 @@ import Http
 // The request new password command (2-stage, followed by set new password)
 // This command is triggered by the forgot password mail that was send
 
-internal let REQUEST_NEW_PASSWORD_COMMAND = "request-new-password"
+internal let COMMAND_REQUEST_NEW_PASSWORD = "request-new-password"
 
 fileprivate let REQUEST_NEW_PASSWORD_FAILED_TEMPLATE = "/pages/request-new-password-failed.sf.html"
 

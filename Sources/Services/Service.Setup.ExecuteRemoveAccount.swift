@@ -48,14 +48,10 @@ import Core
 
 internal func executeRemoveAccount(_ request: Request, _ domain: Domain) {
     
-    guard let accountId = request.info["remove-account-id"] else {
-        Log.atError?.log("Missing remove-account-id")
+    guard let accountUuidString = request.info["account-uuid"], let uuid = UUID(uuidString: accountUuidString) else {
+        Log.atError?.log("No (valid) account uuid present in request")
         return
     }
 
-    if domain.accounts.disable(name: accountId) {
-        Log.atNotice?.log("Account \(accountId) removed from domain \(domain.name)")
-    } else {
-        Log.atError?.log("Account not found for \(accountId) in domain \(domain.name)")
-    }
+    domain.accounts.disable(uuid: uuid)
 }

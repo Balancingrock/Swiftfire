@@ -46,12 +46,50 @@ import Http
 import Core
 
 
-internal func executeConfirmDeleteAccount(_ request: Request, _ domain: Domain) -> Bool {
+internal func executeConfirmDeleteAccount(_ request: Request, _ response: Response, _ domain: Domain) -> Bool {
     
-    guard let adminId = request.info["admin-name"], let uuid = UUID(uuidString: adminId) else {
-        Log.atError?.log("Missing admin ID")
-        return false
+    func setupCommand(_ cmd: String) -> String {
+        return "/\(domain.setupKeyword!)/command/\(cmd)"
     }
+
+    guard let accountUuidString = request.info["account-uuid"],
+        let uuid = UUID(uuidString: accountUuidString),
+        let account = domain.accounts.getAccount(for: uuid) else {
+        
+            Log.atError?.log("Cannot identify account to delete")
+            return false
+    }
+
+    let html: String =
+    """
+        <!DOCTYPE html>
+        <html>
+            <head>
+                <meta charset="utf-8">
+                <meta http-equiv="X-UA-Compatible" content="IE=edge">
+                <meta name="viewport" content="width=device-width, initial-scale=1">
+                <meta name="theme-color" content="#ffffff">
+                <title>Confirm Account Removal</title>
+                <meta name="description" content="Remove account">
+            </head>
+            <body>
+                <div style="display:flex; justify-content:center; margin-bottom:50px;">
+                    <div style="margin-left:auto; margin-right:auto;">
+                    <h1>Confirm removal of account with name: \(account.name)</h1>
+                        <form method="post">
+                            <input type="hidden" name="remove-account-uuid" value="\(account.uuid.uuidString)">
+                            <input type="submit" value="Confirmed" formaction="\(setupCommand("remove-account"))">
+                            <input type="submit" value="Don't remove" formaction="/\(domain.setupKeyword!)">
+                        </form>
+                    </div>
+                </div>
+            </body>
+        </html>
+    """
     
-    return domain.accounts.getAccount(for: uuid) != nil
+    response.body = html.data(using: .utf8)
+    response.code = Response.Code._200_OK
+    response.contentType = mimeTypeHtml
+    
+    return true
 }

@@ -78,7 +78,7 @@ internal func adminTable(_ domain: Domain, _ account: Account) -> String {
                     <td>\(accountName)</td>
                     <td>
                         <form action="\(setupCommand("confirm-delete-account"))" method="post">
-                            <input type="hidden" name="admin-name" value="\(accountName)">
+                            <input type="hidden" name="account-uuid" value="\(account.uuid.uuidString)">
                             <input type="submit" value="Remove">
                         </form>
                     </td>

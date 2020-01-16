@@ -48,7 +48,7 @@ import Http
 
 // Login. This command is used to login to an existing account. It needs the LoginName and LoginPassword.
 
-internal let LOGIN_COMMAND = "login"
+internal let COMMAND_LOGIN = "login"
 
 internal let LOGIN_TEMPLATE = "/pages/login.sf.html"
 

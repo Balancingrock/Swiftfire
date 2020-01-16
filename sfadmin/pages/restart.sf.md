@@ -2,6 +2,13 @@
 layout: page
 title: Restarting Swiftfire
 menuInclude: no
+#
+# Input:
+#	-
+#
+# Output:
+#	-
+#
 ---
 {:.text-centered}
 Please wait 10 seconds to allow the process to complete.

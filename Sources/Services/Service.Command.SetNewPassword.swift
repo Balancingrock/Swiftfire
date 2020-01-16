@@ -48,7 +48,7 @@ import Http
 
 // The set new password command (the follow-up of the request new password Command)
 
-internal let SET_NEW_PASSWORD_COMMAND = "set-new-password"
+internal let COMMAND_SET_NEW_PASSWORD = "set-new-password"
 
 internal let SET_NEW_PASSWORD_TEMPLATE = "/pages/set-new-password.sf.html"
 fileprivate let SET_NEW_PASSWORD_SUCCESS_TEMPLATE = "/pages/set-new-password-success.sf.html"

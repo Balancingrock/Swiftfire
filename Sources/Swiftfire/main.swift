@@ -237,6 +237,9 @@ do {
         emergencyExit("The Server Admin (Pseudo) Domain could not be created")
     }
     
+    
+    // The serveradmin domain should not have an Anon account
+    
     assert(domain.accounts!.getAccountWithoutPassword(for: "Anon") == nil)
     
     serverAdminDomain = domain

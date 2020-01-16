@@ -60,21 +60,35 @@ internal func executeUpdateParameter(_ request: Request, _ domain: Domain) {
 
     
     switch parameter.lowercased() {
-    case "forewardurl": domain.forwardUrl = value
+    case "forward-url": domain.forwardUrl = value
     case "enabled": domain.enabled = Bool(lettersOrDigits: value) ?? domain.enabled
-    case "accesslogenabled": domain.accessLogEnabled = Bool(lettersOrDigits: value) ?? domain.accessLogEnabled
-    case "four04logenabled": domain.four04LogEnabled = Bool(lettersOrDigits: value) ?? domain.four04LogEnabled
-    case "sessionlogenabled": domain.sessionLogEnabled = Bool(lettersOrDigits: value) ?? domain.sessionLogEnabled
-    case "phpmapindex": domain.phpMapIndex = Bool(lettersOrDigits: value) ?? domain.phpMapIndex
-    case "phpmapall":
+    case "access-log-enabled": domain.accessLogEnabled = Bool(lettersOrDigits: value) ?? domain.accessLogEnabled
+    case "404-log-enabled": domain.four04LogEnabled = Bool(lettersOrDigits: value) ?? domain.four04LogEnabled
+    case "session-log-enabled": domain.sessionLogEnabled = Bool(lettersOrDigits: value) ?? domain.sessionLogEnabled
+    case "php-executable-path":
+        domain.phpPath = nil
+        if FileManager.default.isExecutableFile(atPath: value) {
+            let url = URL(fileURLWithPath: value)
+            if url.lastPathComponent.lowercased().contains("php") {
+                domain.phpPath = URL(fileURLWithPath: value)
+            } else {
+                Log.atWarning?.log("Filename at \(value) should contain 'php'")
+            }
+        } else {
+            Log.atWarning?.log("File at \(value) either does not exist or is not an executable")
+        }
+
+    case "php-map-index": domain.phpMapIndex = Bool(lettersOrDigits: value) ?? domain.phpMapIndex
+    case "php-map-all":
         if Bool(lettersOrDigits: value) ?? domain.phpMapAll {
             domain.phpMapAll = true
             domain.phpMapIndex = true
         } else {
             domain.phpMapAll = false
         }
-    case "phptimeout": domain.phpTimeout = Int(value) ?? domain.phpTimeout
-    case "sessiontimeout": domain.sessionTimeout = Int(value) ?? domain.sessionTimeout
+    case "php-timeout": domain.phpTimeout = Int(value) ?? domain.phpTimeout
+    case "session-timeout": domain.sessionTimeout = Int(value) ?? domain.sessionTimeout
+    case "comment-auto-approval-threshold": domain.commentAutoApprovalThreshold = Int32(value) ?? Int32.max
     default: Log.atError?.log("Unknown key '\(parameter)' with value '\(value)'")
     }
     
