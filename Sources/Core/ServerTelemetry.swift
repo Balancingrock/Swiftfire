@@ -91,13 +91,13 @@ public final class ServerTelemetry {
         resetValue: 0)
 
     
-    /// The number of accepted HTTP requests. Wraps around at 999_999.
+    /// The number of accepted connection requests. Wraps around at 999_999.
     ///
     /// For information only.
     
-    public let nofAcceptedHttpRequests = NamedIntValue(
-        name: "NofAcceptedHttpRequests",
-        about: "The number of accepted HTTP requests.",
+    public let nofAcceptedConnectionRequests = NamedIntValue(
+        name: "NofAcceptedConnectionRequests",
+        about: "The number of accepted connection requests.",
         value: 0,
         resetValue: 0)
     
@@ -132,7 +132,7 @@ public final class ServerTelemetry {
     /// Make it available
     
     public init() {
-        all = [serverVersion, httpServerStatus, httpsServerStatus, nofAcceptWaitsForConnectionObject, nofAcceptedHttpRequests, nofHttp400Replies, nofHttp500Replies]
+        all = [serverVersion, httpServerStatus, httpsServerStatus, nofAcceptWaitsForConnectionObject, nofAcceptedConnectionRequests, nofHttp400Replies, nofHttp500Replies]
     }
 
     

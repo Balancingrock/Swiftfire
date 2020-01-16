@@ -462,7 +462,7 @@ func httpConnectionFactory(_ cType: SwifterSockets.InterfaceAccess, _ remoteAddr
     
     // Telemetry update
     
-    serverTelemetry.nofAcceptedHttpRequests.increment()
+    serverTelemetry.nofAcceptedConnectionRequests.increment()
     
     
     return connection
