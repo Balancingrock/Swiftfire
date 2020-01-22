@@ -46,9 +46,9 @@ import Core
 import Http
 
 
-// The command
+/// The  name to be used in HTML to invoke a review of pending comments.
 
-internal let COMMAND_COMMENT_REVIEW = "comment-review"
+let COMMAND_COMMENT_REVIEW = "comment-review"
 
 
 // The URL from where this command is posted
@@ -64,7 +64,14 @@ fileprivate let PREVIEW_BUTTON = "Preview"
 fileprivate let UPDATE_AND_ACCEPT_BUTTON = "Update and Accept"
 
 
-// Execute the Approve Comment command by removing the command from the approval list and updating the article comment table.
+/// Execute the Comment Review command.
+///
+/// - parameters:
+///     - request: The request that resulted in the activation of this procedure.
+///     - domain: The domain for which to review the comments.
+///     - info: The service info dictionary.
+///
+/// - Returns: If a specific page should be returned, the path to that page is returned. Otherwise nil.
 
 func executeCommentReview(_ request: Request, _ domain: Domain, _ info: Services.Info) -> String? {
     

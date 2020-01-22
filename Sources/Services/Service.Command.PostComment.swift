@@ -46,9 +46,9 @@ import Core
 import Http
 
 
-// The command
+/// The  name to be used in HTML to invoke the posting of a comment.
 
-internal let COMMAND_POST_COMMENT = "post-comment"
+let COMMAND_POST_COMMENT = "post-comment"
 
 
 // Defined in the HTML of the originating page and used here
@@ -56,7 +56,14 @@ internal let COMMAND_POST_COMMENT = "post-comment"
 fileprivate let COMMENT_DISPLAY_NAME_KEY = "display-name"
 
 
-// Executes the post comment command
+/// Execute the Post Comment command.
+///
+/// - parameters:
+///     - request: The request that resulted in the activation of this procedure.
+///     - domain: The domain for which to review the comments.
+///     - info: The service info dictionary.
+///
+/// - Returns: If a specific page should be returned, the path to that page is returned. Otherwise nil.
 
 func executePostComment(_ request: Request, _ domain: Domain, _ info: Services.Info) -> String? {
         

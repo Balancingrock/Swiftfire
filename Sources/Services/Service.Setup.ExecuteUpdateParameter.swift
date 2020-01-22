@@ -46,7 +46,13 @@ import Http
 import Core
 
 
-internal func executeUpdateParameter(_ request: Request, _ domain: Domain) {
+/// This command updates a domain parameter.
+///
+/// - Parameters:
+///     - request: The request that resulted in the activation of this procedure.
+///     - domain: The domain for the parameter.
+
+func executeUpdateParameter(_ request: Request, _ domain: Domain) {
     
     guard let parameter = request.info["parameter-name"] else {
         Log.atError?.log("Missing parameter name in request.info")

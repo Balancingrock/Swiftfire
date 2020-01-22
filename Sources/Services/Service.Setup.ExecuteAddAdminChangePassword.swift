@@ -46,7 +46,13 @@ import Http
 import Core
 
 
-internal func executeAddAdminChangePassword(_ request: Request, _ domain: Domain) {
+/// This command changes the password for a domain administrator.
+///
+/// - Parameters:
+///     - request: The request that resulted in the activation of this procedure.
+///     - domain: The domain for the admin.
+
+func executeAddAdminChangePassword(_ request: Request, _ domain: Domain) {
     
     guard let adminId = request.info["adminid"], let uuid = UUID(uuidString: adminId) else {
         Log.atError?.log("Missing admin ID")

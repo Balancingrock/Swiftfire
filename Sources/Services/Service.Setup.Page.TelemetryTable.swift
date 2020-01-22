@@ -44,6 +44,14 @@ import Foundation
 
 import Core
 
+
+/// Create the telemetry table for the domain setup page,
+///
+/// - Parameters:
+///     - domain: The domain for which to create it
+///
+/// - Returns: The requested HTML code.
+
 func telemetryTable(_ domain: Domain) -> String {
     
     var html: String = """

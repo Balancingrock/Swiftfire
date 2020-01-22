@@ -46,7 +46,13 @@ import Http
 import Core
 
 
-internal func loginPage(_ response: Response, _ domainName: String) {
+/// This function returns the login page.
+///
+/// - Parameters:
+///     - response: The response to contain the login page.
+///     - domainName: The domain name for the login page.
+
+func loginPage(_ response: Response, _ domainName: String) {
     
     let page: String =
     """

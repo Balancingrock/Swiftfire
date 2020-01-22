@@ -46,12 +46,19 @@ import Core
 import Http
 
 
-// The command
+/// The  name to be used in HTML to invoke the update of an existing comment.
 
-internal let COMMAND_UPDATE_COMMENT = "update-comment"
+let COMMAND_UPDATE_COMMENT = "update-comment"
 
 
-// Executes the post comment command
+/// Execute the Update Comment command.
+///
+/// - parameters:
+///     - request: The request that resulted in the activation of this procedure.
+///     - domain: The domain for which to review the comments.
+///     - info: The service info dictionary.
+///
+/// - Returns: If a specific page should be returned, the path to that page is returned. Otherwise nil.
 
 func executeUpdateComment(_ request: Request, _ domain: Domain, _ info: Services.Info) -> String? {
     

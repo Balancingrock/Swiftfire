@@ -47,7 +47,15 @@ import Foundation
 import Http
 import Core
 
-internal func setupPage(_ domain: Domain, _ account: Account, _ response: Response) {
+
+/// Creates the setup page for a domain.
+///
+/// - parameters:
+///     - domain: The domain for which to review the comments.
+///     - account: The account, must be a domain administrator..
+///     - response: The response that will be returned.
+
+func setupPage(_ domain: Domain, _ account: Account, _ response: Response) {
                             
     let html: String = """
         <!DOCTYPE html>

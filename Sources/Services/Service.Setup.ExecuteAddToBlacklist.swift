@@ -46,7 +46,13 @@ import Http
 import Core
 
 
-internal func executeAddToBlacklist(_ request: Request, _ domain: Domain) {
+/// This command adds to a blacklist.
+///
+/// - Parameters:
+///     - request: The request that resulted in the activation of this procedure.
+///     - domain: The domain of the blacklist.
+
+func executeAddToBlacklist(_ request: Request, _ domain: Domain) {
     
     guard let address = request.info["blacklist-address"] else {
         Log.atError?.log("Missing blacklist-address")

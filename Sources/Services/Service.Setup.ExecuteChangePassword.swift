@@ -46,7 +46,13 @@ import Http
 import Core
 
 
-internal func executeChangePassword(_ request: Request, _ domain: Domain) {
+/// This command changes the password of a user.
+///
+/// - Parameters:
+///     - request: The request that resulted in the activation of this procedure.
+///     - domain: The domain for the user.
+
+func executeChangePassword(_ request: Request, _ domain: Domain) {
     
     guard let str = request.info["changepasswordid"], let uuid = UUID(uuidString: str) else {
         Log.atError?.log("Missing id")

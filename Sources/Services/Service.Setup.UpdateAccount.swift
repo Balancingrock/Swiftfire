@@ -46,7 +46,14 @@ import Http
 import Core
 
 
-internal func updateAccount(_ request: Request, _ domain: Domain, _ connection: SFConnection) {
+/// Updates an account parameter.
+///
+/// - Parameters:
+///     - request: The originating request.
+///     - domain: The domain for the account
+///     - connection: The connection on which the request happened.
+
+func updateAccount(_ request: Request, _ domain: Domain, _ connection: SFConnection) {
     
     guard let str = request.info["account-uuid"], !str.isEmpty, let uuid = UUID(uuidString: str) else {
         Log.atError?.log("Missing account uuid")

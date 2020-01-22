@@ -52,25 +52,64 @@ import Core
 // Note that commands and templates are lowercase
 // Template paths are case sensitive and must lead with a "/"
 
-internal let PREVIOUS_ATTEMPT_MESSAGE_KEY = "previous-attempt-message"
+
+/// This key can be used to display a message when something failed and the user has to try again.
+
+let PREVIOUS_ATTEMPT_MESSAGE_KEY = "previous-attempt-message"
+
+
+/// This key is used to acces the original page URL that lead to a need to login first.
+
 public let ORIGINAL_PAGE_URL_KEY = "original-page-url"
 
 
 // When somebody tried to do something which is not allowed, yet is also not an error
 
-internal let ATTEMPT_NOT_ALLOWED_TEMPLATE = "/pages/not-allowed.sf.html"
+///The path to the page that displayes an derror when the user attempted something that he has no rights to (yet).
+
+let ATTEMPT_NOT_ALLOWED_TEMPLATE = "/pages/not-allowed.sf.html"
 
 
 // General purpose keys used in the POST requests
 
-internal let BUTTON_KEY = "button"
-internal let NEXT_URL_KEY = "next-url"
-internal let ACCOUNT_ID_KEY = "account-id"
-internal let COMMENT_ACCOUNT_KEY = "comment-account-id"
-internal let COMMENT_UUID_KEY = "comment-uuid"
-internal let COMMENT_SECTION_IDENTIFIER_KEY = "comment-section-identifier"
-internal let COMMENT_TEXT_KEY = "comment-text"
-internal let COMMENT_ORIGINAL_TIMESTAMP_KEY = "comment-original-timestamp"
+/// POST-key for the button id
+
+let BUTTON_KEY = "button"
+
+
+/// POST-Key for the next url to be visited
+
+let NEXT_URL_KEY = "next-url"
+
+
+/// POST-Key for the account id (name)
+
+let ACCOUNT_ID_KEY = "account-id"
+
+
+/// POST-Key for the identify of a comment author id (name)
+
+let COMMENT_ACCOUNT_KEY = "comment-account-id"
+
+
+/// POST-Key for the UUID of a comment
+
+let COMMENT_UUID_KEY = "comment-uuid"
+
+
+/// POST-Key for the comment section identifier
+
+let COMMENT_SECTION_IDENTIFIER_KEY = "comment-section-identifier"
+
+
+/// POST-Key for the text of a comment
+
+let COMMENT_TEXT_KEY = "comment-text"
+
+
+/// POST-Key for the original timestamp of a comment
+
+let COMMENT_ORIGINAL_TIMESTAMP_KEY = "comment-original-timestamp"
 
 
 /// Executes commands given in the URL. Only active if the URL started with the command keyword followed by a command identifier.
@@ -123,7 +162,7 @@ func service_commands(_ request: Request, _ connection: SFConnection, _ domain: 
         
     case COMMAND_LOGIN: relativePath = executeLogin(request, domain, info)
     case COMMAND_LOGOUT: relativePath = executeLogout(request, info)
-    case COMMAND_EMAIL_VERIFICATION: relativePath = executeEmailVerification(request, response, domain, info)
+    case COMMAND_EMAIL_VERIFICATION: relativePath = executeEmailVerification(request, domain, response, info)
     case COMMAND_REGISTER: relativePath = executeRegister(request, connection, domain, response, info)
     case COMMAND_FORGOT_PASSWORD: relativePath = executeForgotPassword(request, connection, domain, response, info)
     case COMMAND_REQUEST_NEW_PASSWORD: relativePath = executeRequestNewPassword(request, domain)

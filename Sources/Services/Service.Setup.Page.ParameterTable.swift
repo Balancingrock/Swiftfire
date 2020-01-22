@@ -44,7 +44,15 @@ import Foundation
 
 import Core
 
-internal func parameterTable(_ domain: Domain) -> String {
+
+/// Create the parameter table for the domain setup page,
+///
+/// - Parameters:
+///     - domain: The domain for which to create it
+///
+/// - Returns: The requested HTML code.
+
+func parameterTable(_ domain: Domain) -> String {
     
     func setupCommand(_ cmd: String) -> String {
         return "/\(domain.setupKeyword!)/command/\(cmd)"

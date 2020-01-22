@@ -46,7 +46,13 @@ import Http
 import Core
 
 
-internal func executeConfirmDeleteAccount(_ request: Request, _ response: Response, _ domain: Domain) -> Bool {
+/// This command requestes the confirmation for the removal of an account.
+///
+/// - Parameters:
+///     - request: The request that resulted in the activation of this procedure.
+///     - domain: The domain for the account.
+
+func executeConfirmDeleteAccount(_ request: Request, _ response: Response, _ domain: Domain) -> Bool {
     
     func setupCommand(_ cmd: String) -> String {
         return "/\(domain.setupKeyword!)/command/\(cmd)"

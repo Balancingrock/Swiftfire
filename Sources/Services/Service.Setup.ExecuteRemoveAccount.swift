@@ -46,7 +46,13 @@ import Http
 import Core
 
 
-internal func executeRemoveAccount(_ request: Request, _ domain: Domain) {
+/// This command removes an account (by switching it to disabled).
+///
+/// - Parameters:
+///     - request: The request that resulted in the activation of this procedure.
+///     - domain: The domain for the account.
+
+func executeRemoveAccount(_ request: Request, _ domain: Domain) {
     
     guard let accountUuidString = request.info["account-uuid"], let uuid = UUID(uuidString: accountUuidString) else {
         Log.atError?.log("No (valid) account uuid present in request")

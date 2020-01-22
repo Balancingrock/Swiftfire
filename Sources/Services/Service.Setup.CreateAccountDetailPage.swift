@@ -46,7 +46,14 @@ import Http
 import Core
 
 
-internal func createAccountDetailPage(_ request: Request, _ domain: Domain, _ response: Response) {
+/// Creates an account detail page.
+///
+/// - Parameters:
+///     - request: The originating request.
+///     - domain: The domain of the account.
+///     - response: The response to contain the page.
+
+func createAccountDetailPage(_ request: Request, _ domain: Domain, _ response: Response) {
     
     guard let str = request.info["account-uuid"], let uuid = UUID(uuidString: str) else {
         Log.atError?.log("Missing account-uuid in request.info")

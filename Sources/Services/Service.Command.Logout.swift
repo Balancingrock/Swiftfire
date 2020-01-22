@@ -46,12 +46,20 @@ import Core
 import Http
 
 
-// Logout. Disassociate an account with the session.
+/// The  name to be used in HTML to invoke the logout process.
 
-internal let COMMAND_LOGOUT = "logout"
+let COMMAND_LOGOUT = "logout"
 
 
-internal func executeLogout(_ request: Request, _ info: Services.Info) -> String? {
+/// Execute the Login command.
+///
+/// - parameters:
+///     - request: The request that resulted in the activation of this procedure.
+///     - info: The service info dictionary.
+///
+/// - Returns: If a specific page should be returned, the path to that page is returned. Otherwise nil.
+
+func executeLogout(_ request: Request, _ info: Services.Info) -> String? {
     
     
     // A session should be present

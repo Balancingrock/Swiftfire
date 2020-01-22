@@ -46,7 +46,13 @@ import Http
 import Core
 
 
-internal func executeUpdateServices(_ request: Request, _ domain: Domain) {
+/// This command updates the domain services.
+///
+/// - Parameters:
+///     - request: The request that resulted in the activation of this procedure.
+///     - domain: The domain for the services.
+
+func executeUpdateServices(_ request: Request, _ domain: Domain) {
     
     struct ServiceItem {
         let index: Int

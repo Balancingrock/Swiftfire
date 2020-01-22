@@ -49,14 +49,28 @@ import Http
 // The request new password command (2-stage, followed by set new password)
 // This command is triggered by the forgot password mail that was send
 
-internal let COMMAND_REQUEST_NEW_PASSWORD = "request-new-password"
+
+/// The  name to be used in HTML to request a new password.
+
+let COMMAND_REQUEST_NEW_PASSWORD = "request-new-password"
 
 fileprivate let REQUEST_NEW_PASSWORD_FAILED_TEMPLATE = "/pages/request-new-password-failed.sf.html"
 
-internal let REQUEST_NEW_PASSWORD_CODE_KEY = "request-new-password-code"
+
+/// The  name to be used in HTML that specifies the key to be used to set a new password.
+
+let REQUEST_NEW_PASSWORD_CODE_KEY = "request-new-password-code"
 
 
-internal func executeRequestNewPassword(_ request: Request, _ domain: Domain) -> String {
+/// Execute the Login command.
+///
+/// - parameters:
+///     - request: The request that resulted in the activation of this procedure.
+///     - domain: The domain for which to review the comments.
+///
+/// - Returns: If a specific page should be returned, the path to that page is returned. Otherwise nil.
+
+func executeRequestNewPassword(_ request: Request, _ domain: Domain) -> String {
     
     guard let code = request.info[REQUEST_NEW_PASSWORD_CODE_KEY] else {
         Log.atError?.log("Missing \(REQUEST_NEW_PASSWORD_CODE_KEY)")

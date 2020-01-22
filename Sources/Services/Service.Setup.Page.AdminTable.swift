@@ -45,7 +45,14 @@ import Foundation
 import Core
 
 
-internal func adminTable(_ domain: Domain, _ account: Account) -> String {
+/// Create the admin table for the domain setup page,
+///
+/// - Parameters:
+///     - domain: The domain for which to create it
+///
+/// - Returns: The requested HTML code.
+
+func adminTable(_ domain: Domain, _ account: Account) -> String {
     
     func setupCommand(_ cmd: String) -> String {
         return "/\(domain.setupKeyword!)/command/\(cmd)"

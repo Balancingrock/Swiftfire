@@ -46,17 +46,30 @@ import Core
 import Http
 
 
-// Email verification. This command is received when a new user clicks the link in the confirmation email.
+/// The  name to be used in the email verification link to invoke the email verification process.
 
-internal let COMMAND_EMAIL_VERIFICATION = "email-verification"
+let COMMAND_EMAIL_VERIFICATION = "email-verification"
 
 fileprivate let EMAIL_VERIFICATION_SUCCESS_TEMPLATE = "/pages/email-verification-success.sf.html"
 fileprivate let EMAIL_VERIFICATION_FAILED_TEMPLATE = "/pages/email-verification-failed.sf.html"
 
-internal let EMAIL_VERIFICATION_CODE_KEY = "verification-code"
+
+/// The  name to be used in the email verification link for the verification code.
+
+let EMAIL_VERIFICATION_CODE_KEY = "verification-code"
 
 
-internal func executeEmailVerification(_ request: Request, _ response: Response, _ domain: Domain, _ info: Services.Info) -> String? {
+/// Execute the Login command.
+///
+/// - parameters:
+///     - request: The request that resulted in the activation of this procedure.
+///     - domain: The domain for which to review the comments.
+///     - response: The response that will be returned.
+///     - info: The service info dictionary.
+///
+/// - Returns: If a specific page should be returned, the path to that page is returned. Otherwise nil.
+
+func executeEmailVerification(_ request: Request, _ domain: Domain, _ response: Response, _ info: Services.Info) -> String? {
         
     guard let verificationCode = request.info[EMAIL_VERIFICATION_CODE_KEY] else {
         Log.atInfo?.log("Missing verifcation code in command")

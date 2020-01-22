@@ -48,17 +48,33 @@ import Http
 
 // The set new password command (the follow-up of the request new password Command)
 
-internal let COMMAND_SET_NEW_PASSWORD = "set-new-password"
+/// The  name to be used in HTML to set a new password.
 
-internal let SET_NEW_PASSWORD_TEMPLATE = "/pages/set-new-password.sf.html"
+let COMMAND_SET_NEW_PASSWORD = "set-new-password"
+
+
+/// The path to the template for the set new password email
+
+let SET_NEW_PASSWORD_TEMPLATE = "/pages/set-new-password.sf.html"
 fileprivate let SET_NEW_PASSWORD_SUCCESS_TEMPLATE = "/pages/set-new-password-success.sf.html"
 
-internal let SET_NEW_PASSWORD_ACCOUNT_ID_KEY = "uuid"
+
+/// The key to use to enable the setting of a new password.
+
+let SET_NEW_PASSWORD_ACCOUNT_ID_KEY = "uuid"
 fileprivate let SET_NEW_PASSWORD_PASSWORD1_KEY = "set-new-password-1"
 fileprivate let SET_NEW_PASSWORD_PASSWORD2_KEY = "set-new-password-2"
 
 
-internal func executeSetNewPassword(_ request: Request, _ domain: Domain) -> String {
+/// Execute the Login command.
+///
+/// - parameters:
+///     - request: The request that resulted in the activation of this procedure.
+///     - domain: The domain for which to review the comments.
+///
+/// - Returns: If a specific page should be returned, the path to that page is returned. Otherwise nil.
+
+func executeSetNewPassword(_ request: Request, _ domain: Domain) -> String {
     
     guard let accountId = request.info[SET_NEW_PASSWORD_ACCOUNT_ID_KEY], let uuid = UUID(uuidString: accountId) else {
         Log.atError?.log("Missing account id")

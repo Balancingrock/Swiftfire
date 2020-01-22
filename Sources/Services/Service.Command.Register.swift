@@ -46,9 +46,9 @@ import Core
 import Http
 
 
-// This creates a new account and sends a verification email
+/// The  name to be used in HTML to invoke the register process that will create a new account and send a verification email..
 
-internal let COMMAND_REGISTER = "register"
+let COMMAND_REGISTER = "register"
 
 fileprivate let REGISTER_TEMPLATE = "/pages/register.sf.html"
 fileprivate let REGISTER_CONTINUE_TEMPLATE = "/pages/register-continue.sf.html"
@@ -62,7 +62,18 @@ fileprivate let REGISTER_FROM_KEY_OPTIONAL = "from-address" // Optional, uncheck
 fileprivate let REGISTER_SUBJECT_KEY_OPTIONAL = "subject" // Optional, unchecked
 
 
-internal func executeRegister(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ response: Response, _ info: Services.Info) -> String? {
+/// Execute the Login command.
+///
+/// - parameters:
+///     - request: The request that resulted in the activation of this procedure.
+///     - connection: The connection object the request uses.
+///     - domain: The domain for which to review the comments.
+///     - response: The response that will be returned.
+///     - info: The service info dictionary.
+///
+/// - Returns: If a specific page should be returned, the path to that page is returned. Otherwise nil.
+
+func executeRegister(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ response: Response, _ info: Services.Info) -> String? {
 
     
     // A session should be present

@@ -48,7 +48,10 @@ import Http
 
 // Creates an email with a link to set a new password
 
-internal let COMMAND_FORGOT_PASSWORD = "forgot-password"
+/// The  name to be used in HTML to initiate the forgot password sequence.
+
+let COMMAND_FORGOT_PASSWORD = "forgot-password"
+
 
 fileprivate let FORGOT_PASSWORD_TEMPLATE = "/pages/forgot-password.sf.html"
 fileprivate let FORGOT_PASSWORD_CONTINUE_TEMPLATE = "/pages/forgot-password-continue.sf.html"
@@ -57,7 +60,18 @@ fileprivate let FORGOT_PASSWORD_EMAIL_TEXT_TEMPLATE = "/templates/request-new-pa
 fileprivate let FORGOT_PASSWORD_ACCOUNT_ID_KEY = "forgot-password-account-id"
 
 
-internal func executeForgotPassword(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ response: Response, _ info: Services.Info) -> String {
+/// Execute the Login command.
+///
+/// - parameters:
+///     - request: The request that resulted in the activation of this procedure.
+///     - connection: The connection object the request uses.
+///     - domain: The domain for which to review the comments.
+///     - response: The response that will be returned.
+///     - info: The service info dictionary.
+///
+/// - Returns: If a specific page should be returned, the path to that page is returned. Otherwise nil.
+
+func executeForgotPassword(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ response: Response, _ info: Services.Info) -> String {
 
     // Note: We always return the 'success' template as we do not want to give out any clues to a possible hack attempt
     

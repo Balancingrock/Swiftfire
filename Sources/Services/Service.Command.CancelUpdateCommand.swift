@@ -46,12 +46,19 @@ import Core
 import Http
 
 
-// The command
+/// The  name to be used in HTML to invoke the cancellation of a comment update.
 
-internal let COMMAND_CANCEL_UPDATE_COMMENT = "cancel-update-comment"
+let COMMAND_CANCEL_UPDATE_COMMENT = "cancel-update-comment"
 
 
-// Executes the post comment command
+/// Execute the Cancel Update Comment command.
+///
+/// - parameters:
+///     - request: The request that resulted in the activation of this procedure.
+///     - domain: The domain for which to review the comments.
+///     - info: The service info dictionary.
+///
+/// - Returns: If a specific page should be returned, the path to that page is returned. Otherwise nil.
 
 func executeCancelUpdateComment(_ request: Request, _ domain: Domain, _ info: Services.Info) -> String? {
     return nil

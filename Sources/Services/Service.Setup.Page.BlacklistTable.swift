@@ -44,7 +44,14 @@ import Foundation
 
 import Core
 
-internal func blacklistTable(_ domain: Domain) -> String {
+/// Create the blacklist table for the domain setup page,
+///
+/// - Parameters:
+///     - domain: The domain for which to create it
+///
+/// - Returns: The requested HTML code.
+
+func blacklistTable(_ domain: Domain) -> String {
     
     func setupCommand(_ cmd: String) -> String {
         return "/\(domain.setupKeyword!)/command/\(cmd)"

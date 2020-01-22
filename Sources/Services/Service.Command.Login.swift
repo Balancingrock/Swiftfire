@@ -46,17 +46,29 @@ import Core
 import Http
 
 
-// Login. This command is used to login to an existing account. It needs the LoginName and LoginPassword.
+/// The  name to be used in HTML to invoke a login.
 
-internal let COMMAND_LOGIN = "login"
+let COMMAND_LOGIN = "login"
 
-internal let LOGIN_TEMPLATE = "/pages/login.sf.html"
+
+/// The  path to the login template.
+
+let LOGIN_TEMPLATE = "/pages/login.sf.html"
 
 fileprivate let LOGIN_NAME_KEY = "login-name"
 fileprivate let LOGIN_PASSWORD_KEY = "login-password"
 
 
-internal func executeLogin(_ request: Request, _ domain: Domain, _ info: Services.Info) -> String? {
+/// Execute the Login command.
+///
+/// - parameters:
+///     - request: The request that resulted in the activation of this procedure.
+///     - domain: The domain for which to review the comments.
+///     - info: The service info dictionary.
+///
+/// - Returns: If a specific page should be returned, the path to that page is returned. Otherwise nil.
+
+func executeLogin(_ request: Request, _ domain: Domain, _ info: Services.Info) -> String? {
     
     
     // A session should be present
