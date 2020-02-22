@@ -346,7 +346,7 @@ extension SFConnection {
         // Update the statistics
         
         let completed = Date().javaDate
-        let session = serviceInfo[.sessionKey] as? Session
+/*        let session = serviceInfo[.sessionKey] as? Session
         
         let visit = Visit(
             received: timestampResponseStart,
@@ -361,7 +361,7 @@ extension SFConnection {
         )
         
         domain.recordStatistics(visit)
- 
+*/
         
         Log.atInfo?.log("Response took \(completed - timestampResponseStart) milli seconds", id: logId)
     }
