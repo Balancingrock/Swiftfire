@@ -236,7 +236,7 @@ fileprivate func reader(_ args: Array<Substring>, _ functionsInfo: Functions.Inf
             
             case "is-domain-admin": return String(account.isDomainAdmin)
             
-            case "is-moderator": return String(account.isModerator)
+            case "is-moderator": return String(account.isModerator || account.isDomainAdmin)
             
             default:
                 Log.atError?.log("No access to Account mapped for key: \(args[1].lowercased())")

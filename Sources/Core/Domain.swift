@@ -36,7 +36,8 @@
 //
 // History
 //
-// 1.3.0 - Replaced var with let due to Xcode 11
+// 1.3.0 - Removed unnecessary initialization of some variables from init
+//       - Replaced var with let due to Xcode 11
 //       #8 Fixed storing of all changes to the service names
 //       - Added default "Anon" account
 //       - Added general purpose cache
@@ -403,7 +404,6 @@ public final class Domain {
             Log.atEmergency?.log("Could not create sessions object for domain \(self.name)")
             return nil
         }
-        self.sessions.loggingEnabled = sessionLogEnabled
         
         
         // Create the accounts object
@@ -429,7 +429,6 @@ public final class Domain {
             Log.atEmergency?.log("Could not create 404 log for domain \(self.name)")
             return nil
         }
-        self.four04Log.enabled = four04LogEnabled
 
         
         // Create the access log
@@ -439,7 +438,6 @@ public final class Domain {
             Log.atEmergency?.log("Could not create access log for domain \(self.name)")
             return nil
         }
-        self.accessLog.enabled = accessLogEnabled
 
         
         // Restore the blacklist

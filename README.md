@@ -174,6 +174,8 @@ The sources for the server admin site are generated using Jekyll. If changes mus
 - Added functions for account creation by users with auto-email verification
 - Added `demo` site to showcase features and serve as a user website template
 - Rewritten sfadmin to push all html code into html files (i.e. functions should not contain html code)
+- Changed server root directory to allow multiple Swiftfire servers running concurently
+- Added command line parameters to support multiple Swiftfre servers running concurrently
 
 #### 1.2.1
 

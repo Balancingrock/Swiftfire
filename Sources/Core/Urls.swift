@@ -126,7 +126,7 @@ public final class Urls {
     
     /// The root directory (Application Support Directory)
     
-    static var applicationSupportDirectoryUrl: URL = {
+    public static var applicationSupportDir: URL = {
         
         let filemanager = FileManager.default
         
@@ -151,15 +151,22 @@ public final class Urls {
     }()
     
     
+    /// The root directory for this instance of swiftfire.
+    ///
+    /// There can be multiple versions of Swiftfire running in parallel each with their own root directory
+    
+    public static var rootDir: URL = { return applicationSupportDir.appendingPathComponent("production") }()
+    
+    
     /// The path to the application support directory
     
-    static var applicationSupportDirectoryPath: NSString = { return applicationSupportDirectoryUrl.path as NSString }()
+    static var rootDirPath: NSString = { return rootDir.path as NSString }()
     
     
     // =================================================================================================================
     /// Ssl support directory
     
-    public static var sslDir: URL? = { dirUrl(applicationSupportDirectoryUrl, "ssl") }()
+    public static var sslDir: URL? = { dirUrl(rootDir, "ssl") }()
     
     
     /// The directory for the server certificate & private key
@@ -170,7 +177,7 @@ public final class Urls {
     // =================================================================================================================
     /// The directory containing the parameter and domain files with default values
     
-    public static var settingsDir: URL? = { dirUrl(applicationSupportDirectoryUrl, "settings") }()
+    public static var settingsDir: URL? = { dirUrl(rootDir, "settings") }()
     
     
     /// The file with parameter defaults
@@ -181,13 +188,13 @@ public final class Urls {
     // =================================================================================================================
     /// The directory for the server telemetry
     
-    public static var serverTelemetryDir: URL? = { dirUrl(applicationSupportDirectoryUrl, "telemetry") }()
+    public static var serverTelemetryDir: URL? = { dirUrl(rootDir, "telemetry") }()
 
     
     // =================================================================================================================
     /// The directory containing the logging files
     
-    public static var logsDir: URL? = { dirUrl(applicationSupportDirectoryUrl, "logs") }()
+    public static var logsDir: URL? = { dirUrl(rootDir, "logs") }()
 
     
     // =================================================================================================================
@@ -205,9 +212,9 @@ public final class Urls {
     // =================================================================================================================
     /// The directory for the domains (and aliasses)
     
-    public static var domainsDir: URL? = { dirUrl(applicationSupportDirectoryUrl, "domains") }()
+    public static var domainsDir: URL? = { dirUrl(rootDir, "domains") }()
     
-    public static var domainsDirPath: NSString = { dirPath(applicationSupportDirectoryPath, "domains") }()
+    public static var domainsDirPath: NSString = { dirPath(rootDirPath, "domains") }()
     
     
     /// The file with domain defaults

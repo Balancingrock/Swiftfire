@@ -57,8 +57,8 @@ public class AccountManager {
     
     // The queue for concurrent access protection
     
-    private static var queue = DispatchQueue(
-        label: "Accounts",
+    private var queue = DispatchQueue(
+        label: "AccountManager",
         qos: DispatchQoS.default,
         attributes: DispatchQueue.Attributes(),
         autoreleaseFrequency: DispatchQueue.AutoreleaseFrequency.inherit,
@@ -315,7 +315,7 @@ extension AccountManager {
                 
         if name.isEmpty { return nil }
         
-        return AccountManager.queue.sync {
+        return queue.sync {
             
             return getAccount(name)
         }
@@ -338,7 +338,7 @@ extension AccountManager {
         if password.isEmpty { return nil }
         if name.isEmpty { return nil }
 
-        return AccountManager.queue.sync {
+        return queue.sync {
             
             
             // Get the uuid of the account
@@ -369,7 +369,7 @@ extension AccountManager {
     
     public func getAccount(for uuid: UUID) -> Account? {
         
-        return AccountManager.queue.sync {
+        return queue.sync {
             
             return getAccount(uuid)
         }
@@ -386,7 +386,7 @@ extension AccountManager {
     
     public func newAccount(name: String, password: String) -> Account? {
         
-        return AccountManager.queue.sync {
+        return queue.sync {
             
             // Only valid parameters
             
@@ -438,7 +438,7 @@ extension AccountManager {
     /// - Returns: True if the given name is available as an account name.
     
     public func available(name: String) -> Bool {
-        return AccountManager.queue.sync {
+        return queue.sync {
             return nameLut[name.lowercased()] == nil
         }
     }
@@ -452,7 +452,7 @@ extension AccountManager {
 
     public func disable(uuid: UUID) {
         
-        return AccountManager.queue.sync {
+        return queue.sync {
             
             
             // Get the account
@@ -531,7 +531,7 @@ extension AccountManager: Sequence {
     
     
     public func makeIterator() -> AccountNameGenerator {
-        return AccountManager.queue.sync {
+        return queue.sync {
             return AccountNameGenerator(source: self)
         }
     }

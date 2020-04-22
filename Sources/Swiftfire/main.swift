@@ -71,7 +71,7 @@ fileprivate func emergencyExit(_ message: String) -> Never {
 }
 
 
-// Set default logging levels to gain some output if anything goes wrong before the log levels are set to the application values
+// Set default logging levels to gain some output if anything goes wrong before the log levels are set from the server parameter values
 
 Log.singleton.osLogFacilityRecordAtAndAboveLevel = SwifterLog.Level.none
 Log.singleton.fileRecordAtAndAboveLevel = SwifterLog.Level.none
@@ -85,6 +85,16 @@ Log.singleton.networkTransmitAtAndAboveLevel = SwifterLog.Level.none
 Log.atNotice?.log("Starting Swiftfire webserver \(serverTelemetry.serverVersion)")
 
 
+// ===============================
+// Evaluate command line arguments
+// ===============================
+
+do {
+    // Note that this function will not return if an error occured on the command line.
+    commandLineArguments.read()
+}
+
+
 // =======================================
 // Initialize the configuration parameters
 // =======================================
@@ -94,6 +104,9 @@ do {
     guard serverParameters.load() else {
         emergencyExit("Could not load server parameters")
     }
+    
+    // Override with command line arguments
+    commandLineArguments.updateServerParameters()
     
     // Add update (validation) actions
     setupParametersDidSetActions()

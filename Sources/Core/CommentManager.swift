@@ -414,7 +414,13 @@ public final class CommentManager {
     
     /// The queue on which all work will be serialized.
     
-    fileprivate let queue = DispatchQueue.init(label: "CommentsAccess", qos: DispatchQoS.userInitiated, attributes: DispatchQueue.Attributes.init(), autoreleaseFrequency: DispatchQueue.AutoreleaseFrequency.workItem, target: nil)
+    fileprivate let queue = DispatchQueue(
+        label: "CommentManager",
+        qos: DispatchQoS.userInitiated,
+        attributes: DispatchQueue.Attributes.init(),
+        autoreleaseFrequency: DispatchQueue.AutoreleaseFrequency.workItem,
+        target: nil
+    )
     
     
     /// The (table) item manager cache

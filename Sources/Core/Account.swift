@@ -36,7 +36,9 @@
 //
 // History
 //
-// 1.3.0 - Redesigned for easier & faster handling of accounts
+// 1.3.0 - Implemented thread protection
+//       - Spilt off the estimated memory consumption protocol into an extension
+//       - Redesigned for easier & faster handling of accounts
 // 1.2.0 - Changed the way the account directory is handled
 //       - Added the isAdmin member
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
@@ -69,10 +71,19 @@ fileprivate let ACCOUNT_NOF_COMMENTS_NF = NameField("ncom")!
 
 /// An account within swiftfire. Used for admin account and can be used for domain accounts as well.
 
-public final class Account: EstimatedMemoryConsumption {
+public final class Account {
     
-    public var estimatedMemoryConsumption: Int { return self.db.root.count }
-
+    
+    /// The queue on which all access is performed
+    
+    fileprivate static var queue = DispatchQueue(
+        label: "Accounts",
+        qos: DispatchQoS.default,
+        attributes: DispatchQueue.Attributes(),
+        autoreleaseFrequency: DispatchQueue.AutoreleaseFrequency.inherit,
+        target: nil
+    )
+    
     
     /// Data storage for the account.
     
@@ -85,10 +96,12 @@ public final class Account: EstimatedMemoryConsumption {
     /// The UUID for this account
     
     public lazy var uuid: UUID = {
-        if let v = db.root[ACCOUNT_UUID_NF].uuid { return v }
-        Log.atCritical?.log("Error retrieving uuid from account store")
-        // Note a random UUID is extremely unlikely to actually refer to an account, but it could happen. However given that this situation should never happen in the first place, this small risk is accepted. The only alternative would be to make the uuid an optional or to shut down the server.
-        return UUID()
+        Account.queue.sync {
+            if let v = db.root[ACCOUNT_UUID_NF].uuid { return v }
+            Log.atCritical?.log("Error retrieving uuid from account store")
+            // Note a random UUID is extremely unlikely to actually refer to an account, but it could happen. However given that this situation should never happen in the first place, this small risk is accepted. The only alternative would be to make the uuid an optional or to shut down the server.
+            return UUID()
+        }
     }()
 
     
@@ -97,10 +110,16 @@ public final class Account: EstimatedMemoryConsumption {
     public let dir: URL
     
     
-    /// Set to 'true' if this account is the anonymous account
+    /// True if this account is the anonymous account
     
     public lazy var isAnon: Bool = {
-        return name.lowercased() == "anon"
+        Account.queue.sync {
+            guard let name = db.root[ACCOUNT_NAME_NF].string else {
+                Log.atCritical?.log("Error retrieving name from account store")
+                return false
+            }
+            return name.lowercased() == "anon"
+        }
     }()
     
     
@@ -109,7 +128,17 @@ public final class Account: EstimatedMemoryConsumption {
     /// An account is active if the email address has been verified and the account is enabled.
     
     public var isActive: Bool {
-        return isEnabled && emailVerificationCode.isEmpty
+        Account.queue.sync {
+            guard let isEnabled = db.root[ACCOUNT_ENABLED_NF].bool else {
+                Log.atCritical?.log("Error retrieving enabled from account store")
+                return false
+            }
+            guard let emailVerificationCode = db.root[ACCOUNT_EMAIL_VERIFICATION_CODE_NF].string else {
+                Log.atCritical?.log("Error retrieving emailAddress from account store")
+                return false
+            }
+            return isEnabled && emailVerificationCode.isEmpty
+        }
     }
     
     
@@ -119,13 +148,17 @@ public final class Account: EstimatedMemoryConsumption {
     
     public var isEnabled: Bool {
         get {
-            if let v = db.root[ACCOUNT_ENABLED_NF].bool { return v }
-            Log.atCritical?.log("Error retrieving enabled from account store")
-            return false
+            Account.queue.sync {
+                if let v = db.root[ACCOUNT_ENABLED_NF].bool { return v }
+                Log.atCritical?.log("Error retrieving enabled from account store")
+                return false
+            }
         }
         set {
-            db.root.updateItem(newValue, withNameField: ACCOUNT_ENABLED_NF)
-            store()
+            Account.queue.sync {
+                db.root.updateItem(newValue, withNameField: ACCOUNT_ENABLED_NF)
+                store()
+            }
         }
     }
 
@@ -134,13 +167,17 @@ public final class Account: EstimatedMemoryConsumption {
     
     public var name: String {
         get {
-            if let v = db.root[ACCOUNT_NAME_NF].string { return v }
-            Log.atCritical?.log("Error retrieving name from account store")
-            return "***error***"
+            Account.queue.sync {
+                if let v = db.root[ACCOUNT_NAME_NF].string { return v }
+                Log.atCritical?.log("Error retrieving name from account store")
+                return "***error***"
+            }
         }
         set {
-            db.root.updateItem(newValue, withNameField: ACCOUNT_NAME_NF)
-            store()
+            Account.queue.sync {
+                db.root.updateItem(newValue, withNameField: ACCOUNT_NAME_NF)
+                store()
+            }
         }
     }
     
@@ -149,13 +186,17 @@ public final class Account: EstimatedMemoryConsumption {
     
     public var emailAddress: String {
         get {
-            if let v = db.root[ACCOUNT_EMAIL_ADDRESS_NF].string { return v }
-            Log.atCritical?.log("Error retrieving emailAddress from account store")
-            return "***error***"
+            Account.queue.sync {
+                if let v = db.root[ACCOUNT_EMAIL_ADDRESS_NF].string { return v }
+                Log.atCritical?.log("Error retrieving emailAddress from account store")
+                return "***error***"
+            }
         }
         set {
-            db.root.updateItem(newValue, withNameField: ACCOUNT_EMAIL_ADDRESS_NF)
-            store()
+            Account.queue.sync {
+                db.root.updateItem(newValue, withNameField: ACCOUNT_EMAIL_ADDRESS_NF)
+                store()
+            }
         }
     }
 
@@ -166,13 +207,17 @@ public final class Account: EstimatedMemoryConsumption {
     
     public var emailVerificationCode: String {
         get {
-            if let v = db.root[ACCOUNT_EMAIL_VERIFICATION_CODE_NF].string { return v }
-            Log.atCritical?.log("Error retrieving emailVerificationCode from account store")
-            return "***error***"
+            Account.queue.sync {
+                if let v = db.root[ACCOUNT_EMAIL_VERIFICATION_CODE_NF].string { return v }
+                Log.atCritical?.log("Error retrieving emailVerificationCode from account store")
+                return "***error***"
+            }
         }
         set {
-            db.root.updateItem(newValue, withNameField: ACCOUNT_EMAIL_VERIFICATION_CODE_NF)
-            store()
+            Account.queue.sync {
+                db.root.updateItem(newValue, withNameField: ACCOUNT_EMAIL_VERIFICATION_CODE_NF)
+                store()
+            }
         }
     }
     
@@ -183,13 +228,17 @@ public final class Account: EstimatedMemoryConsumption {
     
     public var isDomainAdmin: Bool {
         get {
-            if let v = db.root[ACCOUNT_IS_DOMAIN_ADMIN_NF].bool { return v }
-            Log.atCritical?.log("Error retrieving isAdmin from account store")
-            return false
+            Account.queue.sync {
+                if let v = db.root[ACCOUNT_IS_DOMAIN_ADMIN_NF].bool { return v }
+                Log.atCritical?.log("Error retrieving isAdmin from account store")
+                return false
+            }
         }
         set {
-            db.root.updateItem(newValue, withNameField: ACCOUNT_IS_DOMAIN_ADMIN_NF)
-            store()
+            Account.queue.sync {
+                db.root.updateItem(newValue, withNameField: ACCOUNT_IS_DOMAIN_ADMIN_NF)
+                store()
+            }
         }
     }
     
@@ -198,35 +247,40 @@ public final class Account: EstimatedMemoryConsumption {
     
     public var nofComments: Int32 {
         get {
-            if db.root[ACCOUNT_NOF_COMMENTS_NF].int32 == nil {
-                db.root.updateItem(Int32(0), withNameField: ACCOUNT_NOF_COMMENTS_NF)
-                store()
+            Account.queue.sync {
+                if db.root[ACCOUNT_NOF_COMMENTS_NF].int32 == nil {
+                    db.root.updateItem(Int32(0), withNameField: ACCOUNT_NOF_COMMENTS_NF)
+                    store()
+                }
+                return db.root[ACCOUNT_NOF_COMMENTS_NF].int32!
             }
-            return db.root[ACCOUNT_NOF_COMMENTS_NF].int32!
         }
         set {
-            db.root.updateItem(newValue, withNameField: ACCOUNT_NOF_COMMENTS_NF)
-            store()
+            Account.queue.sync {
+                db.root.updateItem(newValue, withNameField: ACCOUNT_NOF_COMMENTS_NF)
+                store()
+            }
         }
     }
 
     
     /// Controls if this user has moderator capabilities.
-    ///
-    /// Is always true for domain administrators.
-    
+
     public var isModerator: Bool {
         get {
-            if db.root[ACCOUNT_IS_MODERATOR_NF].bool == nil {
-                db.root.updateItem(false, withNameField: ACCOUNT_IS_MODERATOR_NF)
-                store()
+            Account.queue.sync {
+                if db.root[ACCOUNT_IS_MODERATOR_NF].bool == nil {
+                    db.root.updateItem(false, withNameField: ACCOUNT_IS_MODERATOR_NF)
+                    store()
+                }
+                return db.root[ACCOUNT_IS_MODERATOR_NF].bool!
             }
-            let isMod = db.root[ACCOUNT_IS_MODERATOR_NF].bool!
-            return isDomainAdmin || isMod
         }
         set {
-            db.root.updateItem(newValue, withNameField: ACCOUNT_IS_MODERATOR_NF)
-            store()
+            Account.queue.sync {
+                db.root.updateItem(newValue, withNameField: ACCOUNT_IS_MODERATOR_NF)
+                store()
+            }
         }
     }
     
@@ -237,13 +291,17 @@ public final class Account: EstimatedMemoryConsumption {
     
     public var newPasswordVerificationCode: String {
         get {
-            if let v = db.root[ACCOUNT_NEW_PWD_VERIFICATION_CODE_NF].string { return v }
-            Log.atError?.log("Error retrieving newPasswordVerificationCode from account store")
-            return "***error***"
+            Account.queue.sync {
+                if let v = db.root[ACCOUNT_NEW_PWD_VERIFICATION_CODE_NF].string { return v }
+                Log.atError?.log("Error retrieving newPasswordVerificationCode from account store")
+                return "***error***"
+            }
         }
         set {
-            db.root.updateItem(newValue, withNameField: ACCOUNT_NEW_PWD_VERIFICATION_CODE_NF)
-            store()
+            Account.queue.sync {
+                db.root.updateItem(newValue, withNameField: ACCOUNT_NEW_PWD_VERIFICATION_CODE_NF)
+                store()
+            }
         }
     }
 
@@ -254,13 +312,17 @@ public final class Account: EstimatedMemoryConsumption {
     
     public var newPasswordRequestTimestamp: Int64 {
         get {
-            if let v = db.root[ACCOUNT_NEW_PWD_REQUEST_TIMESTAMP_NF].int64 { return v }
-            Log.atError?.log("Error retrieving newPasswordRequestTimestamp from account store")
-            return 0 // always expired
+            Account.queue.sync {
+                if let v = db.root[ACCOUNT_NEW_PWD_REQUEST_TIMESTAMP_NF].int64 { return v }
+                Log.atError?.log("Error retrieving newPasswordRequestTimestamp from account store")
+                return 0 // always expired
+            }
         }
         set {
-            db.root.updateItem(newValue, withNameField: ACCOUNT_NEW_PWD_REQUEST_TIMESTAMP_NF)
-            store()
+            Account.queue.sync {
+                db.root.updateItem(newValue, withNameField: ACCOUNT_NEW_PWD_REQUEST_TIMESTAMP_NF)
+                store()
+            }
         }
     }
 
@@ -387,6 +449,16 @@ public final class Account: EstimatedMemoryConsumption {
 }
 
 
+// MARK: - EstimatedMemoryConsumption
+
+extension Account: EstimatedMemoryConsumption {
+
+    public var estimatedMemoryConsumption: Int {
+        Account.queue.sync { return self.db.root.count }
+    }
+}
+
+
 // MARK:- CustomStringConvertible
 
 extension Account: CustomStringConvertible {
@@ -395,14 +467,24 @@ extension Account: CustomStringConvertible {
     /// CustomStringConvertible
     
     public var description: String {
-        var str = "Account\n"
-        str += " Name: \(name)\n"
-        str += " isDomainAdmin: \(isDomainAdmin)\n"
-        str += " Digest: \(String(describing: digest))"
-        if serverParameters.debugMode.value {
-            str += "\n Salt: \(String(describing: salt))\n"
+        Account.queue.sync {
+            guard let name = db.root[ACCOUNT_NAME_NF].string else {
+                Log.atCritical?.log("Error retrieving name from account store")
+                return "***error***"
+            }
+            guard let isDomainAdmin = db.root[ACCOUNT_IS_DOMAIN_ADMIN_NF].bool else {
+                Log.atCritical?.log("Error retrieving isAdmin from account store")
+                return "***error***"
+            }
+            var str = "Account\n"
+            str += " Name: \(name)\n"
+            str += " isDomainAdmin: \(isDomainAdmin)\n"
+            str += " Digest: \(String(describing: digest))"
+            if serverParameters.debugMode.value {
+                str += "\n Salt: \(String(describing: salt))\n"
+            }
+            return str
         }
-        return str
     }
 }
     
@@ -428,38 +510,39 @@ extension Account {
     
     /// Update password (digest). A new salt is created also. If the operation fails, the values of the salt and the digest will remain as they are.
     ///
-    /// - Note: Updates are not thread safe, make sure that the session is 'exclusive' before updating.
-    ///
     /// - Parameter str: The new password. Note that the password itself is not stored, only the digest.
     ///
     /// - Returns: True if the operation succeeded, false if not.
     
     public func updatePassword(_ str: String) -> Bool {
         
-        // Keep the old values until we are sure the old ones are saved.
-        
-        let oldSalt = self.salt
-        let oldDigest = self.digest
-        
-        
-        // Create and set the new values
-        
-        let salt = createSalt()
-        guard let digest = createDigest(for: str, with: salt) else { return false }
-        
-        self.salt = salt
-        self.digest = digest
-        
-        
-        // Save the new values, if the save fails, then restore the old values.
-        
-        guard store() else {
-            self.salt = oldSalt
-            self.digest = oldDigest
-            return false
+        Account.queue.sync {
+            
+            // Keep the old values until we are sure the old ones are saved.
+            
+            let oldSalt = self.salt
+            let oldDigest = self.digest
+            
+            
+            // Create and set the new values
+            
+            let salt = createSalt()
+            guard let digest = createDigest(for: str, with: salt) else { return false }
+            
+            self.salt = salt
+            self.digest = digest
+            
+            
+            // Save the new values, if the save fails, then restore the old values.
+            
+            guard store() else {
+                self.salt = oldSalt
+                self.digest = oldDigest
+                return false
+            }
+            
+            return true
         }
-        
-        return true
     }
     
     
@@ -472,12 +555,14 @@ extension Account {
     
     public func hasSameDigest(as pwd: String) -> Bool {
         
-        guard let testDigest = createDigest(for: pwd, with: salt) else {
-            Log.atCritical?.log("Cannot create digest", type: "Account")
-            return false
-        }
+        Account.queue.sync {
+            guard let testDigest = createDigest(for: pwd, with: salt) else {
+                Log.atCritical?.log("Cannot create digest", type: "Account")
+                return false
+            }
         
-        return digest == testDigest
+            return digest == testDigest
+        }
     }
     
     
@@ -599,9 +684,11 @@ extension Account {
 extension Account: FunctionsInfoDataSource {
     
     public func addSelf(to info: inout Functions.Info) {
-        db.root.addSelf(to: &info)
-        // Remove sensitive info
-        info.removeValue(forKey: ACCOUNT_SALT_NF.string)
-        info.removeValue(forKey: ACCOUNT_DIGEST_NF.string)
+        Account.queue.sync {
+            db.root.addSelf(to: &info)
+            // Remove sensitive info
+            info.removeValue(forKey: ACCOUNT_SALT_NF.string)
+            info.removeValue(forKey: ACCOUNT_DIGEST_NF.string)
+        }
     }
 }
