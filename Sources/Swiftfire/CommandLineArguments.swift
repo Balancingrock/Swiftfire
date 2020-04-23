@@ -52,30 +52,32 @@ import Core
 
 fileprivate let optionsText =
 """
-    Usage: $ swiftfire <options>
 
-    Available Options:
-    ------------------
+Usage: $ swiftfire <options>
 
-    -d <string>
-        Set application root directory (within the application directory).
-        Default: "production"
-        This option allows multiple instances of swiftfire to be run in parallel.
-        For example: $ swiftfire -d debug
-            Runs swiftfire in a 'debug' root directory, even when the production
-            version is still running using the default 'production' root directory.
+Available Options:
+------------------
 
-    -h | -help | -? | ?
-        This help text.
+-d <string>
+    Set application root directory (within the application directory).
+    Default: "production"
+    This option allows multiple instances of swiftfire to be run in parallel.
+    For example: $ swiftfire -d debug
+        Runs swiftfire in a 'debug' root directory, even when the production
+        version is still running using the default 'production' root directory.
 
-    -http <number>
-        Set the port on which to listen for incoming HTTP requests, will override
-        the port number given in the parameter settings.
+-h | -help | -? | ?
+    This help text.
 
-    -https <number>
-        Set the port on which to listen for incoming HTTPS requests, will override
-        the port number given in the parameter settings. Note that the HTTPS server
-        will not be started when no certificates are present.
+-http <number>
+    Set the port on which to listen for incoming HTTP requests, will override
+    the port number given in the parameter settings.
+
+-https <number>
+    Set the port on which to listen for incoming HTTPS requests, will override
+    the port number given in the parameter settings. Note that the HTTPS server
+    will not be started when no certificates are present.
+
 """
 
 var commandLineArguments: CommandLineArguments = CommandLineArguments()
@@ -105,23 +107,24 @@ extension CommandLineArguments {
         
         var index = 0
         
-        for arg in CommandLine.arguments {
+        while index < CommandLine.arguments.count {
+        
+            let arg = CommandLine.arguments[index]
             
-            index += 1
             
             // The first argument is the path to the Swiftfire application
         
-            if index == 1 {
+            if index == 0 {
                 
                 Log.atNotice?.log("Running swiftfire executable at: \(arg)")
                 
             } else {
-                
+                                
                 switch arg {
                 
                 case "-d": option_d(&index)
                 
-                case "-h", "-help", "?", "-?" : option_h(&index)
+                case "-h", "-help", "?", "-?" : option_h()
                 
                 case "-http": option_http(&index)
                 
@@ -130,24 +133,30 @@ extension CommandLineArguments {
                 default: option_unknown(arg)
                 }
             }
+            
+            index += 1
         }
     }
 
 
     fileprivate func option_d(_ index: inout Int) {
         
-        guard CommandLine.arguments.count < index else {
+        guard index + 1 < CommandLine.arguments.count else {
             print("Missing argument for root directory option (-d)\n\n\(optionsText)")
             exit(0)
         }
         
-        Urls.rootDir = Urls.applicationSupportDir.appendingPathComponent(CommandLine.arguments[index])
-        
         index += 1
+        
+        let serverRootDirectory = CommandLine.arguments[index]
+        
+        Urls.rootDir = Urls.applicationSupportDir.appendingPathComponent(serverRootDirectory)
+        
+        Log.atNotice?.log("Found command line option -d with value: \(serverRootDirectory)")
     }
     
     
-    fileprivate func option_h(_ index: inout Int) {
+    fileprivate func option_h() {
         
         print(optionsText)
         exit(0)
@@ -156,27 +165,31 @@ extension CommandLineArguments {
 
     fileprivate mutating func option_http(_ index: inout Int) {
         
-        guard CommandLine.arguments.count < index else {
+        guard index + 1 < CommandLine.arguments.count else {
             print("Missing argument for http port number option (-http)\n\n\(optionsText)")
             exit(0)
         }
         
+        index += 1
+        
         httpPortNumber = CommandLine.arguments[index]
         
-        index += 1
+        Log.atNotice?.log("Found command line option -http with value: \(httpPortNumber!)")
     }
     
 
     fileprivate mutating func option_https(_ index: inout Int) {
         
-        guard CommandLine.arguments.count < index else {
+        guard index + 1 < CommandLine.arguments.count else {
             print("Missing argument for https port number option (-https)\n\n\(optionsText)")
             exit(0)
         }
         
+        index += 1
+        
         httpsPortNumber = CommandLine.arguments[index]
         
-        index += 1
+        Log.atNotice?.log("Found command line option -https with value: \(httpsPortNumber!)")
     }
 
     
