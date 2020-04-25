@@ -155,7 +155,7 @@ public final class Urls {
     ///
     /// There can be multiple versions of Swiftfire running in parallel each with their own root directory
     
-    public static var rootDir: URL = { return applicationSupportDir.appendingPathComponent("production") }()
+    public static var rootDir: URL = { return applicationSupportDir.appendingPathComponent("debug") }()
     
     
     /// The path to the application support directory
