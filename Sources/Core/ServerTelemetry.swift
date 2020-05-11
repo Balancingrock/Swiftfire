@@ -3,14 +3,14 @@
 //  File:       Telemetry.swift
 //  Project:    Swiftfire
 //
-private let version = "1.3.0b1"
+private let version = "1.3.0"
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
 //  Website:    http://swiftfire.nl/
 //  Git:        https://github.com/Balancingrock/Swiftfire
 //
-//  Copyright:  (c) 2014-2019 Marinus van der Lugt, All rights reserved.
+//  Copyright:  (c) 2014-2020 Marinus van der Lugt, All rights reserved.
 //
 //  License:    Use or redistribute this code any way you like with the following two provision:
 //

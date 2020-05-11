@@ -1,8 +1,6 @@
-//
-//  Service.Setup.Page.swift
 // =====================================================================================================================
 //
-//  File:       Service.Setup.ExecuteUpdateBlacklist.swift
+//  File:       Service.Setup.Page.swift
 //  Project:    Swiftfire
 //
 //  Version:    1.3.0
@@ -12,7 +10,7 @@
 //  Website:    http://swiftfire.nl/
 //  Git:        https://github.com/Balancingrock/Swiftfire
 //
-//  Copyright:  (c) 2019 Marinus van der Lugt, All rights reserved.
+//  Copyright:  (c) 2019-2020 Marinus van der Lugt, All rights reserved.
 //
 //  License:    Use or redistribute this code any way you like with the following two provision:
 //
