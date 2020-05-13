@@ -10,7 +10,7 @@
 //  Website:    http://swiftfire.nl/
 //  Git:        https://github.com/Balancingrock/Swiftfire
 //
-//  Copyright:  (c) 2014-2019 Marinus van der Lugt, All rights reserved.
+//  Copyright:  (c) 2014-2020 Marinus van der Lugt, All rights reserved.
 //
 //  License:    Use or redistribute this code any way you like with the following two provision:
 //
@@ -41,6 +41,7 @@
 //       #8 Fixed storing of all changes to the service names
 //       - Added default "Anon" account
 //       - Added general purpose cache
+//       - Updated for Swift 5.2
 // 1.2.0 - Added admin keyword
 //       - Set session timeout to 600 (seconds)
 // 1.1.0 #3 Fixed loading & storing of domain service names
@@ -575,56 +576,56 @@ extension Domain {
     
     /// Return a new SSL context with the private key/certificate combination for the domain
     
-    var ctx: BRUtils.Result<ServerCtx> {
+    var ctx: SwiftfireResult<ServerCtx> {
         
-        guard let sslDir = sslDir else { return .error(message: "No sll directory found for domain: \(name)") }
+        guard let sslDir = sslDir else { return .failure(SwiftfireError("No sll directory found for domain: \(name)")) }
         
         
         // Get all files in the ssl directory
         
-        guard let files = try? FileManager.default.contentsOfDirectory(at: sslDir, includingPropertiesForKeys: [.isReadableKey], options: [.skipsSubdirectoryDescendants, .skipsPackageDescendants, .skipsHiddenFiles]) else { return .error(message: "Directory \(sslDir.path) is empty (no cert or key file found)") }
+        guard let files = try? FileManager.default.contentsOfDirectory(at: sslDir, includingPropertiesForKeys: [.isReadableKey], options: [.skipsSubdirectoryDescendants, .skipsPackageDescendants, .skipsHiddenFiles]) else { return .failure(SwiftfireError("Directory \(sslDir.path) is empty (no cert or key file found)")) }
         
         
         // Filter for PEM files
         
         let pemFiles = files.compactMap({ $0.pathExtension.compare("pem", options: [.caseInsensitive], range: nil, locale: nil) == ComparisonResult.orderedSame ? $0 : nil })
         
-        if pemFiles.count == 0 { return .error(message: "No pem files found in \(sslDir.path)") }
+        if pemFiles.count == 0 { return .failure(SwiftfireError("No pem files found in \(sslDir.path)")) }
         
         
         // Filter for files containing 'cert'
         
         let certFiles = pemFiles.compactMap({ $0.lastPathComponent.contains("cert") ? $0 : nil })
         
-        if certFiles.count != 1 { return .error(message: "No certificate file found in \(sslDir.path) (filename should contain the lowercase characters 'cert'") }
+        if certFiles.count != 1 { return .failure(SwiftfireError("No certificate file found in \(sslDir.path) (filename should contain the lowercase characters 'cert'")) }
         
         
         // Filter for files containing 'key'
         
         let keyFiles = pemFiles.compactMap({ $0.lastPathComponent.contains("key") ? $0 : nil })
         
-        if keyFiles.count != 1 { return .error(message: "No (private) key file found in \(sslDir.path) (filename should contain the lowercase characters 'key'") }
+        if keyFiles.count != 1 { return .failure(SwiftfireError("No (private) key file found in \(sslDir.path) (filename should contain the lowercase characters 'key'")) }
         
         
         // Create a context
         
-        guard let ctx = ServerCtx() else { return .error(message: "Context creation failed for domain: \(name)") }
+        guard let ctx = ServerCtx() else { return .failure(SwiftfireError("Context creation failed for domain: \(name)")) }
         
         
         // Add the certificate and (private) key
         
         switch ctx.useCertificate(file: EncodedFile(path: certFiles[0].path, encoding: .pem)) {
-        case .error(let message): return .error(message: "\(message) for domain: \(name)")
+        case .failure(let message): return .failure(SwiftfireError("\(message) for domain: \(name)"))
         case .success: break
         }
         
         switch ctx.usePrivateKey(file: EncodedFile(path: keyFiles[0].path, encoding: .pem)) {
-        case .error(let message): return .error(message: "\(message) for domain: \(name)")
+        case .failure(let message): return .failure(SwiftfireError("\(message) for domain: \(name)"))
         case .success: break
         }
         
         switch ctx.checkPrivateKey() {
-        case .error: return .error(message: "Certificate and private key are incompatible for domain: \(name)")
+        case .failure: return .failure(SwiftfireError("Certificate and private key are incompatible for domain: \(name)"))
         case .success: break
         }
         

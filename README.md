@@ -176,6 +176,7 @@ The sources for the server admin site are generated using Jekyll. If changes mus
 - Rewritten sfadmin to push all html code into html files (i.e. functions should not contain html code)
 - Changed server root directory to allow multiple Swiftfire servers running concurently
 - Added command line parameters to support multiple Swiftfre servers running concurrently
+- Updated usage of BRBON, SwifterSockets and SecureSockets due to upgrade to Swift 5.2
 
 #### 1.2.1
 

@@ -833,29 +833,32 @@ public final class CommentManager {
         // Insert it into the comment table
         
         if table.count == 0 {
-            switch (table.addRows(1, values: { (portal) in
+            let resultCode = table.addRows(1) { (portal) in
                 switch portal.column! {
                 case COMMENT_SEQUENCE_NUMBER_CI: portal.uint16 = comment.sequenceNumber
                 case COMMENT_URL_CI: portal.string = comment.url.path
                 default:
                     Log.atError?.log("Unknown table column with column index: \(portal.column!)")
                 }
-            })) {
-                case .success: break
-                case .error(let error): Log.atError?.log("Error code received: \(error.description)")
-                case .noAction: Log.atError?.log("Unexpected code executed")
+            }
+            switch resultCode {
+            case .success: break
+            case .noAction: Log.atError?.log("Unexpected code executed")
+            default: Log.atError?.log("Error code received: \(resultCode.description)")
             }
         } else {
-            switch table.insertRows(atIndex: insertionIndex, amount: 1, defaultValues: { (portal) in
+            let resultCode = table.insertRows(atIndex: insertionIndex, amount: 1) { (portal) in
                 switch portal.column! {
                 case COMMENT_SEQUENCE_NUMBER_CI: portal.uint16 = comment.sequenceNumber
                 case COMMENT_URL_CI: portal.string = comment.url.path
                 default:
                     Log.atError?.log("Unknown table column with column index: \(portal.column!)")
-                }}) {
+                }
+            }
+            switch resultCode {
             case .success: break
-            case .error(let error): Log.atError?.log("Error code received: \(error.description)")
             case .noAction: Log.atError?.log("Unexpected code executed")
+            default: Log.atError?.log("Error code received: \(resultCode.description)")
             }
         }
         

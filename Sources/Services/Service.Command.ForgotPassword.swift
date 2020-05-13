@@ -10,7 +10,7 @@
 //  Website:    http://swiftfire.nl/
 //  Git:        https://github.com/Balancingrock/Swiftfire
 //
-//  Copyright:  (c) 2019 Marinus van der Lugt, All rights reserved.
+//  Copyright:  (c) 2019-2020 Marinus van der Lugt, All rights reserved.
 //
 //  License:    Use or redistribute this code any way you like with the following two provision:
 //
@@ -126,9 +126,9 @@ func executeForgotPassword(_ request: Request, _ connection: SFConnection, _ dom
         request.info["link"] = verificationLink
         message = String(data: messageTemplate.getContent(with: env), encoding: .utf8) ?? "Click the following link (or copy it into the url field of a browser) to create a new password.\r\n Link = \(verificationLink)\r\n\r\n"
 
-    case .error(let err):
+    case .failure(let err):
     
-        Log.atError?.log("Failed to read template with error: \(err)")
+        Log.atError?.log("Failed to read template with error: \(err.localizedDescription)")
         message = "Click the following link (or copy it into the url field of a browser) to create a new password.\r\n Link = \(verificationLink)\r\n\r\n"
     }
     

@@ -10,7 +10,7 @@
 //  Website:    http://swiftfire.nl/
 //  Git:        https://github.com/Balancingrock/Swiftfire
 //
-//  Copyright:  (c) 2019 Marinus van der Lugt, All rights reserved.
+//  Copyright:  (c) 2019-2020 Marinus van der Lugt, All rights reserved.
 //
 //  License:    Use or redistribute this code any way you like with the following two provision:
 //
@@ -138,9 +138,9 @@ public func function_commentSection(_ args: Functions.Arguments, _ info: inout F
 
     case .success(let template): return template.getContent(info: &info, environment: environment)
 
-    case .error(let message):
+    case .failure(let message):
         
-        Log.atDebug?.log("Cannot create document from template path: \(templatePath), error message: \(message)")
+        Log.atDebug?.log("Cannot create document from template path: \(templatePath), error message: \(message.localizedDescription)")
         return htmlErrorMessage
     }
 }
