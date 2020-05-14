@@ -1,16 +1,16 @@
 // =====================================================================================================================
 //
-//  File:       Result.swift
-//  Project:    Swiftfire
+//  File:       SwiftfireError.swift
+//  Project:    Core
 //
-//  Version:    1.0.0
+//  Version:    1.3.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
 //  Website:    http://swiftfire.nl/
 //  Git:        https://github.com/Balancingrock/Swiftfire
 //
-//  Copyright:  (c) 2019 Marinus van der Lugt, All rights reserved.
+//  Copyright:  (c) 2017-2020 Marinus van der Lugt, All rights reserved.
 //
 //  License:    Use or redistribute this code any way you like with the following two provision:
 //
@@ -36,25 +36,28 @@
 //
 // History
 //
-// 1.0.0 Raised to v1.0.0, Removed old change log,
+// 1.3.0 - Initial version
 //
 // =====================================================================================================================
 
 import Foundation
-import BRUtils
+import SwifterSockets
 
 
-func + (lhs: Result<Bool>, rhs: Result<Bool>) -> Result<Bool> {
-    switch lhs {
-    case .error(let lmessage):
-        switch rhs {
-        case .error(let rmessage): return Result<Bool>.error(message: "\(lmessage)\n\(rmessage)")
-        case .success: return Result<Bool>.error(message: lmessage)
-        }
-    case .success(let lbool):
-        switch rhs {
-        case .error(let rmessage): return Result<Bool>.error(message: rmessage)
-        case .success(let rbool): return Result<Bool>.success(lbool && rbool)
-        }
+// Error message wrapper to be able to use Swift.Result
+
+public struct SwiftfireError: Error {
+    
+    let message: String
+    
+    public var errorDescription: String? { return message }
+    
+    public init(file: String = #file, function: String = #function, line: Int = #line, _ str: String) {
+        message = "\(file).\(function).\(line): \(str)"
     }
 }
+
+
+// Shortcut
+
+public typealias SwiftfireResult<T> = Result<T, SwiftfireError>

@@ -39,6 +39,7 @@
 // 1.3.0 #7 Removed local filemanager
 //       - Removed inout from the function.environment signature
 //       - Added flow control
+//       - Updated for Swift 5.2
 // 1.0.0 Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
@@ -469,7 +470,7 @@ public class SFDocument: EstimatedMemoryConsumption {
     ///
     /// - Returns: Nil if the file cannot be read.
     
-    public static func factory(path: String, data: Data? = nil) -> BRUtils.Result<SFDocument> {
+    public static func factory(path: String, data: Data? = nil) -> SwiftfireResult<SFDocument> {
         
         return queue.sync(execute: {
             
@@ -495,11 +496,11 @@ public class SFDocument: EstimatedMemoryConsumption {
                 
                 // Try to find reason for error
                 
-                guard FileManager.default.isReadableFile(atPath: path) else { return .error(message: "File not readable at \(path)") }
-                guard let fileattributes = try? FileManager.default.attributesOfItem(atPath: path) else { return .error(message: "Cannot read file attributes at \(path)") }
-                guard let _ = fileattributes[FileAttributeKey.modificationDate] as? Date else { return .error(message: "Cannot extract modification date from file attributes at \(path)") }
+                guard FileManager.default.isReadableFile(atPath: path) else { return .failure(SwiftfireError("File not readable at \(path)")) }
+                guard let fileattributes = try? FileManager.default.attributesOfItem(atPath: path) else { return .failure(SwiftfireError("Cannot read file attributes at \(path)")) }
+                guard let _ = fileattributes[FileAttributeKey.modificationDate] as? Date else { return .failure(SwiftfireError("Cannot extract modification date from file attributes at \(path)")) }
                 
-                return .error(message: "Cannot read file content at \(path)")
+                return .failure(SwiftfireError("Cannot read file content at \(path)"))
             }
             
             

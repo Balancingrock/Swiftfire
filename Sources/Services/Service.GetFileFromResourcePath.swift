@@ -39,6 +39,7 @@
 // 1.3.0 #7 Removed local filemanager
 //       - Removed inout from the service signature
 //       - Removed inout from the function.environment signature
+//       - Updated for Swift 5.2
 // 1.0.1 - Documentation update
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
@@ -128,9 +129,9 @@ func service_getFileAtResourcePath(_ request: Request, _ connection: SFConnectio
     
         switch SFDocument.factory(path: resourcePath, data: phpData) {
             
-        case .error(let message):
+        case .failure(let message):
             
-            handle500_ServerError(connection: connection, resourcePath: resourcePath, message: message, line: #line)
+            handle500_ServerError(connection: connection, resourcePath: resourcePath, message: message.localizedDescription, line: #line)
             return .next
             
             

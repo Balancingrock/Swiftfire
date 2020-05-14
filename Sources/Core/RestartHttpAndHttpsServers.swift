@@ -3,14 +3,14 @@
 //  File:       RestartHttpAndHttpsServers.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.3.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
 //  Website:    http://swiftfire.nl/
 //  Git:        https://github.com/Balancingrock/Swiftfire
 //
-//  Copyright:  (c) 2014-2019 Marinus van der Lugt, All rights reserved.
+//  Copyright:  (c) 2014-2020 Marinus van der Lugt, All rights reserved.
 //
 //  License:    Use or redistribute this code any way you like with the following two provision:
 //
@@ -36,7 +36,8 @@
 //
 // History
 //
-// 1.0.0 Raised to v1.0.0, Removed old change log,
+// 1.3.0 - Updated for Swift 5.2
+// 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 
@@ -146,9 +147,9 @@ public func restartHttpAndHttpsServers() {
         serverTelemetry.httpServerStatus.value = "Cannot"
         
         
-    case let .error(message)?:
+    case .failure(let message)?:
         
-        Log.atError?.log(message)
+        Log.atError?.log(message.localizedDescription)
         serverTelemetry.httpServerStatus.value = "Error, see log"
         
         
@@ -214,9 +215,9 @@ public func restartHttpAndHttpsServers() {
             serverTelemetry.httpsServerStatus.value = "Cannot"
             
             
-        case let .error(message)?:
+        case .failure(let message)?:
             
-            Log.atError?.log(message)
+            Log.atError?.log(message.localizedDescription)
             serverTelemetry.httpsServerStatus.value = "Error"
             
             
@@ -298,18 +299,18 @@ fileprivate func buildServerCtx() -> ServerCtx? {
     
     // Add the certificate and (private) key
     
-    if case let .error(message) = ctx.useCertificate(file: EncodedFile(path: certFiles[0].path, encoding: .pem)) {
-        Log.atWarning?.log(message)
+    if case .failure(let message) = ctx.useCertificate(file: EncodedFile(path: certFiles[0].path, encoding: .pem)) {
+        Log.atWarning?.log(message.localizedDescription)
         return nil
     }
     
-    if case let .error(message) = ctx.usePrivateKey(file: EncodedFile(path: keyFiles[0].path, encoding: .pem)) {
-        Log.atWarning?.log(message)
+    if case .failure(let message) = ctx.usePrivateKey(file: EncodedFile(path: keyFiles[0].path, encoding: .pem)) {
+        Log.atWarning?.log(message.localizedDescription)
         return nil
     }
     
-    if case let .error(message) = ctx.checkPrivateKey() {
-        Log.atWarning?.log(message)
+    if case .failure(let message) = ctx.checkPrivateKey() {
+        Log.atWarning?.log(message.localizedDescription)
         return nil
     }
     
@@ -350,11 +351,11 @@ fileprivate func checkDomainCtxs() -> [ServerCtx] {
         
         switch domain.ctx {
             
-        case let .error(message):
+        case .failure(let message):
             
-            Log.atWarning?.log(message)
+            Log.atWarning?.log(message.localizedDescription)
             
-        case let .success(ctx):
+        case .success(let ctx):
             
             let cert = X509(ctx: ctx)
             

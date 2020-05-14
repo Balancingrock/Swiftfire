@@ -204,9 +204,9 @@ func executeRegister(_ request: Request, _ connection: SFConnection, _ domain: D
         request.info["link"] = verificationLink
         message = String(data: messageTemplate.getContent(with: env), encoding: .utf8) ?? "Click the following link (or copy it into the url field of a browser) to confirm your account at \(domain.name).\r\n Link = \(verificationLink)\r\n\r\n"
 
-    case .error(let err):
+    case .failure(let err):
     
-        Log.atError?.log("Failed to read template with error: \(err)")
+        Log.atError?.log("Failed to read template with error: \(err.localizedDescription)")
         message = "Click the following link (or copy it into the url field of a browser) to confirm your account at \(domain.name).\r\n\r\nLink = \(verificationLink)"
     }
     

@@ -41,6 +41,7 @@
 //       - Removed inout from the service signature
 //       - Removed inout from the function.environment signature
 //       - Changed account handling
+//       - Updated for Swift 5.2
 // 1.2.1 - Fixed bug that failed to update the root directory for the sfadmin
 //         Added more debug entries as well as a couple of notification logentries
 // 1.2.0 - Added admin account creation and removal
@@ -167,9 +168,9 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
             
             switch SFDocument.factory(path: path) {
                 
-            case .error(let message):
+            case .failure(let message):
                 
-                Log.atError?.log(message)
+                Log.atError?.log(message.localizedDescription)
                 
                 response.code = Response.Code._500_InternalServerError
                 
@@ -601,9 +602,9 @@ func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domai
         
         switch SFDocument.factory(path: absPath) {
             
-        case .error(let message):
+        case .failure(let message):
             
-            Log.atError?.log(message, id: connection.logId)
+            Log.atError?.log(message.localizedDescription, id: connection.logId)
 
             response.code = Response.Code._500_InternalServerError
             

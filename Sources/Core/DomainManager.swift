@@ -37,6 +37,7 @@
 // History
 //
 // 1.3.0 #8 Fixed: Added immediate storage of changes to the domains & aliases list
+//       - Updated for Swift 5.2
 // 1.2.0 - Fixed typo in error message
 //       - When loading domains&aliases, now removes domains that have no associated directory.
 // 1.1.0 #3 Fixed
@@ -225,7 +226,7 @@ extension DomainManager {
         
         for domain in self {
             switch domain.ctx {
-            case .error: break
+            case .failure: break
             case .success(let ctx): arr.append(ctx)
             }
         }

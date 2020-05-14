@@ -138,9 +138,9 @@ public func function_commentSection(_ args: Functions.Arguments, _ info: inout F
 
     case .success(let template): return template.getContent(info: &info, environment: environment)
 
-    case .error(let message):
+    case .failure(let message):
         
-        Log.atDebug?.log("Cannot create document from template path: \(templatePath), error message: \(message)")
+        Log.atDebug?.log("Cannot create document from template path: \(templatePath), error message: \(message.localizedDescription)")
         return htmlErrorMessage
     }
 }

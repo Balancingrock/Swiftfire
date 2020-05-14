@@ -38,6 +38,7 @@
 //
 // 1.3.0 - Removed inout from the service signature
 //       - Changed account handling
+//       - Updated for Swift 5.2
 // 1.2.0 - Added domain admin to access setup page even when the domain is disabled
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
@@ -258,10 +259,10 @@ extension SFConnection {
             if forwarder == nil {
                 let result = SwifterSockets.connectToTipServer(atAddress: domain.forwardHost!.address, atPort: (domain.forwardHost!.port ?? "80"), connectionObjectFactory: forwardingConnectionFactory)
                 
-                if case let .error(message) = result {
-                    Log.atWarning?.log(message, id: logId)
+                if case .failure(let message) = result {
+                    Log.atWarning?.log(message.localizedDescription, id: logId)
                 }
-                if case let .success(conn) = result {
+                if case .success(let conn) = result {
                     forwarder = conn as? Forwarder
                     forwarder!.client = self
                 }

@@ -11,11 +11,11 @@ let package = Package(
         .executable(name: "Swiftfire", targets: ["Swiftfire"])
     ],
     dependencies: [
-        .package(url: "https://github.com/Balancingrock/SwifterLog", from: "2.0.0"),
-        .package(url: "https://github.com/Balancingrock/SecureSockets", from: "1.0.0"),
-        .package(url: "https://github.com/Balancingrock/KeyedCache", from: "1.1.0"),
-        .package(url: "https://github.com/Balancingrock/BRBON", from: "1.2.3"),
-        .package(url: "https://github.com/Balancingrock/Http", from: "1.0.0")
+        .package(url: "../../SwifterLog", from: "2.1.0"),
+        .package(url: "../../SecureSockets", from: "1.1.0"),
+        .package(url: "../../KeyedCache", from: "1.2.2"),
+        .package(url: "../../BRBON", from: "1.3.0"),
+        .package(url: "https://github.com/Balancingrock/Http", from: "1.2.1")
     ],
     targets: [
         .target(name: "Custom", dependencies: ["BRBON"]),

@@ -3,14 +3,14 @@
 //  File:       CertificateGeneration.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.3.0
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
 //  Website:    http://swiftfire.nl/
 //  Git:        https://github.com/Balancingrock/Swiftfire
 //
-//  Copyright:  (c) 2016-2019 Marinus van der Lugt, All rights reserved.
+//  Copyright:  (c) 2016-2020 Marinus van der Lugt, All rights reserved.
 //
 //  License:    Use or redistribute this code any way you like with the following two provision:
 //
@@ -36,7 +36,8 @@
 //
 // History
 //
-// 1.0.0 Raised to v1.0.0, Removed old change log,
+// 1.3.0 - Updated for Swift 5.2
+// 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 
@@ -54,7 +55,7 @@ import BRUtils
 /// - Returns: .error(String) when an error occured. .success(true) when the operation completed successfully, .success(false) when the operation did not generate an error, but also did not generate the key and certificate.
 
 @discardableResult
-public func generateKeyAndCertificate(privateKeyLocation keyUrl: URL?, certificateLocation certUrl: URL?) -> Result<Bool> {
+public func generateKeyAndCertificate(privateKeyLocation keyUrl: URL?, certificateLocation certUrl: URL?) -> SwiftfireResult<Bool> {
     
     guard let keyUrl = keyUrl else { return .success(false) }
     guard let certUrl = certUrl else { return .success(false) }
@@ -63,14 +64,14 @@ public func generateKeyAndCertificate(privateKeyLocation keyUrl: URL?, certifica
     // Create key container
     
     guard let pkey = Pkey() else {
-        return .error(message: "Failed to create key pair")
+        return .failure(SwiftfireError("Failed to create key pair"))
     }
     
     
     // Create key pair
     
-    if case .error(let message) = pkey.assignNewRsa(withLength: 4096, andExponent: 65537) {
-        return .error(message: message)
+    if case .failure(let message) = pkey.assignNewRsa(withLength: 4096, andExponent: 65537) {
+        return .failure(SwiftfireError(message.localizedDescription))
     }
     
     
@@ -84,8 +85,8 @@ public func generateKeyAndCertificate(privateKeyLocation keyUrl: URL?, certifica
     
     certificate.validNotAfter = Int64(Date().timeIntervalSince1970 + 2 * 365 * 24 * 60 * 60) // 2 year validity
     
-    if case .error(let message) = certificate.setPublicKey(toPublicKeyIn: pkey) {
-        return .error(message: message)
+    if case .failure(let message) = certificate.setPublicKey(toPublicKeyIn: pkey) {
+        return .failure(SwiftfireError(message.localizedDescription))
     }
     
     
@@ -103,22 +104,22 @@ public func generateKeyAndCertificate(privateKeyLocation keyUrl: URL?, certifica
     
     // Sign the certificate
     
-    if case let .error(message) = certificate.sign(withPrivateKeyIn: pkey) {
-        return .error(message: message)
+    if case .failure(let message) = certificate.sign(withPrivateKeyIn: pkey) {
+        return .failure(SwiftfireError(message.localizedDescription))
     }
     
     
     // Save the certificate
     
-    if case .error(let message) = certificate.write(to: certUrl) {
-        return .error(message: message)
+    if case .failure(let message) = certificate.write(to: certUrl) {
+        return .failure(SwiftfireError(message.localizedDescription))
     }
     
     
     // Save the private key
     
-    if case .error(let message) = pkey.writePrivateKey(to: keyUrl) {
-        return .error(message: message)
+    if case .failure(let message) = pkey.writePrivateKey(to: keyUrl) {
+        return .failure(SwiftfireError(message.localizedDescription))
     }
     
     
