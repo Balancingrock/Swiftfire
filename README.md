@@ -163,6 +163,8 @@ The sources for the server admin site are generated using Jekyll. If changes mus
 
 #### HEAD
 
+- Fixed recursive session thread bug
+
 #### 1.3.0
 
 - Reworked the sfadmin site

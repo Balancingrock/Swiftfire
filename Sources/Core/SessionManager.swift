@@ -3,14 +3,14 @@
 //  File:       SessionManager.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.3.1
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
 //  Website:    http://swiftfire.nl/
 //  Git:        https://github.com/Balancingrock/Swiftfire
 //
-//  Copyright:  (c) 2019 Marinus van der Lugt, All rights reserved.
+//  Copyright:  (c) 2019-2020 Marinus van der Lugt, All rights reserved.
 //
 //  License:    Use or redistribute this code any way you like with the following two provision:
 //
@@ -36,14 +36,15 @@
 //
 // History
 //
-// 1.0.0 Raised to v1.0.0, Removed old change log,
+// 1.3.1 - Fixed recursive session thread bug
+// 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 
 import Foundation
 
 
-public final class SessionManager: CustomStringConvertible {
+public final class SessionManager {
     
     
     /// The queue on which all sessions functions run
@@ -69,17 +70,17 @@ public final class SessionManager: CustomStringConvertible {
     public var loggingEnabled: Bool {
         set {
             SessionManager.queue.sync {
-                self._logginEnabled = newValue
+                self._loggingEnabled = newValue
             }
         }
         get {
             return SessionManager.queue.sync {
-                return self._logginEnabled
+                return self._loggingEnabled
             }
         }
     }
     
-    private var _logginEnabled: Bool = false
+    private var _loggingEnabled: Bool = false
     
     
     /// The directory in which the session information will be stored if it denotes a directory. No session information will be stored if left (or set to) nil.
@@ -87,50 +88,9 @@ public final class SessionManager: CustomStringConvertible {
     private var logDir: URL
     
     
-    /// The total number of active sessions.
-    ///
-    /// - Note: The expired sessions will be removed before the tally is made.
-    
-    public var count: Int {
-        return SessionManager.queue.sync {
-            
-            [weak self] in
-            guard let self = self else { return 0 }
-            
-            self.removeInactiveSessions()
-            return self.active.count
-        }
-    }
-    
-    
     /// The dictionary with active sessions.
     
     private var active: Dictionary<UUID, Session> = [:]
-    
-    
-    /// Create a textual representation
-    
-    public var description: String {
-        
-        return SessionManager.queue.sync {
-            
-            [weak self] in
-            guard let self = self else { return "*** nil ***" }
-            
-            var str = "Sessions:\n"
-            str += " Logging dir:   \(self.logDir.path)\n"
-            str += " Session count: \(self.active.count)\n"
-            
-            if self.active.count == 0 {
-                str += " Sessions: None"
-            } else {
-                str += " Sessions:\n"
-                str += self.active.map({ " \($0.value)"}).joined(separator: "\n")
-            }
-            
-            return str
-        }
-    }
     
     
     /// Create a new sessions object
@@ -174,8 +134,6 @@ public final class SessionManager: CustomStringConvertible {
             } else {
                 
                 // The session is no longer active
-                
-                self.removeInactiveSessions()
                 
                 return nil
             }
@@ -221,7 +179,7 @@ public final class SessionManager: CustomStringConvertible {
     
     private func removeSession(_ id: UUID) {
         guard let session = active[id] else { return }
-        if loggingEnabled { storeSession(session) }
+        if _loggingEnabled { storeSession(session) }
         active[id] = nil
         Log.atInfo?.log("Purged inactive session for \(id.uuidString)")
     }
