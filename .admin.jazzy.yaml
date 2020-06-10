@@ -1,6 +1,6 @@
 # Swiftfire Admin module document generator jazzy settings
 
-copyright: Copyright 2016-2019 rien@balancingrock.nl
+copyright: Copyright 2016-2020 rien@balancingrock.nl
 author: Balancingrock
 module: Admin
 min_acl: internal

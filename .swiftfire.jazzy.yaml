@@ -1,6 +1,6 @@
 # Swiftfire Swiftfire module document generator jazzy settings
 
-copyright: Copyright 2016-2019 rien@balancingrock.nl
+copyright: Copyright 2016-2020 rien@balancingrock.nl
 author: Balancingrock
 module: Swiftfire
 min_acl: public
