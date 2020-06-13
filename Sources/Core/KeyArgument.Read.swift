@@ -3,7 +3,7 @@
 //  File:       KeyArgument.Read.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.3.0
+//  Version:    1.3.2
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.3.2 - Added 'global' source with 'starttime', 'runtime', 'timestamp' and 'rootdir'
 // 1.3.0 - Moved getInfo and postInfo into requestinfo
 //       - Added a requestinfo! to return an empty string if the requested parameter does not exist
 //       - Fixed a bug that caused the account name not to be returned
@@ -350,8 +351,69 @@ fileprivate func reader(_ args: Array<Substring>, _ functionsInfo: Functions.Inf
         return nil
 
         
+    case "global":
+        
+        guard args.count == 2 else {
+            Log.atError?.log("Missing source or key in argument")
+            return nil
+        }
+
+        let name = args[1]
+        
+        switch name {
+            
+        case "starttime":
+            
+            return commentDateFormatter.string(from: startupTime)
+            
+        case "runtime":
+            
+            let duration = Date().unixTime - startupTime.unixTime
+            return duration.timeString
+
+        case "timestamp":
+            
+            return commentDateFormatter.string(from: Date())
+            
+        case "rootdir":
+            
+            return Urls.rootDir.lastPathComponent
+            
+        default:
+            Log.atError?.log("No access to global mapped for key: \(name)")
+            return nil
+        }
+
+        
     default:
         Log.atError?.log("Unknown source for key argument: '\(args[0])'")
         return nil
+    }
+}
+
+fileprivate let secondsPerMinute: Int64 = 60
+fileprivate let secondsPerHour: Int64 = secondsPerMinute * 60
+fileprivate let secondsPerDay: Int64 = secondsPerHour * 24
+
+
+extension Int64 {
+    
+    var timeString: String {
+        
+        var a = self
+        
+        let days = a / secondsPerDay
+
+        a -= days * secondsPerDay
+
+        let hours = a / secondsPerHour
+
+        a -= hours * secondsPerHour
+
+        let minutes = a / secondsPerMinute
+
+        a -= minutes * secondsPerMinute
+        
+        return "\(days) Days, \(hours) h \(minutes) m \(a) s"
     }
 }

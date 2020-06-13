@@ -3,7 +3,7 @@
 //  File:       main.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.3.0
+//  Version:    1.3.2
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.3.2 - Added logging (in global var) of startup time
 // 1.3.0 - Removed DecodePostFormUrlEncoded
 //       #8: Auto oading of domain & aliases list
 // 1.1.0 #1: Fixed loading & storing of domain service names
@@ -338,6 +339,11 @@ Log.atNotice?.log("Finished custom setup")
 // ==================================
 
 restartHttpAndHttpsServers()
+
+
+// Log the startup time
+
+startupTime = Date()
 
 
 // ===========================

@@ -3,14 +3,14 @@
 //  File:       Globals.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.1.0
+//  Version:    1.3.2
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
 //  Website:    http://swiftfire.nl/
 //  Git:        https://github.com/Balancingrock/Swiftfire
 //
-//  Copyright:  (c) 2019 Marinus van der Lugt, All rights reserved.
+//  Copyright:  (c) 2019-2020 Marinus van der Lugt, All rights reserved.
 //
 //  License:    Use or redistribute this code any way you like with the following two provision:
 //
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.3.2 - Added startupTime
 // 1.1.0 - Fixed loading & storing of domain service names
 //       - Removed server blacklist (now located in the serveradmin domain
 // 1.0.0 - Initial version
@@ -143,6 +144,11 @@ public var httpsServerAcceptQueue: DispatchQueue!
 // The default webserver service stack
 
 public var defaultServices: Array<String> = []
+
+
+// The time the startup of the server was completed
+
+public var startupTime: Date!
 
 
 // An often used error message
