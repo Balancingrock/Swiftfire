@@ -50,8 +50,8 @@ import Http
 
 let COMMAND_REGISTER = "register"
 
-fileprivate let REGISTER_TEMPLATE = "/pages/register.sf.html"
-fileprivate let REGISTER_CONTINUE_TEMPLATE = "/pages/register-continue.sf.html"
+fileprivate let REGISTER_TEMPLATE = "/pages/account/register.sf.html"
+fileprivate let REGISTER_CONTINUE_TEMPLATE = "/pages/account/register-continue.sf.html"
 fileprivate let REGISTER_VERIFICATION_EMAIL_TEXT_TEMPLATE = "/templates/email-verification-text.sf.html"
 
 fileprivate let REGISTER_NAME_KEY = "register-name" // Necessary, unique, non-empty

@@ -109,6 +109,11 @@ func parameterTable(_ domain: Domain) -> String {
                 value: String(domain.sessionTimeout),
                 comment: "A session is considered expired when inactive for this long (in seconds)"))
             \(parameterRow(
+                text: "Scan all HTML files",
+                name: "scan-all-html",
+                value: String(domain.scanAllHtml),
+                comment: "When true, all 'htm', 'html' and 'php' file will be scanned for Swiftfire functions"))
+            \(parameterRow(
                 text: "PHP Executable Path",
                 name: "php-executable-path",
                 value: String(domain.phpPath?.path ?? "Disabled"),

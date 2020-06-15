@@ -55,8 +55,8 @@ let COMMAND_SET_NEW_PASSWORD = "set-new-password"
 
 /// The path to the template for the set new password email
 
-let SET_NEW_PASSWORD_TEMPLATE = "/pages/set-new-password.sf.html"
-fileprivate let SET_NEW_PASSWORD_SUCCESS_TEMPLATE = "/pages/set-new-password-success.sf.html"
+let SET_NEW_PASSWORD_TEMPLATE = "/pages/account/set-new-password.sf.html"
+fileprivate let SET_NEW_PASSWORD_SUCCESS_TEMPLATE = "/pages/account/set-new-password-success.sf.html"
 
 
 /// The key to use to enable the setting of a new password.

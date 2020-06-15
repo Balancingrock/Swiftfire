@@ -21,6 +21,8 @@ baseurl: "/serveradmin" # the subpath of your site, e.g. /blog
 
 url: "" # the base hostname & protocol for your site, e.g. http://example.com
 
+excerpt_separator: ""
+
 # Build settings
 markdown: kramdown
 

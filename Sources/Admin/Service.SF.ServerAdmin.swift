@@ -3,7 +3,7 @@
 //  File:       Service.SF.ServerAdmin.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.3.0
+//  Version:    1.3.2
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.3.2 #12 A domain admin account no longer has to be verified for its email account
 // 1.3.0 #7 Removed local filemanager
 //       - Replaced postInfo with request.info
 //       - Removed inout from the service signature
@@ -1012,6 +1013,7 @@ fileprivate func executeCreateDomain(_ request: Request) {
         domain.webroot = domainRoot
         if let account = domain.accounts.getAccount(withName: adminId, andPassword: adminPwd) {
             account.isDomainAdmin = true
+            account.emailVerificationCode = ""
         } else {
             guard let account = domain.accounts.newAccount(name: adminId, password: adminPwd) else {
                 domainManager.remove(name)
@@ -1110,7 +1112,7 @@ fileprivate func executeLogout(_ session: Session) -> CommandExecutionResult {
     
     session.userLogout()
     
-    return .newPath("/pages/login.sf.html")
+    return .newPath("/pages/account/login.sf.html")
 }
 
 fileprivate func executeCreateAdmin(_ request: Request) {

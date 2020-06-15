@@ -4,6 +4,7 @@ title: Parameters
 menuInclude: yes
 menuTopTitle: Parameters
 menuTopIndex: 4
+description: "The Swiftfire parameters"
 #
 # Input:
 #	server-parameters

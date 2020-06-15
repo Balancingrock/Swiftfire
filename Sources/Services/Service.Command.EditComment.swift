@@ -83,5 +83,5 @@ func executeEditComment(_ request: Request, _ domain: Domain, _ info: Services.I
     request.info["preview"] = markedUp
     
     
-    return "/pages/comment-edit.sf.html"
+    return "/pages/account/comment-edit.sf.html"
 }

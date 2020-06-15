@@ -65,9 +65,9 @@ public let ORIGINAL_PAGE_URL_KEY = "original-page-url"
 
 // When somebody tried to do something which is not allowed, yet is also not an error
 
-///The path to the page that displayes an derror when the user attempted something that he has no rights to (yet).
+///The path to the page that displayes an error when the user attempted something that he has no rights to (yet).
 
-let ATTEMPT_NOT_ALLOWED_TEMPLATE = "/pages/not-allowed.sf.html"
+let ATTEMPT_NOT_ALLOWED_TEMPLATE = "/pages/account/not-allowed.sf.html"
 
 
 // General purpose keys used in the POST requests

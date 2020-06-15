@@ -50,8 +50,8 @@ import Http
 
 let COMMAND_EMAIL_VERIFICATION = "email-verification"
 
-fileprivate let EMAIL_VERIFICATION_SUCCESS_TEMPLATE = "/pages/email-verification-success.sf.html"
-fileprivate let EMAIL_VERIFICATION_FAILED_TEMPLATE = "/pages/email-verification-failed.sf.html"
+fileprivate let EMAIL_VERIFICATION_SUCCESS_TEMPLATE = "/pages/account/email-verification-success.sf.html"
+fileprivate let EMAIL_VERIFICATION_FAILED_TEMPLATE = "/pages/account/email-verification-failed.sf.html"
 
 
 /// The  name to be used in the email verification link for the verification code.

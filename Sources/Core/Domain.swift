@@ -3,7 +3,7 @@
 //  File:       Domain.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.3.0
+//  Version:    1.3.2
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,8 @@
 //
 // History
 //
+// 1.3.2 - Added scanAllHtml parameter
+//       - Added readParameter function
 // 1.3.0 - Removed unnecessary initialization of some variables from init
 //       - Replaced var with let due to Xcode 11
 //       #8 Fixed storing of all changes to the service names
@@ -183,6 +185,11 @@ public final class Domain {
         set { sessions.loggingEnabled = newValue }
         get { return sessions.loggingEnabled }
     }
+    
+    
+    /// Scan all html files or just the files with the four magic characters
+    
+    public var scanAllHtml: Bool = false
     
     
     /// Enable PHP by setting the path to a PHP interpreter
@@ -490,7 +497,9 @@ public final class Domain {
                 phpPath = nil
             }
         }
-        
+
+        if let j = (json|"ScanAllHtml")?.boolValue { scanAllHtml = j }
+
         if let j = (json|"PhpOptions")?.stringValue { phpOptions = j }
         if let j = (json|"PhpMapIndex")?.boolValue { phpMapIndex = j }
         if let j = (json|"PhpMapAll")?.boolValue { phpMapAll = j }
@@ -553,6 +562,7 @@ public final class Domain {
         json["AccessLogEnabled"] &= accessLogEnabled
         json["404LogEnabled"] &= four04LogEnabled
         json["SessionLogEnabled"] &= sessionLogEnabled
+        json["ScanAllHtml"] &= scanAllHtml
         json["PhpPath"] &= phpPath?.path ?? ""
         json["PhpOptions"] &= phpOptions ?? ""
         json["PhpMapIndex"] &= phpMapIndex
@@ -673,6 +683,13 @@ extension Domain {
                 Log.atError?.log("Cannot convert: \(value) to bool")
             }
             
+        case "ScanAllHtml":
+            if let b = Bool.init(lettersOrDigits: value) {
+                scanAllHtml = b
+            } else {
+                Log.atError?.log("Cannot convert: \(value) to bool")
+            }
+
         case "PhpPath":
             if FileManager.default.isExecutableFile(atPath: value) {
                 if !value.isEmpty {
@@ -790,6 +807,75 @@ extension Domain {
     }
     
     
+    /// Return the value of the parameter as a string.
+    ///
+    /// - Parameter key: The name of the parameter to be returned
+    ///
+    /// - Returns: The string value of the parameter, nil if the parameter string does not identify a parameter.
+    
+    public func readParameter(_ key: String) -> String? {
+        
+        switch key.lowercased() {
+            
+        case "name": return name
+        
+        case "root": return webroot
+            
+        case "foreward-url": return forwardUrl
+            
+        case "enabled": return String(enabled)
+            
+        case "access-log-enabled": return String(accessLogEnabled)
+            
+        case "404-log-enabled": return String(four04LogEnabled)
+            
+        case "session-log-enabled": return String(sessionLogEnabled)
+            
+        case "scan-all-html": return String(scanAllHtml)
+            
+        case "php-path": return (phpPath?.path ?? "")
+            
+        case "php-options":
+            if phpPath != nil {
+                return (phpOptions ?? "")
+            } else {
+                return "PHP Disabled"
+            }
+            
+        case "php-map-index":
+            if phpPath != nil {
+                return String(phpMapIndex)
+            } else {
+                return "PHP Disabled"
+            }
+            
+        case "php-map-all":
+            if phpPath != nil {
+                return String(phpMapAll)
+            } else {
+                return "PHP Disabled"
+            }
+            
+        case "php-timeout":
+            if phpPath != nil {
+                return String(phpTimeout)
+            } else {
+                return "PHP Disabled"
+            }
+            
+        case "sf-resources": return sfresources
+            
+        case "session-timeout": return String(sessionTimeout)
+
+        case "comment-auto-approval-threshold": return String(comments.forApproval.count)
+        
+        default:
+            Log.atError?.log("No access to Domain mapped for key: \(key.lowercased())")
+            return nil
+        }
+    }
+    
+    
     /// Update the visitor statistics
     
     public func recordStatistics(_ visit: Visit) {
@@ -813,6 +899,7 @@ extension Domain: CustomStringConvertible {
         str += " Enable 404 Log             = \(four04LogEnabled)\n"
         str += " Enable Session Log         = \(sessionLogEnabled)\n"
         str += " Session Timeout            = \(sessionTimeout)\n"
+        str += " ScanAllHtml                = \(scanAllHtml)\n"
         str += " PHP Path                   = \(phpPath?.path ?? "Not Set")\n"
         str += " PHP Options                = \(phpOptions ?? "")\n"
         str += " PHP Map Index              = \(phpMapIndex)\n"
@@ -848,6 +935,7 @@ extension Domain: FunctionsInfoDataSource {
         info["domain-access-log-enabled"] = String(accessLogEnabled)
         info["domain-404-log-enabled"] = String(four04LogEnabled)
         info["domain-session-log-enabled"] = String(sessionLogEnabled)
+        info["domain-scan-all-html"] = String(scanAllHtml)
         info["domain-session-timeout"] = String(sessionTimeout)
         info["domain-php-path"] = phpPath?.path ?? "Not Set"
         info["domain-php-options"] = phpOptions ?? ""

@@ -53,7 +53,7 @@ let COMMAND_LOGIN = "login"
 
 /// The  path to the login template.
 
-let LOGIN_TEMPLATE = "/pages/login.sf.html"
+let LOGIN_TEMPLATE = "/pages/account/login.sf.html"
 
 fileprivate let LOGIN_NAME_KEY = "login-name"
 fileprivate let LOGIN_PASSWORD_KEY = "login-password"

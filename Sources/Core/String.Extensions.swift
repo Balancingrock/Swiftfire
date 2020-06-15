@@ -3,7 +3,7 @@
 //  File:       String.Extensions.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.3.2
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,7 +36,8 @@
 //
 // History
 //
-// 1.0.0 Moved here from Domain.swift
+// 1.3.2 - Added isMember
+// 1.0.0 - Moved here from Domain.swift
 //
 // =====================================================================================================================
 
@@ -48,4 +49,14 @@ import VJson
 
 extension String: VJsonSerializable {
     public var json: VJson { return VJson(self) }
+}
+
+extension String {
+    
+    public func isMember(of arr: Array<String>) -> Bool {
+        for str in arr {
+            if self == str { return true }
+        }
+        return false
+    }
 }

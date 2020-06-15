@@ -37,6 +37,7 @@
 // History
 //
 // 1.3.2 - Added 'global' source with 'starttime', 'runtime', 'timestamp' and 'rootdir'
+//       - Moved 'readKey' of domain parameter to Domain.
 // 1.3.0 - Moved getInfo and postInfo into requestinfo
 //       - Added a requestinfo! to return an empty string if the requested parameter does not exist
 //       - Fixed a bug that caused the account name not to be returned
@@ -256,64 +257,9 @@ fileprivate func reader(_ args: Array<Substring>, _ functionsInfo: Functions.Inf
             Log.atError?.log("Missing source or key in argument")
             return nil
         }
+        
+        return environment.domain.readParameter(String(args[1]))
 
-        switch args[1].lowercased() {
-            
-        case "name": return environment.domain.name
-        
-        case "root": return environment.domain.webroot
-            
-        case "foreward-url": return environment.domain.forwardUrl
-            
-        case "enabled": return String(environment.domain.enabled)
-            
-        case "access-log-enabled": return String(environment.domain.accessLogEnabled)
-            
-        case "404-log-enabled": return String(environment.domain.four04LogEnabled)
-            
-        case "session-log-enabled": return String(environment.domain.sessionLogEnabled)
-            
-        case "php-path": return (environment.domain.phpPath?.path ?? "")
-            
-        case "php-options":
-            if environment.domain.phpPath != nil {
-                return (environment.domain.phpOptions ?? "")
-            } else {
-                return "PHP Disabled"
-            }
-            
-        case "php-map-index":
-            if environment.domain.phpPath != nil {
-                return String(environment.domain.phpMapIndex)
-            } else {
-                return "PHP Disabled"
-            }
-            
-        case "php-map-all":
-            if environment.domain.phpPath != nil {
-                return String(environment.domain.phpMapAll)
-            } else {
-                return "PHP Disabled"
-            }
-            
-        case "php-timeout":
-            if environment.domain.phpPath != nil {
-                return String(environment.domain.phpTimeout)
-            } else {
-                return "PHP Disabled"
-            }
-            
-        case "sf-resources": return environment.domain.sfresources
-            
-        case "session-timeout": return String(environment.domain.sessionTimeout)
-
-        case "comment-auto-approval-threshold": return String(environment.domain.comments.forApproval.count)
-        
-        default:
-            Log.atError?.log("No access to Domain mapped for key: \(args[1].lowercased())")
-            return nil
-        }
-        
     
     case "server-telemetry":
             

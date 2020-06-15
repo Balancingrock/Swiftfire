@@ -54,6 +54,24 @@ layout: default
 			<td>.show($server-telemetry.HttpsServerStatus)</td>
 			<td></td>
 		</tr>
+		<tr>
+			<td>Started on</td>
+			<td>.show($global.starttime)</td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>Runtime</td>
+			<td>.show($global.runtime)</td>
+			<td></td>
+			<td></td>
+		</tr>
+		<tr>
+			<td>Root directory name</td>
+			<td>.show($global.rootdir)</td>
+			<td></td>
+			<td></td>
+		</tr>
 	</tbody>
 </table>
 

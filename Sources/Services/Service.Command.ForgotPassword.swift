@@ -53,8 +53,8 @@ import Http
 let COMMAND_FORGOT_PASSWORD = "forgot-password"
 
 
-fileprivate let FORGOT_PASSWORD_TEMPLATE = "/pages/forgot-password.sf.html"
-fileprivate let FORGOT_PASSWORD_CONTINUE_TEMPLATE = "/pages/forgot-password-continue.sf.html"
+fileprivate let FORGOT_PASSWORD_TEMPLATE = "/pages/account/forgot-password.sf.html"
+fileprivate let FORGOT_PASSWORD_CONTINUE_TEMPLATE = "/pages/account/forgot-password-continue.sf.html"
 fileprivate let FORGOT_PASSWORD_EMAIL_TEXT_TEMPLATE = "/templates/request-new-password-text.sf.html"
 
 fileprivate let FORGOT_PASSWORD_ACCOUNT_ID_KEY = "forgot-password-account-id"

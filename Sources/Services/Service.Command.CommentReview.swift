@@ -53,7 +53,7 @@ let COMMAND_COMMENT_REVIEW = "comment-review"
 
 // The URL from where this command is posted
 
-fileprivate let ORIGINATING_PAGE_URL = "/pages/comment-review.sf.html"
+fileprivate let ORIGINATING_PAGE_URL = "/pages/account/comment-review.sf.html"
 
 
 // Defined in the HTML of the originating page and used here

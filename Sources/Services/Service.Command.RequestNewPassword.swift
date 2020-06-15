@@ -54,7 +54,7 @@ import Http
 
 let COMMAND_REQUEST_NEW_PASSWORD = "request-new-password"
 
-fileprivate let REQUEST_NEW_PASSWORD_FAILED_TEMPLATE = "/pages/request-new-password-failed.sf.html"
+fileprivate let REQUEST_NEW_PASSWORD_FAILED_TEMPLATE = "/pages/account/request-new-password-failed.sf.html"
 
 
 /// The  name to be used in HTML that specifies the key to be used to set a new password.

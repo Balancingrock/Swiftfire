@@ -104,6 +104,8 @@ func service_getFileAtResourcePath(_ request: Request, _ connection: SFConnectio
         handle500_ServerError(connection: connection, resourcePath: nil, message: "No resource path present", line: #line)
         return .next
     }
+    
+    let nsResourcePath = resourcePath as NSString
 
     Log.atDebug?.log("Resource path = \(resourcePath)", id: connection.logId)
     
@@ -118,14 +120,16 @@ func service_getFileAtResourcePath(_ request: Request, _ connection: SFConnectio
     // If the resource is a php file and php is enabled then process the PHP part first
     
     var phpData: Data?
-    if (domain.phpPath != nil) && ((resourcePath as NSString).pathExtension.lowercased() == "php") {
+    if (domain.phpPath != nil) && (nsResourcePath.pathExtension.lowercased() == "php") {
         phpData = loadPhpFile(file: URL(fileURLWithPath: resourcePath), domain: domain)
     }
     
     
     // If the file can contain function calls, then process it. Otherwise return the file as read.
     
-    if (resourcePath as NSString).lastPathComponent.contains(".sf.") {
+    if nsResourcePath.lastPathComponent.contains(".sf.")
+       || domain.scanAllHtml && nsResourcePath.pathExtension.lowercased().isMember(of: ["htm", "html", "php"])
+        {
     
         switch SFDocument.factory(path: resourcePath, data: phpData) {
             
@@ -179,4 +183,3 @@ func service_getFileAtResourcePath(_ request: Request, _ connection: SFConnectio
         
     return .next
 }
-

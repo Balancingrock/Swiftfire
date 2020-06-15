@@ -71,6 +71,7 @@ func executeUpdateParameter(_ request: Request, _ domain: Domain) {
     case "access-log-enabled": domain.accessLogEnabled = Bool(lettersOrDigits: value) ?? domain.accessLogEnabled
     case "404-log-enabled": domain.four04LogEnabled = Bool(lettersOrDigits: value) ?? domain.four04LogEnabled
     case "session-log-enabled": domain.sessionLogEnabled = Bool(lettersOrDigits: value) ?? domain.sessionLogEnabled
+    case "scan-all-html": domain.scanAllHtml = Bool(lettersOrDigits: value) ?? domain.scanAllHtml
     case "php-executable-path":
         domain.phpPath = nil
         if FileManager.default.isExecutableFile(atPath: value) {
