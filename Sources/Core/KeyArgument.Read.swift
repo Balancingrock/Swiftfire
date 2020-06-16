@@ -360,6 +360,6 @@ extension Int64 {
 
         a -= minutes * secondsPerMinute
         
-        return "\(days) Days, \(hours) h \(minutes) m \(a) s"
+        return "\(days) Days, \(hours) h, \(minutes) m, \(a) s"
     }
 }

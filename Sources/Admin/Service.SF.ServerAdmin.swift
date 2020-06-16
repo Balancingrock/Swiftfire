@@ -37,6 +37,7 @@
 // History
 //
 // 1.3.2 #12 A domain admin account no longer has to be verified for its email account
+//       #10 Made the service public
 // 1.3.0 #7 Removed local filemanager
 //       - Replaced postInfo with request.info
 //       - Removed inout from the service signature
@@ -115,7 +116,7 @@ private let SERVER_ADMIN_LOGIN_PWD  = "server-admin-login-password"
 ///
 /// - Returns: Always .next
 
-func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: Services.Info, _ response: Response) -> Services.Result {
+public func service_serverAdmin(_ request: Request, _ connection: SFConnection, _ domain: Domain, _ info: Services.Info, _ response: Response) -> Services.Result {
     
     
     
@@ -951,7 +952,7 @@ fileprivate func executeUpdateDomainServices(_ request: Request) {
         
     domain.serviceNames = serviceArr.map({ $0.name }) //ArrayOfStrings(serviceNames)
     
-    domain.rebuildServices()
+    domain.rebuildServices?(domain)
     
     domain.serviceNames.store(to: Urls.domainServiceNamesFile(for: domain.name))
     

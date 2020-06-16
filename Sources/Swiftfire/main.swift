@@ -37,6 +37,7 @@
 // History
 //
 // 1.3.2 - Added logging (in global var) of startup time
+//       #10 Moved initialization of server admin services to the main operation.
 // 1.3.0 - Removed DecodePostFormUrlEncoded
 //       #8: Auto oading of domain & aliases list
 // 1.1.0 #1: Fixed loading & storing of domain service names
@@ -237,7 +238,7 @@ do {
     
     // Rebuild the available services for the domains
     
-    domainManager.forEach { $0.rebuildServices() }
+    domainManager.forEach { $0.rebuildServices?($0) }
 
     
     // log the domain settings
@@ -267,8 +268,14 @@ do {
     serverAdminDomain.accessLogEnabled = true
     serverAdminDomain.four04LogEnabled = true
     serverAdminDomain.sessionLogEnabled = true
-    serverAdminDomain.serviceNames = serverAdminServices // Defined in: Services.SF.Registration.swift
-    serverAdminDomain.rebuildServices()
+    serverAdminDomain.services = [
+        Services.Entry(serviceName_GetSession, service_getSession),
+        Services.Entry(serviceName_WaitUntilBodyComplete, service_waitUntilBodyComplete),
+        Services.Entry("Server Admin", service_serverAdmin),
+        Services.Entry(serviceName_RestartSessionTimeout, service_restartSessionTimeout),
+        Services.Entry(serviceName_TransferResponse, service_transferResponse)
+    ]
+    serverAdminDomain.rebuildServices = nil // Don't modify the above defined services
     serverAdminDomain.sessionTimeout = 600 // Seconds
 
     serverAdminDomain.storeSetup()

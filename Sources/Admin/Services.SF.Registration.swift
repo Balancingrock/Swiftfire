@@ -3,7 +3,7 @@
 //  File:       Services.SF.Registration.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.3.0
+//  Version:    1.3.2
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.3.2 #10 Removed registration of services, moved definition of server-admin services to main.swift.
 // 1.3.0 - Removed serviceName_DecodePostFormUrlEncoded
 // 1.1.0 - Fixed loading & storing of domain service names
 // 1.0.0 - Initial version
@@ -54,7 +55,7 @@ import Services
 
 // Note: If any of these texts are changed it will be necessary to re-assign new services for existing domains.
 
-private let serverAdmin = "Handle server Admin Domain"
+
 
 
 // =================================================
@@ -65,18 +66,5 @@ private let serverAdmin = "Handle server Admin Domain"
 /// Register the admin related domain services
 
 public func sfRegisterServices() {
-    services.register(name: serverAdmin, service: service_serverAdmin)
+    //
 }
-
-
-/// The services for the server admin (pseudo) domain
-
-public var serverAdminServices: Array<String> {
-    return [
-        serviceName_GetSession,
-        serviceName_WaitUntilBodyComplete,
-        serverAdmin,
-        serviceName_RestartSessionTimeout,
-        serviceName_TransferResponse
-    ]
- }

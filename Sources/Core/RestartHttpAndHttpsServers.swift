@@ -3,7 +3,7 @@
 //  File:       RestartHttpAndHttpsServers.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.3.0
+//  Version:    1.3.2
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.3.2 #10 signature of rebuildServices changed
 // 1.3.0 - Updated for Swift 5.2
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
@@ -125,7 +126,7 @@ public func restartHttpAndHttpsServers() {
         
         // Rebuild the available services for the domains
         
-        domainManager.forEach { $0.rebuildServices() }
+        domainManager.forEach { $0.rebuildServices?($0) }
     }
     
     

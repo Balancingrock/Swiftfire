@@ -38,6 +38,7 @@
 //
 // 1.3.2 - Added scanAllHtml parameter
 //       - Added readParameter function
+//       #10: Made rebuildServices into a variable with function signature and a default value
 // 1.3.0 - Removed unnecessary initialization of some variables from init
 //       - Replaced var with let due to Xcode 11
 //       #8 Fixed storing of all changes to the service names
@@ -246,7 +247,7 @@ public final class Domain {
     public var serviceNames: Array<String> = [] {
         didSet {
             serviceNames.store(to: Urls.domainServiceNamesFile(for: name))
-            rebuildServices()
+            rebuildServices?(self)
         }
     }
     
@@ -259,6 +260,19 @@ public final class Domain {
 
     public var services: Array<Services.Entry> = []
     
+    
+    /// Rebuild the services member from the serviceNames and the available services (the later is a member of domainServices)
+    
+    public var rebuildServices: ((Domain) -> ())? = { (domain) -> Void in
+        
+        domain.services = []
+        for serviceName in domain.serviceNames {
+            if let service = Core.services.registered[serviceName] {
+                domain.services.append(service)
+            }
+        }
+    }
+
     
     /// The domain telemetry
     
@@ -789,19 +803,6 @@ extension Domain {
         for (index, serviceName) in serviceNames.enumerated().reversed() {
             if Core.services.registered[serviceName] == nil {
                 serviceNames.remove(at: index)
-            }
-        }
-    }
-    
-    
-    /// Rebuild the services member from the serviceNames and the available services (the later is a member of domainServices)
-    
-    public func rebuildServices() {
-        
-        services = []
-        for serviceName in serviceNames {
-            if let service = Core.services.registered[serviceName] {
-                services.append(service)
             }
         }
     }

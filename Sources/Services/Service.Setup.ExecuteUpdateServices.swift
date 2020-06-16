@@ -93,7 +93,7 @@ func executeUpdateServices(_ request: Request, _ domain: Domain) {
     
     domain.serviceNames = serviceArr.map({ $0.name })
     
-    domain.rebuildServices()
+    domain.rebuildServices?(domain)
     
     domain.storeSetup()
     
