@@ -3,7 +3,7 @@
 //  File:       Urls.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.3.0
+//  Version:    1.3.2
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.3.2 #13 Changed fileURL to dirURL for logging directories
 // 1.3.0 - Added domainCommentsForApprovalFile
 //         Started change for seperation of URL for files and NSString for paths
 // 1.2.1 - Removed incorrect info
@@ -242,12 +243,12 @@ public final class Urls {
     
     /// The directory for 404 logfiles
     
-    public static func domainFour04LogDir(for name: String) -> URL? { return fileUrl(domainLoggingDir(for: name), "four04Logs")}
+    public static func domainFour04LogDir(for name: String) -> URL? { return dirUrl(domainLoggingDir(for: name), "four04Logs")}
 
     
     /// The directory for access logfiles
     
-    public static func domainAccessLogDir(for name: String) -> URL? { return fileUrl(domainLoggingDir(for: name), "accessLogs")}
+    public static func domainAccessLogDir(for name: String) -> URL? { return dirUrl(domainLoggingDir(for: name), "accessLogs")}
 
 
     /// The sessions logging directory

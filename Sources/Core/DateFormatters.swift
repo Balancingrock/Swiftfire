@@ -3,7 +3,7 @@
 //  File:       DateFormatters.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.3.0
+//  Version:    1.3.2
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.3.2 #13 Changed formatters to 'var' instead of 'let'
 // 1.3.0 - Added formatter for comment's
 // 1.0.0 - Initial version
 //
@@ -44,14 +45,14 @@
 import Foundation
 
 
-public let dateFormatter: DateFormatter = {
+public var dateFormatter: DateFormatter = {
     let ltf = DateFormatter()
     ltf.dateFormat = "yyyy-MM-dd'T'HH.mm.ss.SSSZ"
     return ltf
 }()
 
 
-public let commentDateFormatter: DateFormatter = {
+public var commentDateFormatter: DateFormatter = {
     let ltf = DateFormatter()
     ltf.dateFormat = "yyyy MMM dd HH:mm:ss"
     return ltf
@@ -61,9 +62,9 @@ public let commentDateFormatter: DateFormatter = {
 /// Use to create filenames when they have to be time-stamped
 /// The timestamp will have a leading separator '-' and a trailing '.'.
 ///
-/// - Note: THis formatter is thread safe
+/// - Note: This formatter is thread safe
 
-fileprivate let filenameTimestampFormatter: DateFormatter = {
+fileprivate var filenameTimestampFormatter: DateFormatter = {
     let ltf = DateFormatter()
     ltf.dateFormat = "-yyyy-MM-dd'T'HH.mm.ss.SSSZ."
     return ltf
