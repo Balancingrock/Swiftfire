@@ -109,6 +109,14 @@ func service_storePreLoginUrl(_ request: Request, _ connection: SFConnection, _ 
     session[.preLoginUrlKey] = url
     session[.preLoginRequestInfoKey] = request.info
     
+    
+    // Replace the email verification url
+    
+    if url.contains(EMAIL_VERIFICATION_SUCCESS_TEMPLATE) || url.contains(SET_NEW_PASSWORD_SUCCESS_TEMPLATE) {
+        session.removeValue(forKey: .preLoginUrlKey)
+        session.removeValue(forKey: .preLoginRequestInfoKey)
+    }
+
     Log.atDebug?.log("Pre login URL key new: \(session[.preLoginUrlKey] as? String ?? "not-a-string")")
     
     return .next

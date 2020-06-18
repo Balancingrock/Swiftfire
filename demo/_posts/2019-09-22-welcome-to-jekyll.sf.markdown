@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Welcome to Swiftfire & Jekyll!"
-date:   2019-09-22
+date:   2020-06-18
 categories:
 ---
 Welcome to Swiftfire and Jekyll.
@@ -14,6 +14,6 @@ This demo site uses our Classic-Jekyll-Theme, in the future we hope to enhance t
 
 For more information on Jekyll, check out the [Jekyll docs][jekyll-docs].
 
-.commentSection(2019.09.22.welcome, anon)
+.commentSection(2020.06.18.welcome, anon)
 
 [jekyll-docs]: https://jekyllrb.com/docs/home

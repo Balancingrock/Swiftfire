@@ -20,7 +20,7 @@
 	<meta name="description" content="Write an awesome description for your new site here. You can edit this line in _config.yml. It will appear in your document head meta (for Google search resu...">
 
 	<link rel="stylesheet" href="/assets/main.css">
-	<link rel="canonical" href="http://localhost:4000/pages/register-continue.sf.html">
+	<link rel="canonical" href="/pages/account/register-continue.sf.html">
 	<link rel="alternate" type="application/rss+xml" title="Swiftfire Server Demo" href="/feed.xml">
 </head>
 <!-- end of include head.html -->
@@ -64,13 +64,14 @@
 	<div class="item">
 		<div class="title">
 			<label class="symbol"><p></p></label>
-			<div class="text"><a href="http://localhost:4000/index.html"><p>Home</p></a></div>
+			<div class="text"><a href="/index.html"><p>Home</p></a></div>
 		</div>
 	</div>.if($account.is-domain-admin, equal, true)
+<div class="item-separator"><p><!-- empty but necessary --></p></div>
 <div class="item">
 	<div class="title">
 		<label class="symbol"><p></p></label>
-		<div class="text"><p>Admin</p></div>
+		<div class="text"><p class="paddingAsLink">Admin</p></div>
 	</div>
 	<div class="dropdown">
 		<div class="subitem-separator"><p></p></div>
@@ -78,7 +79,7 @@
 			<div class="title">
 				<div class="symbol"></div>
 				<div class="text">
-					<a href="/pages/comment-review.sf.html"><p>Review Comments Needing Approval</p></a>
+					<a href="/pages/account/comment-review.sf.html"><p>Review Comments Needing Approval</p></a>
 				</div>
 			</div>
 		</div>
@@ -86,10 +87,11 @@
 </div>
 .else()
 	.if($account.is-moderator, equal, true)
+<div class="item-separator"><p><!-- empty but necessary --></p></div>
 <div class="item">
 	<div class="title">
 		<label class="symbol"><p></p></label>
-		<div class="text"><p>Moderator</p></div>
+		<div class="text"><p class="paddingAsLink">Moderator</p></div>
 	</div>
 	<div class="dropdown">
 		<div class="subitem-separator"><p></p></div>
@@ -97,7 +99,7 @@
 			<div class="title">
 				<div class="symbol"></div>
 				<div class="text">
-					<a href="/pages/comment-review.sf.html"><p>Review Comments Needing Approval</p></a>
+					<a href="/pages/account/comment-review.sf.html"><p>Review Comments Needing Approval</p></a>
 				</div>
 			</div>
 		</div>
@@ -105,27 +107,47 @@
 </div>
 	.end()
 .end()
-.if($account, equal, nil)
+<div class="item-separator"><p><!-- empty but necessary --></p></div>
 <div class="item">
 	<div class="title">
 		<label class="symbol"><p></p></label>
-		<div class="text"><a href="/pages/login.sf.html"><p>Login</p></a></div>
+		<div class="text"><p class="paddingAsLink">Account</p></div>
 	</div>
-</div>
-<div class="item">
-	<div class="title">
-		<label class="symbol"><p></p></label>
-		<div class="text"><a href="/pages/register.sf.html"><p>Register</p></a></div>
+	<div class="dropdown">
+		<div class="subitem-separator"><p></p></div>
+		.if($account, equal, nil)
+		<div class="subitem">
+			<div class="title">
+				<div class="symbol"></div>
+				<div class="text">
+					<a href="/pages/account/login.sf.html"><p>Login</p></a>
+				</div>
+			</div>
+		</div>
+		<div class="subitem-separator"><p></p></div>
+		<div class="subitem">
+			<div class="title">
+				<div class="symbol"></div>
+				<div class="text">
+					<a href="/pages/account/register.sf.html"><p>Register</p></a>
+				</div>
+			</div>
+		</div>
+		.else()
+		<div class="subitem">
+			<div class="title">
+				<div class="symbol"></div>
+				<div class="text">
+					<a href="/command/logout"><p>Logout .show($account.name!)</p></a>
+				</div>
+			</div>
+		</div>
+		.end()
 	</div>
+
 </div>
-.else()
-<div class="item">
-	<div class="title">
-		<label class="symbol"><p></p></label>
-		<div class="text"><a href="/command/logout"><p>Logout - .show($account.name!)</p></a></div>
-	</div>
-</div>
-.end()
+
+
 
 
 </nav>
@@ -147,7 +169,7 @@
 <!-- include recent-posts.html -->
 <div>
 	<h1>Recent:</h1>
-		<p><a href="/2019/09/22/welcome-to-jekyll.sf.html">2019-09-22 Welcome to Swiftfire & Jekyll!</a></p>
+		<p><a href="/2020/06/18/welcome-to-jekyll.sf.html">2020-06-18 Welcome to Swiftfire & Jekyll!</a></p>
 </div>
 <!-- end of include recent-posts.html -->
 
@@ -206,10 +228,10 @@
 <div class="older-posts">
 	<h1>Older Posts:</h1>
 	<details class="year-details">
-		<summary>2019</summary>
+		<summary>2020</summary>
 		<details class="month-details">
-			<summary>September</summary>
-			<a href="/2019/09/22/welcome-to-jekyll.sf.html"><p>Welcome to Swiftfire & Jekyll!</p></a>
+			<summary>June</summary>
+			<a href="/2020/06/18/welcome-to-jekyll.sf.html"><p>Welcome to Swiftfire & Jekyll!</p></a>
 		</details>
 	</details>
 </div>

@@ -3,7 +3,7 @@
 //  File:       Service.Command.EmailVerification.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.3.0
+//  Version:    1.3.2
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.3.2 - Made template definition global
 // 1.3.0 - Initial version
 //
 // =====================================================================================================================
@@ -50,7 +51,7 @@ import Http
 
 let COMMAND_EMAIL_VERIFICATION = "email-verification"
 
-fileprivate let EMAIL_VERIFICATION_SUCCESS_TEMPLATE = "/pages/account/email-verification-success.sf.html"
+let EMAIL_VERIFICATION_SUCCESS_TEMPLATE = "/pages/account/email-verification-success.sf.html"
 fileprivate let EMAIL_VERIFICATION_FAILED_TEMPLATE = "/pages/account/email-verification-failed.sf.html"
 
 

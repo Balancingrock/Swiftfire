@@ -3,7 +3,7 @@
 //  File:       Function.Comments.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.3.0
+//  Version:    1.3.2
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.3.2 - Moved templates
 // 1.3.0 - Initial version
 //
 // =====================================================================================================================
@@ -46,7 +47,7 @@ import Core
 import BRBON
 
 
-fileprivate let COMMENT_SECTION_TEMPLATE = "/templates/comment-section.sf.html"
+fileprivate let COMMENT_SECTION_TEMPLATE = "/assets/templates/comment-section.sf.html"
 
 
 /// Returns the HTML code for a comments section.

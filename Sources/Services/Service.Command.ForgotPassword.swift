@@ -3,7 +3,7 @@
 //  File:       Service.Command.ForgotPassword.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.3.0
+//  Version:    1.3.2
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.3.2 #14 fixed template links and usage of parameters
 // 1.3.0 - Initial version
 //
 // =====================================================================================================================
@@ -55,7 +56,7 @@ let COMMAND_FORGOT_PASSWORD = "forgot-password"
 
 fileprivate let FORGOT_PASSWORD_TEMPLATE = "/pages/account/forgot-password.sf.html"
 fileprivate let FORGOT_PASSWORD_CONTINUE_TEMPLATE = "/pages/account/forgot-password-continue.sf.html"
-fileprivate let FORGOT_PASSWORD_EMAIL_TEXT_TEMPLATE = "/templates/request-new-password-text.sf.html"
+fileprivate let FORGOT_PASSWORD_EMAIL_TEXT_TEMPLATE = "/assets/templates/request-new-password-text.sf.html"
 
 fileprivate let FORGOT_PASSWORD_ACCOUNT_ID_KEY = "forgot-password-account-id"
 
@@ -92,13 +93,8 @@ func executeForgotPassword(_ request: Request, _ connection: SFConnection, _ dom
         return FORGOT_PASSWORD_CONTINUE_TEMPLATE
     }
     
-    guard let uuid = UUID(uuidString: accountId) else {
-        Log.atDebug?.log("Cannot create UUID from \(accountId)")
-        return FORGOT_PASSWORD_CONTINUE_TEMPLATE
-    }
-
-    guard let account = domain.accounts.getAccount(for: uuid) else {
-        Log.atDebug?.log("No account for uuid: \(accountId)")
+    guard let account = domain.accounts.getAccountWithoutPassword(for: accountId) else {
+        Log.atDebug?.log("No account for id: \(accountId)")
         return FORGOT_PASSWORD_CONTINUE_TEMPLATE
     }
 

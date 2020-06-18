@@ -3,7 +3,7 @@
 //  File:       Service.Command.SetNewPassword.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.3.0
+//  Version:    1.3.2
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.3.2 #14 fixed template links
 // 1.3.0 - Initial version
 //
 // =====================================================================================================================
@@ -56,12 +57,12 @@ let COMMAND_SET_NEW_PASSWORD = "set-new-password"
 /// The path to the template for the set new password email
 
 let SET_NEW_PASSWORD_TEMPLATE = "/pages/account/set-new-password.sf.html"
-fileprivate let SET_NEW_PASSWORD_SUCCESS_TEMPLATE = "/pages/account/set-new-password-success.sf.html"
+let SET_NEW_PASSWORD_SUCCESS_TEMPLATE = "/pages/account/set-new-password-success.sf.html"
 
 
 /// The key to use to enable the setting of a new password.
 
-let SET_NEW_PASSWORD_ACCOUNT_ID_KEY = "uuid"
+let SET_NEW_PASSWORD_ACCOUNT_ID_KEY = "set-new-pwd-acc-id"
 fileprivate let SET_NEW_PASSWORD_PASSWORD1_KEY = "set-new-password-1"
 fileprivate let SET_NEW_PASSWORD_PASSWORD2_KEY = "set-new-password-2"
 
@@ -83,7 +84,7 @@ func executeSetNewPassword(_ request: Request, _ domain: Domain) -> String {
     }
     
     guard let account = domain.accounts.getAccount(for: uuid) else {
-        Log.atError?.log("Unknown account for uuid: \(accountId)")
+        Log.atError?.log("Unknown account for uuid: \(uuid)")
         request.info[PREVIOUS_ATTEMPT_MESSAGE_KEY] = "Server error, please contact the administrator"
         return SET_NEW_PASSWORD_TEMPLATE
     }

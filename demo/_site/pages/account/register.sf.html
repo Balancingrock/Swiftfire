@@ -15,12 +15,12 @@
 	<meta name="msapplication-config" content="/icons/browserconfig.xml">
 	<meta name="theme-color" content="#ffffff">
 
-	<title>Login</title>
+	<title>Register</title>
 
 	<meta name="description" content="Write an awesome description for your new site here. You can edit this line in _config.yml. It will appear in your document head meta (for Google search resu...">
 
 	<link rel="stylesheet" href="/assets/main.css">
-	<link rel="canonical" href="http://localhost:4000/pages/login.sf.html">
+	<link rel="canonical" href="/pages/account/register.sf.html">
 	<link rel="alternate" type="application/rss+xml" title="Swiftfire Server Demo" href="/feed.xml">
 </head>
 <!-- end of include head.html -->
@@ -64,13 +64,14 @@
 	<div class="item">
 		<div class="title">
 			<label class="symbol"><p></p></label>
-			<div class="text"><a href="http://localhost:4000/index.html"><p>Home</p></a></div>
+			<div class="text"><a href="/index.html"><p>Home</p></a></div>
 		</div>
 	</div>.if($account.is-domain-admin, equal, true)
+<div class="item-separator"><p><!-- empty but necessary --></p></div>
 <div class="item">
 	<div class="title">
 		<label class="symbol"><p></p></label>
-		<div class="text"><p>Admin</p></div>
+		<div class="text"><p class="paddingAsLink">Admin</p></div>
 	</div>
 	<div class="dropdown">
 		<div class="subitem-separator"><p></p></div>
@@ -78,7 +79,7 @@
 			<div class="title">
 				<div class="symbol"></div>
 				<div class="text">
-					<a href="/pages/comment-review.sf.html"><p>Review Comments Needing Approval</p></a>
+					<a href="/pages/account/comment-review.sf.html"><p>Review Comments Needing Approval</p></a>
 				</div>
 			</div>
 		</div>
@@ -86,10 +87,11 @@
 </div>
 .else()
 	.if($account.is-moderator, equal, true)
+<div class="item-separator"><p><!-- empty but necessary --></p></div>
 <div class="item">
 	<div class="title">
 		<label class="symbol"><p></p></label>
-		<div class="text"><p>Moderator</p></div>
+		<div class="text"><p class="paddingAsLink">Moderator</p></div>
 	</div>
 	<div class="dropdown">
 		<div class="subitem-separator"><p></p></div>
@@ -97,7 +99,7 @@
 			<div class="title">
 				<div class="symbol"></div>
 				<div class="text">
-					<a href="/pages/comment-review.sf.html"><p>Review Comments Needing Approval</p></a>
+					<a href="/pages/account/comment-review.sf.html"><p>Review Comments Needing Approval</p></a>
 				</div>
 			</div>
 		</div>
@@ -105,27 +107,47 @@
 </div>
 	.end()
 .end()
-.if($account, equal, nil)
+<div class="item-separator"><p><!-- empty but necessary --></p></div>
 <div class="item">
 	<div class="title">
 		<label class="symbol"><p></p></label>
-		<div class="text"><a href="/pages/login.sf.html"><p>Login</p></a></div>
+		<div class="text"><p class="paddingAsLink">Account</p></div>
 	</div>
-</div>
-<div class="item">
-	<div class="title">
-		<label class="symbol"><p></p></label>
-		<div class="text"><a href="/pages/register.sf.html"><p>Register</p></a></div>
+	<div class="dropdown">
+		<div class="subitem-separator"><p></p></div>
+		.if($account, equal, nil)
+		<div class="subitem">
+			<div class="title">
+				<div class="symbol"></div>
+				<div class="text">
+					<a href="/pages/account/login.sf.html"><p>Login</p></a>
+				</div>
+			</div>
+		</div>
+		<div class="subitem-separator"><p></p></div>
+		<div class="subitem">
+			<div class="title">
+				<div class="symbol"></div>
+				<div class="text">
+					<a href="/pages/account/register.sf.html"><p>Register</p></a>
+				</div>
+			</div>
+		</div>
+		.else()
+		<div class="subitem">
+			<div class="title">
+				<div class="symbol"></div>
+				<div class="text">
+					<a href="/command/logout"><p>Logout .show($account.name!)</p></a>
+				</div>
+			</div>
+		</div>
+		.end()
 	</div>
+
 </div>
-.else()
-<div class="item">
-	<div class="title">
-		<label class="symbol"><p></p></label>
-		<div class="text"><a href="/command/logout"><p>Logout - .show($account.name!)</p></a></div>
-	</div>
-</div>
-.end()
+
+
 
 
 </nav>
@@ -147,7 +169,7 @@
 <!-- include recent-posts.html -->
 <div>
 	<h1>Recent:</h1>
-		<p><a href="/2019/09/22/welcome-to-jekyll.sf.html">2019-09-22 Welcome to Swiftfire & Jekyll!</a></p>
+		<p><a href="/2020/06/18/welcome-to-jekyll.sf.html">2020-06-18 Welcome to Swiftfire & Jekyll!</a></p>
 </div>
 <!-- end of include recent-posts.html -->
 
@@ -206,10 +228,10 @@
 <div class="older-posts">
 	<h1>Older Posts:</h1>
 	<details class="year-details">
-		<summary>2019</summary>
+		<summary>2020</summary>
 		<details class="month-details">
-			<summary>September</summary>
-			<a href="/2019/09/22/welcome-to-jekyll.sf.html"><p>Welcome to Swiftfire & Jekyll!</p></a>
+			<summary>June</summary>
+			<a href="/2020/06/18/welcome-to-jekyll.sf.html"><p>Welcome to Swiftfire & Jekyll!</p></a>
 		</details>
 	</details>
 </div>
@@ -267,23 +289,34 @@
 <!-- Start of main content -->
 <article class="page" itemscope itemtype="http://schema.org/Article">
 	<header class="page-header">
-		<h1 class="page-title" itemprop="name headline">Login</h1>
+		<h1 class="page-title" itemprop="name headline">Register</h1>
 		<p class="page-meta"></p>
 	</header>
 	<div class="page-content" itemprop="articleBody">
 <!-- Page content -->
-   <form action="/command/login" method="post">
+   <p>To register, fill out the fields below and click the ‘Register’ button. Upon verification of the fields values, an email will be sent to the given address containing a verification link. Visit that link to complete the registration process.</p>
+
+<form action="/command/register" method="post">
 	<div style="display:flex; flex-direction:column; justify-content:center; margin-bottom:50px;">
 		<div style="margin-left:auto; margin-right:auto;">
 			<p>.show($request.previous-attempt-message!)</p>
 		</div>
 		<div style="margin-left:auto; margin-right:auto;">
+			<br />
 			<p style="margin-bottom:0px">Name:</p>
-			<input style="width:100%; color:black;" type="text" name="login-name" value=".show($request.login-name!)" autofocus="" /><br />
+			<input style="color:black;" type="text" name="register-name" value=".show($request.register-name!)" autofocus="" />
+			<br />
 			<p style="margin-bottom:0px">Password:</p>
-			<input style="width:100%; color:black;" type="password" name="login-password" value=".show($request.login-password!)" /><br /><br />
-			<input style="width:100%; color:black;" type="submit" value="Login" />
-			<p><a href="/pages/register.sf.html">Register</a> - <a href="/pages/forgot-password.sf.html">Forgot password?</a></p>
+			<input style="color:black;" type="password" name="register-password-1" value=".show($request.RegisterPassword1!)" />
+			<br />
+			<p style="margin-bottom:0px">Password:</p>
+			<input style="color:black;" type="password" name="register-password-2" value=".show($request.RegisterPassword2!)" />
+			<br />
+			<p style="margin-bottom:0px">Email:</p>
+			<input style="color:black;" type="text" name="register-email" value=".show($request.register-email!)" />
+			<br />
+			<br />
+			<input style="width:100%; color:black;" type="submit" value="Register" />
 		</div>
 	</div>
 </form>

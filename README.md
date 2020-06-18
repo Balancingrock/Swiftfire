@@ -10,7 +10,7 @@ To develop Swiftfire extensions you need Xcode as well.
 
 Linux compatibility is envisaged, but not yet actively supported.
 
-Visit the Swiftfire homepage at [http://swiftfire.nl](http://swiftfire.nl).
+Visit the Swiftfire homepage at [http://swiftfire.nl](http://swiftfire.nl) for all available documentation.
 
 Beware: In the current version 1.x Swiftfire is still experimental. It works, but as this way of building websites is still new, it has to be expected that significant changes will need to be made as we gain experience. Hence if you are following along, you should expect that new releases will necessitate some recoding, including any websites that you might be creating. Version 2.0 will be released when we are relatively certain that major recodings will no longer be needed. 
 
@@ -44,6 +44,10 @@ or any other number of course.
 
 The best part is, you can define and write the functions yourself.
 
+It is even possible to create loops and use conditinal expressions:
+
+    <p>Your name is: .if($account, equal, nil) unknown .else() .show($account.name) .end()</p>
+
 It is up to you to determine how much you want to do in Swift. For example, you could decide to have the entire landing page to be created by a function. To do that let index.sf.html exist only of: `.buildLandingPage()`. And of course you have to implement the function that is registered under the name `buildLandingPage`.
 
 It is fast. Depending of course on the amount and complexity of the services and functions, Swiftfire as presented here is very fast. On our server (a mac mini) the static pages are usually served in less than 2mS. Adding functions and services will increase this number of course. Still since the function calls and services refer to compiled code instead of interpreted code the speed of Swiftfire can be expected to be higher than interpreter solutions.
@@ -54,16 +58,20 @@ Oh, and it does PHP as well...
 
 Swiftfire is a faceless webserver application. However it comes with a website that can be used for administration purposes. On initial start of the server, any request on the port on which the server listens will result in a landing page that asks the user to create an admin account and the directory in which the administration site is installed.
 
-Once set up, any access to the port that has as its URL: '/serveradmin' will end up on the login page of the server administrator website. Note that the login is only as secure as the protocol. Use HTTP only when accessing from within a private LAN.
-  
+Once set up, access any hosted domain and append: '/serveradmin' to the url. This will return the server administrator website. Note that the login is only as secure as the protocol. Use HTTP only when accessing from within a private LAN.
+
+When a domain is created the domain setup page can be accessed at 'domain-url/setup'.
+
 ## Features
 
 - Allows code injection (HTML and CSS) from functions written in Swift
 - Allows website services to be implemented in Swift 
 - Out of the box support for static websites
 - Handles multiple domains
+- Integrated comment system for local storage
 - Sessions are supported
 - Accounts are supported
+- End-user registration and lost-password supported (needs postfix)
 - Integrated comment system
 - Client forwarding (to other hosts or a different port on the same host)
 - Integrated usage statistics (page visits)
@@ -77,6 +85,7 @@ Once set up, any access to the port that has as its URL: '/serveradmin' will end
 - Supports PHP
 - Multiple server administrators
 - Multiple domain administrators
+- Integrated with the Jekyll theme: Swifterfire-Jekyll-Theme
 
 ## Installation
 
@@ -129,11 +138,15 @@ Note that Swiftfire will store and expect information in the `~/Library/Applicat
 
 ## Making changes
 
-You can of course change whatever you want, but the current source code layout was choosen for a reason. While this layout is rather new (and thus may need to change) we hope that you will only need to add to the `Custom`, `Functions` and `Services` targets. Though you should leave their current contents unaffected since the correct functioning of the admin server account depends on them.
+You can of course change whatever you want, but the current source code layout was choosen for a reason. While this layout is rather new (and thus may need to change) we hope that you will only need to add to the `Custom`, `Functions` and `Services` modules. Though you should leave their current contents unaffected since the correct functioning of the admin server account depends on them.
 
 ### Jekyll
 
 The sources for the server admin site are generated using Jekyll. If changes must be made, you will need to install Jekyll and the theme Classic-Jekyll-Theme. For more information on Jekyll see [jekyllrb.com/](https://jekyllrb.com/) for more information on Classic-Jekyll-Theme see [balancingrock.github.io/classic-jekyll-theme](https://balancingrock.github.io/classic-jekyll-theme/index.html)
+
+#### Theme
+
+There is a Swiftfire-Jekyll-Theme to quickly setup a (blogging) website that includes handling of user comments. Swiftfire 1.3.2 is matched by Swiftfire-Jekyll-Theme 0.2.0.
 
 ## Useful links
 
@@ -162,6 +175,14 @@ The sources for the server admin site are generated using Jekyll. If changes mus
 ## Version history
 
 #### HEAD
+
+#### 1.3.2
+
+- Fixed issues 10-14
+- Added global parameters starttime, runtime, timestamp and rootdir
+- Integrated with new [jekyll](https://jekyllrb.com) theme "Swiftfire-Jekyll-Theme" version 0.2.0
+
+#### 1.3.1
 
 - Fixed recursive session thread bug
 

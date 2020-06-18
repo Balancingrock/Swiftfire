@@ -3,7 +3,7 @@
 //  File:       Service.Command.Register.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.3.0
+//  Version:    1.3.2
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.3.2 - Moved templates to assets
 // 1.3.0 - Initial version
 //
 // =====================================================================================================================
@@ -52,7 +53,7 @@ let COMMAND_REGISTER = "register"
 
 fileprivate let REGISTER_TEMPLATE = "/pages/account/register.sf.html"
 fileprivate let REGISTER_CONTINUE_TEMPLATE = "/pages/account/register-continue.sf.html"
-fileprivate let REGISTER_VERIFICATION_EMAIL_TEXT_TEMPLATE = "/templates/email-verification-text.sf.html"
+fileprivate let REGISTER_VERIFICATION_EMAIL_TEXT_TEMPLATE = "/assets/templates/email-verification-text.sf.html"
 
 fileprivate let REGISTER_NAME_KEY = "register-name" // Necessary, unique, non-empty
 fileprivate let REGISTER_PASSWORD1_KEY = "register-password-1" // Necessary, non-empty
