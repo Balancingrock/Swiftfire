@@ -19,16 +19,24 @@ let package = Package(
     ],
     targets: [
         .target(name: "Custom", dependencies: ["BRBON"]),
-        .target(name: "Core", dependencies: ["SwifterLog", "COpenSsl", "KeyedCache", "SecureSockets", "BRBON", "Custom", "Http"]),
-        .target(name: "Functions", dependencies: ["SwifterLog", "Http", "Custom", "Core", "COpenSsl", "Services"]),
+        .target(name: "Core", dependencies: ["SwifterLog", "Copenssl", "KeyedCache", "SecureSockets", "BRBON", "Custom", "Http"]),
+        .target(name: "Functions", dependencies: ["SwifterLog", "Http", "Custom", "Core", "Copenssl", "Services"]),
         .target(name: "Services", dependencies: ["SwifterLog", "Http", "Custom", "Core"]),
-        .target(name: "Admin", dependencies: ["Core", "COpenSsl", "Functions", "Services"]),
+        .target(name: "Admin", dependencies: ["Core", "Copenssl", "Functions", "Services"]),
         .target(
             name: "Swiftfire",
             dependencies: ["SwifterLog", "Admin", "Core", "Functions", "Services", "Custom"],
             linkerSettings: [
                 .linkedLibrary("ssl"),
                 .linkedLibrary("crypto"),
+                //
+                // Select one of the following
+                //
+                // For macOS
+                .unsafeFlags(["-Lopenssl/v1_1_1g-macos_10_15/lib"])
+                //
+                // For Linux (mint 19.3)
+                //.unsafeFlags(["-Lopenssl/v1_1_1g-mint_19_3/lib"])
             ]
         )
     ]

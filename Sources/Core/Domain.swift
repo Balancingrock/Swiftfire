@@ -3,7 +3,7 @@
 //  File:       Domain.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.3.2
+//  Version:    1.3.3
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.3.3 - Added filenameOfStartpage
 // 1.3.2 - Added scanAllHtml parameter
 //       - Added readParameter function
 //       #10: Made rebuildServices into a variable with function signature and a default value
@@ -596,6 +597,30 @@ public final class Domain {
 // MARK: - Operational
 
 extension Domain {
+    
+    
+    /// Returns the name of the index file
+    
+    var filenameOfStartpage: String? {
+        
+        if let files = try? FileManager.default.contentsOfDirectory(atPath: webroot) {
+            for path in files {
+                let name = (path as NSString).lastPathComponent
+                // (?i) means case-insensitive, (?-i) means case-sensitive, ? means 0 or 1
+                if let regex = try? NSRegularExpression(pattern: "(?i)index((?-i).sf)?.(htm[l]?|php)", options: NSRegularExpression.Options()) {
+                    if let a = regex.firstMatch(in: name, options: NSRegularExpression.MatchingOptions(), range: NSRange(location: 0, length: name.count)) {
+                        if a.numberOfRanges == 1 {
+                            if a.range(at: 0).location == 0 && a.range(at: 0).length == name.count {
+                                return name
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        return nil
+    }
     
     
     /// Return a new SSL context with the private key/certificate combination for the domain
