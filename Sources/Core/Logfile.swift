@@ -3,14 +3,14 @@
 //  File:       Logfile.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.0.0
+//  Version:    1.3.3
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
 //  Website:    http://swiftfire.nl/
 //  Git:        https://github.com/Balancingrock/Swiftfire
 //
-//  Copyright:  (c) 2016-2019 Marinus van der Lugt, All rights reserved.
+//  Copyright:  (c) 2016-2020 Marinus van der Lugt, All rights reserved.
 //
 //  License:    Use or redistribute this code any way you like with the following two provision:
 //
@@ -36,7 +36,8 @@
 //
 // History
 //
-// 1.0.0 Raised to v1.0.0, Removed old change log,
+// 1.3.3 - Linux compatibility
+// 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 
@@ -181,103 +182,8 @@ public class Logfile {
             }
         }
     }
-}
-
-
-
-extension Logfile {
     
-    
-    /// Returns the current file handle if there is one, or creates a new one if necessary.
-    
-    private var fileHandle: FileHandle? {
-        
-        if _fileHandle == nil {
-            
-            // Create the file
-            
-            if let fileUrl = fileUrl {
-                
-                if FileManager.default.createFile(atPath: fileUrl.path, contents: nil, attributes: [FileAttributeKey(rawValue: FileAttributeKey.posixPermissions.rawValue) : NSNumber(value: 0o640)]) {
-                    _fileHandle = FileHandle(forUpdatingAtPath: fileUrl.path)
-                    if let startData = createFileStart()?.data(using: String.Encoding.utf8, allowLossyConversion: true) { _fileHandle?.write(startData) }
-                    //_filepathForNotice = fileUrl.path
-                } else {
-                    _fileHandle = nil
-                }
-                
-                
-                // Check if there are more than MaxNofFiles in the logfile directory, if so, remove the oldest
-                
-                if maxNofFiles != nil {
-                    
-                    // Get all files that are not hidden
-                    
-                    if let files = try? FileManager.default.contentsOfDirectory(at: directory as URL, includingPropertiesForKeys: nil, options: FileManager.DirectoryEnumerationOptions()) {
-                        
-                        
-                        // Remove all files that do not contain the choosen filename
-                        
-                        let onlyLogfiles = files.compactMap({$0.path.contains(filename) ? $0 : nil})
-                        
-                        if onlyLogfiles.count > maxNofFiles! {
-                            let sortedLogfiles = onlyLogfiles.sorted(by: { $0.lastPathComponent < $1.lastPathComponent })
-                            try? FileManager.default.removeItem(at: sortedLogfiles.first!)
-                        }
-                    }
-                }
-                
-            } else {
-                _fileHandle = nil
-            }
-        }
-        return _fileHandle
-    }
-    
-    
-    /// Create a new filename based on the current time.
-    
-    private var fullFilename: String {
-        return timestampedFilename(name: filename, ext: fileExtension)
-    }
-    
-    
-    // Create a new file URL
-    
-    private var fileUrl: URL? {
-        return directory.appendingPathComponent(fullFilename)
-    }
-    
-    
-    // Keep track of the most recent created file
-    
-    //private(set) var _filepathForNotice: String?
-    
-    
-    /// Close the current logfile immediately (if any)
-    ///
-    /// - Parameter optional: A closure that will be executed immediately before the file is closed. This closure is intended to clean up or reinitialize members when the file is closed. If close, flush or record is called from within the closure, a deadlock will occur.
-    
-    private func _close(cleanup: (() -> ())? = nil) {
-        
-        cleanup?()
-        
-        if let file = self._fileHandle {
-            file.seekToEndOfFile()
-            if let endData = createFileEnd()?.data(using: String.Encoding.utf8, allowLossyConversion: true) { file.write(endData) }
-            file.closeFile()
-            self._fileHandle = nil
-            //self._filepathForNotice = nil
-        }
-    }
-
-}
-
-
 // MARK: - Operational
-
-extension Logfile {
-    
     
     /// Close the logfile.
     ///
@@ -380,4 +286,95 @@ extension Logfile {
     /// Override this function to add a footer when a logfile is closed.
     
     public func createFileEnd() -> String? { return nil }
+
+}
+
+
+
+extension Logfile {
+    
+    
+    /// Returns the current file handle if there is one, or creates a new one if necessary.
+    
+    private var fileHandle: FileHandle? {
+        
+        if _fileHandle == nil {
+            
+            // Create the file
+            
+            if let fileUrl = fileUrl {
+                
+                if FileManager.default.createFile(atPath: fileUrl.path, contents: nil, attributes: [FileAttributeKey(rawValue: FileAttributeKey.posixPermissions.rawValue) : NSNumber(value: 0o640)]) {
+                    _fileHandle = FileHandle(forUpdatingAtPath: fileUrl.path)
+                    if let startData = createFileStart()?.data(using: String.Encoding.utf8, allowLossyConversion: true) { _fileHandle?.write(startData) }
+                    //_filepathForNotice = fileUrl.path
+                } else {
+                    _fileHandle = nil
+                }
+                
+                
+                // Check if there are more than MaxNofFiles in the logfile directory, if so, remove the oldest
+                
+                if maxNofFiles != nil {
+                    
+                    // Get all files that are not hidden
+                    
+                    if let files = try? FileManager.default.contentsOfDirectory(at: directory as URL, includingPropertiesForKeys: nil, options: FileManager.DirectoryEnumerationOptions()) {
+                        
+                        
+                        // Remove all files that do not contain the choosen filename
+                        
+                        let onlyLogfiles = files.compactMap({$0.path.contains(filename) ? $0 : nil})
+                        
+                        if onlyLogfiles.count > maxNofFiles! {
+                            let sortedLogfiles = onlyLogfiles.sorted(by: { $0.lastPathComponent < $1.lastPathComponent })
+                            try? FileManager.default.removeItem(at: sortedLogfiles.first!)
+                        }
+                    }
+                }
+                
+            } else {
+                _fileHandle = nil
+            }
+        }
+        return _fileHandle
+    }
+    
+    
+    /// Create a new filename based on the current time.
+    
+    private var fullFilename: String {
+        return timestampedFilename(name: filename, ext: fileExtension)
+    }
+    
+    
+    // Create a new file URL
+    
+    private var fileUrl: URL? {
+        return directory.appendingPathComponent(fullFilename)
+    }
+    
+    
+    // Keep track of the most recent created file
+    
+    //private(set) var _filepathForNotice: String?
+    
+    
+    /// Close the current logfile immediately (if any)
+    ///
+    /// - Parameter optional: A closure that will be executed immediately before the file is closed. This closure is intended to clean up or reinitialize members when the file is closed. If close, flush or record is called from within the closure, a deadlock will occur.
+    
+    private func _close(cleanup: (() -> ())? = nil) {
+        
+        cleanup?()
+        
+        if let file = self._fileHandle {
+            file.seekToEndOfFile()
+            if let endData = createFileEnd()?.data(using: String.Encoding.utf8, allowLossyConversion: true) { file.write(endData) }
+            file.closeFile()
+            self._fileHandle = nil
+            //self._filepathForNotice = nil
+        }
+    }
+
 }

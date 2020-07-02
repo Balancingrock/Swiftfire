@@ -3,7 +3,7 @@
 //  File:       FileManager.Extensions.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.3.0
+//  Version:    1.3.3
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,12 +36,17 @@
 //
 // History
 //
+// 1.3.3 - Linux compatibility
 // 1.3.0 - Added testFor
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
 //
 // =====================================================================================================================
 
 import Foundation
+
+#if os(Linux)
+    import BRUtils
+#endif
 
 
 public extension FileManager {
@@ -279,7 +284,11 @@ public extension FileManager {
     
     func modificationDateOfFile(atPath path: String) -> Int64? {
 
-        return try? (FileManager.default.attributesOfFileSystem(forPath: path) as NSDictionary).fileModificationDate()?.javaDate
+        guard let fileAttrs = try? FileManager.default.attributesOfItem(atPath: path) as Dictionary else { return nil }
+        
+        guard let modDate = fileAttrs[FileAttributeKey.modificationDate] as? Date else { return nil }
+        
+        return modDate.javaDate
     }
 
     

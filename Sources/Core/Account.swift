@@ -3,7 +3,7 @@
 //  File:       Account.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.3.0
+//  Version:    1.3.3
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.3.3 - Linux compatibility
 // 1.3.0 - Implemented thread protection
 //       - Spilt off the estimated memory consumption protocol into an extension
 //       - Redesigned for easier & faster handling of accounts

@@ -3,7 +3,7 @@
 //  File:       Service.SF.ServerAdmin.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.3.2
+//  Version:    1.3.3
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.3.3 - Linux compatibility
 // 1.3.2 #12 A domain admin account no longer has to be verified for its email account
 //       #10 Made the service public
 // 1.3.0 #7 Removed local filemanager
@@ -89,6 +90,10 @@ import SwifterSockets
 import Http
 import Core
 import Services
+
+#if os(Linux)
+    import Glibc
+#endif
 
 
 // These identifiers are the glue between admin creation/login pages and the code in this function.
@@ -1099,7 +1104,7 @@ fileprivate func executeQuitSwiftfire() {
         httpServer?.stop()
         httpsServer?.stop()
     
-        _ = Darwin.sleep(5)
+        _ = sleep(5)
     
         quitSwiftfire = true
     }
