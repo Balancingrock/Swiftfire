@@ -3,7 +3,7 @@
 //  File:       main.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.3.2
+//  Version:    1.3.3
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.3.3 - Linux compatibility
 // 1.3.2 - Added logging (in global var) of startup time
 //       #10 Moved initialization of server admin services to the main operation.
 // 1.3.0 - Removed DecodePostFormUrlEncoded
@@ -68,7 +69,7 @@ import Custom
 
 fileprivate func emergencyExit(_ message: String) -> Never {
     Log.atEmergency?.log(message)
-    _ = Darwin.sleep(2) // Give the logger some time to do its work
+    _ = sleep(2) // Give the logger some time to do its work
     fatalError(message)
 }
 
@@ -357,7 +358,7 @@ startupTime = Date()
 // Wait for the 'quit' command
 // ===========================
 
-while !quitSwiftfire { _ = Darwin.sleep(2) }
+while !quitSwiftfire { _ = sleep(2) }
 
 httpServer?.stop()
 httpsServer?.stop()
@@ -368,7 +369,7 @@ Log.atNotice?.log("Received quit command, requested the server(s) to stop")
 // The servers should stop processing requests, give active requests time to terminate normally
 // ============================================================================================
 
-_ = Darwin.sleep(10)
+_ = sleep(10)
 
 
 // ================================================
