@@ -3,7 +3,7 @@
 //  File:       RestartHttpAndHttpsServers.swift
 //  Project:    Swiftfire
 //
-//  Version:    1.3.2
+//  Version:    1.3.3
 //
 //  Author:     Marinus van der Lugt
 //  Company:    http://balancingrock.nl
@@ -36,6 +36,7 @@
 //
 // History
 //
+// 1.3.3 - Linux compatibility
 // 1.3.2 #10 signature of rebuildServices changed
 // 1.3.0 - Updated for Swift 5.2
 // 1.0.0 - Raised to v1.0.0, Removed old change log,
@@ -46,6 +47,10 @@ import Foundation
 import SwifterSockets
 import SecureSockets
 import SwifterLog
+
+#if os(Linux)
+    import Glibc
+#endif
 
 
 fileprivate func httpServerErrorHandler(message: String) {
@@ -75,7 +80,7 @@ public func restartHttpAndHttpsServers() {
         
         var waitLimiter = 0
         while httpServer?.isRunning ?? true {
-            _ = Darwin.sleep(1)
+            _ = sleep(1)
             if waitLimiter == 60 { break }
             waitLimiter += 1
         }
@@ -101,7 +106,7 @@ public func restartHttpAndHttpsServers() {
         
         var waitLimiter = 0
         while httpsServer?.isRunning ?? true {
-            _ = Darwin.sleep(1)
+            _ = sleep(1)
             if waitLimiter == 60 { break }
             waitLimiter += 1
         }
