@@ -42,7 +42,7 @@ let package = Package(
                 // Select one of the following
                 //
                 // For macOS
-                .unsafeFlags(["-Lopenssl/v1_1_1g-macos_10_15/lib"])
+                //.unsafeFlags(["-Lopenssl/v1_1_1g-macos_10_15/lib"])
                 //
                 // For Linux (mint 19.3)
                 //.unsafeFlags(["-Lopenssl/v1_1_1g-mint_19_3/lib"])
