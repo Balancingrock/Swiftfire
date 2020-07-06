@@ -4,6 +4,9 @@ import PackageDescription
 
 let package = Package(
     name: "Swiftfire",
+    platforms: [
+        .macOS(.v10_12)
+    ],
     products: [
         .executable(name: "Swiftfire", targets: ["Swiftfire"])
     ],
@@ -20,7 +23,10 @@ let package = Package(
         .target(name: "Functions", dependencies: ["SwifterLog", "Http", "Custom", "Core", "Copenssl", "Services"]),
         .target(name: "Services", dependencies: ["SwifterLog", "Http", "Custom", "Core"]),
         .target(name: "Admin", dependencies: ["Core", "Copenssl", "Functions", "Services"]),
-        .target(name: "Swiftfire", dependencies: ["SwifterLog", "Admin", "Core", "Functions", "Services", "Custom"]
+        .target(
+            name: "Swiftfire",
+            dependencies: ["SwifterLog", "Admin", "Core", "Functions", "Services", "Custom"],
+            linkerSettings: [.linkedLibrary("ssl"), .linkedLibrary("crypto")]
         )
     ]
 )
