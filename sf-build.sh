@@ -1,8 +1,16 @@
 #!/bin/bash
 if [[ "$OSTYPE" == "linux-gnu"* ]]; then
-    swift build -Xswiftc -I"openssl/v1_1_1g-mint_19_3/include" -Xlinker -L"openssl/v1_1_1g-mint_19_3/lib"
+
+    OPENSSL = "openssl/v1_1_1g-mint_19_3"
+
 elif [[ "$OSTYPE" == "darwin"* ]]; then
-    swift build -Xswiftc -I"openssl/v1_1_1g-macos_10_15/include" -Xlinker -L"openssl/v1_1_1g-macos_10_15/lib"
+
+    OPENSSL = "openssl/v1_1_1g-macos_10_15"
+
 else
     echo "Error: Unknown OS"
+    exit 1
 fi
+
+echo "Using openssl path: $OPENSSL"
+swift build -Xswiftc -I"$OPENSSL/include" -Xlinker -L"$OPENSSL/lib"

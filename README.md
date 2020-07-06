@@ -8,7 +8,7 @@ To use Swiftfire as an end-user you need a MacOS computer capable of running at 
 
 To develop Swiftfire extensions you need Xcode as well.
 
-Linux compatibility is envisaged, but not yet actively supported.
+Also builds and runs on Linux (Mint 19.3) with the Swift Ubuntu 18.04 download from [swift.org](https://swift.org/download/).
 
 Visit the Swiftfire homepage at [http://swiftfire.nl](http://swiftfire.nl) for all available documentation.
 
@@ -64,6 +64,7 @@ When a domain is created the domain setup page can be accessed at 'domain-url/se
 
 ## Features
 
+- Builds and runs on MacOS and Linux
 - Allows code injection (HTML and CSS) from functions written in Swift
 - Allows website services to be implemented in Swift 
 - Out of the box support for static websites
@@ -101,18 +102,18 @@ Then switch to the directory containg the project:
 
 The build the project, but first make the build script executable:
 
-    $ chmod +x sf-build.sh
-    $ ./sf-build
+    $ chmod +x *.sh
+    $ ./sf-build.sh
 
 This should build the project without errors.
 
 If the target macOS is before 10.14.4 then it is also necessary to install the [Swift 5 Runtime Support for Command Line Tools](https://support.apple.com/kb/DL1998). This will install a set of libraries into `/usr/lib/swift` among which `libswiftCoreFoundation.dyLib`. When you get an error message -when starting Swiftfire- complaining that this library is missing, install the Swift 5 runtime.
 
-We could stop here, but... the project needs openSSL. And while a compiled version of openSSL is provided with the project, you should not trust this. Make sure to download and install openSSL from the original sources at [openSSL.org](https://openssl.org)
+We could stop here, but... the project needs openSSL. And while pre-compiled versions of openSSL are provided for convenience, you should not trust this for operational use. Make sure to download and install openSSL from the original sources at [openSSL.org](https://openssl.org)
 
-Directions for the installation of openSSL are in the subproject [SecureSockets](https://github.com/balancingrock/SecureSockets). Note that you cannot use an existing installation of openSSL due to some necessary glue code.
+Directions for the installation of openSSL are in the subproject [SecureSockets](https://github.com/balancingrock/SecureSockets).
 
-You will likely enounter some issues with the target release when you have not compiled openSSL for MacOS 10.12, these are easily fixed by setting the corresponding build options.
+Though it is still possible to deploy Swiftfire on MacOS 10.12, this is no longer recommended due to the patches that have to be made on the openSSL source code. If the hardware is incapable of running any macOS higher than 10.12, consider switching to Linux Mint 19.3.
 
 ### Using Xcode
 
@@ -128,13 +129,15 @@ Of course if you have a different paths for the openSSL include and lib paths th
 
 ## Configuring
 
-When Swiftfire is started for the first time, some configuration must be done. You may want to prepare for this by moving the `sfadmin` directory included in the repository to a different location, though it can remain inside the project too.
+When Swiftfire is started for the first time, some configuration must be done. You may want to prepare for this by copying the `sfadmin` and `demo` directories included in the repository to a different location. Though they can remain inside the project, it is less error prone to have these two websites in a different location so that potential changes will not affect an operational scenario.
 
 In the default configuration Swiftfire will listen on port 6678 for incoming connections. Any connection attempt without domains being present will result in the return of a primitive page where the administrator ID and password must be set in addition to the location of the `sfadmin` directory.
 
 Once that is done, Swiftfire can be customized by logging in as admin and using the admin pages.
 
-Note that Swiftfire will store and expect information in the `~/Library/Application Support/Swiftfire` location after it was first started. Some of the logs are in *.txt format, settings are in *.json format (for which we recommend our [proJSON](https://apps.apple.com/app/id1444778157) app) and the visitor statistics are in the *.brbon format. For which there is currently no app available. The BRBON spec however can be found on github including a [BRBON API](https://github.com/Balancingrock/BRBON.git). How to make the visitor statistics available is a subject of discussion.
+Note that Swiftfire will store and expect information in the `~/Library/Application Support/Swiftfire/<<instance-root>>` location after it was first started. Changes to the settings are immediately stored. The `<<instance-root>>` can be used to allow multiple instances of Swiftfire to run in parallel.
+
+Some of the logs are in *.txt format, settings are in *.json format (for which we recommend our [proJSON](https://apps.apple.com/app/id1444778157) app) and the visitor statistics are in the *.brbon format. For which there is currently no app available. The BRBON spec however can be found on github including a [BRBON API](https://github.com/Balancingrock/BRBON.git). How to make the visitor statistics available is a subject of discussion.
 
 ## Making changes
 
@@ -175,6 +178,10 @@ There is a Swiftfire-Jekyll-Theme to quickly setup a (blogging) website that inc
 ## Version history
 
 #### HEAD
+
+#### 1.3.3
+
+- Added linux (mint 19.3) compatibility
 
 #### 1.3.2
 
